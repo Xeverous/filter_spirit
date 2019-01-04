@@ -6,6 +6,7 @@
  * Use BOOST_SPIRIT_DECLARE here.
  */
 #pragma once
+#include "ast.hpp"
 #include <boost/spirit/home/x3.hpp>
 #include <tuple>
 #include <utility>
@@ -14,38 +15,9 @@ namespace fs::parser
 {
 
 namespace x3 = boost::spirit::x3;
-// symbols that denote filter's language constants
-struct booleans_ : x3::symbols<bool>
-{
-	booleans_()
-	{
-		add
-			("True", true)
-			("False", false)
-		;
-	}
 
-};
-const booleans_ booleans;
-
-
-// some constants to aovid code duplication
-constexpr auto keyword_boolean = "Boolean";
-constexpr auto keyword_number  = "Number";
-constexpr auto keyword_true    = "True";
-constexpr auto keyword_false   = "False";
-constexpr auto assignment_operator = '=';
-constexpr auto newline_character   = '\n';
-
-auto set_first = [](auto& ctx){ _val(ctx).first += _attr(ctx); };
-auto set_second = [](auto& ctx){ _val(ctx).second += _attr(ctx); };
-
-using x3::raw;
-using x3::lexeme;
-using x3::alpha;
-using x3::alnum;
-using x3::char_;
-using x3::lit;
+auto set_name  = [](auto& ctx){ _val(ctx).name  = _attr(ctx); };
+auto set_value = [](auto& ctx){ _val(ctx).value = _attr(ctx); };
 
 // Spirit coding style example:
 // - rule ID        : foo_class
@@ -67,19 +39,37 @@ using whitespace_type = x3::rule<class whitespace_class>;
 BOOST_SPIRIT_DECLARE(whitespace_type)
 
 // string
-using string_type = x3::rule<class string_class, std::string>;
-BOOST_SPIRIT_DECLARE(string_type)
+using string_literal_type = x3::rule<class string_literal_class, std::string>;
+BOOST_SPIRIT_DECLARE(string_literal_type)
 
 // boolean definition: Boolean b = True
-using constant_boolean_definition_type = x3::rule<class constant_boolean_definition_class, std::pair<std::string, bool>>;
+using constant_boolean_definition_type = x3::rule<class constant_boolean_definition_class, ast::constant_boolean_definition>;
 BOOST_SPIRIT_DECLARE(constant_boolean_definition_type)
 
 // number definition: Number n = 3
-using constant_number_definition_type = x3::rule<class constant_number_definition_class, std::pair<std::string, int>>;
+using constant_number_definition_type = x3::rule<class constant_number_definition_class, ast::constant_number_definition>;
 BOOST_SPIRIT_DECLARE(constant_number_definition_type)
 
+// Level definition: Level l = 3
+using constant_level_definition_type = x3::rule<class constant_level_definition_class, ast::constant_level_definition>;
+BOOST_SPIRIT_DECLARE(constant_level_definition_type)
+
+// SoundId definition: SoundId si = 3
+using constant_sound_id_definition_type = x3::rule<class constant_sound_id_definition_class, ast::constant_sound_id_definition>;
+BOOST_SPIRIT_DECLARE(constant_sound_id_definition_type)
+
+// Volume definition: Volume v = 300
+using constant_volume_definition_type = x3::rule<class constant_volume_definition_class, ast::constant_volume_definition>;
+BOOST_SPIRIT_DECLARE(constant_volume_definition_type)
+
 // constants
-using constant_definition_type = x3::rule<class constant_definition_class, boost::variant<constant_boolean_definition_type::attribute_type, constant_number_definition_type::attribute_type>>;
+using constant_definition_type = x3::rule<class constant_definition_class, boost::variant<
+	constant_boolean_definition_type::attribute_type,
+	constant_number_definition_type::attribute_type,
+	constant_level_definition_type::attribute_type,
+	constant_sound_id_definition_type::attribute_type,
+	constant_volume_definition_type::attribute_type
+>>;
 BOOST_SPIRIT_DECLARE(constant_definition_type)
 
 // filter language consists of lines, of which every is a comment or some code

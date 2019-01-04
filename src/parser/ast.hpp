@@ -6,19 +6,48 @@
 #pragma once
 
 #include <boost/spirit/home/x3.hpp>
+#include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
 
 namespace fs::ast
 {
 
-struct boolean
+namespace x3 = boost::spirit::x3;
+
+struct constant_boolean_definition : x3::position_tagged
 {
+	std::string name;
 	bool value;
 };
 
-struct number
+struct constant_number_definition : x3::position_tagged
 {
+	std::string name;
 	int value;
 };
+
+struct constant_level_definition : x3::position_tagged
+{
+	std::string name;
+	int value;
+};
+
+struct constant_sound_id_definition : x3::position_tagged
+{
+	std::string name;
+	int value;
+};
+
+struct constant_volume_definition : x3::position_tagged
+{
+	std::string name;
+	int value;
+};
+
+//struct constant_definition : x3::position_tagged
+//{
+//	std::string name;
+//	std::variant<?> value;
+//};
 
 struct level
 {
