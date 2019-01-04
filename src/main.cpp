@@ -1,30 +1,27 @@
 
 #include "utility/utility.hpp"
+#include "parser/ast_adapted.hpp"
 #include "parser/grammar.hpp"
-#include <boost/spirit/home/x3.hpp>
-#include <algorithm>
+
 #include <iostream>
-#include <iterator>
-#include <vector>
-#include <sstream>
 
 bool parse(std::string const& source)
 {
 	namespace x3 = boost::spirit::x3;
 
-	using x3::double_;
-	using x3::phrase_parse;
+	fs::parser::iterator_type it = source.begin();
+	const fs::parser::iterator_type end = source.end();
+	fs::parser::grammar_type::attribute_type data;
 
-	auto it = source.begin();
-
-	const bool result = phrase_parse(
+	const bool result = x3::phrase_parse(
 		it,
-		source.end(),
-		*fs::parser::code_line,
-		fs::parser::whitespace
+		end,
+		fs::grammar(),
+		fs::skipper(),
+		data
 	);
 
-	if (it != source.end()) // fail if we did not get a full match
+	if (it != end) // fail if we did not get a full match
 	{
 		std::cout << "parse failure at pos: " << it - source.begin() << "\n";
 		return false;

@@ -1,3 +1,8 @@
+/**
+ * @file AST definitions
+ *
+ * @brief This file is intended for type definitions that will be used for AST
+ */
 #pragma once
 
 #include <boost/spirit/home/x3.hpp>
@@ -56,7 +61,7 @@ struct rarity
 struct group
 {
 	int r;
-	int b;
+	int g;
 	int b;
 	int w;
 };

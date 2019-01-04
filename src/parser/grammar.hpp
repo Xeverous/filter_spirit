@@ -1,3 +1,10 @@
+/**
+ * @file grammar type definitions
+ *
+ * @details This file is intended for main parser API.
+ * This is the file that all parser source files should include.
+ * Use BOOST_SPIRIT_DECLARE here.
+ */
 #pragma once
 #include <boost/spirit/home/x3.hpp>
 #include <tuple>
@@ -48,51 +55,55 @@ using x3::lit;
 
 // comment - a line that starts with #
 using comment_type = x3::rule<class comment_class>;
-const comment_type comment = "comment";
-const auto comment_def = lexeme['#' >> *(char_ - newline_character)];
-BOOST_SPIRIT_DEFINE(comment)
+BOOST_SPIRIT_DECLARE(comment_type)
 
 // identifier
 using identifier_type = x3::rule<class identifier_class, std::string>;
-const identifier_type identifier = "identifier";
-const auto identifier_def = lexeme[(alpha | '_') >> *(alnum | '_')];
-BOOST_SPIRIT_DEFINE(identifier)
+BOOST_SPIRIT_DECLARE(identifier_type)
 
 // whitespace
 // Filter Spirit grammar skips any whitespace except newline character
 using whitespace_type = x3::rule<class whitespace_class>;
-const whitespace_type whitespace = "whitespace";
-const auto whitespace_def = x3::space - newline_character;
-BOOST_SPIRIT_DEFINE(whitespace)
+BOOST_SPIRIT_DECLARE(whitespace_type)
 
 // string
 using string_type = x3::rule<class string_class, std::string>;
-const string_type string = "string";
-const auto string_def = lexeme['"' >> +(char_ - '"') >> '"'];
-BOOST_SPIRIT_DEFINE(string)
+BOOST_SPIRIT_DECLARE(string_type)
 
 // boolean definition: Boolean b = True
 using constant_boolean_definition_type = x3::rule<class constant_boolean_definition_class, std::pair<std::string, bool>>;
-const constant_boolean_definition_type constant_boolean_definition = "Boolean definition";
-const auto constant_boolean_definition_def = lit(keyword_boolean) >> identifier[set_first] >> lit(assignment_operator) >> booleans[set_second];
-BOOST_SPIRIT_DEFINE(constant_boolean_definition)
+BOOST_SPIRIT_DECLARE(constant_boolean_definition_type)
 
 // number definition: Number n = 3
 using constant_number_definition_type = x3::rule<class constant_number_definition_class, std::pair<std::string, int>>;
-const constant_number_definition_type constant_number_definition = "Number definition";
-const auto constant_number_definition_def = lit(keyword_number) >> identifier[set_first] >> lit(assignment_operator) >> x3::int_[set_second];
-BOOST_SPIRIT_DEFINE(constant_number_definition)
+BOOST_SPIRIT_DECLARE(constant_number_definition_type)
 
 // constants
 using constant_definition_type = x3::rule<class constant_definition_class, boost::variant<constant_boolean_definition_type::attribute_type, constant_number_definition_type::attribute_type>>;
-const constant_definition_type constant_definition = "value definition";
-const auto constant_definition_def = constant_boolean_definition | constant_number_definition;
-BOOST_SPIRIT_DEFINE(constant_definition)
+BOOST_SPIRIT_DECLARE(constant_definition_type)
 
 // filter language consists of lines, of which every is a comment or some code
 using code_line_type = x3::rule<class code_line_class, boost::optional<constant_definition_type::attribute_type>>;
-const code_line_type code_line = "line";
-const auto code_line_def = newline_character | comment | constant_definition;
-BOOST_SPIRIT_DEFINE(code_line)
+BOOST_SPIRIT_DECLARE(code_line_type)
+
+// the entire language grammar
+using grammar_type = x3::rule<class grammar_class, std::vector<code_line_type::attribute_type>>;
+BOOST_SPIRIT_DECLARE(grammar_type)
+
+using skipper_type = whitespace_type;
+
+// Boost Spirit recommends that this should be in a separate config.hpp file but
+// in our case we need skipper type to be visible so we place configuration here
+using iterator_type = std::string::const_iterator;
+using context_type = x3::phrase_parse_context<skipper_type>::type;
+
+
+}
+
+namespace fs
+{
+
+parser::grammar_type grammar();
+parser::skipper_type skipper();
 
 }
