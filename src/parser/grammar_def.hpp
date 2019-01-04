@@ -11,6 +11,15 @@
 namespace fs::parser
 {
 
+const auto set_name  = [](auto& ctx){ _val(ctx).name  = _attr(ctx); };
+const auto set_value = [](auto& ctx){ _val(ctx).value = _attr(ctx); };
+
+// Spirit coding style:
+// - rule ID        : foo_class
+// - rule type      : foo_type
+// - rule definition: foo_def
+// - rule object    : foo
+
 const comment_type comment = "comment";
 const auto comment_def = x3::lexeme['#' >> *(x3::char_ - newline_character)];
 BOOST_SPIRIT_DEFINE(comment)

@@ -2,6 +2,8 @@
  * @file AST adaptations
  *
  * @brief This file is intended only for BOOST_FUSION_ADAPT_STRUCT macros
+ *
+ * @details adaptations must be in global scope
  */
 #pragma once
 

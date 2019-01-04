@@ -95,4 +95,7 @@ struct group
 	int w;
 };
 
+// allow Boost Fusion to pretty print AST types
+using boost::fusion::operator<<;
+
 }

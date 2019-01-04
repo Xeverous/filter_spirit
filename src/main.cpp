@@ -2,33 +2,9 @@
 #include "utility/utility.hpp"
 #include "parser/ast_adapted.hpp"
 #include "parser/grammar.hpp"
+#include "parser/parser.hpp"
 
 #include <iostream>
-
-bool parse(std::string const& source)
-{
-	namespace x3 = boost::spirit::x3;
-
-	fs::parser::iterator_type it = source.begin();
-	const fs::parser::iterator_type end = source.end();
-	fs::parser::grammar_type::attribute_type data;
-
-	const bool result = x3::phrase_parse(
-		it,
-		end,
-		fs::grammar(),
-		fs::skipper(),
-		data
-	);
-
-	if (it != end) // fail if we did not get a full match
-	{
-		std::cout << "parse failure at pos: " << it - source.begin() << "\n";
-		return false;
-	}
-
-	return result;
-}
 
 
 int main(int argc, char* argv[])
@@ -39,7 +15,19 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
-	if (parse(fs::utility::load_file(argv[1]).value()))
+
+	const auto source = fs::utility::load_file(argv[1]);
+	if (!source)
+	{
+		std::cout << "error loading file\n";
+		return -1;
+	}
+
+	auto& input = *source;
+	fs::parser::position_cache positions{input.begin(), input.end()};
+
+	const auto ast = fs::parser::parse(input, positions);
+	if (!ast.empty())
 	{
 		std::cout << "parse successful\n";
 	}
