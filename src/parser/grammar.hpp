@@ -107,9 +107,8 @@ using skipper_type = whitespace_type;
 // in our case we need skipper type to be visible so we place configuration here
 using iterator_type = std::string::const_iterator;
 using position_cache = boost::spirit::x3::position_cache<std::vector<iterator_type>>; // given AST, allows lookup of source code places
-//using phrase_context_type = x3::phrase_parse_context<skipper_type>::type;
-//using context_type = x3::context<x3::error_handler_tag, const std::reference_wrapper<position_cache>, phrase_context_type>;
-using context_type = x3::phrase_parse_context<skipper_type>::type;
+using phrase_context_type = x3::phrase_parse_context<skipper_type>::type;
+using context_type = x3::context<position_cache_tag, std::reference_wrapper<position_cache>, phrase_context_type>;
 
 }
 
