@@ -20,6 +20,10 @@ const auto set_value = [](auto& ctx){ _val(ctx).value = _attr(ctx); };
 // - rule definition: foo_def
 // - rule object    : foo
 
+const whitespace_type whitespace = "whitespace";
+const auto whitespace_def = x3::space - newline_character;
+BOOST_SPIRIT_DEFINE(whitespace)
+
 const comment_type comment = "comment";
 const auto comment_def = x3::lexeme['#' >> *(x3::char_ - newline_character)];
 BOOST_SPIRIT_DEFINE(comment)
@@ -27,10 +31,6 @@ BOOST_SPIRIT_DEFINE(comment)
 const identifier_type identifier = "identifier";
 const auto identifier_def = x3::lexeme[(x3::alpha | '_') >> *(x3::alnum | '_')];
 BOOST_SPIRIT_DEFINE(identifier)
-
-const whitespace_type whitespace = "whitespace";
-const auto whitespace_def = x3::space - newline_character;
-BOOST_SPIRIT_DEFINE(whitespace)
 
 const string_literal_type string_literal = "string";
 const auto string_literal_def = x3::lexeme['"' >> +(x3::char_ - '"') >> '"'];

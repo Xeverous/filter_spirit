@@ -30,21 +30,26 @@ struct annotate_position
 	template <typename T, typename Iterator, typename Context>
 	void on_success(Iterator first, Iterator last, T& ast, const Context& context)
 	{
-		//auto& position_cache = x3::get<position_cache_tag>(context).get();
-		//position_cache.annotate(ast, first, last);
+		auto& position_cache = x3::get<position_cache_tag>(context).get();
+		position_cache.annotate(ast, first, last);
 	}
 };
 
 // rule IDs
 struct comment_class {};
-struct identifier_class {}; //: annotate_position {};
+struct identifier_class : annotate_position {};
 struct whitespace_class {};
-struct string_literal_class {};// : annotate_position {};
+struct string_literal_class : annotate_position {};
 struct constant_boolean_definition_class {};
 struct constant_number_definition_class {};
 struct constant_level_definition_class {};
 struct constant_sound_id_definition_class {};
 struct constant_volume_definition_class {};
+
+// whitespace
+// Filter Spirit grammar skips any whitespace except newline character
+using whitespace_type = x3::rule<whitespace_class>;
+BOOST_SPIRIT_DECLARE(whitespace_type)
 
 // comment - a line that starts with #
 using comment_type = x3::rule<comment_class>;
@@ -53,11 +58,6 @@ BOOST_SPIRIT_DECLARE(comment_type)
 // identifier
 using identifier_type = x3::rule<identifier_class, std::string>;
 BOOST_SPIRIT_DECLARE(identifier_type)
-
-// whitespace
-// Filter Spirit grammar skips any whitespace except newline character
-using whitespace_type = x3::rule<whitespace_class>;
-BOOST_SPIRIT_DECLARE(whitespace_type)
 
 // string
 using string_literal_type = x3::rule<class string_literal_class, std::string>;
