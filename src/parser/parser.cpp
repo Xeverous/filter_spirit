@@ -6,7 +6,7 @@
 namespace fs::parser
 {
 
-fs::ast::ast_type parse(const std::string& source, position_cache& positions)
+fs::ast::ast_type parse(const std::string& source, position_cache& positions, bool& result)
 {
 	iterator_type it = source.begin();
 	const iterator_type end = source.end();
@@ -14,7 +14,7 @@ fs::ast::ast_type parse(const std::string& source, position_cache& positions)
 
 	const auto parser = x3::with<position_cache_tag>(std::ref(positions))[fs::grammar()];
 
-	const bool result = x3::phrase_parse(
+	result = x3::phrase_parse(
 		it,
 		end,
 		parser,
@@ -25,6 +25,7 @@ fs::ast::ast_type parse(const std::string& source, position_cache& positions)
 	if (it != end or !result) // fail if we did not get a full match
 	{
 		std::cout << "parse failure at pos: " << it - source.begin() << "\n";
+		result = false;
 	}
 
 	return ast;
