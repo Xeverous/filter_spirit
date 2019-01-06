@@ -29,33 +29,40 @@ struct printer
 	operator()(const T& ast) const
 	{
 		tab(indent);
-		std::cout << "{\n";
+		std::cout << "[\n";
 		for (const auto& elem : ast)
 		{
 			printer(indent + 1)(elem);
-			std::cout << ",\n";
+			//std::cout << " +\n";
 		}
 		tab(indent);
-		std::cout << "}\n";
+		std::cout << "],\n";
 	}
 
 	template <typename T>
 	std::enable_if_t<std::is_integral_v<T>>
-	operator()(const T& ast) const
+	operator()(const T& integral) const
 	{
 		tab(indent);
-		std::cout << ast << ", ";
+		std::cout << integral;
+		std::cout << ",\n";
 	}
 
 	template <typename T>
 	std::enable_if_t<fs::traits::has_pointer_semantics_v<T>>
 	operator()(const T& obj) const
 	{
-		tab(indent);
 		if (obj)
-			printer(indent + 1)(*obj);
+		{
+			// do not indent optionals (they contain only 1 value)
+			// do not remove extra () - vexing parse
+			(printer(indent))(*obj);
+		}
 		else
-			std::cout << "(empty)";
+		{
+			tab(indent);
+			std::cout << "(empty),\n";
+		}
 	}
 
 	template <typename T>
@@ -63,28 +70,29 @@ struct printer
 	operator()(const T& seq) const
 	{
 		tab(indent);
-		std::cout << "{";
+		std::cout << "{\n";
 		boost::fusion::for_each(
 			seq,
 			[this](const auto& arg) {
 				printer(indent + 1)(arg);
-				std::cout << ", ";
 			}
 		);
-		std::cout << "}";
+		tab(indent);
+		std::cout << "},\n";
 	}
 
 	template <typename... T>
 	void operator()(const boost::spirit::x3::variant<T...>& v) const
 	{
-		boost::apply_visitor(printer(indent + 1), v);
+		// do not indent variants - they hold 1 element only
+		boost::apply_visitor(printer(indent), v);
 	}
 
 	// print strings as strings, do not split them as a sequence of characters
 	void operator()(const std::string& text) const
 	{
 		tab(indent);
-		std::cout << text << "* ";
+		std::cout << text << ",\n";
 	}
 
 	void tab(int spaces) const
@@ -93,7 +101,7 @@ struct printer
 			std::cout << "  ";
 	}
 
-	int indent;
+	const int indent;
 };
 
 }

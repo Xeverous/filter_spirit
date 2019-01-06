@@ -43,26 +43,27 @@ void print_ast(const ast::ast_type& ast)
 	//for (const auto& elem : ast)
 	//	std::cout << elem.value << "\n";
 
-	fs::ast::identifier id;
-	id.value = "abc";
-	fs::ast::boolean b;
-	b.value = true;
-	fs::ast::constant_boolean_definition data;
-	data.name = id;
-	data.value = b;
-	fs::ast::constant_definition d2(data);
+//	fs::ast::identifier id;
+//	id.value = "abc";
+//	fs::ast::boolean b;
+//	b.value = true;
+//	fs::ast::constant_boolean_definition data;
+//	data.name = id;
+//	data.value = b;
+//	fs::ast::constant_definition d2(data);
+//
+//	fs::ast::identifier id2;
+//	id2.value = "abc";
+//	fs::ast::integer i;
+//	i.value = 42;
+//	fs::ast::constant_number_definition num;
+//	num.name = id2;
+//	num.value = i;
+//	fs::ast::constant_definition d3(num);
+//
+//	std::vector<fs::ast::constant_definition> v = { d2, d3 };
 
-	fs::ast::identifier id2;
-	id2.value = "abc";
-	fs::ast::integer i;
-	i.value = 42;
-	fs::ast::constant_number_definition num;
-	num.name = id2;
-	num.value = i;
-	fs::ast::constant_definition d3(num);
-
-	std::vector<fs::ast::constant_definition> v = { d2, d3 };
-
+	//ast::printer()(std::vector<std::vector<std::optional<int>>>{{1,2,{},3,{},4,5},{10, {},20, 30},{{},100, 200,300,{}}});
 	ast::printer()(ast);
 	//std::cout << v;
 	//boost::fusion::for_each(v, [] (const auto& x) { std::cout << x << ", ";});
