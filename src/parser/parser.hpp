@@ -5,6 +5,8 @@
 namespace fs::parser
 {
 
-fs::ast::ast_type parse(const std::string& source, position_cache& positions, bool& result);
+ast::ast_type parse(const std::string& source, position_cache& positions, bool& result);
+
+void print_ast(const ast::ast_type& ast);
 
 }

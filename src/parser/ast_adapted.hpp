@@ -9,6 +9,9 @@
 
 #include "ast.hpp"
 #include <boost/fusion/include/adapt_struct.hpp>
+#include <boost/fusion/include/io.hpp>
+#include <boost/fusion/include/for_each.hpp>
+#include <variant> // std::visit
 
 // core tokens
 
@@ -58,3 +61,15 @@ BOOST_FUSION_ADAPT_STRUCT(
     fs::ast::constant_volume_definition,
     name, value
 )
+
+BOOST_FUSION_ADAPT_STRUCT(
+    fs::ast::code_line,
+    value
+)
+
+namespace fs::ast
+{
+
+
+
+}

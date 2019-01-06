@@ -5,7 +5,6 @@
 #include "parser/parser.hpp"
 
 #include <iostream>
-#include <boost/fusion/include/io.hpp>
 
 
 int main(int argc, char* argv[])
@@ -15,7 +14,6 @@ int main(int argc, char* argv[])
 		std::cout << "usage: " << "./program filepath\n";
 		return -1;
 	}
-
 
 	const auto source = fs::utility::load_file(argv[1]);
 	if (!source)
@@ -32,7 +30,7 @@ int main(int argc, char* argv[])
 	if (result)
 	{
 		std::cout << "parse successful\n";
-		std::cout << ast << "\n";
+		fs::parser::print_ast(ast);
 	}
 	else
 	{

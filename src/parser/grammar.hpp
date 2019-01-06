@@ -74,6 +74,13 @@ BOOST_SPIRIT_DECLARE(identifier_type)
 using string_literal_type = x3::rule<class string_literal_class, ast::string_literal>;
 BOOST_SPIRIT_DECLARE(string_literal_type)
 
+// ----
+
+using integer_value_expression_type = x3::rule<class integer_value_expression_class, ast::integer_value_expression>;
+BOOST_SPIRIT_DECLARE(integer_value_expression_type)
+
+// ----
+
 // boolean definition: Boolean b = True
 using constant_boolean_definition_type = x3::rule<class constant_boolean_definition_class, ast::constant_boolean_definition>;
 BOOST_SPIRIT_DECLARE(constant_boolean_definition_type)
@@ -95,17 +102,11 @@ using constant_volume_definition_type = x3::rule<class constant_volume_definitio
 BOOST_SPIRIT_DECLARE(constant_volume_definition_type)
 
 // constants
-using constant_definition_type = x3::rule<class constant_definition_class, boost::variant<
-	constant_boolean_definition_type::attribute_type,
-	constant_number_definition_type::attribute_type,
-	constant_level_definition_type::attribute_type,
-	constant_sound_id_definition_type::attribute_type,
-	constant_volume_definition_type::attribute_type
->>;
+using constant_definition_type = x3::rule<class constant_definition_class, ast::constant_definition>;
 BOOST_SPIRIT_DECLARE(constant_definition_type)
 
 // filter language consists of lines, of which every is a comment or some code
-using code_line_type = x3::rule<class code_line_class, boost::optional<constant_definition_type::attribute_type>>;
+using code_line_type = x3::rule<class code_line_class, ast::code_line>;
 BOOST_SPIRIT_DECLARE(code_line_type)
 
 // the entire language grammar
@@ -123,12 +124,12 @@ using context_type = x3::context<position_cache_tag, std::reference_wrapper<posi
 
 }
 
-namespace fs::ast
-{
-
-using ast_type = fs::parser::grammar_type::attribute_type;
-
-}
+//namespace fs::ast
+//{
+//
+//using ast_type = fs::parser::grammar_type::attribute_type;
+//
+//}
 
 namespace fs
 {

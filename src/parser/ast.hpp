@@ -9,6 +9,11 @@
 #include <boost/spirit/home/x3/support/ast/variant.hpp>
 #include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
 
+// for pretty-print of AST types
+#include <boost/fusion/sequence/io.hpp>
+#include <boost/fusion/include/io.hpp>
+#include <boost/optional/optional_io.hpp>
+
 namespace fs::ast
 {
 
@@ -38,34 +43,59 @@ struct string_literal : x3::position_tagged
 
 // ----
 
+struct integer_value_expression : x3::variant<integer, identifier>
+{
+	using base_type::base_type;
+	using base_type::operator=;
+};
+
+// ----
+
 struct constant_boolean_definition : x3::position_tagged
 {
 	identifier name;
-	bool value;
+	boolean value;
 };
 
 struct constant_number_definition : x3::position_tagged
 {
 	identifier name;
-	int value;
+	integer_value_expression value;
 };
 
 struct constant_level_definition : x3::position_tagged
 {
 	identifier name;
-	int value;
+	integer_value_expression value;
 };
 
 struct constant_sound_id_definition : x3::position_tagged
 {
 	identifier name;
-	int value;
+	integer_value_expression value;
 };
 
 struct constant_volume_definition : x3::position_tagged
 {
 	identifier name;
-	int value;
+	integer_value_expression value;
+};
+
+struct constant_definition : x3::variant<
+	constant_boolean_definition,
+	constant_number_definition,
+	constant_level_definition,
+	constant_sound_id_definition,
+	constant_volume_definition
+>
+{
+	using base_type::base_type;
+	using base_type::operator=;
+};
+
+struct code_line
+{
+	boost::optional<constant_definition> value;
 };
 
 //struct constant_definition : x3::position_tagged
@@ -122,5 +152,8 @@ struct constant_volume_definition : x3::position_tagged
 
 // allow Boost Fusion to pretty print AST types
 using boost::fusion::operator<<;
+using boost::fusion::operators::operator<<;
+
+using ast_type = std::vector<code_line>;
 
 }
