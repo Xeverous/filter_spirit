@@ -10,6 +10,30 @@
 #include "ast.hpp"
 #include <boost/fusion/include/adapt_struct.hpp>
 
+// core tokens
+
+BOOST_FUSION_ADAPT_STRUCT(
+    fs::ast::identifier,
+    value
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
+    fs::ast::boolean,
+    value
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
+    fs::ast::integer,
+    value
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
+    fs::ast::string_literal,
+    value
+)
+
+// ----
+
 BOOST_FUSION_ADAPT_STRUCT(
     fs::ast::constant_boolean_definition,
     name, value

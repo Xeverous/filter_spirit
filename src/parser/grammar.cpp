@@ -5,6 +5,7 @@
  * Use BOOST_SPIRIT_INSTANTIATE here.
  */
 
+#include "ast_adapted.hpp"
 #include "grammar_def.hpp"
 
 namespace fs::parser

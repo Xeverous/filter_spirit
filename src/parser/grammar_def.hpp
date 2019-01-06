@@ -37,23 +37,23 @@ const auto string_literal_def = x3::lexeme['"' >> +(x3::char_ - '"') >> '"'];
 BOOST_SPIRIT_DEFINE(string_literal)
 
 const constant_boolean_definition_type constant_boolean_definition = "Boolean definition";
-const auto constant_boolean_definition_def = x3::lit(keyword_boolean) >> identifier[set_name] >> x3::lit(assignment_operator) >> booleans[set_value];
+const auto constant_boolean_definition_def = x3::lit(keyword_boolean) >> identifier >> x3::lit(assignment_operator) >> booleans;
 BOOST_SPIRIT_DEFINE(constant_boolean_definition)
 
 const constant_number_definition_type constant_number_definition = "Number definition";
-const auto constant_number_definition_def = x3::lit(keyword_number) >> identifier[set_name] >> x3::lit(assignment_operator) >> x3::int_[set_value];
+const auto constant_number_definition_def = x3::lit(keyword_number) >> identifier >> x3::lit(assignment_operator) >> x3::int_;
 BOOST_SPIRIT_DEFINE(constant_number_definition)
 
 const constant_level_definition_type constant_level_definition = "Level definition";
-const auto constant_level_definition_def = x3::lit(keyword_level) >> identifier[set_name] >> x3::lit(assignment_operator) >> x3::int_[set_value];
+const auto constant_level_definition_def = x3::lit(keyword_level) >> identifier >> x3::lit(assignment_operator) >> x3::int_;
 BOOST_SPIRIT_DEFINE(constant_level_definition)
 
 const constant_sound_id_definition_type constant_sound_id_definition = "SoundId definition";
-const auto constant_sound_id_definition_def = x3::lit(keyword_sound_id) >> identifier[set_name] >> x3::lit(assignment_operator) >> x3::int_[set_value];
+const auto constant_sound_id_definition_def = x3::lit(keyword_sound_id) >> identifier >> x3::lit(assignment_operator) >> x3::int_;
 BOOST_SPIRIT_DEFINE(constant_sound_id_definition)
 
 const constant_volume_definition_type constant_volume_definition = "Volume definition";
-const auto constant_volume_definition_def = x3::lit(keyword_volume) >> identifier[set_name] >> x3::lit(assignment_operator) >> x3::int_[set_value];
+const auto constant_volume_definition_def = x3::lit(keyword_volume) >> identifier >> x3::lit(assignment_operator) >> x3::int_;
 BOOST_SPIRIT_DEFINE(constant_volume_definition)
 
 const constant_definition_type constant_definition = "value definition";

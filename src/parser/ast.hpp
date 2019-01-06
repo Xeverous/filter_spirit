@@ -6,12 +6,37 @@
 #pragma once
 
 #include <boost/spirit/home/x3.hpp>
+#include <boost/spirit/home/x3/support/ast/variant.hpp>
 #include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
 
 namespace fs::ast
 {
 
 namespace x3 = boost::spirit::x3;
+
+// core tokens
+
+struct identifier : x3::position_tagged
+{
+	std::string value;
+};
+
+struct boolean : x3::position_tagged
+{
+	bool value;
+};
+
+struct integer : x3::position_tagged
+{
+	int value;
+};
+
+struct string_literal : x3::position_tagged
+{
+	std::string value;
+};
+
+// ----
 
 struct constant_boolean_definition : x3::position_tagged
 {

@@ -60,7 +60,7 @@ using identifier_type = x3::rule<identifier_class, std::string>;
 BOOST_SPIRIT_DECLARE(identifier_type)
 
 // string
-using string_literal_type = x3::rule<class string_literal_class, std::string>;
+using string_literal_type = x3::rule<class string_literal_class, ast::string_literal>;
 BOOST_SPIRIT_DECLARE(string_literal_type)
 
 // boolean definition: Boolean b = True
