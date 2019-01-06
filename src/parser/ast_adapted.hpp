@@ -13,17 +13,17 @@
 // core tokens
 
 BOOST_FUSION_ADAPT_STRUCT(
-    fs::ast::identifier,
-    value
-)
-
-BOOST_FUSION_ADAPT_STRUCT(
     fs::ast::boolean,
     value
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
     fs::ast::integer,
+    value
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
+    fs::ast::identifier,
     value
 )
 

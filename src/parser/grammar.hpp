@@ -37,9 +37,9 @@ struct annotate_position
 
 // rule IDs
 struct comment_class {};
-struct identifier_class : annotate_position {};
+struct identifier_class {}; //: annotate_position {};
 struct whitespace_class {};
-struct string_literal_class : annotate_position {};
+struct string_literal_class {}; // : annotate_position {};
 struct constant_boolean_definition_class {};
 struct constant_number_definition_class {};
 struct constant_level_definition_class {};
@@ -55,8 +55,14 @@ BOOST_SPIRIT_DECLARE(whitespace_type)
 using comment_type = x3::rule<comment_class>;
 BOOST_SPIRIT_DECLARE(comment_type)
 
+using boolean_type = x3::rule<class boolean_class, ast::boolean>;
+BOOST_SPIRIT_DECLARE(boolean_type)
+
+using integer_type = x3::rule<class integerc_class, ast::integer>;
+BOOST_SPIRIT_DECLARE(integer_type)
+
 // identifier
-using identifier_type = x3::rule<identifier_class, std::string>;
+using identifier_type = x3::rule<identifier_class, std::string>; // FIX to ast::identifier
 BOOST_SPIRIT_DECLARE(identifier_type)
 
 // string

@@ -5,6 +5,7 @@
 #include "parser/parser.hpp"
 
 #include <iostream>
+#include <boost/fusion/include/io.hpp>
 
 
 int main(int argc, char* argv[])
@@ -31,6 +32,7 @@ int main(int argc, char* argv[])
 	if (result)
 	{
 		std::cout << "parse successful\n";
+		std::cout << ast << "\n";
 	}
 	else
 	{
