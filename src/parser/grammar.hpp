@@ -61,8 +61,13 @@ BOOST_SPIRIT_DECLARE(boolean_type)
 using integer_type = x3::rule<class integerc_class, ast::integer>;
 BOOST_SPIRIT_DECLARE(integer_type)
 
-// identifier
-using identifier_type = x3::rule<identifier_class, std::string>; // FIX to ast::identifier
+// identifier has an extra intermediate rule because Spirit for (?) it's container detection reasons
+// can not match identifier grammar with a struct that contains only std::string (compiles only with std::string directly)
+// to workaround, we just add 1 more step with the same grammar
+// https://stackoverflow.com/questions/18166958
+using identifier_impl_type = x3::rule<class identifier_impl_class, std::string>;
+BOOST_SPIRIT_DECLARE(identifier_impl_type)
+using identifier_type = x3::rule<identifier_class, ast::identifier>;
 BOOST_SPIRIT_DECLARE(identifier_type)
 
 // string

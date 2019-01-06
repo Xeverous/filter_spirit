@@ -36,8 +36,12 @@ const integer_type integer = "integer";
 const auto integer_def = x3::int_;
 BOOST_SPIRIT_DEFINE(integer)
 
+const identifier_impl_type identifier_impl = "identifier implementation";
+const auto identifier_impl_def = x3::lexeme[(x3::alpha | '_') >> *(x3::alnum | '_')];
+BOOST_SPIRIT_DEFINE(identifier_impl)
+
 const identifier_type identifier = "identifier";
-const auto identifier_def = x3::lexeme[(x3::alpha | '_') >> *(x3::alnum | '_')];
+const auto identifier_def = identifier_impl;
 BOOST_SPIRIT_DEFINE(identifier)
 
 const string_literal_type string_literal = "string";
