@@ -58,6 +58,21 @@ namespace detail
 		}
 #endif
 
+		// rule of 5 - this is a move-only type
+		type_name_impl(const type_name_impl&) = delete;
+		type_name_impl& operator=(type_name_impl) = delete;
+
+		type_name_impl(type_name_impl&& other) noexcept
+		{
+			std::swap(name, other.name);
+		}
+
+		type_name_impl& operator=(type_name_impl&& other) noexcept
+		{
+			std::swap(name, other.name);
+			return *this;
+		}
+
 		const char* get() const noexcept
 		{
 			if (name != nullptr)
@@ -67,7 +82,7 @@ namespace detail
 		}
 
 	private:
-		const char* name;
+		const char* name = "";
 	};
 
 }
