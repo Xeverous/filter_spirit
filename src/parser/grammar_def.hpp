@@ -58,7 +58,7 @@ const auto constant_boolean_definition_def = x3::lit(keyword_boolean) >> identif
 BOOST_SPIRIT_DEFINE(constant_boolean_definition)
 
 const constant_number_definition_type constant_number_definition = "Number definition";
-const auto constant_number_definition_def = x3::lit(keyword_number) > identifier >> x3::lit(assignment_operator) >> integer_value_expression;
+const auto constant_number_definition_def = x3::lit(keyword_number) >> identifier >> x3::lit(assignment_operator) >> integer_value_expression;
 BOOST_SPIRIT_DEFINE(constant_number_definition)
 
 const constant_level_definition_type constant_level_definition = "Level definition";
