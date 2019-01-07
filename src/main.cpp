@@ -1,11 +1,8 @@
-
 #include "utility/utility.hpp"
 #include "parser/ast_adapted.hpp"
 #include "parser/grammar.hpp"
 #include "parser/parser.hpp"
-
 #include <iostream>
-
 
 int main(int argc, char* argv[])
 {
@@ -23,10 +20,9 @@ int main(int argc, char* argv[])
 	}
 
 	auto& input = *source;
-	fs::parser::position_cache positions{input.begin(), input.end()};
 
 	bool result;
-	const auto ast = fs::parser::parse(input, positions, result);
+	const auto ast = fs::parser::parse(input, result);
 	if (result)
 	{
 		std::cout << "parse successful\n";

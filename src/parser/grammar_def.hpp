@@ -11,9 +11,6 @@
 namespace fs::parser
 {
 
-const auto set_name  = [](auto& ctx){ _val(ctx).name  = _attr(ctx); };
-const auto set_value = [](auto& ctx){ _val(ctx).value = _attr(ctx); };
-
 // Spirit coding style:
 // - rule ID        : foo_class
 // - rule type      : foo_type
@@ -61,7 +58,7 @@ const auto constant_boolean_definition_def = x3::lit(keyword_boolean) >> identif
 BOOST_SPIRIT_DEFINE(constant_boolean_definition)
 
 const constant_number_definition_type constant_number_definition = "Number definition";
-const auto constant_number_definition_def = x3::lit(keyword_number) >> identifier >> x3::lit(assignment_operator) >> integer_value_expression;
+const auto constant_number_definition_def = x3::lit(keyword_number) > identifier >> x3::lit(assignment_operator) >> integer_value_expression;
 BOOST_SPIRIT_DEFINE(constant_number_definition)
 
 const constant_level_definition_type constant_level_definition = "Level definition";
@@ -98,11 +95,13 @@ BOOST_SPIRIT_DEFINE(grammar)
 namespace fs
 {
 
+inline
 parser::grammar_type grammar()
 {
 	return parser::grammar;
 }
 
+inline
 parser::skipper_type skipper()
 {
 	return parser::whitespace;

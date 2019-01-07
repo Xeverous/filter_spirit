@@ -1,6 +1,6 @@
 # comment
 Number num1 = 1
-Number num2 = 2 # d
+Number 2num2 = 2
 Number num3 = b
 
 # comment

@@ -93,7 +93,7 @@ struct constant_definition : x3::variant<
 	using base_type::operator=;
 };
 
-struct code_line
+struct code_line : x3::position_tagged
 {
 	boost::optional<constant_definition> value;
 };
