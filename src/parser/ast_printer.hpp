@@ -1,6 +1,7 @@
 #pragma once
 #include "ast_adapted.hpp"
 #include "utility/type_traits.hpp"
+#include "utility/type_name.hpp"
 #include <boost/fusion/algorithm/iteration/for_each.hpp>
 #include <boost/fusion/include/for_each.hpp>
 #include <iostream>
@@ -29,14 +30,13 @@ struct printer
 	operator()(const T& ast) const
 	{
 		tab(indent);
-		std::cout << "[\n";
+		std::cout << fs::utility::type_name<T>().get() << " [\n";
 		for (const auto& elem : ast)
 		{
 			printer(indent + 1)(elem);
-			//std::cout << " +\n";
 		}
 		tab(indent);
-		std::cout << "],\n";
+		std::cout << "]\n";
 	}
 
 	template <typename T>
@@ -45,7 +45,7 @@ struct printer
 	{
 		tab(indent);
 		std::cout << integral;
-		std::cout << ",\n";
+		std::cout << "\n";
 	}
 
 	template <typename T>
@@ -61,7 +61,7 @@ struct printer
 		else
 		{
 			tab(indent);
-			std::cout << "(empty),\n";
+			std::cout << "(empty)\n";
 		}
 	}
 
@@ -70,7 +70,7 @@ struct printer
 	operator()(const T& seq) const
 	{
 		tab(indent);
-		std::cout << "{\n";
+		std::cout << fs::utility::type_name<T>().get() << " {\n";
 		boost::fusion::for_each(
 			seq,
 			[this](const auto& arg) {
@@ -78,7 +78,7 @@ struct printer
 			}
 		);
 		tab(indent);
-		std::cout << "},\n";
+		std::cout << "}\n";
 	}
 
 	template <typename... T>
@@ -92,10 +92,11 @@ struct printer
 	void operator()(const std::string& text) const
 	{
 		tab(indent);
-		std::cout << text << ",\n";
+		std::cout << text << "\n";
 	}
 
-	void tab(int spaces) const
+	static
+	void tab(int spaces)
 	{
 		for (int i = 0; i < spaces; ++i)
 			std::cout << "  ";

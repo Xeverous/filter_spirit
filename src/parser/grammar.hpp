@@ -105,7 +105,7 @@ BOOST_SPIRIT_DECLARE(constant_volume_definition_type)
 using constant_definition_type = x3::rule<class constant_definition_class, ast::constant_definition>;
 BOOST_SPIRIT_DECLARE(constant_definition_type)
 
-// filter language consists of lines, of which every is a comment or some code
+// filter language consists of lines, of which every is a comment or empty or some code
 using code_line_type = x3::rule<class code_line_class, ast::code_line>;
 BOOST_SPIRIT_DECLARE(code_line_type)
 

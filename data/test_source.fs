@@ -1,10 +1,10 @@
 # comment
-Number a = 1
-Number b = 2
-Number c = 3
+Number num1 = 1
+Number num2 = 2 # d
+Number num3 = b
 
 # comment
-Boolean x = True
-Level l = 10
-Volume v = 300
-SoundId si = 5
+Boolean boolean = True
+Level level = 10
+Volume volume = 300
+SoundId soundId = 5

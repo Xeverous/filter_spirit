@@ -76,7 +76,7 @@ const constant_volume_definition_type constant_volume_definition = "Volume defin
 const auto constant_volume_definition_def = x3::lit(keyword_volume) >> identifier >> x3::lit(assignment_operator) >> integer_value_expression;
 BOOST_SPIRIT_DEFINE(constant_volume_definition)
 
-const constant_definition_type constant_definition = "value definition";
+const constant_definition_type constant_definition = "constant definition";
 const auto constant_definition_def =
 	  constant_boolean_definition
 	| constant_number_definition
