@@ -33,6 +33,11 @@ struct integer : x3::position_tagged
 	int value;
 };
 
+struct opacity : x3::position_tagged
+{
+	boost::optional<integer> value;
+};
+
 struct identifier : x3::position_tagged
 {
 	std::string value;
@@ -51,10 +56,10 @@ struct string_literal : x3::position_tagged
 
 struct color_literal : x3::position_tagged
 {
-	int r;
-	int g;
-	int b;
-	std::optional<int> a;
+	integer r;
+	integer g;
+	integer b;
+	opacity a;
 };
 
 // ----

@@ -25,13 +25,17 @@ const comment_type comment = "comment";
 const auto comment_def = x3::lexeme['#' > *(x3::char_ - newline_character)];
 BOOST_SPIRIT_DEFINE(comment)
 
-const boolean_type boolean = "boolean";
+const boolean_type boolean = "boolean ('True' OR 'False')";
 const auto boolean_def = booleans;
 BOOST_SPIRIT_DEFINE(boolean)
 
 const integer_type integer = "integer";
 const auto integer_def = x3::int_;
 BOOST_SPIRIT_DEFINE(integer)
+
+const opacity_type opacity = "opacity";
+const auto opacity_def = -integer;
+BOOST_SPIRIT_DEFINE(opacity)
 
 const identifier_impl_type identifier_impl = "identifier implementation";
 const auto identifier_impl_def = x3::lexeme[(x3::alpha | '_') > *(x3::alnum | '_')];
@@ -50,7 +54,7 @@ const auto string_literal_def = x3::lexeme['"' >> +(x3::char_ - '"') >> '"'];
 BOOST_SPIRIT_DEFINE(string_literal)
 
 const color_literal_type color_literal = "color (3 or 4 integers)";
-const auto color_literal_def = integer >> integer >> integer >> -integer;
+const auto color_literal_def = integer >> integer >> integer >> opacity;
 BOOST_SPIRIT_DEFINE(color_literal)
 
 // ----

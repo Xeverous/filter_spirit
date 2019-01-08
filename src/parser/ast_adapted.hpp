@@ -11,7 +11,10 @@
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/fusion/include/io.hpp>
 #include <boost/fusion/include/for_each.hpp>
-#include <variant> // std::visit
+// uncomment if adding any such members
+// #include <boost/fusion/include/std_pair.hpp>
+// #include <boost/fusion/include/std_array.hpp>
+// #include <boost/fusion/include/std_tuple.hpp>
 
 // core tokens
 
@@ -22,6 +25,11 @@ BOOST_FUSION_ADAPT_STRUCT(
 
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::ast::integer,
+	value
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::ast::opacity,
 	value
 )
 

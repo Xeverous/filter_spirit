@@ -49,6 +49,7 @@ struct comment_class                      : error_handler, x3::annotate_on_succe
 
 struct boolean_class                      : error_handler, x3::annotate_on_success {};
 struct integer_class                      : error_handler, x3::annotate_on_success {};
+struct opacity_class                      : error_handler, x3::annotate_on_success {};
 struct identifier_impl_class;
 struct identifier_class                   : error_handler, x3::annotate_on_success {};
 struct suit_literal_class                 : error_handler, x3::annotate_on_success {};
@@ -87,6 +88,9 @@ BOOST_SPIRIT_DECLARE(boolean_type)
 
 using integer_type = x3::rule<integer_class, ast::integer>;
 BOOST_SPIRIT_DECLARE(integer_type)
+
+using opacity_type = x3::rule<opacity_class, ast::opacity>;
+BOOST_SPIRIT_DECLARE(opacity_type)
 
 // identifier has an extra intermediate rule because Spirit for (?) it's container detection reasons
 // can not match identifier grammar with a struct that contains only std::string (compiles only with std::string directly)
