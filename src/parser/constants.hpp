@@ -21,6 +21,36 @@ struct booleans_ : x3::symbols<bool>
 };
 const booleans_ booleans;
 
+struct rarities_ : x3::symbols<ast::rarity_type>
+{
+	rarities_()
+	{
+		add
+			("Normal", ast::rarity_type::normal)
+			("Magic",  ast::rarity_type::magic)
+			("Rare",   ast::rarity_type::rare)
+			("Unique", ast::rarity_type::unique)
+		;
+	}
+};
+const rarities_ rarities;
+
+struct shapes_ : x3::symbols<ast::shape_type>
+{
+	shapes_()
+	{
+		add
+			("Circle",   ast::shape_type::circle)
+			("Diamond",  ast::shape_type::diamond)
+			("Hexagon",  ast::shape_type::hexagon)
+			("Square",   ast::shape_type::square)
+			("Star",     ast::shape_type::star)
+			("Triangle", ast::shape_type::triangle)
+		;
+	}
+};
+const shapes_ shapes;
+
 struct suits_ : x3::symbols<ast::suit_type>
 {
 	suits_()
@@ -45,6 +75,8 @@ constexpr auto keyword_number   = "Number";
 constexpr auto keyword_level    = "Level";
 constexpr auto keyword_sound_id = "SoundId";
 constexpr auto keyword_volume   = "Volume";
+constexpr auto keyword_rarity   = "Rarity";
+constexpr auto keyword_shape    = "Shape";
 constexpr auto keyword_suit     = "Suit";
 constexpr auto keyword_color    = "Color";
 constexpr auto keyword_true     = "True";

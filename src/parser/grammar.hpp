@@ -52,11 +52,15 @@ struct integer_class                      : error_handler, x3::annotate_on_succe
 struct opacity_class                      : error_handler, x3::annotate_on_success {};
 struct identifier_impl_class;
 struct identifier_class                   : error_handler, x3::annotate_on_success {};
+struct rarity_literal_class               : error_handler, x3::annotate_on_success {};
+struct shape_literal_class                : error_handler, x3::annotate_on_success {};
 struct suit_literal_class                 : error_handler, x3::annotate_on_success {};
 struct string_literal_class               : error_handler, x3::annotate_on_success {};
 struct color_literal_class                : error_handler, x3::annotate_on_success {};
 
 struct integer_value_expression_class     : error_handler, x3::annotate_on_success {};
+struct rarity_value_expression_class      : error_handler, x3::annotate_on_success {};
+struct shape_value_expression_class       : error_handler, x3::annotate_on_success {};
 struct suit_value_expression_class        : error_handler, x3::annotate_on_success {};
 struct color_value_expression_class       : error_handler, x3::annotate_on_success {};
 
@@ -65,6 +69,8 @@ struct constant_number_definition_class   : error_handler, x3::annotate_on_succe
 struct constant_level_definition_class    : error_handler, x3::annotate_on_success {};
 struct constant_sound_id_definition_class : error_handler, x3::annotate_on_success {};
 struct constant_volume_definition_class   : error_handler, x3::annotate_on_success {};
+struct constant_rarity_definition_class   : error_handler, x3::annotate_on_success {};
+struct constant_shape_definition_class    : error_handler, x3::annotate_on_success {};
 struct constant_suit_definition_class     : error_handler, x3::annotate_on_success {};
 struct constant_color_definition_class    : error_handler, x3::annotate_on_success {};
 
@@ -102,6 +108,12 @@ using identifier_type = x3::rule<identifier_class, ast::identifier>;
 BOOST_SPIRIT_DECLARE(identifier_type)
 
 
+using rarity_literal_type = x3::rule<rarity_literal_class, ast::rarity_literal>;
+BOOST_SPIRIT_DECLARE(rarity_literal_type)
+
+using shape_literal_type = x3::rule<shape_literal_class, ast::shape_literal>;
+BOOST_SPIRIT_DECLARE(shape_literal_type)
+
 using suit_literal_type = x3::rule<suit_literal_class, ast::suit_literal>;
 BOOST_SPIRIT_DECLARE(suit_literal_type)
 
@@ -115,6 +127,12 @@ BOOST_SPIRIT_DECLARE(color_literal_type)
 
 using integer_value_expression_type = x3::rule<integer_value_expression_class, ast::integer_value_expression>;
 BOOST_SPIRIT_DECLARE(integer_value_expression_type)
+
+using rarity_value_expression_type = x3::rule<rarity_value_expression_class, ast::rarity_value_expression>;
+BOOST_SPIRIT_DECLARE(rarity_value_expression_type)
+
+using shape_value_expression_type = x3::rule<shape_value_expression_class, ast::shape_value_expression>;
+BOOST_SPIRIT_DECLARE(shape_value_expression_type)
 
 using suit_value_expression_type = x3::rule<suit_value_expression_class, ast::suit_value_expression>;
 BOOST_SPIRIT_DECLARE(suit_value_expression_type)
@@ -143,6 +161,12 @@ BOOST_SPIRIT_DECLARE(constant_sound_id_definition_type)
 // Volume definition: Volume v = 300
 using constant_volume_definition_type = x3::rule<constant_volume_definition_class, ast::constant_volume_definition>;
 BOOST_SPIRIT_DECLARE(constant_volume_definition_type)
+
+using constant_rarity_definition_type = x3::rule<constant_rarity_definition_class, ast::constant_rarity_definition>;
+BOOST_SPIRIT_DECLARE(constant_rarity_definition_type)
+
+using constant_shape_definition_type = x3::rule<constant_shape_definition_class, ast::constant_shape_definition>;
+BOOST_SPIRIT_DECLARE(constant_shape_definition_type)
 
 using constant_suit_definition_type = x3::rule<constant_suit_definition_class, ast::constant_suit_definition>;
 BOOST_SPIRIT_DECLARE(constant_suit_definition_type)

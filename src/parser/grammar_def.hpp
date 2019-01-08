@@ -45,6 +45,14 @@ const identifier_type identifier = "identifier";
 const auto identifier_def = identifier_impl;
 BOOST_SPIRIT_DEFINE(identifier)
 
+const rarity_literal_type rarity_literal = "rarity literal";
+const auto rarity_literal_def = rarities;
+BOOST_SPIRIT_DEFINE(rarity_literal)
+
+const shape_literal_type shape_literal = "shape literal";
+const auto shape_literal_def = shapes;
+BOOST_SPIRIT_DEFINE(shape_literal)
+
 const suit_literal_type suit_literal = "suit literal";
 const auto suit_literal_def = suits;
 BOOST_SPIRIT_DEFINE(suit_literal)
@@ -62,6 +70,14 @@ BOOST_SPIRIT_DEFINE(color_literal)
 const integer_value_expression_type integer_value_expression = "integer expression";
 const auto integer_value_expression_def = integer | identifier;
 BOOST_SPIRIT_DEFINE(integer_value_expression)
+
+const rarity_value_expression_type rarity_value_expression = "rarity expression";
+const auto rarity_value_expression_def = rarity_literal | identifier;
+BOOST_SPIRIT_DEFINE(rarity_value_expression)
+
+const shape_value_expression_type shape_value_expression = "shape expression";
+const auto shape_value_expression_def = shape_literal | identifier;
+BOOST_SPIRIT_DEFINE(shape_value_expression)
 
 const suit_value_expression_type suit_value_expression = "suit expression";
 const auto suit_value_expression_def = suit_literal | identifier;
@@ -93,6 +109,14 @@ const constant_volume_definition_type constant_volume_definition = "Volume defin
 const auto constant_volume_definition_def = x3::lit(keyword_volume) > identifier > x3::lit(assignment_operator) > integer_value_expression;
 BOOST_SPIRIT_DEFINE(constant_volume_definition)
 
+const constant_rarity_definition_type constant_rarity_definition = "Rarity definition";
+const auto constant_rarity_definition_def = x3::lit(keyword_rarity) > identifier > x3::lit(assignment_operator) > rarity_value_expression;
+BOOST_SPIRIT_DEFINE(constant_rarity_definition)
+
+const constant_shape_definition_type constant_shape_definition = "Shape definition";
+const auto constant_shape_definition_def = x3::lit(keyword_shape) > identifier > x3::lit(assignment_operator) > shape_value_expression;
+BOOST_SPIRIT_DEFINE(constant_shape_definition)
+
 const constant_suit_definition_type constant_suit_definition = "Suit definition";
 const auto constant_suit_definition_def = x3::lit(keyword_suit) > identifier > x3::lit(assignment_operator) > suit_value_expression;
 BOOST_SPIRIT_DEFINE(constant_suit_definition)
@@ -108,6 +132,8 @@ const auto constant_definition_def =
 	| constant_level_definition
 	| constant_sound_id_definition
 	| constant_volume_definition
+	| constant_rarity_definition
+	| constant_shape_definition
 	| constant_suit_definition
 	| constant_color_definition;
 BOOST_SPIRIT_DEFINE(constant_definition)

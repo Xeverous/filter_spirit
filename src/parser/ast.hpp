@@ -43,6 +43,18 @@ struct identifier : x3::position_tagged
 	std::string value;
 };
 
+enum class rarity_type { normal, magic, rare, unique };
+struct rarity_literal : x3::position_tagged
+{
+	rarity_type value;
+};
+
+enum class shape_type { circle, diamond, hexagon, square, star, triangle };
+struct shape_literal : x3::position_tagged
+{
+	shape_type value;
+};
+
 enum class suit_type { red, green, blue, white, brown, yellow };
 struct suit_literal : x3::position_tagged
 {
@@ -65,6 +77,18 @@ struct color_literal : x3::position_tagged
 // ----
 
 struct integer_value_expression : x3::variant<integer, identifier>
+{
+	using base_type::base_type;
+	using base_type::operator=;
+};
+
+struct rarity_value_expression : x3::variant<rarity_literal, identifier>
+{
+	using base_type::base_type;
+	using base_type::operator=;
+};
+
+struct shape_value_expression : x3::variant<shape_literal, identifier>
 {
 	using base_type::base_type;
 	using base_type::operator=;
@@ -114,6 +138,18 @@ struct constant_volume_definition : x3::position_tagged
 	integer_value_expression value;
 };
 
+struct constant_rarity_definition : x3::position_tagged
+{
+	identifier name;
+	rarity_value_expression value;
+};
+
+struct constant_shape_definition : x3::position_tagged
+{
+	identifier name;
+	shape_value_expression value;
+};
+
 struct constant_suit_definition : x3::position_tagged
 {
 	identifier name;
@@ -132,6 +168,8 @@ struct constant_definition : x3::variant<
 	constant_level_definition,
 	constant_sound_id_definition,
 	constant_volume_definition,
+	constant_rarity_definition,
+	constant_shape_definition,
 	constant_suit_definition,
 	constant_color_definition
 >
