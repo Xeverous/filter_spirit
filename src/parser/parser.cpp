@@ -1,4 +1,3 @@
-#include "ast_adapted.hpp"
 #include "parser.hpp"
 #include "grammar.hpp"
 #include "grammar_def.hpp"
