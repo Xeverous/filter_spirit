@@ -27,7 +27,10 @@ ast::ast_type parse(const std::string& source, bool& result)
 
 	if (it != end or !result) // fail if we did not get a full match
 	{
-		std::cout << "parse failure at pos: " << it - source.begin() << "\n";
+		std::cout << "parse failure:\n"
+			"\tstopped at character: #" << it - source.begin() << "\n"
+			"\tconsumed characters :  " << it - source.begin() << "\n"
+			"\tcharacters left     :  " << source.end() - it   << "\n";
 		result = false;
 	}
 

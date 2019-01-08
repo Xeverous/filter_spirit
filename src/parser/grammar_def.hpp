@@ -22,7 +22,7 @@ const auto whitespace_def = x3::space - newline_character;
 BOOST_SPIRIT_DEFINE(whitespace)
 
 const comment_type comment = "comment";
-const auto comment_def = x3::lexeme['#' >> *(x3::char_ - newline_character)];
+const auto comment_def = x3::lexeme['#' > *(x3::char_ - newline_character)];
 BOOST_SPIRIT_DEFINE(comment)
 
 const boolean_type boolean = "boolean";
@@ -34,7 +34,7 @@ const auto integer_def = x3::int_;
 BOOST_SPIRIT_DEFINE(integer)
 
 const identifier_impl_type identifier_impl = "identifier implementation";
-const auto identifier_impl_def = x3::lexeme[(x3::alpha | '_') >> *(x3::alnum | '_')];
+const auto identifier_impl_def = x3::lexeme[(x3::alpha | '_') > *(x3::alnum | '_')];
 BOOST_SPIRIT_DEFINE(identifier_impl)
 
 const identifier_type identifier = "identifier";
@@ -54,23 +54,23 @@ BOOST_SPIRIT_DEFINE(integer_value_expression)
 // ----
 
 const constant_boolean_definition_type constant_boolean_definition = "Boolean definition";
-const auto constant_boolean_definition_def = x3::lit(keyword_boolean) >> identifier >> x3::lit(assignment_operator) >> boolean;
+const auto constant_boolean_definition_def = x3::lit(keyword_boolean) > identifier > x3::lit(assignment_operator) > boolean;
 BOOST_SPIRIT_DEFINE(constant_boolean_definition)
 
 const constant_number_definition_type constant_number_definition = "Number definition";
-const auto constant_number_definition_def = x3::lit(keyword_number) >> identifier >> x3::lit(assignment_operator) >> integer_value_expression;
+const auto constant_number_definition_def = x3::lit(keyword_number) > identifier > x3::lit(assignment_operator) > integer_value_expression;
 BOOST_SPIRIT_DEFINE(constant_number_definition)
 
 const constant_level_definition_type constant_level_definition = "Level definition";
-const auto constant_level_definition_def = x3::lit(keyword_level) >> identifier >> x3::lit(assignment_operator) >> integer_value_expression;
+const auto constant_level_definition_def = x3::lit(keyword_level) > identifier > x3::lit(assignment_operator) > integer_value_expression;
 BOOST_SPIRIT_DEFINE(constant_level_definition)
 
 const constant_sound_id_definition_type constant_sound_id_definition = "SoundId definition";
-const auto constant_sound_id_definition_def = x3::lit(keyword_sound_id) >> identifier >> x3::lit(assignment_operator) >> integer_value_expression;
+const auto constant_sound_id_definition_def = x3::lit(keyword_sound_id) > identifier > x3::lit(assignment_operator) > integer_value_expression;
 BOOST_SPIRIT_DEFINE(constant_sound_id_definition)
 
 const constant_volume_definition_type constant_volume_definition = "Volume definition";
-const auto constant_volume_definition_def = x3::lit(keyword_volume) >> identifier >> x3::lit(assignment_operator) >> integer_value_expression;
+const auto constant_volume_definition_def = x3::lit(keyword_volume) > identifier > x3::lit(assignment_operator) > integer_value_expression;
 BOOST_SPIRIT_DEFINE(constant_volume_definition)
 
 const constant_definition_type constant_definition = "constant definition";
@@ -83,11 +83,11 @@ const auto constant_definition_def =
 BOOST_SPIRIT_DEFINE(constant_definition)
 
 const code_line_type code_line = "line";
-const auto code_line_def = newline_character | comment | constant_definition;
+const auto code_line_def = (constant_definition | x3::eps) >> -comment >> x3::eol;
 BOOST_SPIRIT_DEFINE(code_line)
 
 const grammar_type grammar = "code";
-const auto grammar_def = *code_line;
+const auto grammar_def = *code_line > x3::eoi;
 BOOST_SPIRIT_DEFINE(grammar)
 
 }
