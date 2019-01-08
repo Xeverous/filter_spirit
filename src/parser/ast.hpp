@@ -14,6 +14,8 @@
 #include <boost/fusion/include/io.hpp>
 #include <boost/optional/optional_io.hpp>
 
+#include <optional>
+
 namespace fs::ast
 {
 
@@ -52,7 +54,7 @@ struct color_literal : x3::position_tagged
 	int r;
 	int g;
 	int b;
-	int a;
+	std::optional<int> a;
 };
 
 // ----

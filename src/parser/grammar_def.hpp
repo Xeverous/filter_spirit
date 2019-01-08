@@ -50,7 +50,7 @@ const auto string_literal_def = x3::lexeme['"' >> +(x3::char_ - '"') >> '"'];
 BOOST_SPIRIT_DEFINE(string_literal)
 
 const color_literal_type color_literal = "color (3 or 4 integers)";
-const auto color_literal_def = integer >> integer >> integer >> integer;
+const auto color_literal_def = integer >> integer >> integer >> -integer;
 BOOST_SPIRIT_DEFINE(color_literal)
 
 // ----
