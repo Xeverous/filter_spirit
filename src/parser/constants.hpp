@@ -28,6 +28,7 @@ constexpr auto keyword_number   = "Number";
 constexpr auto keyword_level    = "Level";
 constexpr auto keyword_sound_id = "SoundId";
 constexpr auto keyword_volume   = "Volume";
+constexpr auto keyword_color    = "Color";
 constexpr auto keyword_true     = "True";
 constexpr auto keyword_false    = "False";
 constexpr auto assignment_operator = '=';

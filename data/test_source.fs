@@ -8,6 +8,8 @@ Boolean boolean = True
 Level level = 10
 Volume volume = 300
 SoundId soundId = 5
+Color color = 101 102 103 255
+Color color2 = color
 
 
 # not last comment

@@ -41,9 +41,23 @@ struct string_literal : x3::position_tagged
 	std::string value;
 };
 
+struct color_literal : x3::position_tagged
+{
+	int r;
+	int g;
+	int b;
+	int a;
+};
+
 // ----
 
 struct integer_value_expression : x3::variant<integer, identifier>
+{
+	using base_type::base_type;
+	using base_type::operator=;
+};
+
+struct color_value_expression : x3::variant<color_literal, identifier>
 {
 	using base_type::base_type;
 	using base_type::operator=;
@@ -81,12 +95,19 @@ struct constant_volume_definition : x3::position_tagged
 	integer_value_expression value;
 };
 
+struct constant_color_definition : x3::position_tagged
+{
+	identifier name;
+	color_value_expression value;
+};
+
 struct constant_definition : x3::variant<
 	constant_boolean_definition,
 	constant_number_definition,
 	constant_level_definition,
 	constant_sound_id_definition,
-	constant_volume_definition
+	constant_volume_definition,
+	constant_color_definition
 >
 {
 	using base_type::base_type;
