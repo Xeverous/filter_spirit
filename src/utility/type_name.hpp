@@ -6,7 +6,7 @@
  * Use this way:
  *
  *     type_name<type>().get()
- *     type_name<>(obj).get()
+ *     type_name(obj).get()
  *
  * C++ standard does not place any requiremets on std::type_info::name(),
  * most implementations return mangled name. For GCC, we use their ABI interface

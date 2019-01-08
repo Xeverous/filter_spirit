@@ -16,60 +16,54 @@
 // core tokens
 
 BOOST_FUSION_ADAPT_STRUCT(
-    fs::ast::boolean,
-    value
+	fs::ast::boolean,
+	value
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    fs::ast::integer,
-    value
+	fs::ast::integer,
+	value
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    fs::ast::identifier,
-    value
+	fs::ast::identifier,
+	value
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    fs::ast::string_literal,
-    value
+	fs::ast::string_literal,
+	value
 )
 
 // ----
 
 BOOST_FUSION_ADAPT_STRUCT(
-    fs::ast::constant_boolean_definition,
-    name, value
+	fs::ast::constant_boolean_definition,
+	name, value
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    fs::ast::constant_number_definition,
-    name, value
+	fs::ast::constant_number_definition,
+	name, value
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    fs::ast::constant_level_definition,
-    name, value
+	fs::ast::constant_level_definition,
+	name, value
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    fs::ast::constant_sound_id_definition,
-    name, value
+	fs::ast::constant_sound_id_definition,
+	name, value
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    fs::ast::constant_volume_definition,
-    name, value
+	fs::ast::constant_volume_definition,
+	name, value
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    fs::ast::code_line,
-    value
+	fs::ast::code_line,
+	value
 )
 
-namespace fs::ast
-{
-
-
-
-}

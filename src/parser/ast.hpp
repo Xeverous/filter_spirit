@@ -98,58 +98,6 @@ struct code_line : x3::position_tagged
 	boost::optional<constant_definition> value;
 };
 
-//struct constant_definition : x3::position_tagged
-//{
-//	std::string name;
-//	std::variant<?> value;
-//};
-
-//struct level
-//{
-//	int value;
-//};
-//
-//struct volume_id
-//{
-//	int value;
-//};
-//
-//struct volume
-//{
-//	int value;
-//};
-//
-//struct color
-//{
-//	int r;
-//	int g;
-//	int b;
-//	int a;
-//};
-//
-//struct suit
-//{
-//	// enum?
-//};
-//
-//struct shape
-//{
-//	// enum?
-//};
-//
-//struct rarity
-//{
-//	// enum?
-//};
-//
-//struct group
-//{
-//	int r;
-//	int g;
-//	int b;
-//	int w;
-//};
-
 // allow Boost Fusion to pretty print AST types
 using boost::fusion::operator<<;
 using boost::fusion::operators::operator<<;
