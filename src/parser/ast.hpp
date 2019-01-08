@@ -36,6 +36,12 @@ struct identifier : x3::position_tagged
 	std::string value;
 };
 
+enum class suit_type { red, green, blue, white, brown, yellow };
+struct suit_literal : x3::position_tagged
+{
+	suit_type value;
+};
+
 struct string_literal : x3::position_tagged
 {
 	std::string value;
@@ -52,6 +58,12 @@ struct color_literal : x3::position_tagged
 // ----
 
 struct integer_value_expression : x3::variant<integer, identifier>
+{
+	using base_type::base_type;
+	using base_type::operator=;
+};
+
+struct suit_value_expression : x3::variant<suit_literal, identifier>
 {
 	using base_type::base_type;
 	using base_type::operator=;
@@ -95,6 +107,12 @@ struct constant_volume_definition : x3::position_tagged
 	integer_value_expression value;
 };
 
+struct constant_suit_definition : x3::position_tagged
+{
+	identifier name;
+	suit_value_expression value;
+};
+
 struct constant_color_definition : x3::position_tagged
 {
 	identifier name;
@@ -107,6 +125,7 @@ struct constant_definition : x3::variant<
 	constant_level_definition,
 	constant_sound_id_definition,
 	constant_volume_definition,
+	constant_suit_definition,
 	constant_color_definition
 >
 {

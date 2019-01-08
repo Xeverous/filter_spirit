@@ -41,6 +41,10 @@ const identifier_type identifier = "identifier";
 const auto identifier_def = identifier_impl;
 BOOST_SPIRIT_DEFINE(identifier)
 
+const suit_literal_type suit_literal = "suit literal";
+const auto suit_literal_def = suits;
+BOOST_SPIRIT_DEFINE(suit_literal)
+
 const string_literal_type string_literal = "string";
 const auto string_literal_def = x3::lexeme['"' >> +(x3::char_ - '"') >> '"'];
 BOOST_SPIRIT_DEFINE(string_literal)
@@ -54,6 +58,10 @@ BOOST_SPIRIT_DEFINE(color_literal)
 const integer_value_expression_type integer_value_expression = "integer expression";
 const auto integer_value_expression_def = integer | identifier;
 BOOST_SPIRIT_DEFINE(integer_value_expression)
+
+const suit_value_expression_type suit_value_expression = "suit expression";
+const auto suit_value_expression_def = suit_literal | identifier;
+BOOST_SPIRIT_DEFINE(suit_value_expression)
 
 const color_value_expression_type color_value_expression = "color expression";
 const auto color_value_expression_def = color_literal | identifier;
@@ -81,6 +89,10 @@ const constant_volume_definition_type constant_volume_definition = "Volume defin
 const auto constant_volume_definition_def = x3::lit(keyword_volume) > identifier > x3::lit(assignment_operator) > integer_value_expression;
 BOOST_SPIRIT_DEFINE(constant_volume_definition)
 
+const constant_suit_definition_type constant_suit_definition = "Suit definition";
+const auto constant_suit_definition_def = x3::lit(keyword_suit) > identifier > x3::lit(assignment_operator) > suit_value_expression;
+BOOST_SPIRIT_DEFINE(constant_suit_definition)
+
 const constant_color_definition_type constant_color_definition = "Color definition";
 const auto constant_color_definition_def = x3::lit(keyword_color) > identifier > x3::lit(assignment_operator) > color_value_expression;
 BOOST_SPIRIT_DEFINE(constant_color_definition)
@@ -92,6 +104,7 @@ const auto constant_definition_def =
 	| constant_level_definition
 	| constant_sound_id_definition
 	| constant_volume_definition
+	| constant_suit_definition
 	| constant_color_definition;
 BOOST_SPIRIT_DEFINE(constant_definition)
 

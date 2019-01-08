@@ -51,10 +51,12 @@ struct boolean_class                      : error_handler, x3::annotate_on_succe
 struct integer_class                      : error_handler, x3::annotate_on_success {};
 struct identifier_impl_class;
 struct identifier_class                   : error_handler, x3::annotate_on_success {};
+struct suit_literal_class                 : error_handler, x3::annotate_on_success {};
 struct string_literal_class               : error_handler, x3::annotate_on_success {};
 struct color_literal_class                : error_handler, x3::annotate_on_success {};
 
 struct integer_value_expression_class     : error_handler, x3::annotate_on_success {};
+struct suit_value_expression_class        : error_handler, x3::annotate_on_success {};
 struct color_value_expression_class       : error_handler, x3::annotate_on_success {};
 
 struct constant_boolean_definition_class  : error_handler, x3::annotate_on_success {};
@@ -62,6 +64,7 @@ struct constant_number_definition_class   : error_handler, x3::annotate_on_succe
 struct constant_level_definition_class    : error_handler, x3::annotate_on_success {};
 struct constant_sound_id_definition_class : error_handler, x3::annotate_on_success {};
 struct constant_volume_definition_class   : error_handler, x3::annotate_on_success {};
+struct constant_suit_definition_class     : error_handler, x3::annotate_on_success {};
 struct constant_color_definition_class    : error_handler, x3::annotate_on_success {};
 
 struct constant_definition_class          : error_handler, x3::annotate_on_success {};
@@ -94,7 +97,10 @@ BOOST_SPIRIT_DECLARE(identifier_impl_type)
 using identifier_type = x3::rule<identifier_class, ast::identifier>;
 BOOST_SPIRIT_DECLARE(identifier_type)
 
-// string
+
+using suit_literal_type = x3::rule<suit_literal_class, ast::suit_literal>;
+BOOST_SPIRIT_DECLARE(suit_literal_type)
+
 using string_literal_type = x3::rule<string_literal_class, ast::string_literal>;
 BOOST_SPIRIT_DECLARE(string_literal_type)
 
@@ -105,6 +111,9 @@ BOOST_SPIRIT_DECLARE(color_literal_type)
 
 using integer_value_expression_type = x3::rule<integer_value_expression_class, ast::integer_value_expression>;
 BOOST_SPIRIT_DECLARE(integer_value_expression_type)
+
+using suit_value_expression_type = x3::rule<suit_value_expression_class, ast::suit_value_expression>;
+BOOST_SPIRIT_DECLARE(suit_value_expression_type)
 
 using color_value_expression_type = x3::rule<color_value_expression_class, ast::color_value_expression>;
 BOOST_SPIRIT_DECLARE(color_value_expression_type)
@@ -130,6 +139,9 @@ BOOST_SPIRIT_DECLARE(constant_sound_id_definition_type)
 // Volume definition: Volume v = 300
 using constant_volume_definition_type = x3::rule<constant_volume_definition_class, ast::constant_volume_definition>;
 BOOST_SPIRIT_DECLARE(constant_volume_definition_type)
+
+using constant_suit_definition_type = x3::rule<constant_suit_definition_class, ast::constant_suit_definition>;
+BOOST_SPIRIT_DECLARE(constant_suit_definition_type)
 
 using constant_color_definition_type = x3::rule<constant_color_definition_class, ast::constant_color_definition>;
 BOOST_SPIRIT_DECLARE(constant_color_definition_type)

@@ -81,6 +81,14 @@ struct printer
 		std::cout << "}\n";
 	}
 
+	template <typename T>
+	std::enable_if_t<std::is_enum_v<T>>
+	operator()(T value) const
+	{
+		tab(indent);
+		std::cout << "enum: " << static_cast<int>(value) << "\n";
+	}
+
 	template <typename... T>
 	void operator()(const boost::spirit::x3::variant<T...>& v) const
 	{
@@ -93,6 +101,13 @@ struct printer
 	{
 		tab(indent);
 		std::cout << text << "\n";
+	}
+
+	// lowest priority overload for unmatched Ts
+	template <typename T = void>
+	void operator()(...) const
+	{
+		static_assert(sizeof(T) == 0, "Missing overload for this T");
 	}
 
 	static

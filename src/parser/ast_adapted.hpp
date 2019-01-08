@@ -31,6 +31,11 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
+	fs::ast::suit_literal,
+	value
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
 	fs::ast::string_literal,
 	value
 )
@@ -64,6 +69,11 @@ BOOST_FUSION_ADAPT_STRUCT(
 
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::ast::constant_volume_definition,
+	name, value
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::ast::constant_suit_definition,
 	name, value
 )
 
