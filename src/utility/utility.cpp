@@ -1,5 +1,6 @@
 #include "utility.hpp"
 #include <fstream>
+#include <iterator>
 #include <sys/types.h>
 #include <sys/stat.h>
 

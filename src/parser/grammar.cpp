@@ -12,6 +12,7 @@ namespace fs::parser
 {
 
 BOOST_SPIRIT_INSTANTIATE(grammar_type, iterator_type, context_type)
+BOOST_SPIRIT_INSTANTIATE(skipper_type, iterator_type, boost::spirit::x3::unused_type)
 
 /*
  * If you are getting error: 'undefined reference to bool fs::parser::parse_rule[...]'
@@ -28,5 +29,20 @@ BOOST_SPIRIT_INSTANTIATE(grammar_type, iterator_type, context_type)
 // int x = grammar_type{};
 // int y = iterator_type{};
 // int z = context_type{};
+
+}
+
+namespace fs
+{
+
+parser::grammar_type grammar()
+{
+	return parser::grammar;
+}
+
+parser::skipper_type skipper()
+{
+	return parser::whitespace;
+}
 
 }

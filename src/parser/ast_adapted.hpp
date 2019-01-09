@@ -9,12 +9,21 @@
 
 #include "ast.hpp"
 #include <boost/fusion/include/adapt_struct.hpp>
-#include <boost/fusion/include/io.hpp>
-#include <boost/fusion/include/for_each.hpp>
-// uncomment if adding any such members
+
+// uncomment if adapting any such members
+// but prefer Boost counterparts
 // #include <boost/fusion/include/std_pair.hpp>
 // #include <boost/fusion/include/std_array.hpp>
 // #include <boost/fusion/include/std_tuple.hpp>
+
+// for pretty-print of AST types
+// #include <boost/fusion/include/io.hpp>
+// #include <boost/fusion/sequence/io.hpp>
+// #include <boost/optional/optional_io.hpp>
+
+// allow Boost Fusion to pretty print AST types
+// using boost::fusion::operator<<;
+// using boost::fusion::operators::operator<<;
 
 // core tokens
 

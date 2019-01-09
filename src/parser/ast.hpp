@@ -9,12 +9,14 @@
 #include <boost/spirit/home/x3/support/ast/variant.hpp>
 #include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
 
-// for pretty-print of AST types
-#include <boost/fusion/sequence/io.hpp>
-#include <boost/fusion/include/io.hpp>
-#include <boost/optional/optional_io.hpp>
-
-#include <optional>
+/*
+ * Warning: std::optional and std::tuple are not yet supported,
+ * use Boost counterparts instead.
+ *
+ * Do not use std::variant, inherit from x3::variant instead.
+ *
+ * https://github.com/boostorg/spirit/issues/270
+ */
 
 namespace fs::ast
 {
@@ -182,10 +184,6 @@ struct code_line : x3::position_tagged
 {
 	boost::optional<constant_definition> value;
 };
-
-// allow Boost Fusion to pretty print AST types
-using boost::fusion::operator<<;
-using boost::fusion::operators::operator<<;
 
 using ast_type = std::vector<code_line>;
 

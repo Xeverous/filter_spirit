@@ -148,19 +148,3 @@ BOOST_SPIRIT_DEFINE(grammar)
 
 }
 
-namespace fs
-{
-
-inline
-parser::grammar_type grammar()
-{
-	return parser::grammar;
-}
-
-inline
-parser::skipper_type skipper()
-{
-	return parser::whitespace;
-}
-
-}

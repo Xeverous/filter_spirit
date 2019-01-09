@@ -10,9 +10,7 @@
 #include <boost/spirit/home/x3.hpp>
 #include <boost/spirit/home/x3/support/utility/error_reporting.hpp>
 #include <boost/spirit/home/x3/support/utility/annotate_on_success.hpp>
-#include <tuple>
-#include <utility>
-#include <functional>
+#include <string>
 
 namespace fs::parser
 {
@@ -80,9 +78,16 @@ struct code_line_class                    : error_handler, x3::annotate_on_succe
 
 struct grammar_class                      : error_handler, x3::annotate_on_success {};
 
-// whitespace
-// Filter Spirit grammar skips any whitespace except newline character
-using whitespace_type = x3::rule<class whitespace_class>;
+/*
+ * whitespace
+ * Filter Spirit grammar skips any whitespace except newline character
+ *
+ * Spirit constness bug workaround, see:
+ * https://stackoverflow.com/a/54095167/4818802
+ * https://github.com/boostorg/spirit/pull/347
+ */
+// using whitespace_type = x3::rule<class whitespace_class>;
+using whitespace_type = x3::rule<class whitespace_class, const x3::unused_type>;
 BOOST_SPIRIT_DECLARE(whitespace_type)
 
 // comment - a line that starts with #
