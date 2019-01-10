@@ -40,6 +40,7 @@ struct error_handler
 	}
 };
 
+
 // rule IDs
 // use multiple inheritance to add more handlers
 // rules which do not have any handlers can use forward declared types
@@ -54,6 +55,8 @@ struct rarity_literal_class               : error_handler, x3::annotate_on_succe
 struct shape_literal_class                : error_handler, x3::annotate_on_success {};
 struct suit_literal_class                 : error_handler, x3::annotate_on_success {};
 struct color_literal_class                : error_handler, x3::annotate_on_success {};
+struct group_literal_class                : error_handler, x3::annotate_on_success {};
+struct group_literal_impl_class           : error_handler, x3::annotate_on_success {};
 struct string_literal_class               : error_handler, x3::annotate_on_success {};
 
 struct integer_value_expression_class     : error_handler, x3::annotate_on_success {};
@@ -61,6 +64,7 @@ struct rarity_value_expression_class      : error_handler, x3::annotate_on_succe
 struct shape_value_expression_class       : error_handler, x3::annotate_on_success {};
 struct suit_value_expression_class        : error_handler, x3::annotate_on_success {};
 struct color_value_expression_class       : error_handler, x3::annotate_on_success {};
+struct group_value_expression_class       : error_handler, x3::annotate_on_success {};
 struct string_value_expression_class      : error_handler, x3::annotate_on_success {};
 
 struct constant_boolean_definition_class  : error_handler, x3::annotate_on_success {};
@@ -72,6 +76,7 @@ struct constant_rarity_definition_class   : error_handler, x3::annotate_on_succe
 struct constant_shape_definition_class    : error_handler, x3::annotate_on_success {};
 struct constant_suit_definition_class     : error_handler, x3::annotate_on_success {};
 struct constant_color_definition_class    : error_handler, x3::annotate_on_success {};
+struct constant_group_definition_class    : error_handler, x3::annotate_on_success {};
 struct constant_string_definition_class   : error_handler, x3::annotate_on_success {};
 
 struct constant_definition_class          : error_handler, x3::annotate_on_success {};
@@ -124,11 +129,17 @@ BOOST_SPIRIT_DECLARE(shape_literal_type)
 using suit_literal_type = x3::rule<suit_literal_class, ast::suit_literal>;
 BOOST_SPIRIT_DECLARE(suit_literal_type)
 
-using string_literal_type = x3::rule<string_literal_class, ast::string_literal>;
-BOOST_SPIRIT_DECLARE(string_literal_type)
-
 using color_literal_type = x3::rule<color_literal_class, ast::color_literal>;
 BOOST_SPIRIT_DECLARE(color_literal_type)
+
+// same issue as with integer
+using group_literal_impl_type = x3::rule<group_literal_impl_class, ast::group_literal>;
+BOOST_SPIRIT_DECLARE(group_literal_impl_type)
+using group_literal_type = x3::rule<group_literal_class, ast::group_literal>;
+BOOST_SPIRIT_DECLARE(group_literal_type)
+
+using string_literal_type = x3::rule<string_literal_class, ast::string_literal>;
+BOOST_SPIRIT_DECLARE(string_literal_type)
 
 // ----
 
@@ -146,6 +157,9 @@ BOOST_SPIRIT_DECLARE(suit_value_expression_type)
 
 using color_value_expression_type = x3::rule<color_value_expression_class, ast::color_value_expression>;
 BOOST_SPIRIT_DECLARE(color_value_expression_type)
+
+using group_value_expression_type = x3::rule<group_value_expression_class, ast::group_value_expression>;
+BOOST_SPIRIT_DECLARE(group_value_expression_type)
 
 using string_value_expression_type = x3::rule<string_value_expression_class, ast::string_value_expression>;
 BOOST_SPIRIT_DECLARE(string_value_expression_type)
@@ -183,6 +197,9 @@ BOOST_SPIRIT_DECLARE(constant_suit_definition_type)
 
 using constant_color_definition_type = x3::rule<constant_color_definition_class, ast::constant_color_definition>;
 BOOST_SPIRIT_DECLARE(constant_color_definition_type)
+
+using constant_group_definition_type = x3::rule<constant_group_definition_class, ast::constant_group_definition>;
+BOOST_SPIRIT_DECLARE(constant_group_definition_type)
 
 using constant_string_definition_type = x3::rule<constant_string_definition_class, ast::constant_string_definition>;
 BOOST_SPIRIT_DECLARE(constant_string_definition_type)

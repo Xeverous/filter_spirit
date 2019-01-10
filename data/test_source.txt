@@ -16,6 +16,10 @@ Rarity rarity = Rare
 Shape suit = Hexagon
 String string = "a string"
 String str = string
+Group g1 = RGB
+Group g2 = GBBBBB
+Group g3 = RRRRWW
+Group g4 = g2
 
 
 # not last comment

@@ -63,13 +63,18 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::ast::string_literal,
-	value
+	fs::ast::color_literal,
+	r, g, b, a
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::ast::color_literal,
-	r, g, b, a
+	fs::ast::group_literal,
+	r, g, b, w
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::ast::string_literal,
+	value
 )
 
 // ----
@@ -116,6 +121,11 @@ BOOST_FUSION_ADAPT_STRUCT(
 
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::ast::constant_color_definition,
+	name, value
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::ast::constant_group_definition,
 	name, value
 )
 

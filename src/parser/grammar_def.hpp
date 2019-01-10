@@ -7,6 +7,26 @@
 #pragma once
 #include "grammar.hpp"
 #include "constants.hpp"
+#include "count.hpp"
+#include <type_traits>
+
+namespace
+{
+
+// Validates that a group makes sense. Any color can be specified to appear 0 times,
+// but not all at once as this would form an empty group.
+const auto validate_group = [](auto& context)
+{
+	using attribute_type = std::remove_reference_t<decltype(_attr(context))>;
+	static_assert(
+		std::is_same_v<fs::ast::group_literal, attribute_type>,
+		"Only for validating group type objects");
+
+	if (!_attr(context).has_anything())
+		_pass(context) = false;
+};
+
+}
 
 namespace fs::parser
 {
@@ -57,13 +77,21 @@ const suit_literal_type suit_literal = "suit literal";
 const auto suit_literal_def = suits;
 BOOST_SPIRIT_DEFINE(suit_literal)
 
-const string_literal_type string_literal = "string";
-const auto string_literal_def = x3::lexeme['"' >> +(x3::char_ - '"') >> '"'];
-BOOST_SPIRIT_DEFINE(string_literal)
-
 const color_literal_type color_literal = "color (3 or 4 integers)";
 const auto color_literal_def = integer >> integer >> integer >> opacity;
 BOOST_SPIRIT_DEFINE(color_literal)
+
+const group_literal_impl_type group_literal_impl = "group (R/G/B/W letters in this order)";
+const auto group_literal_impl_def = x3ext::count['R'] >> x3ext::count['G'] >> x3ext::count['B'] >> x3ext::count['W'];
+BOOST_SPIRIT_DEFINE(group_literal_impl)
+
+const group_literal_type group_literal =  group_literal_impl.name;
+const auto group_literal_def = group_literal_impl[validate_group];
+BOOST_SPIRIT_DEFINE(group_literal)
+
+const string_literal_type string_literal = "string";
+const auto string_literal_def = x3::lexeme['"' >> +(x3::char_ - '"') >> '"'];
+BOOST_SPIRIT_DEFINE(string_literal)
 
 // ----
 
@@ -86,6 +114,10 @@ BOOST_SPIRIT_DEFINE(suit_value_expression)
 const color_value_expression_type color_value_expression = "color expression";
 const auto color_value_expression_def = color_literal | identifier;
 BOOST_SPIRIT_DEFINE(color_value_expression)
+
+const group_value_expression_type group_value_expression = "group expression";
+const auto group_value_expression_def = group_literal | identifier;
+BOOST_SPIRIT_DEFINE(group_value_expression)
 
 const string_value_expression_type string_value_expression = "string expression";
 const auto string_value_expression_def = string_literal | identifier;
@@ -129,6 +161,10 @@ const constant_color_definition_type constant_color_definition = "Color definiti
 const auto constant_color_definition_def = x3::lit(keyword_color) > identifier > x3::lit(assignment_operator) > color_value_expression;
 BOOST_SPIRIT_DEFINE(constant_color_definition)
 
+const constant_group_definition_type constant_group_definition = "Group definition";
+const auto constant_group_definition_def = x3::lit(keyword_group) > identifier > x3::lit(assignment_operator) > group_value_expression;
+BOOST_SPIRIT_DEFINE(constant_group_definition)
+
 const constant_string_definition_type constant_string_definition = "String definiton";
 const auto constant_string_definition_def = x3::lit(keyword_string) > identifier > x3::lit(assignment_operator) > string_value_expression;
 BOOST_SPIRIT_DEFINE(constant_string_definition)
@@ -144,6 +180,7 @@ const auto constant_definition_def =
 	| constant_shape_definition
 	| constant_suit_definition
 	| constant_color_definition
+	| constant_group_definition
 	| constant_string_definition;
 BOOST_SPIRIT_DEFINE(constant_definition)
 

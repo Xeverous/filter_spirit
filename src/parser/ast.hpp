@@ -71,6 +71,19 @@ struct color_literal : x3::position_tagged
 	opacity a;
 };
 
+struct group_literal : x3::position_tagged
+{
+	// We do not use 'integer' here as this semantically
+	// is not an integer. It's more like integer::value - here we
+	// just store counts of each color as implementation detail.
+	int r;
+	int g;
+	int b;
+	int w;
+
+	bool has_anything() const { return r != 0 || g != 0 || b != 0 || w != 0; }
+};
+
 struct string_literal : x3::position_tagged
 {
 	std::string value;
@@ -103,6 +116,12 @@ struct suit_value_expression : x3::variant<suit_literal, identifier>
 };
 
 struct color_value_expression : x3::variant<color_literal, identifier>
+{
+	using base_type::base_type;
+	using base_type::operator=;
+};
+
+struct group_value_expression : x3::variant<group_literal, identifier>
 {
 	using base_type::base_type;
 	using base_type::operator=;
@@ -170,6 +189,12 @@ struct constant_color_definition : x3::position_tagged
 	color_value_expression value;
 };
 
+struct constant_group_definition : x3::position_tagged
+{
+	identifier name;
+	group_value_expression value;
+};
+
 struct constant_string_definition : x3::position_tagged
 {
 	identifier name;
@@ -186,6 +211,7 @@ struct constant_definition : x3::variant<
 	constant_shape_definition,
 	constant_suit_definition,
 	constant_color_definition,
+	constant_group_definition,
 	constant_string_definition
 >
 {
