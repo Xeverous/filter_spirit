@@ -63,17 +63,17 @@ struct suit_literal : x3::position_tagged
 	suit_type value;
 };
 
-struct string_literal : x3::position_tagged
-{
-	std::string value;
-};
-
 struct color_literal : x3::position_tagged
 {
 	integer r;
 	integer g;
 	integer b;
 	opacity a;
+};
+
+struct string_literal : x3::position_tagged
+{
+	std::string value;
 };
 
 // ----
@@ -103,6 +103,12 @@ struct suit_value_expression : x3::variant<suit_literal, identifier>
 };
 
 struct color_value_expression : x3::variant<color_literal, identifier>
+{
+	using base_type::base_type;
+	using base_type::operator=;
+};
+
+struct string_value_expression : x3::variant<string_literal, identifier>
 {
 	using base_type::base_type;
 	using base_type::operator=;
@@ -164,6 +170,12 @@ struct constant_color_definition : x3::position_tagged
 	color_value_expression value;
 };
 
+struct constant_string_definition : x3::position_tagged
+{
+	identifier name;
+	string_value_expression value;
+};
+
 struct constant_definition : x3::variant<
 	constant_boolean_definition,
 	constant_number_definition,
@@ -173,7 +185,8 @@ struct constant_definition : x3::variant<
 	constant_rarity_definition,
 	constant_shape_definition,
 	constant_suit_definition,
-	constant_color_definition
+	constant_color_definition,
+	constant_string_definition
 >
 {
 	using base_type::base_type;

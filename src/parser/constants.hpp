@@ -79,6 +79,7 @@ constexpr auto keyword_rarity   = "Rarity";
 constexpr auto keyword_shape    = "Shape";
 constexpr auto keyword_suit     = "Suit";
 constexpr auto keyword_color    = "Color";
+constexpr auto keyword_string   = "String";
 constexpr auto keyword_true     = "True";
 constexpr auto keyword_false    = "False";
 constexpr auto assignment_operator = '=';

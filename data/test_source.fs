@@ -14,6 +14,8 @@ Color color2 = 111 122 133
 Color color3 = color
 Rarity rarity = Rare
 Shape suit = Hexagon
+String string = "a string"
+String str = string
 
 
 # not last comment

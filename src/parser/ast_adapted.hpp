@@ -120,6 +120,11 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
+	fs::ast::constant_string_definition,
+	name, value
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
 	fs::ast::code_line,
 	value
 )

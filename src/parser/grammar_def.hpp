@@ -87,6 +87,10 @@ const color_value_expression_type color_value_expression = "color expression";
 const auto color_value_expression_def = color_literal | identifier;
 BOOST_SPIRIT_DEFINE(color_value_expression)
 
+const string_value_expression_type string_value_expression = "string expression";
+const auto string_value_expression_def = string_literal | identifier;
+BOOST_SPIRIT_DEFINE(string_value_expression)
+
 // ----
 
 const constant_boolean_definition_type constant_boolean_definition = "Boolean definition";
@@ -125,6 +129,10 @@ const constant_color_definition_type constant_color_definition = "Color definiti
 const auto constant_color_definition_def = x3::lit(keyword_color) > identifier > x3::lit(assignment_operator) > color_value_expression;
 BOOST_SPIRIT_DEFINE(constant_color_definition)
 
+const constant_string_definition_type constant_string_definition = "String definiton";
+const auto constant_string_definition_def = x3::lit(keyword_string) > identifier > x3::lit(assignment_operator) > string_value_expression;
+BOOST_SPIRIT_DEFINE(constant_string_definition)
+
 const constant_definition_type constant_definition = "constant definition";
 const auto constant_definition_def =
 	  constant_boolean_definition
@@ -135,7 +143,8 @@ const auto constant_definition_def =
 	| constant_rarity_definition
 	| constant_shape_definition
 	| constant_suit_definition
-	| constant_color_definition;
+	| constant_color_definition
+	| constant_string_definition;
 BOOST_SPIRIT_DEFINE(constant_definition)
 
 const code_line_type code_line = "line";
