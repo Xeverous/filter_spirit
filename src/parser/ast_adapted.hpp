@@ -28,22 +28,17 @@
 // core tokens
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::ast::boolean,
+	fs::ast::boolean_literal,
 	value
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::ast::integer,
+	fs::ast::integer_literal,
 	value
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::ast::opacity,
-	value
-)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::ast::identifier,
+	fs::ast::opacity_literal,
 	value
 )
 
@@ -73,6 +68,11 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
+	fs::ast::identifier,
+	value
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
 	fs::ast::string_literal,
 	value
 )
@@ -80,59 +80,16 @@ BOOST_FUSION_ADAPT_STRUCT(
 // ----
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::ast::constant_boolean_definition,
-	name, value
+	fs::ast::object_type_expression,
+	value
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::ast::constant_number_definition,
-	name, value
+	fs::ast::constant_definition,
+	object_type, name, value
 )
 
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::ast::constant_level_definition,
-	name, value
-)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::ast::constant_sound_id_definition,
-	name, value
-)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::ast::constant_volume_definition,
-	name, value
-)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::ast::constant_rarity_definition,
-	name, value
-)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::ast::constant_shape_definition,
-	name, value
-)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::ast::constant_suit_definition,
-	name, value
-)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::ast::constant_color_definition,
-	name, value
-)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::ast::constant_group_definition,
-	name, value
-)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::ast::constant_string_definition,
-	name, value
-)
+// ----
 
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::ast::code_line,

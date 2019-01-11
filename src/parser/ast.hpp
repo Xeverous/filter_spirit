@@ -25,24 +25,19 @@ namespace x3 = boost::spirit::x3;
 
 // core tokens
 
-struct boolean : x3::position_tagged
+struct boolean_literal : x3::position_tagged
 {
 	bool value;
 };
 
-struct integer : x3::position_tagged
+struct integer_literal : x3::position_tagged
 {
 	int value;
 };
 
-struct opacity : x3::position_tagged
+struct opacity_literal : x3::position_tagged
 {
-	boost::optional<integer> value;
-};
-
-struct identifier : x3::position_tagged
-{
-	std::string value;
+	boost::optional<integer_literal> value;
 };
 
 enum class rarity_type { normal, magic, rare, unique };
@@ -65,16 +60,16 @@ struct suit_literal : x3::position_tagged
 
 struct color_literal : x3::position_tagged
 {
-	integer r;
-	integer g;
-	integer b;
-	opacity a;
+	integer_literal r;
+	integer_literal g;
+	integer_literal b;
+	opacity_literal a;
 };
 
 struct group_literal : x3::position_tagged
 {
-	// We do not use 'integer' here as this semantically
-	// is not an integer. It's more like integer::value - here we
+	// We do not use 'integer_literal' here as this semantically
+	// is not an integer_literal. It's more like integer_literal::value - here we
 	// just store counts of each color as implementation detail.
 	int r;
 	int g;
@@ -84,6 +79,11 @@ struct group_literal : x3::position_tagged
 	bool has_anything() const { return r != 0 || g != 0 || b != 0 || w != 0; }
 };
 
+struct identifier : x3::position_tagged
+{
+	std::string value;
+};
+
 struct string_literal : x3::position_tagged
 {
 	std::string value;
@@ -91,43 +91,37 @@ struct string_literal : x3::position_tagged
 
 // ----
 
-struct integer_value_expression : x3::variant<integer, identifier>
+enum class object_type_type
 {
-	using base_type::base_type;
-	using base_type::operator=;
+	boolean,
+	number,
+	level,
+	sound_id,
+	volume,
+	rarity,
+	shape,
+	suit,
+	color,
+	group,
+	identifier,
+	string
 };
 
-struct rarity_value_expression : x3::variant<rarity_literal, identifier>
+struct object_type_expression : x3::position_tagged
 {
-	using base_type::base_type;
-	using base_type::operator=;
+	object_type_type value;
 };
 
-struct shape_value_expression : x3::variant<shape_literal, identifier>
-{
-	using base_type::base_type;
-	using base_type::operator=;
-};
-
-struct suit_value_expression : x3::variant<suit_literal, identifier>
-{
-	using base_type::base_type;
-	using base_type::operator=;
-};
-
-struct color_value_expression : x3::variant<color_literal, identifier>
-{
-	using base_type::base_type;
-	using base_type::operator=;
-};
-
-struct group_value_expression : x3::variant<group_literal, identifier>
-{
-	using base_type::base_type;
-	using base_type::operator=;
-};
-
-struct string_value_expression : x3::variant<string_literal, identifier>
+struct value_expression : x3::variant<
+		boolean_literal,
+		rarity_literal,
+		shape_literal,
+		suit_literal,
+		color_literal,
+		string_literal,
+		integer_literal,
+		identifier
+	>, x3::position_tagged
 {
 	using base_type::base_type;
 	using base_type::operator=;
@@ -135,89 +129,13 @@ struct string_value_expression : x3::variant<string_literal, identifier>
 
 // ----
 
-struct constant_boolean_definition : x3::position_tagged
+struct constant_definition : x3::position_tagged
 {
+	object_type_expression object_type;
 	identifier name;
-	boolean value;
+	value_expression value;
 };
 
-struct constant_number_definition : x3::position_tagged
-{
-	identifier name;
-	integer_value_expression value;
-};
-
-struct constant_level_definition : x3::position_tagged
-{
-	identifier name;
-	integer_value_expression value;
-};
-
-struct constant_sound_id_definition : x3::position_tagged
-{
-	identifier name;
-	integer_value_expression value;
-};
-
-struct constant_volume_definition : x3::position_tagged
-{
-	identifier name;
-	integer_value_expression value;
-};
-
-struct constant_rarity_definition : x3::position_tagged
-{
-	identifier name;
-	rarity_value_expression value;
-};
-
-struct constant_shape_definition : x3::position_tagged
-{
-	identifier name;
-	shape_value_expression value;
-};
-
-struct constant_suit_definition : x3::position_tagged
-{
-	identifier name;
-	suit_value_expression value;
-};
-
-struct constant_color_definition : x3::position_tagged
-{
-	identifier name;
-	color_value_expression value;
-};
-
-struct constant_group_definition : x3::position_tagged
-{
-	identifier name;
-	group_value_expression value;
-};
-
-struct constant_string_definition : x3::position_tagged
-{
-	identifier name;
-	string_value_expression value;
-};
-
-struct constant_definition : x3::variant<
-	constant_boolean_definition,
-	constant_number_definition,
-	constant_level_definition,
-	constant_sound_id_definition,
-	constant_volume_definition,
-	constant_rarity_definition,
-	constant_shape_definition,
-	constant_suit_definition,
-	constant_color_definition,
-	constant_group_definition,
-	constant_string_definition
->
-{
-	using base_type::base_type;
-	using base_type::operator=;
-};
 
 struct code_line : x3::position_tagged
 {

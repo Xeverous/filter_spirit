@@ -49,36 +49,18 @@ struct comment_class                      : error_handler, x3::annotate_on_succe
 struct boolean_class                      : error_handler, x3::annotate_on_success {};
 struct integer_class                      : error_handler, x3::annotate_on_success {};
 struct opacity_class                      : error_handler, x3::annotate_on_success {};
-struct identifier_impl_class;
-struct identifier_class                   : error_handler, x3::annotate_on_success {};
 struct rarity_literal_class               : error_handler, x3::annotate_on_success {};
 struct shape_literal_class                : error_handler, x3::annotate_on_success {};
 struct suit_literal_class                 : error_handler, x3::annotate_on_success {};
 struct color_literal_class                : error_handler, x3::annotate_on_success {};
 struct group_literal_class                : error_handler, x3::annotate_on_success {};
 struct group_literal_impl_class           : error_handler, x3::annotate_on_success {};
+struct identifier_impl_class;
+struct identifier_class                   : error_handler, x3::annotate_on_success {};
 struct string_literal_class               : error_handler, x3::annotate_on_success {};
 
-struct integer_value_expression_class     : error_handler, x3::annotate_on_success {};
-struct rarity_value_expression_class      : error_handler, x3::annotate_on_success {};
-struct shape_value_expression_class       : error_handler, x3::annotate_on_success {};
-struct suit_value_expression_class        : error_handler, x3::annotate_on_success {};
-struct color_value_expression_class       : error_handler, x3::annotate_on_success {};
-struct group_value_expression_class       : error_handler, x3::annotate_on_success {};
-struct string_value_expression_class      : error_handler, x3::annotate_on_success {};
-
-struct constant_boolean_definition_class  : error_handler, x3::annotate_on_success {};
-struct constant_number_definition_class   : error_handler, x3::annotate_on_success {};
-struct constant_level_definition_class    : error_handler, x3::annotate_on_success {};
-struct constant_sound_id_definition_class : error_handler, x3::annotate_on_success {};
-struct constant_volume_definition_class   : error_handler, x3::annotate_on_success {};
-struct constant_rarity_definition_class   : error_handler, x3::annotate_on_success {};
-struct constant_shape_definition_class    : error_handler, x3::annotate_on_success {};
-struct constant_suit_definition_class     : error_handler, x3::annotate_on_success {};
-struct constant_color_definition_class    : error_handler, x3::annotate_on_success {};
-struct constant_group_definition_class    : error_handler, x3::annotate_on_success {};
-struct constant_string_definition_class   : error_handler, x3::annotate_on_success {};
-
+struct object_type_expression_class       : error_handler, x3::annotate_on_success {};
+struct value_expression_class             : error_handler, x3::annotate_on_success {};
 struct constant_definition_class          : error_handler, x3::annotate_on_success {};
 
 struct code_line_class                    : error_handler, x3::annotate_on_success {};
@@ -101,23 +83,14 @@ BOOST_SPIRIT_DECLARE(whitespace_type)
 using comment_type = x3::rule<comment_class>;
 BOOST_SPIRIT_DECLARE(comment_type)
 
-using boolean_type = x3::rule<boolean_class, ast::boolean>;
+using boolean_type = x3::rule<boolean_class, ast::boolean_literal>;
 BOOST_SPIRIT_DECLARE(boolean_type)
 
-using integer_type = x3::rule<integer_class, ast::integer>;
+using integer_type = x3::rule<integer_class, ast::integer_literal>;
 BOOST_SPIRIT_DECLARE(integer_type)
 
-using opacity_type = x3::rule<opacity_class, ast::opacity>;
+using opacity_type = x3::rule<opacity_class, ast::opacity_literal>;
 BOOST_SPIRIT_DECLARE(opacity_type)
-
-// identifier has an extra intermediate rule because Spirit for (?) it's container detection reasons
-// can not match identifier grammar with a struct that contains only std::string (compiles only with std::string directly)
-// to workaround, we just add 1 more step with the same grammar
-// https://stackoverflow.com/questions/18166958
-using identifier_impl_type = x3::rule<identifier_impl_class, std::string>;
-BOOST_SPIRIT_DECLARE(identifier_impl_type)
-using identifier_type = x3::rule<identifier_class, ast::identifier>;
-BOOST_SPIRIT_DECLARE(identifier_type)
 
 
 using rarity_literal_type = x3::rule<rarity_literal_class, ast::rarity_literal>;
@@ -132,79 +105,32 @@ BOOST_SPIRIT_DECLARE(suit_literal_type)
 using color_literal_type = x3::rule<color_literal_class, ast::color_literal>;
 BOOST_SPIRIT_DECLARE(color_literal_type)
 
-// same issue as with integer
+// same issue as with integer_literal
 using group_literal_impl_type = x3::rule<group_literal_impl_class, ast::group_literal>;
 BOOST_SPIRIT_DECLARE(group_literal_impl_type)
 using group_literal_type = x3::rule<group_literal_class, ast::group_literal>;
 BOOST_SPIRIT_DECLARE(group_literal_type)
+
+// identifier has an extra intermediate rule because Spirit for (?) it's container detection reasons
+// can not match identifier grammar with a struct that contains only std::string (compiles only with std::string directly)
+// to workaround, we just add 1 more step with the same grammar
+// https://stackoverflow.com/questions/18166958
+using identifier_impl_type = x3::rule<identifier_impl_class, std::string>;
+BOOST_SPIRIT_DECLARE(identifier_impl_type)
+using identifier_type = x3::rule<identifier_class, ast::identifier>;
+BOOST_SPIRIT_DECLARE(identifier_type)
 
 using string_literal_type = x3::rule<string_literal_class, ast::string_literal>;
 BOOST_SPIRIT_DECLARE(string_literal_type)
 
 // ----
 
-using integer_value_expression_type = x3::rule<integer_value_expression_class, ast::integer_value_expression>;
-BOOST_SPIRIT_DECLARE(integer_value_expression_type)
+using object_type_expression_type = x3::rule<object_type_expression_class, ast::object_type_expression>;
+BOOST_SPIRIT_DECLARE(object_type_expression_type)
 
-using rarity_value_expression_type = x3::rule<rarity_value_expression_class, ast::rarity_value_expression>;
-BOOST_SPIRIT_DECLARE(rarity_value_expression_type)
+using value_expression_type = x3::rule<value_expression_class, ast::value_expression>;
+BOOST_SPIRIT_DECLARE(value_expression_type)
 
-using shape_value_expression_type = x3::rule<shape_value_expression_class, ast::shape_value_expression>;
-BOOST_SPIRIT_DECLARE(shape_value_expression_type)
-
-using suit_value_expression_type = x3::rule<suit_value_expression_class, ast::suit_value_expression>;
-BOOST_SPIRIT_DECLARE(suit_value_expression_type)
-
-using color_value_expression_type = x3::rule<color_value_expression_class, ast::color_value_expression>;
-BOOST_SPIRIT_DECLARE(color_value_expression_type)
-
-using group_value_expression_type = x3::rule<group_value_expression_class, ast::group_value_expression>;
-BOOST_SPIRIT_DECLARE(group_value_expression_type)
-
-using string_value_expression_type = x3::rule<string_value_expression_class, ast::string_value_expression>;
-BOOST_SPIRIT_DECLARE(string_value_expression_type)
-
-// ----
-
-// boolean definition: Boolean b = True
-using constant_boolean_definition_type = x3::rule<constant_boolean_definition_class, ast::constant_boolean_definition>;
-BOOST_SPIRIT_DECLARE(constant_boolean_definition_type)
-
-// number definition: Number n = 3
-using constant_number_definition_type = x3::rule<constant_number_definition_class, ast::constant_number_definition>;
-BOOST_SPIRIT_DECLARE(constant_number_definition_type)
-
-// Level definition: Level l = 3
-using constant_level_definition_type = x3::rule<constant_level_definition_class, ast::constant_level_definition>;
-BOOST_SPIRIT_DECLARE(constant_level_definition_type)
-
-// SoundId definition: SoundId si = 3
-using constant_sound_id_definition_type = x3::rule<constant_sound_id_definition_class, ast::constant_sound_id_definition>;
-BOOST_SPIRIT_DECLARE(constant_sound_id_definition_type)
-
-// Volume definition: Volume v = 300
-using constant_volume_definition_type = x3::rule<constant_volume_definition_class, ast::constant_volume_definition>;
-BOOST_SPIRIT_DECLARE(constant_volume_definition_type)
-
-using constant_rarity_definition_type = x3::rule<constant_rarity_definition_class, ast::constant_rarity_definition>;
-BOOST_SPIRIT_DECLARE(constant_rarity_definition_type)
-
-using constant_shape_definition_type = x3::rule<constant_shape_definition_class, ast::constant_shape_definition>;
-BOOST_SPIRIT_DECLARE(constant_shape_definition_type)
-
-using constant_suit_definition_type = x3::rule<constant_suit_definition_class, ast::constant_suit_definition>;
-BOOST_SPIRIT_DECLARE(constant_suit_definition_type)
-
-using constant_color_definition_type = x3::rule<constant_color_definition_class, ast::constant_color_definition>;
-BOOST_SPIRIT_DECLARE(constant_color_definition_type)
-
-using constant_group_definition_type = x3::rule<constant_group_definition_class, ast::constant_group_definition>;
-BOOST_SPIRIT_DECLARE(constant_group_definition_type)
-
-using constant_string_definition_type = x3::rule<constant_string_definition_class, ast::constant_string_definition>;
-BOOST_SPIRIT_DECLARE(constant_string_definition_type)
-
-// constants
 using constant_definition_type = x3::rule<constant_definition_class, ast::constant_definition>;
 BOOST_SPIRIT_DECLARE(constant_definition_type)
 
