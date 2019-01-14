@@ -1,5 +1,5 @@
 #pragma once
-
+#include "ast.hpp"
 #include <boost/spirit/home/x3.hpp>
 
 namespace fs::parser
@@ -68,21 +68,43 @@ struct suits_ : x3::symbols<ast::suit_type>
 };
 const suits_ suits;
 
+namespace keywords
+{
+	constexpr auto boolean  = "Boolean";
+	constexpr auto number   = "Number";
+	constexpr auto level    = "Level";
+	constexpr auto sound_id = "SoundId";
+	constexpr auto volume   = "Volume";
+	constexpr auto rarity   = "Rarity";
+	constexpr auto shape    = "Shape";
+	constexpr auto suit     = "Suit";
+	constexpr auto color    = "Color";
+	constexpr auto group    = "Group";
+	constexpr auto string   = "String";
+}
 
-// some constants to aovid code duplication
-constexpr auto keyword_boolean  = "Boolean";
-constexpr auto keyword_number   = "Number";
-constexpr auto keyword_level    = "Level";
-constexpr auto keyword_sound_id = "SoundId";
-constexpr auto keyword_volume   = "Volume";
-constexpr auto keyword_rarity   = "Rarity";
-constexpr auto keyword_shape    = "Shape";
-constexpr auto keyword_suit     = "Suit";
-constexpr auto keyword_color    = "Color";
-constexpr auto keyword_group    = "Group";
-constexpr auto keyword_string   = "String";
-constexpr auto keyword_true     = "True";
-constexpr auto keyword_false    = "False";
+struct object_types_ : x3::symbols<ast::object_type_type>
+{
+	object_types_()
+	{
+		add
+			(keywords::boolean,  ast::object_type_type::boolean)
+			(keywords::number,   ast::object_type_type::number)
+			(keywords::level,    ast::object_type_type::level)
+			(keywords::sound_id, ast::object_type_type::sound_id)
+			(keywords::volume,   ast::object_type_type::volume)
+			(keywords::rarity,   ast::object_type_type::rarity)
+			(keywords::shape,    ast::object_type_type::shape)
+			(keywords::suit,     ast::object_type_type::suit)
+			(keywords::color,    ast::object_type_type::color)
+			(keywords::group,    ast::object_type_type::group)
+			(keywords::string,   ast::object_type_type::string)
+		;
+	}
+};
+const object_types_ object_types;
+
+
 constexpr auto assignment_operator = '=';
 constexpr auto newline_character   = '\n';
 
