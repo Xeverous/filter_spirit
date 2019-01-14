@@ -7,7 +7,7 @@
  */
 #pragma once
 
-#include "ast.hpp"
+#include "parser/ast.hpp"
 #include <boost/fusion/include/adapt_struct.hpp>
 
 // uncomment if adapting any such members
@@ -28,71 +28,71 @@
 // core tokens
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::ast::boolean_literal,
+	fs::parser::ast::boolean_literal,
 	value
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::ast::integer_literal,
+	fs::parser::ast::integer_literal,
 	value
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::ast::opacity_literal,
+	fs::parser::ast::opacity_literal,
 	value
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::ast::rarity_literal,
+	fs::parser::ast::rarity_literal,
 	value
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::ast::shape_literal,
+	fs::parser::ast::shape_literal,
 	value
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::ast::suit_literal,
+	fs::parser::ast::suit_literal,
 	value
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::ast::color_literal,
+	fs::parser::ast::color_literal,
 	r, g, b, a
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::ast::group_literal,
+	fs::parser::ast::group_literal,
 	r, g, b, w
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::ast::identifier,
+	fs::parser::ast::identifier,
 	value
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::ast::string_literal,
+	fs::parser::ast::string_literal,
 	value
 )
 
 // ----
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::ast::object_type_expression,
+	fs::parser::ast::object_type_expression,
 	value
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::ast::constant_definition,
+	fs::parser::ast::constant_definition,
 	object_type, name, value
 )
 
 // ----
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::ast::code_line,
+	fs::parser::ast::code_line,
 	value
 )
 

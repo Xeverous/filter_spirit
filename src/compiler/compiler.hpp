@@ -1,25 +1,16 @@
 #pragma once
 #include "parser/parser.hpp"
+#include "compiler/ast.hpp"
+#include "compiler/error.hpp"
 #include <string>
-#include <utility>
+#include <unordered_map>
+#include <variant>
 
-namespace fs
+namespace fs::compiler
 {
 
-class compiler
-{
-public:
-	compiler(std::string file_content)
-	: file_content(std::move(file_content))
-	{
-	}
+using constants_map = std::unordered_map<std::string, ast::object_type>;
 
-	bool compile();
-
-private:
-	bool semantic_analysis(const ast::ast_type& ast);
-
-	std::string file_content;
-};
+std::variant<constants_map, error_type> parse_constants(const parser::ast::ast_type& ast);
 
 }

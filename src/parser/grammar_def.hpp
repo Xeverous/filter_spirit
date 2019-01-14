@@ -5,9 +5,9 @@
  * Use BOOST_SPIRIT_DEFINE here.
  */
 #pragma once
-#include "grammar.hpp"
-#include "constants.hpp"
-#include "count.hpp"
+#include "parser/grammar.hpp"
+#include "parser/constants.hpp"
+#include "parser/count.hpp"
 #include <type_traits>
 
 namespace
@@ -19,7 +19,7 @@ const auto validate_group = [](auto& context)
 {
 	using attribute_type = std::remove_reference_t<decltype(_attr(context))>;
 	static_assert(
-		std::is_same_v<fs::ast::group_literal, attribute_type>,
+		std::is_same_v<fs::parser::ast::group_literal, attribute_type>,
 		"Only for validating group type objects");
 
 	if (!_attr(context).has_anything())

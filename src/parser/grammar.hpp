@@ -6,7 +6,7 @@
  * Use BOOST_SPIRIT_DECLARE here.
  */
 #pragma once
-#include "ast.hpp"
+#include "parser/ast.hpp"
 #include <boost/spirit/home/x3.hpp>
 #include <boost/spirit/home/x3/support/utility/error_reporting.hpp>
 #include <boost/spirit/home/x3/support/utility/annotate_on_success.hpp>

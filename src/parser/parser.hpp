@@ -1,6 +1,6 @@
 #pragma once
 
-#include "grammar.hpp"
+#include "parser/grammar.hpp"
 
 namespace fs::parser
 {

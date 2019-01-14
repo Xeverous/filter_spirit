@@ -1,6 +1,6 @@
-#include "parser.hpp"
-#include "grammar.hpp"
-#include "ast_printer.hpp"
+#include "parser/parser.hpp"
+#include "parser/grammar.hpp"
+#include "parser/ast_printer.hpp"
 #include <iostream>
 
 namespace fs::parser
@@ -10,7 +10,7 @@ ast::ast_type parse(const std::string& source, bool& result)
 {
 	iterator_type it = source.begin();
 	const iterator_type end = source.end();
-	fs::ast::ast_type ast;
+	fs::parser::ast::ast_type ast;
 	error_handler_type error_handler(it, end, std::cerr);
 	const auto parser = x3::with<x3::error_handler_tag>(std::ref(error_handler))[fs::grammar()];
 

@@ -18,7 +18,7 @@
  * https://github.com/boostorg/spirit/issues/270
  */
 
-namespace fs::ast
+namespace fs::parser::ast
 {
 
 namespace x3 = boost::spirit::x3;

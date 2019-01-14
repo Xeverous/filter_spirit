@@ -1,5 +1,5 @@
 #pragma once
-#include "ast.hpp"
+#include "parser/ast.hpp"
 #include <boost/spirit/home/x3.hpp>
 
 namespace fs::parser

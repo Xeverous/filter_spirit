@@ -1,5 +1,5 @@
 #pragma once
-#include "ast_adapted.hpp"
+#include "parser/ast_adapted.hpp"
 #include "utility/type_traits.hpp"
 #include "utility/type_name.hpp"
 #include <boost/fusion/algorithm/iteration/for_each.hpp>
@@ -17,7 +17,7 @@
 #endif // __CDT_PARSER__
 
 
-namespace fs::ast
+namespace fs::parser::ast
 {
 
 // recursive printer for the whole AST
