@@ -4,7 +4,6 @@
  * @details This file is intended for compilation of grammar objects.
  * Use BOOST_SPIRIT_INSTANTIATE here.
  */
-
 #include "parser/ast_adapted.hpp"
 #include "parser/grammar_def.hpp"
 

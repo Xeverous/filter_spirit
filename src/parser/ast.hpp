@@ -4,7 +4,7 @@
  * @brief This file is intended for type definitions that will be used for AST
  */
 #pragma once
-
+#include "lang/types.hpp"
 #include <boost/spirit/home/x3.hpp>
 #include <boost/spirit/home/x3/support/ast/variant.hpp>
 #include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
@@ -40,22 +40,20 @@ struct opacity_literal : x3::position_tagged
 	boost::optional<integer_literal> value;
 };
 
-enum class rarity_type { normal, magic, rare, unique };
 struct rarity_literal : x3::position_tagged
 {
-	rarity_type value;
+	lang::rarity value;
 };
 
-enum class shape_type { circle, diamond, hexagon, square, star, triangle };
+
 struct shape_literal : x3::position_tagged
 {
-	shape_type value;
+	lang::shape value;
 };
 
-enum class suit_type { red, green, blue, white, brown, yellow };
 struct suit_literal : x3::position_tagged
 {
-	suit_type value;
+	lang::suit value;
 };
 
 struct color_literal : x3::position_tagged
@@ -64,6 +62,21 @@ struct color_literal : x3::position_tagged
 	integer_literal g;
 	integer_literal b;
 	opacity_literal a;
+
+	lang::color to_lang_color() const
+	{
+		fs::lang::color result;
+		result.r = r.value;
+		result.g = g.value;
+		result.b = b.value;
+
+		if (a.value)
+			result.a = (*a.value).value;
+		else
+			result.a = std::nullopt;
+
+		return result;
+	}
 };
 
 struct group_literal : x3::position_tagged
@@ -91,25 +104,9 @@ struct string_literal : x3::position_tagged
 
 // ----
 
-enum class object_type_type
-{
-	boolean,
-	number,
-	level,
-	sound_id,
-	volume,
-	rarity,
-	shape,
-	suit,
-	color,
-	group,
-	identifier,
-	string
-};
-
 struct object_type_expression : x3::position_tagged
 {
-	object_type_type value;
+	lang::object_type value;
 };
 
 struct value_expression : x3::variant<

@@ -1,12 +1,11 @@
 #pragma once
-
-#include "parser/grammar.hpp"
+#include "parser/state_handler.hpp"
+#include <string>
 
 namespace fs::parser
 {
 
-ast::ast_type parse(const std::string& source, bool& result);
-
-void print_ast(const ast::ast_type& ast);
+[[nodiscard]]
+state_handler parse(std::string filepath, std::string file_content, bool& result);
 
 }

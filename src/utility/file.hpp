@@ -1,11 +1,12 @@
 #pragma once
-
 #include <string>
 #include <optional>
 
 namespace fs::utility
 {
 
+// note: do not provide add string_view overload
+// because OS API expect null-terminated strings
 bool file_exists(const char* path);
 inline
 bool file_exists(const std::string& path) { return file_exists(path.c_str()); }

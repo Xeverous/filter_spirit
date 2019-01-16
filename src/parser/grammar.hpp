@@ -7,6 +7,8 @@
  */
 #pragma once
 #include "parser/ast.hpp"
+#include "parser/config.hpp"
+#include "parser/state_handler.hpp"
 #include <boost/spirit/home/x3.hpp>
 #include <boost/spirit/home/x3/support/utility/error_reporting.hpp>
 #include <boost/spirit/home/x3/support/utility/annotate_on_success.hpp>
@@ -15,16 +17,11 @@
 namespace fs::parser
 {
 
-namespace x3 = boost::spirit::x3;
-
-// tag used to get the position cache from the context
-struct position_cache_tag;
-
 // Inherit rule ID type from this type if you want Spirit to call on_success/on_error
 // this allows the same things as expr[func] in grammar definitions but does not bloat it.
 // This type can be used for any rule that has x3::position_tagged attribute type - it just
 // fills it with source code information (eg for later semantic analysis)
-struct error_handler
+struct error_on_error
 {
 	template <typename Iterator, typename Exception, typename Context>
 	x3::error_handler_result on_error(
@@ -33,9 +30,9 @@ struct error_handler
 		const Exception& ex,
 		const Context& context)
 	{
-		auto& error_handler = x3::get<x3::error_handler_tag>(context).get();
-		std::string message = "parse error: expected: '" + ex.which() + "' here";
-		error_handler(ex.where(), message);
+		state_handler& state = x3::get<x3::error_handler_tag>(context).get();
+		std::string message = "parse error: expected: '" + ex.which() + "' here"; // TODO: move deeper
+		state.parse_error(ex.where(), message);
 		return x3::error_handler_result::fail;
 	}
 };
@@ -44,39 +41,31 @@ struct error_handler
 // rule IDs
 // use multiple inheritance to add more handlers
 // rules which do not have any handlers can use forward declared types
-struct comment_class                      : error_handler, x3::annotate_on_success {};
+struct comment_class                      : error_on_error, x3::annotate_on_success {};
 
-struct boolean_class                      : error_handler, x3::annotate_on_success {};
-struct integer_class                      : error_handler, x3::annotate_on_success {};
-struct opacity_class                      : error_handler, x3::annotate_on_success {};
-struct rarity_literal_class               : error_handler, x3::annotate_on_success {};
-struct shape_literal_class                : error_handler, x3::annotate_on_success {};
-struct suit_literal_class                 : error_handler, x3::annotate_on_success {};
-struct color_literal_class                : error_handler, x3::annotate_on_success {};
-struct group_literal_class                : error_handler, x3::annotate_on_success {};
-struct group_literal_impl_class           : error_handler, x3::annotate_on_success {};
+struct boolean_class                      : error_on_error, x3::annotate_on_success {};
+struct integer_class                      : error_on_error, x3::annotate_on_success {};
+struct opacity_class                      : error_on_error, x3::annotate_on_success {};
+struct rarity_literal_class               : error_on_error, x3::annotate_on_success {};
+struct shape_literal_class                : error_on_error, x3::annotate_on_success {};
+struct suit_literal_class                 : error_on_error, x3::annotate_on_success {};
+struct color_literal_class                : error_on_error, x3::annotate_on_success {};
+struct group_literal_class                : error_on_error, x3::annotate_on_success {};
+struct group_literal_impl_class           : error_on_error, x3::annotate_on_success {};
 struct identifier_impl_class;
-struct identifier_class                   : error_handler, x3::annotate_on_success {};
-struct string_literal_class               : error_handler, x3::annotate_on_success {};
+struct identifier_class                   : error_on_error, x3::annotate_on_success {};
+struct string_literal_class               : error_on_error, x3::annotate_on_success {};
 
-struct object_type_expression_class       : error_handler, x3::annotate_on_success {};
-struct value_expression_class             : error_handler, x3::annotate_on_success {};
-struct constant_definition_class          : error_handler, x3::annotate_on_success {};
+struct object_type_expression_class       : error_on_error, x3::annotate_on_success {};
+struct value_expression_class             : error_on_error, x3::annotate_on_success {};
+struct constant_definition_class          : error_on_error, x3::annotate_on_success {};
 
-struct code_line_class                    : error_handler, x3::annotate_on_success {};
+struct code_line_class                    : error_on_error, x3::annotate_on_success {};
 
-struct grammar_class                      : error_handler, x3::annotate_on_success {};
+struct grammar_class                      : error_on_error, x3::annotate_on_success {};
 
-/*
- * whitespace
- * Filter Spirit grammar skips any whitespace except newline character
- *
- * Spirit constness bug workaround, see:
- * https://stackoverflow.com/a/54095167/4818802
- * https://github.com/boostorg/spirit/pull/347
- */
-// using whitespace_type = x3::rule<class whitespace_class>;
-using whitespace_type = x3::rule<class whitespace_class, const x3::unused_type>;
+// whitespace_type should be defined here but it has been moved to parser/config.hpp for
+// dependency reasons. See config.hpp for details.
 BOOST_SPIRIT_DECLARE(whitespace_type)
 
 // comment - a line that starts with #
@@ -141,15 +130,6 @@ BOOST_SPIRIT_DECLARE(code_line_type)
 // the entire language grammar
 using grammar_type = x3::rule<grammar_class, std::vector<code_line_type::attribute_type>>;
 BOOST_SPIRIT_DECLARE(grammar_type)
-
-using skipper_type = whitespace_type;
-
-// Boost Spirit recommends that this should be in a separate config.hpp file but
-// in our case we need skipper type to be visible so we place configuration here
-using iterator_type = std::string::const_iterator;
-using phrase_context_type = typename x3::phrase_parse_context<skipper_type>::type;
-using error_handler_type = boost::spirit::x3::error_handler<iterator_type>;
-using context_type = x3::context<x3::error_handler_tag, std::reference_wrapper<error_handler_type>, phrase_context_type>;
 
 }
 

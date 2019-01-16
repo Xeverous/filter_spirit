@@ -6,17 +6,6 @@
 #include <boost/fusion/include/for_each.hpp>
 #include <iostream>
 
-// workaround for Eclipse CDT not being able (yet) to
-// parse "if constexpr" - define a macro that evaluates to
-// nothing for Eclipse but to constexpr for the compiler
-// https://stackoverflow.com/questions/41386945
-#ifdef __CDT_PARSER__
-#  define ECLIPSE_CONSTEXPR
-#else
-#  define ECLIPSE_CONSTEXPR constexpr
-#endif // __CDT_PARSER__
-
-
 namespace fs::parser::ast
 {
 

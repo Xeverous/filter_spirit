@@ -6,7 +6,6 @@
  * @details adaptations must be in global scope
  */
 #pragma once
-
 #include "parser/ast.hpp"
 #include <boost/fusion/include/adapt_struct.hpp>
 

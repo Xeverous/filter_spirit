@@ -1,5 +1,4 @@
 #pragma once
-
 #include <boost/fusion/support/is_sequence.hpp>
 #include <boost/fusion/include/is_sequence.hpp>
 #include <type_traits>

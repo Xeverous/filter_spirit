@@ -1,7 +1,7 @@
 # comment
 Number num1 = 1
 Number num2 = 2 # appended comment
-Number num3 = b
+Number num3 = num1
 
 # comment
 Boolean boolean = True
@@ -11,11 +11,11 @@ SoundId soundId = 5
 Suit suit = Yellow
 Color color1 = 101 102 103 255
 Color color2 = 111 122 133
-Color color3 = color
+Color color3 = color1
 Rarity rarity = Rare
 Shape suit = Hexagon
-String string = "a string"
-String str = string
+String str1 = "a string"
+String str2 = str1
 Group g1 = RGB
 Group g2 = GBBBBB
 Group g3 = RRRRWW

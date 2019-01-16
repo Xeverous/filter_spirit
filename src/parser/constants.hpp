@@ -1,5 +1,7 @@
 #pragma once
 #include "parser/ast.hpp"
+#include "lang/types.hpp"
+#include "lang/constants.hpp"
 #include <boost/spirit/home/x3.hpp>
 
 namespace fs::parser
@@ -13,92 +15,77 @@ struct booleans_ : x3::symbols<bool>
 	booleans_()
 	{
 		add
-			("True", true)
-			("False", false)
+			(lang::constants::keywords::true_, true)
+			(lang::constants::keywords::false_, false)
 		;
 	}
 
 };
 const booleans_ booleans;
 
-struct rarities_ : x3::symbols<ast::rarity_type>
+struct rarities_ : x3::symbols<lang::rarity>
 {
 	rarities_()
 	{
 		add
-			("Normal", ast::rarity_type::normal)
-			("Magic",  ast::rarity_type::magic)
-			("Rare",   ast::rarity_type::rare)
-			("Unique", ast::rarity_type::unique)
+			(lang::constants::keywords::normal, lang::rarity::normal)
+			(lang::constants::keywords::magic,  lang::rarity::magic)
+			(lang::constants::keywords::rare,   lang::rarity::rare)
+			(lang::constants::keywords::unique, lang::rarity::unique)
 		;
 	}
 };
 const rarities_ rarities;
 
-struct shapes_ : x3::symbols<ast::shape_type>
+struct shapes_ : x3::symbols<lang::shape>
 {
 	shapes_()
 	{
 		add
-			("Circle",   ast::shape_type::circle)
-			("Diamond",  ast::shape_type::diamond)
-			("Hexagon",  ast::shape_type::hexagon)
-			("Square",   ast::shape_type::square)
-			("Star",     ast::shape_type::star)
-			("Triangle", ast::shape_type::triangle)
+			(lang::constants::keywords::circle,   lang::shape::circle)
+			(lang::constants::keywords::diamond,  lang::shape::diamond)
+			(lang::constants::keywords::hexagon,  lang::shape::hexagon)
+			(lang::constants::keywords::square,   lang::shape::square)
+			(lang::constants::keywords::star,     lang::shape::star)
+			(lang::constants::keywords::triangle, lang::shape::triangle)
 		;
 	}
 };
 const shapes_ shapes;
 
-struct suits_ : x3::symbols<ast::suit_type>
+struct suits_ : x3::symbols<lang::suit>
 {
 	suits_()
 	{
 		add
-			("Red",    ast::suit_type::red)
-			("Green",  ast::suit_type::green)
-			("Blue",   ast::suit_type::blue)
-			("White",  ast::suit_type::white)
-			("Brown",  ast::suit_type::brown)
-			("Yellow", ast::suit_type::yellow)
+			(lang::constants::keywords::red,    lang::suit::red)
+			(lang::constants::keywords::green,  lang::suit::green)
+			(lang::constants::keywords::blue,   lang::suit::blue)
+			(lang::constants::keywords::white,  lang::suit::white)
+			(lang::constants::keywords::brown,  lang::suit::brown)
+			(lang::constants::keywords::yellow, lang::suit::yellow)
 		;
 	}
 
 };
 const suits_ suits;
 
-namespace keywords
-{
-	constexpr auto boolean  = "Boolean";
-	constexpr auto number   = "Number";
-	constexpr auto level    = "Level";
-	constexpr auto sound_id = "SoundId";
-	constexpr auto volume   = "Volume";
-	constexpr auto rarity   = "Rarity";
-	constexpr auto shape    = "Shape";
-	constexpr auto suit     = "Suit";
-	constexpr auto color    = "Color";
-	constexpr auto group    = "Group";
-	constexpr auto string   = "String";
-}
-
-struct object_types_ : x3::symbols<ast::object_type_type>
+struct object_types_ : x3::symbols<lang::object_type>
 {
 	object_types_()
 	{
 		add
-			(keywords::boolean,  ast::object_type_type::boolean)
-			(keywords::number,   ast::object_type_type::number)
-			(keywords::level,    ast::object_type_type::level)
-			(keywords::sound_id, ast::object_type_type::sound_id)
-			(keywords::volume,   ast::object_type_type::volume)
-			(keywords::rarity,   ast::object_type_type::rarity)
-			(keywords::shape,    ast::object_type_type::shape)
-			(keywords::suit,     ast::object_type_type::suit)
-			(keywords::color,    ast::object_type_type::color)
-			(keywords::group,    ast::object_type_type::group)
-			(keywords::string,   ast::object_type_type::string)
+			(lang::constants::keywords::boolean,  lang::object_type::boolean)
+			(lang::constants::keywords::number,   lang::object_type::number)
+			(lang::constants::keywords::level,    lang::object_type::level)
+			(lang::constants::keywords::sound_id, lang::object_type::sound_id)
+			(lang::constants::keywords::volume,   lang::object_type::volume)
+			(lang::constants::keywords::rarity,   lang::object_type::rarity)
+			(lang::constants::keywords::shape,    lang::object_type::shape)
+			(lang::constants::keywords::suit,     lang::object_type::suit)
+			(lang::constants::keywords::color,    lang::object_type::color)
+			(lang::constants::keywords::group,    lang::object_type::group)
+			(lang::constants::keywords::string,   lang::object_type::string)
 		;
 	}
 };
