@@ -40,7 +40,7 @@ private:
 	void skip_non_whitespace(iterator_type& err_pos, iterator_type last) const;
 
 	iterator_type get_line_start(iterator_type first, iterator_type pos) const;
-	std::size_t position(iterator_type first, iterator_type it) const;
+	std::size_t count_line_number(iterator_type first, iterator_type it) const;
 };
 
 template <typename OutputStream>
@@ -94,7 +94,7 @@ void error_printer::parse_error(
 	// make sure err_pos does not point to white space
 	skip_whitespace(err_pos, last);
 
-	print_line_number(os, position(first, err_pos));
+	print_line_number(os, count_line_number(first, err_pos));
 	os << error_message;
 
 	iterator_type start = get_line_start(first, err_pos);
@@ -119,7 +119,7 @@ void error_printer::parse_error(
 	iterator_type err_first = error_range.begin();
 	skip_whitespace(err_first, last);
 
-	print_line_number(os, position(first, err_first));
+	print_line_number(os, count_line_number(first, err_first));
 	os << error_message;
 
 	iterator_type start = get_line_start(first, err_first);

@@ -39,7 +39,7 @@ iterator_type error_printer::get_line_start(iterator_type first, iterator_type p
 	return latest;
 }
 
-std::size_t error_printer::position(iterator_type first, iterator_type it) const
+std::size_t error_printer::count_line_number(iterator_type first, iterator_type it) const
 {
 	int line = 1;
 	typename std::iterator_traits<iterator_type>::value_type prev{ 0 };
