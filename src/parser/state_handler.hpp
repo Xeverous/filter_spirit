@@ -13,7 +13,7 @@
 namespace fs::parser
 {
 
-using constants_map = std::unordered_map<std::string_view, lang::object>;
+using constants_map = std::unordered_map<std::string, lang::object>;
 
 // note: the intended usage is to spam with string_view everywhere
 // which all will be valid as long as object of this type is alive

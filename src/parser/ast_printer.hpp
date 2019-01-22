@@ -92,6 +92,12 @@ struct printer
 		std::cout << text << "\n";
 	}
 
+	void operator()(std::string_view text) const
+	{
+		tab(indent);
+		std::cout << text << "\n";
+	}
+
 	// lowest priority overload for unmatched Ts
 	template <typename T = void>
 	void operator()(...) const
