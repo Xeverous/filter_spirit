@@ -3,12 +3,13 @@
 #include "compiler/error.hpp"
 #include "lang/types.hpp"
 #include <string_view>
+#include <iosfwd>
 
 namespace fs::compiler
 {
 
 [[nodiscard]]
-bool compile(std::string filepath, std::string file_content);
+bool compile(std::string file_content, std::string_view output_path, std::ostream& error_stream);
 
 [[nodiscard]]
 bool parse_constants(parser::state_handler& state);

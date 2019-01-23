@@ -6,6 +6,6 @@ namespace fs::parser
 {
 
 [[nodiscard]]
-state_handler parse(std::string filepath, std::string file_content, bool& result);
+state_handler parse(std::string file_content, bool& result);
 
 }

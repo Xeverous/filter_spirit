@@ -19,6 +19,6 @@ int main(int argc, char* argv[])
 	}
 
 	std::string& file_content = *source;
-	bool result = fs::compiler::compile(filepath, std::move(file_content));
+	bool result = fs::compiler::compile(std::move(file_content), "", std::cout);
 	return !result;
 }

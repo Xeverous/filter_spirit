@@ -380,10 +380,10 @@ std::optional<lang::group> identifier_to_group(std::string_view identifier)
 	return gp;
 }
 
-bool compile(std::string filepath, std::string file_content)
+bool compile(std::string file_content, std::string_view /* output_path */, std::ostream& error_stream)
 {
 	bool result;
-	parser::state_handler state = parser::parse(std::move(filepath), std::move(file_content), result);
+	parser::state_handler state = parser::parse(std::move(file_content), result);
 
 	if (!result)
 		return false;
