@@ -6,13 +6,13 @@
 #include <boost/fusion/include/for_each.hpp>
 #include <iostream>
 
-namespace fs::parser::ast
+namespace fs::print
 {
 
-// recursive printer for the whole AST
-struct printer
+// recursive printer for any nested structure
+struct structure_printer
 {
-	printer(int indent = 0) : indent(indent) {}
+	structure_printer(int indent = 0) : indent(indent) {}
 
 	template <typename T>
 	std::enable_if_t<fs::traits::is_iterable_v<T>>
@@ -22,7 +22,7 @@ struct printer
 		std::cout << fs::utility::type_name<T>().get() << " [\n";
 		for (const auto& elem : ast)
 		{
-			printer(indent + 1)(elem);
+			structure_printer(indent + 1)(elem);
 		}
 		tab(indent);
 		std::cout << "]\n";
@@ -45,7 +45,7 @@ struct printer
 		{
 			// do not indent optionals (they contain only 1 value)
 			// do not remove extra () - vexing parse
-			(printer(indent))(*obj);
+			(structure_printer(indent))(*obj);
 		}
 		else
 		{
@@ -63,7 +63,7 @@ struct printer
 		boost::fusion::for_each(
 			seq,
 			[this](const auto& arg) {
-				printer(indent + 1)(arg);
+				structure_printer(indent + 1)(arg);
 			}
 		);
 		tab(indent);
@@ -82,7 +82,7 @@ struct printer
 	void operator()(const boost::spirit::x3::variant<T...>& v) const
 	{
 		// do not indent variants - they hold 1 element only
-		boost::apply_visitor(printer(indent), v);
+		boost::apply_visitor(structure_printer(indent), v);
 	}
 
 	// print strings as strings, do not split them as a sequence of characters
