@@ -8,7 +8,7 @@ namespace fs::compiler
 {
 
 [[nodiscard]]
-error::error_type parse_constants(parser::state_handler& state);
+error::error_variant parse_constants(parser::state_handler& state);
 
 /**
  * @brief attempt to convert sequence of characters (eg RRGBW) to group object

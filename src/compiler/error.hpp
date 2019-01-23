@@ -28,7 +28,7 @@ struct type_mismatch
 
 struct internal_error {};
 
-using error_type = std::variant<
+using error_variant = std::variant<
 	no_error,
 	name_already_exists,
 	no_such_name,

@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
 	std::cout << "parse successful\n";
 	state.print_ast();
 
-	fs::compiler::error::error_type error = fs::compiler::parse_constants(state);
+	fs::compiler::error::error_variant error = fs::compiler::parse_constants(state);
 	if (!std::holds_alternative<fs::compiler::error::no_error>(error))
 	{
 		std::cout << "error building constants\n";

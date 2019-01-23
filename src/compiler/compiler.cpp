@@ -103,7 +103,7 @@ template <fs::lang::object_type WantedType, typename AllowedTypeFirst, typename.
 struct add_constant_from_allowed_types<WantedType, AllowedTypeFirst, AllowedTypesRest...>
 {
 	[[nodiscard]]
-	fs::compiler::error::error_type operator()(
+	fs::compiler::error::error_variant operator()(
 		std::string_view wanted_name,
 		fs::lang::object value,
 		const fs::parser::position_cache_type& position_cache,
@@ -127,7 +127,7 @@ template <fs::lang::object_type WantedType>
 struct add_constant_from_allowed_types<WantedType>
 {
 	[[nodiscard]]
-	fs::compiler::error::error_type operator()(
+	fs::compiler::error::error_variant operator()(
 		std::string_view /* wanted_name */,
 		fs::lang::object value,
 		const fs::parser::position_cache_type& /* position_cache */,
@@ -150,7 +150,7 @@ struct add_constant_from_allowed_types<WantedType>
  * a parameter pack of allowed types.
  */
 [[nodiscard]]
-fs::compiler::error::error_type add_constant_from_value(
+fs::compiler::error::error_variant add_constant_from_value(
 	std::string_view wanted_name,
 	fs::lang::object_type wanted_type,
 	fs::lang::object value,
@@ -268,7 +268,7 @@ fs::compiler::error::error_type add_constant_from_value(
  *   - convert literal to filter's object and proceed
  */
 [[nodiscard]]
-fs::compiler::error::error_type add_constant_from_definition(
+fs::compiler::error::error_variant add_constant_from_definition(
 	const fs::parser::ast::constant_definition& def,
 	const fs::parser::position_cache_type& position_cache,
 	fs::parser::constants_map& map)
@@ -323,13 +323,13 @@ fs::compiler::error::error_type add_constant_from_definition(
 namespace fs::compiler
 {
 
-error::error_type parse_constants(parser::state_handler& state)
+error::error_variant parse_constants(parser::state_handler& state)
 {
 	for (const parser::ast::code_line& line : state.get_ast())
 	{
 		if (line.value)
 		{
-			const error::error_type error = add_constant_from_definition(*line.value, state.get_position_cache(), state.get_map());
+			const error::error_variant error = add_constant_from_definition(*line.value, state.get_position_cache(), state.get_map());
 			if (!std::holds_alternative<error::no_error>(error))
 				return error;
 		}
