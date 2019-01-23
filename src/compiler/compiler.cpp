@@ -106,7 +106,7 @@ struct add_constant_from_allowed_types<WantedType, AllowedTypeFirst, AllowedType
 	fs::compiler::error::error_type operator()(
 		std::string_view wanted_name,
 		fs::lang::object value,
-		const fs::parser::state_handler& state,
+		const fs::parser::position_cache_type& position_cache,
 		fs::parser::constants_map& map)
 	{
 		if (std::holds_alternative<AllowedTypeFirst>(value))
@@ -116,7 +116,7 @@ struct add_constant_from_allowed_types<WantedType, AllowedTypeFirst, AllowedType
 		}
 		else
 		{
-			return add_constant_from_allowed_types<WantedType, AllowedTypesRest...>{}(wanted_name, value, state, map);
+			return add_constant_from_allowed_types<WantedType, AllowedTypesRest...>{}(wanted_name, value, position_cache, map);
 		}
 	}
 
@@ -130,7 +130,7 @@ struct add_constant_from_allowed_types<WantedType>
 	fs::compiler::error::error_type operator()(
 		std::string_view /* wanted_name */,
 		fs::lang::object value,
-		const fs::parser::state_handler& /* state */,
+		const fs::parser::position_cache_type& /* position_cache */,
 		fs::parser::constants_map& /* map */)
 	{
 		return fs::compiler::error::type_mismatch{WantedType, type_of_object(value)};
@@ -154,7 +154,7 @@ fs::compiler::error::error_type add_constant_from_value(
 	std::string_view wanted_name,
 	fs::lang::object_type wanted_type,
 	fs::lang::object value,
-	const fs::parser::state_handler& state,
+	const fs::parser::position_cache_type& position_cache,
 	fs::parser::constants_map& map)
 {
 	switch (wanted_type)
@@ -164,14 +164,14 @@ fs::compiler::error::error_type add_constant_from_value(
 			return add_constant_from_allowed_types<
 				fs::lang::object_type::boolean,
 				fs::lang::boolean
-				>{}(wanted_name, value, state, map);
+				>{}(wanted_name, value, position_cache, map);
 		}
 		case fs::lang::object_type::number:
 		{
 			return add_constant_from_allowed_types<
 				fs::lang::object_type::number,
 				fs::lang::number
-				>{}(wanted_name, value, state, map);
+				>{}(wanted_name, value, position_cache, map);
 		}
 		case fs::lang::object_type::level:
 		{
@@ -179,7 +179,7 @@ fs::compiler::error::error_type add_constant_from_value(
 				fs::lang::object_type::level,
 				fs::lang::level,
 				fs::lang::number // promotion
-				>{}(wanted_name, value, state, map);
+				>{}(wanted_name, value, position_cache, map);
 		}
 		case fs::lang::object_type::sound_id:
 		{
@@ -187,7 +187,7 @@ fs::compiler::error::error_type add_constant_from_value(
 				fs::lang::object_type::sound_id,
 				fs::lang::sound_id,
 				fs::lang::number // promotion
-				>{}(wanted_name, value, state, map);
+				>{}(wanted_name, value, position_cache, map);
 		}
 		case fs::lang::object_type::volume:
 		{
@@ -195,49 +195,49 @@ fs::compiler::error::error_type add_constant_from_value(
 				fs::lang::object_type::volume,
 				fs::lang::volume,
 				fs::lang::number // promotion
-				>{}(wanted_name, value, state, map);
+				>{}(wanted_name, value, position_cache, map);
 		}
 		case fs::lang::object_type::rarity:
 		{
 			return add_constant_from_allowed_types<
 				fs::lang::object_type::rarity,
 				fs::lang::rarity
-				>{}(wanted_name, value, state, map);
+				>{}(wanted_name, value, position_cache, map);
 		}
 		case fs::lang::object_type::shape:
 		{
 			return add_constant_from_allowed_types<
 				fs::lang::object_type::shape,
 				fs::lang::shape
-				>{}(wanted_name, value, state, map);
+				>{}(wanted_name, value, position_cache, map);
 		}
 		case fs::lang::object_type::suit:
 		{
 			return add_constant_from_allowed_types<
 				fs::lang::object_type::suit,
 				fs::lang::suit
-				>{}(wanted_name, value, state, map);
+				>{}(wanted_name, value, position_cache, map);
 		}
 		case fs::lang::object_type::color:
 		{
 			return add_constant_from_allowed_types<
 				fs::lang::object_type::color,
 				fs::lang::color
-				>{}(wanted_name, value, state, map);
+				>{}(wanted_name, value, position_cache, map);
 		}
 		case fs::lang::object_type::group:
 		{
 			return add_constant_from_allowed_types<
 				fs::lang::object_type::group,
 				fs::lang::group
-				>{}(wanted_name, value, state, map);
+				>{}(wanted_name, value, position_cache, map);
 		}
 		case fs::lang::object_type::string:
 		{
 			return add_constant_from_allowed_types<
 				fs::lang::object_type::string,
 				fs::lang::string
-				>{}(wanted_name, value, state, map);
+				>{}(wanted_name, value, position_cache, map);
 		}
 		default:
 		{
@@ -270,7 +270,7 @@ fs::compiler::error::error_type add_constant_from_value(
 [[nodiscard]]
 fs::compiler::error::error_type add_constant_from_definition(
 	const fs::parser::ast::constant_definition& def,
-	const fs::parser::state_handler& state,
+	const fs::parser::position_cache_type& position_cache,
 	fs::parser::constants_map& map)
 {
 	const std::string& wanted_name = def.name.value;
@@ -279,7 +279,7 @@ fs::compiler::error::error_type add_constant_from_definition(
 
 	if (map.find(wanted_name) != map.end()) // (0)
 	{
-		const fs::parser::range_type place_of_error = state.position_of(def.name);
+		const fs::parser::range_type place_of_error = position_cache.position_of(def.name);
 		return fs::compiler::error::name_already_exists{place_of_error};
 	}
 
@@ -293,7 +293,7 @@ fs::compiler::error::error_type add_constant_from_definition(
 			return add_constant_from_allowed_types<
 				fs::lang::object_type::group,
 				fs::lang::group
-				>{}(wanted_name, *group, state, map);
+				>{}(wanted_name, *group, position_cache, map);
 		}
 
 		// else: not a special identifier, search for referenced value then (3)
@@ -301,12 +301,12 @@ fs::compiler::error::error_type add_constant_from_definition(
 		const auto it = map.find(identifier.value);
 		if (it == map.end())
 		{
-			const fs::parser::range_type place_of_error = state.position_of(identifier);
+			const fs::parser::range_type place_of_error = position_cache.position_of(identifier);
 			return fs::compiler::error::no_such_name{place_of_error}; // (4)
 		}
 
 		const auto& value = it->second;
-		return add_constant_from_value(wanted_name, wanted_type, value, state, map); // (5)
+		return add_constant_from_value(wanted_name, wanted_type, value, position_cache, map); // (5)
 	}
 
 	// (6)
@@ -314,7 +314,7 @@ fs::compiler::error::error_type add_constant_from_definition(
 		wanted_name,
 		wanted_type,
 		parser_literal_to_language_object(value_expression),
-		state,
+		position_cache,
 		map);
 }
 
@@ -329,7 +329,7 @@ error::error_type parse_constants(parser::state_handler& state)
 	{
 		if (line.value)
 		{
-			const error::error_type error = add_constant_from_definition(*line.value, state, state.get_map());
+			const error::error_type error = add_constant_from_definition(*line.value, state.get_position_cache(), state.get_map());
 			if (!std::holds_alternative<error::no_error>(error))
 				return error;
 		}
