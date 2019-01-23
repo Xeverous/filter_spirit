@@ -55,6 +55,7 @@ public:
 	ast::ast_type& get_ast() { return ast; }
 	constants_map& get_map() { return map; }
 
+	// TODO: this is too much of a god class, simplify coree state from errors
 	void parse_error(x3::position_tagged pos, std::string_view message) /* const */
 	{
 		range_type where = position_cache.position_of(pos);
@@ -62,6 +63,11 @@ public:
 	}
 
 	void parse_error(iterator_type err_pos, std::string_view error_message) /* const */
+	{
+		print::parse_error(std::cout, get_range_of_all(), err_pos, error_message);
+	}
+
+	void compile_error(range_type err_pos, std::string_view error_message)
 	{
 		print::parse_error(std::cout, get_range_of_all(), err_pos, error_message);
 	}

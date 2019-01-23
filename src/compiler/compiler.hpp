@@ -8,7 +8,10 @@ namespace fs::compiler
 {
 
 [[nodiscard]]
-error::error_variant parse_constants(parser::state_handler& state);
+bool compile(std::string filepath, std::string file_content);
+
+[[nodiscard]]
+bool parse_constants(parser::state_handler& state);
 
 /**
  * @brief attempt to convert sequence of characters (eg RRGBW) to group object

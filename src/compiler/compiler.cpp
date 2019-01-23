@@ -2,12 +2,15 @@
 #include "compiler/error.hpp"
 #include "parser/ast.hpp"
 #include "parser/config.hpp"
+#include "parser/parser.hpp"
 #include "parser/state_handler.hpp"
 #include "lang/constants.hpp"
+#include "print/compile_error.hpp"
 #include "utility/holds_alternative.hpp"
 #include "utility/if_constexpr_workaround.hpp"
-#include <string_view>
 #include <cassert>
+#include <string_view>
+#include <utility>
 
 namespace
 {
@@ -323,7 +326,12 @@ fs::compiler::error::error_variant add_constant_from_definition(
 namespace fs::compiler
 {
 
-error::error_variant parse_constants(parser::state_handler& state)
+void print_error(parser::state_handler& state, error::error_variant error)
+{
+	print::compile_error(state, error);
+}
+
+bool parse_constants(parser::state_handler& state)
 {
 	for (const parser::ast::code_line& line : state.get_ast())
 	{
@@ -331,11 +339,22 @@ error::error_variant parse_constants(parser::state_handler& state)
 		{
 			const error::error_variant error = add_constant_from_definition(*line.value, state.get_position_cache(), state.get_map());
 			if (!std::holds_alternative<error::no_error>(error))
-				return error;
+			{
+				print_error(state, error);
+				return false;
+			}
 		}
 	}
 
-	return error::no_error{};
+	return true;
+}
+
+bool semantic_analysis(parser::state_handler& state)
+{
+	if (!parse_constants(state))
+		return false;
+
+	return true;
 }
 
 std::optional<lang::group> identifier_to_group(std::string_view identifier)
@@ -359,6 +378,24 @@ std::optional<lang::group> identifier_to_group(std::string_view identifier)
 	}
 
 	return gp;
+}
+
+bool compile(std::string filepath, std::string file_content)
+{
+	bool result;
+	parser::state_handler state = parser::parse(std::move(filepath), std::move(file_content), result);
+
+	if (!result)
+		return false;
+
+	state.print_ast();
+
+	if (!semantic_analysis(state))
+		return false;
+
+	state.print_map();
+
+	return true;
 }
 
 }
