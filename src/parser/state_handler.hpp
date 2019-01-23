@@ -1,12 +1,12 @@
 #pragma once
-#include "parser/error_printer.hpp"
 #include "parser/config.hpp"
 #include "parser/ast.hpp"
 #include "compiler/compiler.hpp"
-#include <string>
-#include <vector>
+#include "print/parse_error.hpp"
+#include <cassert>
 #include <utility>
 #include <iostream>
+#include <string>
 #include <string_view>
 #include <unordered_map>
 
@@ -58,12 +58,12 @@ public:
 	void parse_error(x3::position_tagged pos, std::string_view message) /* const */
 	{
 		range_type where = position_cache.position_of(pos);
-		printer.parse_error(std::cout, get_range_of_all(), where, message);
+		print::parse_error(std::cout, get_range_of_all(), where, message);
 	}
 
 	void parse_error(iterator_type err_pos, std::string_view error_message) /* const */
 	{
-		printer.parse_error(std::cout, get_range_of_all(), err_pos, error_message);
+		print::parse_error(std::cout, get_range_of_all(), err_pos, error_message);
 	}
 
 	void print_ast() const;
@@ -80,7 +80,6 @@ private:
 	position_cache_type position_cache;
 	ast::ast_type ast;
 	constants_map map;
-	error_printer printer;
 };
 
 }

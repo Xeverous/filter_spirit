@@ -1,36 +1,40 @@
-#include "parser/error_printer.hpp"
+#include "print/generic.hpp"
 #include <cctype>
 
-namespace fs::parser
+namespace fs::print
 {
 
-void error_printer::skip_whitespace(iterator_type& err_pos, iterator_type last) const
+iterator_type skip_whitespace(iterator_type it, iterator_type last)
 {
-	while (err_pos != last)
+	while (it != last)
 	{
-		char c = *err_pos;
+		const auto c = *it;
 		// Note: it is UB to pass chars that are not representable as unsigned char
 		// https://en.cppreference.com/w/cpp/string/byte/isspace
 		if (std::isspace(static_cast<unsigned char>(c)))
-			++err_pos;
+			++it;
 		else
 			break;
 	}
+
+	return it;
 }
 
-void error_printer::skip_non_whitespace(iterator_type& err_pos, iterator_type last) const
+iterator_type skip_non_whitespace(iterator_type it, iterator_type last)
 {
-	while (err_pos != last)
+	while (it != last)
 	{
-		char c = *err_pos;
+		const auto c = *it;
 		if (std::isspace(static_cast<unsigned char>(c)))
 			break;
 		else
-			++err_pos;
+			++it;
 	}
+
+	return it;
 }
 
-iterator_type error_printer::get_line_start(iterator_type first, iterator_type pos) const
+iterator_type get_line_start(iterator_type first, iterator_type pos)
 {
 	iterator_type latest = first;
 	for (iterator_type i = first; i != pos; ++i)
@@ -39,7 +43,7 @@ iterator_type error_printer::get_line_start(iterator_type first, iterator_type p
 	return latest;
 }
 
-std::size_t error_printer::count_line_number(iterator_type first, iterator_type it) const
+int count_line_number(iterator_type first, iterator_type it)
 {
 	int line = 1;
 	typename std::iterator_traits<iterator_type>::value_type prev{ 0 };
