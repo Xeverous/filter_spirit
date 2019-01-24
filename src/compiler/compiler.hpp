@@ -1,8 +1,8 @@
 #pragma once
-#include "parser/state_handler.hpp"
 #include "compiler/error.hpp"
 #include "lang/types.hpp"
 #include <string_view>
+#include <optional>
 #include <iosfwd>
 
 namespace fs::compiler
@@ -10,9 +10,6 @@ namespace fs::compiler
 
 [[nodiscard]]
 bool compile(std::string file_content, std::string_view output_path, std::ostream& error_stream);
-
-[[nodiscard]]
-bool parse_constants(parser::state_handler& state);
 
 /**
  * @brief attempt to convert sequence of characters (eg RRGBW) to group object

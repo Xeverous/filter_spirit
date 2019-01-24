@@ -8,19 +8,45 @@
 #pragma once
 #include "parser/ast.hpp"
 #include "parser/config.hpp"
-#include "parser/state_handler.hpp"
+#include "print/parse_error.hpp"
 #include <boost/spirit/home/x3.hpp>
-#include <boost/spirit/home/x3/support/utility/error_reporting.hpp>
-#include <boost/spirit/home/x3/support/utility/annotate_on_success.hpp>
+#include <boost/spirit/home/x3/support/utility/lambda_visitor.hpp>
 #include <string>
 
 namespace fs::parser
 {
 
-// Inherit rule ID type from this type if you want Spirit to call on_success/on_error
+// Inherit rule ID type from these type if you want Spirit to call on_success/on_error
 // this allows the same things as expr[func] in grammar definitions but does not bloat it.
 // This type can be used for any rule that has x3::position_tagged attribute type - it just
 // fills it with source code information (eg for later semantic analysis)
+struct annotate_on_success
+{
+	template <typename Iterator, typename Context, typename... Types>
+	void on_success(
+		const Iterator& first,
+		const Iterator& last,
+		x3::variant<Types...>& ast,
+		const Context& context)
+	{
+		ast.apply_visitor(x3::make_lambda_visitor<void>([&](auto& node)
+		{
+			this->on_success(first, last, node, context);
+		}));
+	}
+
+	template <typename T, typename Iterator, typename Context>
+	void on_success(
+		const Iterator& first,
+		const Iterator& last,
+		T& ast,
+		const Context& context)
+	{
+		position_cache_type& positions = x3::get<position_cache_tag>(context).get();
+		positions.annotate(ast, first, last);
+	}
+};
+
 struct error_on_error
 {
 	template <typename Iterator, typename Exception, typename Context>
@@ -30,9 +56,10 @@ struct error_on_error
 		const Exception& ex,
 		const Context& context)
 	{
-		state_handler& state = x3::get<x3::error_handler_tag>(context).get();
+		position_cache_type& positions = x3::get<position_cache_tag>(context).get();
+		auto& error_stream = x3::get<error_stream_tag>(context).get();
 		std::string message = "parse error: expected: '" + ex.which() + "' here"; // TODO: move deeper
-		state.parse_error(ex.where(), message);
+		print::parse_error(error_stream, range_type(positions.first(), positions.last()), ex.where(), message);
 		return x3::error_handler_result::fail;
 	}
 };
@@ -41,28 +68,28 @@ struct error_on_error
 // rule IDs
 // use multiple inheritance to add more handlers
 // rules which do not have any handlers can use forward declared types
-struct comment_class                      : error_on_error, x3::annotate_on_success {};
+struct comment_class                      : error_on_error, annotate_on_success {};
 
-struct boolean_class                      : error_on_error, x3::annotate_on_success {};
-struct integer_class                      : error_on_error, x3::annotate_on_success {};
-struct opacity_class                      : error_on_error, x3::annotate_on_success {};
-struct rarity_literal_class               : error_on_error, x3::annotate_on_success {};
-struct shape_literal_class                : error_on_error, x3::annotate_on_success {};
-struct suit_literal_class                 : error_on_error, x3::annotate_on_success {};
-struct color_literal_class                : error_on_error, x3::annotate_on_success {};
-struct group_literal_class                : error_on_error, x3::annotate_on_success {};
-struct group_literal_impl_class           : error_on_error, x3::annotate_on_success {};
+struct boolean_class                      : error_on_error, annotate_on_success {};
+struct integer_class                      : error_on_error, annotate_on_success {};
+struct opacity_class                      : error_on_error, annotate_on_success {};
+struct rarity_literal_class               : error_on_error, annotate_on_success {};
+struct shape_literal_class                : error_on_error, annotate_on_success {};
+struct suit_literal_class                 : error_on_error, annotate_on_success {};
+struct color_literal_class                : error_on_error, annotate_on_success {};
+struct group_literal_class                : error_on_error, annotate_on_success {};
+struct group_literal_impl_class           : error_on_error, annotate_on_success {};
 struct identifier_impl_class;
-struct identifier_class                   : error_on_error, x3::annotate_on_success {};
-struct string_literal_class               : error_on_error, x3::annotate_on_success {};
+struct identifier_class                   : error_on_error, annotate_on_success {};
+struct string_literal_class               : error_on_error, annotate_on_success {};
 
-struct object_type_expression_class       : error_on_error, x3::annotate_on_success {};
-struct value_expression_class             : error_on_error, x3::annotate_on_success {};
-struct constant_definition_class          : error_on_error, x3::annotate_on_success {};
+struct object_type_expression_class       : error_on_error, annotate_on_success {};
+struct value_expression_class             : error_on_error, annotate_on_success {};
+struct constant_definition_class          : error_on_error, annotate_on_success {};
 
-struct code_line_class                    : error_on_error, x3::annotate_on_success {};
+struct code_line_class                    : error_on_error, annotate_on_success {};
 
-struct grammar_class                      : error_on_error, x3::annotate_on_success {};
+struct grammar_class                      : error_on_error, annotate_on_success {};
 
 // whitespace_type should be defined here but it has been moved to parser/config.hpp for
 // dependency reasons. See config.hpp for details.

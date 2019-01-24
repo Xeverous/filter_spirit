@@ -24,7 +24,7 @@ using iterator_type = std::string::const_iterator;
 using range_type = boost::iterator_range<iterator_type>;
 using position_cache_type = x3::position_cache<std::vector<iterator_type>>;
 using phrase_context_type = typename x3::phrase_parse_context<skipper_type>::type;
-using error_handler_type = class state_handler;
-using context_type = x3::context<x3::error_handler_tag, std::reference_wrapper<state_handler>, phrase_context_type>;
+using inner_context_type = x3::context<struct position_cache_tag, std::reference_wrapper<position_cache_type>, phrase_context_type>;
+using context_type = x3::context<struct error_stream_tag, std::reference_wrapper<std::ostream>, inner_context_type>;
 
 }

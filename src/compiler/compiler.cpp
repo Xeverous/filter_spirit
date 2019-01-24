@@ -3,7 +3,6 @@
 #include "parser/ast.hpp"
 #include "parser/config.hpp"
 #include "parser/parser.hpp"
-#include "parser/state_handler.hpp"
 #include "lang/constants.hpp"
 #include "print/compile_error.hpp"
 #include "utility/holds_alternative.hpp"
@@ -109,7 +108,8 @@ struct add_constant_from_allowed_types<WantedType, AllowedTypeFirst, AllowedType
 	fs::compiler::error::error_variant operator()(
 		std::string_view wanted_name,
 		fs::lang::object value,
-		const fs::parser::position_cache_type& position_cache,
+		const fs::parser::parse_result& parse_data,
+		std::ostream& error_stream,
 		fs::parser::constants_map& map)
 	{
 		if (std::holds_alternative<AllowedTypeFirst>(value))
@@ -119,7 +119,7 @@ struct add_constant_from_allowed_types<WantedType, AllowedTypeFirst, AllowedType
 		}
 		else
 		{
-			return add_constant_from_allowed_types<WantedType, AllowedTypesRest...>{}(wanted_name, value, position_cache, map);
+			return add_constant_from_allowed_types<WantedType, AllowedTypesRest...>{}(wanted_name, value, parse_data, error_stream, map);
 		}
 	}
 
@@ -133,7 +133,8 @@ struct add_constant_from_allowed_types<WantedType>
 	fs::compiler::error::error_variant operator()(
 		std::string_view /* wanted_name */,
 		fs::lang::object value,
-		const fs::parser::position_cache_type& /* position_cache */,
+		const fs::parser::parse_result& /* parse_data */,
+		std::ostream& /* error_stream */,
 		fs::parser::constants_map& /* map */)
 	{
 		return fs::compiler::error::type_mismatch{WantedType, type_of_object(value)};
@@ -157,7 +158,8 @@ fs::compiler::error::error_variant add_constant_from_value(
 	std::string_view wanted_name,
 	fs::lang::object_type wanted_type,
 	fs::lang::object value,
-	const fs::parser::position_cache_type& position_cache,
+	const fs::parser::parse_result& parse_data,
+	std::ostream& error_stream,
 	fs::parser::constants_map& map)
 {
 	switch (wanted_type)
@@ -167,14 +169,14 @@ fs::compiler::error::error_variant add_constant_from_value(
 			return add_constant_from_allowed_types<
 				fs::lang::object_type::boolean,
 				fs::lang::boolean
-				>{}(wanted_name, value, position_cache, map);
+				>{}(wanted_name, value, parse_data, error_stream, map);
 		}
 		case fs::lang::object_type::number:
 		{
 			return add_constant_from_allowed_types<
 				fs::lang::object_type::number,
 				fs::lang::number
-				>{}(wanted_name, value, position_cache, map);
+				>{}(wanted_name, value, parse_data, error_stream, map);
 		}
 		case fs::lang::object_type::level:
 		{
@@ -182,7 +184,7 @@ fs::compiler::error::error_variant add_constant_from_value(
 				fs::lang::object_type::level,
 				fs::lang::level,
 				fs::lang::number // promotion
-				>{}(wanted_name, value, position_cache, map);
+				>{}(wanted_name, value, parse_data, error_stream, map);
 		}
 		case fs::lang::object_type::sound_id:
 		{
@@ -190,7 +192,7 @@ fs::compiler::error::error_variant add_constant_from_value(
 				fs::lang::object_type::sound_id,
 				fs::lang::sound_id,
 				fs::lang::number // promotion
-				>{}(wanted_name, value, position_cache, map);
+				>{}(wanted_name, value, parse_data, error_stream, map);
 		}
 		case fs::lang::object_type::volume:
 		{
@@ -198,49 +200,49 @@ fs::compiler::error::error_variant add_constant_from_value(
 				fs::lang::object_type::volume,
 				fs::lang::volume,
 				fs::lang::number // promotion
-				>{}(wanted_name, value, position_cache, map);
+				>{}(wanted_name, value, parse_data, error_stream, map);
 		}
 		case fs::lang::object_type::rarity:
 		{
 			return add_constant_from_allowed_types<
 				fs::lang::object_type::rarity,
 				fs::lang::rarity
-				>{}(wanted_name, value, position_cache, map);
+				>{}(wanted_name, value, parse_data, error_stream, map);
 		}
 		case fs::lang::object_type::shape:
 		{
 			return add_constant_from_allowed_types<
 				fs::lang::object_type::shape,
 				fs::lang::shape
-				>{}(wanted_name, value, position_cache, map);
+				>{}(wanted_name, value, parse_data, error_stream, map);
 		}
 		case fs::lang::object_type::suit:
 		{
 			return add_constant_from_allowed_types<
 				fs::lang::object_type::suit,
 				fs::lang::suit
-				>{}(wanted_name, value, position_cache, map);
+				>{}(wanted_name, value, parse_data, error_stream, map);
 		}
 		case fs::lang::object_type::color:
 		{
 			return add_constant_from_allowed_types<
 				fs::lang::object_type::color,
 				fs::lang::color
-				>{}(wanted_name, value, position_cache, map);
+				>{}(wanted_name, value, parse_data, error_stream, map);
 		}
 		case fs::lang::object_type::group:
 		{
 			return add_constant_from_allowed_types<
 				fs::lang::object_type::group,
 				fs::lang::group
-				>{}(wanted_name, value, position_cache, map);
+				>{}(wanted_name, value, parse_data, error_stream, map);
 		}
 		case fs::lang::object_type::string:
 		{
 			return add_constant_from_allowed_types<
 				fs::lang::object_type::string,
 				fs::lang::string
-				>{}(wanted_name, value, position_cache, map);
+				>{}(wanted_name, value, parse_data, error_stream, map);
 		}
 		default:
 		{
@@ -273,7 +275,8 @@ fs::compiler::error::error_variant add_constant_from_value(
 [[nodiscard]]
 fs::compiler::error::error_variant add_constant_from_definition(
 	const fs::parser::ast::constant_definition& def,
-	const fs::parser::position_cache_type& position_cache,
+	const fs::parser::parse_result& parse_data,
+	std::ostream& error_stream,
 	fs::parser::constants_map& map)
 {
 	const std::string& wanted_name = def.name.value;
@@ -282,7 +285,7 @@ fs::compiler::error::error_variant add_constant_from_definition(
 
 	if (map.find(wanted_name) != map.end()) // (0)
 	{
-		const fs::parser::range_type place_of_error = position_cache.position_of(def.name);
+		const fs::parser::range_type place_of_error = parse_data.position_cache.position_of(def.name);
 		return fs::compiler::error::name_already_exists{place_of_error};
 	}
 
@@ -296,7 +299,7 @@ fs::compiler::error::error_variant add_constant_from_definition(
 			return add_constant_from_allowed_types<
 				fs::lang::object_type::group,
 				fs::lang::group
-				>{}(wanted_name, *group, position_cache, map);
+				>{}(wanted_name, *group, parse_data, error_stream, map);
 		}
 
 		// else: not a special identifier, search for referenced value then (3)
@@ -304,12 +307,12 @@ fs::compiler::error::error_variant add_constant_from_definition(
 		const auto it = map.find(identifier.value);
 		if (it == map.end())
 		{
-			const fs::parser::range_type place_of_error = position_cache.position_of(identifier);
+			const fs::parser::range_type place_of_error = parse_data.position_cache.position_of(identifier);
 			return fs::compiler::error::no_such_name{place_of_error}; // (4)
 		}
 
 		const auto& value = it->second;
-		return add_constant_from_value(wanted_name, wanted_type, value, position_cache, map); // (5)
+		return add_constant_from_value(wanted_name, wanted_type, value, parse_data, error_stream, map); // (5)
 	}
 
 	// (6)
@@ -317,7 +320,8 @@ fs::compiler::error::error_variant add_constant_from_definition(
 		wanted_name,
 		wanted_type,
 		parser_literal_to_language_object(value_expression),
-		position_cache,
+		parse_data,
+		error_stream,
 		map);
 }
 
@@ -326,33 +330,43 @@ fs::compiler::error::error_variant add_constant_from_definition(
 namespace fs::compiler
 {
 
-void print_error(parser::state_handler& state, error::error_variant error)
+void print_error(const parser::parse_result& parse_data, error::error_variant error, std::ostream& error_stream)
 {
-	print::compile_error(state, error);
+	print::compile_error(parse_data, error, error_stream);
 }
 
-bool parse_constants(parser::state_handler& state)
+[[nodiscard]]
+std::optional<parser::constants_map> parse_constants(const parser::parse_result& parse_data, std::ostream& error_stream)
 {
-	for (const parser::ast::code_line& line : state.get_ast())
+	parser::constants_map map;
+
+	for (const parser::ast::code_line& line : parse_data.ast)
 	{
 		if (line.value)
 		{
-			const error::error_variant error = add_constant_from_definition(*line.value, state.get_position_cache(), state.get_map());
+			const error::error_variant error = add_constant_from_definition(*line.value, parse_data, error_stream, map);
 			if (!std::holds_alternative<error::no_error>(error))
 			{
-				print_error(state, error);
-				return false;
+				print_error(parse_data, error, error_stream);
+				return std::nullopt;
 			}
 		}
 	}
 
-	return true;
+	return map;
 }
 
-bool semantic_analysis(parser::state_handler& state)
+bool semantic_analysis(parser::parse_result& parse_data, std::ostream& error_stream)
 {
-	if (!parse_constants(state))
+	std::optional<parser::constants_map> map = parse_constants(parse_data, error_stream);
+
+	if (!map)
 		return false;
+
+	for (const auto& pair : *map)
+	{
+		error_stream << pair.first << "\n";
+	}
 
 	return true;
 }
@@ -382,18 +396,15 @@ std::optional<lang::group> identifier_to_group(std::string_view identifier)
 
 bool compile(std::string file_content, std::string_view /* output_path */, std::ostream& error_stream)
 {
-	bool result;
-	parser::state_handler state = parser::parse(std::move(file_content), result);
+	std::optional<parser::parse_result> parse_result = parser::parse(file_content, error_stream);
 
-	if (!result)
+	if (!parse_result)
 		return false;
 
-	state.print_ast();
+	(*parse_result).print_ast();
 
-	if (!semantic_analysis(state))
+	if (!semantic_analysis(*parse_result, error_stream))
 		return false;
-
-	state.print_map();
 
 	return true;
 }
