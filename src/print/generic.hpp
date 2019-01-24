@@ -1,5 +1,6 @@
 #pragma once
 #include "parser/config.hpp"
+#include <utility>
 
 namespace fs::print
 {
@@ -7,8 +8,11 @@ namespace fs::print
 using iterator_type = parser::iterator_type;
 using range_type = parser::range_type;
 constexpr auto tab_length = 8;
-constexpr auto indicator_background = '_';
-constexpr auto indicator_foreground = '^';
+constexpr auto indicator_background = ' ';
+constexpr auto indicator_foreground = '~';
+constexpr auto compiler_error_string = "compile error: ";
+constexpr auto parser_error_string = "parse error: ";
+constexpr auto note_string = "note: ";
 
 /**
  * @param first beginning of the input, or something further
@@ -92,6 +96,16 @@ void print_line_with_indicator(OutputStream& os, range_type content_range, range
 
 	print_line(os, line_start, content_range.end());
 	print_indicator(os, line_start, error_range);
+}
+
+template <typename OutputStream, typename... Texts>
+void print_line_number_with_texts(
+	OutputStream& os,
+	int line_number,
+	Texts&&... texts)
+{
+	print_line_number(os, line_number);
+	(os << ... << std::forward<Texts>(texts)) << '\n';
 }
 
 }

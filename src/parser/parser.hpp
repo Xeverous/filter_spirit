@@ -10,7 +10,13 @@
 namespace fs::parser
 {
 
-using constants_map = std::unordered_map<std::string, lang::object>; // TODO move to compiler
+struct parsed_object
+{
+	lang::object value;
+	range_type name_origin; // for printing error name already exists, range should point at name
+};
+
+using constants_map = std::unordered_map<std::string, parsed_object>; // TODO move to compiler
 
 struct parse_result
 {

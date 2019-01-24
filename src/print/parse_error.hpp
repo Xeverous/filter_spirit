@@ -19,8 +19,12 @@ void parse_error(
 	 */
 	error_range = skip_whitespace(error_range, content.end());
 
-	print_line_number(os, count_line_number(content.begin(), error_range.begin()));
-	os << "parse error: expected '" << expected << "' here\n";
+	print_line_number_with_texts(
+		os,
+		count_line_number(content.begin(), error_range.begin()),
+		"parse error: expected '",
+		expected,
+		"' here");
 
 	print_line_with_indicator(os, content, error_range);
 }

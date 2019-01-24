@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <string_view>
 #include <optional>
 #include <variant>
 
@@ -20,6 +21,8 @@ enum class object_type
 	group,
 	string
 };
+
+std::string_view to_string(object_type type);
 
 enum class rarity { normal, magic, rare, unique };
 enum class shape { circle, diamond, hexagon, square, star, triangle };

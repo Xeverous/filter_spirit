@@ -106,20 +106,21 @@ struct add_constant_from_allowed_types<WantedType, AllowedTypeFirst, AllowedType
 {
 	[[nodiscard]]
 	fs::compiler::error::error_variant operator()(
-		std::string_view wanted_name,
-		fs::lang::object value,
+		const past::identifier& wanted_name,
+		const past::object_type_expression& wanted_type,
+		const fs::parser::parsed_object& value,
 		const fs::parser::parse_result& parse_data,
 		std::ostream& error_stream,
 		fs::parser::constants_map& map)
 	{
-		if (std::holds_alternative<AllowedTypeFirst>(value))
+		if (std::holds_alternative<AllowedTypeFirst>(value.value))
 		{
-			map.emplace(wanted_name, /* FIXME */ value);
+			map.emplace(wanted_name.value, value);
 			return fs::compiler::error::no_error();
 		}
 		else
 		{
-			return add_constant_from_allowed_types<WantedType, AllowedTypesRest...>{}(wanted_name, value, parse_data, error_stream, map);
+			return add_constant_from_allowed_types<WantedType, AllowedTypesRest...>{}(wanted_name, wanted_type, value, parse_data, error_stream, map);
 		}
 	}
 
@@ -131,13 +132,19 @@ struct add_constant_from_allowed_types<WantedType>
 {
 	[[nodiscard]]
 	fs::compiler::error::error_variant operator()(
-		std::string_view /* wanted_name */,
-		fs::lang::object value,
-		const fs::parser::parse_result& /* parse_data */,
+		const past::identifier& wanted_name,
+		const past::object_type_expression& wanted_type,
+		const fs::parser::parsed_object& value,
+		const fs::parser::parse_result& parse_data,
 		std::ostream& /* error_stream */,
 		fs::parser::constants_map& /* map */)
 	{
-		return fs::compiler::error::type_mismatch{WantedType, type_of_object(value)};
+		return fs::compiler::error::type_mismatch{
+			WantedType,
+			type_of_object(value.value),
+			parse_data.position_cache.position_of(wanted_type),
+			value.name_origin
+		};
 	}
 
 };
@@ -150,33 +157,33 @@ struct add_constant_from_allowed_types<WantedType>
  *   - invalid: immediately return appropriate error
  *
  * This function is a bit of boilerplate, as most types can ONLY be created from their
- * respective literals. To solve the issue, use the magic of templates to suuply
+ * respective literals. To solve the issue, use the magic of templates to supply
  * a parameter pack of allowed types.
  */
 [[nodiscard]]
 fs::compiler::error::error_variant add_constant_from_value(
-	std::string_view wanted_name,
-	fs::lang::object_type wanted_type,
-	fs::lang::object value,
+	const past::identifier& wanted_name,
+	const past::object_type_expression& wanted_type,
+	const fs::parser::parsed_object& value,
 	const fs::parser::parse_result& parse_data,
 	std::ostream& error_stream,
 	fs::parser::constants_map& map)
 {
-	switch (wanted_type)
+	switch (wanted_type.value)
 	{
 		case fs::lang::object_type::boolean:
 		{
 			return add_constant_from_allowed_types<
 				fs::lang::object_type::boolean,
 				fs::lang::boolean
-				>{}(wanted_name, value, parse_data, error_stream, map);
+				>{}(wanted_name, wanted_type, value, parse_data, error_stream, map);
 		}
 		case fs::lang::object_type::number:
 		{
 			return add_constant_from_allowed_types<
 				fs::lang::object_type::number,
 				fs::lang::number
-				>{}(wanted_name, value, parse_data, error_stream, map);
+				>{}(wanted_name, wanted_type, value, parse_data, error_stream, map);
 		}
 		case fs::lang::object_type::level:
 		{
@@ -184,7 +191,7 @@ fs::compiler::error::error_variant add_constant_from_value(
 				fs::lang::object_type::level,
 				fs::lang::level,
 				fs::lang::number // promotion
-				>{}(wanted_name, value, parse_data, error_stream, map);
+				>{}(wanted_name, wanted_type, value, parse_data, error_stream, map);
 		}
 		case fs::lang::object_type::sound_id:
 		{
@@ -192,7 +199,7 @@ fs::compiler::error::error_variant add_constant_from_value(
 				fs::lang::object_type::sound_id,
 				fs::lang::sound_id,
 				fs::lang::number // promotion
-				>{}(wanted_name, value, parse_data, error_stream, map);
+				>{}(wanted_name, wanted_type, value, parse_data, error_stream, map);
 		}
 		case fs::lang::object_type::volume:
 		{
@@ -200,49 +207,49 @@ fs::compiler::error::error_variant add_constant_from_value(
 				fs::lang::object_type::volume,
 				fs::lang::volume,
 				fs::lang::number // promotion
-				>{}(wanted_name, value, parse_data, error_stream, map);
+				>{}(wanted_name, wanted_type, value, parse_data, error_stream, map);
 		}
 		case fs::lang::object_type::rarity:
 		{
 			return add_constant_from_allowed_types<
 				fs::lang::object_type::rarity,
 				fs::lang::rarity
-				>{}(wanted_name, value, parse_data, error_stream, map);
+				>{}(wanted_name, wanted_type, value, parse_data, error_stream, map);
 		}
 		case fs::lang::object_type::shape:
 		{
 			return add_constant_from_allowed_types<
 				fs::lang::object_type::shape,
 				fs::lang::shape
-				>{}(wanted_name, value, parse_data, error_stream, map);
+				>{}(wanted_name, wanted_type, value, parse_data, error_stream, map);
 		}
 		case fs::lang::object_type::suit:
 		{
 			return add_constant_from_allowed_types<
 				fs::lang::object_type::suit,
 				fs::lang::suit
-				>{}(wanted_name, value, parse_data, error_stream, map);
+				>{}(wanted_name, wanted_type, value, parse_data, error_stream, map);
 		}
 		case fs::lang::object_type::color:
 		{
 			return add_constant_from_allowed_types<
 				fs::lang::object_type::color,
 				fs::lang::color
-				>{}(wanted_name, value, parse_data, error_stream, map);
+				>{}(wanted_name, wanted_type, value, parse_data, error_stream, map);
 		}
 		case fs::lang::object_type::group:
 		{
 			return add_constant_from_allowed_types<
 				fs::lang::object_type::group,
 				fs::lang::group
-				>{}(wanted_name, value, parse_data, error_stream, map);
+				>{}(wanted_name, wanted_type, value, parse_data, error_stream, map);
 		}
 		case fs::lang::object_type::string:
 		{
 			return add_constant_from_allowed_types<
 				fs::lang::object_type::string,
 				fs::lang::string
-				>{}(wanted_name, value, parse_data, error_stream, map);
+				>{}(wanted_name, wanted_type, value, parse_data, error_stream, map);
 		}
 		default:
 		{
@@ -260,7 +267,7 @@ fs::compiler::error::error_variant add_constant_from_value(
  * after either successful addition or any error return immediately.
  *
  * flow:
- * - check that name is not already taken and error is so (0)
+ * - check that name is not already taken and error if so (0)
  *   (it's impossible to have multiple objects with the same name)
  *   (as of now, filter's language has no scoping/name shadowing)
  * - if right side is an identifier (1)
@@ -279,14 +286,16 @@ fs::compiler::error::error_variant add_constant_from_definition(
 	std::ostream& error_stream,
 	fs::parser::constants_map& map)
 {
-	const std::string& wanted_name = def.name.value;
-	const fs::lang::object_type& wanted_type = def.object_type.value;
+	const past::identifier& wanted_name = def.name;
+	const past::object_type_expression& wanted_type = def.object_type;
 	const past::value_expression& value_expression = def.value;
 
-	if (map.find(wanted_name) != map.end()) // (0)
+	const auto wanted_name_it = map.find(wanted_name.value); // C++17: use if (expr; cond)
+	if (wanted_name_it != map.end()) // (0)
 	{
-		const fs::parser::range_type place_of_error = parse_data.position_cache.position_of(def.name);
-		return fs::compiler::error::name_already_exists{place_of_error};
+		const fs::parser::range_type place_of_duplicated_name = parse_data.position_cache.position_of(def.name);
+		const fs::parser::range_type place_of_original_name = wanted_name_it->second.name_origin;
+		return fs::compiler::error::name_already_exists{place_of_duplicated_name, place_of_original_name};
 	}
 
 	if (holds_alternative<past::identifier>(value_expression.get())) // (1)
@@ -296,30 +305,38 @@ fs::compiler::error::error_variant add_constant_from_definition(
 		const std::optional<fs::lang::group> group = fs::compiler::identifier_to_group(identifier.value); // (2)
 		if (group)
 		{
+			const fs::parser::parsed_object value{
+				parser_literal_to_language_object(value_expression),
+				parse_data.position_cache.position_of(value_expression)
+			};
 			return add_constant_from_allowed_types<
 				fs::lang::object_type::group,
 				fs::lang::group
-				>{}(wanted_name, *group, parse_data, error_stream, map);
+				>{}(wanted_name, wanted_type, value, parse_data, error_stream, map);
 		}
 
 		// else: not a special identifier, search for referenced value then (3)
 
-		const auto it = map.find(identifier.value);
+		const auto it = map.find(identifier.value); // C++17: use if (expr; cond)
 		if (it == map.end())
 		{
 			const fs::parser::range_type place_of_error = parse_data.position_cache.position_of(identifier);
 			return fs::compiler::error::no_such_name{place_of_error}; // (4)
 		}
 
-		const auto& value = it->second;
+		const fs::parser::parsed_object& value = it->second;
 		return add_constant_from_value(wanted_name, wanted_type, value, parse_data, error_stream, map); // (5)
 	}
 
 	// (6)
+	const fs::parser::parsed_object value{ // FIXME duplicated code, see (2)
+		parser_literal_to_language_object(value_expression),
+		parse_data.position_cache.position_of(value_expression)
+	};
 	return add_constant_from_value(
 		wanted_name,
 		wanted_type,
-		parser_literal_to_language_object(value_expression),
+		value,
 		parse_data,
 		error_stream,
 		map);
