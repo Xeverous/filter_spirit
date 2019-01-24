@@ -9,7 +9,7 @@ namespace fs::compiler
 {
 
 [[nodiscard]]
-bool compile(std::string file_content, std::string_view output_path, std::ostream& error_stream);
+bool compile(std::string file_content, std::ostream& error_stream);
 
 /**
  * @brief attempt to convert sequence of characters (eg RRGBW) to group object

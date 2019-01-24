@@ -394,7 +394,7 @@ std::optional<lang::group> identifier_to_group(std::string_view identifier)
 	return gp;
 }
 
-bool compile(std::string file_content, std::string_view /* output_path */, std::ostream& error_stream)
+bool compile(std::string file_content, std::ostream& error_stream)
 {
 	std::optional<parser::parse_result> parse_result = parser::parse(file_content, error_stream);
 
