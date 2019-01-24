@@ -5,7 +5,7 @@
 namespace fs::parser
 {
 
-std::optional<parse_result> parse(const std::string& file_content, std::ostream& error_stream)
+std::optional<std::pair<ast::ast_type, lookup_data>> parse(const std::string& file_content, std::ostream& error_stream)
 {
 	      iterator_type it   {file_content.begin()};
 	const iterator_type begin{file_content.begin()};
@@ -32,12 +32,12 @@ std::optional<parse_result> parse(const std::string& file_content, std::ostream&
 		return std::nullopt;
 	}
 
-	return parse_result(std::move(ast), std::move(position_cache));
+	return std::make_pair(ast, lookup_data(std::move(position_cache)));
 }
 
-void parse_result::print_ast() const
+void lookup_data::print_ast() const
 {
-	print::structure_printer()(ast);
+
 }
 
 }

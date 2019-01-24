@@ -6,6 +6,6 @@
 namespace fs::print
 {
 
-void compile_error(const parser::parse_result& parse_data, compiler::error::error_variant error, std::ostream& error_stream);
+void compile_error(const parser::lookup_data& lookup_data, compiler::error::error_variant error, std::ostream& error_stream);
 
 }
