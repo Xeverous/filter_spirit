@@ -1,5 +1,6 @@
 #include "print/generic.hpp"
 #include <cctype>
+#include <iterator>
 
 namespace fs::print
 {
@@ -20,26 +21,33 @@ iterator_type skip_whitespace(iterator_type it, iterator_type last)
 	return it;
 }
 
-iterator_type skip_non_whitespace(iterator_type it, iterator_type last)
+range_type skip_whitespace(range_type range, iterator_type last)
 {
-	while (it != last)
+	iterator_type it = range.begin();
+	while (it != range.end() && it != last)
 	{
 		const auto c = *it;
 		if (std::isspace(static_cast<unsigned char>(c)))
-			break;
-		else
 			++it;
+		else
+			break;
 	}
 
-	return it;
+	// make sure we havent accidentally advanced range beginning so that the range is empty
+	// move end 1 position forward unless last has been reached
+	if (it == range.end() && range.end() != last)
+		return range_type(it, ++range.end());
+	else
+		return range_type(it, range.end());
+
 }
 
 iterator_type get_line_start(iterator_type first, iterator_type pos)
 {
 	iterator_type latest = first;
-	for (iterator_type i = first; i != pos; ++i)
-		if (*i == '\r' || *i == '\n')
-			latest = i;
+	for (iterator_type it = first; it != pos; ++it)
+		if (*it == '\r' || *it == '\n')
+			latest = it;
 	return latest;
 }
 

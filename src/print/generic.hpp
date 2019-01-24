@@ -10,15 +10,32 @@ constexpr auto tab_length = 8;
 constexpr auto indicator_background = '_';
 constexpr auto indicator_foreground = '^';
 
+/**
+ * @param first beginning of the input, or something further
+ * @param pos position of interest
+ * @return iterator to first character of the line where pos is
+ *
+ * @note function assumes that first <= pos
+ */
 [[nodiscard]]
 iterator_type get_line_start(iterator_type first, iterator_type pos);
+/**
+ * @param first beginning of the input
+ * @param it position of interest
+ * @return amount of encountered line breaks + 1
+ */
 [[nodiscard]]
 int count_line_number(iterator_type first, iterator_type it);
 
+/**
+ * Move 'it' (or 'range') forward so that it does not point at whitespace by
+ * skipping until hit a non-whitespace or reached 'last'. In case range would be
+ * of length 0 it's end is moved forward 1 position if it would not exceed 'last'
+ */
 [[nodiscard]]
 iterator_type skip_whitespace(iterator_type it, iterator_type last);
 [[nodiscard]]
-iterator_type skip_non_whitespace(iterator_type it, iterator_type last);
+range_type skip_whitespace(range_type range, iterator_type last);
 
 
 template <typename OutputStream>

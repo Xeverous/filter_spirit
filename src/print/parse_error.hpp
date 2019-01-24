@@ -11,9 +11,13 @@ void parse_error(
 	range_type error_range,
 	std::string_view expected)
 {
-	// TODO: verify that this is needed
-	// make sure err_pos does not point to white space
-	// error_range.begin() = skip_whitespace(error_range.begin(), last);
+	/*
+	 * Make sure error does not point to whitespace - such errors would be rather unclear for the user.
+	 * Why it happens? I don't know, even boost::spirit::x3 implementation uses whitespace skipping in
+	 * their examples - perhaps whitespace are just the place where parser backtracks upon encountering
+	 * an error. So move the iterator forward then to express that the error was caused by next token.
+	 */
+	error_range = skip_whitespace(error_range, content.end());
 
 	print_line_number(os, count_line_number(content.begin(), error_range.begin()));
 	os << "parse error: expected '" << expected << "' here\n";
