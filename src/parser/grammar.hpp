@@ -58,8 +58,7 @@ struct error_on_error
 	{
 		position_cache_type& positions = x3::get<position_cache_tag>(context).get();
 		auto& error_stream = x3::get<error_stream_tag>(context).get();
-		std::string message = "parse error: expected: '" + ex.which() + "' here"; // TODO: move deeper
-		print::parse_error(error_stream, range_type(positions.first(), positions.last()), ex.where(), message);
+		print::parse_error(error_stream, range_type(positions.first(), positions.last()), ex.where(), ex.which());
 		return x3::error_handler_result::fail;
 	}
 };
