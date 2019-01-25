@@ -8,7 +8,7 @@
 #pragma once
 #include "parser/ast.hpp"
 #include "parser/config.hpp"
-#include "print/parse_error.hpp"
+#include "print/generic.hpp"
 #include <boost/spirit/home/x3.hpp>
 #include <boost/spirit/home/x3/support/utility/lambda_visitor.hpp>
 #include <string>
@@ -56,9 +56,16 @@ struct error_on_error
 		const Exception& ex,
 		const Context& context)
 	{
-		position_cache_type& positions = x3::get<position_cache_tag>(context).get();
-		auto& error_stream = x3::get<error_stream_tag>(context).get();
-		print::parse_error(error_stream, range_type(positions.first(), positions.last()), ex.where(), ex.which());
+		const position_cache_type& positions = x3::get<position_cache_tag>(context).get();
+		const iterator_type error_first = ex.where();
+		const auto error_last = ++iterator_type(error_first);
+		print::print_line_number_with_indication_and_texts(
+			x3::get<error_stream_tag>(context).get(),
+			range_type(positions.first(), positions.last()),
+			range_type(error_first, error_last),
+			"parse error: expected '",
+			ex.which(),
+			"' here");
 		return x3::error_handler_result::fail;
 	}
 };

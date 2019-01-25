@@ -99,13 +99,24 @@ void print_line_with_indicator(OutputStream& os, range_type content_range, range
 }
 
 template <typename OutputStream, typename... Texts>
-void print_line_number_with_texts(
+void print_line_number_with_indication_and_texts(
 	OutputStream& os,
-	int line_number,
+	range_type content_range,
+	range_type indicated_range,
 	Texts&&... texts)
 {
+	/*
+	 * Make sure error does not point to whitespace - such errors would be rather unclear for the user.
+	 * Why it happens? I don't know, even boost::spirit::x3 implementation uses whitespace skipping in
+	 * their examples - perhaps whitespace are just the place where parser backtracks upon encountering
+	 * an error. So move the iterator forward then to express that the error was caused by next token.
+	 */
+	indicated_range = skip_whitespace(indicated_range, content_range.end());
+	const int line_number = count_line_number(content_range.begin(), indicated_range.begin());
+
 	print_line_number(os, line_number);
 	(os << ... << std::forward<Texts>(texts)) << '\n';
+	print_line_with_indicator(os, content_range, indicated_range);
 }
 
 }
