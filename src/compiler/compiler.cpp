@@ -111,7 +111,6 @@ struct add_constant_from_allowed_types<WantedType, AllowedTypeFirst, AllowedType
 		const past::object_type_expression& wanted_type,
 		const fs::parser::parsed_object& value,
 		const fs::parser::lookup_data& lookup_data,
-		std::ostream& error_stream,
 		fs::parser::constants_map& map)
 	{
 		if (std::holds_alternative<AllowedTypeFirst>(value.value))
@@ -121,7 +120,8 @@ struct add_constant_from_allowed_types<WantedType, AllowedTypeFirst, AllowedType
 		}
 		else
 		{
-			return add_constant_from_allowed_types<WantedType, AllowedTypesRest...>{}(wanted_name, wanted_type, value, lookup_data, error_stream, map);
+			return add_constant_from_allowed_types<WantedType, AllowedTypesRest...>{}(
+				wanted_name, wanted_type, value, lookup_data, map);
 		}
 	}
 
@@ -137,7 +137,6 @@ struct add_constant_from_allowed_types<WantedType>
 		const past::object_type_expression& wanted_type,
 		const fs::parser::parsed_object& value,
 		const fs::parser::lookup_data& lookup_data,
-		std::ostream& /* error_stream */,
 		fs::parser::constants_map& /* map */)
 	{
 		return fs::compiler::error::type_mismatch{
@@ -167,7 +166,6 @@ fs::compiler::error::error_variant add_constant_from_value(
 	const past::object_type_expression& wanted_type,
 	const fs::parser::parsed_object& value,
 	const fs::parser::lookup_data& lookup_data,
-	std::ostream& error_stream,
 	fs::parser::constants_map& map)
 {
 	switch (wanted_type.value)
@@ -177,14 +175,14 @@ fs::compiler::error::error_variant add_constant_from_value(
 			return add_constant_from_allowed_types<
 				fs::lang::object_type::boolean,
 				fs::lang::boolean
-				>{}(wanted_name, wanted_type, value, lookup_data, error_stream, map);
+				>{}(wanted_name, wanted_type, value, lookup_data, map);
 		}
 		case fs::lang::object_type::number:
 		{
 			return add_constant_from_allowed_types<
 				fs::lang::object_type::number,
 				fs::lang::number
-				>{}(wanted_name, wanted_type, value, lookup_data, error_stream, map);
+				>{}(wanted_name, wanted_type, value, lookup_data, map);
 		}
 		case fs::lang::object_type::level:
 		{
@@ -192,7 +190,7 @@ fs::compiler::error::error_variant add_constant_from_value(
 				fs::lang::object_type::level,
 				fs::lang::level,
 				fs::lang::number // promotion
-				>{}(wanted_name, wanted_type, value, lookup_data, error_stream, map);
+				>{}(wanted_name, wanted_type, value, lookup_data, map);
 		}
 		case fs::lang::object_type::sound_id:
 		{
@@ -200,7 +198,7 @@ fs::compiler::error::error_variant add_constant_from_value(
 				fs::lang::object_type::sound_id,
 				fs::lang::sound_id,
 				fs::lang::number // promotion
-				>{}(wanted_name, wanted_type, value, lookup_data, error_stream, map);
+				>{}(wanted_name, wanted_type, value, lookup_data, map);
 		}
 		case fs::lang::object_type::volume:
 		{
@@ -208,49 +206,49 @@ fs::compiler::error::error_variant add_constant_from_value(
 				fs::lang::object_type::volume,
 				fs::lang::volume,
 				fs::lang::number // promotion
-				>{}(wanted_name, wanted_type, value, lookup_data, error_stream, map);
+				>{}(wanted_name, wanted_type, value, lookup_data, map);
 		}
 		case fs::lang::object_type::rarity:
 		{
 			return add_constant_from_allowed_types<
 				fs::lang::object_type::rarity,
 				fs::lang::rarity
-				>{}(wanted_name, wanted_type, value, lookup_data, error_stream, map);
+				>{}(wanted_name, wanted_type, value, lookup_data, map);
 		}
 		case fs::lang::object_type::shape:
 		{
 			return add_constant_from_allowed_types<
 				fs::lang::object_type::shape,
 				fs::lang::shape
-				>{}(wanted_name, wanted_type, value, lookup_data, error_stream, map);
+				>{}(wanted_name, wanted_type, value, lookup_data, map);
 		}
 		case fs::lang::object_type::suit:
 		{
 			return add_constant_from_allowed_types<
 				fs::lang::object_type::suit,
 				fs::lang::suit
-				>{}(wanted_name, wanted_type, value, lookup_data, error_stream, map);
+				>{}(wanted_name, wanted_type, value, lookup_data, map);
 		}
 		case fs::lang::object_type::color:
 		{
 			return add_constant_from_allowed_types<
 				fs::lang::object_type::color,
 				fs::lang::color
-				>{}(wanted_name, wanted_type, value, lookup_data, error_stream, map);
+				>{}(wanted_name, wanted_type, value, lookup_data, map);
 		}
 		case fs::lang::object_type::group:
 		{
 			return add_constant_from_allowed_types<
 				fs::lang::object_type::group,
 				fs::lang::group
-				>{}(wanted_name, wanted_type, value, lookup_data, error_stream, map);
+				>{}(wanted_name, wanted_type, value, lookup_data, map);
 		}
 		case fs::lang::object_type::string:
 		{
 			return add_constant_from_allowed_types<
 				fs::lang::object_type::string,
 				fs::lang::string
-				>{}(wanted_name, wanted_type, value, lookup_data, error_stream, map);
+				>{}(wanted_name, wanted_type, value, lookup_data, map);
 		}
 		default:
 		{
@@ -284,7 +282,6 @@ fs::compiler::error::error_variant add_constant_from_value(
 fs::compiler::error::error_variant add_constant_from_definition(
 	const fs::parser::ast::constant_definition& def,
 	const fs::parser::lookup_data& lookup_data,
-	std::ostream& error_stream,
 	fs::parser::constants_map& map)
 {
 	const past::identifier& wanted_name = def.name;
@@ -313,7 +310,7 @@ fs::compiler::error::error_variant add_constant_from_definition(
 			return add_constant_from_allowed_types<
 				fs::lang::object_type::group,
 				fs::lang::group
-				>{}(wanted_name, wanted_type, value, lookup_data, error_stream, map);
+				>{}(wanted_name, wanted_type, value, lookup_data, map);
 		}
 
 		// else: not a special identifier, search for referenced value then (3)
@@ -326,7 +323,7 @@ fs::compiler::error::error_variant add_constant_from_definition(
 		}
 
 		const fs::parser::parsed_object& value = it->second;
-		return add_constant_from_value(wanted_name, wanted_type, value, lookup_data, error_stream, map); // (5)
+		return add_constant_from_value(wanted_name, wanted_type, value, lookup_data, map); // (5)
 	}
 
 	// (6)
@@ -339,7 +336,6 @@ fs::compiler::error::error_variant add_constant_from_definition(
 		wanted_type,
 		value,
 		lookup_data,
-		error_stream,
 		map);
 }
 
@@ -354,7 +350,10 @@ void print_error(const parser::lookup_data& lookup_data, error::error_variant er
 }
 
 [[nodiscard]]
-std::optional<parser::constants_map> parse_constants(const parser::ast::ast_type& ast, const parser::lookup_data& lookup_data, std::ostream& error_stream)
+std::optional<parser::constants_map> parse_constants(
+	const parser::ast::ast_type& ast,
+	const parser::lookup_data& lookup_data,
+	std::ostream& error_stream)
 {
 	parser::constants_map map;
 
@@ -362,7 +361,7 @@ std::optional<parser::constants_map> parse_constants(const parser::ast::ast_type
 	{
 		if (line.value)
 		{
-			const error::error_variant error = add_constant_from_definition(*line.value, lookup_data, error_stream, map);
+			const error::error_variant error = add_constant_from_definition(*line.value, lookup_data, map);
 			if (!std::holds_alternative<error::no_error>(error))
 			{
 				print_error(lookup_data, error, error_stream);
