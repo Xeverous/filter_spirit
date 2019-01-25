@@ -22,11 +22,12 @@ struct no_such_name
 
 struct type_mismatch
 {
-	//parser::range_type place_of_error;
-	lang::object_type expected;
-	lang::object_type actual;
-	parser::range_type type_origin;
-	parser::range_type value_origin;
+	// invariant: left_operand_type != right_operand_type
+	lang::object_type left_operand_type;
+	lang::object_type right_operand_type;
+	parser::range_type right_operand_value_origin;
+	// if object was unnamed literal then type origin should point at that literal
+	parser::range_type right_operand_type_origin;
 };
 
 struct internal_error {};

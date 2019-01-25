@@ -45,26 +45,26 @@ void print_compile_error(const fs::parser::lookup_data& lookup_data, fs::compile
 void print_compile_error(const fs::parser::lookup_data& lookup_data, fs::compiler::error::type_mismatch error, std::ostream& error_stream)
 {
 	const range_type content_range = lookup_data.get_range_of_whole_content();
-	const range_type value_origin_range = fp::skip_whitespace(error.value_origin, content_range.end());
+	const range_type value_origin_range = fp::skip_whitespace(error.right_operand_value_origin, content_range.end());
 
 	fp::print_line_number_with_texts(
 		error_stream,
 		fp::count_line_number(content_range.begin(), value_origin_range.begin()),
 		fp::compiler_error_string,
 		"type mismatch in expression, operands of types '",
-		fs::lang::to_string(error.expected),
+		fs::lang::to_string(error.left_operand_type),
 		"' and '",
-		fs::lang::to_string(error.actual),
+		fs::lang::to_string(error.right_operand_type),
 		"'");
 	fp::print_line_with_indicator(error_stream, content_range, value_origin_range);
 
-	const range_type type_origin_range = fp::skip_whitespace(error.type_origin, content_range.end());
+	const range_type type_origin_range = fp::skip_whitespace(error.right_operand_type_origin, content_range.end());
 
 	fp::print_line_number_with_texts(
 		error_stream,
 		fp::count_line_number(content_range.begin(), type_origin_range.begin()),
 		fp::note_string,
-		"type defined here");
+		"right operand type defined here");
 	fp::print_line_with_indicator(error_stream, content_range, type_origin_range);
 }
 

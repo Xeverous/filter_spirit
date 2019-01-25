@@ -13,7 +13,15 @@ namespace fs::parser
 struct parsed_object
 {
 	lang::object value;
-	range_type name_origin; // for printing error name already exists, range should point at name
+	// for printing errors about mismatched types
+	// if object originated from a literal this should point at the literal
+	range_type type_origin;
+	// if object was referened from other object this should point at the use of
+	// that object - in other words, point at expression which object was assigned from
+	range_type value_origin;
+	// for printing error name already exists
+	// if object originated from a literal this should be empty
+	std::optional<range_type> name_origin;
 };
 
 using constants_map = std::unordered_map<std::string, parsed_object>; // TODO move to compiler
@@ -25,8 +33,6 @@ public:
 	: position_cache(std::move(position_cache))
 	{
 	}
-
-	void print_ast() const;
 
 	[[nodiscard]]
 	range_type get_range_of_whole_content() const

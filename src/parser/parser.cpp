@@ -35,9 +35,4 @@ std::optional<std::pair<ast::ast_type, lookup_data>> parse(const std::string& fi
 	return std::make_pair(ast, lookup_data(std::move(position_cache)));
 }
 
-void lookup_data::print_ast() const
-{
-
-}
-
 }

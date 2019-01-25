@@ -115,7 +115,13 @@ struct add_constant_from_allowed_types<WantedType, AllowedTypeFirst, AllowedType
 	{
 		if (std::holds_alternative<AllowedTypeFirst>(value.value))
 		{
-			map.emplace(wanted_name.value, value);
+			fs::parser::parsed_object obj{
+				value.value,
+				lookup_data.position_of(wanted_type),
+				value.value_origin,
+				lookup_data.position_of(wanted_name)
+			};
+			map.emplace(wanted_name.value, obj);
 			return fs::compiler::error::no_error();
 		}
 		else
@@ -142,8 +148,8 @@ struct add_constant_from_allowed_types<WantedType>
 		return fs::compiler::error::type_mismatch{
 			WantedType,
 			type_of_object(value.value),
-			lookup_data.position_of(wanted_type),
-			value.name_origin
+			value.value_origin,
+			value.type_origin
 		};
 	}
 
@@ -292,7 +298,8 @@ fs::compiler::error::error_variant add_constant_from_definition(
 	if (wanted_name_it != map.end()) // (0)
 	{
 		const fs::parser::range_type place_of_duplicated_name = lookup_data.position_of(def.name);
-		const fs::parser::range_type place_of_original_name = wanted_name_it->second.name_origin;
+		assert(wanted_name_it->second.name_origin);
+		const fs::parser::range_type place_of_original_name = *wanted_name_it->second.name_origin;
 		return fs::compiler::error::name_already_exists{place_of_duplicated_name, place_of_original_name};
 	}
 
@@ -305,7 +312,9 @@ fs::compiler::error::error_variant add_constant_from_definition(
 		{
 			const fs::parser::parsed_object value{
 				parser_literal_to_language_object(value_expression),
-				lookup_data.position_of(value_expression)
+				lookup_data.position_of(value_expression),
+				lookup_data.position_of(value_expression),
+				std::nullopt
 			};
 			return add_constant_from_allowed_types<
 				fs::lang::object_type::group,
@@ -318,18 +327,27 @@ fs::compiler::error::error_variant add_constant_from_definition(
 		const auto it = map.find(identifier.value); // C++17: use if (expr; cond)
 		if (it == map.end())
 		{
-			const fs::parser::range_type place_of_error = lookup_data.position_of(identifier);
-			return fs::compiler::error::no_such_name{place_of_error}; // (4)
+			const fs::parser::range_type place_of_name = lookup_data.position_of(identifier);
+			return fs::compiler::error::no_such_name{place_of_name}; // (4)
 		}
 
-		const fs::parser::parsed_object& value = it->second;
+		// object acquired from identifier expression: copy it's value and type origin
+		// but set name origin where identifier was last encountered
+		const fs::parser::parsed_object value{
+			it->second.value,
+			it->second.type_origin,
+			lookup_data.position_of(identifier),
+			it->second.name_origin
+		};
 		return add_constant_from_value(wanted_name, wanted_type, value, lookup_data, map); // (5)
 	}
 
 	// (6)
 	const fs::parser::parsed_object value{ // FIXME duplicated code, see (2)
 		parser_literal_to_language_object(value_expression),
-		lookup_data.position_of(value_expression)
+		lookup_data.position_of(value_expression),
+		lookup_data.position_of(value_expression),
+		std::nullopt
 	};
 	return add_constant_from_value(
 		wanted_name,
