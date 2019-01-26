@@ -2,7 +2,6 @@
 #include "parser/ast_adapted.hpp"
 #include "utility/type_traits.hpp"
 #include "utility/type_name.hpp"
-#include <boost/fusion/algorithm/iteration/for_each.hpp>
 #include <boost/fusion/include/for_each.hpp>
 #include <iostream>
 
@@ -33,8 +32,7 @@ struct structure_printer
 	operator()(const T& integral) const
 	{
 		tab(indent);
-		std::cout << integral;
-		std::cout << "\n";
+		std::cout << integral << '\n';
 	}
 
 	template <typename T>
@@ -75,7 +73,7 @@ struct structure_printer
 	operator()(T value) const
 	{
 		tab(indent);
-		std::cout << "enum: " << static_cast<int>(value) << "\n";
+		std::cout << "enum: " << static_cast<int>(value) << '\n';
 	}
 
 	template <typename... T>
@@ -89,20 +87,20 @@ struct structure_printer
 	void operator()(const std::string& text) const
 	{
 		tab(indent);
-		std::cout << text << "\n";
+		std::cout << text << '\n';
 	}
 
 	void operator()(std::string_view text) const
 	{
 		tab(indent);
-		std::cout << text << "\n";
+		std::cout << text << '\n';
 	}
 
 	// lowest priority overload for unmatched Ts
 	template <typename T = void>
 	void operator()(...) const
 	{
-		static_assert(sizeof(T) == 0, "Missing overload for this T");
+		static_assert(sizeof(T) == 0, "Missing overload for some T");
 	}
 
 	static
