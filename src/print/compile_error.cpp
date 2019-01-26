@@ -9,12 +9,10 @@ namespace fp = fs::print;
 using iterator_type = fp::iterator_type;
 using range_type = fp::range_type;
 
-void print_compile_error(const fs::parser::lookup_data& /* lookup_data */, fs::compiler::error::no_error /* error */, std::ostream& error_stream)
-{
-	error_stream << "(no error)\n"; // TODO refactor so that there is no no_error type, then remove this overload
-}
-
-void print_compile_error(const fs::parser::lookup_data& lookup_data, fs::compiler::error::name_already_exists error, std::ostream& error_stream)
+void print_compile_error(
+	const fs::parser::lookup_data& lookup_data,
+	fs::compiler::error::name_already_exists error,
+	std::ostream& error_stream)
 {
 	const range_type content_range = lookup_data.get_range_of_whole_content();
 	fp::print_line_number_with_indication_and_texts(
@@ -31,7 +29,10 @@ void print_compile_error(const fs::parser::lookup_data& lookup_data, fs::compile
 		"first defined here");
 }
 
-void print_compile_error(const fs::parser::lookup_data& lookup_data, fs::compiler::error::no_such_name error, std::ostream& error_stream)
+void print_compile_error(
+	const fs::parser::lookup_data& lookup_data,
+	fs::compiler::error::no_such_name error,
+	std::ostream& error_stream)
 {
 	const range_type content_range = lookup_data.get_range_of_whole_content();
 	fp::print_line_number_with_indication_and_texts(
@@ -42,7 +43,10 @@ void print_compile_error(const fs::parser::lookup_data& lookup_data, fs::compile
 		"no such name exists");
 }
 
-void print_compile_error(const fs::parser::lookup_data& lookup_data, fs::compiler::error::type_mismatch error, std::ostream& error_stream)
+void print_compile_error(
+	const fs::parser::lookup_data& lookup_data,
+	fs::compiler::error::type_mismatch error,
+	std::ostream& error_stream)
 {
 	const range_type content_range = lookup_data.get_range_of_whole_content();
 	fp::print_line_number_with_indication_and_texts(
@@ -63,9 +67,51 @@ void print_compile_error(const fs::parser::lookup_data& lookup_data, fs::compile
 		"right operand type defined here");
 }
 
-void print_compile_error(const fs::parser::lookup_data& lookup_data, fs::compiler::error::internal_error /* error */, std::ostream& error_stream)
+void print_compile_error(
+	const fs::parser::lookup_data& lookup_data,
+	fs::compiler::error::internal_error_while_parsing_constant error,
+	std::ostream& error_stream)
 {
-	error_stream << "internal compiler error\nplease report a bug with attached minimal source that reproduces it\n";
+	error_stream << "INTERNAL COMPILER ERROR while parsing a type definition expression\n"
+		"please report a bug with attached minimal source that reproduces it\n";
+
+	const range_type content_range = lookup_data.get_range_of_whole_content();
+	constexpr auto note = "while parsing this";
+
+	fp::print_line_number_with_indication_and_texts(
+		error_stream,
+		content_range,
+		error.wanted_type_origin,
+		fp::note_string,
+		note);
+	fp::print_line_number_with_indication_and_texts(
+		error_stream,
+		content_range,
+		error.wanted_name_origin,
+		fp::note_string,
+		note);
+	fp::print_line_number_with_indication_and_texts(
+		error_stream,
+		content_range,
+		error.expression_type_origin,
+		fp::note_string,
+		note);
+
+	if (error.expression_value_origin != error.expression_type_origin)
+		fp::print_line_number_with_indication_and_texts(
+			error_stream,
+			content_range,
+			error.expression_value_origin,
+			fp::note_string,
+			note);
+
+	if (error.expression_name_origin)
+		fp::print_line_number_with_indication_and_texts(
+			error_stream,
+			content_range,
+			*error.expression_name_origin,
+			fp::note_string,
+			note);
 }
 
 }
@@ -73,7 +119,10 @@ void print_compile_error(const fs::parser::lookup_data& lookup_data, fs::compile
 namespace fs::print
 {
 
-void compile_error(const parser::lookup_data& lookup_data, compiler::error::error_variant error, std::ostream& error_stream)
+void compile_error(
+	const parser::lookup_data& lookup_data,
+	compiler::error::error_variant error,
+	std::ostream& error_stream)
 {
 	std::visit(
 		[&](auto error) { print_compile_error(lookup_data, error, error_stream); },

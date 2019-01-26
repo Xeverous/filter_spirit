@@ -106,7 +106,7 @@ template <fs::lang::object_type WantedType, typename AllowedTypeFirst, typename.
 struct add_constant_from_allowed_types<WantedType, AllowedTypeFirst, AllowedTypesRest...>
 {
 	[[nodiscard]]
-	fs::compiler::error::error_variant operator()(
+	std::optional<fs::compiler::error::error_variant> operator()(
 		const past::identifier& wanted_name,
 		const past::object_type_expression& wanted_type,
 		const fs::parser::parsed_object& value,
@@ -122,7 +122,7 @@ struct add_constant_from_allowed_types<WantedType, AllowedTypeFirst, AllowedType
 				lookup_data.position_of(wanted_name)
 			};
 			map.emplace(wanted_name.value, obj);
-			return fs::compiler::error::no_error();
+			return std::nullopt;
 		}
 		else
 		{
@@ -138,7 +138,7 @@ template <fs::lang::object_type WantedType>
 struct add_constant_from_allowed_types<WantedType>
 {
 	[[nodiscard]]
-	fs::compiler::error::error_variant operator()(
+	std::optional<fs::compiler::error::error_variant> operator()(
 		const past::identifier& wanted_name,
 		const past::object_type_expression& wanted_type,
 		const fs::parser::parsed_object& value,
@@ -167,7 +167,7 @@ struct add_constant_from_allowed_types<WantedType>
  * a parameter pack of allowed types.
  */
 [[nodiscard]]
-fs::compiler::error::error_variant add_constant_from_value(
+std::optional<fs::compiler::error::error_variant> add_constant_from_value(
 	const past::identifier& wanted_name,
 	const past::object_type_expression& wanted_type,
 	const fs::parser::parsed_object& value,
@@ -258,8 +258,13 @@ fs::compiler::error::error_variant add_constant_from_value(
 		}
 		default:
 		{
-			assert(false);
-			return fs::compiler::error::internal_error();
+			return fs::compiler::error::internal_error_while_parsing_constant {
+				lookup_data.position_of(wanted_name),
+				lookup_data.position_of(wanted_type),
+				value.type_origin,
+				value.value_origin,
+				value.name_origin
+			};
 		}
 	}
 }
@@ -285,7 +290,7 @@ fs::compiler::error::error_variant add_constant_from_value(
  *   - convert literal to filter's object and proceed
  */
 [[nodiscard]]
-fs::compiler::error::error_variant add_constant_from_definition(
+std::optional<fs::compiler::error::error_variant> add_constant_from_definition(
 	const fs::parser::ast::constant_definition& def,
 	const fs::parser::lookup_data& lookup_data,
 	fs::parser::constants_map& map)
@@ -379,10 +384,10 @@ std::optional<parser::constants_map> parse_constants(
 	{
 		if (line.value)
 		{
-			const error::error_variant error = add_constant_from_definition(*line.value, lookup_data, map);
-			if (!std::holds_alternative<error::no_error>(error))
+			const std::optional<fs::compiler::error::error_variant> error = add_constant_from_definition(*line.value, lookup_data, map);
+			if (error)
 			{
-				print_error(lookup_data, error, error_stream);
+				print_error(lookup_data, *error, error_stream);
 				return std::nullopt;
 			}
 		}
