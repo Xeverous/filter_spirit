@@ -1,13 +1,12 @@
 #include "compiler/compiler.hpp"
+#include "compiler/generic.hpp"
 #include "compiler/error.hpp"
 #include "parser/ast.hpp"
 #include "parser/config.hpp"
 #include "parser/parser.hpp"
-#include "lang/constants.hpp"
 #include "print/compile_error.hpp"
 #include "print/structure_printer.hpp"
 #include "utility/holds_alternative.hpp"
-#include "utility/if_constexpr_workaround.hpp"
 #include <cassert>
 #include <string_view>
 #include <utility>
@@ -16,78 +15,6 @@ namespace
 {
 
 namespace past = fs::parser::ast;
-
-fs::lang::object parser_literal_to_language_object(const past::value_expression& literal)
-{
-	return boost::apply_visitor([](const auto& literal) -> fs::lang::object {
-		using T = std::decay_t<decltype(literal)>;
-
-		if ECLIPSE_CONSTEXPR (std::is_same_v<T, past::boolean_literal>) {
-			return fs::lang::boolean{literal.value};
-		}
-		else if ECLIPSE_CONSTEXPR (std::is_same_v<T, past::integer_literal>) {
-			return fs::lang::number{literal.value};
-		}
-		else if ECLIPSE_CONSTEXPR (std::is_same_v<T, past::rarity_literal>) {
-			return fs::lang::rarity{literal.value};
-		}
-		else if ECLIPSE_CONSTEXPR (std::is_same_v<T, past::shape_literal>) {
-			return fs::lang::shape{literal.value};
-		}
-		else if ECLIPSE_CONSTEXPR (std::is_same_v<T, past::suit_literal>) {
-			return fs::lang::suit{literal.value};
-		}
-		else if ECLIPSE_CONSTEXPR (std::is_same_v<T, past::color_literal>) {
-			return literal.to_lang_color();
-		}
-		else if ECLIPSE_CONSTEXPR (std::is_same_v<T, past::string_literal>) {
-			return fs::lang::string{literal.value};
-		}
-		else if ECLIPSE_CONSTEXPR (std::is_same_v<T, past::identifier>) {
-			assert(false);
-			return fs::lang::boolean{false};
-		}
-		else
-		{
-			assert(false);
-			return fs::lang::boolean{false};
-		}
-	}, literal);
-}
-
-// get type's enum from object
-[[nodiscard]]
-fs::lang::object_type type_of_object(const fs::lang::object& obj)
-{
-	if (std::holds_alternative<fs::lang::boolean>(obj))
-		return fs::lang::object_type::boolean;
-	if (std::holds_alternative<fs::lang::number>(obj))
-		return fs::lang::object_type::number;
-	if (std::holds_alternative<fs::lang::level>(obj))
-		return fs::lang::object_type::level;
-	if (std::holds_alternative<fs::lang::sound_id>(obj))
-		return fs::lang::object_type::sound_id;
-	if (std::holds_alternative<fs::lang::volume>(obj))
-		return fs::lang::object_type::volume;
-	if (std::holds_alternative<fs::lang::rarity>(obj))
-		return fs::lang::object_type::rarity;
-	if (std::holds_alternative<fs::lang::shape>(obj))
-		return fs::lang::object_type::shape;
-	if (std::holds_alternative<fs::lang::suit>(obj))
-		return fs::lang::object_type::suit;
-	if (std::holds_alternative<fs::lang::color>(obj))
-		return fs::lang::object_type::color;
-	if (std::holds_alternative<fs::lang::group>(obj))
-		return fs::lang::object_type::group;
-	if (std::holds_alternative<fs::lang::string>(obj))
-		return fs::lang::object_type::string;
-
-	assert(false);
-	// make a return to avoid UB
-	// debug: fire assertion
-	// release: return boolean as it is the most likely to be a noisy bug
-	return fs::lang::object_type::boolean;
-}
 
 /**
  * @tparam WantedType type that is desired to be added
@@ -139,15 +66,15 @@ struct add_constant_from_allowed_types<WantedType>
 {
 	[[nodiscard]]
 	std::optional<fs::compiler::error::error_variant> operator()(
-		const past::identifier& wanted_name,
-		const past::object_type_expression& wanted_type,
+		const past::identifier& /* wanted_name */,
+		const past::object_type_expression& /* wanted_type */,
 		const fs::parser::parsed_object& value,
-		const fs::parser::lookup_data& lookup_data,
+		const fs::parser::lookup_data& /* lookup_data */,
 		fs::parser::constants_map& /* map */)
 	{
 		return fs::compiler::error::type_mismatch{
 			WantedType,
-			type_of_object(value.value),
+			fs::compiler::type_of_object(value.value),
 			value.value_origin,
 			value.type_origin
 		};
@@ -258,6 +185,7 @@ std::optional<fs::compiler::error::error_variant> add_constant_from_value(
 		}
 		default:
 		{
+			// got this error? then the switch has missing a case for some type
 			return fs::compiler::error::internal_error_while_parsing_constant {
 				lookup_data.position_of(wanted_name),
 				lookup_data.position_of(wanted_type),
@@ -349,7 +277,7 @@ std::optional<fs::compiler::error::error_variant> add_constant_from_definition(
 
 	// (6)
 	const fs::parser::parsed_object value{
-		parser_literal_to_language_object(value_expression),
+		fs::compiler::parser_literal_to_language_object(value_expression),
 		lookup_data.position_of(value_expression),
 		lookup_data.position_of(value_expression),
 		std::nullopt
@@ -409,29 +337,6 @@ bool semantic_analysis(const parser::ast::ast_type& ast, const parser::lookup_da
 	}
 
 	return true;
-}
-
-std::optional<lang::group> identifier_to_group(std::string_view identifier)
-{
-	lang::group gp;
-
-	for (char c : identifier)
-	{
-		namespace kw = fs::lang::constants::keywords;
-
-		if (c == kw::r)
-			++gp.r;
-		else if (c == kw::g)
-			++gp.g;
-		else if (c == kw::b)
-			++gp.b;
-		else if (c == kw::w)
-			++gp.w;
-		else
-			return std::nullopt;
-	}
-
-	return gp;
 }
 
 bool compile(const std::string& file_content, std::ostream& error_stream)
