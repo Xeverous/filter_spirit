@@ -316,7 +316,7 @@ std::optional<fs::compiler::error::error_variant> add_constant_from_definition(
 		if (group)
 		{
 			const fs::parser::parsed_object value{
-				parser_literal_to_language_object(value_expression),
+				*group,
 				lookup_data.position_of(value_expression),
 				lookup_data.position_of(value_expression),
 				std::nullopt
@@ -348,7 +348,7 @@ std::optional<fs::compiler::error::error_variant> add_constant_from_definition(
 	}
 
 	// (6)
-	const fs::parser::parsed_object value{ // FIXME duplicated code, see (2)
+	const fs::parser::parsed_object value{
 		parser_literal_to_language_object(value_expression),
 		lookup_data.position_of(value_expression),
 		lookup_data.position_of(value_expression),
@@ -434,7 +434,7 @@ std::optional<lang::group> identifier_to_group(std::string_view identifier)
 	return gp;
 }
 
-bool compile(std::string file_content, std::ostream& error_stream)
+bool compile(const std::string& file_content, std::ostream& error_stream)
 {
 	std::optional<std::pair<parser::ast::ast_type, parser::lookup_data>> parse_result = parser::parse(file_content, error_stream);
 
