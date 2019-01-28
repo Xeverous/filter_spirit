@@ -99,8 +99,18 @@ const object_type_expression_type object_type_expression = "type name";
 const auto object_type_expression_def = object_types;
 BOOST_SPIRIT_DEFINE(object_type_expression)
 
-const value_expression_type value_expression = "value expression";
-const auto value_expression_def =
+const array_type_expression_type array_type_expression = "array type name";
+const auto array_type_expression_def = x3::lit(lang::constants::keywords::array) > x3::lit('<') > object_types > x3::lit('>');
+BOOST_SPIRIT_DEFINE(array_type_expression)
+
+const type_expression_type type_expression = "type expression";
+const auto type_expression_def = object_type_expression | array_type_expression;
+BOOST_SPIRIT_DEFINE(type_expression)
+
+// ----
+
+const literal_expression_type literal_expression = "literal";
+const auto literal_expression_def =
 // order has a big matter here
 // more complex grammars should be first, otherwise the parser
 // could mistakenly treat insufficient amount of tokens
@@ -111,14 +121,26 @@ const auto value_expression_def =
 	| suit_literal
 	| color_literal
 	| string_literal
-	| integer_literal
-	| identifier;
+	| integer_literal;
+BOOST_SPIRIT_DEFINE(literal_expression)
+
+// circular reference, need to change order
+const array_expression_type array_expression = "array expression";
+
+const value_expression_type value_expression = "value expression";
+const auto value_expression_def =
+	  literal_expression
+	| identifier
+	| array_expression;
 BOOST_SPIRIT_DEFINE(value_expression)
+
+const auto array_expression_def = x3::lit('[') > (value_expression % x3::lit(',')) > x3::lit(']');
+BOOST_SPIRIT_DEFINE(array_expression)
 
 // ----
 
 const constant_definition_type constant_definition = "constant definiton";
-const auto constant_definition_def = object_type_expression > identifier > x3::lit(assignment_operator) > value_expression;
+const auto constant_definition_def = type_expression > identifier > x3::lit(assignment_operator) > value_expression;
 BOOST_SPIRIT_DEFINE(constant_definition)
 
 // ----

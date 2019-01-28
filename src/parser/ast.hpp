@@ -45,7 +45,6 @@ struct rarity_literal : x3::position_tagged
 	lang::rarity value;
 };
 
-
 struct shape_literal : x3::position_tagged
 {
 	lang::shape value;
@@ -106,18 +105,17 @@ struct string_literal : x3::position_tagged
 
 struct object_type_expression : x3::position_tagged
 {
-	lang::object_type value;
+	lang::single_object_type value;
 };
 
-struct value_expression : x3::variant<
-		boolean_literal,
-		rarity_literal,
-		shape_literal,
-		suit_literal,
-		color_literal,
-		string_literal,
-		integer_literal,
-		identifier
+struct array_type_expression : x3::position_tagged
+{
+	lang::single_object_type value;
+};
+
+struct type_expression : x3::variant<
+		object_type_expression,
+		array_type_expression
 	>, x3::position_tagged
 {
 	using base_type::base_type;
@@ -126,13 +124,43 @@ struct value_expression : x3::variant<
 
 // ----
 
+struct literal_expression : x3::variant<
+		boolean_literal,
+		rarity_literal,
+		shape_literal,
+		suit_literal,
+		color_literal,
+		string_literal,
+		integer_literal
+	>, x3::position_tagged
+{
+	using base_type::base_type;
+	using base_type::operator=;
+};
+
+struct value_expression : x3::variant<
+		literal_expression,
+		identifier,
+		x3::forward_ast<struct array_expression>
+	>, x3::position_tagged
+{
+	using base_type::base_type;
+	using base_type::operator=;
+};
+
+struct array_expression : x3::position_tagged
+{
+	std::vector<value_expression> values;
+};
+
+// ----
+
 struct constant_definition : x3::position_tagged
 {
-	object_type_expression object_type;
+	type_expression type;
 	identifier name;
 	value_expression value;
 };
-
 
 struct code_line : x3::position_tagged
 {

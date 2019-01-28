@@ -1,6 +1,7 @@
 #pragma once
 #include "parser/ast.hpp"
 #include "parser/config.hpp"
+#include "lang/types.hpp"
 #include <string>
 #include <iosfwd>
 #include <optional>
@@ -9,22 +10,6 @@
 
 namespace fs::parser
 {
-
-struct parsed_object
-{
-	lang::object value;
-	// for printing errors about mismatched types
-	// if object originated from a literal this should point at the literal
-	range_type type_origin;
-	// if object was referened from other object this should point at the use of
-	// that object - in other words, point at expression which object was assigned from
-	range_type value_origin;
-	// for printing error name already exists
-	// if object originated from a literal this should be empty
-	std::optional<range_type> name_origin;
-};
-
-using constants_map = std::unordered_map<std::string, parsed_object>; // TODO move to compiler
 
 class lookup_data
 {

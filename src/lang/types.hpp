@@ -1,13 +1,15 @@
 #pragma once
+#include "parser/config.hpp"
 #include <string>
 #include <string_view>
 #include <optional>
 #include <variant>
+#include <vector>
 
 namespace fs::lang
 {
 
-enum class object_type
+enum class single_object_type
 {
 	boolean,
 	number,
@@ -19,15 +21,28 @@ enum class object_type
 	suit,
 	color,
 	group,
-	string
+	string,
+
+	generic // for generic constructs such as empty arrays
 };
 
-std::string_view to_string(object_type type);
+struct object_type
+{
+	object_type(single_object_type type, bool is_array = false)
+	: type(type), is_array(is_array)
+	{
+	}
+
+	single_object_type type;
+	bool is_array;
+};
+
+std::string_view to_string(single_object_type type);
+std::string to_string(object_type type);
 
 enum class rarity { normal, magic, rare, unique };
 enum class shape { circle, diamond, hexagon, square, star, triangle };
 enum class suit { red, green, blue, white, brown, yellow };
-
 
 struct boolean
 {
@@ -75,7 +90,7 @@ struct string
 	std::string value;
 };
 
-using object = std::variant<
+using single_object = std::variant<
 	boolean,
 	number,
 	level,
@@ -88,5 +103,21 @@ using object = std::variant<
 	group,
 	string
 >;
+
+using array_object = std::vector<single_object>;
+
+struct object
+{
+	std::variant<single_object, array_object> value;
+	// for printing errors about mismatched types
+	// if object_ originated from a literal this should point at the literal
+	fs::parser::range_type type_origin;
+	// if object_ was referened from other object_ this should point at the use of
+	// that object_ - in other words, point at expression which object_ was assigned from
+	fs::parser::range_type value_origin;
+	// for printing error name already exists
+	// if object originated from a literal this should be empty
+	std::optional<fs::parser::range_type> name_origin;
+};
 
 }

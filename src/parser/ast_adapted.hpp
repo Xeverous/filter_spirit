@@ -84,8 +84,18 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::array_type_expression,
+	value
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::array_expression,
+	values
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::constant_definition,
-	object_type, name, value
+	type, name, value
 )
 
 // ----

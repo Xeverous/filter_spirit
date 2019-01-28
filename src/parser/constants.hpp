@@ -70,22 +70,22 @@ struct suits_ : x3::symbols<lang::suit>
 };
 const suits_ suits;
 
-struct object_types_ : x3::symbols<lang::object_type>
+struct object_types_ : x3::symbols<lang::single_object_type>
 {
 	object_types_()
 	{
 		add
-			(lang::constants::keywords::boolean,  lang::object_type::boolean)
-			(lang::constants::keywords::number,   lang::object_type::number)
-			(lang::constants::keywords::level,    lang::object_type::level)
-			(lang::constants::keywords::sound_id, lang::object_type::sound_id)
-			(lang::constants::keywords::volume,   lang::object_type::volume)
-			(lang::constants::keywords::rarity,   lang::object_type::rarity)
-			(lang::constants::keywords::shape,    lang::object_type::shape)
-			(lang::constants::keywords::suit,     lang::object_type::suit)
-			(lang::constants::keywords::color,    lang::object_type::color)
-			(lang::constants::keywords::group,    lang::object_type::group)
-			(lang::constants::keywords::string,   lang::object_type::string)
+			(lang::constants::keywords::boolean,  lang::single_object_type::boolean)
+			(lang::constants::keywords::number,   lang::single_object_type::number)
+			(lang::constants::keywords::level,    lang::single_object_type::level)
+			(lang::constants::keywords::sound_id, lang::single_object_type::sound_id)
+			(lang::constants::keywords::volume,   lang::single_object_type::volume)
+			(lang::constants::keywords::rarity,   lang::single_object_type::rarity)
+			(lang::constants::keywords::shape,    lang::single_object_type::shape)
+			(lang::constants::keywords::suit,     lang::single_object_type::suit)
+			(lang::constants::keywords::color,    lang::single_object_type::color)
+			(lang::constants::keywords::group,    lang::single_object_type::group)
+			(lang::constants::keywords::string,   lang::single_object_type::string)
 		;
 	}
 };

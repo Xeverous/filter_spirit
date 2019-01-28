@@ -90,9 +90,14 @@ struct identifier_class                   : error_on_error, annotate_on_success 
 struct string_literal_class               : error_on_error, annotate_on_success {};
 
 struct object_type_expression_class       : error_on_error, annotate_on_success {};
-struct value_expression_class             : error_on_error, annotate_on_success {};
-struct constant_definition_class          : error_on_error, annotate_on_success {};
+struct array_type_expression_class        : error_on_error, annotate_on_success {};
+struct type_expression_class              : error_on_error, annotate_on_success {};
 
+struct literal_expression_class           : error_on_error, annotate_on_success {};
+struct value_expression_class             : error_on_error, annotate_on_success {};
+struct array_expression_class             : error_on_error, annotate_on_success {};
+
+struct constant_definition_class          : error_on_error, annotate_on_success {};
 struct code_line_class                    : error_on_error, annotate_on_success {};
 
 struct grammar_class                      : error_on_error, annotate_on_success {};
@@ -150,11 +155,29 @@ BOOST_SPIRIT_DECLARE(string_literal_type)
 using object_type_expression_type = x3::rule<object_type_expression_class, ast::object_type_expression>;
 BOOST_SPIRIT_DECLARE(object_type_expression_type)
 
+using array_type_expression_type = x3::rule<array_type_expression_class, ast::array_type_expression>;
+BOOST_SPIRIT_DECLARE(array_type_expression_type)
+
+using type_expression_type = x3::rule<type_expression_class, ast::type_expression>;
+BOOST_SPIRIT_DECLARE(type_expression_type)
+
+// ----
+
+using literal_expression_type = x3::rule<literal_expression_class, ast::literal_expression>;
+BOOST_SPIRIT_DECLARE(literal_expression_type)
+
 using value_expression_type = x3::rule<value_expression_class, ast::value_expression>;
 BOOST_SPIRIT_DECLARE(value_expression_type)
 
+using array_expression_type = x3::rule<array_expression_class, ast::array_expression>;
+BOOST_SPIRIT_DECLARE(array_expression_type)
+
+// ----
+
 using constant_definition_type = x3::rule<constant_definition_class, ast::constant_definition>;
 BOOST_SPIRIT_DECLARE(constant_definition_type)
+
+// ----
 
 // filter language consists of lines, of which every is a comment or empty or some code
 using code_line_type = x3::rule<code_line_class, ast::code_line>;

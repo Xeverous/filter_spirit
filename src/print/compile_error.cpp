@@ -10,11 +10,10 @@ using iterator_type = fp::iterator_type;
 using range_type = fp::range_type;
 
 void print_compile_error(
-	const fs::parser::lookup_data& lookup_data,
 	fs::compiler::error::name_already_exists error,
+	range_type content_range,
 	std::ostream& error_stream)
 {
-	const range_type content_range = lookup_data.get_range_of_whole_content();
 	fp::print_line_number_with_indication_and_texts(
 		error_stream,
 		content_range,
@@ -30,11 +29,10 @@ void print_compile_error(
 }
 
 void print_compile_error(
-	const fs::parser::lookup_data& lookup_data,
 	fs::compiler::error::no_such_name error,
+	range_type content_range,
 	std::ostream& error_stream)
 {
-	const range_type content_range = lookup_data.get_range_of_whole_content();
 	fp::print_line_number_with_indication_and_texts(
 		error_stream,
 		content_range,
@@ -44,11 +42,10 @@ void print_compile_error(
 }
 
 void print_compile_error(
-	const fs::parser::lookup_data& lookup_data,
 	fs::compiler::error::type_mismatch error,
+	range_type content_range,
 	std::ostream& error_stream)
 {
-	const range_type content_range = lookup_data.get_range_of_whole_content();
 	fp::print_line_number_with_indication_and_texts(
 		error_stream,
 		content_range,
@@ -59,23 +56,78 @@ void print_compile_error(
 		"' and '",
 		fs::lang::to_string(error.right_operand_type),
 		"'");
-	fp::print_line_number_with_indication_and_texts(
-		error_stream,
-		content_range,
-		error.right_operand_type_origin,
-		fp::note_string,
-		"right operand type defined here");
+
+	if (error.right_operand_type_origin != error.right_operand_value_origin)
+		fp::print_line_number_with_indication_and_texts(
+			error_stream,
+			content_range,
+			error.right_operand_type_origin,
+			fp::note_string,
+			"right operand type defined here");
 }
 
 void print_compile_error(
-	const fs::parser::lookup_data& lookup_data,
+	fs::compiler::error::non_homogeneous_array error,
+	range_type content_range,
+	std::ostream& error_stream)
+{
+	fp::print_line_number_with_indication_and_texts(
+		error_stream,
+		content_range,
+		error.first_expr_origin,
+		fp::compiler_error_string,
+		"non homogeneous array, one operand of type '",
+		fs::lang::to_string(error.first_expr_type),
+		"'");
+
+	fp::print_line_number_with_indication_and_texts(
+		error_stream,
+		content_range,
+		error.second_expr_origin,
+		fp::note_string,
+		"and one operand of type '",
+		fs::lang::to_string(error.second_expr_type),
+		"'");
+}
+
+void print_compile_error(
+	fs::compiler::error::single_object_to_array_assignment error,
+	range_type content_range,
+	std::ostream& error_stream)
+{
+	fp::print_line_number_with_indication_and_texts(
+		error_stream,
+		content_range,
+		error.right_operand_expr,
+		fp::compiler_error_string,
+		"type mismatch in expression, operands of types '",
+		fs::lang::to_string(error.left_operand_type),
+		"' and '",
+		fs::lang::to_string(error.right_operand_type),
+		"'\nperhaps you meant to write '[expression]' instead of 'expression'");
+}
+
+void print_compile_error(
+	fs::compiler::error::nested_arrays_not_allowed error,
+	range_type content_range,
+	std::ostream& error_stream)
+{
+	fp::print_line_number_with_indication_and_texts(
+		error_stream,
+		content_range,
+		error.expression_origin,
+		fp::compiler_error_string,
+		"nested arrays are not allowed");
+}
+
+void print_compile_error(
 	fs::compiler::error::internal_error_while_parsing_constant error,
+	range_type content_range,
 	std::ostream& error_stream)
 {
 	error_stream << "INTERNAL COMPILER ERROR while parsing a type definition expression\n"
 		"please report a bug with attached minimal source that reproduces it\n";
 
-	const range_type content_range = lookup_data.get_range_of_whole_content();
 	constexpr auto note = "while parsing this";
 
 	fp::print_line_number_with_indication_and_texts(
@@ -120,12 +172,12 @@ namespace fs::print
 {
 
 void compile_error(
-	const parser::lookup_data& lookup_data,
 	compiler::error::error_variant error,
+	parser::range_type content_range,
 	std::ostream& error_stream)
 {
 	std::visit(
-		[&](auto error) { print_compile_error(lookup_data, error, error_stream); },
+		[&](auto error) { print_compile_error(error, content_range, error_stream); },
 		error);
 }
 

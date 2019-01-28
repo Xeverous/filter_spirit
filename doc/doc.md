@@ -57,5 +57,35 @@ Actions and conditions may consist of multiple elements. Filter Spirit denotes m
 Some stuff which is worth to mention.
 
 - Filter Spirit syntax consists only of basic ASCII (first 128 codes) but source files can be UTF-8 and contain unicode characters in the comments.
-- `=` from filter language has been replaced by `==` for consistency (this change should be obvious for anyone who ever programmed in any language). `=` is used for defining constants, `==` for comparisons. You can also skip `==`, just like with original filter language: `Quality 20` will have exactly the same meaning as `Quality == 20`.
-- Different font sizes that have very close values may look exactly the same. This is not a bug in item filters but the result of roundings in graphics and the fact that Path of Exile client supports any custom resolution.
+
+## FAQ
+
+**I have changed font size but it looks the same.**
+
+Different font sizes that have very close values may look exactly the same. This is not a bug in item filters but the result of whole pixel roundings in graphics and the fact that Path of Exile client supports custom resolutions.
+
+## FAQ - language design
+
+**Why `==` and not `=` like in the original filter?**
+
+`=` from filter language has been replaced by `==` for consistency (this change should be obvious for anyone who ever programmed in any language). `=` is used for defining constants, `==` for comparisons. This makes filter easier to parse. You can still skip `==`, just like with original filter language: `Quality 20` will have exactly the same meaning as `Quality == 20`.
+
+**Why arrays have `[elem, ...]` syntax?**
+
+Again, parsing problems, this time even more complex.
+
+```
+String str = "xyz"
+Array<String> arr = "a" "b" "c"
+
+Array<String> a1 = str # array of 1 element
+Array<String> a2 = arr # array assignment
+```
+
+Here it's ambiguous whether the right-side expressions are arrays of 1 element or an array assignment. `= [str]` + `= arr` is much easier to implement because I don't have to check if it's one element and what that name refers to.
+
+```
+101 102 103 # a color or an array of integers?
+```
+
+Obviously there would be some way to deal with such problems but I prefer to have a context-free grammar rather than something that requires to write a ton of if-else to handle all corner cases.

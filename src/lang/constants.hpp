@@ -51,6 +51,8 @@ namespace fs::lang::constants
 		constexpr auto g   = 'G';
 		constexpr auto b   = 'B';
 		constexpr auto w   = 'W';
+
+		constexpr auto array    = "Array";
 	}
 
 	constexpr auto default_opacity = 255; // TODO: this is not correct, find the real value

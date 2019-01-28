@@ -13,6 +13,9 @@ struct structure_printer
 {
 	structure_printer(int indent = 0) : indent(indent) {}
 
+	// required by boost's Visitor concept
+	using result_type = void;
+
 	template <typename T>
 	std::enable_if_t<fs::traits::is_iterable_v<T>>
 	operator()(const T& ast) const
@@ -81,6 +84,13 @@ struct structure_printer
 	{
 		// do not indent variants - they hold 1 element only
 		boost::apply_visitor(structure_printer(indent), v);
+	}
+
+	template <typename T>
+	void operator()(const boost::spirit::x3::forward_ast<T>& ast) const
+	{
+		// do not remove extra () - vexing parse
+		(structure_printer(indent))(ast.get());
 	}
 
 	// print strings as strings, do not split them as a sequence of characters

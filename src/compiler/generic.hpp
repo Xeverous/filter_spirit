@@ -1,31 +1,72 @@
 #pragma once
 #include "lang/types.hpp"
+#include "compiler/error.hpp"
+#include "compiler/compiler.hpp"
+#include "parser/ast.hpp"
+#include "parser/parser.hpp"
 #include <string_view>
 #include <optional>
-
-// forward declare to avoid too heavy includes
-namespace fs::parser::ast { class value_expression; }
 
 namespace fs::compiler
 {
 
 /**
- * @brief attempt to convert sequence of characters (eg RRGBW) to group object
+ * @brief attempt to convert sequence of characters (eg RRGBW) to a group
  * @return empty if string was not valid
  */
 [[nodiscard]]
 std::optional<lang::group> identifier_to_group(std::string_view identifier);
 
-// get type's enum from object - mostly for error printing purposes
 [[nodiscard]]
-fs::lang::object_type type_of_object(const fs::lang::object& obj);
+lang::single_object_type type_of_single_object(const lang::single_object& obj);
 
-/**
- *
- * @param expression denoting a literal, CAN NOT be an identifier expression
- * @return expresion as a language object
- */
-[[nodiscard]] // C++20: add [[expects]] for the literal
-fs::lang::object parser_literal_to_language_object(const fs::parser::ast::value_expression& literal);
+[[nodiscard]]
+lang::object_type type_of_object(const lang::object& obj);
+
+[[nodiscard]]
+lang::single_object literal_to_single_object(const parser::ast::literal_expression& literal);
+
+[[nodiscard]]
+lang::object_type type_expression_to_type(const parser::ast::type_expression& type_expr);
+
+// array MUST NOT be empty
+// both containers MUST BE of the same size
+[[nodiscard]]
+std::optional<error::non_homogeneous_array> verify_homogeneity(
+	const lang::array_object& array,
+	const std::vector<parser::range_type>& origins);
+
+[[nodiscard]]
+std::variant<lang::object, error::error_variant> identifier_to_object(
+	const parser::ast::identifier& identifier,
+	parser::range_type position_of_identifier,
+	const compiler::constants_map& map);
+
+[[nodiscard]]
+std::variant<lang::object, error::error_variant> expression_to_object(
+	const parser::ast::value_expression& value_expression,
+	const parser::lookup_data& lookup_data,
+	const compiler::constants_map& map);
+
+[[nodiscard]]
+std::variant<lang::single_object, error::error_variant> construct_single_object_of_type(
+	fs::lang::single_object_type wanted_type,
+	fs::lang::single_object object,
+	parser::range_type object_origin);
+
+[[nodiscard]]
+std::variant<lang::single_object, error::error_variant> construct_single_object_of_type(
+	fs::lang::single_object_type wanted_type,
+	fs::lang::object object);
+
+[[nodiscard]]
+std::variant<lang::array_object, error::error_variant> construct_array_object_of_type(
+	fs::lang::single_object_type inner_array_type,
+	fs::lang::object object);
+
+[[nodiscard]]
+std::variant<fs::lang::object, fs::compiler::error::error_variant> construct_object_of_type(
+	fs::lang::object_type wanted_type,
+	fs::lang::object&& object);
 
 }
