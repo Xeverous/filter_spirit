@@ -82,7 +82,7 @@ const auto group_literal_def = group_literal_impl[validate_group];
 BOOST_SPIRIT_DEFINE(group_literal)
 
 const identifier_impl_type identifier_impl = "identifier implementation";
-const auto identifier_impl_def = x3::lexeme[(x3::alpha | '_') > *(x3::alnum | '_')];
+const auto identifier_impl_def = x3::lexeme[(x3::alpha | x3::char_('_')) > *(x3::alnum | x3::char_('_'))];
 BOOST_SPIRIT_DEFINE(identifier_impl)
 
 const identifier_type identifier = "identifier";

@@ -1,0 +1,6 @@
+# test that parser correctly handles all comments, including this one
+#
+##
+# #
+Number n1 = 1 #
+Number n2 = 2 ##text

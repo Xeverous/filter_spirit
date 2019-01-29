@@ -1,0 +1,6 @@
+# test that parser can correctly parse various identifiers
+Number n1 = 1
+Number n_2 = 2
+Number n__3 = 3
+Number bUt_RaIdEr_Is_fAsTeR = 4
+Number n5___ = 5

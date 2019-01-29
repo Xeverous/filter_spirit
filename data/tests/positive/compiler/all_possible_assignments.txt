@@ -1,0 +1,34 @@
+# test that the compiler can properly analyze all possible assignments
+Number num1 = 1
+Number num2 = num1
+
+# basic ones (both operands of the same type)
+Boolean boolean    = True
+Level   level      = 10
+SoundId soundId    = 5
+Volume  volume     = 300
+Color   color4     = 101 102 103 255
+Color   color3     = 111 122 133
+Color   color4Copy = color4
+Color   color3Copy = color3
+Rarity  rarity     = Rare
+Shape   shape      = Hexagon
+Suit    suit       = Red
+Group   g1         = RGB
+Group   g2         = GBBBBB
+Group   g3         = RRRRWW
+Group   g4         = g2
+String  string     = "a_b c"
+String  stringCopy = string
+
+# promotions
+Level   promotedLevel   = num1
+SoundId promotedSoundId = num1
+Volume  promotedVolume  = num1
+
+# arrays
+Array<String> a1 = ["a", "b", "c"]
+Array<String> a2 = a1
+Array<String> a3 = ["abc", string]
+# Array<String> a4 = [] # empty arrays are not currently supported
+
