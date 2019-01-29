@@ -145,12 +145,12 @@ BOOST_SPIRIT_DEFINE(constant_definition)
 
 // ----
 
-const code_line_type code_line = "line";
-const auto code_line_def = (constant_definition | x3::eps) >> -comment >> x3::eol;
-BOOST_SPIRIT_DEFINE(code_line)
+const constant_definition_line_type constant_definition_line = "constant definition line";
+const auto constant_definition_line_def = (constant_definition | x3::eps) >> -comment >> x3::eol;
+BOOST_SPIRIT_DEFINE(constant_definition_line)
 
 const grammar_type grammar = "code";
-const auto grammar_def = *code_line > x3::eoi;
+const auto grammar_def = *constant_definition_line > x3::eoi;
 BOOST_SPIRIT_DEFINE(grammar)
 
 }

@@ -162,11 +162,11 @@ struct constant_definition : x3::position_tagged
 	value_expression value;
 };
 
-struct code_line : x3::position_tagged
+struct constant_definition_line : x3::position_tagged
 {
 	boost::optional<constant_definition> value;
 };
 
-using ast_type = std::vector<code_line>;
+using ast_type = std::vector<constant_definition_line>;
 
 }

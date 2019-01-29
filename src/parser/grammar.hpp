@@ -180,11 +180,11 @@ BOOST_SPIRIT_DECLARE(constant_definition_type)
 // ----
 
 // filter language consists of lines, of which every is a comment or empty or some code
-using code_line_type = x3::rule<code_line_class, ast::code_line>;
-BOOST_SPIRIT_DECLARE(code_line_type)
+using constant_definition_line_type = x3::rule<code_line_class, ast::constant_definition_line>;
+BOOST_SPIRIT_DECLARE(constant_definition_line_type)
 
 // the entire language grammar
-using grammar_type = x3::rule<grammar_class, std::vector<code_line_type::attribute_type>>;
+using grammar_type = x3::rule<grammar_class, std::vector<constant_definition_line_type::attribute_type>>;
 BOOST_SPIRIT_DECLARE(grammar_type)
 
 }

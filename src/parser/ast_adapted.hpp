@@ -101,7 +101,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 // ----
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::code_line,
+	fs::parser::ast::constant_definition_line,
 	value
 )
 

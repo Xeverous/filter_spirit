@@ -86,7 +86,7 @@ std::optional<compiler::constants_map> parse_constants(
 {
 	compiler::constants_map map;
 
-	for (const parser::ast::code_line& line : ast)
+	for (const parser::ast::constant_definition_line& line : ast)
 	{
 		if (line.value)
 		{
