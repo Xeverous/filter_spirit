@@ -81,16 +81,16 @@ const group_literal_type group_literal =  group_literal_impl.name;
 const auto group_literal_def = group_literal_impl[validate_group];
 BOOST_SPIRIT_DEFINE(group_literal)
 
-const identifier_impl_type identifier_impl = "identifier implementation";
+const identifier_impl_type identifier_impl = "identifier";
 const auto identifier_impl_def = x3::lexeme[(x3::alpha | x3::char_('_')) > *(x3::alnum | x3::char_('_'))];
 BOOST_SPIRIT_DEFINE(identifier_impl)
 
-const identifier_type identifier = "identifier";
+const identifier_type identifier = identifier_impl.name;
 const auto identifier_def = identifier_impl;
 BOOST_SPIRIT_DEFINE(identifier)
 
 const string_literal_type string_literal = "string";
-const auto string_literal_def = x3::lexeme['"' >> +(x3::char_ - '"') >> '"'];
+const auto string_literal_def = x3::lexeme['"' > +(x3::char_ - '"') > '"'];
 BOOST_SPIRIT_DEFINE(string_literal)
 
 // ----
@@ -103,7 +103,7 @@ const array_type_expression_type array_type_expression = "array type name";
 const auto array_type_expression_def = x3::lit(lang::constants::keywords::array) > x3::lit('<') > object_types > x3::lit('>');
 BOOST_SPIRIT_DEFINE(array_type_expression)
 
-const type_expression_type type_expression = "type expression";
+const type_expression_type type_expression = "type name";
 const auto type_expression_def = object_type_expression | array_type_expression;
 BOOST_SPIRIT_DEFINE(type_expression)
 
@@ -127,7 +127,7 @@ BOOST_SPIRIT_DEFINE(literal_expression)
 // circular reference, need to change order
 const array_expression_type array_expression = "array expression";
 
-const value_expression_type value_expression = "value expression";
+const value_expression_type value_expression = "expression";
 const auto value_expression_def =
 	  literal_expression
 	| identifier
