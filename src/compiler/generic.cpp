@@ -271,7 +271,8 @@ std::variant<lang::object, error::error_variant> expression_to_object(
 std::variant<lang::single_object, error::error_variant> construct_single_object_of_type(
 	fs::lang::single_object_type wanted_type,
 	fs::lang::single_object object,
-	parser::range_type object_origin)
+	parser::range_type object_value_origin,
+	parser::range_type object_type_origin)
 {
 	fs::lang::single_object_type actual_type = type_of_single_object(object);
 	if (actual_type == wanted_type)
@@ -293,8 +294,8 @@ std::variant<lang::single_object, error::error_variant> construct_single_object_
 	return error::type_mismatch{
 		wanted_type,
 		actual_type,
-		object_origin,
-		object_origin
+		object_value_origin,
+		object_type_origin
 	};
 }
 
@@ -308,7 +309,7 @@ std::variant<lang::single_object, error::error_variant> construct_single_object_
 	return std::visit(utility::visitor{
 		[&](lang::single_object&& obj) -> result_type
 		{
-			return construct_single_object_of_type(wanted_type, std::move(obj), object.value_origin);
+			return construct_single_object_of_type(wanted_type, std::move(obj), object.value_origin, object.type_origin);
 		},
 		[&](lang::array_object&&) -> result_type
 		{
@@ -316,7 +317,7 @@ std::variant<lang::single_object, error::error_variant> construct_single_object_
 				lang::object_type(wanted_type),
 				lang::object_type(lang::single_object_type::generic, true),
 				object.value_origin,
-				object.value_origin
+				object.type_origin
 			};
 		}
 	}, std::move(object.value));
@@ -333,7 +334,7 @@ std::variant<lang::array_object, error::error_variant> construct_array_object_of
 		[&](lang::single_object&& obj) -> result_type
 		{
 			return error::single_object_to_array_assignment{
-				inner_array_type,
+				lang::object_type(inner_array_type, true),
 				type_of_single_object(obj),
 				object.value_origin
 			};
@@ -344,7 +345,11 @@ std::variant<lang::array_object, error::error_variant> construct_array_object_of
 			for (lang::single_object& single_obj : obj)
 			{
 				std::variant<lang::single_object, error::error_variant> result =
-					construct_single_object_of_type(inner_array_type, std::move(single_obj), object.value_origin);//
+					construct_single_object_of_type(
+						inner_array_type,
+						std::move(single_obj),
+						object.value_origin,
+						object.type_origin);
 
 				if (std::holds_alternative<error::error_variant>(result))
 					return std::get<error::error_variant>(result);

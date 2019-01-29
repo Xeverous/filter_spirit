@@ -1,0 +1,3 @@
+Number num = 1  # 2/2
+Level lvl = num
+Color col = num # 1/2

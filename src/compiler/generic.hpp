@@ -52,7 +52,8 @@ std::variant<lang::object, error::error_variant> expression_to_object(
 std::variant<lang::single_object, error::error_variant> construct_single_object_of_type(
 	fs::lang::single_object_type wanted_type,
 	fs::lang::single_object object,
-	parser::range_type object_origin);
+	parser::range_type object_value_origin,
+	parser::range_type object_type_origin);
 
 [[nodiscard]]
 std::variant<lang::single_object, error::error_variant> construct_single_object_of_type(

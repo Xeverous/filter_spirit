@@ -1,0 +1,4 @@
+String str = "abc"
+Array<String> a1 = [str, "def", "ghi"]
+Array<String> a2 = a1
+Array<String> a3 = str # 1/1

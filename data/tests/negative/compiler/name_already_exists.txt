@@ -1,0 +1,5 @@
+Number n1 = 1
+Number n2 = 2  # 2/2
+Number n3 = n1
+Number n2 = n3 # 1/2
+
