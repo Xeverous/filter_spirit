@@ -223,7 +223,39 @@ struct background_color_action : x3::position_tagged
 	color_expression color;
 };
 
+struct action_expression : x3::variant<
+		border_color_action,
+		text_color_action,
+		background_color_action
+	>, x3::position_tagged
+{
+	using base_type::base_type;
+	using base_type::operator=;
+};
+
 // ---- core structure ----
+
+struct condition_list : x3::position_tagged
+{
+	std::vector<condition_expression> condition_expressions;
+};
+
+struct action_list : x3::position_tagged
+{
+	std::vector<action_expression> action_expressions;
+};
+
+struct condition_block_list : x3::position_tagged
+{
+	std::vector<struct condition_block> condition_blocks;
+};
+
+struct condition_block : x3::position_tagged
+{
+	condition_list conditions;
+	action_list actions;
+	condition_block_list nested_blocks;
+};
 
 struct constant_definition : x3::position_tagged
 {

@@ -109,6 +109,12 @@ struct color_expression_class                : error_on_error, annotate_on_succe
 struct border_color_action_class             : error_on_error, annotate_on_success {};
 struct text_color_action_class               : error_on_error, annotate_on_success {};
 struct background_color_action_class         : error_on_error, annotate_on_success {};
+struct action_expression_class               : error_on_error, annotate_on_success {};
+
+struct condition_list_class                  : error_on_error, annotate_on_success {};
+struct action_list_class                     : error_on_error, annotate_on_success {};
+struct condition_block_class                 : error_on_error, annotate_on_success {};
+struct condition_block_list_class            : error_on_error, annotate_on_success {};
 
 struct constant_definition_class             : error_on_error, annotate_on_success {};
 struct code_line_class                       : error_on_error, annotate_on_success {};
@@ -220,6 +226,23 @@ BOOST_SPIRIT_DECLARE(text_color_action_type)
 
 using background_color_action_type = x3::rule<background_color_action_class, ast::background_color_action>;
 BOOST_SPIRIT_DECLARE(background_color_action_type)
+
+using action_expression_type = x3::rule<action_expression_class, ast::action_expression>;
+BOOST_SPIRIT_DECLARE(action_expression_type)
+
+// ----
+
+using condition_list_type = x3::rule<condition_list_class, ast::condition_list>;
+BOOST_SPIRIT_DECLARE(condition_list_type)
+
+using action_list_type = x3::rule<action_list_class, ast::action_list>;
+BOOST_SPIRIT_DECLARE(action_list_type)
+
+using condition_block_type = x3::rule<condition_block_class, ast::condition_block>;
+BOOST_SPIRIT_DECLARE(condition_block_type)
+
+using condition_block_list_type = x3::rule<condition_block_list_class, ast::condition_block_list>;
+BOOST_SPIRIT_DECLARE(condition_block_list_type)
 
 // ----
 

@@ -201,6 +201,33 @@ const background_color_action_type background_color_action = "background color a
 const auto background_color_action_def = lang::constants::keywords::set_background_color > color_expression;
 BOOST_SPIRIT_DEFINE(background_color_action)
 
+const action_expression_type action_expression = "action expression";
+const auto action_expression_def =
+	  border_color_action
+	| text_color_action
+	| background_color_action;
+BOOST_SPIRIT_DEFINE(action_expression)
+
+// ----
+
+const condition_list_type condition_list = "condition list";
+const auto condition_list_def = condition_expression % x3::lit(',');
+BOOST_SPIRIT_DEFINE(condition_list)
+
+const action_list_type action_list = "action list";
+const auto action_list_def = *action_expression;
+BOOST_SPIRIT_DEFINE(action_list)
+
+// circular reference
+const condition_block_list_type condition_block_list = "condition block list";
+
+const condition_block_type condition_block = "condition block";
+const auto condition_block_def = condition_list > x3::lit('{') > action_list > condition_block_list > x3::lit('}');
+BOOST_SPIRIT_DEFINE(condition_block)
+
+const auto condition_block_list_def = *condition_block;
+BOOST_SPIRIT_DEFINE(condition_block_list)
+
 // ----
 
 const constant_definition_line_type constant_definition_line = "constant definition line";
