@@ -93,12 +93,53 @@ BOOST_FUSION_ADAPT_STRUCT(
 	values
 )
 
+// ----
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::comparison_operator_expression,
+	comparison
+)
+
+// ----
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::item_level_condition,
+	comparison, level
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::drop_level_condition,
+	comparison, level
+)
+
+// ----
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::visibility_action,
+	show
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::border_color_action,
+	color
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::text_color_action,
+	color
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::background_color_action,
+	color
+)
+
+// ----
+
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::constant_definition,
 	type, name, value
 )
-
-// ----
 
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::constant_definition_line,

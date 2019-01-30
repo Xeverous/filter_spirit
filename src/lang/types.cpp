@@ -22,7 +22,7 @@ std::string_view to_string(single_object_type type)
 		case single_object_type::volume:
 			return ck::volume;
 		case single_object_type::rarity:
-			return ck::rarity;
+			return ck::rarity_type;
 		case single_object_type::shape:
 			return ck::shape;
 		case single_object_type::suit:

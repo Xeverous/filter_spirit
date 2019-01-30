@@ -155,6 +155,76 @@ struct array_expression : x3::position_tagged
 
 // ----
 
+struct comparison_operator_expression : x3::position_tagged
+{
+	lang::comparison_type comparison;
+};
+
+// ---- conditions ----
+
+struct level_expression : x3::variant<
+		integer_literal,
+		identifier
+	>, x3::position_tagged
+{
+	using base_type::base_type;
+	using base_type::operator=;
+};
+
+struct item_level_condition : x3::position_tagged
+{
+	lang::comparison_type comparison;
+	level_expression level;
+};
+
+struct drop_level_condition : x3::position_tagged
+{
+	lang::comparison_type comparison;
+	level_expression level;
+};
+
+struct condition_expression : x3::variant<
+		item_level_condition,
+		drop_level_condition
+	>, x3::position_tagged
+{
+	using base_type::base_type;
+	using base_type::operator=;
+};
+
+// ---- actions
+
+struct visibility_action : x3::position_tagged
+{
+	bool show;
+};
+
+struct color_expression : x3::variant<
+		color_literal,
+		identifier
+	>, x3::position_tagged
+{
+	using base_type::base_type;
+	using base_type::operator=;
+};
+
+struct border_color_action : x3::position_tagged
+{
+	color_expression color;
+};
+
+struct text_color_action : x3::position_tagged
+{
+	color_expression color;
+};
+
+struct background_color_action : x3::position_tagged
+{
+	color_expression color;
+};
+
+// ---- core structure ----
+
 struct constant_definition : x3::position_tagged
 {
 	type_expression type;

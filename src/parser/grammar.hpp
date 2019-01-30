@@ -74,33 +74,46 @@ struct error_on_error
 // rule IDs
 // use multiple inheritance to add more handlers
 // rules which do not have any handlers can use forward declared types
-struct comment_class                      : error_on_error, annotate_on_success {};
+struct comment_class                         : error_on_error, annotate_on_success {};
 
-struct boolean_class                      : error_on_error, annotate_on_success {};
-struct integer_class                      : error_on_error, annotate_on_success {};
-struct opacity_class                      : error_on_error, annotate_on_success {};
-struct rarity_literal_class               : error_on_error, annotate_on_success {};
-struct shape_literal_class                : error_on_error, annotate_on_success {};
-struct suit_literal_class                 : error_on_error, annotate_on_success {};
-struct color_literal_class                : error_on_error, annotate_on_success {};
-struct group_literal_class                : error_on_error, annotate_on_success {};
-struct group_literal_impl_class           : error_on_error, annotate_on_success {};
+struct boolean_class                         : error_on_error, annotate_on_success {};
+struct integer_class                         : error_on_error, annotate_on_success {};
+struct opacity_class                         : error_on_error, annotate_on_success {};
+struct rarity_literal_class                  : error_on_error, annotate_on_success {};
+struct shape_literal_class                   : error_on_error, annotate_on_success {};
+struct suit_literal_class                    : error_on_error, annotate_on_success {};
+struct color_literal_class                   : error_on_error, annotate_on_success {};
+struct group_literal_class                   : error_on_error, annotate_on_success {};
+struct group_literal_impl_class              : error_on_error, annotate_on_success {};
 struct identifier_impl_class;
-struct identifier_class                   : error_on_error, annotate_on_success {};
-struct string_literal_class               : error_on_error, annotate_on_success {};
+struct identifier_class                      : error_on_error, annotate_on_success {};
+struct string_literal_class                  : error_on_error, annotate_on_success {};
 
-struct object_type_expression_class       : error_on_error, annotate_on_success {};
-struct array_type_expression_class        : error_on_error, annotate_on_success {};
-struct type_expression_class              : error_on_error, annotate_on_success {};
+struct object_type_expression_class          : error_on_error, annotate_on_success {};
+struct array_type_expression_class           : error_on_error, annotate_on_success {};
+struct type_expression_class                 : error_on_error, annotate_on_success {};
 
-struct literal_expression_class           : error_on_error, annotate_on_success {};
-struct value_expression_class             : error_on_error, annotate_on_success {};
-struct array_expression_class             : error_on_error, annotate_on_success {};
+struct literal_expression_class              : error_on_error, annotate_on_success {};
+struct value_expression_class                : error_on_error, annotate_on_success {};
+struct array_expression_class                : error_on_error, annotate_on_success {};
 
-struct constant_definition_class          : error_on_error, annotate_on_success {};
-struct code_line_class                    : error_on_error, annotate_on_success {};
+struct comparison_operator_expression_class  : error_on_error, annotate_on_success {};
 
-struct grammar_class                      : error_on_error, annotate_on_success {};
+struct level_expression_class                : error_on_error, annotate_on_success {};
+struct item_level_condition_class            : error_on_error, annotate_on_success {};
+struct drop_level_condition_class            : error_on_error, annotate_on_success {};
+struct condition_expression_class            : error_on_error, annotate_on_success {};
+
+struct visibility_action_class               : error_on_error, annotate_on_success {};
+struct color_expression_class                : error_on_error, annotate_on_success {};
+struct border_color_action_class             : error_on_error, annotate_on_success {};
+struct text_color_action_class               : error_on_error, annotate_on_success {};
+struct background_color_action_class         : error_on_error, annotate_on_success {};
+
+struct constant_definition_class             : error_on_error, annotate_on_success {};
+struct code_line_class                       : error_on_error, annotate_on_success {};
+
+struct grammar_class                         : error_on_error, annotate_on_success {};
 
 // whitespace_type should be defined here but it has been moved to parser/config.hpp for
 // dependency reasons. See config.hpp for details.
@@ -171,6 +184,42 @@ BOOST_SPIRIT_DECLARE(value_expression_type)
 
 using array_expression_type = x3::rule<array_expression_class, ast::array_expression>;
 BOOST_SPIRIT_DECLARE(array_expression_type)
+
+// ----
+
+using comparison_operator_expression_type = x3::rule<comparison_operator_expression_class, ast::comparison_operator_expression>;
+BOOST_SPIRIT_DECLARE(comparison_operator_expression_type)
+
+// ----
+
+using level_expression_type = x3::rule<level_expression_class, ast::level_expression>;
+BOOST_SPIRIT_DECLARE(level_expression_type)
+
+using item_level_condition_type = x3::rule<item_level_condition_class, ast::item_level_condition>;
+BOOST_SPIRIT_DECLARE(item_level_condition_type)
+
+using drop_level_condition_type = x3::rule<drop_level_condition_class, ast::drop_level_condition>;
+BOOST_SPIRIT_DECLARE(drop_level_condition_type)
+
+using condition_expression_type = x3::rule<condition_expression_class, ast::condition_expression>;
+BOOST_SPIRIT_DECLARE(condition_expression_type)
+
+// ----
+
+using visibility_action_type = x3::rule<visibility_action_class, ast::visibility_action>;
+BOOST_SPIRIT_DECLARE(visibility_action_type)
+
+using color_expression_type = x3::rule<color_expression_class, ast::color_expression>;
+BOOST_SPIRIT_DECLARE(color_expression_type)
+
+using border_color_action_type = x3::rule<border_color_action_class, ast::border_color_action>;
+BOOST_SPIRIT_DECLARE(border_color_action_type)
+
+using text_color_action_type = x3::rule<text_color_action_class, ast::text_color_action>;
+BOOST_SPIRIT_DECLARE(text_color_action_type)
+
+using background_color_action_type = x3::rule<background_color_action_class, ast::background_color_action>;
+BOOST_SPIRIT_DECLARE(background_color_action_type)
 
 // ----
 

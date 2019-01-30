@@ -9,6 +9,8 @@
 namespace fs::lang
 {
 
+// ---- constants ----
+
 enum class single_object_type
 {
 	boolean,
@@ -118,6 +120,17 @@ struct object
 	// for printing error name already exists
 	// if object originated from a literal this should be empty
 	std::optional<fs::parser::range_type> name_origin;
+};
+
+// ----
+
+enum class comparison_type
+{
+	less,
+	less_equal,
+	equal,
+	greater,
+	greater_equal
 };
 
 }

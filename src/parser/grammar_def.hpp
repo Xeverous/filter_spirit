@@ -26,6 +26,16 @@ const auto validate_group = [](auto& context)
 		_pass(context) = false;
 };
 
+const auto set_compare_equal = [](auto& context)
+{
+	using attribute_type = std::remove_reference_t<decltype(_attr(context))>;
+	static_assert(
+		std::is_same_v<fs::parser::ast::comparison_operator_expression, attribute_type>,
+		"Only setting up comparison operator");
+
+	_val(context) = fs::lang::comparison_type::equal;
+};
+
 }
 
 namespace fs::parser
@@ -139,9 +149,57 @@ BOOST_SPIRIT_DEFINE(array_expression)
 
 // ----
 
+const comparison_operator_expression_type comparison_operator_expression = "comparison operator";
+const auto comparison_operator_expression_def = comparison_operators | x3::eps[set_compare_equal];
+BOOST_SPIRIT_DEFINE(comparison_operator_expression)
+
+// ----
+
 const constant_definition_type constant_definition = "constant definiton";
 const auto constant_definition_def = type_expression > identifier > x3::lit(assignment_operator) > value_expression;
 BOOST_SPIRIT_DEFINE(constant_definition)
+
+// ----
+
+const level_expression_type level_expression = "level expression";
+const auto level_expression_def = integer_literal | identifier;
+BOOST_SPIRIT_DEFINE(level_expression)
+
+const item_level_condition_type item_level_condition = "item level condition";
+const auto item_level_condition_def = x3::lit(lang::constants::keywords::item_level) > comparison_operator_expression > level_expression;
+BOOST_SPIRIT_DEFINE(item_level_condition)
+
+const drop_level_condition_type drop_level_condition = "drop level condition";
+const auto drop_level_condition_def = x3::lit(lang::constants::keywords::drop_level) > comparison_operator_expression > level_expression;
+BOOST_SPIRIT_DEFINE(drop_level_condition)
+
+const condition_expression_type condition_expression = "condition expression";
+const auto condition_expression_def =
+	  item_level_condition
+	| drop_level_condition;
+BOOST_SPIRIT_DEFINE(condition_expression)
+
+// ----
+
+const visibility_action_type visibility_action = "visibility action";
+const auto visibility_action_def = visibility_literals;
+BOOST_SPIRIT_DEFINE(visibility_action)
+
+const color_expression_type color_expression = "color expression";
+const auto color_expression_def = color_literal | identifier;
+BOOST_SPIRIT_DEFINE(color_expression)
+
+const border_color_action_type border_color_action = "border color action";
+const auto border_color_action_def = lang::constants::keywords::set_border_color > color_expression;
+BOOST_SPIRIT_DEFINE(border_color_action)
+
+const text_color_action_type text_color_action = "text color action";
+const auto text_color_action_def = lang::constants::keywords::set_text_color > color_expression;
+BOOST_SPIRIT_DEFINE(text_color_action)
+
+const background_color_action_type background_color_action = "background color action";
+const auto background_color_action_def = lang::constants::keywords::set_background_color > color_expression;
+BOOST_SPIRIT_DEFINE(background_color_action)
 
 // ----
 
