@@ -1,5 +1,5 @@
+#include "compiler/process_input.hpp"
 #include "utility/file.hpp"
-#include "compiler/compiler.hpp"
 #include <iostream>
 
 int main(int argc, char* argv[])
@@ -19,6 +19,6 @@ int main(int argc, char* argv[])
 	}
 
 	std::string& file_content = *source;
-	bool result = fs::compiler::compile(std::move(file_content), std::cout);
+	bool result = fs::compiler::process_input(std::move(file_content), std::cout);
 	return !result;
 }

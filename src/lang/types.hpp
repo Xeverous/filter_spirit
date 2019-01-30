@@ -113,10 +113,10 @@ struct object
 	std::variant<single_object, array_object> value;
 	// for printing errors about mismatched types
 	// if object_ originated from a literal this should point at the literal
-	fs::parser::range_type type_origin;
+	parser::range_type type_origin;
 	// if object_ was referened from other object_ this should point at the use of
 	// that object_ - in other words, point at expression which object_ was assigned from
-	fs::parser::range_type value_origin;
+	parser::range_type value_origin;
 	// for printing error name already exists
 	// if object originated from a literal this should be empty
 	std::optional<fs::parser::range_type> name_origin;

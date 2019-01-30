@@ -1,7 +1,8 @@
 #pragma once
-#include "lang/types.hpp"
-#include "compiler/error.hpp"
 #include "compiler/compiler.hpp"
+#include "compiler/process_input.hpp"
+#include "compiler/error.hpp"
+#include "lang/types.hpp"
 #include "parser/ast.hpp"
 #include "parser/parser.hpp"
 #include <string_view>
@@ -40,34 +41,34 @@ std::optional<error::non_homogeneous_array> verify_homogeneity(
 std::variant<lang::object, error::error_variant> identifier_to_object(
 	const parser::ast::identifier& identifier,
 	parser::range_type position_of_identifier,
-	const compiler::constants_map& map);
+	const constants_map& map);
 
 [[nodiscard]]
 std::variant<lang::object, error::error_variant> expression_to_object(
 	const parser::ast::value_expression& value_expression,
 	const parser::lookup_data& lookup_data,
-	const compiler::constants_map& map);
+	const constants_map& map);
 
 [[nodiscard]]
 std::variant<lang::single_object, error::error_variant> construct_single_object_of_type(
-	fs::lang::single_object_type wanted_type,
-	fs::lang::single_object object,
+	lang::single_object_type wanted_type,
+	lang::single_object object,
 	parser::range_type object_value_origin,
 	parser::range_type object_type_origin);
 
 [[nodiscard]]
 std::variant<lang::single_object, error::error_variant> construct_single_object_of_type(
-	fs::lang::single_object_type wanted_type,
-	fs::lang::object object);
+	lang::single_object_type wanted_type,
+	lang::object object);
 
 [[nodiscard]]
 std::variant<lang::array_object, error::error_variant> construct_array_object_of_type(
-	fs::lang::single_object_type inner_array_type,
-	fs::lang::object object);
+	lang::single_object_type inner_array_type,
+	lang::object object);
 
 [[nodiscard]]
-std::variant<fs::lang::object, fs::compiler::error::error_variant> construct_object_of_type(
-	fs::lang::object_type wanted_type,
-	fs::lang::object&& object);
+std::variant<lang::object, error::error_variant> construct_object_of_type(
+	lang::object_type wanted_type,
+	lang::object&& object);
 
 }

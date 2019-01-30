@@ -1,20 +1,20 @@
 #include "compiler/compiler.hpp"
+#include "compiler/process_input.hpp"
 #include "compiler/generic.hpp"
 #include "compiler/error.hpp"
 #include "parser/ast.hpp"
 #include "parser/config.hpp"
 #include "parser/parser.hpp"
 #include "print/compile_error.hpp"
-#include "print/structure_printer.hpp"
 #include "utility/holds_alternative.hpp"
 #include <cassert>
 #include <string_view>
 #include <utility>
 
-namespace
+namespace fs::compiler
 {
 
-namespace past = fs::parser::ast;
+namespace past = parser::ast;
 
 /*
  * core entry point into adding constants
@@ -29,11 +29,10 @@ namespace past = fs::parser::ast;
  *   (as of now, filter's language has no scoping/name shadowing)
  * - convert expression to language object and proceed
  */
-[[nodiscard]]
-std::optional<fs::compiler::error::error_variant> add_constant_from_definition(
-	const fs::parser::ast::constant_definition& def,
-	const fs::parser::lookup_data& lookup_data,
-	fs::compiler::constants_map& map)
+std::optional<error::error_variant> add_constant_from_definition(
+	const past::constant_definition& def,
+	const parser::lookup_data& lookup_data,
+	constants_map& map)
 {
 	const past::identifier& wanted_name = def.name;
 	const past::type_expression& wanted_type = def.type;
@@ -42,28 +41,28 @@ std::optional<fs::compiler::error::error_variant> add_constant_from_definition(
 	const auto wanted_name_it = map.find(wanted_name.value); // C++17: use if (expr; cond)
 	if (wanted_name_it != map.end())
 	{
-		const fs::parser::range_type place_of_duplicated_name = lookup_data.position_of(def.name);
+		const parser::range_type place_of_duplicated_name = lookup_data.position_of(def.name);
 		assert(wanted_name_it->second.name_origin);
-		const fs::parser::range_type place_of_original_name = *wanted_name_it->second.name_origin;
-		return fs::compiler::error::name_already_exists{place_of_duplicated_name, place_of_original_name};
+		const parser::range_type place_of_original_name = *wanted_name_it->second.name_origin;
+		return error::name_already_exists{place_of_duplicated_name, place_of_original_name};
 	}
 
-	std::variant<fs::lang::object, fs::compiler::error::error_variant> expr_result =
-		fs::compiler::expression_to_object(value_expression, lookup_data, map);
+	std::variant<lang::object, error::error_variant> expr_result =
+		expression_to_object(value_expression, lookup_data, map);
 
-	if (std::holds_alternative<fs::compiler::error::error_variant>(expr_result))
-		return std::get<fs::compiler::error::error_variant>(expr_result);
+	if (std::holds_alternative<error::error_variant>(expr_result))
+		return std::get<error::error_variant>(expr_result);
 
-	fs::lang::object_type lang_type = fs::compiler::type_expression_to_type(wanted_type);
-	fs::lang::object& object = std::get<fs::lang::object>(expr_result);
+	lang::object_type lang_type = type_expression_to_type(wanted_type);
+	lang::object& object = std::get<lang::object>(expr_result);
 
-	std::variant<fs::lang::object, fs::compiler::error::error_variant> construct_result =
-		fs::compiler::construct_object_of_type(lang_type, std::move(object));
+	std::variant<lang::object, error::error_variant> construct_result =
+		construct_object_of_type(lang_type, std::move(object));
 
-	if (std::holds_alternative<fs::compiler::error::error_variant>(construct_result))
-		return std::get<fs::compiler::error::error_variant>(construct_result);
+	if (std::holds_alternative<error::error_variant>(construct_result))
+		return std::get<error::error_variant>(construct_result);
 
-	fs::lang::object& final_object = std::get<fs::lang::object>(construct_result);
+	lang::object& final_object = std::get<lang::object>(construct_result);
 	final_object.type_origin  = lookup_data.position_of(wanted_type);
 	final_object.value_origin = lookup_data.position_of(value_expression);
 	final_object.name_origin  = lookup_data.position_of(wanted_name);
@@ -73,24 +72,18 @@ std::optional<fs::compiler::error::error_variant> add_constant_from_definition(
 	return std::nullopt;
 }
 
-} // namespace
-
-namespace fs::compiler
-{
-
-[[nodiscard]]
-std::optional<compiler::constants_map> parse_constants(
-	const parser::ast::ast_type& ast,
+std::optional<constants_map> parse_constants(
+	const past::ast_type& ast,
 	const parser::lookup_data& lookup_data,
 	std::ostream& error_stream)
 {
-	compiler::constants_map map;
+	constants_map map;
 
-	for (const parser::ast::constant_definition_line& line : ast)
+	for (const past::constant_definition_line& line : ast)
 	{
 		if (line.value)
 		{
-			const std::optional<fs::compiler::error::error_variant> error =
+			const std::optional<error::error_variant> error =
 				add_constant_from_definition(*line.value, lookup_data, map);
 
 			if (error)
@@ -104,9 +97,12 @@ std::optional<compiler::constants_map> parse_constants(
 	return map;
 }
 
-bool semantic_analysis(const parser::ast::ast_type& ast, const parser::lookup_data& lookup_data, std::ostream& error_stream)
+bool semantic_analysis(
+	const past::ast_type& ast,
+	const parser::lookup_data& lookup_data,
+	std::ostream& error_stream)
 {
-	std::optional<compiler::constants_map> map = parse_constants(ast, lookup_data, error_stream);
+	std::optional<constants_map> map = parse_constants(ast, lookup_data, error_stream);
 
 	if (!map)
 		return false;
@@ -115,25 +111,6 @@ bool semantic_analysis(const parser::ast::ast_type& ast, const parser::lookup_da
 	{
 		error_stream << pair.first << "\n";
 	}
-
-	return true;
-}
-
-bool compile(const std::string& file_content, std::ostream& error_stream)
-{
-	std::optional<std::pair<parser::ast::ast_type, parser::lookup_data>> parse_result = parser::parse(file_content, error_stream);
-
-	if (!parse_result)
-		return false;
-
-	auto& ast = (*parse_result).first;
-	auto& lookup_data = (*parse_result).second;
-
-	if (false) // don't print now, but keep to test that code compiles
-		print::structure_printer()(ast);
-
-	if (!semantic_analysis(ast, lookup_data, error_stream))
-		return false;
 
 	return true;
 }

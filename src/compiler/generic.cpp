@@ -189,7 +189,7 @@ std::variant<lang::object, error::error_variant> identifier_to_object(
 std::variant<lang::object, error::error_variant> expression_to_object(
 	const past::value_expression& value_expression,
 	const parser::lookup_data& lookup_data,
-	const compiler::constants_map& map)
+	const constants_map& map)
 {
 	using result_type = std::variant<lang::object, error::error_variant>;
 
@@ -269,17 +269,17 @@ std::variant<lang::object, error::error_variant> expression_to_object(
 
 [[nodiscard]]
 std::variant<lang::single_object, error::error_variant> construct_single_object_of_type(
-	fs::lang::single_object_type wanted_type,
-	fs::lang::single_object object,
+	lang::single_object_type wanted_type,
+	lang::single_object object,
 	parser::range_type object_value_origin,
 	parser::range_type object_type_origin)
 {
-	fs::lang::single_object_type actual_type = type_of_single_object(object);
+	lang::single_object_type actual_type = type_of_single_object(object);
 	if (actual_type == wanted_type)
 		return object;
 
 	// check for promotions
-	if (actual_type == fs::lang::single_object_type::number)
+	if (actual_type == lang::single_object_type::number)
 	{
 		if (wanted_type == lang::single_object_type::level)
 			return lang::single_object{lang::level{std::get<lang::number>(object).value}};
@@ -301,8 +301,8 @@ std::variant<lang::single_object, error::error_variant> construct_single_object_
 
 [[nodiscard]]
 std::variant<lang::single_object, error::error_variant> construct_single_object_of_type(
-	fs::lang::single_object_type wanted_type,
-	fs::lang::object object)
+	lang::single_object_type wanted_type,
+	lang::object object)
 {
 	using result_type = std::variant<lang::single_object, error::error_variant>;
 
@@ -325,8 +325,8 @@ std::variant<lang::single_object, error::error_variant> construct_single_object_
 
 [[nodiscard]]
 std::variant<lang::array_object, error::error_variant> construct_array_object_of_type(
-	fs::lang::single_object_type inner_array_type,
-	fs::lang::object object)
+	lang::single_object_type inner_array_type,
+	lang::object object)
 {
 	using result_type = std::variant<lang::array_object, error::error_variant>;
 
@@ -363,8 +363,8 @@ std::variant<lang::array_object, error::error_variant> construct_array_object_of
 }
 
 std::variant<lang::object, error::error_variant> construct_object_of_type(
-	fs::lang::object_type wanted_type,
-	fs::lang::object&& object)
+	lang::object_type wanted_type,
+	lang::object&& object)
 {
 	if (wanted_type.is_array)
 	{
