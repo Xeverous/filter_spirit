@@ -245,18 +245,6 @@ struct action_list : x3::position_tagged
 	std::vector<action_expression> action_expressions;
 };
 
-struct condition_block_list : x3::position_tagged
-{
-	std::vector<struct condition_block> condition_blocks;
-};
-
-struct condition_block : x3::position_tagged
-{
-	condition_list conditions;
-	action_list actions;
-	condition_block_list nested_blocks;
-};
-
 struct constant_definition : x3::position_tagged
 {
 	type_expression type;
@@ -264,11 +252,30 @@ struct constant_definition : x3::position_tagged
 	value_expression value;
 };
 
-struct constant_definition_line : x3::position_tagged
+struct constant_definition_list : x3::position_tagged
 {
-	boost::optional<constant_definition> value;
+	std::vector<constant_definition> constant_definitions;
 };
 
-using ast_type = std::vector<constant_definition_line>;
+struct rule_block_list : x3::position_tagged
+{
+	std::vector<struct rule_block> blocks;
+};
+
+struct rule_block : x3::position_tagged
+{
+	condition_list conditions;
+	action_list actions;
+	rule_block_list nested_blocks;
+};
+
+struct filter_specification : x3::position_tagged
+{
+	constant_definition_list constants_list;
+	action_list actions;
+	rule_block_list blocks;
+};
+
+using ast_type = filter_specification;
 
 }

@@ -16,7 +16,7 @@ bool process_input(const std::string& file_content, std::ostream& error_stream)
 	auto& ast = (*parse_result).first;
 	auto& lookup_data = (*parse_result).second;
 
-	if (false) // don't print now, but keep to test that code compiles
+	if (true) // allow easy switching on/off for now (before full implemenation of command line args)
 		print::structure_printer()(ast);
 
 	if (!semantic_analysis(ast, lookup_data, error_stream))

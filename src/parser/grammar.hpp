@@ -74,8 +74,6 @@ struct error_on_error
 // rule IDs
 // use multiple inheritance to add more handlers
 // rules which do not have any handlers can use forward declared types
-struct comment_class                         : error_on_error, annotate_on_success {};
-
 struct boolean_class                         : error_on_error, annotate_on_success {};
 struct integer_class                         : error_on_error, annotate_on_success {};
 struct opacity_class                         : error_on_error, annotate_on_success {};
@@ -113,11 +111,12 @@ struct action_expression_class               : error_on_error, annotate_on_succe
 
 struct condition_list_class                  : error_on_error, annotate_on_success {};
 struct action_list_class                     : error_on_error, annotate_on_success {};
-struct condition_block_class                 : error_on_error, annotate_on_success {};
-struct condition_block_list_class            : error_on_error, annotate_on_success {};
 
 struct constant_definition_class             : error_on_error, annotate_on_success {};
-struct code_line_class                       : error_on_error, annotate_on_success {};
+struct constant_definition_list_class        : error_on_error, annotate_on_success {};
+struct rule_block_class                      : error_on_error, annotate_on_success {};
+struct rule_block_list_class                 : error_on_error, annotate_on_success {};
+struct filter_specification_class            : error_on_error, annotate_on_success {};
 
 struct grammar_class                         : error_on_error, annotate_on_success {};
 
@@ -125,8 +124,8 @@ struct grammar_class                         : error_on_error, annotate_on_succe
 // dependency reasons. See config.hpp for details.
 BOOST_SPIRIT_DECLARE(whitespace_type)
 
-// comment - a line that starts with #
-using comment_type = x3::rule<comment_class>;
+// comment anything to the end of line after #
+using comment_type = x3::rule<struct comment_class>;
 BOOST_SPIRIT_DECLARE(comment_type)
 
 using boolean_type = x3::rule<boolean_class, ast::boolean_literal>;
@@ -238,12 +237,6 @@ BOOST_SPIRIT_DECLARE(condition_list_type)
 using action_list_type = x3::rule<action_list_class, ast::action_list>;
 BOOST_SPIRIT_DECLARE(action_list_type)
 
-using condition_block_type = x3::rule<condition_block_class, ast::condition_block>;
-BOOST_SPIRIT_DECLARE(condition_block_type)
-
-using condition_block_list_type = x3::rule<condition_block_list_class, ast::condition_block_list>;
-BOOST_SPIRIT_DECLARE(condition_block_list_type)
-
 // ----
 
 using constant_definition_type = x3::rule<constant_definition_class, ast::constant_definition>;
@@ -251,12 +244,20 @@ BOOST_SPIRIT_DECLARE(constant_definition_type)
 
 // ----
 
-// filter language consists of lines, of which every is a comment or empty or some code
-using constant_definition_line_type = x3::rule<code_line_class, ast::constant_definition_line>;
-BOOST_SPIRIT_DECLARE(constant_definition_line_type)
+using constant_definition_list_type = x3::rule<constant_definition_list_class, ast::constant_definition_list>;
+BOOST_SPIRIT_DECLARE(constant_definition_list_type)
+
+using rule_block_type = x3::rule<rule_block_class, ast::rule_block>;
+BOOST_SPIRIT_DECLARE(rule_block_type)
+
+using rule_block_list_type = x3::rule<rule_block_list_class, ast::rule_block_list>;
+BOOST_SPIRIT_DECLARE(rule_block_list_type)
+
+using filter_specification_type = x3::rule<filter_specification_class, ast::filter_specification>;
+BOOST_SPIRIT_DECLARE(filter_specification_type)
 
 // the entire language grammar
-using grammar_type = x3::rule<grammar_class, std::vector<constant_definition_line_type::attribute_type>>;
+using grammar_type = x3::rule<grammar_class, ast::ast_type>;
 BOOST_SPIRIT_DECLARE(grammar_type)
 
 }

@@ -9,16 +9,7 @@ namespace fs::parser
 
 namespace x3 = boost::spirit::x3;
 
-/*
- * whitespace
- * Filter Spirit grammar skips any whitespace except newline character
- *
- * Spirit constness bug workaround, see:
- * https://stackoverflow.com/a/54095167/4818802
- * https://github.com/boostorg/spirit/pull/347
- */
-// using whitespace_type = x3::rule<class whitespace_class>;
-using whitespace_type = x3::rule<class whitespace_class, const x3::unused_type>;
+using whitespace_type = x3::rule<struct whitespace_class>;
 using skipper_type = whitespace_type;
 
 using iterator_type = std::string::const_iterator;

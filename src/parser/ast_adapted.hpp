@@ -146,16 +146,6 @@ BOOST_FUSION_ADAPT_STRUCT(
 	action_expressions
 )
 
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::condition_block,
-	conditions, actions, nested_blocks
-)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::condition_block_list,
-	condition_blocks
-)
-
 // ----
 
 BOOST_FUSION_ADAPT_STRUCT(
@@ -164,7 +154,22 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::constant_definition_line,
-	value
+	fs::parser::ast::constant_definition_list,
+	constant_definitions
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::rule_block,
+	conditions, actions, nested_blocks
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::rule_block_list,
+	blocks
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::filter_specification,
+	constants_list, actions, blocks
 )
 

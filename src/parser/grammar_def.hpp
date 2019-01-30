@@ -13,14 +13,18 @@
 namespace
 {
 
+template <typename T, typename U>
+struct static_assertion
+{
+	static_assert(std::is_same_v<T, U>, "check invokation");
+};
+
 // Validates that a group makes sense. Any color can be specified to appear 0 times,
 // but not all at once as this would form an empty group.
 const auto validate_group = [](auto& context)
 {
 	using attribute_type = std::remove_reference_t<decltype(_attr(context))>;
-	static_assert(
-		std::is_same_v<fs::parser::ast::group_literal, attribute_type>,
-		"Only for validating group type objects");
+	(void) static_assertion<fs::parser::ast::group_literal, attribute_type>();
 
 	if (!_attr(context).has_anything())
 		_pass(context) = false;
@@ -28,12 +32,10 @@ const auto validate_group = [](auto& context)
 
 const auto set_compare_equal = [](auto& context)
 {
-	using attribute_type = std::remove_reference_t<decltype(_attr(context))>;
-	static_assert(
-		std::is_same_v<fs::parser::ast::comparison_operator_expression, attribute_type>,
-		"Only setting up comparison operator");
+	using attribute_type = std::remove_reference_t<decltype(_val(context))>;
+	(void) static_assertion<fs::parser::ast::comparison_operator_expression, attribute_type>();
 
-	_val(context) = fs::lang::comparison_type::equal;
+	_val(context).comparison = fs::lang::comparison_type::equal;
 };
 
 }
@@ -47,13 +49,13 @@ namespace fs::parser
 // - rule definition: foo_def
 // - rule object    : foo
 
-const whitespace_type whitespace = "whitespace";
-const auto whitespace_def = x3::space - newline_character;
-BOOST_SPIRIT_DEFINE(whitespace)
-
 const comment_type comment = "comment";
-const auto comment_def = x3::lexeme['#' > *(x3::char_ - newline_character)];
+const auto comment_def = x3::lit('#') >> *(x3::char_ - x3::eol) >> (x3::eol | x3::eoi);
 BOOST_SPIRIT_DEFINE(comment)
+
+const whitespace_type whitespace = "whitespace";
+const auto whitespace_def = x3::space | comment;
+BOOST_SPIRIT_DEFINE(whitespace)
 
 const boolean_type boolean_literal = "boolean ('True' OR 'False')";
 const auto boolean_literal_def = booleans;
@@ -218,24 +220,28 @@ const action_list_type action_list = "action list";
 const auto action_list_def = *action_expression;
 BOOST_SPIRIT_DEFINE(action_list)
 
-// circular reference
-const condition_block_list_type condition_block_list = "condition block list";
-
-const condition_block_type condition_block = "condition block";
-const auto condition_block_def = condition_list > x3::lit('{') > action_list > condition_block_list > x3::lit('}');
-BOOST_SPIRIT_DEFINE(condition_block)
-
-const auto condition_block_list_def = *condition_block;
-BOOST_SPIRIT_DEFINE(condition_block_list)
-
 // ----
 
-const constant_definition_line_type constant_definition_line = "constant definition line";
-const auto constant_definition_line_def = (constant_definition | x3::eps) >> -comment >> x3::eol;
-BOOST_SPIRIT_DEFINE(constant_definition_line)
+const constant_definition_list_type constant_definition_list = "constant definition list";
+const auto constant_definition_list_def = *constant_definition;
+BOOST_SPIRIT_DEFINE(constant_definition_list)
+
+// circular reference
+const rule_block_list_type rule_block_list = "rule block list";
+
+const rule_block_type rule_block = "rule block";
+const auto rule_block_def = condition_list > x3::lit('{') > action_list > rule_block_list > x3::lit('}');
+BOOST_SPIRIT_DEFINE(rule_block)
+
+const auto rule_block_list_def = *rule_block;
+BOOST_SPIRIT_DEFINE(rule_block_list)
+
+const filter_specification_type filter_specification = "filter specification";
+const auto filter_specification_def = constant_definition_list > action_list > rule_block_list;
+BOOST_SPIRIT_DEFINE(filter_specification)
 
 const grammar_type grammar = "code";
-const auto grammar_def = *constant_definition_line > x3::eoi;
+const auto grammar_def = filter_specification > x3::eoi;
 BOOST_SPIRIT_DEFINE(grammar)
 
 }

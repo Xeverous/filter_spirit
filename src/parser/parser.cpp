@@ -1,6 +1,7 @@
 #include "parser/parser.hpp"
 #include "parser/grammar.hpp"
 #include "print/structure_printer.hpp"
+#include "print/generic.hpp"
 
 namespace fs::parser
 {
@@ -28,11 +29,11 @@ std::optional<std::pair<ast::ast_type, lookup_data>> parse(const std::string& fi
 
 	if (it != end or !result) // fail if we did not get a full match
 	{
-		error_stream << "parse failure\n";
-		return std::nullopt;
+		error_stream << "parse failure\nstopped at:\n";
+		fs::print::print_line_with_indicator(error_stream, range_type(begin, end), range_type(it, ++iterator_type(it)));
 	}
 
-	return std::make_pair(ast, lookup_data(std::move(position_cache)));
+	return std::make_pair(std::move(ast), lookup_data(std::move(position_cache)));
 }
 
 }

@@ -73,24 +73,21 @@ std::optional<error::error_variant> add_constant_from_definition(
 }
 
 std::optional<constants_map> parse_constants(
-	const past::ast_type& ast,
+	const past::constant_definition_list& constants_list,
 	const parser::lookup_data& lookup_data,
 	std::ostream& error_stream)
 {
 	constants_map map;
 
-	for (const past::constant_definition_line& line : ast)
+	for (const past::constant_definition& line : constants_list.constant_definitions)
 	{
-		if (line.value)
-		{
-			const std::optional<error::error_variant> error =
-				add_constant_from_definition(*line.value, lookup_data, map);
+		const std::optional<error::error_variant> error =
+			add_constant_from_definition(line, lookup_data, map);
 
-			if (error)
-			{
-				print::compile_error(*error, lookup_data.get_range_of_whole_content(), error_stream);
-				return std::nullopt;
-			}
+		if (error)
+		{
+			print::compile_error(*error, lookup_data.get_range_of_whole_content(), error_stream);
+			return std::nullopt;
 		}
 	}
 
@@ -102,7 +99,7 @@ bool semantic_analysis(
 	const parser::lookup_data& lookup_data,
 	std::ostream& error_stream)
 {
-	std::optional<constants_map> map = parse_constants(ast, lookup_data, error_stream);
+	std::optional<constants_map> map = parse_constants(ast.constants_list, lookup_data, error_stream);
 
 	if (!map)
 		return false;

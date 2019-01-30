@@ -30,6 +30,7 @@
 								<option id="gnu.cpp.compiler.option.dialect.flags.505751964" name="Other dialect flags" superClass="gnu.cpp.compiler.option.dialect.flags" useByScannerDiscovery="true" value="-std=c++17" valueType="string"/>
 								<option id="gnu.cpp.compiler.option.include.paths.173666067" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;G:\Files\C++\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;G:\Files\C++\repos\spirit\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src}&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.preprocessor.def.1292400661" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" useByScannerDiscovery="false" valueType="definedSymbols">
@@ -89,6 +90,7 @@
 								<option id="gnu.cpp.compiler.option.other.other.1007756463" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 -ffast-math -Wno-implicit-fallthrough -Wno-unused-parameter" valueType="string"/>
 								<option id="gnu.cpp.compiler.option.include.paths.459114305" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;G:\Files\C++\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;G:\Files\C++\repos\spirit\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src}&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.dialect.flags.719677034" name="Other dialect flags" superClass="gnu.cpp.compiler.option.dialect.flags" useByScannerDiscovery="true" value="-std=c++17" valueType="string"/>
