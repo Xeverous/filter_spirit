@@ -1,6 +1,7 @@
 #pragma once
 #include "parser/config.hpp"
 #include "utility/type_traits.hpp"
+#include <cassert>
 #include <string>
 #include <string_view>
 #include <optional>
@@ -57,6 +58,7 @@ struct number
 struct level
 {
 	int value;
+	parser::range_type origin;
 };
 
 struct sound_id
@@ -142,22 +144,45 @@ struct range_bound
 };
 
 template <typename T>
-struct range
+class range_condition
 {
+public:
+	range_condition(comparison_type comparison, T value, parser::range_type origin)
+	: origin(origin)
+	{
+		if (comparison == comparison_type::greater)
+		{
+			lower_bound = {value, false};
+		}
+		else if (comparison == comparison_type::greater_equal)
+		{
+			lower_bound = {value, true};
+		}
+		else if (comparison == comparison_type::less)
+		{
+			upper_bound = {value, false};
+		}
+		else if (comparison == comparison_type::less_equal)
+		{
+			upper_bound = {value, true};
+		}
+		else
+		{
+			lower_bound = {value, true};
+			upper_bound = {value, true};
+		}
+	}
+
+	bool includes(range_condition other) const
+	{
+		// FIXME implement relation testing
+		// return enum: exact/superset/subset/intersect/disjoint
+		return true;
+	}
+
+private:
 	std::optional<range_bound<T>> lower_bound;
 	std::optional<range_bound<T>> upper_bound;
-};
-
-template <typename T>
-struct exact_value
-{
-	T value;
-};
-
-template <typename T>
-struct range_condition
-{
-	std::variant<range<T>, exact_value<T>> spec;
 	parser::range_type origin;
 };
 
@@ -203,7 +228,7 @@ struct custom_alert_sound
 
 struct alert_sound
 {
-	std::variant<built_in_sound, custom_alert_sound>;
+	std::variant<built_in_sound, custom_alert_sound> sound;
 	volume vol;
 };
 
@@ -255,11 +280,11 @@ single_object_type type_of_single_object(const single_object& obj);
 [[nodiscard]]
 object_type type_of_object(const object& obj);
 
-[[nodiscard]]
-template <typename T> constexpr
+template <typename T> [[nodiscard]] constexpr
 single_object_type type_to_enum_impl()
 {
 	static_assert(sizeof(T) == 0, "missing implementation for this type");
+	return single_object_type::generic;
 }
 
 template <> constexpr
@@ -285,8 +310,7 @@ single_object_type type_to_enum_impl<group>() { return single_object_type::group
 template <> constexpr
 single_object_type type_to_enum_impl<string>() { return single_object_type::string; }
 
-[[nodiscard]]
-template <typename T> constexpr
+template <typename T> [[nodiscard]] constexpr
 single_object_type type_to_enum()
 {
 	static_assert(

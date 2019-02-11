@@ -69,7 +69,7 @@ struct internal_error_while_parsing_constant
 };
 
 /*
- *  identical action types in 1 action list, eg
+ * identical action types in 1 action list, eg
  * ... {
  *     SetTextColor 101 102 103
  *     SetTextColor 101 102 103 255
@@ -77,8 +77,20 @@ struct internal_error_while_parsing_constant
  */
 struct duplicate_action
 {
-	parser::range_type first_action;
-	parser::range_type second_action;
+	parser::range_type first_action_origin;
+	parser::range_type second_action_origin;
+};
+
+/*
+ * identical condition types in 1 condition list, eg
+ * ItemLevel 10, ItemLevel 11 {
+ *     ...
+ * }
+ */
+struct duplicate_condition
+{
+	parser::range_type first_condition_origin;
+	parser::range_type second_condition_origin;
 };
 
 using error_variant = std::variant<
@@ -90,7 +102,8 @@ using error_variant = std::variant<
 	nested_arrays_not_allowed,
 	non_homogeneous_array,
 	internal_error_while_parsing_constant,
-	duplicate_action
+	duplicate_action,
+	duplicate_condition
 >;
 
 }

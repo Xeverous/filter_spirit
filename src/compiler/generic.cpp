@@ -51,7 +51,7 @@ lang::single_object literal_to_single_object(
 		[](past::suit_literal literal) -> lang::single_object {
 			return lang::suit{literal.value};
 		},
-		[](past::color_literal literal) -> lang::single_object {
+		[&](past::color_literal literal) -> lang::single_object {
 			return color_literal_to_color(literal, lookup_data);
 		},
 		[](past::string_literal literal) -> lang::single_object {
@@ -256,7 +256,7 @@ std::variant<lang::single_object, error::error_variant> construct_single_object_
 	if (actual_type == lang::single_object_type::number)
 	{
 		if (wanted_type == lang::single_object_type::level)
-			return lang::single_object{lang::level{std::get<lang::number>(object).value}};
+			return lang::single_object{lang::level{std::get<lang::number>(object).value, object_value_origin}};
 
 		if (wanted_type == lang::single_object_type::sound_id)
 			return lang::single_object{lang::sound_id{std::get<lang::number>(object).value}};
@@ -378,13 +378,29 @@ std::variant<lang::color, error::error_variant> color_expression_to_color(
 	const parser::lookup_data& lookup_data)
 {
 	return expr.apply_visitor(x3::make_lambda_visitor<std::variant<lang::color, error::error_variant>>(
-		[](past::color_literal lit)
+		[&](past::color_literal lit)
 		{
 			return color_literal_to_color(lit, lookup_data);
 		},
 		[&](const past::identifier& identifier)
 		{
 			return identifier_to_type<lang::color>(identifier, map, lookup_data);
+		}));
+}
+
+std::variant<lang::level, error::error_variant> level_expression_to_level(
+	const past::level_expression& expr,
+	const constants_map& map,
+	const parser::lookup_data& lookup_data)
+{
+	return expr.apply_visitor(x3::make_lambda_visitor<std::variant<lang::level, error::error_variant>>(
+		[&](past::integer_literal lit)
+		{
+			return lang::level{lit.value, lookup_data.position_of(lit)};
+		},
+		[&](const past::identifier& identifier)
+		{
+			return identifier_to_type<lang::level>(identifier, map, lookup_data);
 		}));
 }
 
@@ -474,11 +490,45 @@ std::variant<lang::condition_set, error::error_variant> construct_condition_set(
 		const auto error = expr.apply_visitor(x3::make_lambda_visitor<std::optional<error::error_variant>>(
 			[&](const parser::ast::item_level_condition& cond)
 			{
-				// TODO implement
+				std::variant<lang::level, error::error_variant> result = level_expression_to_level(cond.level, map, lookup_data);
+
+				if (std::holds_alternative<error::error_variant>(result))
+					return std::get<error::error_variant>(result);
+
+				auto& level = std::get<lang::level>(result);
+				lang::numeric_range_condition nrc(cond.comparison, level.value, lookup_data.position_of(cond));
+
+				if (result_conditions.item_level) // FIXME try to add to exising one first
+				{
+					return error::duplicate_condition{
+						(*result_conditions.item_level).origin,
+						lookup_data.position_of(cond)
+					};
+				}
+
+				// FIXME missing addition to result_conditions
+				return std::nullopt;
 			},
 			[&](const parser::ast::drop_level_condition& cond)
 			{
-				// TODO implement
+				std::variant<lang::level, error::error_variant> result = level_expression_to_level(cond.level, map, lookup_data);
+
+				if (std::holds_alternative<error::error_variant>(result))
+					return std::get<error::error_variant>(result);
+
+				auto& level = std::get<lang::level>(result);
+				lang::numeric_range_condition nrc(cond.comparison, level.value, lookup_data.position_of(cond));
+
+				if (result_conditions.drop_level) // FIXME try to add to exising one first
+				{
+					return error::duplicate_condition{
+						(*result_conditions.drop_level).origin,
+						lookup_data.position_of(cond)
+					};
+				}
+
+				// FIXME missing addition to result_conditions
+				return std::nullopt;
 			}
 			));
 

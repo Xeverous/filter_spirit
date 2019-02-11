@@ -74,7 +74,13 @@ std::variant<lang::object, error::error_variant> construct_object_of_type(
 
 [[nodiscard]]
 std::variant<lang::color, error::error_variant> color_expression_to_color(
-	const past::color_expression& expr,
+	const parser::ast::color_expression& expr,
+	const constants_map& map,
+	const parser::lookup_data& lookup_data);
+
+[[nodiscard]]
+std::variant<lang::level, error::error_variant> level_expression_to_level(
+	const parser::ast::level_expression& expr,
 	const constants_map& map,
 	const parser::lookup_data& lookup_data);
 
@@ -94,8 +100,7 @@ std::variant<lang::condition_set, error::error_variant> construct_condition_set(
 // FIXME: investigate code duplication and potential missing promotion bugs with:
 // - identifier_to_object
 // - construct_{single|array|}object_of_type
-[[nodiscard]]
-template <typename T>
+template <typename T> [[nodiscard]]
 std::variant<T, error::error_variant> identifier_to_type(
 	const parser::ast::identifier& identifier,
 	const constants_map& map,
@@ -109,7 +114,7 @@ std::variant<T, error::error_variant> identifier_to_type(
 		};
 	}
 
-	const lang::object& object = *it;
+	const lang::object& object = it->second;
 
 	if (std::holds_alternative<lang::array_object>(object.value))
 	{
@@ -120,7 +125,7 @@ std::variant<T, error::error_variant> identifier_to_type(
 		};
 	}
 
-	const lang::single_object& single_object = std::get<T>(object.value);
+	const auto& single_object = std::get<lang::single_object>(object.value);
 
 	if (!std::holds_alternative<T>(single_object))
 	{

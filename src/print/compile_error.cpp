@@ -51,7 +51,7 @@ void print_compile_error(
 		content_range,
 		error.right_operand_value_origin,
 		fp::compiler_error_string,
-		"type mismatch in expression, operands of types '",
+		"type mismatch in assignment, operands of types '",
 		fs::lang::to_string(error.left_operand_type),
 		"' and '",
 		fs::lang::to_string(error.right_operand_type),
@@ -64,6 +64,23 @@ void print_compile_error(
 			error.right_operand_type_origin,
 			fp::note_string,
 			"right operand type defined here");
+}
+
+void print_compile_error(
+	fs::compiler::error::type_mismatch_in_expression error,
+	range_type content_range,
+	std::ostream& error_stream)
+{
+	fp::print_line_number_with_indication_and_texts(
+		error_stream,
+		content_range,
+		error.expression_type_origin,
+		fp::compiler_error_string,
+		"type mismatch in expression, expected expression of type '",
+		fs::lang::to_string(error.expected_type),
+		"' but got '",
+		fs::lang::to_string(error.actual_type),
+		"'");
 }
 
 void print_compile_error(
@@ -164,6 +181,46 @@ void print_compile_error(
 			*error.expression_name_origin,
 			fp::note_string,
 			note);
+}
+
+void print_compile_error(
+	fs::compiler::error::duplicate_action error,
+	range_type content_range,
+	std::ostream& error_stream)
+{
+	fp::print_line_number_with_indication_and_texts(
+		error_stream,
+		content_range,
+		error.second_action_origin,
+		fp::compiler_error_string,
+		"action duplication");
+
+	fp::print_line_number_with_indication_and_texts(
+		error_stream,
+		content_range,
+		error.first_action_origin,
+		fp::note_string,
+		"first defined here");
+}
+
+void print_compile_error(
+	fs::compiler::error::duplicate_condition error,
+	range_type content_range,
+	std::ostream& error_stream)
+{
+	fp::print_line_number_with_indication_and_texts(
+		error_stream,
+		content_range,
+		error.second_condition_origin,
+		fp::compiler_error_string,
+		"condition duplication");
+
+	fp::print_line_number_with_indication_and_texts(
+		error_stream,
+		content_range,
+		error.first_condition_origin,
+		fp::note_string,
+		"first defined here");
 }
 
 }
