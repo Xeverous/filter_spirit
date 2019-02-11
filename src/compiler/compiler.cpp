@@ -1,5 +1,6 @@
 #include "compiler/compiler.hpp"
 #include "compiler/process_input.hpp"
+#include "compiler/rules.hpp"
 #include "compiler/generic.hpp"
 #include "compiler/error.hpp"
 #include "parser/ast.hpp"
@@ -109,7 +110,10 @@ bool semantic_analysis(
 		error_stream << pair.first << "\n";
 	}
 
-	return true;
+	std::variant<std::vector<lang::filter_block>, error::error_variant> filter_content =
+		compile_rules(ast.actions, ast.blocks, *map, lookup_data);
+
+	return !std::holds_alternative<error::error_variant>(filter_content);
 }
 
 }

@@ -61,21 +61,6 @@ struct color_literal : x3::position_tagged
 	integer_literal g;
 	integer_literal b;
 	opacity_literal a;
-
-	lang::color to_lang_color() const
-	{
-		fs::lang::color result;
-		result.r = r.value;
-		result.g = g.value;
-		result.b = b.value;
-
-		if (a.value)
-			result.a = (*a.value).value;
-		else
-			result.a = std::nullopt;
-
-		return result;
-	}
 };
 
 struct group_literal : x3::position_tagged

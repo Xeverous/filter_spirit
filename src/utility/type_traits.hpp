@@ -2,6 +2,7 @@
 #include <boost/fusion/support/is_sequence.hpp>
 #include <boost/fusion/include/is_sequence.hpp>
 #include <type_traits>
+#include <variant>
 #include <iosfwd>
 
 namespace fs::traits
@@ -79,5 +80,27 @@ struct is_printable<T, std::void_t<
 
 template <typename T>
 constexpr bool is_printable_v = is_printable<T>::value;
+
+template <typename... Ts>
+struct type_list {};
+
+template <typename... Ts>
+type_list<Ts...> list_of_variant_alternatives(std::variant<Ts...> v);
+
+template <typename T, typename... Ts>
+constexpr bool is_one_of(type_list<Ts...>)
+{
+	return (std::is_same_v<T, Ts> || ...);
+}
+
+template <typename T, typename Variant>
+struct is_variant_alternative
+{
+	using types = decltype(list_of_variant_alternatives(std::declval<Variant>()));
+	static constexpr bool value = is_one_of<T>(types{});
+};
+
+template <typename T, typename Variant>
+constexpr bool is_variant_alternative_v = is_variant_alternative<T, Variant>::value;
 
 }

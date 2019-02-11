@@ -13,7 +13,27 @@ namespace fs::compiler
 namespace past = parser::ast;
 namespace x3 = boost::spirit::x3;
 
-lang::single_object literal_to_single_object(const past::literal_expression& literal)
+lang::color color_literal_to_color(
+	parser::ast::color_literal lit,
+	const parser::lookup_data& lookup_data)
+{
+	fs::lang::color result;
+	result.r = lit.r.value;
+	result.g = lit.g.value;
+	result.b = lit.b.value;
+
+	if (lit.a.value)
+		result.a = (*lit.a.value).value;
+	else
+		result.a = std::nullopt;
+
+	result.origin = lookup_data.position_of(lit);
+	return result;
+}
+
+lang::single_object literal_to_single_object(
+	const past::literal_expression& literal,
+	const parser::lookup_data& lookup_data)
 {
 	return literal.apply_visitor(x3::make_lambda_visitor<lang::single_object>(
 		[](past::boolean_literal literal) -> lang::single_object {
@@ -32,44 +52,12 @@ lang::single_object literal_to_single_object(const past::literal_expression& lit
 			return lang::suit{literal.value};
 		},
 		[](past::color_literal literal) -> lang::single_object {
-			return literal.to_lang_color();
+			return color_literal_to_color(literal, lookup_data);
 		},
 		[](past::string_literal literal) -> lang::single_object {
 			return lang::string{literal.value};
 		}
 	));
-}
-
-lang::single_object_type type_of_single_object(const lang::single_object& obj)
-{
-	if (std::holds_alternative<lang::boolean>(obj))
-		return lang::single_object_type::boolean;
-	if (std::holds_alternative<lang::number>(obj))
-		return lang::single_object_type::number;
-	if (std::holds_alternative<lang::level>(obj))
-		return lang::single_object_type::level;
-	if (std::holds_alternative<lang::sound_id>(obj))
-		return lang::single_object_type::sound_id;
-	if (std::holds_alternative<lang::volume>(obj))
-		return lang::single_object_type::volume;
-	if (std::holds_alternative<lang::rarity>(obj))
-		return lang::single_object_type::rarity;
-	if (std::holds_alternative<lang::shape>(obj))
-		return lang::single_object_type::shape;
-	if (std::holds_alternative<lang::suit>(obj))
-		return lang::single_object_type::suit;
-	if (std::holds_alternative<lang::color>(obj))
-		return lang::single_object_type::color;
-	if (std::holds_alternative<lang::group>(obj))
-		return lang::single_object_type::group;
-	if (std::holds_alternative<lang::string>(obj))
-		return lang::single_object_type::string;
-
-	assert(false);
-	// make a return to avoid UB
-	// debug: fire assertion
-	// release: return boolean as it is the most likely to be a noisy bug
-	return lang::single_object_type::boolean;
 }
 
 lang::object_type type_expression_to_type(const parser::ast::type_expression& type_expr)
@@ -78,20 +66,6 @@ lang::object_type type_expression_to_type(const parser::ast::type_expression& ty
 		[](const parser::ast::object_type_expression& expr) { return lang::object_type{expr.value}; },
 		[](const parser::ast::array_type_expression& expr) { return lang::object_type{expr.value, true}; }
 	));
-}
-
-lang::object_type type_of_object(const lang::object& obj)
-{
-	return std::visit(utility::visitor{
-		[](const lang::single_object& obj) { return lang::object_type(type_of_single_object(obj)); },
-		[](const lang::array_object& obj)
-		{
-			if (obj.empty())
-				return lang::object_type(lang::single_object_type::generic, true);
-
-			return lang::object_type(type_of_single_object(obj.front()), true);
-		}
-	}, obj.value);
 }
 
 std::optional<lang::group> identifier_to_group(std::string_view identifier)
@@ -133,8 +107,8 @@ std::optional<error::non_homogeneous_array> verify_homogeneity(
 			return error::non_homogeneous_array{
 				origins.front(),
 				origins[i],
-				type_of_single_object(array.front()),
-				type_of_single_object(array[i])
+				lang::type_of_single_object(array.front()),
+				lang::type_of_single_object(array[i])
 			};
 		}
 	}
@@ -151,7 +125,7 @@ std::optional<error::non_homogeneous_array> verify_homogeneity(
  */
 [[nodiscard]]
 std::variant<lang::object, error::error_variant> identifier_to_object(
-	const past::identifier& identifier,
+	const past::identifier& identifier, // FIXME: identifier not used, only .value member
 	parser::range_type position_of_identifier,
 	const constants_map& map)
 {
@@ -195,7 +169,7 @@ std::variant<lang::object, error::error_variant> expression_to_object(
 
 	auto literal_to_object = [&](const past::literal_expression& literal) -> result_type
 	{
-		lang::single_object obj = literal_to_single_object(literal);
+		lang::single_object obj = literal_to_single_object(literal, lookup_data);
 		return lang::object{
 			obj,
 			lookup_data.position_of(literal),
@@ -274,7 +248,7 @@ std::variant<lang::single_object, error::error_variant> construct_single_object_
 	parser::range_type object_value_origin,
 	parser::range_type object_type_origin)
 {
-	lang::single_object_type actual_type = type_of_single_object(object);
+	lang::single_object_type actual_type = lang::type_of_single_object(object);
 	if (actual_type == wanted_type)
 		return object;
 
@@ -291,7 +265,7 @@ std::variant<lang::single_object, error::error_variant> construct_single_object_
 			return lang::single_object{lang::volume{std::get<lang::number>(object).value}};
 	}
 
-	return error::type_mismatch{
+	return error::type_mismatch_in_assignment{
 		wanted_type,
 		actual_type,
 		object_value_origin,
@@ -313,7 +287,7 @@ std::variant<lang::single_object, error::error_variant> construct_single_object_
 		},
 		[&](lang::array_object&&) -> result_type
 		{
-			return error::type_mismatch{
+			return error::type_mismatch_in_assignment{
 				lang::object_type(wanted_type),
 				lang::object_type(lang::single_object_type::generic, true),
 				object.value_origin,
@@ -335,7 +309,7 @@ std::variant<lang::array_object, error::error_variant> construct_array_object_of
 		{
 			return error::single_object_to_array_assignment{
 				lang::object_type(inner_array_type, true),
-				type_of_single_object(obj),
+				lang::type_of_single_object(obj),
 				object.value_origin
 			};
 		},
@@ -396,6 +370,123 @@ std::variant<lang::object, error::error_variant> construct_object_of_type(
 			object.name_origin
 		};
 	}
+}
+
+std::variant<lang::color, error::error_variant> color_expression_to_color(
+	const past::color_expression& expr,
+	const constants_map& map,
+	const parser::lookup_data& lookup_data)
+{
+	return expr.apply_visitor(x3::make_lambda_visitor<std::variant<lang::color, error::error_variant>>(
+		[](past::color_literal lit)
+		{
+			return color_literal_to_color(lit, lookup_data);
+		},
+		[&](const past::identifier& identifier)
+		{
+			return identifier_to_type<lang::color>(identifier, map, lookup_data);
+		}));
+}
+
+std::variant<lang::action_set, error::error_variant> construct_action_set(
+	const past::action_list& action_list,
+	const constants_map& map,
+	const parser::lookup_data& lookup_data)
+{
+	lang::action_set result_actions;
+
+	for (const past::action_expression& expr : action_list.action_expressions)
+	{
+		const auto error = expr.apply_visitor(x3::make_lambda_visitor<std::optional<error::error_variant>>(
+			[&](const past::border_color_action& action)
+			{
+				std::variant<lang::color, error::error_variant> result = color_expression_to_color(action.color, map, lookup_data);
+
+				if (std::holds_alternative<error::error_variant>(result))
+					return std::get<error::error_variant>(std::move(result));
+
+				if (result_actions.border_color)
+				{
+					return error::duplicate_action{
+						(*result_actions.border_color).origin,
+						lookup_data.position_of(action)
+					};
+				}
+
+				result_actions.border_color = std::get<lang::color>(result);
+				return std::nullopt;
+			},
+			[&](const past::text_color_action& action)
+			{
+				std::variant<lang::color, error::error_variant> result = color_expression_to_color(action.color, map, lookup_data);
+
+				if (std::holds_alternative<error::error_variant>(result))
+					return std::get<error::error_variant>(std::move(result));
+
+				if (result_actions.text_color)
+				{
+					return error::duplicate_action{
+						(*result_actions.text_color).origin,
+						lookup_data.position_of(action)
+					};
+				}
+
+				result_actions.text_color = std::get<lang::color>(result);
+				return std::nullopt;
+			},
+			[&](const past::background_color_action& action)
+			{
+				std::variant<lang::color, error::error_variant> result = color_expression_to_color(action.color, map, lookup_data);
+
+				if (std::holds_alternative<error::error_variant>(result))
+					return std::get<error::error_variant>(std::move(result));
+
+				if (result_actions.background_color)
+				{
+					return error::duplicate_action{
+						(*result_actions.background_color).origin,
+						lookup_data.position_of(action)
+					};
+				}
+
+				result_actions.background_color = std::get<lang::color>(result);
+				return std::nullopt;
+			}
+			));
+
+		if (error)
+			return *error;
+	}
+
+	return result_actions;
+}
+
+[[nodiscard]]
+std::variant<lang::condition_set, error::error_variant> construct_condition_set(
+	const parser::ast::condition_list& condition_list,
+	const constants_map& map,
+	const parser::lookup_data& lookup_data)
+{
+	lang::condition_set result_conditions;
+
+	for (const past::condition_expression& expr : condition_list.condition_expressions)
+	{
+		const auto error = expr.apply_visitor(x3::make_lambda_visitor<std::optional<error::error_variant>>(
+			[&](const parser::ast::item_level_condition& cond)
+			{
+				// TODO implement
+			},
+			[&](const parser::ast::drop_level_condition& cond)
+			{
+				// TODO implement
+			}
+			));
+
+		if (error)
+			return *error;
+	}
+
+	return result_conditions;
 }
 
 }

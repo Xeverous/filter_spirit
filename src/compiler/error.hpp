@@ -19,7 +19,7 @@ struct no_such_name
 	parser::range_type name_origin;
 };
 
-struct type_mismatch
+struct type_mismatch_in_assignment
 {
 	// invariant: left_operand_type != right_operand_type
 	lang::object_type left_operand_type;
@@ -27,6 +27,14 @@ struct type_mismatch
 	parser::range_type right_operand_value_origin;
 	// if object was unnamed literal then type origin should point at that literal
 	parser::range_type right_operand_type_origin;
+};
+
+struct type_mismatch_in_expression
+{
+	// invariant: expected_type != actual_type
+	lang::object_type expected_type;
+	lang::object_type actual_type;
+	parser::range_type expression_type_origin;
 };
 
 // inform the user that '[expr]' was probably intended than 'expr'
@@ -60,14 +68,29 @@ struct internal_error_while_parsing_constant
 	std::optional<parser::range_type> expression_name_origin;
 };
 
+/*
+ *  identical action types in 1 action list, eg
+ * ... {
+ *     SetTextColor 101 102 103
+ *     SetTextColor 101 102 103 255
+ * }
+ */
+struct duplicate_action
+{
+	parser::range_type first_action;
+	parser::range_type second_action;
+};
+
 using error_variant = std::variant<
 	name_already_exists,
 	no_such_name,
-	type_mismatch,
+	type_mismatch_in_assignment,
+	type_mismatch_in_expression,
 	single_object_to_array_assignment,
 	nested_arrays_not_allowed,
 	non_homogeneous_array,
-	internal_error_while_parsing_constant
+	internal_error_while_parsing_constant,
+	duplicate_action
 >;
 
 }

@@ -42,7 +42,7 @@ void print_compile_error(
 }
 
 void print_compile_error(
-	fs::compiler::error::type_mismatch error,
+	fs::compiler::error::type_mismatch_in_assignment error,
 	range_type content_range,
 	std::ostream& error_stream)
 {
