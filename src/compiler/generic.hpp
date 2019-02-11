@@ -67,7 +67,7 @@ std::variant<lang::array_object, error::error_variant> construct_array_object_of
 	lang::single_object_type inner_array_type,
 	lang::object object);
 
-[[nodiscard]]
+[[nodiscard]] // FIXME: does not set returned object's origins
 std::variant<lang::object, error::error_variant> construct_object_of_type(
 	lang::object_type wanted_type,
 	lang::object&& object);

@@ -42,9 +42,9 @@ std::optional<error::error_variant> add_constant_from_definition(
 	const auto wanted_name_it = map.find(wanted_name.value); // C++17: use if (expr; cond)
 	if (wanted_name_it != map.end())
 	{
-		const parser::range_type place_of_duplicated_name = lookup_data.position_of(def.name);
 		assert(wanted_name_it->second.name_origin);
 		const parser::range_type place_of_original_name = *wanted_name_it->second.name_origin;
+		const parser::range_type place_of_duplicated_name = lookup_data.position_of(wanted_name);
 		return error::name_already_exists{place_of_duplicated_name, place_of_original_name};
 	}
 
