@@ -3,6 +3,8 @@
 #include "compiler/process_input.hpp"
 #include "compiler/error.hpp"
 #include "lang/types.hpp"
+#include "lang/condition_set.hpp"
+#include "lang/action_set.hpp"
 #include "parser/ast.hpp"
 #include "parser/parser.hpp"
 #include <string_view>

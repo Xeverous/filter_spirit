@@ -1,4 +1,5 @@
 #pragma once
+#include "lang/type_names.hpp"
 #include "parser/config.hpp"
 #include "utility/type_traits.hpp"
 #include <cassert>
@@ -10,36 +11,6 @@
 
 namespace fs::lang
 {
-
-// ---- constants ----
-
-enum class single_object_type
-{
-	boolean,
-	number,
-	level,
-	sound_id,
-	volume,
-	rarity,
-	shape,
-	suit,
-	color,
-	group,
-	string,
-
-	generic // for generic constructs such as empty arrays
-};
-
-struct object_type
-{
-	object_type(single_object_type type, bool is_array = false)
-	: type(type), is_array(is_array)
-	{
-	}
-
-	single_object_type type;
-	bool is_array;
-};
 
 enum class rarity { normal, magic, rare, unique };
 enum class shape { circle, diamond, hexagon, square, star, triangle };
@@ -136,83 +107,6 @@ enum class comparison_type
 
 // ---- conditions ----
 
-template <typename T>
-struct range_bound
-{
-	T value;
-	bool inclusive;
-};
-
-template <typename T>
-class range_condition
-{
-public:
-	range_condition(comparison_type comparison, T value, parser::range_type origin)
-	: origin(origin)
-	{
-		if (comparison == comparison_type::greater)
-		{
-			lower_bound = {value, false};
-		}
-		else if (comparison == comparison_type::greater_equal)
-		{
-			lower_bound = {value, true};
-		}
-		else if (comparison == comparison_type::less)
-		{
-			upper_bound = {value, false};
-		}
-		else if (comparison == comparison_type::less_equal)
-		{
-			upper_bound = {value, true};
-		}
-		else
-		{
-			lower_bound = {value, true};
-			upper_bound = {value, true};
-		}
-	}
-
-	bool includes(range_condition other) const
-	{
-		// FIXME implement relation testing
-		// return enum: exact/superset/subset/intersect/disjoint
-		return true;
-	}
-
-private:
-	std::optional<range_bound<T>> lower_bound;
-	std::optional<range_bound<T>> upper_bound;
-	parser::range_type origin;
-};
-
-using numeric_range_condition = range_condition<int>;
-using rarity_range_condition = range_condition<rarity>;
-
-struct condition_set
-{
-	std::optional<numeric_range_condition> item_level;
-	std::optional<numeric_range_condition> drop_level;
-	std::optional<numeric_range_condition> quality;
-	std::optional<rarity_range_condition> rarity;
-	// ??? class_;
-	// ??? base_type;
-	std::optional<numeric_range_condition> sockets;
-	std::optional<numeric_range_condition> links;
-	std::optional<group> socket_group;
-	std::optional<numeric_range_condition> height;
-	std::optional<numeric_range_condition> width;
-	// ??? has_explicit_mod;
-	std::optional<numeric_range_condition> stack_size;
-	std::optional<numeric_range_condition> gem_level;
-	std::optional<numeric_range_condition> map_tier;
-	std::optional<bool> is_identified;
-	std::optional<bool> id_corrupted;
-	std::optional<bool> is_shaper_item;
-	std::optional<bool> is_elder_item;
-	std::optional<bool> is_shaped_map;
-};
-
 // ---- actions ----
 
 struct built_in_sound
@@ -245,36 +139,7 @@ struct beam_effect
 	bool is_temporary;
 };
 
-struct action_set
-{
-	std::optional<bool> show;
-	std::optional<color> border_color;
-	std::optional<color> text_color;
-	std::optional<color> background_color;
-	std::optional<number> font_size;
-	std::optional<alert_sound> sound;
-	std::optional<std::monostate> disabled_drop_sound;
-	std::optional<minimap_icon> icon;
-	std::optional<beam_effect> effect;
-
-	[[nodiscard]]
-	action_set override_by(const action_set& other) const;
-};
-
-// ---- filter ----
-
-struct filter_block
-{
-	condition_set conditions;
-	action_set actions;
-};
-
 // ---- utility functions ----
-[[nodiscard]]
-std::string_view to_string(single_object_type type);
-[[nodiscard]]
-std::string to_string(object_type type);
-
 [[nodiscard]]
 single_object_type type_of_single_object(const single_object& obj);
 [[nodiscard]]

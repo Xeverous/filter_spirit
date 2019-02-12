@@ -2,6 +2,9 @@
 #include "compiler/error.hpp"
 #include "compiler/compiler.hpp"
 #include "parser/ast.hpp"
+#include "lang/action_set.hpp"
+#include "lang/condition_set.hpp"
+#include "lang/filter_block.hpp"
 #include <variant>
 
 namespace fs::compiler

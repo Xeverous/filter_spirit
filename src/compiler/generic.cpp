@@ -413,8 +413,10 @@ std::variant<lang::action_set, error::error_variant> construct_action_set(
 
 	for (const past::action_expression& expr : action_list.action_expressions)
 	{
-		const auto error = expr.apply_visitor(x3::make_lambda_visitor<std::optional<error::error_variant>>(
-			[&](const past::border_color_action& action)
+		using result_type = std::optional<error::error_variant>;
+
+		const auto error = expr.apply_visitor(x3::make_lambda_visitor<result_type>(
+			[&](const past::border_color_action& action) -> result_type
 			{
 				std::variant<lang::color, error::error_variant> result = color_expression_to_color(action.color, map, lookup_data);
 
@@ -432,7 +434,7 @@ std::variant<lang::action_set, error::error_variant> construct_action_set(
 				result_actions.border_color = std::get<lang::color>(result);
 				return std::nullopt;
 			},
-			[&](const past::text_color_action& action)
+			[&](const past::text_color_action& action) -> result_type
 			{
 				std::variant<lang::color, error::error_variant> result = color_expression_to_color(action.color, map, lookup_data);
 
@@ -450,7 +452,7 @@ std::variant<lang::action_set, error::error_variant> construct_action_set(
 				result_actions.text_color = std::get<lang::color>(result);
 				return std::nullopt;
 			},
-			[&](const past::background_color_action& action)
+			[&](const past::background_color_action& action) -> result_type
 			{
 				std::variant<lang::color, error::error_variant> result = color_expression_to_color(action.color, map, lookup_data);
 
@@ -487,8 +489,10 @@ std::variant<lang::condition_set, error::error_variant> construct_condition_set(
 
 	for (const past::condition_expression& expr : condition_list.condition_expressions)
 	{
-		const auto error = expr.apply_visitor(x3::make_lambda_visitor<std::optional<error::error_variant>>(
-			[&](const parser::ast::item_level_condition& cond)
+		using result_type = std::optional<error::error_variant>;
+
+		const auto error = expr.apply_visitor(x3::make_lambda_visitor<result_type>(
+			[&](const parser::ast::item_level_condition& cond) -> result_type
 			{
 				std::variant<lang::level, error::error_variant> result = level_expression_to_level(cond.level, map, lookup_data);
 
@@ -506,10 +510,10 @@ std::variant<lang::condition_set, error::error_variant> construct_condition_set(
 					};
 				}
 
-				// FIXME missing addition to result_conditions
+				result_conditions.item_level = nrc;
 				return std::nullopt;
 			},
-			[&](const parser::ast::drop_level_condition& cond)
+			[&](const parser::ast::drop_level_condition& cond) -> result_type
 			{
 				std::variant<lang::level, error::error_variant> result = level_expression_to_level(cond.level, map, lookup_data);
 
@@ -527,7 +531,7 @@ std::variant<lang::condition_set, error::error_variant> construct_condition_set(
 					};
 				}
 
-				// FIXME missing addition to result_conditions
+				result_conditions.drop_level = nrc;
 				return std::nullopt;
 			}
 			));
