@@ -1,0 +1,12 @@
+# version requirement
+version: 1.2.3
+
+config {
+	chance_bases: yes
+	animate_weapon: no {
+		ranged_weapons: no
+		magic_items: no
+	}
+	hide_rare_garbage: yes
+}
+

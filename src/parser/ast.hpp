@@ -23,7 +23,14 @@ namespace fs::parser::ast
 
 namespace x3 = boost::spirit::x3;
 
-// version requirement
+// ---- lowest-level tokens ----
+
+struct identifier : x3::position_tagged
+{
+	std::string value;
+};
+
+// ---- version requirement ----
 
 struct version_literal : x3::position_tagged
 {
@@ -35,6 +42,20 @@ struct version_literal : x3::position_tagged
 struct version_requirement_statement : x3::position_tagged
 {
 	version_literal min_required_version;
+};
+
+// ---- config ----
+
+struct config_param : x3::position_tagged
+{
+	identifier name;
+	bool enabled;
+	std::vector<config_param> child_params; // yo dawg, I heard you like recursion...
+};
+
+struct config : x3::position_tagged
+{
+	std::vector<config_param> params;
 };
 
 // core tokens
@@ -88,11 +109,6 @@ struct group_literal : x3::position_tagged
 	int w;
 
 	bool has_anything() const { return r != 0 || g != 0 || b != 0 || w != 0; }
-};
-
-struct identifier : x3::position_tagged
-{
-	std::string value;
 };
 
 struct string_literal : x3::position_tagged
@@ -271,6 +287,7 @@ struct rule_block : x3::position_tagged
 struct filter_specification : x3::position_tagged
 {
 	version_requirement_statement version_data;
+	config config;
 	constant_definition_list constants_list;
 	action_list actions;
 	rule_block_list blocks;

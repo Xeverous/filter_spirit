@@ -10,6 +10,19 @@ namespace fs::parser
 namespace x3 = boost::spirit::x3;
 
 // symbols that denote filter's language constants
+
+struct yes_no_ : x3::symbols<bool>
+{
+	yes_no_()
+	{
+		add
+			(lang::constants::keywords::yes, true)
+			(lang::constants::keywords::no, false)
+		;
+	}
+};
+const yes_no_ yes_no;
+
 struct booleans_ : x3::symbols<bool>
 {
 	booleans_()

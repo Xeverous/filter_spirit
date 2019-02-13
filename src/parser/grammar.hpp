@@ -13,6 +13,11 @@
 #include <boost/spirit/home/x3/support/utility/lambda_visitor.hpp>
 #include <string>
 
+// workaround for https://github.com/boostorg/spirit/issues/461
+// or maybe the missing implementation of the most obvious substitution
+template <typename T>
+struct boost::spirit::x3::traits::is_substitute<T, T> : boost::mpl::true_ {};
+
 namespace fs::parser
 {
 
@@ -74,8 +79,14 @@ struct error_on_error
 // rule IDs
 // use multiple inheritance to add more handlers
 // rules which do not have any handlers can use forward declared types
+struct identifier_impl_class;
+struct identifier_class                      : error_on_error, annotate_on_success {};
+
 struct version_literal_class                 : error_on_error, annotate_on_success {};
 struct version_requirement_statement_class   : error_on_error, annotate_on_success {};
+
+struct config_param_class                    : error_on_error, annotate_on_success {};
+struct config_class                          : error_on_error, annotate_on_success {};
 
 struct boolean_class                         : error_on_error, annotate_on_success {};
 struct integer_class                         : error_on_error, annotate_on_success {};
@@ -86,8 +97,6 @@ struct suit_literal_class                    : error_on_error, annotate_on_succe
 struct color_literal_class                   : error_on_error, annotate_on_success {};
 struct group_literal_class                   : error_on_error, annotate_on_success {};
 struct group_literal_impl_class              : error_on_error, annotate_on_success {};
-struct identifier_impl_class;
-struct identifier_class                      : error_on_error, annotate_on_success {};
 struct string_literal_class                  : error_on_error, annotate_on_success {};
 
 struct object_type_expression_class          : error_on_error, annotate_on_success {};
@@ -123,20 +132,40 @@ struct filter_specification_class            : error_on_error, annotate_on_succe
 
 struct grammar_class                         : error_on_error, annotate_on_success {};
 
+// ---- lowest-level tokens ----
+
 // whitespace_type should be defined here but it has been moved to parser/config.hpp for
 // dependency reasons. See config.hpp for details.
 BOOST_SPIRIT_DECLARE(whitespace_type)
 
-// comment anything to the end of line after #
-using comment_type = x3::rule<struct comment_class>;
+// all comments are ignored
+using comment_type = x3::rule<struct comment_class /*, intentionally nothing */>;
 BOOST_SPIRIT_DECLARE(comment_type)
 
-// version requirement
+// identifier has an extra intermediate rule because Spirit for (?) it's container detection reasons
+// can not match identifier grammar with a struct that contains only std::string (compiles only with std::string directly)
+// to workaround, we just add 1 more step with the same grammar
+// https://stackoverflow.com/questions/18166958
+using identifier_impl_type = x3::rule<identifier_impl_class, std::string>;
+BOOST_SPIRIT_DECLARE(identifier_impl_type)
+using identifier_type = x3::rule<identifier_class, ast::identifier>;
+BOOST_SPIRIT_DECLARE(identifier_type)
+
+// ---- version requirement ----
+
 using version_literal_type = x3::rule<version_literal_class, ast::version_literal>;
 BOOST_SPIRIT_DECLARE(version_literal_type)
 
 using version_requirement_statement_type = x3::rule<version_requirement_statement_class, ast::version_literal>;
 BOOST_SPIRIT_DECLARE(version_requirement_statement_type)
+
+// ---- config ----
+
+using config_param_type = x3::rule<config_param_class, ast::config_param>;
+BOOST_SPIRIT_DECLARE(config_param_type)
+
+using config_type = x3::rule<config_class, ast::config>;
+BOOST_SPIRIT_DECLARE(config_type)
 
 // core tokens
 
@@ -167,15 +196,6 @@ using group_literal_impl_type = x3::rule<group_literal_impl_class, ast::group_li
 BOOST_SPIRIT_DECLARE(group_literal_impl_type)
 using group_literal_type = x3::rule<group_literal_class, ast::group_literal>;
 BOOST_SPIRIT_DECLARE(group_literal_type)
-
-// identifier has an extra intermediate rule because Spirit for (?) it's container detection reasons
-// can not match identifier grammar with a struct that contains only std::string (compiles only with std::string directly)
-// to workaround, we just add 1 more step with the same grammar
-// https://stackoverflow.com/questions/18166958
-using identifier_impl_type = x3::rule<identifier_impl_class, std::string>;
-BOOST_SPIRIT_DECLARE(identifier_impl_type)
-using identifier_type = x3::rule<identifier_class, ast::identifier>;
-BOOST_SPIRIT_DECLARE(identifier_type)
 
 using string_literal_type = x3::rule<string_literal_class, ast::string_literal>;
 BOOST_SPIRIT_DECLARE(string_literal_type)

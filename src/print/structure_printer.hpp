@@ -106,6 +106,15 @@ struct structure_printer
 		std::cout << text << '\n';
 	}
 
+	void operator()(bool b) const
+	{
+		tab(indent);
+		if (b)
+			std::cout << "true\n";
+		else
+			std::cout << "false\n";
+	}
+
 	// lowest priority overload for unmatched Ts
 	template <typename T = void>
 	void operator()(...) const

@@ -49,6 +49,8 @@ namespace fs::parser
 // - rule definition: foo_def
 // - rule object    : foo
 
+// ---- lowest-level tokens ----
+
 const comment_type comment = "comment";
 const auto comment_def = x3::lit('#') >> *(x3::char_ - x3::eol) >> (x3::eol | x3::eoi);
 BOOST_SPIRIT_DEFINE(comment)
@@ -57,7 +59,15 @@ const whitespace_type whitespace = "whitespace";
 const auto whitespace_def = x3::space | comment;
 BOOST_SPIRIT_DEFINE(whitespace)
 
-// version requirement
+const identifier_impl_type identifier_impl = "identifier";
+const auto identifier_impl_def = x3::lexeme[(x3::alpha | x3::char_('_')) > *(x3::alnum | x3::char_('_'))];
+BOOST_SPIRIT_DEFINE(identifier_impl)
+
+const identifier_type identifier = identifier_impl.name;
+const auto identifier_def = identifier_impl;
+BOOST_SPIRIT_DEFINE(identifier)
+
+// ---- version requirement ----
 
 const version_literal_type version_literal = "version literal";
 const auto version_literal_def = x3::int_ >> '.' >> x3::int_ >> '.' >> x3::int_;
@@ -66,6 +76,16 @@ BOOST_SPIRIT_DEFINE(version_literal)
 const version_requirement_statement_type version_requirement_statement = "version requirement statement";
 const auto version_requirement_statement_def = x3::lit(lang::constants::keywords::version) > ':' > version_literal;
 BOOST_SPIRIT_DEFINE(version_requirement_statement)
+
+// ---- config ----
+
+const config_param_type config_param = "config param";
+const auto config_param_def = identifier > ':' > yes_no > (('{' > *config_param > '}') | x3::attr(std::vector<ast::config_param>()));
+BOOST_SPIRIT_DEFINE(config_param)
+
+const config_type config = "config";
+const auto config_def = x3::lit(lang::constants::keywords::config) > '{' > *config_param > '}';
+BOOST_SPIRIT_DEFINE(config)
 
 // core tokens
 
@@ -104,14 +124,6 @@ BOOST_SPIRIT_DEFINE(group_literal_impl)
 const group_literal_type group_literal =  group_literal_impl.name;
 const auto group_literal_def = group_literal_impl[validate_group];
 BOOST_SPIRIT_DEFINE(group_literal)
-
-const identifier_impl_type identifier_impl = "identifier";
-const auto identifier_impl_def = x3::lexeme[(x3::alpha | x3::char_('_')) > *(x3::alnum | x3::char_('_'))];
-BOOST_SPIRIT_DEFINE(identifier_impl)
-
-const identifier_type identifier = identifier_impl.name;
-const auto identifier_def = identifier_impl;
-BOOST_SPIRIT_DEFINE(identifier)
 
 const string_literal_type string_literal = "string";
 const auto string_literal_def = x3::lexeme['"' > +(x3::char_ - '"') > '"'];
@@ -249,7 +261,7 @@ const auto rule_block_list_def = *rule_block;
 BOOST_SPIRIT_DEFINE(rule_block_list)
 
 const filter_specification_type filter_specification = "filter specification";
-const auto filter_specification_def = version_requirement_statement > constant_definition_list > action_list > rule_block_list;
+const auto filter_specification_def = version_requirement_statement > config > constant_definition_list > action_list > rule_block_list;
 BOOST_SPIRIT_DEFINE(filter_specification)
 
 const grammar_type grammar = "code";

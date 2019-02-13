@@ -24,7 +24,13 @@
 // using boost::fusion::operator<<;
 // using boost::fusion::operators::operator<<;
 
-// version requirement
+// ---- lowest-level tokens ----
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::identifier,
+	value)
+
+// ---- version requirement ----
 
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::version_literal,
@@ -33,6 +39,16 @@ BOOST_FUSION_ADAPT_STRUCT(
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::version_requirement_statement,
 	min_required_version)
+
+// ---- config ----
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::config_param,
+	name, enabled, child_params)
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::config,
+	params)
 
 // core tokens
 
@@ -74,11 +90,6 @@ BOOST_FUSION_ADAPT_STRUCT(
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::group_literal,
 	r, g, b, w
-)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::identifier,
-	value
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
@@ -180,5 +191,5 @@ BOOST_FUSION_ADAPT_STRUCT(
 
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::filter_specification,
-	version_data, constants_list, actions, blocks)
+	version_data, config, constants_list, actions, blocks)
 

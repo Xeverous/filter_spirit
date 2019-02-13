@@ -91,6 +91,10 @@ namespace fs::lang::constants
 
 		// new syntax
 		constexpr auto version = "version";
+
+		constexpr auto config = "config";
+		constexpr auto yes = "yes";
+		constexpr auto no = "no";
 	}
 
 	constexpr auto default_opacity = 255; // TODO: this is not correct, find the real value
