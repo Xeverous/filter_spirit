@@ -54,7 +54,7 @@ std::optional<error::error_variant> add_rules_to_filter(
 	if (std::holds_alternative<error::error_variant>(condition_set_result))
 		return std::get<error::error_variant>(std::move(condition_set_result));
 
-	const lang::condition_set conditions = parent_condition_set.override_by(std::get<lang::condition_set>(condition_set_result));
+	const lang::condition_set conditions = std::get<lang::condition_set>(parent_condition_set.add_restrictions(std::get<lang::condition_set>(condition_set_result)));
 
 	for (const parser::ast::rule_block& child_block : block.nested_blocks.blocks)
 	{

@@ -62,10 +62,11 @@ public:
 		return true;
 	}
 
+	parser::range_type origin;
+
 private:
 	std::optional<range_bound<T>> lower_bound;
 	std::optional<range_bound<T>> upper_bound;
-	parser::range_type origin;
 };
 
 using numeric_range_condition = range_condition<int>;
