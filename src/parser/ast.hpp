@@ -23,6 +23,20 @@ namespace fs::parser::ast
 
 namespace x3 = boost::spirit::x3;
 
+// version requirement
+
+struct version_literal : x3::position_tagged
+{
+	int major = 0;
+	int minor = 0;
+	int patch = 0;
+};
+
+struct version_requirement_statement : x3::position_tagged
+{
+	version_literal min_required_version;
+};
+
 // core tokens
 
 struct boolean_literal : x3::position_tagged
@@ -256,6 +270,7 @@ struct rule_block : x3::position_tagged
 
 struct filter_specification : x3::position_tagged
 {
+	version_requirement_statement version_data;
 	constant_definition_list constants_list;
 	action_list actions;
 	rule_block_list blocks;

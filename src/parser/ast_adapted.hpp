@@ -24,6 +24,16 @@
 // using boost::fusion::operator<<;
 // using boost::fusion::operators::operator<<;
 
+// version requirement
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::version_literal,
+	major, minor, patch)
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::version_requirement_statement,
+	min_required_version)
+
 // core tokens
 
 BOOST_FUSION_ADAPT_STRUCT(
@@ -170,6 +180,5 @@ BOOST_FUSION_ADAPT_STRUCT(
 
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::filter_specification,
-	constants_list, actions, blocks
-)
+	version_data, constants_list, actions, blocks)
 

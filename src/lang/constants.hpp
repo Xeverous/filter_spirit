@@ -88,6 +88,9 @@ namespace fs::lang::constants
 
 		constexpr auto show = "Show";
 		constexpr auto hide = "Hide";
+
+		// new syntax
+		constexpr auto version = "version";
 	}
 
 	constexpr auto default_opacity = 255; // TODO: this is not correct, find the real value

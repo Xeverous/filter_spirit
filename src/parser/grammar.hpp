@@ -74,6 +74,9 @@ struct error_on_error
 // rule IDs
 // use multiple inheritance to add more handlers
 // rules which do not have any handlers can use forward declared types
+struct version_literal_class                 : error_on_error, annotate_on_success {};
+struct version_requirement_statement_class   : error_on_error, annotate_on_success {};
+
 struct boolean_class                         : error_on_error, annotate_on_success {};
 struct integer_class                         : error_on_error, annotate_on_success {};
 struct opacity_class                         : error_on_error, annotate_on_success {};
@@ -127,6 +130,15 @@ BOOST_SPIRIT_DECLARE(whitespace_type)
 // comment anything to the end of line after #
 using comment_type = x3::rule<struct comment_class>;
 BOOST_SPIRIT_DECLARE(comment_type)
+
+// version requirement
+using version_literal_type = x3::rule<version_literal_class, ast::version_literal>;
+BOOST_SPIRIT_DECLARE(version_literal_type)
+
+using version_requirement_statement_type = x3::rule<version_requirement_statement_class, ast::version_literal>;
+BOOST_SPIRIT_DECLARE(version_requirement_statement_type)
+
+// core tokens
 
 using boolean_type = x3::rule<boolean_class, ast::boolean_literal>;
 BOOST_SPIRIT_DECLARE(boolean_type)

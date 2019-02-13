@@ -57,6 +57,18 @@ const whitespace_type whitespace = "whitespace";
 const auto whitespace_def = x3::space | comment;
 BOOST_SPIRIT_DEFINE(whitespace)
 
+// version requirement
+
+const version_literal_type version_literal = "version literal";
+const auto version_literal_def = x3::int_ >> '.' >> x3::int_ >> '.' >> x3::int_;
+BOOST_SPIRIT_DEFINE(version_literal)
+
+const version_requirement_statement_type version_requirement_statement = "version requirement statement";
+const auto version_requirement_statement_def = x3::lit(lang::constants::keywords::version) > ':' > version_literal;
+BOOST_SPIRIT_DEFINE(version_requirement_statement)
+
+// core tokens
+
 const boolean_type boolean_literal = "boolean ('True' OR 'False')";
 const auto boolean_literal_def = booleans;
 BOOST_SPIRIT_DEFINE(boolean_literal)
@@ -237,7 +249,7 @@ const auto rule_block_list_def = *rule_block;
 BOOST_SPIRIT_DEFINE(rule_block_list)
 
 const filter_specification_type filter_specification = "filter specification";
-const auto filter_specification_def = constant_definition_list > action_list > rule_block_list;
+const auto filter_specification_def = version_requirement_statement > constant_definition_list > action_list > rule_block_list;
 BOOST_SPIRIT_DEFINE(filter_specification)
 
 const grammar_type grammar = "code";
