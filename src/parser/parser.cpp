@@ -1,6 +1,5 @@
 #include "parser/parser.hpp"
 #include "parser/grammar.hpp"
-#include "print/structure_printer.hpp"
 #include "print/generic.hpp"
 
 namespace fs::parser

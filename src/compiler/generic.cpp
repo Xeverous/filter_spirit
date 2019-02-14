@@ -55,7 +55,7 @@ lang::single_object literal_to_single_object(
 			return color_literal_to_color(literal, lookup_data);
 		},
 		[](past::string_literal literal) -> lang::single_object {
-			return lang::string{literal.value};
+			return lang::string{literal};
 		}
 	));
 }

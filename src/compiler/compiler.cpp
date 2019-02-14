@@ -36,8 +36,10 @@ std::optional<error::error_variant> add_constant_from_definition(
 	constants_map& map)
 {
 	const past::identifier& wanted_name = def.name;
-	const past::type_expression& wanted_type = def.type;
 	const past::value_expression& value_expression = def.value;
+
+	// const past::type_expression& wanted_type = def.type; // FIXME syntax redesign
+	const past::type_expression wanted_type(past::object_type_expression{{}, lang::single_object_type::number});
 
 	const auto wanted_name_it = map.find(wanted_name.value); // C++17: use if (expr; cond)
 	if (wanted_name_it != map.end())

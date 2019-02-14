@@ -95,6 +95,8 @@ namespace fs::lang::constants
 		constexpr auto config = "config";
 		constexpr auto yes = "yes";
 		constexpr auto no = "no";
+
+		constexpr const char* const const_ = "const"; // (for meme purposes only)
 	}
 
 	constexpr auto default_opacity = 255; // TODO: this is not correct, find the real value

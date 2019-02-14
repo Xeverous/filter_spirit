@@ -8,6 +8,7 @@
 #include <boost/spirit/home/x3.hpp>
 #include <boost/spirit/home/x3/support/ast/variant.hpp>
 #include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
+#include <utility>
 
 /*
  * Warning: std::optional and std::tuple are not yet supported,
@@ -23,10 +24,21 @@ namespace fs::parser::ast
 
 namespace x3 = boost::spirit::x3;
 
-// ---- lowest-level tokens ----
+// ---- whitespace ----
+
+// all whitespace and comments are ignored
+// no point in saving them, hence nothing here
+
+// ---- fundamental tokens ----
 
 struct identifier : x3::position_tagged
 {
+	identifier& operator=(std::string str)
+	{
+		value = std::move(str);
+		return *this;
+	}
+
 	std::string value;
 };
 
@@ -41,6 +53,12 @@ struct version_literal : x3::position_tagged
 
 struct version_requirement_statement : x3::position_tagged
 {
+	version_requirement_statement& operator=(version_literal vl)
+	{
+		min_required_version = vl;
+		return *this;
+	}
+
 	version_literal min_required_version;
 };
 
@@ -58,36 +76,86 @@ struct config : x3::position_tagged
 	std::vector<config_param> params;
 };
 
-// core tokens
-
-struct boolean_literal : x3::position_tagged
-{
-	bool value;
-};
+// ---- literal types ----
 
 struct integer_literal : x3::position_tagged
 {
+	integer_literal& operator=(int n)
+	{
+		value = n;
+		return *this;
+	}
+
 	int value;
 };
 
-struct opacity_literal : x3::position_tagged
+struct string_literal : std::string, x3::position_tagged
 {
-	boost::optional<integer_literal> value;
+};
+
+struct boolean_literal : x3::position_tagged
+{
+	boolean_literal& operator=(bool b)
+	{
+		value = b;
+		return *this;
+	}
+
+	bool value;
 };
 
 struct rarity_literal : x3::position_tagged
 {
+	rarity_literal& operator=(lang::rarity r)
+	{
+		value = r;
+		return *this;
+	}
+
 	lang::rarity value;
 };
 
 struct shape_literal : x3::position_tagged
 {
+	shape_literal& operator=(lang::shape s)
+	{
+		value = s;
+		return *this;
+	}
+
 	lang::shape value;
 };
 
 struct suit_literal : x3::position_tagged
 {
+	suit_literal& operator=(lang::suit s)
+	{
+		value = s;
+		return *this;
+	}
+
 	lang::suit value;
+};
+
+struct literal_expression : x3::variant<
+		integer_literal,
+		string_literal,
+		boolean_literal,
+		rarity_literal,
+		shape_literal,
+		suit_literal
+	>, x3::position_tagged
+{
+	using base_type::base_type;
+	using base_type::operator=;
+};
+
+
+// core tokens
+
+struct opacity_literal : x3::position_tagged
+{
+	boost::optional<integer_literal> value;
 };
 
 struct color_literal : x3::position_tagged
@@ -109,11 +177,6 @@ struct group_literal : x3::position_tagged
 	int w;
 
 	bool has_anything() const { return r != 0 || g != 0 || b != 0 || w != 0; }
-};
-
-struct string_literal : x3::position_tagged
-{
-	std::string value;
 };
 
 // ----
@@ -138,20 +201,6 @@ struct type_expression : x3::variant<
 };
 
 // ----
-
-struct literal_expression : x3::variant<
-		boolean_literal,
-		rarity_literal,
-		shape_literal,
-		suit_literal,
-		color_literal,
-		string_literal,
-		integer_literal
-	>, x3::position_tagged
-{
-	using base_type::base_type;
-	using base_type::operator=;
-};
 
 struct value_expression : x3::variant<
 		literal_expression,
@@ -262,7 +311,6 @@ struct action_list : x3::position_tagged
 
 struct constant_definition : x3::position_tagged
 {
-	type_expression type;
 	identifier name;
 	value_expression value;
 };

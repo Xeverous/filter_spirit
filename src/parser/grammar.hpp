@@ -132,7 +132,7 @@ struct filter_specification_class            : error_on_error, annotate_on_succe
 
 struct grammar_class                         : error_on_error, annotate_on_success {};
 
-// ---- lowest-level tokens ----
+// ---- whitespace ----
 
 // whitespace_type should be defined here but it has been moved to parser/config.hpp for
 // dependency reasons. See config.hpp for details.
@@ -141,6 +141,8 @@ BOOST_SPIRIT_DECLARE(whitespace_type)
 // all comments are ignored
 using comment_type = x3::rule<struct comment_class /*, intentionally nothing */>;
 BOOST_SPIRIT_DECLARE(comment_type)
+
+// ---- fundamental tokens ----
 
 // identifier has an extra intermediate rule because Spirit for (?) it's container detection reasons
 // can not match identifier grammar with a struct that contains only std::string (compiles only with std::string directly)
@@ -167,17 +169,16 @@ BOOST_SPIRIT_DECLARE(config_param_type)
 using config_type = x3::rule<config_class, ast::config>;
 BOOST_SPIRIT_DECLARE(config_type)
 
-// core tokens
+// ---- literal types ----
 
-using boolean_type = x3::rule<boolean_class, ast::boolean_literal>;
-BOOST_SPIRIT_DECLARE(boolean_type)
+using integer_literal_type = x3::rule<integer_class, ast::integer_literal>;
+BOOST_SPIRIT_DECLARE(integer_literal_type)
 
-using integer_type = x3::rule<integer_class, ast::integer_literal>;
-BOOST_SPIRIT_DECLARE(integer_type)
+using string_literal_type = x3::rule<string_literal_class, ast::string_literal>;
+BOOST_SPIRIT_DECLARE(string_literal_type)
 
-using opacity_type = x3::rule<opacity_class, ast::opacity_literal>;
-BOOST_SPIRIT_DECLARE(opacity_type)
-
+using boolean_literal_type = x3::rule<boolean_class, ast::boolean_literal>;
+BOOST_SPIRIT_DECLARE(boolean_literal_type)
 
 using rarity_literal_type = x3::rule<rarity_literal_class, ast::rarity_literal>;
 BOOST_SPIRIT_DECLARE(rarity_literal_type)
@@ -188,6 +189,14 @@ BOOST_SPIRIT_DECLARE(shape_literal_type)
 using suit_literal_type = x3::rule<suit_literal_class, ast::suit_literal>;
 BOOST_SPIRIT_DECLARE(suit_literal_type)
 
+
+
+// core tokens
+
+using opacity_type = x3::rule<opacity_class, ast::opacity_literal>;
+BOOST_SPIRIT_DECLARE(opacity_type)
+
+
 using color_literal_type = x3::rule<color_literal_class, ast::color_literal>;
 BOOST_SPIRIT_DECLARE(color_literal_type)
 
@@ -196,9 +205,6 @@ using group_literal_impl_type = x3::rule<group_literal_impl_class, ast::group_li
 BOOST_SPIRIT_DECLARE(group_literal_impl_type)
 using group_literal_type = x3::rule<group_literal_class, ast::group_literal>;
 BOOST_SPIRIT_DECLARE(group_literal_type)
-
-using string_literal_type = x3::rule<string_literal_class, ast::string_literal>;
-BOOST_SPIRIT_DECLARE(string_literal_type)
 
 // ----
 

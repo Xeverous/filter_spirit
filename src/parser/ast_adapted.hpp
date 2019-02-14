@@ -3,7 +3,12 @@
  *
  * @brief This file is intended only for BOOST_FUSION_ADAPT_STRUCT macros
  *
- * @details adaptations must be in global scope
+ * @details
+ * - adaptations must be in global scope
+ * - DO NOT adapt 1-member structs, use inheritance or overload operator= instead
+ *   (Spirit is not intended to be used with 1-element fusions)
+ * - there are some tricks available (partial adapations, rearranged order of adapted members)
+ *   lookup Boost Fusion documentation for more details
  */
 #pragma once
 #include "parser/ast.hpp"
@@ -24,21 +29,19 @@
 // using boost::fusion::operator<<;
 // using boost::fusion::operators::operator<<;
 
-// ---- lowest-level tokens ----
+// ---- whitespace ----
 
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::identifier,
-	value)
+// (nothing to adapt)
+
+// ---- fundamental tokens ----
+
+// (nothing to adapt)
 
 // ---- version requirement ----
 
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::version_literal,
 	major, minor, patch)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::version_requirement_statement,
-	min_required_version)
 
 // ---- config ----
 
@@ -50,35 +53,12 @@ BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::config,
 	params)
 
+// ---- literal types ----
+
 // core tokens
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::boolean_literal,
-	value
-)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::integer_literal,
-	value
-)
-
-BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::opacity_literal,
-	value
-)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::rarity_literal,
-	value
-)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::shape_literal,
-	value
-)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::suit_literal,
 	value
 )
 
@@ -90,11 +70,6 @@ BOOST_FUSION_ADAPT_STRUCT(
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::group_literal,
 	r, g, b, w
-)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::string_literal,
-	value
 )
 
 // ----
@@ -171,7 +146,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::constant_definition,
-	type, name, value
+	name, value
 )
 
 BOOST_FUSION_ADAPT_STRUCT(

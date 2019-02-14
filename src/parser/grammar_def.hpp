@@ -49,7 +49,7 @@ namespace fs::parser
 // - rule definition: foo_def
 // - rule object    : foo
 
-// ---- lowest-level tokens ----
+// ---- whitespace ----
 
 const comment_type comment = "comment";
 const auto comment_def = x3::lit('#') >> *(x3::char_ - x3::eol) >> (x3::eol | x3::eoi);
@@ -58,6 +58,8 @@ BOOST_SPIRIT_DEFINE(comment)
 const whitespace_type whitespace = "whitespace";
 const auto whitespace_def = x3::space | comment;
 BOOST_SPIRIT_DEFINE(whitespace)
+
+// ---- fundamental tokens ----
 
 const identifier_impl_type identifier_impl = "identifier";
 const auto identifier_impl_def = x3::lexeme[(x3::alpha | x3::char_('_')) > *(x3::alnum | x3::char_('_'))];
@@ -87,19 +89,19 @@ const config_type config = "config";
 const auto config_def = x3::lit(lang::constants::keywords::config) > '{' > *config_param > '}';
 BOOST_SPIRIT_DEFINE(config)
 
-// core tokens
+// ---- literal types ----
 
-const boolean_type boolean_literal = "boolean ('True' OR 'False')";
-const auto boolean_literal_def = booleans;
-BOOST_SPIRIT_DEFINE(boolean_literal)
-
-const integer_type integer_literal = "integer";
+const integer_literal_type integer_literal = "integer";
 const auto integer_literal_def = x3::int_;
 BOOST_SPIRIT_DEFINE(integer_literal)
 
-const opacity_type opacity_literal = "opacity";
-const auto opacity_literal_def = -integer_literal;
-BOOST_SPIRIT_DEFINE(opacity_literal)
+const string_literal_type string_literal = "string";
+const auto string_literal_def = x3::lexeme['"' > +(x3::char_ - '"') > '"'];
+BOOST_SPIRIT_DEFINE(string_literal)
+
+const boolean_literal_type boolean_literal = "boolean ('True' OR 'False')";
+const auto boolean_literal_def = booleans;
+BOOST_SPIRIT_DEFINE(boolean_literal)
 
 const rarity_literal_type rarity_literal = "rarity literal";
 const auto rarity_literal_def = rarities;
@@ -113,6 +115,12 @@ const suit_literal_type suit_literal = "suit literal";
 const auto suit_literal_def = suits;
 BOOST_SPIRIT_DEFINE(suit_literal)
 
+// core tokens
+
+const opacity_type opacity_literal = "opacity";
+const auto opacity_literal_def = -integer_literal;
+BOOST_SPIRIT_DEFINE(opacity_literal)
+
 const color_literal_type color_literal = "color (3 or 4 integers)";
 const auto color_literal_def = integer_literal >> integer_literal >> integer_literal >> opacity_literal;
 BOOST_SPIRIT_DEFINE(color_literal)
@@ -124,10 +132,6 @@ BOOST_SPIRIT_DEFINE(group_literal_impl)
 const group_literal_type group_literal =  group_literal_impl.name;
 const auto group_literal_def = group_literal_impl[validate_group];
 BOOST_SPIRIT_DEFINE(group_literal)
-
-const string_literal_type string_literal = "string";
-const auto string_literal_def = x3::lexeme['"' > +(x3::char_ - '"') > '"'];
-BOOST_SPIRIT_DEFINE(string_literal)
 
 // ----
 
@@ -147,17 +151,16 @@ BOOST_SPIRIT_DEFINE(type_expression)
 
 const literal_expression_type literal_expression = "literal";
 const auto literal_expression_def =
-// order has a big matter here
-// more complex grammars should be first, otherwise the parser
-// could mistakenly treat insufficient amount of tokens
-// eg parsing 101 102 103 as integer + 2 unwanted tokens instead of color
-	  boolean_literal
+// order here is crucial in context-sensitive grammars
+// this grammar is context-free but the order will affect performance
+// we can clearly assume that integers and strings will be the most popular
+// note: order should match types in literal_expression_type::attribute_type
+	  integer_literal
+	| string_literal
+	| boolean_literal
 	| rarity_literal
 	| shape_literal
-	| suit_literal
-	| color_literal
-	| string_literal
-	| integer_literal;
+	| suit_literal;
 BOOST_SPIRIT_DEFINE(literal_expression)
 
 // circular reference, need to change order
@@ -182,7 +185,7 @@ BOOST_SPIRIT_DEFINE(comparison_operator_expression)
 // ----
 
 const constant_definition_type constant_definition = "constant definiton";
-const auto constant_definition_def = type_expression > identifier > x3::lit(assignment_operator) > value_expression;
+const auto constant_definition_def = lang::constants::keywords::const_ > identifier > x3::lit(assignment_operator) > value_expression;
 BOOST_SPIRIT_DEFINE(constant_definition)
 
 // ----
