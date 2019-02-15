@@ -39,6 +39,8 @@ struct identifier : x3::position_tagged
 		return *this;
 	}
 
+	const std::string& get_value() const { return value; }
+
 	std::string value;
 };
 
@@ -58,6 +60,8 @@ struct version_requirement_statement : x3::position_tagged
 		min_required_version = vl;
 		return *this;
 	}
+
+	const version_literal& get_value() const { return min_required_version; }
 
 	version_literal min_required_version;
 };
@@ -86,6 +90,8 @@ struct integer_literal : x3::position_tagged
 		return *this;
 	}
 
+	int get_value() const { return value; }
+
 	int value;
 };
 
@@ -101,6 +107,8 @@ struct boolean_literal : x3::position_tagged
 		return *this;
 	}
 
+	bool get_value() const { return value; }
+
 	bool value;
 };
 
@@ -111,6 +119,8 @@ struct rarity_literal : x3::position_tagged
 		value = r;
 		return *this;
 	}
+
+	lang::rarity get_value() const { return value; }
 
 	lang::rarity value;
 };
@@ -123,6 +133,8 @@ struct shape_literal : x3::position_tagged
 		return *this;
 	}
 
+	lang::shape get_value() const { return value; }
+
 	lang::shape value;
 };
 
@@ -133,6 +145,8 @@ struct suit_literal : x3::position_tagged
 		value = s;
 		return *this;
 	}
+
+	lang::suit get_value() const { return value; }
 
 	lang::suit value;
 };

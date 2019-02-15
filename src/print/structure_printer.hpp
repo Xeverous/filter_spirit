@@ -31,11 +31,11 @@ struct structure_printer
 	}
 
 	template <typename T>
-	std::enable_if_t<std::is_integral_v<T>>
-	operator()(const T& integral) const
+	std::enable_if_t<std::is_arithmetic_v<T>>
+	operator()(const T& arithmetic) const
 	{
 		tab(indent);
-		std::cout << integral << '\n';
+		std::cout << fs::utility::type_name<T>().get() << " { " << arithmetic << " }\n";
 	}
 
 	template <typename T>
@@ -72,11 +72,22 @@ struct structure_printer
 	}
 
 	template <typename T>
+	std::enable_if_t<traits::has_get_value_v<T>>
+	operator()(const T& obj) const
+	{
+		tab(indent);
+		std::cout << fs::utility::type_name<T>().get() << " {\n";
+		structure_printer(indent + 1)(obj.get_value());
+		tab(indent);
+		std::cout << "}\n";
+	}
+
+	template <typename T>
 	std::enable_if_t<std::is_enum_v<T>>
 	operator()(T value) const
 	{
 		tab(indent);
-		std::cout << "enum: " << static_cast<int>(value) << '\n';
+		std::cout << "enum " << fs::utility::type_name<T>().get() << " { " << static_cast<int>(value) << " }\n";
 	}
 
 	template <typename... T>
@@ -109,10 +120,12 @@ struct structure_printer
 	void operator()(bool b) const
 	{
 		tab(indent);
+		std::cout << "bool { ";
 		if (b)
-			std::cout << "true\n";
+			std::cout << "true";
 		else
-			std::cout << "false\n";
+			std::cout << "false";
+		std::cout << " }\n";
 	}
 
 	// lowest priority overload for unmatched Ts

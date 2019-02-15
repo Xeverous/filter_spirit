@@ -1,6 +1,11 @@
-# version requirement
-version: 1.2.3
+# test supported version, if source file requirement is too high
+# the user will be prompted to update
+version: 0.0.0
 
+# section config
+# use this to tweak filter variants
+# note: all options can be overriden in the application
+# yes/no provided here are only defaults
 config {
 	chance_bases: yes
 	animate_weapon: no {
@@ -10,3 +15,972 @@ config {
 	hide_rare_garbage: yes
 }
 
+
+const color_golden          = RGB(240, 200, 150)
+const color_perandus        = RGB(255, 192, 128)
+const color_silver          = RGB(192, 192, 255)
+const color_chromatic_small = RGB(175, 255, 200)
+const color_chromatic_big   = RGB( 96,  96, 127)
+const color_breach          = RGB(255,  51, 204)
+const color_essence         = RGB(  0, 128, 192)
+const color_vaal            = RGB(255, 140, 120)
+const color_gem             = RGB( 27, 162, 155)
+const color_hammer          = RGB(162,  85,   0)
+const color_unique          = RGB(175,  96,  37)
+const color_rare_chance     = RGB(255, 255, 153)
+const color_rare_chaos      = RGB(255, 255, 119)
+const color_rare            = color_rare_chaos
+const color_rare_regal      = RGB(255, 173,   0)
+const color_magic           = RGB(136, 136, 255)
+const color_normal          = RGB(200, 200, 200)
+const color_6s              = RGB(152,   0, 152)
+const color_5L              = RGB(192, 128,   0)
+const color_sacrifice       = RGB(150, 100,   0)
+const color_mortal          = RGB( 60, 150,   0)
+const color_labirynth       = RGB(  0, 150,   0)
+const color_quest           = RGB( 74, 230,  58)
+const color_divination      = RGB(100, 210, 255)
+const color_map_red         = RGB.red
+const color_map_yellow      = color_rare
+const color_map_white       = color_normal
+const color_talisman        = RGB( 50, 130,  50)
+const color_rare_t1         = RGB(  0,  96,   0)
+const color_rare_t2         = RGB(  0,  64,   0)
+const color_chance_base     = RGB( 51, 204, 204)
+const color_extra_base_drop = RGB(208,  32, 144)
+const color_flask_utility   = RGB(122, 105,  28)
+const color_crafting        = RGB(191, 244,   0)
+const color_currency        = RGB(213, 159,  15)
+const color_corrupted       = RGB(255, 127, 127)
+const color_shaper_item     = RGB( 49, 127, 155)
+const color_elder_item      = RGB(102,   0, 128)
+const color_veiled_item     = RGB(150, 100, 158)
+
+Array<String> currency_t1 = read_file("currency_t1.txt")
+Array<String> currency_t2 = read_file("currency_t2.txt")
+Array<String> currency_t3 = read_file("currency_t3.txt")
+Array<String> currency_t4 = read_file("currency_t4.txt")
+
+Array<String> hammers = ["Gavel", "Stone Hammer", "Rock Breaker"]
+
+FontSize font_min            = 18
+FontSize font_max            = 42
+FontSize font_currency_t2    = font_max
+FontSize font_currency_t3    = 38
+FontSize font_currency_delve = font_currency_t2
+FontSize font_essence        = font_max
+FontSize font_mid_divinaton  = font_currency_t3
+FontSize font_map            = font_max
+FontSize font_abyss_jewel    = font_max
+FontSize font_jewel          = 40
+FontSize font_talisman       = 40
+FontSize font_crafting       = 40
+
+SoundId sound_unusual_drop = 1
+SoundId sound_red_map      = 3
+
+Path alert_mlg_airhorn       = "mlg_airhorn.mp3"
+Path alert_undisputed        = "zizaran_undisputed.mp3"
+Path alert_airhorn           = "airhorn.mp3"
+Path alert_wow               = "wow.mp3"
+Path alert_hitmarker         = "hitmarker.wav" # FIXME overused
+Path alert_damn_son          = "damn_son.mp3"
+Path alert_smoke_weed        = "smoke_weed.mp3"
+Path alert_intervention      = "intervention.mp3" # FIXME overused
+Path alert_john_cena         = "john_cena.mp3"
+Path alert_metal_gear        = "metal_gear.mp3"
+Path alert_explosion         = "explosion.mp3"
+
+Path alert_misc_reliquary     = alert_mlg_airhorn
+Path alert_currency_t1        = alert_mlg_airhorn
+Path alert_currency_t2        = alert_airhorn
+Path alert_currency_t3        = alert_intervention # maybe something different?
+Path alert_currency_t4        = alert_hitmarker
+Path alert_currency_incursion = alert_intervention # maybe better?
+Path alert_currency_prophecy  = alert_intervention
+Path alert_currency_fossil    = alert_airhorn
+Path alert_currency_resonator = alert_airhorn
+Path alert_incursion_item     = alert_unusual_drop
+Path alert_perandus_coin      = alert_hitmarker
+Path alert_splinter           = alert_hitmarker
+Path alert_sacrifice          = alert_hitmarker
+Path alert_top_essence        = alert_explosion
+Path alert_other_essence      = alert_hitmarker
+Path alert_gem_vaal_20        = alert_explosion
+Path alert_gem_vaal           = alert_hitmarker
+Path alert_gem_quality        = alert_hitmarker
+Path alert_gem_20_quality     = alert_airhorn
+Path alert_gem_drop_only      = alert_hitmarker
+Path alert_unique_piece       = alert_wow
+Path alert_top_unique         = alert_john_cena
+Path alert_mid_unique         = alert_damn_son
+Path alert_other_unique       = alert_damn_son
+Path alert_divination_t1      = alert_john_cena
+Path alert_divination_t2      = alert_intervention
+Path alert_divination_t3      = alert_hitmarker
+Path alert_divination_t4      = alert_hitmarker
+Path alert_divination_t5      = alert_hitmarker
+Path alert_atlas_fragment     = alert_airhorn
+Path alert_fishing_rod        = alert_mlg_airhorn
+Path alert_microtransaction   = alert_mlg_airhorn
+Path alert_leaguestone        = alert_intervention
+Path alert_pale_court         = alert_unusual_drop
+Path alert_map_t16            = alert_smoke_weed
+Path alert_map_red            = alert_smoke_weed
+Path alert_map_yellow         = alert_metal_gear
+Path alert_map_white          = alert_metal_gear
+Path alert_error              = sound_red_map
+Path alert_extra_base_drop    = alert_intervention
+Path alert_chance_base        = 10
+Path alert_crafting           = 4
+Path alert_shaper_item        = alert_wow
+Path alert_elder_item         = alert_wow
+Path alert_veiled_item        = alert_wow
+Path alert_6L                 = alert_mlg_airhorn
+Path alert_5L                 = alert_wow
+Path alert_6s                 = alert_intervention
+Path alert_blessing           = alert_explosion
+Path alert_midnight           = alert_intervention
+Path alert_mortal             = alert_airhorn
+Path alert_breachstone        = alert_airhorn
+Path alert_offering           = alert_unusual_drop
+Path alert_lab_key            = alert_unusual_drop
+Path alert_lab_trinket        = alert_unusual_drop
+Path alert_quest_item         = alert_damn_son
+Path alert_talisman_rare      = alert_explosion
+Path alert_talisman_other     = alert_explosion
+
+Beam beam_top_gem = Green
+Beam beam_top_unique = brown
+Beam beam_6L = red
+Beam beam_fishing_rod = white
+Beam beam_currency = yellow
+Beam beam_delve_fossil = beam_currency
+Beam beam_delve_resonator = beam_currency
+
+MinimapIcon minimap_top_gem = 0 green circle
+MinimapIcon minimap_mid_gem = 1 green circle
+MinimapIcon minimap_low_gem = 2 green circle
+MinimapIcon minimap_top_unique = 0 brown triangle
+MinimapIcon minimap_6L = 0 red hexagon
+MinimapIcon minimap_fishing_rod = 0 white star
+MinimapIcon minimap_currency_t1 = 0 yellow star
+MinimapIcon minimap_currency_t2 = 1 yellow star
+MinimapIcon minimap_currency_t3 = 2 yellow star
+MinimapIcon minimap_delve_fossil    = minimap_currency_t2
+MinimapIcon minimap_delve_resonator = minimap_currency_t2
+MinimapIcon minimap_reliquary       = minimap_currency_t1
+
+
+# this will apply globally to ALL blocks
+SetBackgroundColor color_black
+
+Class "Currency" {
+	SetBackgroundColor color_black
+
+	BaseType currency_t1 {
+		SetTextColor color_golden
+		SetBorderColor color_golden
+		SetBackgroundColor color_red
+		SetFontSize font_max
+		SetCustomSound alert_currency_t1
+		SetBeam beam_currency
+		SetMinimapIcon minimap_currency_t1
+	}
+
+	BaseType currency_t2 {
+		SetTextColor color_black
+		SetBackgroundColor color_currency
+		SetFontSize font_currency_t2
+		SetCustomSound alert_currency_t2
+		SetBeam beam_currency
+		SetMinimapIcon minimap_currency_t2
+	}
+
+	BaseType currency_t3 {
+		SetTextColor color_black
+		SetBackgroundColor color_currency
+		SetFontSize font_currency_t3
+		SetCustomSound alert_currency_t3
+		SetBeam beam_currency
+		SetMinimapIcon minimap_currency_t3
+	}
+
+	BaseType currency_t4 {
+		SetTextColor color_golden
+		SetBorderColor color_golden
+		SetBackgroundColor color_currency
+		SetFontSize font_currency_t4
+		SetAlertSound alert_currency_t4
+	}
+
+	BaseType currency_fossil {
+		SetTextColor color_black
+		SetBackgroundColor color_currency_delve
+		SetFontSize font_currency_t2
+		SetAlertSound alert_currency_fossil
+		SetBeam beam_delve_fossil
+		SetMinimapIcon minimap_delve_fossil
+	}
+
+	BaseType currency_resonator {
+		SetTextColor color_black
+		SetBackgroundColor color_currency_delve
+		SetFontSize font_currency_t2
+		SetAlertSound alert_currency_resonator
+		SetBeam beam_delve_resonator
+		SetMinimapIcon minimap_delve_resonator
+	}
+
+	BaseType "Perandus Coin" {
+		SetTextColor color_perandus
+		# SetBackgroundColor color_black # inherit
+		SetFontSize font_currency_t3
+		SetAlertSound alert_perandus_coin
+	}
+
+	BaseType "Prophecy" {
+		SetTextColor color_black
+		SetBackgroundColor 159 15 213
+		SetFontSize font_currency_t3
+		SetAlertSound alert_currency_prophecy
+	}
+
+	BaseType "Scroll of Wisdom" {
+		SetTextColor 220 195 160
+		# SetBackgroundColor color_black # inherit
+	}
+
+	BaseType "Portal Scroll" {
+		SetTextColor 162 152 145
+		# SetBackgroundColor color_black # inherit
+	}
+
+	BaseType "Armourer's Scrap" {
+		SetTextColor 150, 100, 70
+		# SetBackgroundColor color_black # inherit
+	}
+
+	BaseType "Blacksmith's Whetstone" {
+		SetTextColor 190, 160, 130
+		# SetBackgroundColor color_black # inherit
+	}
+
+	BaseType "Glassblower's Bauble" {
+		SetTextColor 150, 210, 210
+		# SetBackgroundColor color_black # inherit
+	}
+
+	BaseType "Orb of Transmutation" {
+		SetTextColor 70, 115, 160
+		# SetBackgroundColor color_black # inherit
+	}
+
+	BaseType "Orb of Augmentation" {
+		SetTextColor 120, 165, 202
+		# SetBackgroundColor color_black # inherit
+	}
+
+	BaseType "Orb of Alteration" {
+		SetTextColor 170, 210, 255
+		# SetBackgroundColor color_black # inherit
+	}
+
+	BaseType "Chromatic Orb" {
+		SetTextColor 175, 255, 200
+		# SetBackgroundColor color_black # inherit
+	}
+
+	BaseType "Splinter" {
+		SetTextColor color_breach
+		SetBorderColor color_breach
+		SetFontSize font_max
+		SetAlertSound alert_splinter
+	}
+
+	BaseType "Blessing" {
+		SetTextColor color_breach
+		SetBorderColor color_breach
+		SetBackgroundColor color_white
+		SetFontSize font_max
+		SetAlertSound alert_blessing
+	}
+
+	BaseType "Vial of" {
+		SetTextColor color_perandus
+		SetFontSize font_currency_t3
+		SetAlertSound alert_currency_incursion
+	}
+
+	BaseType ["Transmutation Shard", "Alteration Shard", "Scroll Fragment"] {
+		Hide
+	}
+
+	SetTextColor color_essence
+	SetBorderColor color_essence
+
+	BaseType from_file("essence_best.txt") {
+		SetFontSize font_max
+		SetAlertSound alert_top_essence
+	}
+
+	BaseType "Essence" {
+		SetFontSize font_currency_t3
+		SetAlertSound alert_other_essence
+	}
+
+	# last block (implicitly created)
+	# purpose: catch errors
+	SetTextColor color_error
+	SetBorderColor color_error
+	SetBackgroundColor color_currency
+	SetFontSize font_max
+	# TODO: implicit block creation - is this good syntax design?
+}
+
+Class "Gem" {
+	# multiplies by 3 (vaal/drop only/none)
+	if (BaseType "Vaal") {
+		SetTextColor color_vaal
+	}
+	else if (BaseType ["Empower", "Enhance", "Enlighten", "Portal", "Detonate Mines", "Added Chaos Damage"]) {
+		SetFontSize font_gem_drop_only
+		SetAlertSound alert_gem_drop_only
+	}
+
+	# multiplies by 3 (20/>0/none)
+	if (Quality 20) {
+		SetBackgroundColor color_white
+		SetAlertSound alert_gem_20_quality
+	}
+	else if (Quality > 0) {
+		SetBorderColor GetTextColor
+		SetAlertSound alert_gem_quality
+	}
+
+	# implicit creation of 9 blocks (3 * 3)
+}
+
+# idea: generate blocks only where 'Show' appears
+# idea: warning if there are any statements not followed by 'Show'
+BaseType hammers {
+	SetTextColor color_white
+	SetBackgroundColor color_hammer
+
+	Rarity normal {
+		Show
+	}
+
+	Rarity magic && Quality > 12 {
+		Show
+	}
+
+	Rarity rare && Quality > 16 {
+		Show
+	}
+
+	# total: 3 blocks, no block "just hammer base type"
+	# that would have no rarity requirement
+}
+
+# harbinger unique pieces
+Class "Piece" {
+	SetTextColor color_unique
+	SetBorderColor color_unique
+	SetFontSize font_max
+	SetAlertSound alert_unique_piece
+	Show
+}
+
+# Tabula Rasa and Skin of the Loyal
+Rarity unique && LinkedSockets 6 {
+	SetTextColor color_unique
+	SetBorderColor color_unique
+	SetBackgroundColor color_white
+	SetFontSize font_max
+	SetAlertSound alert_top_unique
+	SetBeam beam_top_unique
+	SetMinimapIcon minimap_top_unique
+	Show
+}
+
+# top uniques: use downloaded data
+Rarity unique {
+	SetTextColor color_unique
+	SetBorderColor color_unique
+	SetFontSize font_max
+
+	# >= 100c unique base types
+	BaseType $uniques(100,) {
+		SetBackgroundColor color_white
+		SetAlertSound alert_top_unique
+		SetFontSize font_max
+		SetBeam beam_top_unique
+		Show
+	}
+
+	# ranges are [X, Y) (inclusive, exclusive)
+	# [10c, 100c) unique base types
+	BaseType $uniques(10,100) {
+		SetBackgroundColor color_white
+		SetFontSize font_max
+		SetAlertSound alert_mid_unique
+		Show
+	}
+
+	# note that APIs may not list all possible uniques
+	# therefore always make a block with no price requirement
+	# any other unique:
+	Show
+}
+
+# random 6L drops
+# (Tabula Rasa and Skin of the Loyal handler earlier)
+LinkedSockets 6 {
+	SetTextColor color_white
+	SetBackgroundColor color_red
+	SetFontSize font_max
+	SetAlertSound alert_6L
+	SetBeam beam_6L
+	SetMinimapIcon minimap_6L
+	Show
+}
+
+# random 5L drops
+LinkedSockets 5 {
+	SetTextColor color_white
+	SetBackgroundColor color_5L
+	SetFontSize font_currency_t2
+	SetAlertSound alert_5L
+	Show
+}
+
+# random 6s drops
+Sockets 6 {
+	SetTextColor color_white
+	SetBackgroundColor color_6s
+	SetFontSize font_currency_t2
+	SetAlertSound alert_6s
+	Show
+}
+
+# Incursion items
+Class "Incursion Item" && BaseType ["Stone of Passage", "Flashpowder Keg"] {
+	SetTextColor color_black
+	SetBackgroundColor color_labirynth
+	SetFontSize font_max
+	SetAlertSound alert_incursion_item
+	Show
+}
+
+Class "Misc Map Fragments" {
+	# top map fragment items
+	# TODO: scarabs should have own block with API prices
+	BaseType ["Sacrifice at Midnight", "Divine Vessel", "Scarab"] {
+		SetTextColor color_sacrifice
+		SetBorderColor color_sacrifice
+		SetBackgroundColor color_white
+		SetFontSize font_max
+		SetAlertSound alert_midnight
+		Show
+	}
+
+	# non-midnight sacrifice
+	BaseType "Sacrifice" {
+		SetTextColor color_sacrifice
+		SetBorderColor color_sacrifice
+		SetFontSize font_max
+		SetAlertSound alert_sacrifice
+		Show
+	}
+
+	# Uber Atziri
+	BaseType "Mortal" {
+		SetTextColor color_mortal
+		SetBorderColor color_mortal
+		SetBackgroundColor color_white
+		SetFontSize font_max
+		SetAlertSound alert_mortal
+		Show
+	}
+
+	# Shaper guardians
+	BaseType ["Fragment of the Phoenix", "Fragment of the Minotaur", "Fragment of the Chimera", "Fragment of the Hydra"] {
+		SetBorderColor color_white
+		SetTextColor color_white
+		SetBackgroundColor color_red
+		SetFontSize font_max
+		SetAlertSound alert_atlas_fragment
+		Show
+	}
+}
+
+Class "Leaguestones" {
+	SetTextColor color_white
+	SetBorderColor 235 200 180
+	SetTextColor color_white
+	SetBackgroundColor GetBorderColor
+	SetFontSize font_max
+	SetAlertSound alert_leaguestone
+	Show
+}
+
+Class "Misc Map Item" {
+	BaseType "Breachstone" {
+		SetTextColor color_breach
+		SetBorderColor color_breach
+		SetBackgroundColor color_white
+		SetFontSize font_max
+		SetAlertSound alert_breachstone
+		Show
+	}
+
+	# reliquary keys from Legacy and Delve
+	BaseType ["Ancient Reliquary Key", "Timeworn Reliquary Key"] {
+		SetBorderColor 204 153 0
+		SetTextColor color_white
+		SetBackgroundColor GetBorderColor
+		SetFontSize font_max
+		SetAlertSound alert_misc_reliquary
+		SetBeam beam_reliquary
+		SetMinimapIcon minimap_reliquary
+		Show
+	}
+
+	# Pale Court
+	BaseType ["Eber's Key", "Yriel's Key", "Inya's Key", "Volkuur's Key"] {
+		SetTextColor color_white
+		SetBorderColor color_white
+		SetBackgroundColor 255 0 255
+		SetFontSize font_max
+		SetAlertSound alert_pale_court
+		Show
+	}
+}
+
+BaseType "Offering to the Goddess" {
+	SetBorderColor color_labirynth
+	SetTextColor color_black
+	SetBackgroundColor color_labirynth
+	SetFontSize font_max
+	SetAlertSound alert_offering
+	Show
+}
+
+# note: Izaro will speak upon key drops
+# some sound alerts may feel like unnecessary noise
+BaseType ["Golden Key", "Treasure Key", "Silver Key"] {
+	SetTextColor color_black
+	SetBackgroundColor color_labirynth
+	SetFontSize font_max
+	SetAlertSound alert_lab_key
+	Show
+}
+
+# lab trinkets (no Izaro quotes on these)
+Class "Trinket" {
+	SetTextColor color_black
+	SetBackgroundColor color_labirynth
+	SetFontSize font_max
+	SetAlertSound alert_lab_trinket
+	Show
+}
+
+Class "Fishing Rods" {
+	SetBorderColor color_white
+	SetTextColor color_white
+	SetBackgroundColor color_red
+	SetFontSize font_max
+	SetAlertSound alert_fishing_rod
+	SetBeam beam_fishing_rod
+	SetMinimapIcon minimap_fishing_rod
+	Show
+}
+
+Class ["Quest", "Hideout", "PantheonSoul"] {
+	SetTextColor color_quest
+	SetBorderColor color_quest
+	SetBackgroundColor color_black
+	SetFontSize font_max
+	SetAlertSound alert_quest_item
+}
+
+Class "Microtransactions" {
+	SetTextColor color_white
+	SetBorderColor color_white
+	SetBackgroundColor color_red
+	SetFontSize font_max
+	SetAlertSound alert_microtransaction
+}
+
+# divination - probably the biggest gain of API data
+Class "Divination Card" {
+	SetTextColor color_divination
+
+	# place here low-value cards that you always want to pickup
+	BaseType ["The Gambler", "The Void"] {
+		SetAlertSound alert_divination_t3
+		SetBeam blue temp
+		Show
+	}
+
+	BaseType $divination(100,) {
+		SetTextColor color_black
+		SetBorderColor color_divination
+		SetBackgroundColor color_divination
+		SetFontSize font_max
+		SetAlertSound alert_divination_t1
+		SetBeam blue
+		SetMinimapIcon 0 blue square
+		Show
+	}
+
+	BaseType $divination(10, 100) {
+		SetBorderColor color_divination
+		SetFontSize font_mid_divinaton
+		SetAlertSound alert_divination_t3
+		SetBeam blue
+		SetMinimapIcon 1 blue square
+		Show
+	}
+
+	BaseType $divination(1, 10) {
+		SetTextColor color_divination
+		SetFontSize font_mid_divinaton
+		SetAlertSound alert_divination_t4
+		SetBeam blue temp
+		SetMinimapIcon 2 blue square
+		Show
+	}
+
+	# < 1c shits (eg Rain of Chaos)
+	Hide
+}
+
+Class "Maps" {
+	if (ShapedMap true) {
+		# what do to? how to highlight?
+	}
+
+	MapTier >= 16 {
+		SetTextColor color_white
+		SetBorderColor color_white
+		SetBackgroundColor color_red
+		SetFontSize font_max
+		SetAlertSound alert_map_t16
+		# maybe beam?
+		Show
+	}
+
+	MapTier >= 11 {
+		SetBorderColor color_map_red
+		SetBackgroundColor color_black
+		SetFontSize font_map
+		SetAlertSound alert_map_red
+		Show
+	}
+
+	MapTier >= 6 {
+		SetBorderColor color_map_yellow
+		SetBackgroundColor color_black
+		SetFontSize font_map
+		SetAlertSound alert_map_yellow
+		Show
+	}
+
+	# white maps
+	SetBorderColor color_white
+	SetBackgroundColor color_black
+	SetFontSize font_map
+	SetAlertSound alert_map_white
+	Show
+}
+
+
+Class "Abyss Jewel" {
+	SetFontSize font_abyss_jewel
+
+	Rarity magic {
+		SetTextColor color_magic
+		SetBorderColor color_magic
+		Show
+	}
+
+	Rarity rare {
+		SetTextColor color_rare
+		SetBorderColor color_rare
+		Show
+	}
+
+	Show # show normal abyss jewels (in case of future drops)
+}
+
+Class "Jewel" {
+	SetFontSize font_jewel
+
+	Rarity magic {
+		SetTextColor color_magic
+		SetBorderColor color_magic
+		Show
+	}
+
+	Rarity rare {
+		SetTextColor color_rare
+		SetBorderColor color_rare
+		Show
+	}
+
+	Show # show normal jewels (in case of future drops)
+}
+
+Class "Amulet" && BaseType "Talisman" {
+	SetBackgroundColor color_talisman
+	SetFontSize font_talisman
+
+	Rarity rare {
+		SetTextColor color_rare
+		SetAlertSound alert_talisman_rare
+		Show
+	}
+
+	SetTextColor color_black
+	SetAlertSound alert_talisman_other
+	Show
+}
+
+# bases you want to pickup for crafting
+Rarity <= rare && ItemLevel >= 84 && BaseType crafting_bases {
+	SetTextColor color_black
+	SetBackgroundColor color_crafting
+	SetFontSize font_crafting
+	SetAlertSound alert_crafting
+	Show
+}
+
+# corrupted items
+# note: 6L and 6s will be catched earlier
+# note: you might want a separate block for breach rings
+Rarity <= rare && Corrupted true {
+	SetBackgroundColor color_corrupted
+	Show
+}
+
+# (shaper/elder) bases
+Rarity <= rare {
+	ShaperItem true {
+		SetBackgroundColor color_shaper_item
+		SetAlertSound alert_shaper_item
+
+		# idea: how this should work?
+		# bases in filter require to check:
+		# - base type
+		# - item level
+		# - influence type
+		$bases_shaper(100,) {
+			# TODO
+			SetBeam beam_base_shaper
+			Show
+		}
+
+		BaseType $bases_shaper(10,) {
+			# TODO
+			SetBeam beam_base_shaper
+			Show
+		}
+
+		Show
+	}
+
+	ElderItem true {
+		SetBackgroundColor color_elder_item
+		SetAlertSound alert_elder_item
+
+		BaseType $bases_elder(100,) {
+			# TODO
+			SetBeam beam_base_elder
+			Show
+		}
+
+		BaseType $bases_elder(10,) {
+			# TODO
+			SetBeam beam_base_elder
+			Show
+		}
+
+		Show
+	}
+
+	# non-influenced bases
+
+	$bases_no_influence(100,) {
+		# TODO
+		SetBeam beam_base_no_influence
+		Show
+	}
+
+	$bases_no_influence(10,) {
+		# TODO
+		SetBeam beam_base_no_influence
+		Show
+	}
+
+	# Betrayal league items
+	VeiledItem true {
+		SetBackgroundColor color_veiled_item
+		SetAlertSound alert_veiled_item
+		Show
+	}
+}
+
+# magic + chance/chaos/regal recipe items
+# one   border for small (<= 4 tiles) RGB items
+# other border for big                RGB items
+# other border for jewelery
+{ # <- limit the scope of ifs
+	if (Class "Jewelery") {
+		SetBorderColor GetTextColor
+	}
+	else if (SocketGroup RGB) {
+		if (Width 2 && Height <= 2) {
+			SetBorderColor color_chromatic_small
+		}
+		else if (Width 1 && Height <= 4) {
+			SetBorderColor color_chromatic_small
+		}
+		else {
+			SetBorderColor color_chromatic_big
+		}
+	}
+
+	Rarity magic {
+		SetTextColor color_magic
+		Show
+	}
+
+	Rarity rare {
+		ItemLevel >= 75 {
+			SetTextColor color_rare_regal
+
+			BaseType bases_t1 {
+				SetBackgroundColor color_rare_t1
+				Show
+			}
+
+			Show
+		}
+
+		ItemLevel >= 60 {
+			SetTextColor color_rare_chaos
+
+			BaseType bases_t1 {
+				SetBackgroundColor color_rare_t1
+				Show
+			}
+
+			Show
+		}
+
+		SetTextColor color_rare_chance
+
+		BaseType bases_t1 {
+			SetBackgroundColor color_rare_t1
+			Show
+		}
+
+		Show
+	}
+}
+
+# base types you want to pickup for chancing
+# idea: compile-time switches
+enable_if (config.chance_bases) {
+	Rarity normal && BaseType ["Leather Belt"] {
+		SetTextColor color_black
+		SetBackgroundColor color_chance_base
+		SetAlertSound alert_chance_base
+		Show
+	}
+}
+
+enable_if (config.animate_weapon) {
+	Rarity normal && Class "TODO" {
+		# TODO
+	}
+
+	enable_if (config.animate_weapon.ranged_weapons) {
+		Rarity normal && Class "TODO" {
+			# TODO
+		}
+	}
+
+	enable_if (config.animate_weapon.magic_items) {
+		Rarity magic && Class "TODO" {
+			# TODO
+		}
+
+		enable_if (config.animate_weapon.ranged_weapons) {
+			Rarity magic && Class "TODO" {
+				# TODO
+			}
+		}
+	}
+}
+
+# flasks - utility
+Class "Utility Flasks" {
+	SetTextColor color_white
+	SetBackgroundColor color_flask_utility
+}
+
+# flasks - life/mana
+# TODO
+
+# leveling - sceptres for +1 gem lvl recipe
+# TODO
+
+# leveling - 4Ls
+# ilvl cap: stop showing 4Ls once you reach maps
+ItemLevel <= 67 && LinkedSockets 4 {
+	Show
+}
+
+# leveling - 3Ls
+# raise the ilvl cap if you have bad RNG and can't drop 3L
+ItemLevel <= 30 && LinkedSockets 3 {
+	Show
+}
+
+# show everything at the start of the game
+ItemLevel <= 15 {
+	Show
+}
+
+# show IDed blue items (Atzoatzl and Warband drops)
+# could be done better with HasExplicitMod
+Rarity magic && Identified true {
+	SetBorderColor color_magic
+	Show
+}
+
+# at this point all worthwhile items should be sorted out
+# hide all remaining normal/magic/(rare) garbage
+Rarity <= magic {
+	Hide
+}
+
+enable_if (config.hide_rare_garbage) {
+	Rarity rare {
+		Hide
+	}
+}
+
+# all non-rarity items that were not catched earlier
+# will be catched here - mark them as error as this means
+# something potentially valueable was missed
+SetTextColor color_error
+SetBorderColor color_error
+SetFontSize font_max
+SetAlertSound alert_error
+SetBeam red square
+SetMinimapIcon minimap_error
+Show
