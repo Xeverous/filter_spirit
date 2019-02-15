@@ -55,6 +55,14 @@ BOOST_FUSION_ADAPT_STRUCT(
 
 // ---- literal types ----
 
+// (nothing to adapt)
+
+// ---- expressions ----
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::constructor_call,
+	type_name, arguments)
+
 // core tokens
 
 BOOST_FUSION_ADAPT_STRUCT(
@@ -82,11 +90,6 @@ BOOST_FUSION_ADAPT_STRUCT(
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::array_type_expression,
 	value
-)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::array_expression,
-	values
 )
 
 // ----

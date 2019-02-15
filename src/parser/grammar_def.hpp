@@ -115,6 +115,40 @@ const suit_literal_type suit_literal = "suit literal";
 const auto suit_literal_def = suits;
 BOOST_SPIRIT_DEFINE(suit_literal)
 
+// ---- expressions ----
+
+const literal_expression_type literal_expression = "literal";
+const auto literal_expression_def =
+// order here is crucial in context-sensitive grammars
+// this grammar is context-free but the order will affect performance
+// we can clearly assume that integers and strings will be the most popular
+// note: order should match types in literal_expression_type::attribute_type
+	  integer_literal
+	| string_literal
+	| boolean_literal
+	| rarity_literal
+	| shape_literal
+	| suit_literal;
+BOOST_SPIRIT_DEFINE(literal_expression)
+
+// circular reference dependency - need to define earlier
+const value_expression_type value_expression = "expression";
+
+const constructor_call_type constructor_call = "constructor call";
+const auto constructor_call_def = identifier >> '(' >> value_expression % ',' >> ')';
+BOOST_SPIRIT_DEFINE(constructor_call)
+
+const array_expression_type array_expression = "array expression";
+const auto array_expression_def = x3::lit('[') > (value_expression % x3::lit(',')) > x3::lit(']');
+BOOST_SPIRIT_DEFINE(array_expression)
+
+const auto value_expression_def =
+	  literal_expression
+	| identifier
+	| array_expression
+	| constructor_call;
+BOOST_SPIRIT_DEFINE(value_expression)
+
 // core tokens
 
 const opacity_type opacity_literal = "opacity";
@@ -149,32 +183,6 @@ BOOST_SPIRIT_DEFINE(type_expression)
 
 // ----
 
-const literal_expression_type literal_expression = "literal";
-const auto literal_expression_def =
-// order here is crucial in context-sensitive grammars
-// this grammar is context-free but the order will affect performance
-// we can clearly assume that integers and strings will be the most popular
-// note: order should match types in literal_expression_type::attribute_type
-	  integer_literal
-	| string_literal
-	| boolean_literal
-	| rarity_literal
-	| shape_literal
-	| suit_literal;
-BOOST_SPIRIT_DEFINE(literal_expression)
-
-// circular reference, need to change order
-const array_expression_type array_expression = "array expression";
-
-const value_expression_type value_expression = "expression";
-const auto value_expression_def =
-	  literal_expression
-	| identifier
-	| array_expression;
-BOOST_SPIRIT_DEFINE(value_expression)
-
-const auto array_expression_def = x3::lit('[') > (value_expression % x3::lit(',')) > x3::lit(']');
-BOOST_SPIRIT_DEFINE(array_expression)
 
 // ----
 

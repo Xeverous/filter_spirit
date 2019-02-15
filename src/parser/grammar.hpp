@@ -79,33 +79,52 @@ struct error_on_error
 // rule IDs
 // use multiple inheritance to add more handlers
 // rules which do not have any handlers can use forward declared types
+
+// ---- whitespace ----
+
+// (nothing - whitespace does not synthesize any attributes)
+
+// ---- fundamental tokens ----
+
 struct identifier_impl_class;
 struct identifier_class                      : error_on_error, annotate_on_success {};
+
+// ---- version requirement ----
 
 struct version_literal_class                 : error_on_error, annotate_on_success {};
 struct version_requirement_statement_class   : error_on_error, annotate_on_success {};
 
+// ---- config ----
+
 struct config_param_class                    : error_on_error, annotate_on_success {};
 struct config_class                          : error_on_error, annotate_on_success {};
 
-struct boolean_class                         : error_on_error, annotate_on_success {};
+// ---- literal types ----
+
 struct integer_class                         : error_on_error, annotate_on_success {};
-struct opacity_class                         : error_on_error, annotate_on_success {};
+struct string_literal_class                  : error_on_error, annotate_on_success {};
+struct boolean_class                         : error_on_error, annotate_on_success {};
 struct rarity_literal_class                  : error_on_error, annotate_on_success {};
 struct shape_literal_class                   : error_on_error, annotate_on_success {};
 struct suit_literal_class                    : error_on_error, annotate_on_success {};
+
+// ---- expressions ----
+
+struct literal_expression_class              : error_on_error, annotate_on_success {};
+struct constructor_call_class                : error_on_error, annotate_on_success {};
+struct array_expression_class                : error_on_error, annotate_on_success {};
+struct value_expression_class                : error_on_error, annotate_on_success {};
+
+//
+
 struct color_literal_class                   : error_on_error, annotate_on_success {};
 struct group_literal_class                   : error_on_error, annotate_on_success {};
 struct group_literal_impl_class              : error_on_error, annotate_on_success {};
-struct string_literal_class                  : error_on_error, annotate_on_success {};
+struct opacity_class                         : error_on_error, annotate_on_success {};
 
 struct object_type_expression_class          : error_on_error, annotate_on_success {};
 struct array_type_expression_class           : error_on_error, annotate_on_success {};
 struct type_expression_class                 : error_on_error, annotate_on_success {};
-
-struct literal_expression_class              : error_on_error, annotate_on_success {};
-struct value_expression_class                : error_on_error, annotate_on_success {};
-struct array_expression_class                : error_on_error, annotate_on_success {};
 
 struct comparison_operator_expression_class  : error_on_error, annotate_on_success {};
 
@@ -189,7 +208,19 @@ BOOST_SPIRIT_DECLARE(shape_literal_type)
 using suit_literal_type = x3::rule<suit_literal_class, ast::suit_literal>;
 BOOST_SPIRIT_DECLARE(suit_literal_type)
 
+// ---- expressions ----
 
+using literal_expression_type = x3::rule<literal_expression_class, ast::literal_expression>;
+BOOST_SPIRIT_DECLARE(literal_expression_type)
+
+using constructor_call_type = x3::rule<constructor_call_class, ast::constructor_call>;
+BOOST_SPIRIT_DECLARE(constructor_call_type)
+
+using array_type_expression_type = x3::rule<array_type_expression_class, ast::array_type_expression>;
+BOOST_SPIRIT_DECLARE(array_type_expression_type)
+
+using value_expression_type = x3::rule<value_expression_class, ast::value_expression>;
+BOOST_SPIRIT_DECLARE(value_expression_type)
 
 // core tokens
 
@@ -211,19 +242,10 @@ BOOST_SPIRIT_DECLARE(group_literal_type)
 using object_type_expression_type = x3::rule<object_type_expression_class, ast::object_type_expression>;
 BOOST_SPIRIT_DECLARE(object_type_expression_type)
 
-using array_type_expression_type = x3::rule<array_type_expression_class, ast::array_type_expression>;
-BOOST_SPIRIT_DECLARE(array_type_expression_type)
-
 using type_expression_type = x3::rule<type_expression_class, ast::type_expression>;
 BOOST_SPIRIT_DECLARE(type_expression_type)
 
 // ----
-
-using literal_expression_type = x3::rule<literal_expression_class, ast::literal_expression>;
-BOOST_SPIRIT_DECLARE(literal_expression_type)
-
-using value_expression_type = x3::rule<value_expression_class, ast::value_expression>;
-BOOST_SPIRIT_DECLARE(value_expression_type)
 
 using array_expression_type = x3::rule<array_expression_class, ast::array_expression>;
 BOOST_SPIRIT_DECLARE(array_expression_type)

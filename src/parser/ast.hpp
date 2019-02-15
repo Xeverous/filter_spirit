@@ -137,6 +137,8 @@ struct suit_literal : x3::position_tagged
 	lang::suit value;
 };
 
+// ---- expressions ----
+
 struct literal_expression : x3::variant<
 		integer_literal,
 		string_literal,
@@ -150,6 +152,26 @@ struct literal_expression : x3::variant<
 	using base_type::operator=;
 };
 
+struct constructor_call : x3::position_tagged
+{
+	identifier type_name;
+	std::vector<struct value_expression> arguments;
+};
+
+struct array_expression : std::vector<struct value_expression>, x3::position_tagged
+{
+};
+
+struct value_expression : x3::variant<
+		literal_expression,
+		identifier,
+		array_expression,
+		constructor_call
+	>, x3::position_tagged
+{
+	using base_type::base_type;
+	using base_type::operator=;
+};
 
 // core tokens
 
@@ -201,21 +223,6 @@ struct type_expression : x3::variant<
 };
 
 // ----
-
-struct value_expression : x3::variant<
-		literal_expression,
-		identifier,
-		x3::forward_ast<struct array_expression>
-	>, x3::position_tagged
-{
-	using base_type::base_type;
-	using base_type::operator=;
-};
-
-struct array_expression : x3::position_tagged
-{
-	std::vector<value_expression> values;
-};
 
 // ----
 
