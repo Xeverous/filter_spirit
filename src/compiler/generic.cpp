@@ -183,7 +183,7 @@ std::variant<lang::object, error::error_variant> expression_to_object(
 		return identifier_to_object(identifier, lookup_data.position_of(identifier), map);
 	};
 
-	auto constructor_call_to_object = [&](const past::constructor_call& cc) -> result_type
+	auto function_call_to_object = [&](const past::function_call&) -> result_type
 	{
 		assert(false);
 		return error::internal_error_while_parsing_constant{}; // FIXME implement
@@ -210,7 +210,7 @@ std::variant<lang::object, error::error_variant> expression_to_object(
 			result_type result = expr.apply_visitor(x3::make_lambda_visitor<result_type>(
 				literal_to_object,
 				iden_to_object,
-				constructor_call_to_object,
+				function_call_to_object,
 				[&lookup_data](const past::array_expression& array_expr) -> result_type
 				{
 					return error::nested_arrays_not_allowed{lookup_data.position_of(array_expr)};
@@ -244,7 +244,7 @@ std::variant<lang::object, error::error_variant> expression_to_object(
 	return value_expression.apply_visitor(x3::make_lambda_visitor<result_type>(
 		literal_to_object,
 		iden_to_object,
-		constructor_call_to_object,
+		function_call_to_object,
 		array_to_object
 	));
 }

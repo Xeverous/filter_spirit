@@ -111,7 +111,7 @@ struct suit_literal_class                    : error_on_error, annotate_on_succe
 // ---- expressions ----
 
 struct literal_expression_class              : error_on_error, annotate_on_success {};
-struct constructor_call_class                : error_on_error, annotate_on_success {};
+struct function_call_class                   : error_on_error, annotate_on_success {};
 struct array_expression_class                : error_on_error, annotate_on_success {};
 struct value_expression_class                : error_on_error, annotate_on_success {};
 
@@ -213,8 +213,8 @@ BOOST_SPIRIT_DECLARE(suit_literal_type)
 using literal_expression_type = x3::rule<literal_expression_class, ast::literal_expression>;
 BOOST_SPIRIT_DECLARE(literal_expression_type)
 
-using constructor_call_type = x3::rule<constructor_call_class, ast::constructor_call>;
-BOOST_SPIRIT_DECLARE(constructor_call_type)
+using function_call_type = x3::rule<function_call_class, ast::function_call>;
+BOOST_SPIRIT_DECLARE(function_call_type)
 
 using array_type_expression_type = x3::rule<array_type_expression_class, ast::array_type_expression>;
 BOOST_SPIRIT_DECLARE(array_type_expression_type)

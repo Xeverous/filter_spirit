@@ -60,7 +60,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 // ---- expressions ----
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::constructor_call,
+	fs::parser::ast::function_call,
 	type_name, arguments)
 
 // core tokens

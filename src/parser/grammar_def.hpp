@@ -134,9 +134,9 @@ BOOST_SPIRIT_DEFINE(literal_expression)
 // circular reference dependency - need to define earlier
 const value_expression_type value_expression = "expression";
 
-const constructor_call_type constructor_call = "constructor call";
-const auto constructor_call_def = identifier >> '(' >> value_expression % ',' >> ')';
-BOOST_SPIRIT_DEFINE(constructor_call)
+const function_call_type function_call = "function call";
+const auto function_call_def = identifier >> '(' >> value_expression % ',' >> ')';
+BOOST_SPIRIT_DEFINE(function_call)
 
 const array_expression_type array_expression = "array expression";
 const auto array_expression_def = x3::lit('[') > (value_expression % x3::lit(',')) > x3::lit(']');
@@ -145,7 +145,7 @@ BOOST_SPIRIT_DEFINE(array_expression)
 const auto value_expression_def =
 	  literal_expression
 	| array_expression
-	| constructor_call
+	| function_call
 	| identifier;
 BOOST_SPIRIT_DEFINE(value_expression)
 
