@@ -187,6 +187,14 @@ struct value_expression : x3::variant<
 	using base_type::operator=;
 };
 
+// ---- definitions ----
+
+struct constant_definition : x3::position_tagged
+{
+	identifier name;
+	value_expression value;
+};
+
 // core tokens
 
 struct opacity_literal : x3::position_tagged
@@ -330,17 +338,6 @@ struct action_list : x3::position_tagged
 	std::vector<action_expression> action_expressions;
 };
 
-struct constant_definition : x3::position_tagged
-{
-	identifier name;
-	value_expression value;
-};
-
-struct constant_definition_list : x3::position_tagged
-{
-	std::vector<constant_definition> constant_definitions;
-};
-
 struct rule_block_list : x3::position_tagged
 {
 	std::vector<struct rule_block> blocks;
@@ -357,7 +354,7 @@ struct filter_specification : x3::position_tagged
 {
 	version_requirement_statement version_data;
 	config config;
-	constant_definition_list constants_list;
+	std::vector<constant_definition> constant_definitions;
 	action_list actions;
 	rule_block_list blocks;
 };

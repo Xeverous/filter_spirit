@@ -63,6 +63,13 @@ BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::function_call,
 	type_name, arguments)
 
+// ---- definitions ----
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::constant_definition,
+	name, value
+)
+
 // core tokens
 
 BOOST_FUSION_ADAPT_STRUCT(
@@ -148,16 +155,6 @@ BOOST_FUSION_ADAPT_STRUCT(
 // ----
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::constant_definition,
-	name, value
-)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::constant_definition_list,
-	constant_definitions
-)
-
-BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::rule_block,
 	conditions, actions, nested_blocks
 )
@@ -169,5 +166,5 @@ BOOST_FUSION_ADAPT_STRUCT(
 
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::filter_specification,
-	version_data, config, constants_list, actions, blocks)
+	version_data, config, constant_definitions, actions, blocks)
 

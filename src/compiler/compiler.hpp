@@ -19,7 +19,7 @@ bool semantic_analysis(
 
 [[nodiscard]]
 std::optional<constants_map> parse_constants(
-	const parser::ast::constant_definition_list& constants_list,
+	const std::vector<parser::ast::constant_definition>& constant_definitions,
 	const parser::lookup_data& lookup_data,
 	std::ostream& error_stream);
 

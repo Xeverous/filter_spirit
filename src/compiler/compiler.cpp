@@ -76,13 +76,13 @@ std::optional<error::error_variant> add_constant_from_definition(
 }
 
 std::optional<constants_map> parse_constants(
-	const past::constant_definition_list& constants_list,
+	const std::vector<parser::ast::constant_definition>& constant_definitions,
 	const parser::lookup_data& lookup_data,
 	std::ostream& error_stream)
 {
 	constants_map map;
 
-	for (const past::constant_definition& line : constants_list.constant_definitions)
+	for (const past::constant_definition& line : constant_definitions)
 	{
 		const std::optional<error::error_variant> error =
 			add_constant_from_definition(line, lookup_data, map);
@@ -102,7 +102,7 @@ bool semantic_analysis(
 	const parser::lookup_data& lookup_data,
 	std::ostream& error_stream)
 {
-	std::optional<constants_map> map = parse_constants(ast.constants_list, lookup_data, error_stream);
+	std::optional<constants_map> map = parse_constants(ast.constant_definitions, lookup_data, error_stream);
 
 	if (!map)
 		return false;

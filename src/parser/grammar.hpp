@@ -115,6 +115,10 @@ struct function_call_class                   : error_on_error, annotate_on_succe
 struct array_expression_class                : error_on_error, annotate_on_success {};
 struct value_expression_class                : error_on_error, annotate_on_success {};
 
+// ---- definitions ----
+
+struct constant_definition_class             : error_on_error, annotate_on_success {};
+
 //
 
 struct color_literal_class                   : error_on_error, annotate_on_success {};
@@ -143,8 +147,6 @@ struct action_expression_class               : error_on_error, annotate_on_succe
 struct condition_list_class                  : error_on_error, annotate_on_success {};
 struct action_list_class                     : error_on_error, annotate_on_success {};
 
-struct constant_definition_class             : error_on_error, annotate_on_success {};
-struct constant_definition_list_class        : error_on_error, annotate_on_success {};
 struct rule_block_class                      : error_on_error, annotate_on_success {};
 struct rule_block_list_class                 : error_on_error, annotate_on_success {};
 struct filter_specification_class            : error_on_error, annotate_on_success {};
@@ -221,6 +223,11 @@ BOOST_SPIRIT_DECLARE(array_type_expression_type)
 
 using value_expression_type = x3::rule<value_expression_class, ast::value_expression>;
 BOOST_SPIRIT_DECLARE(value_expression_type)
+
+// ---- definitions ----
+
+using constant_definition_type = x3::rule<constant_definition_class, ast::constant_definition>;
+BOOST_SPIRIT_DECLARE(constant_definition_type)
 
 // core tokens
 
@@ -299,13 +306,7 @@ BOOST_SPIRIT_DECLARE(action_list_type)
 
 // ----
 
-using constant_definition_type = x3::rule<constant_definition_class, ast::constant_definition>;
-BOOST_SPIRIT_DECLARE(constant_definition_type)
-
 // ----
-
-using constant_definition_list_type = x3::rule<constant_definition_list_class, ast::constant_definition_list>;
-BOOST_SPIRIT_DECLARE(constant_definition_list_type)
 
 using rule_block_type = x3::rule<rule_block_class, ast::rule_block>;
 BOOST_SPIRIT_DECLARE(rule_block_type)

@@ -149,6 +149,12 @@ const auto value_expression_def =
 	| identifier;
 BOOST_SPIRIT_DEFINE(value_expression)
 
+// ---- definitions ----
+
+const constant_definition_type constant_definition = "constant definiton";
+const auto constant_definition_def = lang::constants::keywords::const_ > identifier > x3::lit(assignment_operator) > value_expression;
+BOOST_SPIRIT_DEFINE(constant_definition)
+
 // core tokens
 
 const opacity_type opacity_literal = "opacity";
@@ -192,9 +198,7 @@ BOOST_SPIRIT_DEFINE(comparison_operator_expression)
 
 // ----
 
-const constant_definition_type constant_definition = "constant definiton";
-const auto constant_definition_def = lang::constants::keywords::const_ > identifier > x3::lit(assignment_operator) > value_expression;
-BOOST_SPIRIT_DEFINE(constant_definition)
+
 
 // ----
 
@@ -257,10 +261,6 @@ BOOST_SPIRIT_DEFINE(action_list)
 
 // ----
 
-const constant_definition_list_type constant_definition_list = "constant definition list";
-const auto constant_definition_list_def = *constant_definition;
-BOOST_SPIRIT_DEFINE(constant_definition_list)
-
 // circular reference
 const rule_block_list_type rule_block_list = "rule block list";
 
@@ -272,7 +272,7 @@ const auto rule_block_list_def = *rule_block;
 BOOST_SPIRIT_DEFINE(rule_block_list)
 
 const filter_specification_type filter_specification = "filter specification";
-const auto filter_specification_def = version_requirement_statement > config > constant_definition_list > action_list > rule_block_list;
+const auto filter_specification_def = version_requirement_statement > config > *constant_definition > action_list > rule_block_list;
 BOOST_SPIRIT_DEFINE(filter_specification)
 
 const grammar_type grammar = "code";
