@@ -144,9 +144,9 @@ BOOST_SPIRIT_DEFINE(array_expression)
 
 const auto value_expression_def =
 	  literal_expression
-	| identifier
 	| array_expression
-	| constructor_call;
+	| constructor_call
+	| identifier;
 BOOST_SPIRIT_DEFINE(value_expression)
 
 // core tokens

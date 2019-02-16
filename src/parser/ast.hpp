@@ -178,9 +178,9 @@ struct array_expression : std::vector<struct value_expression>, x3::position_tag
 
 struct value_expression : x3::variant<
 		literal_expression,
-		identifier,
 		array_expression,
-		constructor_call
+		constructor_call,
+		identifier
 	>, x3::position_tagged
 {
 	using base_type::base_type;

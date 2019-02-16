@@ -185,6 +185,7 @@ std::variant<lang::object, error::error_variant> expression_to_object(
 
 	auto constructor_call_to_object = [&](const past::constructor_call& cc) -> result_type
 	{
+		assert(false);
 		return error::internal_error_while_parsing_constant{}; // FIXME implement
 	};
 

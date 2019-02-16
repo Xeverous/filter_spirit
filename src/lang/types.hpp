@@ -117,7 +117,7 @@ struct built_in_sound
 
 struct custom_alert_sound
 {
-	std::string_view path;
+	std::string path;
 };
 
 struct alert_sound
