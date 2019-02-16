@@ -155,15 +155,13 @@ const constant_definition_type constant_definition = "constant definiton";
 const auto constant_definition_def = lang::constants::keywords::const_ > identifier > x3::lit(assignment_operator) > value_expression;
 BOOST_SPIRIT_DEFINE(constant_definition)
 
+// ---- rules ----
+
+const action_expression_type action_expression = "action expression";
+const auto action_expression_def = action_types > value_expression;
+BOOST_SPIRIT_DEFINE(action_expression)
+
 // core tokens
-
-const opacity_type opacity_literal = "opacity";
-const auto opacity_literal_def = -integer_literal;
-BOOST_SPIRIT_DEFINE(opacity_literal)
-
-const color_literal_type color_literal = "color (3 or 4 integers)";
-const auto color_literal_def = integer_literal >> integer_literal >> integer_literal >> opacity_literal;
-BOOST_SPIRIT_DEFINE(color_literal)
 
 const group_literal_impl_type group_literal_impl = "group (R/G/B/W letters in this order)";
 const auto group_literal_impl_def = x3ext::count['R'] >> x3ext::count['G'] >> x3ext::count['B'] >> x3ext::count['W'];
@@ -225,29 +223,6 @@ BOOST_SPIRIT_DEFINE(condition_expression)
 const visibility_action_type visibility_action = "visibility action";
 const auto visibility_action_def = visibility_literals;
 BOOST_SPIRIT_DEFINE(visibility_action)
-
-const color_expression_type color_expression = "color expression";
-const auto color_expression_def = color_literal | identifier;
-BOOST_SPIRIT_DEFINE(color_expression)
-
-const border_color_action_type border_color_action = "border color action";
-const auto border_color_action_def = lang::constants::keywords::set_border_color > color_expression;
-BOOST_SPIRIT_DEFINE(border_color_action)
-
-const text_color_action_type text_color_action = "text color action";
-const auto text_color_action_def = lang::constants::keywords::set_text_color > color_expression;
-BOOST_SPIRIT_DEFINE(text_color_action)
-
-const background_color_action_type background_color_action = "background color action";
-const auto background_color_action_def = lang::constants::keywords::set_background_color > color_expression;
-BOOST_SPIRIT_DEFINE(background_color_action)
-
-const action_expression_type action_expression = "action expression";
-const auto action_expression_def =
-	  border_color_action
-	| text_color_action
-	| background_color_action;
-BOOST_SPIRIT_DEFINE(action_expression)
 
 // ----
 

@@ -195,20 +195,15 @@ struct constant_definition : x3::position_tagged
 	value_expression value;
 };
 
+// ---- rules ----
+
+struct action_expression : x3::position_tagged
+{
+	lang::action_type action_type;
+	value_expression value;
+};
+
 // core tokens
-
-struct opacity_literal : x3::position_tagged
-{
-	boost::optional<integer_literal> value;
-};
-
-struct color_literal : x3::position_tagged
-{
-	integer_literal r;
-	integer_literal g;
-	integer_literal b;
-	opacity_literal a;
-};
 
 struct group_literal : x3::position_tagged
 {
@@ -290,40 +285,6 @@ struct condition_expression : x3::variant<
 struct visibility_action : x3::position_tagged
 {
 	bool show;
-};
-
-struct color_expression : x3::variant<
-		color_literal,
-		identifier
-	>, x3::position_tagged
-{
-	using base_type::base_type;
-	using base_type::operator=;
-};
-
-struct border_color_action : x3::position_tagged
-{
-	color_expression color;
-};
-
-struct text_color_action : x3::position_tagged
-{
-	color_expression color;
-};
-
-struct background_color_action : x3::position_tagged
-{
-	color_expression color;
-};
-
-struct action_expression : x3::variant<
-		border_color_action,
-		text_color_action,
-		background_color_action
-	>, x3::position_tagged
-{
-	using base_type::base_type;
-	using base_type::operator=;
 };
 
 // ---- core structure ----

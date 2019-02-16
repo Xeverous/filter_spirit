@@ -67,20 +67,15 @@ BOOST_FUSION_ADAPT_STRUCT(
 
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::constant_definition,
-	name, value
-)
+	name, value)
+
+// ---- rules ----
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::action_expression,
+	action_type, value)
 
 // core tokens
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::opacity_literal,
-	value
-)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::color_literal,
-	r, g, b, a
-)
 
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::group_literal,
@@ -123,21 +118,6 @@ BOOST_FUSION_ADAPT_STRUCT(
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::visibility_action,
 	show
-)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::border_color_action,
-	color
-)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::text_color_action,
-	color
-)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::background_color_action,
-	color
 )
 
 // ----

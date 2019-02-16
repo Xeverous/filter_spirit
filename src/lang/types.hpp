@@ -185,4 +185,14 @@ single_object_type type_to_enum()
 	return type_to_enum_impl<T>();
 }
 
+// ---- new syntax ----
+
+enum class action_type
+{
+	set_border_color,
+	set_text_color,
+	set_background_color
+	// TODO add missing action types
+};
+
 }

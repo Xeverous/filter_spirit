@@ -119,12 +119,14 @@ struct value_expression_class                : error_on_error, annotate_on_succe
 
 struct constant_definition_class             : error_on_error, annotate_on_success {};
 
+// ---- rules ----
+
+struct action_expression_class               : error_on_error, annotate_on_success {};
+
 //
 
-struct color_literal_class                   : error_on_error, annotate_on_success {};
 struct group_literal_class                   : error_on_error, annotate_on_success {};
 struct group_literal_impl_class              : error_on_error, annotate_on_success {};
-struct opacity_class                         : error_on_error, annotate_on_success {};
 
 struct object_type_expression_class          : error_on_error, annotate_on_success {};
 struct array_type_expression_class           : error_on_error, annotate_on_success {};
@@ -142,7 +144,6 @@ struct color_expression_class                : error_on_error, annotate_on_succe
 struct border_color_action_class             : error_on_error, annotate_on_success {};
 struct text_color_action_class               : error_on_error, annotate_on_success {};
 struct background_color_action_class         : error_on_error, annotate_on_success {};
-struct action_expression_class               : error_on_error, annotate_on_success {};
 
 struct condition_list_class                  : error_on_error, annotate_on_success {};
 struct action_list_class                     : error_on_error, annotate_on_success {};
@@ -229,14 +230,12 @@ BOOST_SPIRIT_DECLARE(value_expression_type)
 using constant_definition_type = x3::rule<constant_definition_class, ast::constant_definition>;
 BOOST_SPIRIT_DECLARE(constant_definition_type)
 
+// ---- rules ----
+
+using action_expression_type = x3::rule<action_expression_class, ast::action_expression>;
+BOOST_SPIRIT_DECLARE(action_expression_type)
+
 // core tokens
-
-using opacity_type = x3::rule<opacity_class, ast::opacity_literal>;
-BOOST_SPIRIT_DECLARE(opacity_type)
-
-
-using color_literal_type = x3::rule<color_literal_class, ast::color_literal>;
-BOOST_SPIRIT_DECLARE(color_literal_type)
 
 // same issue as with integer_literal
 using group_literal_impl_type = x3::rule<group_literal_impl_class, ast::group_literal>;
@@ -281,20 +280,6 @@ BOOST_SPIRIT_DECLARE(condition_expression_type)
 using visibility_action_type = x3::rule<visibility_action_class, ast::visibility_action>;
 BOOST_SPIRIT_DECLARE(visibility_action_type)
 
-using color_expression_type = x3::rule<color_expression_class, ast::color_expression>;
-BOOST_SPIRIT_DECLARE(color_expression_type)
-
-using border_color_action_type = x3::rule<border_color_action_class, ast::border_color_action>;
-BOOST_SPIRIT_DECLARE(border_color_action_type)
-
-using text_color_action_type = x3::rule<text_color_action_class, ast::text_color_action>;
-BOOST_SPIRIT_DECLARE(text_color_action_type)
-
-using background_color_action_type = x3::rule<background_color_action_class, ast::background_color_action>;
-BOOST_SPIRIT_DECLARE(background_color_action_type)
-
-using action_expression_type = x3::rule<action_expression_class, ast::action_expression>;
-BOOST_SPIRIT_DECLARE(action_expression_type)
 
 // ----
 

@@ -119,6 +119,19 @@ struct comparison_operators_ : x3::symbols<lang::comparison_type>
 };
 const comparison_operators_ comparison_operators;
 
+struct action_types_ : x3::symbols<lang::action_type>
+{
+	action_types_()
+	{
+		add
+			(lang::constants::keywords::set_border_color,     lang::action_type::set_border_color)
+			(lang::constants::keywords::set_text_color,       lang::action_type::set_text_color)
+			(lang::constants::keywords::set_background_color, lang::action_type::set_background_color)
+		;
+	}
+};
+const action_types_ action_types;
+
 struct visibility_literals_ : x3::symbols<bool>
 {
 	visibility_literals_()

@@ -75,9 +75,6 @@ namespace fs::lang::constants
 		constexpr auto shaped_map       = "ShapedMap";
 		constexpr auto map_tier         = "MapTier";
 
-		constexpr auto set_border_color            = "SetBorderColor";
-		constexpr auto set_text_color              = "SetTextColor";
-		constexpr auto set_background_color        = "SetBackgroundColor";
 		constexpr auto set_font_size               = "SetFontSize";
 		constexpr auto play_alert_sound            = "PlayAlertSound";
 		constexpr auto play_alert_sound_positional = "PlayAlertSoundPositional";
@@ -97,6 +94,10 @@ namespace fs::lang::constants
 		constexpr auto no = "no";
 
 		constexpr const char* const const_ = "const"; // (for meme purposes only)
+
+		constexpr auto set_border_color            = "SetBorderColor";
+		constexpr auto set_text_color              = "SetTextColor";
+		constexpr auto set_background_color        = "SetBackgroundColor";
 	}
 
 	constexpr auto default_opacity = 255; // TODO: this is not correct, find the real value

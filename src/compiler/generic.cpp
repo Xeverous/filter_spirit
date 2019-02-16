@@ -13,24 +13,6 @@ namespace fs::compiler
 namespace past = parser::ast;
 namespace x3 = boost::spirit::x3;
 
-lang::color color_literal_to_color(
-	parser::ast::color_literal lit,
-	const parser::lookup_data& lookup_data)
-{
-	fs::lang::color result;
-	result.r = lit.r.value;
-	result.g = lit.g.value;
-	result.b = lit.b.value;
-
-	if (lit.a.value)
-		result.a = (*lit.a.value).value;
-	else
-		result.a = std::nullopt;
-
-	result.origin = lookup_data.position_of(lit);
-	return result;
-}
-
 lang::single_object literal_to_single_object(
 	const past::literal_expression& literal,
 	const parser::lookup_data& lookup_data)
@@ -50,9 +32,6 @@ lang::single_object literal_to_single_object(
 		},
 		[](past::suit_literal literal) -> lang::single_object {
 			return lang::suit{literal.value};
-		},
-		[&](past::color_literal literal) -> lang::single_object {
-			return color_literal_to_color(literal, lookup_data);
 		},
 		[](past::string_literal literal) -> lang::single_object {
 			return lang::string{literal};
@@ -380,22 +359,6 @@ std::variant<lang::object, error::error_variant> construct_object_of_type(
 	}
 }
 
-std::variant<lang::color, error::error_variant> color_expression_to_color(
-	const past::color_expression& expr,
-	const constants_map& map,
-	const parser::lookup_data& lookup_data)
-{
-	return expr.apply_visitor(x3::make_lambda_visitor<std::variant<lang::color, error::error_variant>>(
-		[&](past::color_literal lit)
-		{
-			return color_literal_to_color(lit, lookup_data);
-		},
-		[&](const past::identifier& identifier)
-		{
-			return identifier_to_type<lang::color>(identifier, map, lookup_data);
-		}));
-}
-
 std::variant<lang::level, error::error_variant> level_expression_to_level(
 	const past::level_expression& expr,
 	const constants_map& map,
@@ -417,74 +380,8 @@ std::variant<lang::action_set, error::error_variant> construct_action_set(
 	const constants_map& map,
 	const parser::lookup_data& lookup_data)
 {
-	lang::action_set result_actions;
-
-	for (const past::action_expression& expr : action_list.action_expressions)
-	{
-		using result_type = std::optional<error::error_variant>;
-
-		const auto error = expr.apply_visitor(x3::make_lambda_visitor<result_type>(
-			[&](const past::border_color_action& action) -> result_type
-			{
-				std::variant<lang::color, error::error_variant> result = color_expression_to_color(action.color, map, lookup_data);
-
-				if (std::holds_alternative<error::error_variant>(result))
-					return std::get<error::error_variant>(std::move(result));
-
-				if (result_actions.border_color)
-				{
-					return error::duplicate_action{
-						(*result_actions.border_color).origin,
-						lookup_data.position_of(action)
-					};
-				}
-
-				result_actions.border_color = std::get<lang::color>(result);
-				return std::nullopt;
-			},
-			[&](const past::text_color_action& action) -> result_type
-			{
-				std::variant<lang::color, error::error_variant> result = color_expression_to_color(action.color, map, lookup_data);
-
-				if (std::holds_alternative<error::error_variant>(result))
-					return std::get<error::error_variant>(std::move(result));
-
-				if (result_actions.text_color)
-				{
-					return error::duplicate_action{
-						(*result_actions.text_color).origin,
-						lookup_data.position_of(action)
-					};
-				}
-
-				result_actions.text_color = std::get<lang::color>(result);
-				return std::nullopt;
-			},
-			[&](const past::background_color_action& action) -> result_type
-			{
-				std::variant<lang::color, error::error_variant> result = color_expression_to_color(action.color, map, lookup_data);
-
-				if (std::holds_alternative<error::error_variant>(result))
-					return std::get<error::error_variant>(std::move(result));
-
-				if (result_actions.background_color)
-				{
-					return error::duplicate_action{
-						(*result_actions.background_color).origin,
-						lookup_data.position_of(action)
-					};
-				}
-
-				result_actions.background_color = std::get<lang::color>(result);
-				return std::nullopt;
-			}
-			));
-
-		if (error)
-			return *error;
-	}
-
-	return result_actions;
+	assert(false);
+	return lang::action_set{}; // FIXME implement
 }
 
 [[nodiscard]]

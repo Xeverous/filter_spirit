@@ -21,11 +21,6 @@ namespace fs::compiler
 std::optional<lang::group> identifier_to_group(std::string_view identifier);
 
 [[nodiscard]]
-lang::color color_literal_to_color(
-	parser::ast::color_literal lit,
-	const parser::lookup_data& lookup_data);
-
-[[nodiscard]]
 lang::single_object literal_to_single_object(
 	const parser::ast::literal_expression& literal,
 	const parser::lookup_data& lookup_data);
@@ -73,12 +68,6 @@ std::variant<lang::array_object, error::error_variant> construct_array_object_of
 std::variant<lang::object, error::error_variant> construct_object_of_type(
 	lang::object_type wanted_type,
 	lang::object&& object);
-
-[[nodiscard]]
-std::variant<lang::color, error::error_variant> color_expression_to_color(
-	const parser::ast::color_expression& expr,
-	const constants_map& map,
-	const parser::lookup_data& lookup_data);
 
 [[nodiscard]]
 std::variant<lang::level, error::error_variant> level_expression_to_level(
