@@ -83,27 +83,6 @@ struct suits_ : x3::symbols<lang::suit>
 };
 const suits_ suits;
 
-struct object_types_ : x3::symbols<lang::single_object_type>
-{
-	object_types_()
-	{
-		add
-			(lang::constants::keywords::boolean,     lang::single_object_type::boolean)
-			(lang::constants::keywords::number,      lang::single_object_type::number)
-			(lang::constants::keywords::level,       lang::single_object_type::level)
-			(lang::constants::keywords::sound_id,    lang::single_object_type::sound_id)
-			(lang::constants::keywords::volume,      lang::single_object_type::volume)
-			(lang::constants::keywords::rarity_type, lang::single_object_type::rarity)
-			(lang::constants::keywords::shape,       lang::single_object_type::shape)
-			(lang::constants::keywords::suit,        lang::single_object_type::suit)
-			(lang::constants::keywords::color,       lang::single_object_type::color)
-			(lang::constants::keywords::group,       lang::single_object_type::group)
-			(lang::constants::keywords::string,      lang::single_object_type::string)
-		;
-	}
-};
-const object_types_ object_types;
-
 struct comparison_operators_ : x3::symbols<lang::comparison_type>
 {
 	comparison_operators_()

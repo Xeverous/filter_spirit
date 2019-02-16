@@ -39,14 +39,6 @@ lang::single_object literal_to_single_object(
 	));
 }
 
-lang::object_type type_expression_to_type(const parser::ast::type_expression& type_expr)
-{
-	return type_expr.apply_visitor(x3::make_lambda_visitor<lang::object_type>(
-		[](const parser::ast::object_type_expression& expr) { return lang::object_type{expr.value}; },
-		[](const parser::ast::array_type_expression& expr) { return lang::object_type{expr.value, true}; }
-	));
-}
-
 std::optional<lang::group> identifier_to_group(std::string_view identifier)
 {
 	lang::group gp;
@@ -359,22 +351,6 @@ std::variant<lang::object, error::error_variant> construct_object_of_type(
 	}
 }
 
-std::variant<lang::level, error::error_variant> level_expression_to_level(
-	const past::level_expression& expr,
-	const constants_map& map,
-	const parser::lookup_data& lookup_data)
-{
-	return expr.apply_visitor(x3::make_lambda_visitor<std::variant<lang::level, error::error_variant>>(
-		[&](past::integer_literal lit)
-		{
-			return lang::level{lit.value, lookup_data.position_of(lit)};
-		},
-		[&](const past::identifier& identifier)
-		{
-			return identifier_to_type<lang::level>(identifier, map, lookup_data);
-		}));
-}
-
 std::variant<lang::action_set, error::error_variant> construct_action_set(
 	const past::action_list& action_list,
 	const constants_map& map,
@@ -399,13 +375,14 @@ std::variant<lang::condition_set, error::error_variant> construct_condition_set(
 		const auto error = expr.apply_visitor(x3::make_lambda_visitor<result_type>(
 			[&](const parser::ast::item_level_condition& cond) -> result_type
 			{
-				std::variant<lang::level, error::error_variant> result = level_expression_to_level(cond.level, map, lookup_data);
+				std::variant<lang::level, error::error_variant> result =
+					/* TODO get_val<level>(map, value) */ error::internal_error_while_parsing_constant{};
 
 				if (std::holds_alternative<error::error_variant>(result))
 					return std::get<error::error_variant>(result);
 
 				auto& level = std::get<lang::level>(result);
-				lang::numeric_range_condition nrc(cond.comparison, level.value, lookup_data.position_of(cond));
+				lang::numeric_range_condition nrc(cond.comparison_type.value, level.value, lookup_data.position_of(cond));
 
 				if (result_conditions.item_level) // FIXME try to add to exising one first
 				{
@@ -420,13 +397,14 @@ std::variant<lang::condition_set, error::error_variant> construct_condition_set(
 			},
 			[&](const parser::ast::drop_level_condition& cond) -> result_type
 			{
-				std::variant<lang::level, error::error_variant> result = level_expression_to_level(cond.level, map, lookup_data);
+				std::variant<lang::level, error::error_variant> result =
+					/* TODO get_val<level>(map, value) */ error::internal_error_while_parsing_constant{};
 
 				if (std::holds_alternative<error::error_variant>(result))
 					return std::get<error::error_variant>(result);
 
 				auto& level = std::get<lang::level>(result);
-				lang::numeric_range_condition nrc(cond.comparison, level.value, lookup_data.position_of(cond));
+				lang::numeric_range_condition nrc(cond.comparison_type.value, level.value, lookup_data.position_of(cond));
 
 				if (result_conditions.drop_level) // FIXME try to add to exising one first
 				{

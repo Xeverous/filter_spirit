@@ -19,23 +19,12 @@ struct static_assertion
 	static_assert(std::is_same_v<T, U>, "check invokation");
 };
 
-// Validates that a group makes sense. Any color can be specified to appear 0 times,
-// but not all at once as this would form an empty group.
-const auto validate_group = [](auto& context)
-{
-	using attribute_type = std::remove_reference_t<decltype(_attr(context))>;
-	(void) static_assertion<fs::parser::ast::group_literal, attribute_type>();
-
-	if (!_attr(context).has_anything())
-		_pass(context) = false;
-};
-
 const auto set_compare_equal = [](auto& context)
 {
 	using attribute_type = std::remove_reference_t<decltype(_val(context))>;
 	(void) static_assertion<fs::parser::ast::comparison_operator_expression, attribute_type>();
 
-	_val(context).comparison = fs::lang::comparison_type::equal;
+	_val(context).value = fs::lang::comparison_type::equal;
 };
 
 }
@@ -157,59 +146,16 @@ BOOST_SPIRIT_DEFINE(constant_definition)
 
 // ---- rules ----
 
-const action_expression_type action_expression = "action expression";
-const auto action_expression_def = action_types > value_expression;
-BOOST_SPIRIT_DEFINE(action_expression)
-
-// core tokens
-
-const group_literal_impl_type group_literal_impl = "group (R/G/B/W letters in this order)";
-const auto group_literal_impl_def = x3ext::count['R'] >> x3ext::count['G'] >> x3ext::count['B'] >> x3ext::count['W'];
-BOOST_SPIRIT_DEFINE(group_literal_impl)
-
-const group_literal_type group_literal =  group_literal_impl.name;
-const auto group_literal_def = group_literal_impl[validate_group];
-BOOST_SPIRIT_DEFINE(group_literal)
-
-// ----
-
-const object_type_expression_type object_type_expression = "type name";
-const auto object_type_expression_def = object_types;
-BOOST_SPIRIT_DEFINE(object_type_expression)
-
-const array_type_expression_type array_type_expression = "array type name";
-const auto array_type_expression_def = x3::lit(lang::constants::keywords::array) > x3::lit('<') > object_types > x3::lit('>');
-BOOST_SPIRIT_DEFINE(array_type_expression)
-
-const type_expression_type type_expression = "type name";
-const auto type_expression_def = object_type_expression | array_type_expression;
-BOOST_SPIRIT_DEFINE(type_expression)
-
-// ----
-
-
-// ----
-
 const comparison_operator_expression_type comparison_operator_expression = "comparison operator";
 const auto comparison_operator_expression_def = comparison_operators | x3::eps[set_compare_equal];
 BOOST_SPIRIT_DEFINE(comparison_operator_expression)
 
-// ----
-
-
-
-// ----
-
-const level_expression_type level_expression = "level expression";
-const auto level_expression_def = integer_literal | identifier;
-BOOST_SPIRIT_DEFINE(level_expression)
-
 const item_level_condition_type item_level_condition = "item level condition";
-const auto item_level_condition_def = x3::lit(lang::constants::keywords::item_level) > comparison_operator_expression > level_expression;
+const auto item_level_condition_def = x3::lit(lang::constants::keywords::item_level) > comparison_operator_expression > value_expression;
 BOOST_SPIRIT_DEFINE(item_level_condition)
 
 const drop_level_condition_type drop_level_condition = "drop level condition";
-const auto drop_level_condition_def = x3::lit(lang::constants::keywords::drop_level) > comparison_operator_expression > level_expression;
+const auto drop_level_condition_def = x3::lit(lang::constants::keywords::drop_level) > comparison_operator_expression > value_expression;
 BOOST_SPIRIT_DEFINE(drop_level_condition)
 
 const condition_expression_type condition_expression = "condition expression";
@@ -217,6 +163,27 @@ const auto condition_expression_def =
 	  item_level_condition
 	| drop_level_condition;
 BOOST_SPIRIT_DEFINE(condition_expression)
+
+const action_expression_type action_expression = "action expression";
+const auto action_expression_def = action_types > value_expression;
+BOOST_SPIRIT_DEFINE(action_expression)
+
+// core tokens
+
+// ----
+
+// ----
+
+
+// ----
+
+// ----
+
+
+
+// ----
+
+
 
 // ----
 

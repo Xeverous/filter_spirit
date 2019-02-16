@@ -72,46 +72,25 @@ BOOST_FUSION_ADAPT_STRUCT(
 // ---- rules ----
 
 BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::item_level_condition,
+	comparison_type, value)
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::drop_level_condition,
+	comparison_type, value)
+
+BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::action_expression,
 	action_type, value)
 
 // core tokens
 
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::group_literal,
-	r, g, b, w
-)
+// ----
+
+
 
 // ----
 
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::object_type_expression,
-	value
-)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::array_type_expression,
-	value
-)
-
-// ----
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::comparison_operator_expression,
-	comparison
-)
-
-// ----
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::item_level_condition,
-	comparison, level
-)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::drop_level_condition,
-	comparison, level
-)
 
 // ----
 

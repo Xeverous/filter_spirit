@@ -197,78 +197,29 @@ struct constant_definition : x3::position_tagged
 
 // ---- rules ----
 
-struct action_expression : x3::position_tagged
-{
-	lang::action_type action_type;
-	value_expression value;
-};
-
-// core tokens
-
-struct group_literal : x3::position_tagged
-{
-	// We do not use 'integer_literal' here as this semantically
-	// is not an integer_literal. It's more like integer_literal::value - here we
-	// just store counts of each color as implementation detail.
-	int r;
-	int g;
-	int b;
-	int w;
-
-	bool has_anything() const { return r != 0 || g != 0 || b != 0 || w != 0; }
-};
-
-// ----
-
-struct object_type_expression : x3::position_tagged
-{
-	lang::single_object_type value;
-};
-
-struct array_type_expression : x3::position_tagged
-{
-	lang::single_object_type value;
-};
-
-struct type_expression : x3::variant<
-		object_type_expression,
-		array_type_expression
-	>, x3::position_tagged
-{
-	using base_type::base_type;
-	using base_type::operator=;
-};
-
-// ----
-
-// ----
-
 struct comparison_operator_expression : x3::position_tagged
 {
-	lang::comparison_type comparison;
-};
+	comparison_operator_expression& operator=(lang::comparison_type ct)
+	{
+		value = ct;
+		return *this;
+	}
 
-// ---- conditions ----
+	lang::comparison_type get_value() const { return value; }
 
-struct level_expression : x3::variant<
-		integer_literal,
-		identifier
-	>, x3::position_tagged
-{
-	using base_type::base_type;
-	using base_type::operator=;
+	lang::comparison_type value;
 };
 
 struct item_level_condition : x3::position_tagged
 {
-	lang::comparison_type comparison;
-	level_expression level;
+	comparison_operator_expression comparison_type;
+	value_expression value;
 };
 
 struct drop_level_condition : x3::position_tagged
 {
-	lang::comparison_type comparison;
-	level_expression level;
+	comparison_operator_expression comparison_type;
+	value_expression value;
 };
 
 struct condition_expression : x3::variant<
@@ -279,6 +230,21 @@ struct condition_expression : x3::variant<
 	using base_type::base_type;
 	using base_type::operator=;
 };
+
+struct action_expression : x3::position_tagged
+{
+	lang::action_type action_type;
+	value_expression value;
+};
+
+// core tokens
+
+// ----
+
+// ----
+
+// ----
+
 
 // ---- actions
 

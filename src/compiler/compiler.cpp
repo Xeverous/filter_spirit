@@ -31,48 +31,48 @@ namespace past = parser::ast;
  * - convert expression to language object and proceed
  */
 std::optional<error::error_variant> add_constant_from_definition(
-	const past::constant_definition& def,
-	const parser::lookup_data& lookup_data,
-	constants_map& map)
+	const past::constant_definition& /* def */,
+	const parser::lookup_data& /* lookup_data */,
+	constants_map& /* map */)
 {
-	const past::identifier& wanted_name = def.name;
-	const past::value_expression& value_expression = def.value;
-
-	// const past::type_expression& wanted_type = def.type; // FIXME syntax redesign
-	const past::type_expression wanted_type(past::object_type_expression{{}, lang::single_object_type::number});
-
-	const auto wanted_name_it = map.find(wanted_name.value); // C++17: use if (expr; cond)
-	if (wanted_name_it != map.end())
-	{
-		assert(wanted_name_it->second.name_origin);
-		const parser::range_type place_of_original_name = *wanted_name_it->second.name_origin;
-		const parser::range_type place_of_duplicated_name = lookup_data.position_of(wanted_name);
-		return error::name_already_exists{place_of_duplicated_name, place_of_original_name};
-	}
-
-	std::variant<lang::object, error::error_variant> expr_result =
-		expression_to_object(value_expression, lookup_data, map);
-
-	if (std::holds_alternative<error::error_variant>(expr_result))
-		return std::get<error::error_variant>(expr_result);
-
-	lang::object_type lang_type = type_expression_to_type(wanted_type);
-	lang::object& object = std::get<lang::object>(expr_result);
-
-	std::variant<lang::object, error::error_variant> construct_result =
-		construct_object_of_type(lang_type, std::move(object));
-
-	if (std::holds_alternative<error::error_variant>(construct_result))
-		return std::get<error::error_variant>(construct_result);
-
-	lang::object& final_object = std::get<lang::object>(construct_result);
-	final_object.type_origin  = lookup_data.position_of(wanted_type);
-	final_object.value_origin = lookup_data.position_of(value_expression);
-	final_object.name_origin  = lookup_data.position_of(wanted_name);
-
-	const auto pair = map.emplace(wanted_name.value, std::move(final_object));
-	assert(pair.second);
-	return std::nullopt;
+//	const past::identifier& wanted_name = def.name;
+//	const past::value_expression& value_expression = def.value;
+//
+//	// const past::type_expression& wanted_type = def.type; // FIXME syntax redesign
+//
+//	const auto wanted_name_it = map.find(wanted_name.value); // C++17: use if (expr; cond)
+//	if (wanted_name_it != map.end())
+//	{
+//		assert(wanted_name_it->second.name_origin);
+//		const parser::range_type place_of_original_name = *wanted_name_it->second.name_origin;
+//		const parser::range_type place_of_duplicated_name = lookup_data.position_of(wanted_name);
+//		return error::name_already_exists{place_of_duplicated_name, place_of_original_name};
+//	}
+//
+//	std::variant<lang::object, error::error_variant> expr_result =
+//		expression_to_object(value_expression, lookup_data, map);
+//
+//	if (std::holds_alternative<error::error_variant>(expr_result))
+//		return std::get<error::error_variant>(expr_result);
+//
+//	lang::object_type lang_type = type_expression_to_type(wanted_type);
+//	lang::object& object = std::get<lang::object>(expr_result);
+//
+//	std::variant<lang::object, error::error_variant> construct_result =
+//		construct_object_of_type(lang_type, std::move(object));
+//
+//	if (std::holds_alternative<error::error_variant>(construct_result))
+//		return std::get<error::error_variant>(construct_result);
+//
+//	lang::object& final_object = std::get<lang::object>(construct_result);
+//	final_object.type_origin  = lookup_data.position_of(wanted_type);
+//	final_object.value_origin = lookup_data.position_of(value_expression);
+//	final_object.name_origin  = lookup_data.position_of(wanted_name);
+//
+//	const auto pair = map.emplace(wanted_name.value, std::move(final_object));
+//	assert(pair.second);
+	assert(false);
+	return std::nullopt; // FIXME implement
 }
 
 std::optional<constants_map> parse_constants(

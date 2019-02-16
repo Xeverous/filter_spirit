@@ -25,9 +25,6 @@ lang::single_object literal_to_single_object(
 	const parser::ast::literal_expression& literal,
 	const parser::lookup_data& lookup_data);
 
-[[nodiscard]]
-lang::object_type type_expression_to_type(const parser::ast::type_expression& type_expr);
-
 // array MUST NOT be empty
 // both containers MUST BE of the same size
 [[nodiscard]]
@@ -68,12 +65,6 @@ std::variant<lang::array_object, error::error_variant> construct_array_object_of
 std::variant<lang::object, error::error_variant> construct_object_of_type(
 	lang::object_type wanted_type,
 	lang::object&& object);
-
-[[nodiscard]]
-std::variant<lang::level, error::error_variant> level_expression_to_level(
-	const parser::ast::level_expression& expr,
-	const constants_map& map,
-	const parser::lookup_data& lookup_data);
 
 [[nodiscard]]
 std::variant<lang::action_set, error::error_variant> construct_action_set(

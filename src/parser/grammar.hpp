@@ -121,23 +121,13 @@ struct constant_definition_class             : error_on_error, annotate_on_succe
 
 // ---- rules ----
 
-struct action_expression_class               : error_on_error, annotate_on_success {};
-
-//
-
-struct group_literal_class                   : error_on_error, annotate_on_success {};
-struct group_literal_impl_class              : error_on_error, annotate_on_success {};
-
-struct object_type_expression_class          : error_on_error, annotate_on_success {};
-struct array_type_expression_class           : error_on_error, annotate_on_success {};
-struct type_expression_class                 : error_on_error, annotate_on_success {};
-
 struct comparison_operator_expression_class  : error_on_error, annotate_on_success {};
-
-struct level_expression_class                : error_on_error, annotate_on_success {};
 struct item_level_condition_class            : error_on_error, annotate_on_success {};
 struct drop_level_condition_class            : error_on_error, annotate_on_success {};
 struct condition_expression_class            : error_on_error, annotate_on_success {};
+struct action_expression_class               : error_on_error, annotate_on_success {};
+
+//
 
 struct visibility_action_class               : error_on_error, annotate_on_success {};
 struct color_expression_class                : error_on_error, annotate_on_success {};
@@ -219,9 +209,6 @@ BOOST_SPIRIT_DECLARE(literal_expression_type)
 using function_call_type = x3::rule<function_call_class, ast::function_call>;
 BOOST_SPIRIT_DECLARE(function_call_type)
 
-using array_type_expression_type = x3::rule<array_type_expression_class, ast::array_type_expression>;
-BOOST_SPIRIT_DECLARE(array_type_expression_type)
-
 using value_expression_type = x3::rule<value_expression_class, ast::value_expression>;
 BOOST_SPIRIT_DECLARE(value_expression_type)
 
@@ -232,39 +219,8 @@ BOOST_SPIRIT_DECLARE(constant_definition_type)
 
 // ---- rules ----
 
-using action_expression_type = x3::rule<action_expression_class, ast::action_expression>;
-BOOST_SPIRIT_DECLARE(action_expression_type)
-
-// core tokens
-
-// same issue as with integer_literal
-using group_literal_impl_type = x3::rule<group_literal_impl_class, ast::group_literal>;
-BOOST_SPIRIT_DECLARE(group_literal_impl_type)
-using group_literal_type = x3::rule<group_literal_class, ast::group_literal>;
-BOOST_SPIRIT_DECLARE(group_literal_type)
-
-// ----
-
-using object_type_expression_type = x3::rule<object_type_expression_class, ast::object_type_expression>;
-BOOST_SPIRIT_DECLARE(object_type_expression_type)
-
-using type_expression_type = x3::rule<type_expression_class, ast::type_expression>;
-BOOST_SPIRIT_DECLARE(type_expression_type)
-
-// ----
-
-using array_expression_type = x3::rule<array_expression_class, ast::array_expression>;
-BOOST_SPIRIT_DECLARE(array_expression_type)
-
-// ----
-
 using comparison_operator_expression_type = x3::rule<comparison_operator_expression_class, ast::comparison_operator_expression>;
 BOOST_SPIRIT_DECLARE(comparison_operator_expression_type)
-
-// ----
-
-using level_expression_type = x3::rule<level_expression_class, ast::level_expression>;
-BOOST_SPIRIT_DECLARE(level_expression_type)
 
 using item_level_condition_type = x3::rule<item_level_condition_class, ast::item_level_condition>;
 BOOST_SPIRIT_DECLARE(item_level_condition_type)
@@ -274,6 +230,23 @@ BOOST_SPIRIT_DECLARE(drop_level_condition_type)
 
 using condition_expression_type = x3::rule<condition_expression_class, ast::condition_expression>;
 BOOST_SPIRIT_DECLARE(condition_expression_type)
+
+using action_expression_type = x3::rule<action_expression_class, ast::action_expression>;
+BOOST_SPIRIT_DECLARE(action_expression_type)
+
+// core tokens
+
+// ----
+
+// ----
+
+using array_expression_type = x3::rule<array_expression_class, ast::array_expression>;
+BOOST_SPIRIT_DECLARE(array_expression_type)
+
+// ----
+
+// ----
+
 
 // ----
 
