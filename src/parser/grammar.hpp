@@ -127,9 +127,12 @@ struct drop_level_condition_class            : error_on_error, annotate_on_succe
 struct condition_expression_class            : error_on_error, annotate_on_success {};
 struct action_expression_class               : error_on_error, annotate_on_success {};
 
+// ---- filter structure ----
+
+struct visibility_statement_class            : error_on_error, annotate_on_success {};
+
 //
 
-struct visibility_action_class               : error_on_error, annotate_on_success {};
 struct color_expression_class                : error_on_error, annotate_on_success {};
 struct border_color_action_class             : error_on_error, annotate_on_success {};
 struct text_color_action_class               : error_on_error, annotate_on_success {};
@@ -234,6 +237,13 @@ BOOST_SPIRIT_DECLARE(condition_expression_type)
 using action_expression_type = x3::rule<action_expression_class, ast::action_expression>;
 BOOST_SPIRIT_DECLARE(action_expression_type)
 
+// ---- filter structure ----
+
+using visibility_statement_type = x3::rule<visibility_statement_class, ast::visibility_statement>;
+BOOST_SPIRIT_DECLARE(visibility_statement_type)
+
+
+
 // core tokens
 
 // ----
@@ -249,9 +259,6 @@ BOOST_SPIRIT_DECLARE(array_expression_type)
 
 
 // ----
-
-using visibility_action_type = x3::rule<visibility_action_class, ast::visibility_action>;
-BOOST_SPIRIT_DECLARE(visibility_action_type)
 
 
 // ----

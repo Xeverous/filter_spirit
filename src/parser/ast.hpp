@@ -237,6 +237,30 @@ struct action_expression : x3::position_tagged
 	value_expression value;
 };
 
+// ---- filter structure ----
+
+struct visibility_statement : x3::position_tagged
+{
+	visibility_statement& operator=(bool b)
+	{
+		show = b;
+		return *this;
+	}
+
+	bool get_value() const { return show; }
+
+	bool show;
+};
+
+struct statement : x3::variant<
+		action_expression,
+		visibility_statement
+	>, x3::position_tagged
+{
+	using base_type::base_type;
+	using base_type::operator=;
+};
+
 // core tokens
 
 // ----
@@ -247,11 +271,6 @@ struct action_expression : x3::position_tagged
 
 
 // ---- actions
-
-struct visibility_action : x3::position_tagged
-{
-	bool show;
-};
 
 // ---- core structure ----
 

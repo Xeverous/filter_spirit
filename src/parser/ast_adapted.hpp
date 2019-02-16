@@ -83,6 +83,8 @@ BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::action_expression,
 	action_type, value)
 
+// ---- filter structure ----
+
 // core tokens
 
 // ----
@@ -93,11 +95,6 @@ BOOST_FUSION_ADAPT_STRUCT(
 
 
 // ----
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::visibility_action,
-	show
-)
 
 // ----
 

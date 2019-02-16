@@ -168,6 +168,12 @@ const action_expression_type action_expression = "action expression";
 const auto action_expression_def = action_types > value_expression;
 BOOST_SPIRIT_DEFINE(action_expression)
 
+// ---- filter structure ----
+
+const visibility_statement_type visibility_statement = "visibility statement";
+const auto visibility_statement_def = visibility_literals;
+BOOST_SPIRIT_DEFINE(visibility_statement)
+
 // core tokens
 
 // ----
@@ -187,14 +193,10 @@ BOOST_SPIRIT_DEFINE(action_expression)
 
 // ----
 
-const visibility_action_type visibility_action = "visibility action";
-const auto visibility_action_def = visibility_literals;
-BOOST_SPIRIT_DEFINE(visibility_action)
-
 // ----
 
 const condition_list_type condition_list = "condition list";
-const auto condition_list_def = condition_expression % x3::lit(',');
+const auto condition_list_def = condition_expression % x3::lit("&&");
 BOOST_SPIRIT_DEFINE(condition_list)
 
 const action_list_type action_list = "action list";
