@@ -156,6 +156,21 @@ struct string_condition_properties_ : x3::symbols<lang::string_condition_propert
 };
 const string_condition_properties_ string_condition_properties;
 
+struct boolean_condition_properties_ : x3::symbols<lang::boolean_condition_property>
+{
+	boolean_condition_properties_()
+	{
+		add
+			(lang::keywords::identified,  lang::boolean_condition_property::identified)
+			(lang::keywords::corrupted,   lang::boolean_condition_property::corrupted)
+			(lang::keywords::elder_item,  lang::boolean_condition_property::elder_item)
+			(lang::keywords::shaper_item, lang::boolean_condition_property::shaper_item)
+			(lang::keywords::shaped_map,  lang::boolean_condition_property::shaped_map)
+		;
+	}
+};
+const boolean_condition_properties_ boolean_condition_properties;
+
 struct action_types_ : x3::symbols<lang::action_type>
 {
 	action_types_()

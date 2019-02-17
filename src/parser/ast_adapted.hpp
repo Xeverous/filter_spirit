@@ -80,6 +80,10 @@ BOOST_FUSION_ADAPT_STRUCT(
 	property, value)
 
 BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::boolean_condition,
+	property, value)
+
+BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::action,
 	action_type, value)
 

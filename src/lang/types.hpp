@@ -212,6 +212,15 @@ enum class string_condition_property
 	has_explicit_mod
 };
 
+enum class boolean_condition_property
+{
+	identified,
+	corrupted,
+	elder_item,
+	shaper_item,
+	shaped_map
+};
+
 enum class action_type
 {
 	set_border_color,

@@ -223,9 +223,16 @@ struct string_condition
 	value_expression value;
 };
 
+struct boolean_condition
+{
+	lang::boolean_condition_property property;
+	value_expression value;
+};
+
 struct condition : x3::variant<
 		comparison_condition,
-		string_condition
+		string_condition,
+		boolean_condition
 	>, x3::position_tagged
 {
 	using base_type::base_type;
