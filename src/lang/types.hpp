@@ -190,6 +190,28 @@ single_object_type type_to_enum()
 
 // ---- new syntax ----
 
+enum class comparison_condition_property
+{
+	item_level,
+	drop_level,
+	quality,
+	rarity,
+	sockets,
+	links,
+	height,
+	width,
+	stack_size,
+	gem_level,
+	map_tier
+};
+
+enum class string_condition_property
+{
+	class_,
+	base_type,
+	has_explicit_mod
+};
+
 enum class action_type
 {
 	set_border_color,

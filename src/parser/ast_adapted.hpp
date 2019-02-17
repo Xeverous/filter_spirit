@@ -72,12 +72,12 @@ BOOST_FUSION_ADAPT_STRUCT(
 // ---- rules ----
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::item_level_condition,
-	comparison_type, value)
+	fs::parser::ast::comparison_condition,
+	property, comparison_type, value)
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::drop_level_condition,
-	comparison_type, value)
+	fs::parser::ast::string_condition,
+	property, value)
 
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::action,

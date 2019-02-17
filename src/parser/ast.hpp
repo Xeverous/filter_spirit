@@ -210,21 +210,22 @@ struct comparison_operator_expression : x3::position_tagged
 	lang::comparison_type value;
 };
 
-struct item_level_condition : x3::position_tagged
+struct comparison_condition
 {
+	lang::comparison_condition_property property;
 	comparison_operator_expression comparison_type;
 	value_expression value;
 };
 
-struct drop_level_condition : x3::position_tagged
+struct string_condition
 {
-	comparison_operator_expression comparison_type;
+	lang::string_condition_property property;
 	value_expression value;
 };
 
 struct condition : x3::variant<
-		item_level_condition,
-		drop_level_condition
+		comparison_condition,
+		string_condition
 	>, x3::position_tagged
 {
 	using base_type::base_type;

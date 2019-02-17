@@ -1,5 +1,5 @@
 #include "lang/type_names.hpp"
-#include "lang/constants.hpp"
+#include "lang/keywords.hpp"
 #include <cassert>
 
 namespace fs::lang
@@ -9,30 +9,28 @@ std::string_view to_string(single_object_type type)
 {
 	switch (type)
 	{
-		namespace ck = constants::keywords;
-
 		case single_object_type::boolean:
-			return ck::boolean;
+			return keywords::boolean;
 		case single_object_type::number:
-			return ck::number;
+			return keywords::number;
 		case single_object_type::level:
-			return ck::level;
+			return keywords::level;
 		case single_object_type::sound_id:
-			return ck::sound_id;
+			return keywords::sound_id;
 		case single_object_type::volume:
-			return ck::volume;
+			return keywords::volume;
 		case single_object_type::rarity:
-			return ck::rarity_type;
+			return keywords::rarity_type;
 		case single_object_type::shape:
-			return ck::shape;
+			return keywords::shape;
 		case single_object_type::suit:
-			return ck::suit;
+			return keywords::suit;
 		case single_object_type::color:
-			return ck::color;
+			return keywords::color;
 		case single_object_type::group:
-			return ck::group;
+			return keywords::group;
 		case single_object_type::string:
-			return ck::string;
+			return keywords::string;
 		case single_object_type::generic:
 			return "?";
 	}

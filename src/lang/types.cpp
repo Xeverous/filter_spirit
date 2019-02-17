@@ -1,5 +1,4 @@
 #include "lang/types.hpp"
-#include "lang/constants.hpp"
 #include "utility/visitor.hpp"
 #include <cassert>
 

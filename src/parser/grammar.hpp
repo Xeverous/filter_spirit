@@ -113,8 +113,8 @@ struct constant_definition_class             : error_on_error, annotate_on_succe
 // ---- rules ----
 
 struct comparison_operator_expression_class  : error_on_error, annotate_on_success {};
-struct item_level_condition_class            : error_on_error, annotate_on_success {};
-struct drop_level_condition_class            : error_on_error, annotate_on_success {};
+struct comparison_condition_class            : error_on_error, annotate_on_success {};
+struct string_condition_class                : error_on_error, annotate_on_success {};
 struct condition_class                       : error_on_error, annotate_on_success {};
 struct action_class                          : error_on_error, annotate_on_success {};
 
@@ -220,11 +220,11 @@ BOOST_SPIRIT_DECLARE(constant_definition_type)
 using comparison_operator_expression_type = x3::rule<comparison_operator_expression_class, ast::comparison_operator_expression>;
 BOOST_SPIRIT_DECLARE(comparison_operator_expression_type)
 
-using item_level_condition_type = x3::rule<item_level_condition_class, ast::item_level_condition>;
-BOOST_SPIRIT_DECLARE(item_level_condition_type)
+using comparison_condition_type = x3::rule<comparison_condition_class, ast::comparison_condition>;
+BOOST_SPIRIT_DECLARE(comparison_condition_type)
 
-using drop_level_condition_type = x3::rule<drop_level_condition_class, ast::drop_level_condition>;
-BOOST_SPIRIT_DECLARE(drop_level_condition_type)
+using string_condition_type = x3::rule<string_condition_class, ast::string_condition>;
+BOOST_SPIRIT_DECLARE(string_condition_type)
 
 using condition_type = x3::rule<condition_class, ast::condition>;
 BOOST_SPIRIT_DECLARE(condition_type)

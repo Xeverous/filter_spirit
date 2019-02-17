@@ -5,8 +5,8 @@
  * Use BOOST_SPIRIT_DEFINE here.
  */
 #pragma once
+#include "parser/symbols.hpp"
 #include "parser/grammar.hpp"
-#include "parser/constants.hpp"
 #include <type_traits>
 
 namespace
@@ -64,17 +64,17 @@ const auto version_literal_def = x3::int_ >> '.' >> x3::int_ >> '.' >> x3::int_;
 BOOST_SPIRIT_DEFINE(version_literal)
 
 const version_requirement_statement_type version_requirement_statement = "version requirement statement";
-const auto version_requirement_statement_def = x3::lit(lang::constants::keywords::version) > ':' > version_literal;
+const auto version_requirement_statement_def = x3::lit(lang::keywords::version) > ':' > version_literal;
 BOOST_SPIRIT_DEFINE(version_requirement_statement)
 
 // ---- config ----
 
 const config_param_type config_param = "config param";
-const auto config_param_def = identifier > ':' > yes_no > (('{' > *config_param > '}') | x3::attr(std::vector<ast::config_param>()));
+const auto config_param_def = identifier > ':' > symbols::yes_no > (('{' > *config_param > '}') | x3::attr(std::vector<ast::config_param>()));
 BOOST_SPIRIT_DEFINE(config_param)
 
 const config_type config = "config";
-const auto config_def = x3::lit(lang::constants::keywords::config) > '{' > *config_param > '}';
+const auto config_def = x3::lit(lang::keywords::config) > '{' > *config_param > '}';
 BOOST_SPIRIT_DEFINE(config)
 
 // ---- literal types ----
@@ -88,19 +88,19 @@ const auto string_literal_def = x3::lexeme['"' > +(x3::char_ - '"') > '"'];
 BOOST_SPIRIT_DEFINE(string_literal)
 
 const boolean_literal_type boolean_literal = "boolean literal";
-const auto boolean_literal_def = booleans;
+const auto boolean_literal_def = symbols::booleans;
 BOOST_SPIRIT_DEFINE(boolean_literal)
 
 const rarity_literal_type rarity_literal = "rarity literal";
-const auto rarity_literal_def = rarities;
+const auto rarity_literal_def = symbols::rarities;
 BOOST_SPIRIT_DEFINE(rarity_literal)
 
 const shape_literal_type shape_literal = "shape literal";
-const auto shape_literal_def = shapes;
+const auto shape_literal_def = symbols::shapes;
 BOOST_SPIRIT_DEFINE(shape_literal)
 
 const suit_literal_type suit_literal = "suit literal";
-const auto suit_literal_def = suits;
+const auto suit_literal_def = symbols::suits;
 BOOST_SPIRIT_DEFINE(suit_literal)
 
 // ---- expressions ----
@@ -140,37 +140,37 @@ BOOST_SPIRIT_DEFINE(value_expression)
 // ---- definitions ----
 
 const constant_definition_type constant_definition = "constant definiton";
-const auto constant_definition_def = lang::constants::keywords::const_ > identifier > x3::lit(assignment_operator) > value_expression;
+const auto constant_definition_def = lang::keywords::const_ > identifier > '=' > value_expression;
 BOOST_SPIRIT_DEFINE(constant_definition)
 
 // ---- rules ----
 
 const comparison_operator_expression_type comparison_operator_expression = "comparison operator";
-const auto comparison_operator_expression_def = comparison_operators | x3::eps[set_compare_equal];
+const auto comparison_operator_expression_def = symbols::comparison_operators | x3::eps[set_compare_equal];
 BOOST_SPIRIT_DEFINE(comparison_operator_expression)
 
-const item_level_condition_type item_level_condition = "item level condition";
-const auto item_level_condition_def = x3::lit(lang::constants::keywords::item_level) > comparison_operator_expression > value_expression;
-BOOST_SPIRIT_DEFINE(item_level_condition)
+const comparison_condition_type comparison_condition = "comparison condition";
+const auto comparison_condition_def = symbols::comparison_condition_properties > comparison_operator_expression > value_expression;
+BOOST_SPIRIT_DEFINE(comparison_condition)
 
-const drop_level_condition_type drop_level_condition = "drop level condition";
-const auto drop_level_condition_def = x3::lit(lang::constants::keywords::drop_level) > comparison_operator_expression > value_expression;
-BOOST_SPIRIT_DEFINE(drop_level_condition)
+const string_condition_type string_condition = "string condition";
+const auto string_condition_def = symbols::string_condition_properties > value_expression;
+BOOST_SPIRIT_DEFINE(string_condition)
 
 const condition_type condition = "condition";
 const auto condition_def =
-	  item_level_condition
-	| drop_level_condition;
+	  comparison_condition
+	| string_condition;
 BOOST_SPIRIT_DEFINE(condition)
 
 const action_type action= "action";
-const auto action_def = action_types > value_expression;
+const auto action_def = symbols::action_types > value_expression;
 BOOST_SPIRIT_DEFINE(action)
 
 // ---- filter structure ----
 
 const visibility_statement_type visibility_statement = "visibility statement";
-const auto visibility_statement_def = visibility_literals;
+const auto visibility_statement_def = symbols::visibility_literals;
 BOOST_SPIRIT_DEFINE(visibility_statement)
 
 // moved here due to circular dependency
