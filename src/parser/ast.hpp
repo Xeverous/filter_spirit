@@ -5,10 +5,10 @@
  */
 #pragma once
 #include "lang/types.hpp"
-#include <boost/spirit/home/x3.hpp>
 #include <boost/spirit/home/x3/support/ast/variant.hpp>
 #include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
 #include <utility>
+#include <string>
 
 /*
  * Warning: std::optional and std::tuple are not yet supported,
@@ -222,7 +222,7 @@ struct drop_level_condition : x3::position_tagged
 	value_expression value;
 };
 
-struct condition_expression : x3::variant<
+struct condition : x3::variant<
 		item_level_condition,
 		drop_level_condition
 	>, x3::position_tagged
@@ -231,7 +231,7 @@ struct condition_expression : x3::variant<
 	using base_type::operator=;
 };
 
-struct action_expression : x3::position_tagged
+struct action : x3::position_tagged
 {
 	lang::action_type action_type;
 	value_expression value;
@@ -252,59 +252,32 @@ struct visibility_statement : x3::position_tagged
 	bool show;
 };
 
+// rule_block defined earlier than statement due to circular dependency
+// note: we could use x3::forward_ast but it would have a worse memory layout
+struct rule_block : x3::position_tagged
+{
+	std::vector<condition> conditions;
+	std::vector<struct statement> statements;
+};
+
 struct statement : x3::variant<
-		action_expression,
-		visibility_statement
+		action,
+		visibility_statement,
+		rule_block
 	>, x3::position_tagged
 {
 	using base_type::base_type;
 	using base_type::operator=;
 };
 
-// core tokens
-
-// ----
-
-// ----
-
-// ----
-
-
-// ---- actions
-
-// ---- core structure ----
-
-struct condition_list : x3::position_tagged
-{
-	std::vector<condition_expression> condition_expressions;
-};
-
-struct action_list : x3::position_tagged
-{
-	std::vector<action_expression> action_expressions;
-};
-
-struct rule_block_list : x3::position_tagged
-{
-	std::vector<struct rule_block> blocks;
-};
-
-struct rule_block : x3::position_tagged
-{
-	condition_list conditions;
-	action_list actions;
-	rule_block_list nested_blocks;
-};
-
-struct filter_specification : x3::position_tagged
+struct filter_structure : x3::position_tagged
 {
 	version_requirement_statement version_data;
 	config config;
 	std::vector<constant_definition> constant_definitions;
-	action_list actions;
-	rule_block_list blocks;
+	std::vector<statement> statements;
 };
 
-using ast_type = filter_specification;
+using ast_type = filter_structure;
 
 }

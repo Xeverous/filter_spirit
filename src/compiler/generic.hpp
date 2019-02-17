@@ -1,6 +1,5 @@
 #pragma once
 #include "compiler/compiler.hpp"
-#include "compiler/process_input.hpp"
 #include "compiler/error.hpp"
 #include "lang/types.hpp"
 #include "lang/condition_set.hpp"
@@ -36,13 +35,13 @@ std::optional<error::non_homogeneous_array> verify_homogeneity(
 std::variant<lang::object, error::error_variant> identifier_to_object(
 	const parser::ast::identifier& identifier,
 	parser::range_type position_of_identifier,
-	const constants_map& map);
+	const lang::constants_map& map);
 
 [[nodiscard]]
 std::variant<lang::object, error::error_variant> expression_to_object(
 	const parser::ast::value_expression& value_expression,
 	const parser::lookup_data& lookup_data,
-	const constants_map& map);
+	const lang::constants_map& map);
 
 [[nodiscard]]
 std::variant<lang::single_object, error::error_variant> construct_single_object_of_type(
@@ -68,14 +67,14 @@ std::variant<lang::object, error::error_variant> construct_object_of_type(
 
 [[nodiscard]]
 std::variant<lang::action_set, error::error_variant> construct_action_set(
-	const parser::ast::action_list& action_list,
-	const constants_map& map,
+	const std::vector<parser::ast::action>& actions,
+	const lang::constants_map& map,
 	const parser::lookup_data& lookup_data);
 
 [[nodiscard]]
 std::variant<lang::condition_set, error::error_variant> construct_condition_set(
-	const parser::ast::condition_list& condition_list,
-	const constants_map& map,
+	const std::vector<parser::ast::condition>& conditions,
+	const lang::constants_map& map,
 	const parser::lookup_data& lookup_data);
 
 
@@ -85,7 +84,7 @@ std::variant<lang::condition_set, error::error_variant> construct_condition_set(
 template <typename T> [[nodiscard]]
 std::variant<T, error::error_variant> identifier_to_type(
 	const parser::ast::identifier& identifier,
-	const constants_map& map,
+	const lang::constants_map& map,
 	const parser::lookup_data& lookup_data)
 {
 	const auto it = map.find(identifier.value);

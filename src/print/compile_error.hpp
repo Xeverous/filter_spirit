@@ -1,5 +1,5 @@
 #pragma once
-#include "parser/parser.hpp"
+#include "parser/config.hpp"
 #include "compiler/error.hpp"
 #include <iosfwd>
 

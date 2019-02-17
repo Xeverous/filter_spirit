@@ -7,7 +7,6 @@
 #pragma once
 #include "parser/grammar.hpp"
 #include "parser/constants.hpp"
-#include "parser/count.hpp"
 #include <type_traits>
 
 namespace
@@ -88,7 +87,7 @@ const string_literal_type string_literal = "string";
 const auto string_literal_def = x3::lexeme['"' > +(x3::char_ - '"') > '"'];
 BOOST_SPIRIT_DEFINE(string_literal)
 
-const boolean_literal_type boolean_literal = "boolean ('True' OR 'False')";
+const boolean_literal_type boolean_literal = "boolean literal";
 const auto boolean_literal_def = booleans;
 BOOST_SPIRIT_DEFINE(boolean_literal)
 
@@ -120,7 +119,7 @@ const auto literal_expression_def =
 	| suit_literal;
 BOOST_SPIRIT_DEFINE(literal_expression)
 
-// circular reference dependency - need to define earlier
+// moved here due to circular dependency
 const value_expression_type value_expression = "expression";
 
 const function_call_type function_call = "function call";
@@ -158,15 +157,15 @@ const drop_level_condition_type drop_level_condition = "drop level condition";
 const auto drop_level_condition_def = x3::lit(lang::constants::keywords::drop_level) > comparison_operator_expression > value_expression;
 BOOST_SPIRIT_DEFINE(drop_level_condition)
 
-const condition_expression_type condition_expression = "condition expression";
-const auto condition_expression_def =
+const condition_type condition = "condition";
+const auto condition_def =
 	  item_level_condition
 	| drop_level_condition;
-BOOST_SPIRIT_DEFINE(condition_expression)
+BOOST_SPIRIT_DEFINE(condition)
 
-const action_expression_type action_expression = "action expression";
-const auto action_expression_def = action_types > value_expression;
-BOOST_SPIRIT_DEFINE(action_expression)
+const action_type action= "action";
+const auto action_def = action_types > value_expression;
+BOOST_SPIRIT_DEFINE(action)
 
 // ---- filter structure ----
 
@@ -174,54 +173,22 @@ const visibility_statement_type visibility_statement = "visibility statement";
 const auto visibility_statement_def = visibility_literals;
 BOOST_SPIRIT_DEFINE(visibility_statement)
 
-// core tokens
-
-// ----
-
-// ----
-
-
-// ----
-
-// ----
-
-
-
-// ----
-
-
-
-// ----
-
-// ----
-
-const condition_list_type condition_list = "condition list";
-const auto condition_list_def = condition_expression % x3::lit("&&");
-BOOST_SPIRIT_DEFINE(condition_list)
-
-const action_list_type action_list = "action list";
-const auto action_list_def = *action_expression;
-BOOST_SPIRIT_DEFINE(action_list)
-
-// ----
-
-// circular reference
-const rule_block_list_type rule_block_list = "rule block list";
-
+// moved here due to circular dependency
 const rule_block_type rule_block = "rule block";
-const auto rule_block_def = condition_list > x3::lit('{') > action_list > rule_block_list > x3::lit('}');
+
+const statement_type statement = "statement";
+const auto statement_def = action | visibility_statement | rule_block;
+BOOST_SPIRIT_DEFINE(statement)
+
+const auto rule_block_def = *condition > x3::lit('{') > *statement > x3::lit('}');
 BOOST_SPIRIT_DEFINE(rule_block)
 
-const auto rule_block_list_def = *rule_block;
-BOOST_SPIRIT_DEFINE(rule_block_list)
-
-const filter_specification_type filter_specification = "filter specification";
-const auto filter_specification_def = version_requirement_statement > config > *constant_definition > action_list > rule_block_list;
-BOOST_SPIRIT_DEFINE(filter_specification)
+const filter_structure_type filter_structure = "filter structure";
+const auto filter_structure_def = version_requirement_statement > config > *constant_definition > *statement;
+BOOST_SPIRIT_DEFINE(filter_structure)
 
 const grammar_type grammar = "code";
-const auto grammar_def = filter_specification > x3::eoi;
+const auto grammar_def = filter_structure > x3::eoi;
 BOOST_SPIRIT_DEFINE(grammar)
 
 }
-

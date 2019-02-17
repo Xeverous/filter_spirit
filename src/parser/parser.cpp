@@ -1,23 +1,28 @@
 #include "parser/parser.hpp"
 #include "parser/grammar.hpp"
-#include "print/generic.hpp"
+#include "print/structure_printer.hpp"
+#include "print/parse_error.hpp"
 
-namespace fs::parser
+namespace
 {
 
-std::optional<std::pair<ast::ast_type, lookup_data>> parse(const std::string& file_content, std::ostream& error_stream)
+namespace p = fs::parser;
+namespace x3 = boost::spirit::x3;
+
+std::pair<p::lookup_data, std::variant<p::ast::ast_type, p::error_holder_type>> parse_impl(const std::string& file_content)
 {
-	      iterator_type it   {file_content.begin()};
-	const iterator_type begin{file_content.begin()};
-	const iterator_type end  {file_content.end()};
-	position_cache_type position_cache(begin, end);
+	      p::iterator_type it   {file_content.begin()};
+	const p::iterator_type begin{file_content.begin()};
+	const p::iterator_type end  {file_content.end()};
+	p::position_cache_type position_cache(begin, end);
+	p::error_holder_type error_holder;
 	// note: x3::with<> must match with grammar's context_type, otherwise you will get linker errors
-	const auto parser = x3::with<position_cache_tag>(std::ref(position_cache))
+	const auto parser = x3::with<p::position_cache_tag>(std::ref(position_cache))
 	[
-		x3::with<error_stream_tag>(std::ref(error_stream))[fs::grammar()]
+		x3::with<p::error_holder_tag>(std::ref(error_holder))[fs::grammar()]
 	];
 
-	ast::ast_type ast;
+	p::ast::ast_type ast;
 	const bool result = x3::phrase_parse(
 		it,
 		end,
@@ -26,13 +31,46 @@ std::optional<std::pair<ast::ast_type, lookup_data>> parse(const std::string& fi
 		ast
 	);
 
-	if (it != end or !result) // fail if we did not get a full match
+	using result_variant = std::variant<p::ast::ast_type, p::error_holder_type>;
+
+	if (it != end || !result)
 	{
-		error_stream << "parse failure\nstopped at:\n";
-		fs::print::print_line_with_indicator(error_stream, range_type(begin, end), range_type(it, ++iterator_type(it)));
+		//error_stream << "parse failure\nstopped at:\n";
+		//fs::print::print_line_with_indicator(error_stream, range_type(begin, end), range_type(it, ++iterator_type(it)));
+		return std::make_pair(p::lookup_data(std::move(position_cache)), result_variant(std::move(error_holder)));
 	}
 
-	return std::make_pair(std::move(ast), lookup_data(std::move(position_cache)));
+	return std::make_pair(p::lookup_data(std::move(position_cache)), result_variant(std::move(ast)));
+}
+
+}
+
+namespace fs::parser
+{
+
+std::optional<parse_data> parse(const std::string& file_content, std::ostream& error_stream)
+{
+	std::pair<lookup_data, std::variant<ast::ast_type, error_holder_type>> parse_result = parse_impl(file_content);
+
+	auto& lookup_data = parse_result.first;
+	auto& ast_or_error = parse_result.second;
+
+	if (std::holds_alternative<error_holder_type>(ast_or_error))
+	{
+		auto& errors = std::get<error_holder_type>(ast_or_error);
+
+		for (const parse_error& error : errors)
+			print::print_parse_error(error, lookup_data, error_stream);
+
+		return std::nullopt;
+	}
+
+	auto& ast = std::get<ast::ast_type>(ast_or_error);
+
+	if (true) // allow easy switching on/off for now (before full implemenation of command line args)
+		print::structure_printer()(ast);
+
+	return parse_data{std::move(ast), std::move(lookup_data)};
 }
 
 }

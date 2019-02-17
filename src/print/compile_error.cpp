@@ -1,6 +1,5 @@
 #include "print/compile_error.hpp"
 #include "print/generic.hpp"
-#include "compiler/error.hpp"
 
 namespace
 {

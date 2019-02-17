@@ -1,4 +1,4 @@
-#include "compiler/process_input.hpp"
+#include "compiler/compiler.hpp"
 #include "utility/file.hpp"
 #include <iostream>
 

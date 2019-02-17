@@ -8,10 +8,9 @@
 #pragma once
 #include "parser/ast.hpp"
 #include "parser/config.hpp"
-#include "print/generic.hpp"
+#include "parser/error.hpp"
 #include <boost/spirit/home/x3.hpp>
 #include <boost/spirit/home/x3/support/utility/lambda_visitor.hpp>
-#include <string>
 
 // workaround for https://github.com/boostorg/spirit/issues/461
 // or maybe the missing implementation of the most obvious substitution
@@ -61,16 +60,8 @@ struct error_on_error
 		const Exception& ex,
 		const Context& context)
 	{
-		const position_cache_type& positions = x3::get<position_cache_tag>(context).get();
-		const iterator_type error_first = ex.where();
-		const auto error_last = ++iterator_type(error_first);
-		print::print_line_number_with_indication_and_texts(
-			x3::get<error_stream_tag>(context).get(),
-			range_type(positions.first(), positions.last()),
-			range_type(error_first, error_last),
-			"parse error: expected '",
-			ex.which(),
-			"' here");
+		error_holder_type& error_holder = x3::get<error_holder_tag>(context).get();
+		error_holder.push_back(parse_error{ex.where(), ex.which()});
 		return x3::error_handler_result::fail;
 	}
 };
@@ -124,12 +115,15 @@ struct constant_definition_class             : error_on_error, annotate_on_succe
 struct comparison_operator_expression_class  : error_on_error, annotate_on_success {};
 struct item_level_condition_class            : error_on_error, annotate_on_success {};
 struct drop_level_condition_class            : error_on_error, annotate_on_success {};
-struct condition_expression_class            : error_on_error, annotate_on_success {};
-struct action_expression_class               : error_on_error, annotate_on_success {};
+struct condition_class                       : error_on_error, annotate_on_success {};
+struct action_class                          : error_on_error, annotate_on_success {};
 
 // ---- filter structure ----
 
 struct visibility_statement_class            : error_on_error, annotate_on_success {};
+struct statement_class                       : error_on_error, annotate_on_success {};
+struct rule_block_class                      : error_on_error, annotate_on_success {};
+struct filter_structure_class                : error_on_error, annotate_on_success {};
 
 //
 
@@ -141,9 +135,7 @@ struct background_color_action_class         : error_on_error, annotate_on_succe
 struct condition_list_class                  : error_on_error, annotate_on_success {};
 struct action_list_class                     : error_on_error, annotate_on_success {};
 
-struct rule_block_class                      : error_on_error, annotate_on_success {};
 struct rule_block_list_class                 : error_on_error, annotate_on_success {};
-struct filter_specification_class            : error_on_error, annotate_on_success {};
 
 struct grammar_class                         : error_on_error, annotate_on_success {};
 
@@ -212,6 +204,9 @@ BOOST_SPIRIT_DECLARE(literal_expression_type)
 using function_call_type = x3::rule<function_call_class, ast::function_call>;
 BOOST_SPIRIT_DECLARE(function_call_type)
 
+using array_expression_type = x3::rule<array_expression_class, ast::array_expression>;
+BOOST_SPIRIT_DECLARE(array_expression_type)
+
 using value_expression_type = x3::rule<value_expression_class, ast::value_expression>;
 BOOST_SPIRIT_DECLARE(value_expression_type)
 
@@ -231,58 +226,26 @@ BOOST_SPIRIT_DECLARE(item_level_condition_type)
 using drop_level_condition_type = x3::rule<drop_level_condition_class, ast::drop_level_condition>;
 BOOST_SPIRIT_DECLARE(drop_level_condition_type)
 
-using condition_expression_type = x3::rule<condition_expression_class, ast::condition_expression>;
-BOOST_SPIRIT_DECLARE(condition_expression_type)
+using condition_type = x3::rule<condition_class, ast::condition>;
+BOOST_SPIRIT_DECLARE(condition_type)
 
-using action_expression_type = x3::rule<action_expression_class, ast::action_expression>;
-BOOST_SPIRIT_DECLARE(action_expression_type)
+using action_type = x3::rule<action_class, ast::action>;
+BOOST_SPIRIT_DECLARE(action_type)
 
 // ---- filter structure ----
 
 using visibility_statement_type = x3::rule<visibility_statement_class, ast::visibility_statement>;
 BOOST_SPIRIT_DECLARE(visibility_statement_type)
 
-
-
-// core tokens
-
-// ----
-
-// ----
-
-using array_expression_type = x3::rule<array_expression_class, ast::array_expression>;
-BOOST_SPIRIT_DECLARE(array_expression_type)
-
-// ----
-
-// ----
-
-
-// ----
-
-
-// ----
-
-using condition_list_type = x3::rule<condition_list_class, ast::condition_list>;
-BOOST_SPIRIT_DECLARE(condition_list_type)
-
-using action_list_type = x3::rule<action_list_class, ast::action_list>;
-BOOST_SPIRIT_DECLARE(action_list_type)
-
-// ----
-
-// ----
+using statement_type = x3::rule<statement_class, ast::statement>;
+BOOST_SPIRIT_DECLARE(statement_type)
 
 using rule_block_type = x3::rule<rule_block_class, ast::rule_block>;
 BOOST_SPIRIT_DECLARE(rule_block_type)
 
-using rule_block_list_type = x3::rule<rule_block_list_class, ast::rule_block_list>;
-BOOST_SPIRIT_DECLARE(rule_block_list_type)
+using filter_structure_type = x3::rule<filter_structure_class, ast::filter_structure>;
+BOOST_SPIRIT_DECLARE(filter_structure_type)
 
-using filter_specification_type = x3::rule<filter_specification_class, ast::filter_specification>;
-BOOST_SPIRIT_DECLARE(filter_specification_type)
-
-// the entire language grammar
 using grammar_type = x3::rule<grammar_class, ast::ast_type>;
 BOOST_SPIRIT_DECLARE(grammar_type)
 

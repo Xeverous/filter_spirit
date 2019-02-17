@@ -1,12 +1,10 @@
 #pragma once
 #include "parser/ast.hpp"
 #include "parser/config.hpp"
-#include "lang/types.hpp"
 #include <string>
 #include <iosfwd>
 #include <optional>
 #include <utility>
-#include <unordered_map>
 
 namespace fs::parser
 {
@@ -43,7 +41,13 @@ private:
 	position_cache_type position_cache;
 };
 
+struct parse_data
+{
+	ast::ast_type ast;
+	lookup_data lookup_data;
+};
+
 [[nodiscard]]
-std::optional<std::pair<ast::ast_type, lookup_data>> parse(const std::string& file_content, std::ostream& error_stream);
+std::optional<parse_data> parse(const std::string& file_content, std::ostream& error_stream);
 
 }

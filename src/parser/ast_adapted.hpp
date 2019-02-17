@@ -80,47 +80,15 @@ BOOST_FUSION_ADAPT_STRUCT(
 	comparison_type, value)
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::action_expression,
+	fs::parser::ast::action,
 	action_type, value)
 
 // ---- filter structure ----
 
-// core tokens
-
-// ----
-
-
-
-// ----
-
-
-// ----
-
-// ----
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::condition_list,
-	condition_expressions
-)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::action_list,
-	action_expressions
-)
-
-// ----
-
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::rule_block,
-	conditions, actions, nested_blocks
-)
+	conditions, statements)
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::rule_block_list,
-	blocks
-)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::filter_specification,
-	version_data, config, constant_definitions, actions, blocks)
-
+	fs::parser::ast::filter_structure,
+	version_data, config, constant_definitions, statements)

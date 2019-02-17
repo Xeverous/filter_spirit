@@ -98,7 +98,7 @@ std::optional<error::non_homogeneous_array> verify_homogeneity(
 std::variant<lang::object, error::error_variant> identifier_to_object(
 	const past::identifier& identifier, // FIXME: identifier not used, only .value member
 	parser::range_type position_of_identifier,
-	const constants_map& map)
+	const lang::constants_map& map)
 {
 	const std::optional<lang::group> group = identifier_to_group(identifier.value); // (1)
 	if (group)
@@ -134,7 +134,7 @@ std::variant<lang::object, error::error_variant> identifier_to_object(
 std::variant<lang::object, error::error_variant> expression_to_object(
 	const past::value_expression& value_expression,
 	const parser::lookup_data& lookup_data,
-	const constants_map& map)
+	const lang::constants_map& map)
 {
 	using result_type = std::variant<lang::object, error::error_variant>;
 
@@ -352,8 +352,8 @@ std::variant<lang::object, error::error_variant> construct_object_of_type(
 }
 
 std::variant<lang::action_set, error::error_variant> construct_action_set(
-	const past::action_list& action_list,
-	const constants_map& map,
+	const std::vector<parser::ast::action>& actions,
+	const lang::constants_map& map,
 	const parser::lookup_data& lookup_data)
 {
 	assert(false);
@@ -362,13 +362,13 @@ std::variant<lang::action_set, error::error_variant> construct_action_set(
 
 [[nodiscard]]
 std::variant<lang::condition_set, error::error_variant> construct_condition_set(
-	const parser::ast::condition_list& condition_list,
-	const constants_map& map,
+	const std::vector<parser::ast::condition>& conditions,
+	const lang::constants_map& map,
 	const parser::lookup_data& lookup_data)
 {
 	lang::condition_set result_conditions;
 
-	for (const past::condition_expression& expr : condition_list.condition_expressions)
+	for (const past::condition& expr : conditions)
 	{
 		using result_type = std::optional<error::error_variant>;
 

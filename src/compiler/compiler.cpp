@@ -1,5 +1,4 @@
 #include "compiler/compiler.hpp"
-#include "compiler/process_input.hpp"
 #include "compiler/rules.hpp"
 #include "compiler/generic.hpp"
 #include "compiler/error.hpp"
@@ -7,6 +6,7 @@
 #include "parser/config.hpp"
 #include "parser/parser.hpp"
 #include "print/compile_error.hpp"
+#include "print/structure_printer.hpp"
 #include "utility/holds_alternative.hpp"
 #include <cassert>
 #include <string_view>
@@ -14,6 +14,17 @@
 
 namespace fs::compiler
 {
+
+[[nodiscard]]
+std::variant<lang::constants_map, error::error_variant> resolve_constants(
+	const std::vector<parser::ast::constant_definition>& constant_definitions,
+	const parser::lookup_data& lookup_data);
+
+[[nodiscard]]
+std::optional<error::error_variant> add_constant_from_definition(
+	const parser::ast::constant_definition& def,
+	const parser::lookup_data& lookup_data,
+	lang::constants_map& map);
 
 namespace past = parser::ast;
 
@@ -33,7 +44,7 @@ namespace past = parser::ast;
 std::optional<error::error_variant> add_constant_from_definition(
 	const past::constant_definition& /* def */,
 	const parser::lookup_data& /* lookup_data */,
-	constants_map& /* map */)
+	lang::constants_map& /* map */)
 {
 //	const past::identifier& wanted_name = def.name;
 //	const past::value_expression& value_expression = def.value;
@@ -75,12 +86,11 @@ std::optional<error::error_variant> add_constant_from_definition(
 	return std::nullopt; // FIXME implement
 }
 
-std::optional<constants_map> parse_constants(
+std::variant<lang::constants_map, error::error_variant> resolve_constants(
 	const std::vector<parser::ast::constant_definition>& constant_definitions,
-	const parser::lookup_data& lookup_data,
-	std::ostream& error_stream)
+	const parser::lookup_data& lookup_data)
 {
-	constants_map map;
+	lang::constants_map map;
 
 	for (const past::constant_definition& line : constant_definitions)
 	{
@@ -88,34 +98,41 @@ std::optional<constants_map> parse_constants(
 			add_constant_from_definition(line, lookup_data, map);
 
 		if (error)
-		{
-			print::compile_error(*error, lookup_data.get_range_of_whole_content(), error_stream);
-			return std::nullopt;
-		}
+			return *error;
 	}
 
 	return map;
 }
 
-bool semantic_analysis(
-	const past::ast_type& ast,
-	const parser::lookup_data& lookup_data,
-	std::ostream& error_stream)
+[[nodiscard]]
+bool semantic_analysis(const parser::parse_data& /* parse_data */)
 {
-	std::optional<constants_map> map = parse_constants(ast.constant_definitions, lookup_data, error_stream);
+	return false; // FIXME implement
+}
 
-	if (!map)
+bool process_input(const std::string& file_content, std::ostream& error_stream)
+{
+	std::optional<parser::parse_data> parse_result = parser::parse(file_content, error_stream);
+
+	if (!parse_result)
 		return false;
 
-	for (const auto& pair : *map)
+	parser::parse_data& parse_data = *parse_result;
+	if (true) // allow easy switching on/off for now (before full implemenation of command line args)
+		print::structure_printer()(parse_data.ast);
+
+	std::variant<lang::constants_map, error::error_variant> map_or_error = resolve_constants(parse_data.ast.constant_definitions, parse_data.lookup_data);
+
+	if (std::holds_alternative<error::error_variant>(map_or_error))
 	{
-		error_stream << pair.first << "\n";
+		print::compile_error(std::get<error::error_variant>(map_or_error), parse_data.lookup_data.get_range_of_whole_content(), error_stream);
+		return false;
 	}
 
-	std::variant<std::vector<lang::filter_block>, error::error_variant> filter_content =
-		compile_rules(ast.actions, ast.blocks, *map, lookup_data);
+	if (!semantic_analysis(parse_data))
+		return false;
 
-	return !std::holds_alternative<error::error_variant>(filter_content);
+	return true;
 }
 
 }
