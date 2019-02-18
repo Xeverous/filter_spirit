@@ -116,6 +116,7 @@ struct comparison_operator_expression_class  : error_on_error, annotate_on_succe
 struct comparison_condition_class            : error_on_error, annotate_on_success {};
 struct string_condition_class                : error_on_error, annotate_on_success {};
 struct boolean_condition_class               : error_on_error, annotate_on_success {};
+struct socket_group_condition_class          : error_on_error, annotate_on_success {};
 struct condition_class                       : error_on_error, annotate_on_success {};
 struct action_class                          : error_on_error, annotate_on_success {};
 
@@ -229,6 +230,9 @@ BOOST_SPIRIT_DECLARE(string_condition_type)
 
 using boolean_condition_type = x3::rule<boolean_condition_class, ast::boolean_condition>;
 BOOST_SPIRIT_DECLARE(boolean_condition_type)
+
+using socket_group_condition_type = x3::rule<socket_group_condition_class, ast::socket_group_condition>;
+BOOST_SPIRIT_DECLARE(socket_group_condition_type)
 
 using condition_type = x3::rule<condition_class, ast::condition>;
 BOOST_SPIRIT_DECLARE(condition_type)

@@ -229,10 +229,24 @@ struct boolean_condition
 	value_expression value;
 };
 
+struct socket_group_condition
+{
+	socket_group_condition& operator=(value_expression ve)
+	{
+		value = std::move(ve);
+		return *this;
+	}
+
+	const value_expression& get_value() const { return value; }
+
+	value_expression value;
+};
+
 struct condition : x3::variant<
 		comparison_condition,
 		string_condition,
-		boolean_condition
+		boolean_condition,
+		socket_group_condition
 	>, x3::position_tagged
 {
 	using base_type::base_type;

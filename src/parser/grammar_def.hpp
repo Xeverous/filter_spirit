@@ -161,11 +161,16 @@ const boolean_condition_type boolean_condition = "boolean condition";
 const auto boolean_condition_def = symbols::boolean_condition_properties > value_expression;
 BOOST_SPIRIT_DEFINE(boolean_condition)
 
+const socket_group_condition_type socket_group_condition = "socket group condition";
+const auto socket_group_condition_def = value_expression;
+BOOST_SPIRIT_DEFINE(socket_group_condition)
+
 const condition_type condition = "condition";
 const auto condition_def =
 	  comparison_condition
 	| string_condition
-	| boolean_condition;
+	| boolean_condition
+	| socket_group_condition;
 BOOST_SPIRIT_DEFINE(condition)
 
 const action_type action= "action";
