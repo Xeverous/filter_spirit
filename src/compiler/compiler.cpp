@@ -5,6 +5,7 @@
 #include "parser/ast.hpp"
 #include "parser/config.hpp"
 #include "parser/parser.hpp"
+#include "lang/constants_map.hpp"
 #include "print/compile_error.hpp"
 #include "print/structure_printer.hpp"
 #include "utility/holds_alternative.hpp"
@@ -12,16 +13,18 @@
 #include <string_view>
 #include <utility>
 
-namespace fs::compiler
+namespace
 {
 
+using namespace fs;
+
 [[nodiscard]]
-std::variant<lang::constants_map, error::error_variant> resolve_constants(
+std::variant<lang::constants_map, compiler::error::error_variant> resolve_constants(
 	const std::vector<parser::ast::constant_definition>& constant_definitions,
 	const parser::lookup_data& lookup_data);
 
 [[nodiscard]]
-std::optional<error::error_variant> add_constant_from_definition(
+std::optional<compiler::error::error_variant> add_constant_from_definition(
 	const parser::ast::constant_definition& def,
 	const parser::lookup_data& lookup_data,
 	lang::constants_map& map);
@@ -41,7 +44,7 @@ namespace past = parser::ast;
  *   (as of now, filter's language has no scoping/name shadowing)
  * - convert expression to language object and proceed
  */
-std::optional<error::error_variant> add_constant_from_definition(
+std::optional<compiler::error::error_variant> add_constant_from_definition(
 	const past::constant_definition& /* def */,
 	const parser::lookup_data& /* lookup_data */,
 	lang::constants_map& /* map */)
@@ -86,16 +89,16 @@ std::optional<error::error_variant> add_constant_from_definition(
 	return std::nullopt; // FIXME implement
 }
 
-std::variant<lang::constants_map, error::error_variant> resolve_constants(
+std::variant<lang::constants_map, compiler::error::error_variant> resolve_constants(
 	const std::vector<parser::ast::constant_definition>& constant_definitions,
 	const parser::lookup_data& lookup_data)
 {
 	lang::constants_map map;
 
-	for (const past::constant_definition& line : constant_definitions)
+	for (const past::constant_definition& def : constant_definitions)
 	{
-		const std::optional<error::error_variant> error =
-			add_constant_from_definition(line, lookup_data, map);
+		const std::optional<compiler::error::error_variant> error =
+			add_constant_from_definition(def, lookup_data, map);
 
 		if (error)
 			return *error;
@@ -109,6 +112,11 @@ bool semantic_analysis(const parser::parse_data& /* parse_data */)
 {
 	return false; // FIXME implement
 }
+
+} // namespace
+
+namespace fs::compiler
+{
 
 bool process_input(const std::string& file_content, std::ostream& error_stream)
 {

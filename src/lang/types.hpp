@@ -8,7 +8,6 @@
 #include <optional>
 #include <variant>
 #include <vector>
-#include <unordered_map>
 
 namespace fs::lang
 {
@@ -94,8 +93,6 @@ struct object
 	// if object originated from a literal this should be empty
 	std::optional<fs::parser::range_type> name_origin;
 };
-
-using constants_map = std::unordered_map<std::string, object>;
 
 // ----
 

@@ -2,6 +2,8 @@
 #include "compiler/error.hpp"
 #include "compiler/compiler.hpp"
 #include "parser/ast.hpp"
+#include "parser/parser.hpp"
+#include "lang/constants_map.hpp"
 #include "lang/action_set.hpp"
 #include "lang/condition_set.hpp"
 #include "lang/filter_block.hpp"

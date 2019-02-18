@@ -2,6 +2,7 @@
 #include "compiler/compiler.hpp"
 #include "compiler/error.hpp"
 #include "lang/types.hpp"
+#include "lang/constants_map.hpp"
 #include "lang/condition_set.hpp"
 #include "lang/action_set.hpp"
 #include "parser/ast.hpp"

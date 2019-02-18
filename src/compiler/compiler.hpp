@@ -1,9 +1,6 @@
 #pragma once
-#include "compiler/error.hpp"
-#include "parser/ast.hpp"
-#include "parser/parser.hpp"
-#include "lang/types.hpp"
 #include <string>
+#include <iosfwd>
 
 namespace fs::compiler
 {
