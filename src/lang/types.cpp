@@ -9,7 +9,7 @@ single_object_type type_of_single_object(const single_object& obj)
 {
 	if (std::holds_alternative<boolean>(obj))
 		return single_object_type::boolean;
-	if (std::holds_alternative<number>(obj))
+	if (std::holds_alternative<integer>(obj))
 		return single_object_type::number;
 	if (std::holds_alternative<level>(obj))
 		return single_object_type::level;

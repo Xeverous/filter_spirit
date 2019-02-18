@@ -51,13 +51,13 @@ std::variant<lang::single_object, error::error_variant> construct_single_object_
 	if (actual_type == lang::single_object_type::number)
 	{
 		if (wanted_type == lang::single_object_type::level)
-			return lang::single_object{lang::level{std::get<lang::number>(object).value, object_value_origin}};
+			return lang::single_object{lang::level{std::get<lang::integer>(object).value, object_value_origin}};
 
 		if (wanted_type == lang::single_object_type::sound_id)
-			return lang::single_object{lang::sound_id{std::get<lang::number>(object).value}};
+			return lang::single_object{lang::sound_id{std::get<lang::integer>(object).value}};
 
 		if (wanted_type == lang::single_object_type::volume)
-			return lang::single_object{lang::volume{std::get<lang::number>(object).value}};
+			return lang::single_object{lang::volume{std::get<lang::integer>(object).value}};
 	}
 
 	return error::type_mismatch_in_assignment{

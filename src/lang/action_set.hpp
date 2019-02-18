@@ -10,7 +10,7 @@ struct action_set
 	std::optional<color> border_color;
 	std::optional<color> text_color;
 	std::optional<color> background_color;
-	std::optional<number> font_size;
+	std::optional<integer> font_size;
 	std::optional<alert_sound> sound;
 	std::optional<std::monostate> disabled_drop_sound;
 	std::optional<minimap_icon> icon;

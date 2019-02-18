@@ -40,7 +40,7 @@ lang::object evaluate_literal(
 			return lang::boolean{literal.value};
 		},
 		[](ast::integer_literal literal) -> result_type {
-			return lang::number{literal.value};
+			return lang::integer{literal.value};
 		},
 		[](ast::rarity_literal literal) -> result_type {
 			return lang::rarity{literal.value};

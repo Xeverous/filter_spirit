@@ -22,7 +22,7 @@ struct boolean
 	bool value;
 };
 
-struct number
+struct integer
 {
 	int value;
 };
@@ -67,7 +67,7 @@ struct string
 
 using single_object = std::variant<
 	boolean,
-	number,
+	integer,
 	level,
 	sound_id,
 	volume,
@@ -140,7 +140,7 @@ single_object_type type_to_enum_impl()
 template <> constexpr
 single_object_type type_to_enum_impl<boolean>() { return single_object_type::boolean; }
 template <> constexpr
-single_object_type type_to_enum_impl<number>() { return single_object_type::number; }
+single_object_type type_to_enum_impl<integer>() { return single_object_type::number; }
 template <> constexpr
 single_object_type type_to_enum_impl<level>() { return single_object_type::level; }
 template <> constexpr
