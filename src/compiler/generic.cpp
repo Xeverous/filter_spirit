@@ -13,32 +13,6 @@ namespace fs::compiler
 namespace past = parser::ast;
 namespace x3 = boost::spirit::x3;
 
-lang::single_object literal_to_single_object(
-	const past::literal_expression& literal,
-	const parser::lookup_data& lookup_data)
-{
-	return literal.apply_visitor(x3::make_lambda_visitor<lang::single_object>(
-		[](past::boolean_literal literal) -> lang::single_object {
-			return lang::boolean{literal.value};
-		},
-		[](past::integer_literal literal) -> lang::single_object {
-			return lang::number{literal.value};
-		},
-		[](past::rarity_literal literal) -> lang::single_object {
-			return lang::rarity{literal.value};
-		},
-		[](past::shape_literal literal) -> lang::single_object {
-			return lang::shape{literal.value};
-		},
-		[](past::suit_literal literal) -> lang::single_object {
-			return lang::suit{literal.value};
-		},
-		[](past::string_literal literal) -> lang::single_object {
-			return lang::string{literal};
-		}
-	));
-}
-
 std::optional<lang::group> identifier_to_group(std::string_view identifier)
 {
 	lang::group gp;
@@ -60,74 +34,6 @@ std::optional<lang::group> identifier_to_group(std::string_view identifier)
 	}
 
 	return gp;
-}
-
-std::optional<error::non_homogeneous_array> verify_homogeneity(
-	const lang::array_object& array,
-	const std::vector<parser::range_type>& origins)
-{
-	assert(!array.empty());
-	assert(array.size() == origins.size());
-
-	std::size_t first_index = array.front().index();
-	for (int i = 1; i < static_cast<int>(array.size()); ++i)
-	{
-		const auto idx = array[i].index();
-		if (idx != first_index) // C++20: [[unlikely]]
-		{
-			return error::non_homogeneous_array{
-				origins.front(),
-				origins[i],
-				lang::type_of_single_object(array.front()),
-				lang::type_of_single_object(array[i])
-			};
-		}
-	}
-
-	return std::nullopt;
-}
-
-/*
- * - check for special identifiers (eg RGBBW) (1)
- *   if so, return object of appropriate type
- * - check for references to other values (2)
- *   - return error if no such object exists (3)
- *   - proceed otherwise, copying value from referenced object (4)
- */
-[[nodiscard]]
-std::variant<lang::object, error::error_variant> identifier_to_object(
-	const past::identifier& identifier, // FIXME: identifier not used, only .value member
-	parser::range_type position_of_identifier,
-	const lang::constants_map& map)
-{
-	const std::optional<lang::group> group = identifier_to_group(identifier.value); // (1)
-	if (group)
-	{
-		return lang::object{
-			lang::single_object{*group},
-			position_of_identifier,
-			position_of_identifier,
-			std::nullopt
-		};
-
-	}
-
-	// else: not a special identifier, search for referenced value then (2)
-
-	const auto it = map.find(identifier.value); // C++17: use if (expr; cond)
-	if (it == map.end())
-	{
-		return error::no_such_name{position_of_identifier}; // (3)
-	}
-
-	// object acquired from identifier expression: copy it's value and type origin
-	// but set name origin where identifier was last encountered (4)
-	return lang::object{
-		it->second.value,
-		it->second.type_origin,
-		position_of_identifier,
-		it->second.name_origin
-	};
 }
 
 [[nodiscard]]
@@ -162,54 +68,8 @@ std::variant<lang::object, error::error_variant> expression_to_object(
 
 	auto array_to_object = [&](const past::array_expression& array_expr) -> result_type
 	{
-		if (array_expr.empty()) // C++20: [[unlikely]]
-		{
-			return lang::object{
-				lang::array_object{},
-				lookup_data.position_of(array_expr),
-				lookup_data.position_of(array_expr),
-				std::nullopt
-			};
-		}
-
-		// sorry dawg, no recursion this time
-		// we don't support nested arrays (at least for now)
-		lang::array_object array;
-		std::vector<parser::range_type> origins;
-		for (const past::value_expression& expr : array_expr)
-		{
-			result_type result = expr.apply_visitor(x3::make_lambda_visitor<result_type>(
-				literal_to_object,
-				iden_to_object,
-				function_call_to_object,
-				[&lookup_data](const past::array_expression& array_expr) -> result_type
-				{
-					return error::nested_arrays_not_allowed{lookup_data.position_of(array_expr)};
-				}
-			));
-
-			if (std::holds_alternative<error::error_variant>(result))
-				return std::get<error::error_variant>(result);
-
-			auto& obj = std::get<lang::object>(result);
-
-			if (std::holds_alternative<lang::array_object>(obj.value))
-				return error::nested_arrays_not_allowed{lookup_data.position_of(expr)};
-
-			array.push_back(std::get<lang::single_object>(std::move(obj.value)));
-			origins.push_back(lookup_data.position_of(expr));
-		}
-
-		std::optional<error::non_homogeneous_array> err = verify_homogeneity(array, origins);
-		if (err)
-			return *err;
-
-		return lang::object{
-			std::move(array),
-			lookup_data.position_of(array_expr),
-			lookup_data.position_of(array_expr),
-			std::nullopt
-		};
+		assert(false);
+		return result_type{};
 	};
 
 	return value_expression.apply_visitor(x3::make_lambda_visitor<result_type>(

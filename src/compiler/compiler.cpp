@@ -1,3 +1,4 @@
+#include "compiler/evaluate.hpp"
 #include "compiler/compiler.hpp"
 #include "compiler/rules.hpp"
 #include "compiler/generic.hpp"
@@ -20,13 +21,11 @@ using namespace fs;
 
 [[nodiscard]]
 std::variant<lang::constants_map, compiler::error::error_variant> resolve_constants(
-	const std::vector<parser::ast::constant_definition>& constant_definitions,
-	const parser::lookup_data& lookup_data);
+	const std::vector<parser::ast::constant_definition>& constant_definitions);
 
 [[nodiscard]]
 std::optional<compiler::error::error_variant> add_constant_from_definition(
 	const parser::ast::constant_definition& def,
-	const parser::lookup_data& lookup_data,
 	lang::constants_map& map);
 
 namespace past = parser::ast;
@@ -45,60 +44,43 @@ namespace past = parser::ast;
  * - convert expression to language object and proceed
  */
 std::optional<compiler::error::error_variant> add_constant_from_definition(
-	const past::constant_definition& /* def */,
-	const parser::lookup_data& /* lookup_data */,
-	lang::constants_map& /* map */)
+	const past::constant_definition& def,
+	lang::constants_map& map)
 {
-//	const past::identifier& wanted_name = def.name;
-//	const past::value_expression& value_expression = def.value;
-//
-//	// const past::type_expression& wanted_type = def.type; // FIXME syntax redesign
-//
-//	const auto wanted_name_it = map.find(wanted_name.value); // C++17: use if (expr; cond)
-//	if (wanted_name_it != map.end())
-//	{
-//		assert(wanted_name_it->second.name_origin);
-//		const parser::range_type place_of_original_name = *wanted_name_it->second.name_origin;
-//		const parser::range_type place_of_duplicated_name = lookup_data.position_of(wanted_name);
-//		return error::name_already_exists{place_of_duplicated_name, place_of_original_name};
-//	}
-//
-//	std::variant<lang::object, error::error_variant> expr_result =
-//		expression_to_object(value_expression, lookup_data, map);
-//
-//	if (std::holds_alternative<error::error_variant>(expr_result))
-//		return std::get<error::error_variant>(expr_result);
-//
-//	lang::object_type lang_type = type_expression_to_type(wanted_type);
-//	lang::object& object = std::get<lang::object>(expr_result);
-//
-//	std::variant<lang::object, error::error_variant> construct_result =
-//		construct_object_of_type(lang_type, std::move(object));
-//
-//	if (std::holds_alternative<error::error_variant>(construct_result))
-//		return std::get<error::error_variant>(construct_result);
-//
-//	lang::object& final_object = std::get<lang::object>(construct_result);
-//	final_object.type_origin  = lookup_data.position_of(wanted_type);
-//	final_object.value_origin = lookup_data.position_of(value_expression);
-//	final_object.name_origin  = lookup_data.position_of(wanted_name);
-//
-//	const auto pair = map.emplace(wanted_name.value, std::move(final_object));
-//	assert(pair.second);
-	assert(false);
-	return std::nullopt; // FIXME implement
+	const past::identifier& wanted_name = def.name;
+	const past::value_expression& value_expression = def.value;
+
+	const auto it = map.find(wanted_name.value); // C++17: use if (expr; cond)
+	if (it != map.end())
+	{
+		assert(it->second.name_origin);
+		lang::position_tag place_of_original_name = parser::get_position_info(*it->second.name_origin);
+		lang::position_tag place_of_duplicated_name = parser::get_position_info(wanted_name);
+		return compiler::error::name_already_exists{place_of_duplicated_name, place_of_original_name};
+	}
+
+	std::variant<lang::object, compiler::error::error_variant> expr_result =
+		compiler::evaluate_expression(value_expression, map);
+
+	if (std::holds_alternative<compiler::error::error_variant>(expr_result))
+		return std::get<compiler::error::error_variant>(expr_result);
+
+	lang::object& object = std::get<lang::object>(expr_result);
+	object.name_origin = parser::get_position_info(wanted_name);
+	const auto pair = map.emplace(wanted_name.value, std::move(object));
+	assert(pair.second);
+	return std::nullopt;
 }
 
 std::variant<lang::constants_map, compiler::error::error_variant> resolve_constants(
-	const std::vector<parser::ast::constant_definition>& constant_definitions,
-	const parser::lookup_data& lookup_data)
+	const std::vector<parser::ast::constant_definition>& constant_definitions)
 {
 	lang::constants_map map;
 
 	for (const past::constant_definition& def : constant_definitions)
 	{
 		const std::optional<compiler::error::error_variant> error =
-			add_constant_from_definition(def, lookup_data, map);
+			add_constant_from_definition(def, map);
 
 		if (error)
 			return *error;

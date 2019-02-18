@@ -9,6 +9,7 @@
 #include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
 #include <utility>
 #include <string>
+#include <type_traits>
 
 /*
  * Warning: std::optional and std::tuple are not yet supported,
@@ -168,7 +169,7 @@ struct literal_expression : x3::variant<
 
 struct function_call : x3::position_tagged
 {
-	identifier type_name;
+	identifier name;
 	std::vector<struct value_expression> arguments;
 };
 
@@ -315,4 +316,15 @@ struct filter_structure : x3::position_tagged
 
 using ast_type = filter_structure;
 
+}
+
+namespace fs::parser
+{
+	template <typename T>
+	x3::position_tagged get_position_info(const T& ast)
+	{
+		static_assert(std::is_base_of_v<T, x3::position_tagged>, "T must be derived from position_tagged");
+		// intentional object slicing
+		return static_cast<x3::position_tagged>(ast);
+	}
 }

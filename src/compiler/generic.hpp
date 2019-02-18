@@ -21,18 +21,6 @@ namespace fs::compiler
 std::optional<lang::group> identifier_to_group(std::string_view identifier);
 
 [[nodiscard]]
-lang::single_object literal_to_single_object(
-	const parser::ast::literal_expression& literal,
-	const parser::lookup_data& lookup_data);
-
-// array MUST NOT be empty
-// both containers MUST BE of the same size
-[[nodiscard]]
-std::optional<error::non_homogeneous_array> verify_homogeneity(
-	const lang::array_object& array,
-	const std::vector<parser::range_type>& origins);
-
-[[nodiscard]]
 std::variant<lang::object, error::error_variant> identifier_to_object(
 	const parser::ast::identifier& identifier,
 	parser::range_type position_of_identifier,

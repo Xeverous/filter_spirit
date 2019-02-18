@@ -16,13 +16,13 @@ void print_compile_error(
 	fp::print_line_number_with_indication_and_texts(
 		error_stream,
 		content_range,
-		error.duplicated_name,
+		error.place_of_duplicated_name,
 		fp::compiler_error_string,
 		"name already exists");
 	fp::print_line_number_with_indication_and_texts(
 		error_stream,
 		content_range,
-		error.original_name,
+		error.place_of_original_name,
 		fp::note_string,
 		"first defined here");
 }

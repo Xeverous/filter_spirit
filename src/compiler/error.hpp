@@ -1,6 +1,6 @@
 #pragma once
 #include "lang/types.hpp"
-#include "parser/config.hpp"
+#include "parser/config.hpp" // TODO reduce dependency, remove
 #include <variant>
 
 // all possible compilation errors
@@ -10,13 +10,18 @@ namespace fs::compiler::error
 
 struct name_already_exists
 {
-	parser::range_type duplicated_name;
-	parser::range_type original_name;
+	lang::position_tag place_of_duplicated_name;
+	lang::position_tag place_of_original_name;
 };
 
 struct no_such_name
 {
-	parser::range_type name_origin;
+	lang::position_tag place_of_name;
+};
+
+struct no_such_function
+{
+	lang::position_tag place_of_name;
 };
 
 struct type_mismatch_in_assignment
@@ -47,15 +52,15 @@ struct single_object_to_array_assignment
 
 struct nested_arrays_not_allowed
 {
-	parser::range_type expression_origin;
+	lang::position_tag place_of_nested_array_expression;
 };
 
 struct non_homogeneous_array
 {
-	parser::range_type first_expr_origin;
-	parser::range_type second_expr_origin;
-	lang::single_object_type first_expr_type;
-	lang::single_object_type second_expr_type;
+	lang::position_tag place_of_first_element;
+	lang::position_tag place_of_second_element;
+	lang::single_object_type first_element_type;
+	lang::single_object_type second_element_type;
 };
 
 struct internal_error_while_parsing_constant

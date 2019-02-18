@@ -8,6 +8,7 @@
 #include <optional>
 #include <variant>
 #include <vector>
+#include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
 
 namespace fs::lang
 {
@@ -78,22 +79,6 @@ using single_object = std::variant<
 	string
 >;
 
-using array_object = std::vector<single_object>;
-
-struct object
-{
-	std::variant<single_object, array_object> value;
-	// for printing errors about mismatched types
-	// if object_ originated from a literal this should point at the literal
-	parser::range_type type_origin;
-	// if object_ was referened from other object_ this should point at the use of
-	// that object_ - in other words, point at expression which object_ was assigned from
-	parser::range_type value_origin;
-	// for printing error name already exists
-	// if object originated from a literal this should be empty
-	std::optional<fs::parser::range_type> name_origin;
-};
-
 // ----
 
 enum class comparison_type
@@ -143,7 +128,7 @@ struct beam_effect
 [[nodiscard]]
 single_object_type type_of_single_object(const single_object& obj);
 [[nodiscard]]
-object_type type_of_object(const object& obj);
+object_type type_of_object(const struct object& obj);
 
 template <typename T> [[nodiscard]] constexpr
 single_object_type type_to_enum_impl()
@@ -224,6 +209,25 @@ enum class action_type
 	set_text_color,
 	set_background_color
 	// TODO add missing action types
+};
+
+using position_tag = boost::spirit::x3::position_tagged;
+
+using array_object = std::vector<struct object>;
+
+struct object
+{
+	bool is_array() const
+	{
+		return std::holds_alternative<array_object>(value);
+	}
+
+	std::variant<single_object, array_object> value;
+	// for printing errors about mismatched types
+	position_tag value_origin;
+	// for printing error name already exists
+	// if object originated from a literal this should be empty
+	std::optional<position_tag> name_origin;
 };
 
 }
