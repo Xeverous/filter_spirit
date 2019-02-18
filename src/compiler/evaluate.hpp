@@ -9,14 +9,13 @@ namespace fs::compiler
 {
 
 [[nodiscard]]
-std::variant<lang::object, error::error_variant> evaluate_expression(
-	const parser::ast::value_expression& expression,
+std::variant<lang::object, error::error_variant> evaluate_value_expression(
+	const parser::ast::value_expression& value_expression,
 	const lang::constants_map& map);
 
 [[nodiscard]]
 lang::object evaluate_literal(
-	const parser::ast::literal_expression& expression,
-	const lang::constants_map& map);
+	const parser::ast::literal_expression& expression);
 
 [[nodiscard]]
 std::variant<lang::object, error::error_variant> evaluate_array(

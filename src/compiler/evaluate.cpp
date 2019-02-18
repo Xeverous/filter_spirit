@@ -8,41 +8,50 @@ namespace fs::compiler
 namespace x3 = boost::spirit::x3;
 namespace ast = parser::ast;
 
-std::variant<lang::object, error::error_variant> evaluate_expression(
-	const ast::value_expression& expression,
+std::variant<lang::object, error::error_variant> evaluate_value_expression(
+	const ast::value_expression& value_expression,
 	const lang::constants_map& map)
 {
 	using result_type = std::variant<lang::object, error::error_variant>;
 
 	return value_expression.apply_visitor(x3::make_lambda_visitor<result_type>(
-		result_type(evaluate_literal),
-		evaluate_array,
-		evaluate_function_call,
-		evaluate_identifier
+		[](const ast::literal_expression& literal) -> result_type {
+			return evaluate_literal(literal);
+		},
+		[&](const ast::array_expression& array) {
+			return evaluate_array(array, map);
+		},
+		[&](const ast::function_call& function_call) {
+			return evaluate_function_call(function_call, map);
+		},
+		[&](const ast::identifier& identifier) {
+			return evaluate_identifier(identifier, map);
+		}
 	));
 }
 
 lang::object evaluate_literal(
-	const ast::literal_expression& expression,
-	const lang::constants_map& map)
+	const ast::literal_expression& expression)
 {
-	lang::single_object object = expression.apply_visitor(x3::make_lambda_visitor<lang::single_object>(
-		[](ast::boolean_literal literal) -> lang::single_object {
+	using result_type = lang::single_object;
+
+	result_type object = expression.apply_visitor(x3::make_lambda_visitor<result_type>(
+		[](ast::boolean_literal literal) -> result_type {
 			return lang::boolean{literal.value};
 		},
-		[](ast::integer_literal literal) -> lang::single_object {
+		[](ast::integer_literal literal) -> result_type {
 			return lang::number{literal.value};
 		},
-		[](ast::rarity_literal literal) -> lang::single_object {
+		[](ast::rarity_literal literal) -> result_type {
 			return lang::rarity{literal.value};
 		},
-		[](ast::shape_literal literal) -> lang::single_object {
+		[](ast::shape_literal literal) -> result_type {
 			return lang::shape{literal.value};
 		},
-		[](ast::suit_literal literal) -> lang::single_object {
+		[](ast::suit_literal literal) -> result_type {
 			return lang::suit{literal.value};
 		},
-		[](const ast::string_literal& literal) -> lang::single_object {
+		[](const ast::string_literal& literal) -> result_type {
 			return lang::string{literal};
 		}
 	));
@@ -61,7 +70,7 @@ std::variant<lang::object, error::error_variant> evaluate_array(
 	lang::array_object array;
 	for (const ast::value_expression& value_expression : expression)
 	{
-		std::variant<lang::object, error::error_variant> object_or_error = evaluate_expression(value_expression, map);
+		std::variant<lang::object, error::error_variant> object_or_error = evaluate_value_expression(value_expression, map);
 		if (std::holds_alternative<error::error_variant>(object_or_error))
 			return std::get<error::error_variant>(object_or_error);
 

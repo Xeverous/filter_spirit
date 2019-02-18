@@ -27,12 +27,6 @@ std::variant<lang::object, error::error_variant> identifier_to_object(
 	const lang::constants_map& map);
 
 [[nodiscard]]
-std::variant<lang::object, error::error_variant> expression_to_object(
-	const parser::ast::value_expression& value_expression,
-	const parser::lookup_data& lookup_data,
-	const lang::constants_map& map);
-
-[[nodiscard]]
 std::variant<lang::single_object, error::error_variant> construct_single_object_of_type(
 	lang::single_object_type wanted_type,
 	lang::single_object object,

@@ -37,50 +37,6 @@ std::optional<lang::group> identifier_to_group(std::string_view identifier)
 }
 
 [[nodiscard]]
-std::variant<lang::object, error::error_variant> expression_to_object(
-	const past::value_expression& value_expression,
-	const parser::lookup_data& lookup_data,
-	const lang::constants_map& map)
-{
-	using result_type = std::variant<lang::object, error::error_variant>;
-
-	auto literal_to_object = [&](const past::literal_expression& literal) -> result_type
-	{
-		lang::single_object obj = literal_to_single_object(literal, lookup_data);
-		return lang::object{
-			obj,
-			lookup_data.position_of(literal),
-			lookup_data.position_of(literal),
-			std::nullopt
-		};
-	};
-
-	auto iden_to_object = [&](const past::identifier& identifier) -> result_type
-	{
-		return identifier_to_object(identifier, lookup_data.position_of(identifier), map);
-	};
-
-	auto function_call_to_object = [&](const past::function_call&) -> result_type
-	{
-		assert(false);
-		return error::internal_error_while_parsing_constant{}; // FIXME implement
-	};
-
-	auto array_to_object = [&](const past::array_expression& array_expr) -> result_type
-	{
-		assert(false);
-		return result_type{};
-	};
-
-	return value_expression.apply_visitor(x3::make_lambda_visitor<result_type>(
-		literal_to_object,
-		iden_to_object,
-		function_call_to_object,
-		array_to_object
-	));
-}
-
-[[nodiscard]]
 std::variant<lang::single_object, error::error_variant> construct_single_object_of_type(
 	lang::single_object_type wanted_type,
 	lang::single_object object,
