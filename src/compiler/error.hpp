@@ -41,6 +41,12 @@ struct invalid_socket_group
 	lang::position_tag place_of_socket_group_string;
 };
 
+struct invalid_minimap_icon_size
+{
+	int requested_size;
+	lang::position_tag place_of_size_argument;
+};
+
 struct type_mismatch
 {
 	lang::object_type expected_type;
@@ -129,6 +135,7 @@ using error_variant = std::variant<
 	invalid_amount_of_arguments,
 	empty_socket_group,
 	invalid_socket_group,
+	invalid_minimap_icon_size,
 	type_mismatch,
 	single_object_to_array_assignment,
 	nested_arrays_not_allowed,
