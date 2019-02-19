@@ -24,7 +24,21 @@ struct no_such_function
 	lang::position_tag place_of_name;
 };
 
-struct type_mismatch_in_assignment
+struct invalid_amount_of_arguments
+{
+	int min_expected;
+	int max_expected;
+	lang::position_tag place_of_arguments;
+};
+
+struct type_mismatch
+{
+	lang::object_type expected_type;
+	lang::object_type actual_type;
+	lang::position_tag place_of_expression;
+};
+
+struct type_mismatch_in_assignment // TODO remove this, we now auto-deduce types
 {
 	// invariant: left_operand_type != right_operand_type
 	lang::object_type left_operand_type;
@@ -101,8 +115,9 @@ struct duplicate_condition
 using error_variant = std::variant<
 	name_already_exists,
 	no_such_name,
-	type_mismatch_in_assignment,
-	type_mismatch_in_expression,
+	no_such_function,
+	invalid_amount_of_arguments,
+	type_mismatch,
 	single_object_to_array_assignment,
 	nested_arrays_not_allowed,
 	non_homogeneous_array,

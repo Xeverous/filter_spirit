@@ -1,4 +1,5 @@
 #include "compiler/evaluate.hpp"
+#include "compiler/functions.hpp"
 #include <utility>
 #include <boost/spirit/home/x3/support/utility/lambda_visitor.hpp>
 
@@ -89,8 +90,7 @@ std::variant<lang::object, error::error_variant> evaluate_array(
 	return lang::object{
 		std::move(array),
 		parser::get_position_info(expression),
-		std::nullopt
-	};
+		std::nullopt};
 }
 
 std::variant<lang::object, error::error_variant> evaluate_function_call(
@@ -100,10 +100,31 @@ std::variant<lang::object, error::error_variant> evaluate_function_call(
 	/*
 	 * right now there is no support for user-defined functions
 	 * so just compare function name against built-in functions
+	 *
+	 * if there is a need to support user-defined functions,
+	 * they can be stored in the map
 	 */
-	const ast::identifier& name = function_call.name;
-	// TODO functions
-	return error::no_such_function{parser::get_position_info(name)};
+	const ast::identifier& function_name = function_call.name;
+	const ast::function_arguments& arguments = function_call.arguments;
+	/*
+	 * note: this is O(n) but relying on small string optimization
+	 * and much better memory layout makes it to run faster than a
+	 * tree-based or hash-based map. We can also optimize order of
+	 * comparisons.
+	 */
+	if (function_name.value == "RGB")
+	{
+		std::variant<lang::color, error::error_variant> color_or_error = construct_color(arguments, map);
+		if (std::holds_alternative<error::error_variant>(color_or_error))
+			return std::get<error::error_variant>(color_or_error);
+
+		return lang::object{
+			lang::single_object(std::get<lang::color>(color_or_error)),
+			parser::get_position_info(function_call),
+			std::nullopt};
+	}
+
+	return error::no_such_function{parser::get_position_info(function_name)};
 }
 
 std::variant<lang::object, error::error_variant> evaluate_identifier(

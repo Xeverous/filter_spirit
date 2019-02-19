@@ -167,10 +167,14 @@ struct literal_expression : x3::variant<
 	using base_type::operator=;
 };
 
+struct function_arguments : std::vector<struct value_expression>, x3::position_tagged
+{
+};
+
 struct function_call : x3::position_tagged
 {
 	identifier name;
-	std::vector<struct value_expression> arguments;
+	function_arguments arguments;
 };
 
 struct array_expression : std::vector<struct value_expression>, x3::position_tagged

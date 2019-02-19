@@ -29,27 +29,37 @@ struct integer
 
 struct level
 {
+	explicit level(integer n) : value(n.value) {}
+
 	int value;
-	parser::range_type origin;
 };
 
 struct sound_id
 {
+	explicit sound_id(integer n) : value(n.value) {}
+
 	int value;
 };
 
 struct volume
 {
+	explicit volume(integer n) : value(n.value) {}
+
 	int value;
 };
 
 struct color
 {
+	color(int r, int g, int b)
+	: r(r), g(g), b(b) {}
+
+	color(int r, int g, int b, int a)
+	: color(r, g, b), a(a) {}
+
 	int r;
 	int g;
 	int b;
 	std::optional<int> a;
-	parser::range_type origin;
 };
 
 struct group
@@ -124,52 +134,6 @@ struct beam_effect
 	bool is_temporary;
 };
 
-// ---- utility functions ----
-[[nodiscard]]
-single_object_type type_of_single_object(const single_object& obj);
-[[nodiscard]]
-object_type type_of_object(const struct object& obj);
-
-template <typename T> [[nodiscard]] constexpr
-single_object_type type_to_enum_impl()
-{
-	static_assert(sizeof(T) == 0, "missing implementation for this type");
-	return single_object_type::generic;
-}
-
-template <> constexpr
-single_object_type type_to_enum_impl<boolean>() { return single_object_type::boolean; }
-template <> constexpr
-single_object_type type_to_enum_impl<integer>() { return single_object_type::number; }
-template <> constexpr
-single_object_type type_to_enum_impl<level>() { return single_object_type::level; }
-template <> constexpr
-single_object_type type_to_enum_impl<sound_id>() { return single_object_type::sound_id; }
-template <> constexpr
-single_object_type type_to_enum_impl<volume>() { return single_object_type::volume; }
-template <> constexpr
-single_object_type type_to_enum_impl<color>() { return single_object_type::color; }
-template <> constexpr
-single_object_type type_to_enum_impl<rarity>() { return single_object_type::rarity; }
-template <> constexpr
-single_object_type type_to_enum_impl<shape>() { return single_object_type::shape; }
-template <> constexpr
-single_object_type type_to_enum_impl<suit>() { return single_object_type::suit; }
-template <> constexpr
-single_object_type type_to_enum_impl<group>() { return single_object_type::group; }
-template <> constexpr
-single_object_type type_to_enum_impl<string>() { return single_object_type::string; }
-
-template <typename T> [[nodiscard]] constexpr
-single_object_type type_to_enum()
-{
-	static_assert(
-		traits::is_variant_alternative_v<T, single_object>,
-		"T must be one of object type alternatives");
-
-	return type_to_enum_impl<T>();
-}
-
 // ---- new syntax ----
 
 enum class comparison_condition_property
@@ -222,6 +186,15 @@ struct object
 		return std::holds_alternative<array_object>(value);
 	}
 
+	object promote_to_array() const
+	{
+		assert(!is_array());
+		return object{
+			array_object(1, *this),
+			value_origin,
+			name_origin};
+	}
+
 	std::variant<single_object, array_object> value;
 	// for printing errors about mismatched types
 	position_tag value_origin;
@@ -229,5 +202,52 @@ struct object
 	// if object originated from a literal this should be empty
 	std::optional<position_tag> name_origin;
 };
+
+[[nodiscard]]
+single_object_type type_of_single_object(const single_object& object);
+[[nodiscard]]
+object_type type_of_object(const object& object);
+[[nodiscard]]
+object_type type_of_object(const single_object& object);
+
+template <typename T> [[nodiscard]] constexpr
+single_object_type type_to_enum_impl()
+{
+	static_assert(sizeof(T) == 0, "missing implementation for this type");
+	return single_object_type::generic;
+}
+
+template <> constexpr
+single_object_type type_to_enum_impl<boolean>() { return single_object_type::boolean; }
+template <> constexpr
+single_object_type type_to_enum_impl<integer>() { return single_object_type::number; }
+template <> constexpr
+single_object_type type_to_enum_impl<level>() { return single_object_type::level; }
+template <> constexpr
+single_object_type type_to_enum_impl<sound_id>() { return single_object_type::sound_id; }
+template <> constexpr
+single_object_type type_to_enum_impl<volume>() { return single_object_type::volume; }
+template <> constexpr
+single_object_type type_to_enum_impl<color>() { return single_object_type::color; }
+template <> constexpr
+single_object_type type_to_enum_impl<rarity>() { return single_object_type::rarity; }
+template <> constexpr
+single_object_type type_to_enum_impl<shape>() { return single_object_type::shape; }
+template <> constexpr
+single_object_type type_to_enum_impl<suit>() { return single_object_type::suit; }
+template <> constexpr
+single_object_type type_to_enum_impl<group>() { return single_object_type::group; }
+template <> constexpr
+single_object_type type_to_enum_impl<string>() { return single_object_type::string; }
+
+template <typename T> [[nodiscard]] constexpr
+single_object_type type_to_enum()
+{
+	static_assert(
+		traits::is_variant_alternative_v<T, single_object>,
+		"T must be one of object type alternatives");
+
+	return type_to_enum_impl<T>();
+}
 
 }

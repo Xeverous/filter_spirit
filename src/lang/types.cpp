@@ -37,7 +37,7 @@ single_object_type type_of_single_object(const single_object& obj)
 	return single_object_type::boolean;
 }
 
-object_type type_of_object(const object& obj)
+object_type type_of_object(const object& object)
 {
 	return std::visit(utility::visitor{
 		[](const single_object& obj) { return object_type(type_of_single_object(obj)); },
@@ -48,7 +48,12 @@ object_type type_of_object(const object& obj)
 
 			return object_type(type_of_single_object(obj.front()), true);
 		}
-	}, obj.value);
+	}, object.value);
+}
+
+object_type type_of_object(const single_object& object)
+{
+	return object_type{type_of_single_object(object), false};
 }
 
 }
