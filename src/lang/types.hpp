@@ -130,6 +130,9 @@ struct minimap_icon
 
 struct beam_effect
 {
+	explicit beam_effect(suit s)
+	: color(s), is_temporary(false) {}
+
 	suit color;
 	bool is_temporary;
 };

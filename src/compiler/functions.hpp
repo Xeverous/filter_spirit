@@ -24,4 +24,9 @@ std::variant<lang::minimap_icon, error::error_variant> construct_minimap_icon(
 	const parser::ast::function_arguments& arguments,
 	const lang::constants_map& map);
 
+[[nodiscard]]
+std::variant<lang::beam_effect, error::error_variant> construct_beam_effect(
+	const parser::ast::function_arguments& arguments,
+	const lang::constants_map& map);
+
 }

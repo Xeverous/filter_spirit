@@ -30,6 +30,9 @@ struct allowed_promotions<lang::sound_id> : promotion_list<lang::integer> {};
 template <>
 struct allowed_promotions<lang::volume> : promotion_list<lang::integer> {};
 
+template <>
+struct allowed_promotions<lang::beam_effect> : promotion_list<lang::suit> {};
+
 template <typename T, typename P, typename... Ps>
 std::variant<T, error::error_variant> attempt_to_promote(
 	const lang::single_object& single_object,

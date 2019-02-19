@@ -47,6 +47,11 @@ struct invalid_minimap_icon_size
 	lang::position_tag place_of_size_argument;
 };
 
+struct temporary_beam_effect_not_supported
+{
+	lang::position_tag place_of_2nd_argument;
+};
+
 struct type_mismatch
 {
 	lang::object_type expected_type;
@@ -136,6 +141,7 @@ using error_variant = std::variant<
 	empty_socket_group,
 	invalid_socket_group,
 	invalid_minimap_icon_size,
+	temporary_beam_effect_not_supported,
 	type_mismatch,
 	single_object_to_array_assignment,
 	nested_arrays_not_allowed,

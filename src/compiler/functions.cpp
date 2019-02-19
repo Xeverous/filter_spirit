@@ -23,7 +23,7 @@ std::variant<lang::color, error::error_variant> construct_color(
 		if (std::holds_alternative<error::error_variant>(int_or_error))
 			return std::get<error::error_variant>(int_or_error);
 
-		auto& integer = std::get<lang::integer>(int_or_error);
+		const auto& integer = std::get<lang::integer>(int_or_error);
 		rgb_values[i] = integer.value;
 	}
 
@@ -35,7 +35,7 @@ std::variant<lang::color, error::error_variant> construct_color(
 	if (std::holds_alternative<error::error_variant>(int_or_error))
 		return std::get<error::error_variant>(int_or_error);
 
-	auto& integer = std::get<lang::integer>(int_or_error);
+	const auto& integer = std::get<lang::integer>(int_or_error);
 	return lang::color(rgb_values[0], rgb_values[1], rgb_values[2], integer.value);
 }
 
@@ -51,7 +51,7 @@ std::variant<lang::socket_group, error::error_variant> construct_socket_group(
 	if (std::holds_alternative<error::error_variant>(string_or_error))
 		return std::get<error::error_variant>(string_or_error);
 
-	auto& string = std::get<lang::string>(string_or_error);
+	const auto& string = std::get<lang::string>(string_or_error);
 
 	if (string.value.empty())
 		return error::empty_socket_group{parser::get_position_info(string)};
@@ -88,7 +88,7 @@ std::variant<lang::minimap_icon, error::error_variant> construct_minimap_icon(
 	if (std::holds_alternative<error::error_variant>(integer_or_error))
 		return std::get<error::error_variant>(integer_or_error);
 
-	auto& integer = std::get<lang::integer>(integer_or_error);
+	const auto& integer = std::get<lang::integer>(integer_or_error);
 	if (integer.value != 0 && integer.value != 1 && integer.value != 2)
 		return error::invalid_minimap_icon_size{integer.value, parser::get_position_info(arguments[0])};
 
@@ -104,6 +104,26 @@ std::variant<lang::minimap_icon, error::error_variant> construct_minimap_icon(
 		integer.value,
 		std::get<lang::suit>(suit_or_error),
 		std::get<lang::shape>(shape_or_error)};
+}
+
+std::variant<lang::beam_effect, error::error_variant> construct_beam_effect(
+	const parser::ast::function_arguments& arguments,
+	const lang::constants_map& map)
+{
+	int arguments_amount = arguments.size();
+	if (arguments_amount != 1 && arguments_amount != 2)
+		return error::invalid_amount_of_arguments{1, 2, parser::get_position_info(arguments)};
+
+	std::variant<lang::suit, error::error_variant> suit_or_error = evaluate_as<lang::suit>(arguments[0], map);
+	if (std::holds_alternative<error::error_variant>(suit_or_error))
+		return std::get<error::error_variant>(suit_or_error);
+
+	const auto& suit = std::get<lang::suit>(suit_or_error);
+
+	if (arguments_amount == 1)
+		return lang::beam_effect(suit);
+	else
+		return error::temporary_beam_effect_not_supported{parser::get_position_info(arguments[1])};
 }
 
 }
