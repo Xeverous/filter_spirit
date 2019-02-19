@@ -31,6 +31,9 @@ std::pair<p::lookup_data, std::variant<p::ast::ast_type, p::error_holder_type>> 
 		ast
 	);
 
+	if (true) // allow easy switching on/off for now (before full implemenation of command line args)
+		fs::print::structure_printer()(ast);
+
 	using result_variant = std::variant<p::ast::ast_type, p::error_holder_type>;
 
 	if (it != end || !result)
@@ -66,10 +69,6 @@ std::optional<parse_data> parse(const std::string& file_content, std::ostream& e
 	}
 
 	auto& ast = std::get<ast::ast_type>(ast_or_error);
-
-	if (true) // allow easy switching on/off for now (before full implemenation of command line args)
-		print::structure_printer()(ast);
-
 	return parse_data{std::move(ast), std::move(lookup_data)};
 }
 

@@ -47,8 +47,13 @@ enum class action_type
 {
 	set_border_color,
 	set_text_color,
-	set_background_color
-	// TODO add missing action types
+	set_background_color,
+	set_font_size,
+	set_alert_sound,
+	set_alert_sound_positional,
+	disable_drop_sound,
+	set_minimap_icon,
+	set_beam
 };
 
 struct boolean

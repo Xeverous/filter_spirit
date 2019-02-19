@@ -176,9 +176,15 @@ struct action_types_ : x3::symbols<lang::action_type>
 	action_types_()
 	{
 		add
-			(lang::keywords::set_border_color,     lang::action_type::set_border_color)
-			(lang::keywords::set_text_color,       lang::action_type::set_text_color)
-			(lang::keywords::set_background_color, lang::action_type::set_background_color)
+			(lang::keywords::set_border_color,           lang::action_type::set_border_color)
+			(lang::keywords::set_text_color,             lang::action_type::set_text_color)
+			(lang::keywords::set_background_color,       lang::action_type::set_background_color)
+			(lang::keywords::set_font_size,              lang::action_type::set_font_size)
+			(lang::keywords::set_alert_sound,            lang::action_type::set_alert_sound)
+			(lang::keywords::set_alert_sound_positional, lang::action_type::set_alert_sound_positional)
+			(lang::keywords::disable_drop_sound,         lang::action_type::disable_drop_sound)
+			(lang::keywords::set_minimap_icon,           lang::action_type::set_minimap_icon)
+			(lang::keywords::set_beam,                   lang::action_type::set_beam)
 		;
 	}
 };

@@ -158,15 +158,15 @@ const beam_currency = yellow
 const beam_delve_fossil = beam_currency
 const beam_delve_resonator = beam_currency
 
-const minimap_top_gem         = Icon(0, green, circle)
-const minimap_mid_gem         = Icon(1, green, circle)
-const minimap_low_gem         = Icon(2, green, circle)
-const minimap_top_unique      = Icon(0, brown, triangle)
-const minimap_6L              = Icon(0, red, hexagon)
-const minimap_fishing_rod     = Icon(0, white, star)
-const minimap_currency_t1     = Icon(0, yellow, star)
-const minimap_currency_t2     = Icon(1, yellow, star)
-const minimap_currency_t3     = Icon(2, yellow, star)
+const minimap_top_gem         = MinimapIcon(0, green, circle)
+const minimap_mid_gem         = MinimapIcon(1, green, circle)
+const minimap_low_gem         = MinimapIcon(2, green, circle)
+const minimap_top_unique      = MinimapIcon(0, brown, triangle)
+const minimap_6L              = MinimapIcon(0, red, hexagon)
+const minimap_fishing_rod     = MinimapIcon(0, white, star)
+const minimap_currency_t1     = MinimapIcon(0, yellow, star)
+const minimap_currency_t2     = MinimapIcon(1, yellow, star)
+const minimap_currency_t3     = MinimapIcon(2, yellow, star)
 const minimap_delve_fossil    = minimap_currency_t2
 const minimap_delve_resonator = minimap_currency_t2
 const minimap_reliquary       = minimap_currency_t1
@@ -183,7 +183,7 @@ Class "Currency" {
 		SetBorderColor color_golden
 		SetBackgroundColor color_red
 		SetFontSize font_max
-		SetCustomSound alert_currency_t1
+		SetAlertSound alert_currency_t1
 		SetBeam beam_currency
 		SetMinimapIcon minimap_currency_t1
 	}
@@ -192,7 +192,7 @@ Class "Currency" {
 		SetTextColor color_black
 		SetBackgroundColor color_currency
 		SetFontSize font_currency_t2
-		SetCustomSound alert_currency_t2
+		SetAlertSound alert_currency_t2
 		SetBeam beam_currency
 		SetMinimapIcon minimap_currency_t2
 	}
@@ -201,7 +201,7 @@ Class "Currency" {
 		SetTextColor color_black
 		SetBackgroundColor color_currency
 		SetFontSize font_currency_t3
-		SetCustomSound alert_currency_t3
+		SetAlertSound alert_currency_t3
 		SetBeam beam_currency
 		SetMinimapIcon minimap_currency_t3
 	}
@@ -241,53 +241,53 @@ Class "Currency" {
 
 	BaseType "Prophecy" {
 		SetTextColor color_black
-		SetBackgroundColor 159 15 213
+		SetBackgroundColor RGB(159, 15, 213)
 		SetFontSize font_currency_t3
 		SetAlertSound alert_currency_prophecy
 	}
 
 	BaseType "Scroll of Wisdom" {
-		SetTextColor 220 195 160
+		SetTextColor RGB(220, 195, 160)
 		# SetBackgroundColor color_black # inherit
 	}
 
 	BaseType "Portal Scroll" {
-		SetTextColor 162 152 145
+		SetTextColor RGB(162, 152, 145)
 		# SetBackgroundColor color_black # inherit
 	}
 
 	BaseType "Armourer's Scrap" {
-		SetTextColor 150, 100, 70
+		SetTextColor RGB(150, 100, 70)
 		# SetBackgroundColor color_black # inherit
 	}
 
 	BaseType "Blacksmith's Whetstone" {
-		SetTextColor 190, 160, 130
+		SetTextColor RGB(190, 160, 130)
 		# SetBackgroundColor color_black # inherit
 	}
 
 	BaseType "Glassblower's Bauble" {
-		SetTextColor 150, 210, 210
+		SetTextColor RGB(150, 210, 210)
 		# SetBackgroundColor color_black # inherit
 	}
 
 	BaseType "Orb of Transmutation" {
-		SetTextColor 70, 115, 160
+		SetTextColor RGB(70, 115, 160)
 		# SetBackgroundColor color_black # inherit
 	}
 
 	BaseType "Orb of Augmentation" {
-		SetTextColor 120, 165, 202
+		SetTextColor RGB(120, 165, 202)
 		# SetBackgroundColor color_black # inherit
 	}
 
 	BaseType "Orb of Alteration" {
-		SetTextColor 170, 210, 255
+		SetTextColor RGB(170, 210, 255)
 		# SetBackgroundColor color_black # inherit
 	}
 
 	BaseType "Chromatic Orb" {
-		SetTextColor 175, 255, 200
+		SetTextColor RGB(175, 255, 200)
 		# SetBackgroundColor color_black # inherit
 	}
 
@@ -517,7 +517,7 @@ Class "Misc Map Fragments" {
 
 Class "Leaguestones" {
 	SetTextColor color_white
-	SetBorderColor 235 200 180
+	SetBorderColor RGB(235, 200, 180)
 	SetTextColor color_white
 	SetBackgroundColor GetBorderColor
 	SetFontSize font_max
@@ -537,7 +537,7 @@ Class "Misc Map Item" {
 
 	# reliquary keys from Legacy and Delve
 	BaseType ["Ancient Reliquary Key", "Timeworn Reliquary Key"] {
-		SetBorderColor 204 153 0
+		SetBorderColor RGB(204, 153, 0)
 		SetTextColor color_white
 		SetBackgroundColor GetBorderColor
 		SetFontSize font_max
@@ -551,7 +551,7 @@ Class "Misc Map Item" {
 	BaseType ["Eber's Key", "Yriel's Key", "Inya's Key", "Volkuur's Key"] {
 		SetTextColor color_white
 		SetBorderColor color_white
-		SetBackgroundColor 255 0 255
+		SetBackgroundColor RGB(255, 0, 255)
 		SetFontSize font_max
 		SetAlertSound alert_pale_court
 		Show

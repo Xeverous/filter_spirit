@@ -7,7 +7,6 @@
 #include "parser/parser.hpp"
 #include "lang/constants_map.hpp"
 #include "print/compile_error.hpp"
-#include "print/structure_printer.hpp"
 #include "utility/holds_alternative.hpp"
 #include <cassert>
 #include <string_view>
@@ -100,9 +99,6 @@ bool process_input(const std::string& file_content, std::ostream& error_stream)
 		return false;
 
 	parser::parse_data& parse_data = *parse_result;
-	if (true) // allow easy switching on/off for now (before full implemenation of command line args)
-		print::structure_printer()(parse_data.ast);
-
 	std::variant<lang::constants_map, error::error_variant> map_or_error = resolve_constants(parse_data.ast.constant_definitions);
 
 	if (std::holds_alternative<error::error_variant>(map_or_error))
