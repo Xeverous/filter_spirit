@@ -1,6 +1,7 @@
 #pragma once
 #include "lang/types.hpp"
 #include <unordered_map>
+#include <string>
 
 namespace fs::lang
 {

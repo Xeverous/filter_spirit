@@ -1,6 +1,5 @@
 #pragma once
 #include "lang/types.hpp"
-#include "lang/constants_map.hpp"
 #include "compiler/error.hpp"
 #include "utility/if_constexpr_workaround.hpp"
 #include <variant>

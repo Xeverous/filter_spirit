@@ -1,6 +1,5 @@
 #pragma once
 #include "lang/types.hpp"
-#include "parser/config.hpp" // TODO reduce dependency, remove
 #include <variant>
 
 // all possible compilation errors
@@ -82,8 +81,8 @@ struct non_homogeneous_array
  */
 struct duplicate_action
 {
-	parser::range_type first_action_origin;
-	parser::range_type second_action_origin;
+	lang::position_tag place_of_first_action;
+	lang::position_tag place_of_second_action;
 };
 
 /*
@@ -94,8 +93,8 @@ struct duplicate_action
  */
 struct duplicate_condition
 {
-	parser::range_type first_condition_origin;
-	parser::range_type second_condition_origin;
+	lang::position_tag place_of_first_condition;
+	lang::position_tag place_of_second_condition;
 };
 
 using error_variant = std::variant<

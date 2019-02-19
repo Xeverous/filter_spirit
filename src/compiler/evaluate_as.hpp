@@ -1,6 +1,7 @@
 #pragma once
 #include "compiler/evaluate.hpp"
 #include "compiler/get_value_as.hpp"
+#include <utility>
 
 namespace fs::compiler
 {
@@ -21,7 +22,7 @@ std::variant<T, error::error_variant> evaluate_as(
 	if (std::holds_alternative<error::error_variant>(value_or_error))
 		return std::get<error::error_variant>(value_or_error);
 	else
-		return std::get<T>(value_or_error);
+		return std::get<T>(std::move(value_or_error));
 }
 
 }

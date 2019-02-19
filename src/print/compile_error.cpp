@@ -191,14 +191,14 @@ void print_compile_error(
 	print::print_line_number_with_indication_and_texts(
 		error_stream,
 		lookup_data.get_range_of_whole_content(),
-		error.second_action_origin,
+		lookup_data.position_of(error.place_of_second_action),
 		print::compiler_error_string,
 		"action duplication");
 
 	print::print_line_number_with_indication_and_texts(
 		error_stream,
 		lookup_data.get_range_of_whole_content(),
-		error.first_action_origin,
+		lookup_data.position_of(error.place_of_first_action),
 		print::note_string,
 		"first defined here");
 }
@@ -211,14 +211,14 @@ void print_compile_error(
 	print::print_line_number_with_indication_and_texts(
 		error_stream,
 		lookup_data.get_range_of_whole_content(),
-		error.second_condition_origin,
+		lookup_data.position_of(error.place_of_second_condition),
 		print::compiler_error_string,
 		"condition duplication");
 
 	print::print_line_number_with_indication_and_texts(
 		error_stream,
 		lookup_data.get_range_of_whole_content(),
-		error.first_condition_origin,
+		lookup_data.position_of(error.place_of_first_condition),
 		print::note_string,
 		"first defined here");
 }

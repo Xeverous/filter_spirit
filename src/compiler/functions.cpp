@@ -1,5 +1,4 @@
 #include "compiler/functions.hpp"
-#include "compiler/evaluate.hpp"
 #include "compiler/evaluate_as.hpp"
 #include "lang/keywords.hpp"
 #include <array>

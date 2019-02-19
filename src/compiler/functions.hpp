@@ -4,7 +4,6 @@
 #include "lang/constants_map.hpp"
 #include "compiler/error.hpp"
 #include <variant>
-#include <vector>
 
 namespace fs::compiler
 {

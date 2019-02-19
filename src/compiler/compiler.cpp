@@ -1,7 +1,6 @@
-#include "compiler/evaluate.hpp"
 #include "compiler/compiler.hpp"
+#include "compiler/evaluate.hpp"
 #include "compiler/rules.hpp"
-#include "compiler/generic.hpp"
 #include "compiler/error.hpp"
 #include "parser/ast.hpp"
 #include "parser/config.hpp"
