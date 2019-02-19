@@ -124,7 +124,7 @@ std::variant<lang::object, error::error_variant> evaluate_function_call(
 			parser::get_position_info(function_call),
 			std::nullopt};
 	}
-	else if (function_name.value == lang::functions::socket_group)
+	else if (function_name.value == lang::functions::group)
 	{
 		std::variant<lang::socket_group, error::error_variant> socket_group_or_error = construct_socket_group(arguments, map);
 		if (std::holds_alternative<error::error_variant>(socket_group_or_error))

@@ -28,6 +28,7 @@ struct invalid_amount_of_arguments
 {
 	int min_expected;
 	int max_expected;
+	int actual;
 	lang::position_tag place_of_arguments;
 };
 
@@ -59,32 +60,6 @@ struct type_mismatch
 	lang::position_tag place_of_expression;
 };
 
-struct type_mismatch_in_assignment // TODO remove this, we now auto-deduce types
-{
-	// invariant: left_operand_type != right_operand_type
-	lang::object_type left_operand_type;
-	lang::object_type right_operand_type;
-	parser::range_type right_operand_value_origin;
-	// if object was unnamed literal then type origin should point at that literal
-	parser::range_type right_operand_type_origin;
-};
-
-struct type_mismatch_in_expression
-{
-	// invariant: expected_type != actual_type
-	lang::object_type expected_type;
-	lang::object_type actual_type;
-	parser::range_type expression_type_origin;
-};
-
-// inform the user that '[expr]' was probably intended than 'expr'
-struct single_object_to_array_assignment
-{
-	lang::object_type left_operand_type;
-	lang::single_object_type right_operand_type;
-	parser::range_type right_operand_expr;
-};
-
 struct nested_arrays_not_allowed
 {
 	lang::position_tag place_of_nested_array_expression;
@@ -94,18 +69,8 @@ struct non_homogeneous_array
 {
 	lang::position_tag place_of_first_element;
 	lang::position_tag place_of_second_element;
-	lang::single_object_type first_element_type;
-	lang::single_object_type second_element_type;
-};
-
-struct internal_error_while_parsing_constant
-// all available backtrack places when error is generated
-{
-	parser::range_type wanted_name_origin;
-	parser::range_type wanted_type_origin;
-	parser::range_type expression_type_origin;
-	parser::range_type expression_value_origin;
-	std::optional<parser::range_type> expression_name_origin;
+	lang::object_type first_element_type;
+	lang::object_type second_element_type;
 };
 
 /*
@@ -143,10 +108,8 @@ using error_variant = std::variant<
 	invalid_minimap_icon_size,
 	temporary_beam_effect_not_supported,
 	type_mismatch,
-	single_object_to_array_assignment,
 	nested_arrays_not_allowed,
 	non_homogeneous_array,
-	internal_error_while_parsing_constant,
 	duplicate_action,
 	duplicate_condition
 >;

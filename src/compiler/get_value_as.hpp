@@ -81,7 +81,7 @@ std::variant<T, error::error_variant> get_non_array_value_as(const lang::object&
 			object.value_origin};
 
 	const auto& single_object = std::get<lang::single_object>(object.value);
-	return get_non_array_value_as<T>(single_object);
+	return get_non_array_value_as<T>(single_object, object.value_origin);
 }
 
 template <typename T>

@@ -19,16 +19,7 @@ namespace
 
 using namespace fs;
 
-[[nodiscard]]
-std::variant<lang::constants_map, compiler::error::error_variant> resolve_constants(
-	const std::vector<parser::ast::constant_definition>& constant_definitions);
-
-[[nodiscard]]
-std::optional<compiler::error::error_variant> add_constant_from_definition(
-	const parser::ast::constant_definition& def,
-	lang::constants_map& map);
-
-namespace past = parser::ast;
+namespace ast = parser::ast;
 
 /*
  * core entry point into adding constants
@@ -43,12 +34,13 @@ namespace past = parser::ast;
  *   (as of now, filter's language has no scoping/name shadowing)
  * - convert expression to language object and proceed
  */
+[[nodiscard]]
 std::optional<compiler::error::error_variant> add_constant_from_definition(
-	const past::constant_definition& def,
+	const ast::constant_definition& def,
 	lang::constants_map& map)
 {
-	const past::identifier& wanted_name = def.name;
-	const past::value_expression& value_expression = def.value;
+	const ast::identifier& wanted_name = def.name;
+	const ast::value_expression& value_expression = def.value;
 
 	const auto it = map.find(wanted_name.value); // C++17: use if (expr; cond)
 	if (it != map.end())
@@ -60,7 +52,7 @@ std::optional<compiler::error::error_variant> add_constant_from_definition(
 	}
 
 	std::variant<lang::object, compiler::error::error_variant> expr_result =
-		compiler::evaluate_expression(value_expression, map);
+		compiler::evaluate_value_expression(value_expression, map);
 
 	if (std::holds_alternative<compiler::error::error_variant>(expr_result))
 		return std::get<compiler::error::error_variant>(expr_result);
@@ -72,12 +64,13 @@ std::optional<compiler::error::error_variant> add_constant_from_definition(
 	return std::nullopt;
 }
 
+[[nodiscard]]
 std::variant<lang::constants_map, compiler::error::error_variant> resolve_constants(
 	const std::vector<parser::ast::constant_definition>& constant_definitions)
 {
 	lang::constants_map map;
 
-	for (const past::constant_definition& def : constant_definitions)
+	for (const ast::constant_definition& def : constant_definitions)
 	{
 		const std::optional<compiler::error::error_variant> error =
 			add_constant_from_definition(def, map);
@@ -111,11 +104,11 @@ bool process_input(const std::string& file_content, std::ostream& error_stream)
 	if (true) // allow easy switching on/off for now (before full implemenation of command line args)
 		print::structure_printer()(parse_data.ast);
 
-	std::variant<lang::constants_map, error::error_variant> map_or_error = resolve_constants(parse_data.ast.constant_definitions, parse_data.lookup_data);
+	std::variant<lang::constants_map, error::error_variant> map_or_error = resolve_constants(parse_data.ast.constant_definitions);
 
 	if (std::holds_alternative<error::error_variant>(map_or_error))
 	{
-		print::compile_error(std::get<error::error_variant>(map_or_error), parse_data.lookup_data.get_range_of_whole_content(), error_stream);
+		print::compile_error(std::get<error::error_variant>(map_or_error), parse_data.lookup_data, error_stream);
 		return false;
 	}
 

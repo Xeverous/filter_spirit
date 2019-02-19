@@ -15,7 +15,7 @@ std::variant<lang::socket_group, error::error_variant> construct_socket_group(
 {
 	int arguments_amount = arguments.size();
 	if (arguments_amount != 1)
-		return error::invalid_amount_of_arguments{1, 1, parser::get_position_info(arguments)};
+		return error::invalid_amount_of_arguments{1, 1, arguments_amount, parser::get_position_info(arguments)};
 
 	std::variant<lang::string, error::error_variant> string_or_error = evaluate_as<lang::string>(arguments.front(), map);
 	if (std::holds_alternative<error::error_variant>(string_or_error))
@@ -51,7 +51,7 @@ std::variant<lang::color, error::error_variant> construct_color(
 {
 	int arguments_amount = arguments.size();
 	if (arguments_amount != 3 && arguments_amount != 4)
-		return error::invalid_amount_of_arguments{3, 4, parser::get_position_info(arguments)};
+		return error::invalid_amount_of_arguments{3, 4, arguments_amount, parser::get_position_info(arguments)};
 
 	std::array<int, 3> rgb_values;
 	for (std::size_t i = 0; i < rgb_values.size(); ++i)
@@ -82,7 +82,7 @@ std::variant<lang::path, error::error_variant> construct_path(
 {
 	int arguments_amount = arguments.size();
 	if (arguments_amount != 1)
-		return error::invalid_amount_of_arguments{1, 1, parser::get_position_info(arguments)};
+		return error::invalid_amount_of_arguments{1, 1, arguments_amount, parser::get_position_info(arguments)};
 
 	std::variant<lang::path, error::error_variant> path_or_error = evaluate_as<lang::path>(arguments.front(), map);
 	if (std::holds_alternative<error::error_variant>(path_or_error))
@@ -97,7 +97,7 @@ std::variant<lang::minimap_icon, error::error_variant> construct_minimap_icon(
 {
 	int arguments_amount = arguments.size();
 	if (arguments_amount != 3)
-		return error::invalid_amount_of_arguments{3, 3, parser::get_position_info(arguments)};
+		return error::invalid_amount_of_arguments{3, 3, arguments_amount, parser::get_position_info(arguments)};
 
 	std::variant<lang::integer, error::error_variant> integer_or_error = evaluate_as<lang::integer>(arguments[0], map);
 	if (std::holds_alternative<error::error_variant>(integer_or_error))
@@ -127,7 +127,7 @@ std::variant<lang::beam_effect, error::error_variant> construct_beam_effect(
 {
 	int arguments_amount = arguments.size();
 	if (arguments_amount != 1 && arguments_amount != 2)
-		return error::invalid_amount_of_arguments{1, 2, parser::get_position_info(arguments)};
+		return error::invalid_amount_of_arguments{1, 2, arguments_amount, parser::get_position_info(arguments)};
 
 	std::variant<lang::suit, error::error_variant> suit_or_error = evaluate_as<lang::suit>(arguments[0], map);
 	if (std::holds_alternative<error::error_variant>(suit_or_error))

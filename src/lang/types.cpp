@@ -2,6 +2,7 @@
 #include "lang/keywords.hpp"
 #include "utility/visitor.hpp"
 #include <cassert>
+#include <variant>
 
 namespace fs::lang
 {
@@ -90,18 +91,20 @@ single_object_type type_of_single_object(const single_object& obj)
 	return single_object_type::boolean;
 }
 
-object_type type_of_object(const object& object)
+object_type type_of_object(const object& obj)
 {
 	return std::visit(utility::visitor{
-		[](const single_object& obj) { return type_of_object(obj); },
-		[](const array_object& obj)
+		[](const single_object& so) { return type_of_object(so); },
+		[](const array_object& ao)
 		{
-			if (obj.empty())
+			if (ao.empty())
 				return object_type(single_object_type::generic, true);
 
-			return object_type(type_of_single_object(obj.front()), true);
+			const auto& inner_object_value = ao.front().value;
+			assert(std::holds_alternative<single_object>(inner_object_value));
+			return object_type(type_of_single_object(std::get<single_object>(inner_object_value)), true);
 		}
-	}, object.value);
+	}, obj.value);
 }
 
 object_type type_of_object(const single_object& object)

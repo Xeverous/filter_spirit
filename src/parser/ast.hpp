@@ -325,10 +325,10 @@ using ast_type = filter_structure;
 namespace fs::parser
 {
 	template <typename T>
-	x3::position_tagged get_position_info(const T& ast)
+	boost::spirit::x3::position_tagged get_position_info(const T& ast)
 	{
-		static_assert(std::is_base_of_v<T, x3::position_tagged>, "T must be derived from position_tagged");
+		static_assert(std::is_base_of_v<boost::spirit::x3::position_tagged, T>, "T must be derived from position_tagged");
 		// intentional object slicing
-		return static_cast<x3::position_tagged>(ast);
+		return static_cast<boost::spirit::x3::position_tagged>(ast);
 	}
 }

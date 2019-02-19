@@ -1,47 +1,16 @@
 #pragma once
-#include "lang/type_names.hpp"
-#include "parser/config.hpp"
 #include "utility/type_traits.hpp"
 #include <cassert>
 #include <string>
 #include <string_view>
 #include <optional>
+#include <utility>
 #include <variant>
 #include <vector>
 #include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
 
 namespace fs::lang
 {
-
-// ---- TODO sort/implement/refactor ---
-
-enum class comparison_type
-{
-	less,
-	less_equal,
-	equal,
-	greater,
-	greater_equal
-};
-
-struct built_in_sound
-{
-	sound_id id;
-	bool positional;
-};
-
-struct custom_alert_sound
-{
-	std::string path;
-};
-
-struct alert_sound
-{
-	std::variant<built_in_sound, custom_alert_sound> sound;
-	volume vol;
-};
-
-// ---- new syntax ----
 
 enum class comparison_condition_property
 {
@@ -162,6 +131,9 @@ struct string
 
 struct path
 {
+	explicit path(string s)
+	: value(std::move(s.value)) {}
+
 	std::string value;
 };
 
@@ -212,6 +184,18 @@ struct object_type
 	single_object_type type;
 	bool is_array;
 };
+
+inline
+bool operator==(object_type left, object_type right)
+{
+	return left.is_array == right.is_array && left.type == right.type;
+}
+
+inline
+bool operator!=(object_type left, object_type right)
+{
+	return !(left == right);
+}
 
 [[nodiscard]]
 std::string_view to_string(single_object_type type);
@@ -298,5 +282,33 @@ single_object_type type_to_enum()
 
 	return type_to_enum_impl<T>();
 }
+
+// ---- TODO sort/implement/refactor ---
+
+enum class comparison_type
+{
+	less,
+	less_equal,
+	equal,
+	greater,
+	greater_equal
+};
+
+struct built_in_sound
+{
+	sound_id id;
+	bool positional;
+};
+
+struct custom_alert_sound
+{
+	std::string path;
+};
+
+struct alert_sound
+{
+	std::variant<built_in_sound, custom_alert_sound> sound;
+	volume vol;
+};
 
 }
