@@ -13,83 +13,7 @@
 namespace fs::lang
 {
 
-enum class rarity { normal, magic, rare, unique };
-enum class shape { circle, diamond, hexagon, square, star, triangle };
-enum class suit { red, green, blue, white, brown, yellow };
-
-struct boolean
-{
-	bool value;
-};
-
-struct integer
-{
-	int value;
-};
-
-struct level
-{
-	explicit level(integer n) : value(n.value) {}
-
-	int value;
-};
-
-struct sound_id
-{
-	explicit sound_id(integer n) : value(n.value) {}
-
-	int value;
-};
-
-struct volume
-{
-	explicit volume(integer n) : value(n.value) {}
-
-	int value;
-};
-
-struct color
-{
-	color(int r, int g, int b)
-	: r(r), g(g), b(b) {}
-
-	color(int r, int g, int b, int a)
-	: r(r), g(g), b(b), a(a) {}
-
-	int r;
-	int g;
-	int b;
-	std::optional<int> a;
-};
-
-struct socket_group
-{
-	int r = 0;
-	int g = 0;
-	int b = 0;
-	int w = 0;
-};
-
-struct string
-{
-	std::string value;
-};
-
-using single_object = std::variant<
-	boolean,
-	integer,
-	level,
-	sound_id,
-	volume,
-	color,
-	rarity,
-	shape,
-	suit,
-	socket_group,
-	string
->;
-
-// ----
+// ---- TODO sort/implement/refactor ---
 
 enum class comparison_type
 {
@@ -99,10 +23,6 @@ enum class comparison_type
 	greater,
 	greater_equal
 };
-
-// ---- conditions ----
-
-// ---- actions ----
 
 struct built_in_sound
 {
@@ -119,22 +39,6 @@ struct alert_sound
 {
 	std::variant<built_in_sound, custom_alert_sound> sound;
 	volume vol;
-};
-
-struct minimap_icon
-{
-	int size;
-	suit color;
-	shape shape;
-};
-
-struct beam_effect
-{
-	explicit beam_effect(suit s)
-	: color(s), is_temporary(false) {}
-
-	suit color;
-	bool is_temporary;
 };
 
 // ---- new syntax ----
@@ -177,6 +81,142 @@ enum class action_type
 	set_background_color
 	// TODO add missing action types
 };
+
+struct boolean
+{
+	bool value;
+};
+
+struct integer
+{
+	int value;
+};
+
+struct level
+{
+	explicit level(integer n) : value(n.value) {}
+
+	int value;
+};
+
+struct sound_id
+{
+	explicit sound_id(integer n) : value(n.value) {}
+
+	int value;
+};
+
+struct volume
+{
+	explicit volume(integer n) : value(n.value) {}
+
+	int value;
+};
+
+struct socket_group
+{
+	int r = 0;
+	int g = 0;
+	int b = 0;
+	int w = 0;
+};
+
+enum class rarity { normal, magic, rare, unique };
+enum class shape { circle, diamond, hexagon, square, star, triangle };
+enum class suit { red, green, blue, white, brown, yellow };
+
+struct color
+{
+	color(int r, int g, int b)
+	: r(r), g(g), b(b) {}
+
+	color(int r, int g, int b, int a)
+	: r(r), g(g), b(b), a(a) {}
+
+	int r;
+	int g;
+	int b;
+	std::optional<int> a;
+};
+
+struct minimap_icon
+{
+	int size;
+	suit color;
+	shape shape;
+};
+
+struct beam_effect
+{
+	explicit beam_effect(suit s)
+	: color(s), is_temporary(false) {}
+
+	suit color;
+	bool is_temporary;
+};
+
+struct string
+{
+	std::string value;
+};
+
+struct path
+{
+	std::string value;
+};
+
+using single_object = std::variant<
+	boolean,
+	integer,
+	level,
+	sound_id,
+	volume,
+	socket_group,
+	rarity,
+	shape,
+	suit,
+	color,
+	minimap_icon,
+	beam_effect,
+	string,
+	path
+>;
+
+enum class single_object_type
+{
+	boolean,
+	integer,
+	level,
+	sound_id,
+	volume,
+	socket_group,
+	rarity,
+	shape,
+	suit,
+	color,
+	minimap_icon,
+	beam_effect,
+	string,
+	path,
+
+	generic // for generic constructs such as empty arrays
+};
+
+struct object_type
+{
+	object_type(single_object_type type, bool is_array = false)
+	: type(type), is_array(is_array)
+	{
+	}
+
+	single_object_type type;
+	bool is_array;
+};
+
+[[nodiscard]]
+std::string_view to_string(single_object_type type);
+[[nodiscard]]
+std::string to_string(object_type type);
 
 using position_tag = boost::spirit::x3::position_tagged;
 
@@ -223,7 +263,7 @@ single_object_type type_to_enum_impl()
 template <> constexpr
 single_object_type type_to_enum_impl<boolean>() { return single_object_type::boolean; }
 template <> constexpr
-single_object_type type_to_enum_impl<integer>() { return single_object_type::number; }
+single_object_type type_to_enum_impl<integer>() { return single_object_type::integer; }
 template <> constexpr
 single_object_type type_to_enum_impl<level>() { return single_object_type::level; }
 template <> constexpr
@@ -231,7 +271,7 @@ single_object_type type_to_enum_impl<sound_id>() { return single_object_type::so
 template <> constexpr
 single_object_type type_to_enum_impl<volume>() { return single_object_type::volume; }
 template <> constexpr
-single_object_type type_to_enum_impl<color>() { return single_object_type::color; }
+single_object_type type_to_enum_impl<socket_group>() { return single_object_type::socket_group; }
 template <> constexpr
 single_object_type type_to_enum_impl<rarity>() { return single_object_type::rarity; }
 template <> constexpr
@@ -239,9 +279,15 @@ single_object_type type_to_enum_impl<shape>() { return single_object_type::shape
 template <> constexpr
 single_object_type type_to_enum_impl<suit>() { return single_object_type::suit; }
 template <> constexpr
-single_object_type type_to_enum_impl<socket_group>() { return single_object_type::socket_group; }
+single_object_type type_to_enum_impl<color>() { return single_object_type::color; }
+template <> constexpr
+single_object_type type_to_enum_impl<minimap_icon>() { return single_object_type::minimap_icon; }
+template <> constexpr
+single_object_type type_to_enum_impl<beam_effect>() { return single_object_type::beam_effect; }
 template <> constexpr
 single_object_type type_to_enum_impl<string>() { return single_object_type::string; }
+template <> constexpr
+single_object_type type_to_enum_impl<path>() { return single_object_type::path; }
 
 template <typename T> [[nodiscard]] constexpr
 single_object_type type_to_enum()

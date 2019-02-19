@@ -31,6 +31,9 @@ template <>
 struct allowed_promotions<lang::volume> : promotion_list<lang::integer> {};
 
 template <>
+struct allowed_promotions<lang::path> : promotion_list<lang::string> {};
+
+template <>
 struct allowed_promotions<lang::beam_effect> : promotion_list<lang::suit> {};
 
 template <typename T, typename P, typename... Ps>

@@ -1,5 +1,6 @@
 #include "compiler/evaluate.hpp"
 #include "compiler/functions.hpp"
+#include "lang/functions.hpp"
 #include <utility>
 #include <boost/spirit/home/x3/support/utility/lambda_visitor.hpp>
 
@@ -112,7 +113,7 @@ std::variant<lang::object, error::error_variant> evaluate_function_call(
 	 * tree-based or hash-based map. We can also optimize order of
 	 * comparisons.
 	 */
-	if (function_name.value == "RGB")
+	if (function_name.value == lang::functions::rgb)
 	{
 		std::variant<lang::color, error::error_variant> color_or_error = construct_color(arguments, map);
 		if (std::holds_alternative<error::error_variant>(color_or_error))
@@ -123,7 +124,7 @@ std::variant<lang::object, error::error_variant> evaluate_function_call(
 			parser::get_position_info(function_call),
 			std::nullopt};
 	}
-	else if (function_name.value == "SocketGroup")
+	else if (function_name.value == lang::functions::socket_group)
 	{
 		std::variant<lang::socket_group, error::error_variant> socket_group_or_error = construct_socket_group(arguments, map);
 		if (std::holds_alternative<error::error_variant>(socket_group_or_error))
@@ -131,6 +132,28 @@ std::variant<lang::object, error::error_variant> evaluate_function_call(
 
 		return lang::object{
 			lang::single_object(std::get<lang::socket_group>(socket_group_or_error)),
+			parser::get_position_info(function_call),
+			std::nullopt};
+	}
+	else if (function_name.value == lang::functions::beam_effect)
+	{
+		std::variant<lang::beam_effect, error::error_variant> beam_effect_or_error = construct_beam_effect(arguments, map);
+		if (std::holds_alternative<error::error_variant>(beam_effect_or_error))
+			return std::get<error::error_variant>(beam_effect_or_error);
+
+		return lang::object{
+			lang::single_object(std::get<lang::beam_effect>(beam_effect_or_error)),
+			parser::get_position_info(function_call),
+			std::nullopt};
+	}
+	else if (function_name.value == lang::functions::path)
+	{
+		std::variant<lang::path, error::error_variant> path_or_error = construct_path(arguments, map);
+		if (std::holds_alternative<error::error_variant>(path_or_error))
+			return std::get<error::error_variant>(path_or_error);
+
+		return lang::object{
+			lang::single_object(std::get<lang::path>(path_or_error)),
 			parser::get_position_info(function_call),
 			std::nullopt};
 	}
@@ -142,9 +165,9 @@ std::variant<lang::object, error::error_variant> evaluate_identifier(
 	const ast::identifier& identifier,
 	const lang::constants_map& map)
 {
-	const auto it = map.find(identifier.value); // C++17: use if (expr; cond)
 	const lang::position_tag place_of_name = parser::get_position_info(identifier);
 
+	const auto it = map.find(identifier.value); // C++17: use if (expr; cond)
 	if (it == map.end())
 		return error::no_such_name{place_of_name};
 

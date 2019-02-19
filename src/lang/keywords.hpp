@@ -11,17 +11,20 @@
 namespace fs::lang::keywords
 {
 
-constexpr auto boolean     = "Boolean";
-constexpr auto number      = "Number";
-constexpr auto level       = "Level";
-constexpr auto sound_id    = "SoundId";
-constexpr auto volume      = "Volume";
-constexpr auto rarity_type = "RarityType";
-constexpr auto shape       = "Shape";
-constexpr auto suit        = "Suit";
-constexpr auto color       = "Color";
-constexpr auto group       = "Group";
-constexpr auto string      = "String";
+constexpr auto boolean      = "Boolean";
+constexpr auto integer      = "Integer";
+constexpr auto level        = "Level";
+constexpr auto sound_id     = "SoundId";
+constexpr auto volume       = "Volume";
+constexpr auto socket_group = "SocketGroup";
+constexpr auto rarity_type  = "RarityType";
+constexpr auto shape        = "Shape";
+constexpr auto suit         = "Suit";
+constexpr auto color        = "Color";
+constexpr auto minimap_icon = "MinimapIcon";
+constexpr auto beam_effect  = "BeamEffect";
+constexpr auto string       = "String";
+constexpr auto path         = "Path";
 
 constexpr auto r = 'R';
 constexpr auto g = 'G';
