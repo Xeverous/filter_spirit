@@ -54,7 +54,7 @@ struct color
 	: r(r), g(g), b(b) {}
 
 	color(int r, int g, int b, int a)
-	: color(r, g, b), a(a) {}
+	: r(r), g(g), b(b), a(a) {}
 
 	int r;
 	int g;
@@ -62,7 +62,7 @@ struct color
 	std::optional<int> a;
 };
 
-struct group
+struct socket_group
 {
 	int r = 0;
 	int g = 0;
@@ -85,7 +85,7 @@ using single_object = std::variant<
 	rarity,
 	shape,
 	suit,
-	group,
+	socket_group,
 	string
 >;
 
@@ -236,7 +236,7 @@ single_object_type type_to_enum_impl<shape>() { return single_object_type::shape
 template <> constexpr
 single_object_type type_to_enum_impl<suit>() { return single_object_type::suit; }
 template <> constexpr
-single_object_type type_to_enum_impl<group>() { return single_object_type::group; }
+single_object_type type_to_enum_impl<socket_group>() { return single_object_type::socket_group; }
 template <> constexpr
 single_object_type type_to_enum_impl<string>() { return single_object_type::string; }
 

@@ -13,29 +13,6 @@ namespace fs::compiler
 namespace past = parser::ast;
 namespace x3 = boost::spirit::x3;
 
-std::optional<lang::group> identifier_to_group(std::string_view identifier)
-{
-	lang::group gp;
-
-	for (char c : identifier)
-	{
-		namespace kw = lang::keywords;
-
-		if (c == kw::r)
-			++gp.r;
-		else if (c == kw::g)
-			++gp.g;
-		else if (c == kw::b)
-			++gp.b;
-		else if (c == kw::w)
-			++gp.w;
-		else
-			return std::nullopt;
-	}
-
-	return gp;
-}
-
 std::variant<lang::action_set, error::error_variant> construct_action_set(
 	const std::vector<parser::ast::action>& actions,
 	const lang::constants_map& map,

@@ -25,8 +25,8 @@ single_object_type type_of_single_object(const single_object& obj)
 		return single_object_type::suit;
 	if (std::holds_alternative<color>(obj))
 		return single_object_type::color;
-	if (std::holds_alternative<group>(obj))
-		return single_object_type::group;
+	if (std::holds_alternative<socket_group>(obj))
+		return single_object_type::socket_group;
 	if (std::holds_alternative<string>(obj))
 		return single_object_type::string;
 

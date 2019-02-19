@@ -27,7 +27,7 @@ std::string_view to_string(single_object_type type)
 			return keywords::suit;
 		case single_object_type::color:
 			return keywords::color;
-		case single_object_type::group:
+		case single_object_type::socket_group:
 			return keywords::group;
 		case single_object_type::string:
 			return keywords::string;

@@ -123,6 +123,17 @@ std::variant<lang::object, error::error_variant> evaluate_function_call(
 			parser::get_position_info(function_call),
 			std::nullopt};
 	}
+	else if (function_name.value == "SocketGroup")
+	{
+		std::variant<lang::socket_group, error::error_variant> socket_group_or_error = construct_socket_group(arguments, map);
+		if (std::holds_alternative<error::error_variant>(socket_group_or_error))
+			return std::get<error::error_variant>(socket_group_or_error);
+
+		return lang::object{
+			lang::single_object(std::get<lang::socket_group>(socket_group_or_error)),
+			parser::get_position_info(function_call),
+			std::nullopt};
+	}
 
 	return error::no_such_function{parser::get_position_info(function_name)};
 }

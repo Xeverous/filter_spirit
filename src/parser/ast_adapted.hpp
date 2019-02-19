@@ -61,7 +61,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::function_call,
-	type_name, arguments)
+	name, arguments)
 
 // ---- definitions ----
 

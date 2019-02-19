@@ -82,7 +82,7 @@ struct condition_set
 	// ??? base_type;
 	std::optional<numeric_range_condition> sockets;
 	std::optional<numeric_range_condition> links;
-	std::optional<group> socket_group;
+	std::optional<socket_group> socket_group;
 	std::optional<numeric_range_condition> height;
 	std::optional<numeric_range_condition> width;
 	// ??? has_explicit_mod;

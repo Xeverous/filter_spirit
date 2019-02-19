@@ -31,6 +31,16 @@ struct invalid_amount_of_arguments
 	lang::position_tag place_of_arguments;
 };
 
+struct empty_socket_group
+{
+	lang::position_tag place_of_socket_group_string;
+};
+
+struct invalid_socket_group
+{
+	lang::position_tag place_of_socket_group_string;
+};
+
 struct type_mismatch
 {
 	lang::object_type expected_type;
@@ -117,6 +127,8 @@ using error_variant = std::variant<
 	no_such_name,
 	no_such_function,
 	invalid_amount_of_arguments,
+	empty_socket_group,
+	invalid_socket_group,
 	type_mismatch,
 	single_object_to_array_assignment,
 	nested_arrays_not_allowed,

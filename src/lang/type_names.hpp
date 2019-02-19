@@ -16,7 +16,7 @@ enum class single_object_type
 	shape,
 	suit,
 	color,
-	group,
+	socket_group,
 	string,
 
 	generic // for generic constructs such as empty arrays
@@ -37,6 +37,5 @@ struct object_type
 std::string_view to_string(single_object_type type);
 [[nodiscard]]
 std::string to_string(object_type type);
-
 
 }
