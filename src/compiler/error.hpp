@@ -72,29 +72,39 @@ struct non_homogeneous_array
 	lang::object_type second_element_type;
 };
 
-/*
- * identical action types in 1 action list, eg
- * ... {
- *     SetTextColor 101 102 103
- *     SetTextColor 101 102 103 255
- * }
- */
-struct duplicate_action
+struct positional_sound_not_supported
 {
-	lang::position_tag place_of_first_action;
-	lang::position_tag place_of_second_action;
+	lang::position_tag place_of_action;
 };
 
-/*
- * identical condition types in 1 condition list, eg
- * ItemLevel 10, ItemLevel 11 {
- *     ...
- * }
- */
-struct duplicate_condition
+struct disable_drop_sound_not_supported
 {
-	lang::position_tag place_of_first_condition;
-	lang::position_tag place_of_second_condition;
+	lang::position_tag place_of_action;
+};
+
+struct condition_redefinition
+{
+	lang::position_tag place_of_redefinition;
+};
+
+struct internal_compiler_error_during_action_evaluation
+{
+	lang::position_tag place_of_action;
+};
+
+struct internal_compiler_error_during_comparison_condition_evaluation
+{
+	lang::position_tag place_of_comparison_condition;
+};
+
+struct internal_compiler_error_during_string_condition_evaluation
+{
+	lang::position_tag place_of_string_condition;
+};
+
+struct internal_compiler_error_during_boolean_condition_evaluation
+{
+	lang::position_tag place_of_string_condition;
 };
 
 using error_variant = std::variant<
@@ -109,8 +119,13 @@ using error_variant = std::variant<
 	type_mismatch,
 	nested_arrays_not_allowed,
 	non_homogeneous_array,
-	duplicate_action,
-	duplicate_condition
+	positional_sound_not_supported,
+	disable_drop_sound_not_supported,
+	condition_redefinition,
+	internal_compiler_error_during_action_evaluation,
+	internal_compiler_error_during_comparison_condition_evaluation,
+	internal_compiler_error_during_string_condition_evaluation,
+	internal_compiler_error_during_boolean_condition_evaluation
 >;
 
 }

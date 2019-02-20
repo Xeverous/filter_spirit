@@ -24,6 +24,12 @@ template <>
 struct allowed_promotions<lang::level> : promotion_list<lang::integer> {};
 
 template <>
+struct allowed_promotions<lang::quality> : promotion_list<lang::integer> {};
+
+template <>
+struct allowed_promotions<lang::font_size> : promotion_list<lang::integer> {};
+
+template <>
 struct allowed_promotions<lang::sound_id> : promotion_list<lang::integer> {};
 
 template <>

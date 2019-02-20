@@ -7,6 +7,7 @@ namespace fs::lang
 
 struct filter_block
 {
+	bool show;
 	condition_set conditions;
 	action_set actions;
 };

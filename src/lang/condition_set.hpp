@@ -1,8 +1,9 @@
 #pragma once
 #include "lang/types.hpp"
-#include "parser/config.hpp"
 #include "compiler/error.hpp"
+#include <memory>
 #include <variant>
+#include <vector>
 
 namespace fs::lang
 {
@@ -23,8 +24,7 @@ template <typename T>
 class range_condition
 {
 public:
-	range_condition(comparison_type comparison, T value, parser::range_type origin)
-	: origin(origin)
+	range_condition(comparison_type comparison, T value)
 	{
 		if (comparison == comparison_type::greater)
 		{
@@ -62,8 +62,6 @@ public:
 		return true;
 	}
 
-	parser::range_type origin;
-
 private:
 	std::optional<range_bound<T>> lower_bound;
 	std::optional<range_bound<T>> upper_bound;
@@ -78,24 +76,22 @@ struct condition_set
 	std::optional<numeric_range_condition> drop_level;
 	std::optional<numeric_range_condition> quality;
 	std::optional<rarity_range_condition> rarity;
-	// ??? class_;
-	// ??? base_type;
+	std::shared_ptr<std::vector<std::string>> class_;
+	std::shared_ptr<std::vector<std::string>> base_type;
 	std::optional<numeric_range_condition> sockets;
 	std::optional<numeric_range_condition> links;
 	std::optional<socket_group> socket_group;
 	std::optional<numeric_range_condition> height;
 	std::optional<numeric_range_condition> width;
-	// ??? has_explicit_mod;
+	std::shared_ptr<std::vector<std::string>> has_explicit_mod;
 	std::optional<numeric_range_condition> stack_size;
 	std::optional<numeric_range_condition> gem_level;
 	std::optional<numeric_range_condition> map_tier;
-	std::optional<bool> is_identified;
-	std::optional<bool> id_corrupted;
-	std::optional<bool> is_shaper_item;
-	std::optional<bool> is_elder_item;
-	std::optional<bool> is_shaped_map;
-
-	std::variant<condition_set, compiler::error::error_variant> add_restrictions(condition_set other) const;
+	std::optional<boolean> is_identified;
+	std::optional<boolean> is_corrupted;
+	std::optional<boolean> is_shaper_item;
+	std::optional<boolean> is_elder_item;
+	std::optional<boolean> is_shaped_map;
 };
 
 }

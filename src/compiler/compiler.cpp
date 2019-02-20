@@ -2,6 +2,7 @@
 #include "compiler/evaluate.hpp"
 #include "compiler/rules.hpp"
 #include "compiler/error.hpp"
+#include "compiler/filter_builder.hpp"
 #include "parser/ast.hpp"
 #include "parser/config.hpp"
 #include "parser/parser.hpp"
@@ -80,12 +81,6 @@ std::variant<lang::constants_map, compiler::error::error_variant> resolve_consta
 	return map;
 }
 
-[[nodiscard]]
-bool semantic_analysis(const parser::parse_data& /* parse_data */)
-{
-	return false; // FIXME implement
-}
-
 } // namespace
 
 namespace fs::compiler
@@ -107,10 +102,9 @@ bool process_input(const std::string& file_content, std::ostream& error_stream)
 		return false;
 	}
 
-	if (!semantic_analysis(parse_data))
-		return false;
-
-	return true;
+	auto& map = std::get<lang::constants_map>(map_or_error);
+	filter_builder fb(std::move(parse_data.ast.statements), std::move(map), std::move(parse_data.lookup_data));
+	return fb.build_filter();
 }
 
 }

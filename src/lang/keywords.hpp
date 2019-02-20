@@ -16,6 +16,7 @@ constexpr auto integer      = "Integer";
 constexpr auto level        = "Level";
 constexpr auto sound_id     = "SoundId";
 constexpr auto volume       = "Volume";
+constexpr auto font_size    = "FontSize";
 constexpr auto group        = "Group";
 constexpr auto rarity_type  = "RarityType";
 constexpr auto shape        = "Shape";

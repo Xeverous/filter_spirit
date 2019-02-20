@@ -73,6 +73,20 @@ struct level
 	int value;
 };
 
+struct quality
+{
+	explicit quality(integer n) : value(n.value) {}
+
+	int value;
+};
+
+struct font_size
+{
+	explicit font_size(integer n) : value(n.value) {}
+
+	int value;
+};
+
 struct sound_id
 {
 	explicit sound_id(integer n) : value(n.value) {}
@@ -146,6 +160,8 @@ using single_object = std::variant<
 	boolean,
 	integer,
 	level,
+	quality,
+	font_size,
 	sound_id,
 	volume,
 	socket_group,
@@ -164,6 +180,8 @@ enum class single_object_type
 	boolean,
 	integer,
 	level,
+	quality,
+	font_size,
 	sound_id,
 	volume,
 	socket_group,
@@ -256,6 +274,10 @@ single_object_type type_to_enum_impl<integer>() { return single_object_type::int
 template <> constexpr
 single_object_type type_to_enum_impl<level>() { return single_object_type::level; }
 template <> constexpr
+single_object_type type_to_enum_impl<quality>() { return single_object_type::quality; }
+template <> constexpr
+single_object_type type_to_enum_impl<font_size>() { return single_object_type::font_size; }
+template <> constexpr
 single_object_type type_to_enum_impl<sound_id>() { return single_object_type::sound_id; }
 template <> constexpr
 single_object_type type_to_enum_impl<volume>() { return single_object_type::volume; }
@@ -299,12 +321,6 @@ enum class comparison_type
 	greater_equal
 };
 
-struct built_in_sound
-{
-	sound_id id;
-	bool positional;
-};
-
 struct custom_alert_sound
 {
 	std::string path;
@@ -312,7 +328,7 @@ struct custom_alert_sound
 
 struct alert_sound
 {
-	std::variant<built_in_sound, custom_alert_sound> sound;
+	std::variant<sound_id, custom_alert_sound> sound;
 	volume vol;
 };
 

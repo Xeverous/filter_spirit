@@ -17,6 +17,10 @@ std::string_view to_string(single_object_type type)
 			return keywords::integer;
 		case single_object_type::level:
 			return keywords::level;
+		case single_object_type::quality:
+			return keywords::quality;
+		case single_object_type::font_size:
+			return keywords::font_size;
 		case single_object_type::sound_id:
 			return keywords::sound_id;
 		case single_object_type::volume:
@@ -65,6 +69,10 @@ single_object_type type_of_single_object(const single_object& obj)
 		return single_object_type::integer;
 	if (std::holds_alternative<level>(obj))
 		return single_object_type::level;
+	if (std::holds_alternative<quality>(obj))
+		return single_object_type::quality;
+	if (std::holds_alternative<font_size>(obj))
+		return single_object_type::font_size;
 	if (std::holds_alternative<sound_id>(obj))
 		return single_object_type::sound_id;
 	if (std::holds_alternative<volume>(obj))
