@@ -825,7 +825,7 @@ Rarity <= rare {
 	}
 
 	# Betrayal league items
-	VeiledItem true {
+	HasExplicitMod "Veil" {
 		SetBackgroundColor color_veiled_item
 		SetAlertSound alert_veiled_item
 		Show

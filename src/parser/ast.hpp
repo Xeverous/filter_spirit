@@ -271,6 +271,12 @@ struct condition : x3::variant<
 	using base_type::operator=;
 };
 
+// as above
+namespace
+{
+	using workaround2 = decltype(condition{*static_cast<const condition*>(nullptr)});
+}
+
 struct action : x3::position_tagged
 {
 	lang::action_type action_type;

@@ -190,7 +190,7 @@ const statement_type statement = "statement";
 const auto statement_def = action | visibility_statement | rule_block;
 BOOST_SPIRIT_DEFINE(statement)
 
-const auto rule_block_def = condition % "&&" > x3::lit('{') > *statement > x3::lit('}');
+const auto rule_block_def = ((condition % "&&") | x3::attr(std::vector<ast::condition>())) >> x3::lit('{') > *statement > x3::lit('}');
 BOOST_SPIRIT_DEFINE(rule_block)
 
 const filter_structure_type filter_structure = "filter structure";
