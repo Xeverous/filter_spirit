@@ -16,17 +16,21 @@ namespace fs::compiler
 class filter_builder
 {
 public:
+	[[nodiscard]] static
+	std::variant<std::vector<lang::filter_block>, error::error_variant> build_filter(
+		const std::vector<parser::ast::statement>& top_level_statements,
+		const lang::constants_map& map);
+
+private:
 	filter_builder(
-		std::vector<parser::ast::statement>&& top_level_statements,
-		lang::constants_map&& map)
-	: statements(std::move(top_level_statements)),
-	  map(std::move(map))
+		const std::vector<parser::ast::statement>& top_level_statements,
+		const lang::constants_map& map)
+	: statements(top_level_statements), map(map)
 	{}
 
 	[[nodiscard]]
-	std::optional<error::error_variant> build_filter();
+	std::variant<std::vector<lang::filter_block>, error::error_variant> build_filter();
 
-private:
 	/*
 	 * copies of actions and conditions are intentional
 	 *
@@ -46,8 +50,8 @@ private:
 		lang::condition_set conditions,
 		lang::action_set actions);
 
-	const std::vector<parser::ast::statement> statements;
-	const lang::constants_map map;
+	const std::vector<parser::ast::statement>& statements;
+	const lang::constants_map& map;
 
 	std::vector<lang::filter_block> blocks;
 };

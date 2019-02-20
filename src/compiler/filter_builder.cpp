@@ -10,11 +10,23 @@ namespace fs::compiler
 namespace ast = parser::ast;
 namespace x3 = boost::spirit::x3;
 
-std::optional<error::error_variant> filter_builder::build_filter()
+std::variant<std::vector<lang::filter_block>, error::error_variant> filter_builder::build_filter(
+	const std::vector<parser::ast::statement>& top_level_statements,
+	const lang::constants_map& map)
+{
+	filter_builder fb(top_level_statements, map);
+	return fb.build_filter();
+}
+
+std::variant<std::vector<lang::filter_block>, error::error_variant> filter_builder::build_filter()
 {
 	lang::condition_set conditions;
 	lang::action_set actions;
-	return build_nested(statements, conditions, actions);
+	std::optional<error::error_variant> error = build_nested(statements, conditions, actions);
+	if (error)
+		return *error;
+
+	return blocks;
 }
 
 std::optional<error::error_variant> filter_builder::build_nested(

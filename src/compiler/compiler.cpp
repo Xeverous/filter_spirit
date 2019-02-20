@@ -101,12 +101,11 @@ bool process_input(const std::string& file_content, std::ostream& error_stream)
 		return false;
 	}
 
-	auto& map = std::get<lang::constants_map>(map_or_error);
-	filter_builder fb(std::move(parse_data.ast.statements), std::move(map));
-	std::optional<error::error_variant> build_error = fb.build_filter();
-	if (build_error)
+	const auto& map = std::get<lang::constants_map>(map_or_error);
+	std::variant<std::vector<lang::filter_block>, error::error_variant> filter_or_error = filter_builder::build_filter(parse_data.ast.statements, map);
+	if (std::holds_alternative<error::error_variant>(filter_or_error))
 	{
-		print::compile_error(*build_error, parse_data.lookup_data, error_stream);
+		print::compile_error(std::get<error::error_variant>(filter_or_error), parse_data.lookup_data, error_stream);
 		return false;
 	}
 
