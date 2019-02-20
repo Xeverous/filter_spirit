@@ -18,11 +18,9 @@ class filter_builder
 public:
 	filter_builder(
 		std::vector<parser::ast::statement>&& top_level_statements,
-		lang::constants_map&& map,
-		parser::lookup_data&& lookup_data)
+		lang::constants_map&& map)
 	: statements(std::move(top_level_statements)),
-	  map(std::move(map)),
-	  lookup_data(std::move(lookup_data))
+	  map(std::move(map))
 	{}
 
 	[[nodiscard]]
@@ -50,7 +48,6 @@ private:
 
 	const std::vector<parser::ast::statement> statements;
 	const lang::constants_map map;
-	const parser::lookup_data lookup_data;
 
 	std::vector<lang::filter_block> blocks;
 };

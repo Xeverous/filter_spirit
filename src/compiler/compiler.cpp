@@ -1,6 +1,5 @@
 #include "compiler/compiler.hpp"
 #include "compiler/evaluate.hpp"
-#include "compiler/rules.hpp"
 #include "compiler/error.hpp"
 #include "compiler/filter_builder.hpp"
 #include "parser/ast.hpp"
@@ -103,8 +102,15 @@ bool process_input(const std::string& file_content, std::ostream& error_stream)
 	}
 
 	auto& map = std::get<lang::constants_map>(map_or_error);
-	filter_builder fb(std::move(parse_data.ast.statements), std::move(map), std::move(parse_data.lookup_data));
-	return fb.build_filter();
+	filter_builder fb(std::move(parse_data.ast.statements), std::move(map));
+	std::optional<error::error_variant> build_error = fb.build_filter();
+	if (build_error)
+	{
+		print::compile_error(*build_error, parse_data.lookup_data, error_stream);
+		return false;
+	}
+
+	return true;
 }
 
 }

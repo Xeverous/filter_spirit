@@ -11,6 +11,8 @@ constexpr auto tab_length = 8;
 constexpr auto indicator_background = ' ';
 constexpr auto indicator_foreground = '~';
 constexpr auto compiler_error_string = "compile error: ";
+constexpr auto internal_compiler_error_string = "internal compile error: ";
+constexpr auto internal_compiler_error_info = "please report a bug with attached minimal filter source that reproduces it";
 constexpr auto parser_error_string = "parse error: ";
 constexpr auto note_string = "note: ";
 

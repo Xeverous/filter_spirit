@@ -15,8 +15,8 @@ action_set action_set::override_by(const action_set& other) const
 		result.background_color = other.background_color;
 	if (other.font_size)
 		result.font_size = other.font_size;
-	if (other.sound)
-		result.sound = other.sound;
+	if (other.alert_sound)
+		result.alert_sound = other.alert_sound;
 	if (other.disabled_drop_sound)
 		result.disabled_drop_sound = other.disabled_drop_sound;
 	if (other.minimap_icon)

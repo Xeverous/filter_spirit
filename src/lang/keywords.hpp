@@ -26,6 +26,7 @@ constexpr auto minimap_icon = "MinimapIcon";
 constexpr auto beam_effect  = "BeamEffect";
 constexpr auto string       = "String";
 constexpr auto path         = "Path";
+constexpr auto alert_sound  = "AlertSound";
 
 constexpr auto r = 'R';
 constexpr auto g = 'G';
@@ -55,8 +56,8 @@ constexpr auto no = "no";
 
 // ---- literal types ----
 
-constexpr auto true_       = "True";
-constexpr auto false_      = "False";
+constexpr auto true_       = "true";
+constexpr auto false_      = "false";
 
 constexpr auto normal      = "normal";
 constexpr auto magic       = "magic";

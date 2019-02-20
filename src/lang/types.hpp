@@ -156,6 +156,24 @@ struct path
 	std::string value;
 };
 
+struct alert_sound
+{
+	explicit alert_sound(sound_id id)
+	: sound(id) {}
+
+	explicit alert_sound(integer n)
+	: sound(sound_id(n)) {}
+
+	explicit alert_sound(path p)
+	: sound(std::move(p)) {}
+
+	explicit alert_sound(string s)
+	: sound(path(std::move(s))) {}
+
+	std::variant<sound_id, path> sound;
+	std::optional<volume> vol;
+};
+
 using single_object = std::variant<
 	boolean,
 	integer,
@@ -172,7 +190,8 @@ using single_object = std::variant<
 	minimap_icon,
 	beam_effect,
 	string,
-	path
+	path,
+	alert_sound
 >;
 
 enum class single_object_type
@@ -193,6 +212,7 @@ enum class single_object_type
 	beam_effect,
 	string,
 	path,
+	alert_sound,
 
 	generic // for generic constructs such as empty arrays
 };
@@ -236,13 +256,10 @@ struct object
 		return std::holds_alternative<array_object>(value);
 	}
 
-	object promote_to_array() const
+	array_object promote_to_array() const
 	{
 		assert(!is_array());
-		return object{
-			array_object(1, *this),
-			value_origin,
-			name_origin};
+		return array_object(1, *this);
 	}
 
 	std::variant<single_object, array_object> value;
@@ -299,6 +316,8 @@ template <> constexpr
 single_object_type type_to_enum_impl<string>() { return single_object_type::string; }
 template <> constexpr
 single_object_type type_to_enum_impl<path>() { return single_object_type::path; }
+template <> constexpr
+single_object_type type_to_enum_impl<alert_sound>() { return single_object_type::alert_sound; }
 
 template <typename T> [[nodiscard]] constexpr
 single_object_type type_to_enum()
@@ -319,17 +338,6 @@ enum class comparison_type
 	equal,
 	greater,
 	greater_equal
-};
-
-struct custom_alert_sound
-{
-	std::string path;
-};
-
-struct alert_sound
-{
-	std::variant<sound_id, custom_alert_sound> sound;
-	volume vol;
 };
 
 }

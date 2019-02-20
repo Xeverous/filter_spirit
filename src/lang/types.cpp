@@ -43,6 +43,8 @@ std::string_view to_string(single_object_type type)
 			return keywords::string;
 		case single_object_type::path:
 			return keywords::path;
+		case single_object_type::alert_sound:
+			return keywords::alert_sound;
 		case single_object_type::generic:
 			return "?";
 	}
@@ -91,6 +93,8 @@ single_object_type type_of_single_object(const single_object& obj)
 		return single_object_type::string;
 	if (std::holds_alternative<path>(obj))
 		return single_object_type::path;
+	if (std::holds_alternative<alert_sound>(obj))
+		return single_object_type::alert_sound;
 
 	assert(false);
 	// make a return to avoid UB

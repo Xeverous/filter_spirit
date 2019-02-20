@@ -31,27 +31,6 @@ struct invalid_amount_of_arguments
 	lang::position_tag place_of_arguments;
 };
 
-struct empty_socket_group
-{
-	lang::position_tag place_of_socket_group_string;
-};
-
-struct invalid_socket_group
-{
-	lang::position_tag place_of_socket_group_string;
-};
-
-struct invalid_minimap_icon_size
-{
-	int requested_size;
-	lang::position_tag place_of_size_argument;
-};
-
-struct temporary_beam_effect_not_supported
-{
-	lang::position_tag place_of_2nd_argument;
-};
-
 struct type_mismatch
 {
 	lang::object_type expected_type;
@@ -72,6 +51,22 @@ struct non_homogeneous_array
 	lang::object_type second_element_type;
 };
 
+struct empty_socket_group
+{
+	lang::position_tag place_of_socket_group_string;
+};
+
+struct invalid_socket_group
+{
+	lang::position_tag place_of_socket_group_string;
+};
+
+struct invalid_minimap_icon_size
+{
+	int requested_size;
+	lang::position_tag place_of_size_argument;
+};
+
 struct positional_sound_not_supported
 {
 	lang::position_tag place_of_action;
@@ -80,6 +75,11 @@ struct positional_sound_not_supported
 struct disable_drop_sound_not_supported
 {
 	lang::position_tag place_of_action;
+};
+
+struct temporary_beam_effect_not_supported
+{
+	lang::position_tag place_of_2nd_argument;
 };
 
 struct condition_redefinition
@@ -104,7 +104,7 @@ struct internal_compiler_error_during_string_condition_evaluation
 
 struct internal_compiler_error_during_boolean_condition_evaluation
 {
-	lang::position_tag place_of_string_condition;
+	lang::position_tag place_of_boolean_condition;
 };
 
 using error_variant = std::variant<
@@ -112,15 +112,15 @@ using error_variant = std::variant<
 	no_such_name,
 	no_such_function,
 	invalid_amount_of_arguments,
-	empty_socket_group,
-	invalid_socket_group,
-	invalid_minimap_icon_size,
-	temporary_beam_effect_not_supported,
 	type_mismatch,
 	nested_arrays_not_allowed,
 	non_homogeneous_array,
+	empty_socket_group,
+	invalid_socket_group,
+	invalid_minimap_icon_size,
 	positional_sound_not_supported,
 	disable_drop_sound_not_supported,
+	temporary_beam_effect_not_supported,
 	condition_redefinition,
 	internal_compiler_error_during_action_evaluation,
 	internal_compiler_error_during_comparison_condition_evaluation,

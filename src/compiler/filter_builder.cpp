@@ -25,7 +25,7 @@ std::optional<error::error_variant> filter_builder::build_nested(
 	for (const ast::statement& statement : statements)
 	{
 		auto error = statement.apply_visitor(x3::make_lambda_visitor<std::optional<error::error_variant>>(
-			[](const ast::action& action)
+			[&, this](const ast::action& action)
 			{
 				return add_action(action, map, parent_actions);
 			},
@@ -36,11 +36,14 @@ std::optional<error::error_variant> filter_builder::build_nested(
 			},
 			[&, this](const ast::rule_block& nested_block)
 			{
-				std::optional<error::error_variant> error = add_conditions(nested_block.conditions, map, parent_conditions);
-				if (error)
-					return *error;
+				// explicitly make a copy of parent conditions - the call stack will preserve
+				// old instance while nested blocks can add additional conditions that have limited lifetime
+				lang::condition_set nested_conditions(parent_conditions);
+				std::optional<error::error_variant> error = add_conditions(nested_block.conditions, map, nested_conditions);
+				if (error.has_value())
+					return error;
 
-				return build_nested(nested_block.statements, parent_conditions, parent_actions);
+				return build_nested(nested_block.statements, std::move(nested_conditions), parent_actions);
 			}));
 
 		if (error)

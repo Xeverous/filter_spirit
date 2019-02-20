@@ -47,7 +47,7 @@ std::optional<error::error_variant> add_comparison_condition(
 	const lang::constants_map& map,
 	lang::condition_set& condition_set)
 {
-	switch (condition.comparison_type)
+	switch (condition.property)
 	{
 		case lang::comparison_condition_property::item_level:
 		{
@@ -56,7 +56,7 @@ std::optional<error::error_variant> add_comparison_condition(
 				return std::get<error::error_variant>(level_or_error);
 
 			const auto& level = std::get<lang::level>(level_or_error);
-			lang::numeric_range_condition nrc(condition.comparison_type, level.value);
+			lang::numeric_range_condition nrc(condition.comparison_type.value, level.value);
 			return add_range_condition(nrc, condition_set.item_level);
 		}
 		case lang::comparison_condition_property::drop_level:
@@ -66,7 +66,7 @@ std::optional<error::error_variant> add_comparison_condition(
 				return std::get<error::error_variant>(level_or_error);
 
 			const auto& level = std::get<lang::level>(level_or_error);
-			lang::numeric_range_condition nrc(condition.comparison_type, level.value);
+			lang::numeric_range_condition nrc(condition.comparison_type.value, level.value);
 			return add_range_condition(nrc, condition_set.drop_level);
 		}
 		case lang::comparison_condition_property::quality:
@@ -76,7 +76,7 @@ std::optional<error::error_variant> add_comparison_condition(
 				return std::get<error::error_variant>(quality_or_error);
 
 			const auto& quality = std::get<lang::quality>(quality_or_error);
-			lang::numeric_range_condition nrc(condition.comparison_type, quality.value);
+			lang::numeric_range_condition nrc(condition.comparison_type.value, quality.value);
 			return add_range_condition(nrc, condition_set.quality);
 		}
 		case lang::comparison_condition_property::rarity:
@@ -86,7 +86,7 @@ std::optional<error::error_variant> add_comparison_condition(
 				return std::get<error::error_variant>(rarity_or_error);
 
 			const auto& rarity = std::get<lang::rarity>(rarity_or_error);
-			lang::rarity_range_condition rrc(condition.comparison_type, rarity);
+			lang::rarity_range_condition rrc(condition.comparison_type.value, rarity);
 			return add_range_condition(rrc, condition_set.rarity);
 		}
 		case lang::comparison_condition_property::sockets:
@@ -96,7 +96,7 @@ std::optional<error::error_variant> add_comparison_condition(
 				return std::get<error::error_variant>(integer_or_error);
 
 			const auto& integer = std::get<lang::integer>(integer_or_error);
-			lang::numeric_range_condition nrc(condition.comparison_type, integer.value);
+			lang::numeric_range_condition nrc(condition.comparison_type.value, integer.value);
 			return add_range_condition(nrc, condition_set.sockets);
 		}
 		case lang::comparison_condition_property::links:
@@ -106,7 +106,7 @@ std::optional<error::error_variant> add_comparison_condition(
 				return std::get<error::error_variant>(integer_or_error);
 
 			const auto& integer = std::get<lang::integer>(integer_or_error);
-			lang::numeric_range_condition nrc(condition.comparison_type, integer.value);
+			lang::numeric_range_condition nrc(condition.comparison_type.value, integer.value);
 			return add_range_condition(nrc, condition_set.links);
 		}
 		case lang::comparison_condition_property::height:
@@ -116,7 +116,7 @@ std::optional<error::error_variant> add_comparison_condition(
 				return std::get<error::error_variant>(integer_or_error);
 
 			const auto& integer = std::get<lang::integer>(integer_or_error);
-			lang::numeric_range_condition nrc(condition.comparison_type, integer.value);
+			lang::numeric_range_condition nrc(condition.comparison_type.value, integer.value);
 			return add_range_condition(nrc, condition_set.height);
 		}
 		case lang::comparison_condition_property::width:
@@ -126,7 +126,7 @@ std::optional<error::error_variant> add_comparison_condition(
 				return std::get<error::error_variant>(integer_or_error);
 
 			const auto& integer = std::get<lang::integer>(integer_or_error);
-			lang::numeric_range_condition nrc(condition.comparison_type, integer.value);
+			lang::numeric_range_condition nrc(condition.comparison_type.value, integer.value);
 			return add_range_condition(nrc, condition_set.width);
 		}
 		case lang::comparison_condition_property::stack_size:
@@ -136,7 +136,7 @@ std::optional<error::error_variant> add_comparison_condition(
 				return std::get<error::error_variant>(integer_or_error);
 
 			const auto& integer = std::get<lang::integer>(integer_or_error);
-			lang::numeric_range_condition nrc(condition.comparison_type, integer.value);
+			lang::numeric_range_condition nrc(condition.comparison_type.value, integer.value);
 			return add_range_condition(nrc, condition_set.stack_size);
 		}
 		case lang::comparison_condition_property::gem_level:
@@ -146,7 +146,7 @@ std::optional<error::error_variant> add_comparison_condition(
 				return std::get<error::error_variant>(integer_or_error);
 
 			const auto& integer = std::get<lang::integer>(integer_or_error);
-			lang::numeric_range_condition nrc(condition.comparison_type, integer.value);
+			lang::numeric_range_condition nrc(condition.comparison_type.value, integer.value);
 			return add_range_condition(nrc, condition_set.gem_level);
 		}
 		case lang::comparison_condition_property::map_tier:
@@ -156,7 +156,7 @@ std::optional<error::error_variant> add_comparison_condition(
 				return std::get<error::error_variant>(integer_or_error);
 
 			const auto& integer = std::get<lang::integer>(integer_or_error);
-			lang::numeric_range_condition nrc(condition.comparison_type, integer.value);
+			lang::numeric_range_condition nrc(condition.comparison_type.value, integer.value);
 			return add_range_condition(nrc, condition_set.map_tier);
 		}
 		default:

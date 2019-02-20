@@ -1,6 +1,5 @@
 #pragma once
 #include "lang/types.hpp"
-#include "compiler/error.hpp"
 #include <memory>
 #include <variant>
 #include <vector>

@@ -41,6 +41,9 @@ struct allowed_promotions<lang::path> : promotion_list<lang::string> {};
 template <>
 struct allowed_promotions<lang::beam_effect> : promotion_list<lang::suit> {};
 
+template <> // note: the implementation does not allow to chain promotions (hence there both sound_id and integer and also path and string)
+struct allowed_promotions<lang::alert_sound> : promotion_list<lang::sound_id, lang::integer, lang::path, lang::string> {};
+
 template <typename T, typename P, typename... Ps>
 std::variant<T, error::error_variant> attempt_to_promote(
 	const lang::single_object& single_object,

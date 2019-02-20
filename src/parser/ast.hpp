@@ -228,26 +228,26 @@ struct comparison_operator_expression : x3::position_tagged
 	lang::comparison_type value;
 };
 
-struct comparison_condition
+struct comparison_condition : x3::position_tagged
 {
 	lang::comparison_condition_property property;
 	comparison_operator_expression comparison_type;
 	value_expression value;
 };
 
-struct string_condition
+struct string_condition : x3::position_tagged
 {
 	lang::string_condition_property property;
 	value_expression value;
 };
 
-struct boolean_condition
+struct boolean_condition : x3::position_tagged
 {
 	lang::boolean_condition_property property;
 	value_expression value;
 };
 
-struct socket_group_condition
+struct socket_group_condition : x3::position_tagged
 {
 	socket_group_condition& operator=(value_expression ve)
 	{
