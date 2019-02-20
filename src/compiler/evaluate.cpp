@@ -135,6 +135,17 @@ std::variant<lang::object, error::error_variant> evaluate_function_call(
 			parser::get_position_info(function_call),
 			std::nullopt};
 	}
+	else if (function_name.value == lang::functions::minimap_icon)
+	{
+		std::variant<lang::minimap_icon, error::error_variant> icon_or_error = construct_minimap_icon(arguments, map);
+		if (std::holds_alternative<error::error_variant>(icon_or_error))
+			return std::get<error::error_variant>(icon_or_error);
+
+		return lang::object{
+			lang::single_object(std::get<lang::minimap_icon>(icon_or_error)),
+			parser::get_position_info(function_call),
+			std::nullopt};
+	}
 	else if (function_name.value == lang::functions::beam_effect)
 	{
 		std::variant<lang::beam_effect, error::error_variant> beam_effect_or_error = construct_beam_effect(arguments, map);
