@@ -114,6 +114,25 @@ void output_strings_condition(
 	output_stream << '\n';
 }
 
+void output_boolean_condition(
+	std::optional<lang::boolean> boolean,
+	const char* name,
+	std::ostream& output_stream)
+{
+	if (!boolean.has_value())
+		return;
+
+	output_stream << '\t' << name << ' ';
+
+	const lang::boolean& b = *boolean;
+	if (b.value)
+		output_stream << lang::generation::true_;
+	else
+		output_stream << lang::generation::false_;
+
+	output_stream << '\n';
+}
+
 }
 
 namespace fs::lang
@@ -121,9 +140,6 @@ namespace fs::lang
 
 void condition_set::generate(std::ostream& output_stream) const
 {
-	// order matters for filter performance (first unmatched rule short-circuits entire block)
-	// use integer conditions first, string conditions last
-
 	namespace lg = lang::generation;
 	output_range_condition(item_level, lg::item_level,     output_stream);
 	output_range_condition(drop_level, lg::drop_level,     output_stream);
@@ -138,6 +154,12 @@ void condition_set::generate(std::ostream& output_stream) const
 	output_range_condition(map_tier,   lg::map_tier,       output_stream);
 
 	output_socket_group_condition(socket_group, output_stream);
+
+	output_boolean_condition(is_identified,  lg::identified,  output_stream);
+	output_boolean_condition(is_corrupted,   lg::corrupted,   output_stream);
+	output_boolean_condition(is_elder_item,  lg::elder_item,  output_stream);
+	output_boolean_condition(is_shaper_item, lg::shaper_item, output_stream);
+	output_boolean_condition(is_shaped_map,  lg::shaped_map,  output_stream);
 
 	output_strings_condition(class_,           lg::class_,           output_stream);
 	output_strings_condition(base_type,        lg::base_type,        output_stream);

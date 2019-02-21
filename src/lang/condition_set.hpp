@@ -121,8 +121,8 @@ struct condition_set
 	numeric_range_condition map_tier;
 	std::optional<boolean> is_identified;
 	std::optional<boolean> is_corrupted;
-	std::optional<boolean> is_shaper_item;
 	std::optional<boolean> is_elder_item;
+	std::optional<boolean> is_shaper_item;
 	std::optional<boolean> is_shaped_map;
 };
 

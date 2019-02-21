@@ -40,6 +40,9 @@ constexpr auto magic  = "Magic";
 constexpr auto rare   = "Rare";
 constexpr auto unique = "Unique";
 
+constexpr auto true_   = "True";
+constexpr auto false_  = "False";
+
 // actions
 constexpr auto set_border_color            = "SetBorderColor";
 constexpr auto set_text_color              = "SetTextColor";
