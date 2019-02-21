@@ -12,6 +12,15 @@
 namespace fs::lang
 {
 
+enum class comparison_type
+{
+	less,
+	less_equal,
+	equal,
+	greater,
+	greater_equal
+};
+
 enum class comparison_condition_property
 {
 	item_level,
@@ -334,16 +343,5 @@ single_object_type type_to_enum()
 
 	return type_to_enum_impl<T>();
 }
-
-// ---- TODO sort/implement/refactor ---
-
-enum class comparison_type
-{
-	less,
-	less_equal,
-	equal,
-	greater,
-	greater_equal
-};
 
 }

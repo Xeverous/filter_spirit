@@ -49,21 +49,160 @@ public:
 		}
 	}
 
-	range_relation relation_with(range_condition other) const
+	[[nodiscard]] static
+	range_relation relation_first_to_second(range_condition first, range_condition second)
 	{
-		// TODO implement
-		return range_relation::identical;
-	}
+		bound_relation lower_bound_relation = get_lower_bound_relation(first.lower_bound, second.lower_bound, second.upper_bound);
+		bound_relation upper_bound_relation = get_upper_bound_relation(first.upper_bound, second.lower_bound, second.upper_bound);
 
-	bool includes(range_condition other) const
-	{
-		// FIXME implement relation testing
-		// return enum: exact/superset/subset/intersect/disjoint
-		return true;
+		if (lower_bound_relation == bound_relation::disjoint ||
+			upper_bound_relation == bound_relation::disjoint)
+			return range_relation::disjoint;
+
+		if (lower_bound_relation == bound_relation::more_restrictive &&
+			upper_bound_relation == bound_relation::more_restrictive)
+			return range_relation::subset;
+
+		if (lower_bound_relation == bound_relation::identical &&
+			upper_bound_relation == bound_relation::more_restrictive)
+			return range_relation::subset;
+
+		if (lower_bound_relation == bound_relation::more_restrictive &&
+			upper_bound_relation == bound_relation::identical)
+			return range_relation::subset;
+
+		if (lower_bound_relation == bound_relation::less_restrictive &&
+			upper_bound_relation == bound_relation::less_restrictive)
+			return range_relation::superset;
+
+		if (lower_bound_relation == bound_relation::identical &&
+			upper_bound_relation == bound_relation::less_restrictive)
+			return range_relation::superset;
+
+		if (lower_bound_relation == bound_relation::less_restrictive &&
+			upper_bound_relation == bound_relation::identical)
+			return range_relation::superset;
+
+		if (lower_bound_relation == bound_relation::identical &&
+			upper_bound_relation == bound_relation::identical)
+			return range_relation::identical;
+
+		return range_relation::intersect;
 	}
 
 	std::optional<range_bound<T>> lower_bound;
 	std::optional<range_bound<T>> upper_bound;
+
+private:
+	enum class bound_relation { identical, more_restrictive, less_restrictive, disjoint };
+
+	[[nodiscard]] static
+	bound_relation get_lower_bound_relation(
+		std::optional<range_bound<T>> lower_bound,
+		std::optional<range_bound<T>> other_lower_bound,
+		std::optional<range_bound<T>> other_upper_bound)
+	{
+		if (lower_bound.has_value() && other_upper_bound.has_value())
+		{
+			 if ((*lower_bound).value > (*other_upper_bound).value)
+				 return bound_relation::disjoint;
+
+			 if ((*lower_bound).value == (*other_upper_bound).value)
+			 {
+				 if (!(*lower_bound).inclusive || !(*other_upper_bound).inclusive)
+					 return bound_relation::disjoint;
+			 }
+		}
+
+		if (lower_bound.has_value())
+		{
+			if (other_lower_bound.has_value())
+			{
+				if ((*lower_bound).value < (*other_lower_bound).value)
+					return bound_relation::less_restrictive;
+
+				if ((*lower_bound).value > (*other_lower_bound).value)
+					return bound_relation::more_restrictive;
+
+				if ((*lower_bound).inclusive && !(*other_lower_bound).inclusive)
+					return bound_relation::less_restrictive;
+
+				if (!(*lower_bound).inclusive && (*other_lower_bound).inclusive)
+					return bound_relation::more_restrictive;
+
+				return bound_relation::identical;
+			}
+			else
+			{
+				return bound_relation::more_restrictive;
+			}
+		}
+		else
+		{
+			if (other_lower_bound.has_value())
+			{
+				return bound_relation::less_restrictive;
+			}
+			else
+			{
+				return bound_relation::identical;
+			}
+		}
+	}
+
+	[[nodiscard]] static
+	bound_relation get_upper_bound_relation(
+		std::optional<range_bound<T>> upper_bound,
+		std::optional<range_bound<T>> other_lower_bound,
+		std::optional<range_bound<T>> other_upper_bound)
+	{
+		if (upper_bound.has_value() && other_lower_bound.has_value())
+		{
+			 if ((*upper_bound).value < (*other_lower_bound).value)
+				 return bound_relation::disjoint;
+
+			 if ((*upper_bound).value == (*other_lower_bound).value)
+			 {
+				 if (!(*upper_bound).inclusive || !(*other_lower_bound).inclusive)
+					 return bound_relation::disjoint;
+			 }
+		}
+
+		if (upper_bound.has_value())
+		{
+			if (other_lower_bound.has_value())
+			{
+				if ((*upper_bound).value < (*other_lower_bound).value)
+					return bound_relation::more_restrictive;
+
+				if ((*upper_bound).value > (*other_lower_bound).value)
+					return bound_relation::less_restrictive;
+
+				if ((*upper_bound).inclusive && !(*other_lower_bound).inclusive)
+					return bound_relation::less_restrictive;
+
+				if (!(*upper_bound).inclusive && (*other_lower_bound).inclusive)
+					return bound_relation::more_restrictive;
+
+				return bound_relation::identical;
+			}
+			else
+			{
+				return bound_relation::more_restrictive;
+			}
+		}
+		else
+		{
+			if (other_lower_bound.has_value())
+			{
+				return bound_relation::less_restrictive;
+			}
+			else
+			{
+				return bound_relation::identical;
+			}
+		}
+	}
 };
 
 using numeric_range_condition = range_condition<int>;
