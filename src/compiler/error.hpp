@@ -92,9 +92,34 @@ struct condition_redefinition
 	lang::position_tag place_of_redefinition;
 };
 
+struct lower_bound_redefinition
+{
+	lang::position_tag place_of_redefinition;
+};
+
+struct upper_bound_redefinition
+{
+	lang::position_tag place_of_redefinition;
+};
+
+struct exact_comparison_redefinition
+{
+	lang::position_tag place_of_redefinition;
+};
+
+struct exact_comparison_outside_parent_range
+{
+	lang::position_tag place_of_redefinition;
+};
+
 struct internal_compiler_error_during_action_evaluation
 {
 	lang::position_tag place_of_action;
+};
+
+struct internal_compiler_error_during_range_evaluation
+{
+	lang::position_tag place_of_comparison_condition;
 };
 
 struct internal_compiler_error_during_comparison_condition_evaluation
@@ -128,7 +153,12 @@ using error_variant = std::variant<
 	disable_drop_sound_not_supported,
 	temporary_beam_effect_not_supported,
 	condition_redefinition,
+	lower_bound_redefinition,
+	upper_bound_redefinition,
+	exact_comparison_redefinition,
+	exact_comparison_outside_parent_range,
 	internal_compiler_error_during_action_evaluation,
+	internal_compiler_error_during_range_evaluation,
 	internal_compiler_error_during_comparison_condition_evaluation,
 	internal_compiler_error_during_string_condition_evaluation,
 	internal_compiler_error_during_boolean_condition_evaluation

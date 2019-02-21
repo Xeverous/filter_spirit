@@ -34,15 +34,18 @@ std::ostream& operator<<(std::ostream& os, lang::rarity r)
 
 template <typename T>
 void output_range_condition(
-	std::optional<lang::range_condition<T>> condition,
+	lang::range_condition<T> range,
 	const char* name,
 	std::ostream& output_stream)
 {
-	if (!condition.has_value())
+	if (!range.has_anything())
 		return;
 
-	const lang::range_condition<T>& range = *condition;
-	assert(range.lower_bound.has_value() || range.upper_bound.has_value());
+	if (range.is_exact())
+	{
+		output_stream << '\t' << name << " = " << (*range.lower_bound).value << '\n';
+		return;
+	}
 
 	if (range.lower_bound.has_value())
 	{
@@ -75,9 +78,8 @@ void output_socket_group_condition(
 	std::optional<lang::socket_group> socket_group,
 	std::ostream& output_stream)
 {
-	if (!socket_group)
+	if (!socket_group.has_value())
 		return;
-
 
 	const auto output_letter = [&](char letter, int times)
 	{

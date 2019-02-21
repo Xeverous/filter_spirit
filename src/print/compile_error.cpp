@@ -77,7 +77,7 @@ void print_compile_error(
 }
 
 void print_compile_error(
-	fs::compiler::error::type_mismatch error,
+	compiler::error::type_mismatch error,
 	const parser::lookup_data& lookup_data,
 	std::ostream& error_stream)
 {
@@ -94,7 +94,7 @@ void print_compile_error(
 }
 
 void print_compile_error(
-	fs::compiler::error::nested_arrays_not_allowed error,
+	compiler::error::nested_arrays_not_allowed error,
 	const parser::lookup_data& lookup_data,
 	std::ostream& error_stream)
 {
@@ -107,7 +107,7 @@ void print_compile_error(
 }
 
 void print_compile_error(
-	fs::compiler::error::non_homogeneous_array error,
+	compiler::error::non_homogeneous_array error,
 	const parser::lookup_data& lookup_data,
 	std::ostream& error_stream)
 {
@@ -223,7 +223,7 @@ void print_compile_error(
 }
 
 void print_compile_error(
-	fs::compiler::error::condition_redefinition error,
+	compiler::error::condition_redefinition error,
 	const parser::lookup_data& lookup_data,
 	std::ostream& error_stream)
 {
@@ -232,11 +232,63 @@ void print_compile_error(
 		lookup_data.get_range_of_whole_content(),
 		lookup_data.position_of(error.place_of_redefinition),
 		print::compiler_error_string,
-		"condition redefinition (the same condition can not be specified again in nested blocks)");
+		"condition redefinition (the same condition can not be specified again in the same block or nested blocks)");
 }
 
 void print_compile_error(
-	fs::compiler::error::internal_compiler_error_during_action_evaluation error,
+	compiler::error::lower_bound_redefinition error,
+	const parser::lookup_data& lookup_data,
+	std::ostream& error_stream)
+{
+	print::print_line_number_with_indication_and_texts(
+		error_stream,
+		lookup_data.get_range_of_whole_content(),
+		lookup_data.position_of(error.place_of_redefinition),
+		print::compiler_error_string,
+		"lower bound redefinition (the same bound for comparison can not be specified again in the same block or nested blocks)");
+}
+
+void print_compile_error(
+	compiler::error::upper_bound_redefinition error,
+	const parser::lookup_data& lookup_data,
+	std::ostream& error_stream)
+{
+	print::print_line_number_with_indication_and_texts(
+		error_stream,
+		lookup_data.get_range_of_whole_content(),
+		lookup_data.position_of(error.place_of_redefinition),
+		print::compiler_error_string,
+		"upper bound redefinition (the same bound for comparison can not be specified again in the same block or nested blocks)");
+}
+
+void print_compile_error(
+	compiler::error::exact_comparison_redefinition error,
+	const parser::lookup_data& lookup_data,
+	std::ostream& error_stream)
+{
+	print::print_line_number_with_indication_and_texts(
+		error_stream,
+		lookup_data.get_range_of_whole_content(),
+		lookup_data.position_of(error.place_of_redefinition),
+		print::compiler_error_string,
+		"exact comparison redefinition (exact comparison can not be specified again in the same block or nested blocks)");
+}
+
+void print_compile_error(
+	compiler::error::exact_comparison_outside_parent_range error,
+	const parser::lookup_data& lookup_data,
+	std::ostream& error_stream)
+{
+	print::print_line_number_with_indication_and_texts(
+		error_stream,
+		lookup_data.get_range_of_whole_content(),
+		lookup_data.position_of(error.place_of_redefinition),
+		print::compiler_error_string,
+		"exact comparison outside parent range (no item can ever satisfy this requirement because specified value does not fit into parent block range)");
+}
+
+void print_compile_error(
+	compiler::error::internal_compiler_error_during_action_evaluation error,
 	const parser::lookup_data& lookup_data,
 	std::ostream& error_stream)
 {
@@ -250,7 +302,21 @@ void print_compile_error(
 }
 
 void print_compile_error(
-	fs::compiler::error::internal_compiler_error_during_comparison_condition_evaluation error,
+	compiler::error::internal_compiler_error_during_range_evaluation error,
+	const parser::lookup_data& lookup_data,
+	std::ostream& error_stream)
+{
+	print::print_line_number_with_indication_and_texts(
+		error_stream,
+		lookup_data.get_range_of_whole_content(),
+		lookup_data.position_of(error.place_of_comparison_condition),
+		print::internal_compiler_error_string,
+		"unhandled case in range evaluation\n",
+		print::internal_compiler_error_info);
+}
+
+void print_compile_error(
+	compiler::error::internal_compiler_error_during_comparison_condition_evaluation error,
 	const parser::lookup_data& lookup_data,
 	std::ostream& error_stream)
 {
@@ -264,7 +330,7 @@ void print_compile_error(
 }
 
 void print_compile_error(
-	fs::compiler::error::internal_compiler_error_during_string_condition_evaluation error,
+	compiler::error::internal_compiler_error_during_string_condition_evaluation error,
 	const parser::lookup_data& lookup_data,
 	std::ostream& error_stream)
 {
@@ -278,7 +344,7 @@ void print_compile_error(
 }
 
 void print_compile_error(
-	fs::compiler::error::internal_compiler_error_during_boolean_condition_evaluation error,
+	compiler::error::internal_compiler_error_during_boolean_condition_evaluation error,
 	const parser::lookup_data& lookup_data,
 	std::ostream& error_stream)
 {

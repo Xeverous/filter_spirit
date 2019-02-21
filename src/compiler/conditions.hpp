@@ -62,15 +62,61 @@ std::optional<error::error_variant> add_socket_group_condition(
 
 template <typename T>
 std::optional<error::error_variant> add_range_condition(
-	lang::range_condition<T> range_condition,
+	lang::comparison_type comparison_type,
+	T value,
 	lang::position_tag condition_origin,
-	std::optional<lang::range_condition<T>>& target)
+	lang::range_condition<T>& target)
 {
-	if (target.has_value())
-		return error::condition_redefinition{condition_origin}; // FIXME this is not fully correct
+	switch (comparison_type)
+	{
+		case lang::comparison_type::equal:
+		{
+			if (target.is_exact())
+				return error::exact_comparison_redefinition{condition_origin};
 
-	// FIXME compare ranges
-	return std::nullopt;
+			if (!target.includes(value))
+				return error::exact_comparison_outside_parent_range{condition_origin};
+
+			target.set_exact(value);
+			return std::nullopt;
+		}
+		case lang::comparison_type::less:
+		{
+			if (target.upper_bound.has_value())
+				return error::upper_bound_redefinition{condition_origin};
+
+			target.set_upper_bound(value, false);
+			return std::nullopt;
+		}
+		case lang::comparison_type::less_equal:
+		{
+			if (target.upper_bound.has_value())
+				return error::upper_bound_redefinition{condition_origin};
+
+			target.set_upper_bound(value, true);
+			return std::nullopt;
+		}
+		case lang::comparison_type::greater:
+		{
+			if (target.lower_bound.has_value())
+				return error::lower_bound_redefinition{condition_origin};
+
+			target.set_upper_bound(value, false);
+			return std::nullopt;
+		}
+		case lang::comparison_type::greater_equal:
+		{
+			if (target.lower_bound.has_value())
+				return error::lower_bound_redefinition{condition_origin};
+
+			target.set_upper_bound(value, true);
+			return std::nullopt;
+		}
+		default:
+		{
+			return error::internal_compiler_error_during_range_evaluation{condition_origin};
+		}
+	}
 }
 
 }

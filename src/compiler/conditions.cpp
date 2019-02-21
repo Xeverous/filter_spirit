@@ -58,8 +58,7 @@ std::optional<error::error_variant> add_comparison_condition(
 				return std::get<error::error_variant>(level_or_error);
 
 			const auto& level = std::get<lang::level>(level_or_error);
-			lang::numeric_range_condition nrc(condition.comparison_type.value, level.value);
-			return add_range_condition(nrc, condition_origin, condition_set.item_level);
+			return add_range_condition(condition.comparison_type.value, level.value, condition_origin, condition_set.item_level);
 		}
 		case lang::comparison_condition_property::drop_level:
 		{
@@ -68,8 +67,7 @@ std::optional<error::error_variant> add_comparison_condition(
 				return std::get<error::error_variant>(level_or_error);
 
 			const auto& level = std::get<lang::level>(level_or_error);
-			lang::numeric_range_condition nrc(condition.comparison_type.value, level.value);
-			return add_range_condition(nrc, condition_origin, condition_set.drop_level);
+			return add_range_condition(condition.comparison_type.value, level.value, condition_origin, condition_set.drop_level);
 		}
 		case lang::comparison_condition_property::quality:
 		{
@@ -78,8 +76,7 @@ std::optional<error::error_variant> add_comparison_condition(
 				return std::get<error::error_variant>(quality_or_error);
 
 			const auto& quality = std::get<lang::quality>(quality_or_error);
-			lang::numeric_range_condition nrc(condition.comparison_type.value, quality.value);
-			return add_range_condition(nrc, condition_origin, condition_set.quality);
+			return add_range_condition(condition.comparison_type.value, quality.value, condition_origin, condition_set.quality);
 		}
 		case lang::comparison_condition_property::rarity:
 		{
@@ -88,8 +85,7 @@ std::optional<error::error_variant> add_comparison_condition(
 				return std::get<error::error_variant>(rarity_or_error);
 
 			const auto& rarity = std::get<lang::rarity>(rarity_or_error);
-			lang::rarity_range_condition rrc(condition.comparison_type.value, rarity);
-			return add_range_condition(rrc, condition_origin, condition_set.rarity);
+			return add_range_condition(condition.comparison_type.value, rarity, condition_origin, condition_set.rarity);
 		}
 		case lang::comparison_condition_property::sockets:
 		{
@@ -98,8 +94,7 @@ std::optional<error::error_variant> add_comparison_condition(
 				return std::get<error::error_variant>(integer_or_error);
 
 			const auto& integer = std::get<lang::integer>(integer_or_error);
-			lang::numeric_range_condition nrc(condition.comparison_type.value, integer.value);
-			return add_range_condition(nrc, condition_origin, condition_set.sockets);
+			return add_range_condition(condition.comparison_type.value, integer.value, condition_origin, condition_set.sockets);
 		}
 		case lang::comparison_condition_property::links:
 		{
@@ -108,8 +103,7 @@ std::optional<error::error_variant> add_comparison_condition(
 				return std::get<error::error_variant>(integer_or_error);
 
 			const auto& integer = std::get<lang::integer>(integer_or_error);
-			lang::numeric_range_condition nrc(condition.comparison_type.value, integer.value);
-			return add_range_condition(nrc, condition_origin, condition_set.links);
+			return add_range_condition(condition.comparison_type.value, integer.value, condition_origin, condition_set.links);
 		}
 		case lang::comparison_condition_property::height:
 		{
@@ -118,8 +112,7 @@ std::optional<error::error_variant> add_comparison_condition(
 				return std::get<error::error_variant>(integer_or_error);
 
 			const auto& integer = std::get<lang::integer>(integer_or_error);
-			lang::numeric_range_condition nrc(condition.comparison_type.value, integer.value);
-			return add_range_condition(nrc, condition_origin, condition_set.height);
+			return add_range_condition(condition.comparison_type.value, integer.value, condition_origin, condition_set.height);
 		}
 		case lang::comparison_condition_property::width:
 		{
@@ -128,8 +121,7 @@ std::optional<error::error_variant> add_comparison_condition(
 				return std::get<error::error_variant>(integer_or_error);
 
 			const auto& integer = std::get<lang::integer>(integer_or_error);
-			lang::numeric_range_condition nrc(condition.comparison_type.value, integer.value);
-			return add_range_condition(nrc, condition_origin, condition_set.width);
+			return add_range_condition(condition.comparison_type.value, integer.value, condition_origin, condition_set.width);
 		}
 		case lang::comparison_condition_property::stack_size:
 		{
@@ -138,8 +130,7 @@ std::optional<error::error_variant> add_comparison_condition(
 				return std::get<error::error_variant>(integer_or_error);
 
 			const auto& integer = std::get<lang::integer>(integer_or_error);
-			lang::numeric_range_condition nrc(condition.comparison_type.value, integer.value);
-			return add_range_condition(nrc, condition_origin, condition_set.stack_size);
+			return add_range_condition(condition.comparison_type.value, integer.value, condition_origin, condition_set.stack_size);
 		}
 		case lang::comparison_condition_property::gem_level:
 		{
@@ -148,8 +139,7 @@ std::optional<error::error_variant> add_comparison_condition(
 				return std::get<error::error_variant>(integer_or_error);
 
 			const auto& integer = std::get<lang::integer>(integer_or_error);
-			lang::numeric_range_condition nrc(condition.comparison_type.value, integer.value);
-			return add_range_condition(nrc, condition_origin, condition_set.gem_level);
+			return add_range_condition(condition.comparison_type.value, integer.value, condition_origin, condition_set.gem_level);
 		}
 		case lang::comparison_condition_property::map_tier:
 		{
@@ -158,17 +148,13 @@ std::optional<error::error_variant> add_comparison_condition(
 				return std::get<error::error_variant>(integer_or_error);
 
 			const auto& integer = std::get<lang::integer>(integer_or_error);
-			lang::numeric_range_condition nrc(condition.comparison_type.value, integer.value);
-			return add_range_condition(nrc, condition_origin, condition_set.map_tier);
+			return add_range_condition(condition.comparison_type.value, integer.value, condition_origin, condition_set.map_tier);
 		}
 		default:
 		{
-			break;
+			return error::internal_compiler_error_during_comparison_condition_evaluation{parser::get_position_info(condition)};
 		}
-
 	}
-
-	return error::internal_compiler_error_during_comparison_condition_evaluation{parser::get_position_info(condition)};
 }
 
 std::optional<error::error_variant> add_string_condition(
@@ -217,11 +203,7 @@ std::optional<error::error_variant> add_strings_condition(
 	std::shared_ptr<std::vector<std::string>>& target)
 {
 	if (target != nullptr)
-	{
-		// error situation: parent block has already set a condition
-		// conditions do not override, only inherit
 		return error::condition_redefinition{condition_origin};
-	}
 
 	target = std::make_shared<std::vector<std::string>>(std::move(strings));
 	return std::nullopt;

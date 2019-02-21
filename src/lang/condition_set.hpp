@@ -1,9 +1,9 @@
 #pragma once
 #include "lang/types.hpp"
 #include <memory>
+#include <optional>
 #include <variant>
 #include <vector>
-#include <iosfwd>
 
 namespace fs::lang
 {
@@ -15,194 +15,75 @@ struct range_bound
 	bool inclusive;
 };
 
-enum class range_relation
+template <typename T>
+bool operator==(range_bound<T> left, range_bound<T> right)
 {
-	identical, superset, subset, intersect, disjoint
-};
+	return left.value == right.value && left.inclusive == right.inclusive;
+}
 
 template <typename T>
-class range_condition
+bool operator!=(range_bound<T> left, range_bound<T> right)
 {
-public:
-	range_condition(comparison_type comparison, T value)
+	return !(left == right);
+}
+
+template <typename T>
+struct range_condition
+{
+	bool is_exact() const
 	{
-		if (comparison == comparison_type::greater)
-		{
-			lower_bound = {value, false};
-		}
-		else if (comparison == comparison_type::greater_equal)
-		{
-			lower_bound = {value, true};
-		}
-		else if (comparison == comparison_type::less)
-		{
-			upper_bound = {value, false};
-		}
-		else if (comparison == comparison_type::less_equal)
-		{
-			upper_bound = {value, true};
-		}
-		else
-		{
-			lower_bound = {value, true};
-			upper_bound = {value, true};
-		}
+		if (lower_bound.has_value() && upper_bound.has_value())
+			return *lower_bound == *upper_bound;
+
+		return false;
 	}
 
-	[[nodiscard]] static
-	range_relation relation_first_to_second(range_condition first, range_condition second)
+	// check whether 'value' can fit into currently specified range
+	bool includes(T value) const
 	{
-		bound_relation lower_bound_relation = get_lower_bound_relation(first.lower_bound, second.lower_bound, second.upper_bound);
-		bound_relation upper_bound_relation = get_upper_bound_relation(first.upper_bound, second.lower_bound, second.upper_bound);
-
-		if (lower_bound_relation == bound_relation::disjoint ||
-			upper_bound_relation == bound_relation::disjoint)
-			return range_relation::disjoint;
-
-		if (lower_bound_relation == bound_relation::more_restrictive &&
-			upper_bound_relation == bound_relation::more_restrictive)
-			return range_relation::subset;
-
-		if (lower_bound_relation == bound_relation::identical &&
-			upper_bound_relation == bound_relation::more_restrictive)
-			return range_relation::subset;
-
-		if (lower_bound_relation == bound_relation::more_restrictive &&
-			upper_bound_relation == bound_relation::identical)
-			return range_relation::subset;
-
-		if (lower_bound_relation == bound_relation::less_restrictive &&
-			upper_bound_relation == bound_relation::less_restrictive)
-			return range_relation::superset;
-
-		if (lower_bound_relation == bound_relation::identical &&
-			upper_bound_relation == bound_relation::less_restrictive)
-			return range_relation::superset;
-
-		if (lower_bound_relation == bound_relation::less_restrictive &&
-			upper_bound_relation == bound_relation::identical)
-			return range_relation::superset;
-
-		if (lower_bound_relation == bound_relation::identical &&
-			upper_bound_relation == bound_relation::identical)
-			return range_relation::identical;
-
-		return range_relation::intersect;
-	}
-
-	std::optional<range_bound<T>> lower_bound;
-	std::optional<range_bound<T>> upper_bound;
-
-private:
-	enum class bound_relation { identical, more_restrictive, less_restrictive, disjoint };
-
-	[[nodiscard]] static
-	bound_relation get_lower_bound_relation(
-		std::optional<range_bound<T>> lower_bound,
-		std::optional<range_bound<T>> other_lower_bound,
-		std::optional<range_bound<T>> other_upper_bound)
-	{
-		if (lower_bound.has_value() && other_upper_bound.has_value())
-		{
-			 if ((*lower_bound).value > (*other_upper_bound).value)
-				 return bound_relation::disjoint;
-
-			 if ((*lower_bound).value == (*other_upper_bound).value)
-			 {
-				 if (!(*lower_bound).inclusive || !(*other_upper_bound).inclusive)
-					 return bound_relation::disjoint;
-			 }
-		}
-
 		if (lower_bound.has_value())
 		{
-			if (other_lower_bound.has_value())
-			{
-				if ((*lower_bound).value < (*other_lower_bound).value)
-					return bound_relation::less_restrictive;
+			if ((*lower_bound).value > value)
+				return false;
 
-				if ((*lower_bound).value > (*other_lower_bound).value)
-					return bound_relation::more_restrictive;
-
-				if ((*lower_bound).inclusive && !(*other_lower_bound).inclusive)
-					return bound_relation::less_restrictive;
-
-				if (!(*lower_bound).inclusive && (*other_lower_bound).inclusive)
-					return bound_relation::more_restrictive;
-
-				return bound_relation::identical;
-			}
-			else
-			{
-				return bound_relation::more_restrictive;
-			}
-		}
-		else
-		{
-			if (other_lower_bound.has_value())
-			{
-				return bound_relation::less_restrictive;
-			}
-			else
-			{
-				return bound_relation::identical;
-			}
-		}
-	}
-
-	[[nodiscard]] static
-	bound_relation get_upper_bound_relation(
-		std::optional<range_bound<T>> upper_bound,
-		std::optional<range_bound<T>> other_lower_bound,
-		std::optional<range_bound<T>> other_upper_bound)
-	{
-		if (upper_bound.has_value() && other_lower_bound.has_value())
-		{
-			 if ((*upper_bound).value < (*other_lower_bound).value)
-				 return bound_relation::disjoint;
-
-			 if ((*upper_bound).value == (*other_lower_bound).value)
-			 {
-				 if (!(*upper_bound).inclusive || !(*other_lower_bound).inclusive)
-					 return bound_relation::disjoint;
-			 }
+			if ((*lower_bound).value == value && !(*lower_bound).inclusive)
+				return false;
 		}
 
 		if (upper_bound.has_value())
 		{
-			if (other_lower_bound.has_value())
-			{
-				if ((*upper_bound).value < (*other_lower_bound).value)
-					return bound_relation::more_restrictive;
+			if ((*upper_bound).value < value)
+				return false;
 
-				if ((*upper_bound).value > (*other_lower_bound).value)
-					return bound_relation::less_restrictive;
-
-				if ((*upper_bound).inclusive && !(*other_lower_bound).inclusive)
-					return bound_relation::less_restrictive;
-
-				if (!(*upper_bound).inclusive && (*other_lower_bound).inclusive)
-					return bound_relation::more_restrictive;
-
-				return bound_relation::identical;
-			}
-			else
-			{
-				return bound_relation::more_restrictive;
-			}
+			if ((*upper_bound).value == value && !(*upper_bound).inclusive)
+				return false;
 		}
-		else
-		{
-			if (other_lower_bound.has_value())
-			{
-				return bound_relation::less_restrictive;
-			}
-			else
-			{
-				return bound_relation::identical;
-			}
-		}
+
+		return true;
 	}
+
+	bool has_anything() const
+	{
+		return lower_bound.has_value() || upper_bound.has_value();
+	}
+
+	void set_exact(T value)
+	{
+		lower_bound = upper_bound = range_bound<T>{value, true};
+	}
+
+	void set_lower_bound(T value, bool inclusive)
+	{
+		lower_bound = range_bound<T>{value, inclusive};
+	}
+
+	void set_upper_bound(T value, bool inclusive)
+	{
+		upper_bound = range_bound<T>{value, inclusive};
+	}
+
+	std::optional<range_bound<T>> lower_bound;
+	std::optional<range_bound<T>> upper_bound;
 };
 
 using numeric_range_condition = range_condition<int>;
@@ -223,21 +104,21 @@ struct condition_set
 	[[nodiscard]]
 	bool is_valid() const;
 
-	std::optional<numeric_range_condition> item_level;
-	std::optional<numeric_range_condition> drop_level;
-	std::optional<numeric_range_condition> quality;
-	std::optional<rarity_range_condition> rarity;
+	numeric_range_condition item_level;
+	numeric_range_condition drop_level;
+	numeric_range_condition quality;
+	rarity_range_condition rarity;
 	std::shared_ptr<std::vector<std::string>> class_;
 	std::shared_ptr<std::vector<std::string>> base_type;
-	std::optional<numeric_range_condition> sockets;
-	std::optional<numeric_range_condition> links;
+	numeric_range_condition sockets;
+	numeric_range_condition links;
 	std::optional<socket_group> socket_group;
-	std::optional<numeric_range_condition> height;
-	std::optional<numeric_range_condition> width;
+	numeric_range_condition height;
+	numeric_range_condition width;
 	std::shared_ptr<std::vector<std::string>> has_explicit_mod;
-	std::optional<numeric_range_condition> stack_size;
-	std::optional<numeric_range_condition> gem_level;
-	std::optional<numeric_range_condition> map_tier;
+	numeric_range_condition stack_size;
+	numeric_range_condition gem_level;
+	numeric_range_condition map_tier;
 	std::optional<boolean> is_identified;
 	std::optional<boolean> is_corrupted;
 	std::optional<boolean> is_shaper_item;
