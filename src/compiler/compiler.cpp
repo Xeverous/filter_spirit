@@ -11,6 +11,7 @@
 #include <cassert>
 #include <string_view>
 #include <utility>
+#include <fstream>
 
 namespace
 {
@@ -80,6 +81,20 @@ std::variant<lang::constants_map, compiler::error::error_variant> resolve_consta
 	return map;
 }
 
+[[nodiscard]]
+bool generate_filter(const std::vector<lang::filter_block>& blocks)
+{
+	std::ofstream output("output.filter");
+
+	if (!output.good())
+		return false;
+
+	for (const lang::filter_block& block : blocks)
+		block.generate(output);
+
+	return true;
+}
+
 } // namespace
 
 namespace fs::compiler
@@ -109,7 +124,8 @@ bool process_input(const std::string& file_content, std::ostream& error_stream)
 		return false;
 	}
 
-	return true;
+	const auto& blocks = std::get<std::vector<lang::filter_block>>(filter_or_error);
+	return generate_filter(blocks);
 }
 
 }

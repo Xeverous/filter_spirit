@@ -56,6 +56,11 @@ struct empty_socket_group
 	lang::position_tag place_of_socket_group_string;
 };
 
+struct illegal_characters_in_socket_group
+{
+	lang::position_tag place_of_socket_group_string;
+};
+
 struct invalid_socket_group
 {
 	lang::position_tag place_of_socket_group_string;
@@ -116,6 +121,7 @@ using error_variant = std::variant<
 	nested_arrays_not_allowed,
 	non_homogeneous_array,
 	empty_socket_group,
+	illegal_characters_in_socket_group,
 	invalid_socket_group,
 	invalid_minimap_icon_size,
 	positional_sound_not_supported,

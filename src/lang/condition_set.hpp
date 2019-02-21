@@ -3,6 +3,7 @@
 #include <memory>
 #include <variant>
 #include <vector>
+#include <iosfwd>
 
 namespace fs::lang
 {
@@ -61,7 +62,6 @@ public:
 		return true;
 	}
 
-private:
 	std::optional<range_bound<T>> lower_bound;
 	std::optional<range_bound<T>> upper_bound;
 };
@@ -71,6 +71,8 @@ using rarity_range_condition = range_condition<rarity>;
 
 struct condition_set
 {
+	void generate(std::ostream& output_stream) const;
+
 	std::optional<numeric_range_condition> item_level;
 	std::optional<numeric_range_condition> drop_level;
 	std::optional<numeric_range_condition> quality;

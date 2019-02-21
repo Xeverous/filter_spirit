@@ -144,6 +144,19 @@ void print_compile_error(
 }
 
 void print_compile_error(
+	compiler::error::illegal_characters_in_socket_group error,
+	const parser::lookup_data& lookup_data,
+	std::ostream& error_stream)
+{
+	print::print_line_number_with_indication_and_texts(
+		error_stream,
+		lookup_data.get_range_of_whole_content(),
+		lookup_data.position_of(error.place_of_socket_group_string),
+		print::compiler_error_string,
+		"invalid socket group (use only R/G/B/W characters)");
+}
+
+void print_compile_error(
 	compiler::error::invalid_socket_group error,
 	const parser::lookup_data& lookup_data,
 	std::ostream& error_stream)
@@ -153,7 +166,7 @@ void print_compile_error(
 		lookup_data.get_range_of_whole_content(),
 		lookup_data.position_of(error.place_of_socket_group_string),
 		print::compiler_error_string,
-		"invalid socket group (use only R/G/B/W letters)");
+		"invalid socket group");
 }
 
 void print_compile_error(

@@ -1,6 +1,7 @@
 #pragma once
 #include "lang/types.hpp"
 #include <utility>
+#include <iosfwd>
 
 namespace fs::lang
 {
@@ -46,6 +47,8 @@ struct action_set
 	{
 		beam_effect = new_beam_effect;
 	}
+
+	void generate(std::ostream& output_stream) const;
 
 	std::optional<color> border_color;
 	std::optional<color> text_color;

@@ -103,6 +103,12 @@ struct volume
 
 struct socket_group
 {
+	bool is_valid() const
+	{
+		int sum = r + g + b + w;
+		return 0 < sum && sum <= 6;
+	}
+
 	int r = 0;
 	int g = 0;
 	int b = 0;

@@ -38,8 +38,11 @@ std::variant<lang::socket_group, error::error_variant> construct_socket_group(
 		else if (c == kw::w)
 			++sg.w;
 		else
-			return error::invalid_socket_group{parser::get_position_info(arguments.front())};
+			return error::illegal_characters_in_socket_group{parser::get_position_info(arguments.front())};
 	}
+
+	if (!sg.is_valid())
+		return error::invalid_socket_group{parser::get_position_info(arguments.front())};
 
 	return sg;
 }
