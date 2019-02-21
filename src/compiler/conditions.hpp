@@ -101,7 +101,7 @@ std::optional<error::error_variant> add_range_condition(
 			if (target.lower_bound.has_value())
 				return error::lower_bound_redefinition{condition_origin};
 
-			target.set_upper_bound(value, false);
+			target.set_lower_bound(value, false);
 			return std::nullopt;
 		}
 		case lang::comparison_type::greater_equal:
@@ -109,7 +109,7 @@ std::optional<error::error_variant> add_range_condition(
 			if (target.lower_bound.has_value())
 				return error::lower_bound_redefinition{condition_origin};
 
-			target.set_upper_bound(value, true);
+			target.set_lower_bound(value, true);
 			return std::nullopt;
 		}
 		default:

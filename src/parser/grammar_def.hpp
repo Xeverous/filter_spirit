@@ -7,26 +7,6 @@
 #pragma once
 #include "parser/symbols.hpp"
 #include "parser/grammar.hpp"
-#include <type_traits>
-
-namespace
-{
-
-template <typename T, typename U>
-struct static_assertion
-{
-	static_assert(std::is_same_v<T, U>, "check invokation");
-};
-
-const auto set_compare_equal = [](auto& context)
-{
-	using attribute_type = std::remove_reference_t<decltype(_val(context))>;
-	(void) static_assertion<fs::parser::ast::comparison_operator_expression, attribute_type>();
-
-	_val(context).value = fs::lang::comparison_type::equal;
-};
-
-}
 
 namespace fs::parser
 {
@@ -146,7 +126,7 @@ BOOST_SPIRIT_DEFINE(constant_definition)
 // ---- rules ----
 
 const comparison_operator_expression_type comparison_operator_expression = "comparison operator";
-const auto comparison_operator_expression_def = symbols::comparison_operators | x3::eps[set_compare_equal];
+const auto comparison_operator_expression_def = symbols::comparison_operators | x3::attr(lang::comparison_type::equal);
 BOOST_SPIRIT_DEFINE(comparison_operator_expression)
 
 const comparison_condition_type comparison_condition = "comparison condition";

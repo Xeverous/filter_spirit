@@ -148,9 +148,12 @@ bool condition_set::is_valid() const
 {
 	const auto is_valid_strings_condition = [](const std::shared_ptr<std::vector<std::string>>& sptr)
 	{
+		// no condition: ok, we just don't require item to have this property
 		if (sptr == nullptr)
 			return true;
 
+		// empty list of allowed values: there are no items that can match this block
+		// game client will not accept an empty list so return that the block is invalid
 		if (sptr->empty())
 			return false;
 
