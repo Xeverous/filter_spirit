@@ -73,6 +73,17 @@ struct condition_set
 {
 	void generate(std::ostream& output_stream) const;
 
+	/**
+	 * @brief determines whether given condition set is valid
+	 * for generation into the actual filter
+	 *
+	 * @details if a string condition (eg base type) is an empty array
+	 * the resulting filter would not be valid - PoE client will not
+	 * accept base type conditions that do not specify any base name
+	 */
+	[[nodiscard]]
+	bool is_valid() const;
+
 	std::optional<numeric_range_condition> item_level;
 	std::optional<numeric_range_condition> drop_level;
 	std::optional<numeric_range_condition> quality;

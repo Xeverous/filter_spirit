@@ -107,7 +107,7 @@ void output_strings_condition(
 
 	output_stream << '\t' << name;
 	for (const std::string& str : *strings_ptr)
-		output_stream << ' ' << str;
+		output_stream << " \"" << str << '"';
 
 	output_stream << '\n';
 }
@@ -140,6 +140,24 @@ void condition_set::generate(std::ostream& output_stream) const
 	output_strings_condition(class_,           lg::class_,           output_stream);
 	output_strings_condition(base_type,        lg::base_type,        output_stream);
 	output_strings_condition(has_explicit_mod, lg::has_explicit_mod, output_stream);
+}
+
+bool condition_set::is_valid() const
+{
+	const auto is_valid_strings_condition = [](const std::shared_ptr<std::vector<std::string>>& sptr)
+	{
+		if (sptr == nullptr)
+			return true;
+
+		if (sptr->empty())
+			return false;
+
+		return true;
+	};
+
+	return is_valid_strings_condition(class_)
+		&& is_valid_strings_condition(base_type)
+		&& is_valid_strings_condition(has_explicit_mod);
 }
 
 }

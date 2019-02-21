@@ -52,4 +52,20 @@ constexpr auto custom_alert_sound          = "CustomAlertSound";
 constexpr auto minimap_icon                = "MinimapIcon";
 constexpr auto play_effect                 = "PlayEffect";
 
+constexpr auto red    = "Red";
+constexpr auto green  = "Green";
+constexpr auto blue   = "Blue";
+constexpr auto white  = "White";
+constexpr auto brown  = "Brown";
+constexpr auto yellow = "Yellow";
+
+constexpr auto circle   = "Circle";
+constexpr auto diamond  = "Diamon";
+constexpr auto hexagon  = "Hexagon";
+constexpr auto square   = "Square";
+constexpr auto star     = "Star";
+constexpr auto triangle = "Triangle";
+
+constexpr auto temp = "Temp";
+
 }

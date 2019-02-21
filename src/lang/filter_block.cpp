@@ -7,6 +7,9 @@ namespace fs::lang
 
 void filter_block::generate(std::ostream& output_stream) const
 {
+	if (!conditions.is_valid())
+		return;
+
 	if (show)
 		output_stream << generation::show;
 	else
@@ -15,6 +18,7 @@ void filter_block::generate(std::ostream& output_stream) const
 
 	conditions.generate(output_stream);
 	actions.generate(output_stream);
+	output_stream << '\n';
 }
 
 }
