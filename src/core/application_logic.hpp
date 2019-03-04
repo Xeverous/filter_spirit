@@ -1,5 +1,6 @@
 #pragma once
 #include <optional>
+#include <string>
 
 namespace fs::core
 {

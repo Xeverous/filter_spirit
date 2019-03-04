@@ -1,0 +1,13 @@
+#pragma once
+#include "itemdata/types.hpp"
+#include <string_view>
+#include <vector>
+
+namespace fs::itemdata
+{
+
+std::vector<league> parse_league_info(std::string_view league_json);
+
+item_price_data parse_item_prices(std::string_view itemdata_json, std::string_view compact_json);
+
+}
