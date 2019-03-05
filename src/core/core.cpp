@@ -31,7 +31,7 @@ int run(int argc, char* argv[])
 		bool opt_generate = false;
 		po::options_description main_options("main options");
 		main_options.add_options()
-			("list-leagues,l", po::value(&opt_list_leagues), "list available leagues (this option will query the API)")
+			("list-leagues,l", po::bool_switch(&opt_list_leagues), "list available leagues (this option will query the API)")
 			("download,d", po::value(&league_name), "download item price data from api.poe.watch for specified league\n(this option can be combined with -g)")
 			("generate,g", po::value(&opt_generate), "generate an item filter using currently saved item price data")
 		;
