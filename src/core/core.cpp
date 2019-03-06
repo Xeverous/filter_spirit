@@ -24,7 +24,7 @@ int run(int argc, char* argv[])
 		main_options.add_options()
 			("list-leagues,l", po::bool_switch(&opt_list_leagues), "list available leagues (this option will query the API)")
 			("download,d", po::value(&league_name), "download item price data from api.poe.watch for specified league\n(this option can be combined with -g)")
-			("generate,g", po::value(&opt_generate), "generate an item filter using currently saved item price data")
+			("generate,g", po::bool_switch(&opt_generate), "generate an item filter using currently saved item price data")
 		;
 
 		boost::optional<std::string> input_path;
@@ -99,7 +99,13 @@ int run(int argc, char* argv[])
 				return EXIT_FAILURE;
 			}
 
-			if (!al.generate_filter(*input_path, *output_path))
+			if (!league_name)
+			{
+				std::cout << "error: no league name given\n";
+				return EXIT_FAILURE;
+			}
+
+			if (!al.generate_filter(*league_name, *input_path, *output_path))
 			{
 				std::cout << "errors occured during filter generation\n";
 				return EXIT_FAILURE;

@@ -11,7 +11,7 @@ namespace fs::core
 class application_logic
 {
 public:
-	bool generate_filter(const std::string& source_filepath, const std::string& output_filepath);
+	bool generate_filter(const std::string& league_name, const std::string& source_filepath, const std::string& output_filepath);
 
 	void list_leagues();
 

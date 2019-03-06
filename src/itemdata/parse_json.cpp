@@ -8,6 +8,8 @@
 #include <type_traits>
 #include <utility>
 
+#include <iostream> // TODO refactor logging and get rid of this
+
 namespace
 {
 
@@ -328,7 +330,9 @@ std::vector<league> parse_league_info(std::string_view league_json)
 
 item_price_data parse_item_prices(std::string_view itemdata_json, std::string_view compact_json)
 {
+	std::cout << "parsing item prices" << std::endl;
 	std::vector<std::optional<price_data>> item_prices = parse_compact(compact_json);
+	std::cout << "parsing item data" << std::endl;
 	std::vector<item> itemdata = parse_itemdata(itemdata_json);
 
 	item_price_data result;

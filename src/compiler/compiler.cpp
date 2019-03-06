@@ -100,9 +100,9 @@ bool generate_filter(const std::vector<lang::filter_block>& blocks)
 namespace fs::compiler
 {
 
-bool process_input(const std::string& file_content, std::ostream& error_stream)
+bool process_input(const std::string& input, const itemdata::item_price_data& /* items */, std::ostream& error_stream)
 {
-	std::optional<parser::parse_data> parse_result = parser::parse(file_content, error_stream);
+	std::optional<parser::parse_data> parse_result = parser::parse(input, error_stream);
 
 	if (!parse_result)
 		return false;
