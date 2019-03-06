@@ -12,15 +12,6 @@
 namespace fs::core
 {
 
-void list_leagues()
-{
-	network::poe_watch_api api;
-	std::future<std::vector<itemdata::league>> leagues_future = api.async_download_leagues();
-	const auto& leagues = leagues_future.get();
-	for (const itemdata::league& league : leagues)
-		std::cout << league.display_name << '\n';
-}
-
 int run(int argc, char* argv[])
 {
 	try {
@@ -86,9 +77,11 @@ int run(int argc, char* argv[])
 			return EXIT_SUCCESS;
 		}
 
+		application_logic al;
+
 		if (opt_list_leagues)
 		{
-			list_leagues();
+			al.list_leagues();
 			return EXIT_SUCCESS;
 		}
 
@@ -106,14 +99,7 @@ int run(int argc, char* argv[])
 				return EXIT_FAILURE;
 			}
 
-			application_logic al;
-			if (!al.load_source_file(*input_path))
-			{
-				std::cout << "error: could not load the input file\n";
-				return EXIT_FAILURE;
-			}
-
-			if (!al.generate_filter(*output_path))
+			if (!al.generate_filter(*input_path, *output_path))
 			{
 				std::cout << "errors occured during filter generation\n";
 				return EXIT_FAILURE;
