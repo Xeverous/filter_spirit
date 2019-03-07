@@ -77,6 +77,8 @@ struct integer
 
 struct floating_point
 {
+	explicit floating_point(integer n) : value(n.value) {}
+
 	double value;
 };
 

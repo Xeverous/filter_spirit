@@ -16,7 +16,7 @@ std::variant<std::vector<lang::filter_block>, error::error_variant> filter_build
 	const lang::constants_map& map,
 	const itemdata::item_price_data& item_price_data)
 {
-	filter_builder fb(top_level_statements, map);
+	filter_builder fb(top_level_statements, map, item_price_data);
 	return fb.build_filter();
 }
 
@@ -41,7 +41,7 @@ std::optional<error::error_variant> filter_builder::build_nested(
 		auto error = statement.apply_visitor(x3::make_lambda_visitor<std::optional<error::error_variant>>(
 			[&, this](const ast::action& action)
 			{
-				return add_action(action, map, parent_actions);
+				return add_action(action, map, item_price_data, parent_actions);
 			},
 			[&, this](const ast::visibility_statement& vs)
 			{
@@ -53,7 +53,7 @@ std::optional<error::error_variant> filter_builder::build_nested(
 				// explicitly make a copy of parent conditions - the call stack will preserve
 				// old instance while nested blocks can add additional conditions that have limited lifetime
 				lang::condition_set nested_conditions(parent_conditions);
-				std::optional<error::error_variant> error = add_conditions(nested_block.conditions, map, nested_conditions);
+				std::optional<error::error_variant> error = add_conditions(nested_block.conditions, map, item_price_data, nested_conditions);
 				if (error.has_value())
 					return error;
 

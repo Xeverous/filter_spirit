@@ -99,6 +99,8 @@ bool generate_filter(const std::vector<lang::filter_block>& blocks)
 
 } // namespace
 
+#include <iostream> // TODO implement logging, remove
+
 namespace fs::compiler
 {
 
@@ -117,6 +119,15 @@ bool process_input(const std::string& input, const itemdata::item_price_data& it
 		print::compile_error(std::get<error::error_variant>(map_or_error), parse_data.lookup_data, error_stream);
 		return false;
 	}
+
+	std::cout << "itemdata:\n"
+		<< "divination cards: " << item_price_data.divination_cards.size() << "\n"
+		<< "prophecies: " << item_price_data.prophecies.size() << "\n"
+		<< "bases no inf: " << item_price_data.bases_without_influence.size() << "\n"
+		<< "bases shaper: " << item_price_data.bases_shaper.size() << "\n"
+		<< "bases elder: " << item_price_data.bases_elder.size() << "\n"
+		<< "uniques: " << item_price_data.unique_items.size() << "\n"
+		<< "relics: " << item_price_data.relic_items.size() << "\n";
 
 	const auto& map = std::get<lang::constants_map>(map_or_error);
 	std::variant<std::vector<lang::filter_block>, error::error_variant> filter_or_error = filter_builder::build_filter(parse_data.ast.statements, map, item_price_data);

@@ -24,10 +24,10 @@ std::variant<lang::object, error::error_variant> evaluate_value_expression(
 			return evaluate_literal(literal);
 		},
 		[&](const ast::array_expression& array) {
-			return evaluate_array(array, map);
+			return evaluate_array(array, map, item_price_data);
 		},
 		[&](const ast::function_call& function_call) {
-			return evaluate_function_call(function_call, map);
+			return evaluate_function_call(function_call, map, item_price_data);
 		},
 		[&](const ast::price_range_query& price_range_query) {
 			return evaluate_price_range_query(price_range_query, map, item_price_data);
@@ -72,13 +72,14 @@ lang::object evaluate_literal(
 
 std::variant<lang::object, error::error_variant> evaluate_array(
 	const ast::array_expression& expression,
-	const lang::constants_map& map)
+	const lang::constants_map& map,
+	const itemdata::item_price_data& item_price_data)
 {
 	// note: the entire function should work also in case of empty array
 	lang::array_object array;
 	for (const ast::value_expression& value_expression : expression)
 	{
-		std::variant<lang::object, error::error_variant> object_or_error = evaluate_value_expression(value_expression, map);
+		std::variant<lang::object, error::error_variant> object_or_error = evaluate_value_expression(value_expression, map, item_price_data);
 		if (std::holds_alternative<error::error_variant>(object_or_error))
 			return std::get<error::error_variant>(object_or_error);
 
@@ -102,7 +103,8 @@ std::variant<lang::object, error::error_variant> evaluate_array(
 
 std::variant<lang::object, error::error_variant> evaluate_function_call(
 	const ast::function_call& function_call,
-	const lang::constants_map& map)
+	const lang::constants_map& map,
+	const itemdata::item_price_data& item_price_data)
 {
 	/*
 	 * right now there is no support for user-defined functions
@@ -121,7 +123,7 @@ std::variant<lang::object, error::error_variant> evaluate_function_call(
 	 */
 	if (function_name.value == lang::functions::rgb)
 	{
-		std::variant<lang::color, error::error_variant> color_or_error = construct_color(arguments, map);
+		std::variant<lang::color, error::error_variant> color_or_error = construct_color(arguments, map, item_price_data);
 		if (std::holds_alternative<error::error_variant>(color_or_error))
 			return std::get<error::error_variant>(color_or_error);
 
@@ -132,7 +134,7 @@ std::variant<lang::object, error::error_variant> evaluate_function_call(
 	}
 	else if (function_name.value == lang::functions::group)
 	{
-		std::variant<lang::socket_group, error::error_variant> socket_group_or_error = construct_socket_group(arguments, map);
+		std::variant<lang::socket_group, error::error_variant> socket_group_or_error = construct_socket_group(arguments, map, item_price_data);
 		if (std::holds_alternative<error::error_variant>(socket_group_or_error))
 			return std::get<error::error_variant>(socket_group_or_error);
 
@@ -143,7 +145,7 @@ std::variant<lang::object, error::error_variant> evaluate_function_call(
 	}
 	else if (function_name.value == lang::functions::minimap_icon)
 	{
-		std::variant<lang::minimap_icon, error::error_variant> icon_or_error = construct_minimap_icon(arguments, map);
+		std::variant<lang::minimap_icon, error::error_variant> icon_or_error = construct_minimap_icon(arguments, map, item_price_data);
 		if (std::holds_alternative<error::error_variant>(icon_or_error))
 			return std::get<error::error_variant>(icon_or_error);
 
@@ -154,7 +156,7 @@ std::variant<lang::object, error::error_variant> evaluate_function_call(
 	}
 	else if (function_name.value == lang::functions::beam_effect)
 	{
-		std::variant<lang::beam_effect, error::error_variant> beam_effect_or_error = construct_beam_effect(arguments, map);
+		std::variant<lang::beam_effect, error::error_variant> beam_effect_or_error = construct_beam_effect(arguments, map, item_price_data);
 		if (std::holds_alternative<error::error_variant>(beam_effect_or_error))
 			return std::get<error::error_variant>(beam_effect_or_error);
 
@@ -165,7 +167,7 @@ std::variant<lang::object, error::error_variant> evaluate_function_call(
 	}
 	else if (function_name.value == lang::functions::path)
 	{
-		std::variant<lang::path, error::error_variant> path_or_error = construct_path(arguments, map);
+		std::variant<lang::path, error::error_variant> path_or_error = construct_path(arguments, map, item_price_data);
 		if (std::holds_alternative<error::error_variant>(path_or_error))
 			return std::get<error::error_variant>(path_or_error);
 
@@ -180,15 +182,16 @@ std::variant<lang::object, error::error_variant> evaluate_function_call(
 
 
 std::variant<lang::object, error::error_variant> evaluate_price_range_query(
-	const parser::ast::price_range_query& price_range_query,
+	const ast::price_range_query& price_range_query,
 	const lang::constants_map& map,
 	const itemdata::item_price_data& item_price_data)
 {
-	std::variant<lang::price_range, error::error_variant> range_or_error = construct_price_range(price_range_query.arguments, map);
+	std::variant<lang::price_range, error::error_variant> range_or_error = construct_price_range(price_range_query.arguments, map, item_price_data);
 	if (std::holds_alternative<error::error_variant>(range_or_error))
 		return std::get<error::error_variant>(range_or_error);
 
 	const auto& price_range = std::get<lang::price_range>(range_or_error);
+	const lang::position_tag position_of_query = parser::get_position_info(price_range_query);
 
 	/*
 	 * note: this is O(n) but relying on small string optimization
@@ -200,12 +203,22 @@ std::variant<lang::object, error::error_variant> evaluate_price_range_query(
 	if (query_name.value == lang::queries::divination)
 	{
 		const std::vector<itemdata::divination_card>& cards = item_price_data.divination_cards;
-		return evaluate_price_range_query_on_sorted_range(price_range, cards.begin(), cards.end());
+		lang::array_object array = evaluate_price_range_query_on_sorted_range(
+			price_range,
+			position_of_query,
+			cards.begin(),
+			cards.end());
+		return lang::object{std::move(array), position_of_query, std::nullopt};
 	}
 	else if (query_name.value == lang::queries::prophecies)
 	{
 		const std::vector<itemdata::prophecy>& prophecies = item_price_data.prophecies;
-		return evaluate_price_range_query_on_sorted_range(price_range, prophecies.begin(), prophecies.end());
+		lang::array_object array = evaluate_price_range_query_on_sorted_range(
+			price_range,
+			position_of_query,
+			prophecies.begin(),
+			prophecies.end());
+		return lang::object{std::move(array), position_of_query, std::nullopt};
 	}
 
 	return error::no_such_query{parser::get_position_info(query_name)};

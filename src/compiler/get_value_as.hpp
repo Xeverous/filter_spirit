@@ -21,6 +21,9 @@ template <typename>
 struct allowed_promotions : promotion_list<> {}; // by default no promotions are allowed
 
 template <>
+struct allowed_promotions<lang::floating_point> : promotion_list<lang::integer> {};
+
+template <>
 struct allowed_promotions<lang::level> : promotion_list<lang::integer> {};
 
 template <>
@@ -50,6 +53,8 @@ std::variant<T, error::error_variant> attempt_to_promote(
 	lang::position_tag object_position,
 	type_list<P, Ps...>)
 {
+	static_assert(std::is_constructible_v<T, P>, "T must define a constructor that takes P");
+
 	if (std::holds_alternative<P>(single_object))
 		return T(std::get<P>(single_object));
 	else

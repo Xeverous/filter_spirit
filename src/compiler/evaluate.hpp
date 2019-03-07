@@ -24,12 +24,14 @@ lang::object evaluate_literal(
 [[nodiscard]]
 std::variant<lang::object, error::error_variant> evaluate_array(
 	const parser::ast::array_expression& expression,
-	const lang::constants_map& map);
+	const lang::constants_map& map,
+	const itemdata::item_price_data& item_price_data);
 
 [[nodiscard]]
 std::variant<lang::object, error::error_variant> evaluate_function_call(
 	const parser::ast::function_call& function_call,
-	const lang::constants_map& map);
+	const lang::constants_map& map,
+	const itemdata::item_price_data& item_price_data);
 
 [[nodiscard]]
 std::variant<lang::object, error::error_variant> evaluate_price_range_query(

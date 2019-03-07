@@ -9,9 +9,10 @@ namespace fs::compiler
 template <typename T>
 std::variant<T, error::error_variant> evaluate_as(
 	const parser::ast::value_expression& expression,
-	const lang::constants_map& map)
+	const lang::constants_map& map,
+	const itemdata::item_price_data& item_price_data)
 {
-	std::variant<lang::object, error::error_variant> object_or_error = evaluate_value_expression(expression, map);
+	std::variant<lang::object, error::error_variant> object_or_error = evaluate_value_expression(expression, map, item_price_data);
 
 	if (std::holds_alternative<error::error_variant>(object_or_error))
 		return std::get<error::error_variant>(object_or_error);

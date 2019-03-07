@@ -17,7 +17,7 @@ config {
 
 # TODO predefined constants
 const color_white           = RGB(255, 255, 255)
-const color_black           = RGB(  0,   0,   0)
+const color_black           = RGB(  0,   0,   0, 255)
 const color_red             = RGB(255,   0,   0)
 const color_error           = color_red
 
@@ -62,10 +62,6 @@ const color_shaper_item     = RGB( 49, 127, 155)
 const color_elder_item      = RGB(102,   0, 128)
 const color_veiled_item     = RGB(150, 100, 158)
 
-#const currency_t1 = read_file("currency_t1.txt")
-#const currency_t2 = read_file("currency_t2.txt")
-#const currency_t3 = read_file("currency_t3.txt")
-#const currency_t4 = read_file("currency_t4.txt")
 const currency_t1 = ["Exalted Orb", "Divine Orb", "Mirror of Kalandra", "Eternal Orb", "Albino Rhoa Feather", "Mirror Shard" ]
 const currency_t2 = ["Chaos Orb", "Gemcutter's Prism", "Orb of Regret", "Regal Orb", "Stacked Deck", "Vaal Orb", "Apprentice Cartographer's Seal", "Apprentice Cartographer's Sextant", "Journeyman Cartographer's Seal", "Journeyman Cartographer's Sextant", "Master Cartographer's Seal", "Master Cartographer's Sextant", "Unshaping Orb", "Remnant of Corruption", "Exalted Shard", "Orb of Annulment", "Orb of Binding", "Orb of Horizons", "Harbinger's Orb", "Engineer's Orb", "Ancient Orb", "Stacked Deck", "Vial of" ]
 const currency_t3 = ["Cartographer's Chisel", "Jeweller's Orb", "Orb of Alchemy", "Orb of Chance", "Orb of Fusing", "Orb of Scouring", "Silver Coin", "Blessed Orb" ]
@@ -161,6 +157,7 @@ const alert_lab_trinket        = alert_unusual_drop
 const alert_quest_item         = alert_damn_son
 const alert_talisman_rare      = alert_explosion
 const alert_talisman_other     = alert_explosion
+const alert_rain_of_chaos      = alert_hitmarker
 
 const beam_top_gem         = green
 const beam_top_unique      = brown
@@ -358,13 +355,10 @@ Class "Currency" {
 		Show
 	}
 
-	# last block (implicitly created)
-	# purpose: catch errors
 	SetTextColor color_error
 	SetBorderColor color_error
 	SetBackgroundColor color_currency
 	SetFontSize font_max
-	# TODO: implicit block creation - is this good syntax design?
 	Show
 }
 
@@ -374,7 +368,7 @@ Class "Gem" {
 #		SetTextColor color_vaal
 #	}
 #	else if (BaseType ["Empower", "Enhance", "Enlighten", "Portal", "Detonate Mines", "Added Chaos Damage"]) {
-#		SetFontSize font_gem_drop_only
+#		SetFontSize 40
 #		SetAlertSound alert_gem_drop_only
 #	}
 #
@@ -387,8 +381,47 @@ Class "Gem" {
 #		SetBorderColor GetTextColor
 #		SetAlertSound alert_gem_quality
 #	}
+#	# implicit creation of 9 blocks (3 * 3)
+#	Show
 
-	# implicit creation of 9 blocks (3 * 3)
+	BaseType ["Empower", "Enhance", "Enlighten", "Portal", "Detonate Mines", "Added Chaos Damage"] {
+		SetFontSize 40
+		SetAlertSound alert_gem_drop_only
+		Show
+	}
+
+	BaseType "Vaal" {
+		SetTextColor color_vaal
+
+		Quality 20 {
+			SetBackgroundColor color_white
+			SetAlertSound alert_gem_20_quality
+			Show
+		}
+
+		Quality > 0 {
+			SetBorderColor color_vaal
+			SetAlertSound alert_gem_quality
+			Show
+		}
+
+		Show
+	}
+
+	# non-vaal gems
+	Quality 20 {
+		SetBackgroundColor color_white
+		SetAlertSound alert_gem_20_quality
+		Show
+	}
+
+	Quality > 0 {
+		SetBorderColor color_gem
+		SetAlertSound alert_gem_quality
+		Show
+	}
+
+	# no special highlight for "just a gem"; just show the item
 	Show
 }
 
@@ -462,6 +495,7 @@ Rarity unique {
 	# note that APIs may not list all possible uniques
 	# therefore always make a block with no price requirement
 	# any other unique:
+	SetAlertSound alert_other_unique
 	Show
 }
 
@@ -504,18 +538,18 @@ Class "Incursion Item" && BaseType ["Stone of Passage", "Flashpowder Keg"] {
 	Show
 }
 
-Class "Misc Map Fragments" {
-	# top map fragment items
-	# TODO: scarabs should have own block with API prices
-	BaseType ["Sacrifice at Midnight", "Divine Vessel", "Scarab"] {
-		SetTextColor color_sacrifice
-		SetBorderColor color_sacrifice
-		SetBackgroundColor color_white
-		SetFontSize font_max
-		SetAlertSound alert_midnight
-		Show
-	}
+# top map fragment items
+# TODO: scarabs should have own block with API prices
+BaseType ["Divine Vessel", "Scarab"] {
+	SetTextColor color_sacrifice
+	SetBorderColor color_sacrifice
+	SetBackgroundColor color_white
+	SetFontSize font_max
+	SetAlertSound alert_midnight
+	Show
+}
 
+Class "Map Fragments" {
 	# non-midnight sacrifice
 	BaseType "Sacrifice" {
 		SetTextColor color_sacrifice
@@ -649,40 +683,45 @@ Class "Divination Card" {
 	SetTextColor color_divination
 
 	# place here low-value cards that you always want to pickup
-	BaseType ["The Gambler", "The Void"] {
+	BaseType ["The Gambler", "The Void", "Jack in the Box", "Emperor's Luck", "Her Mask", "Humility", "Loyalty", "Lucky Connections", "Lucky Deck", "No Traces", "The Calling", "The Cartographer", "The Catalyst", "The Encroaching Darkness", "The Gambler", "The Gemcutter", "The Innocent", "The Inventor", "The Master Artisan", "The Obscured", "The Puzzle", "The Risk", "The Survivalist", "The Throne", "The Wrath", "The Wretched", "Three Faces in the Dark", "Three Voices", "Vinia's Token"] {
 		SetAlertSound alert_divination_t3
 		SetBeam blue # temp # (not yet supported)
 		Show
 	}
 
-#	BaseType $divination(100,) {
-#		SetTextColor color_black
-#		SetBorderColor color_divination
-#		SetBackgroundColor color_divination
-#		SetFontSize font_max
-#		SetAlertSound alert_divination_t1
-#		SetBeam blue
-#		SetMinimapIcon 0 blue square
-#		Show
-#	}
+	BaseType ["Rain of Chaos", "The Scholar"] {
+		SetAlertSound alert_rain_of_chaos
+		Show
+	}
 
-#	BaseType $divination(10, 100) {
-#		SetBorderColor color_divination
-#		SetFontSize font_mid_divinaton
-#		SetAlertSound alert_divination_t3
-#		SetBeam blue
-#		SetMinimapIcon 1 blue square
-#		Show
-#	}
+	BaseType $divination(100,999999) {
+		SetTextColor color_black
+		SetBorderColor color_divination
+		SetBackgroundColor color_divination
+		SetFontSize font_max
+		SetAlertSound alert_divination_t1
+		SetBeam blue
+		SetMinimapIcon MinimapIcon(0, blue, square)
+		Show
+	}
 
-#	BaseType $divination(1, 10) {
-#		SetTextColor color_divination
-#		SetFontSize font_mid_divinaton
-#		SetAlertSound alert_divination_t4
-#		SetBeam blue temp
-#		SetMinimapIcon 2 blue square
-#		Show
-#	}
+	BaseType $divination(10, 100) {
+		SetBorderColor color_divination
+		SetFontSize font_mid_divinaton
+		SetAlertSound alert_divination_t3
+		SetBeam blue
+		SetMinimapIcon MinimapIcon(1, blue, square)
+		Show
+	}
+
+	BaseType $divination(1, 10) {
+		SetTextColor color_divination
+		SetFontSize font_mid_divinaton
+		SetAlertSound alert_divination_t4
+		SetBeam blue # temp
+		SetMinimapIcon MinimapIcon(2, blue, square)
+		Show
+	}
 
 	# < 1c shits (eg Rain of Chaos)
 	Hide
@@ -961,10 +1000,20 @@ Rarity <= rare {
 Class "Utility Flasks" {
 	SetTextColor color_white
 	SetBackgroundColor color_flask_utility
+	Show
 }
 
 # flasks - life/mana
 # TODO
+
+Class "Flasks" {
+	Quality 20 {
+		SetBorderColor color_white
+		Show
+	}
+
+	Show
+}
 
 # leveling - sceptres for +1 gem lvl recipe
 # TODO

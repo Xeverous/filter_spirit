@@ -28,34 +28,34 @@ struct price_data
 
 struct divination_card
 {
-	std::string name;
+	std::string base_type_name;
 	price_data price_data;
 };
 
 struct prophecy
 {
-	std::string name;
+	std::string base_type_name;
 	price_data price_data;
 };
 
 struct base_without_influence
 {
 	int ilvl;
-	std::string base_name;
+	std::string base_type_name;
 	price_data price_data;
 };
 
 struct base_shaper
 {
 	int ilvl;
-	std::string base_name;
+	std::string base_type_name;
 	price_data price_data;
 };
 
 struct base_elder
 {
 	int ilvl;
-	std::string base_name;
+	std::string base_type_name;
 	price_data price_data;
 };
 

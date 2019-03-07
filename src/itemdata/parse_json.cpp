@@ -103,7 +103,7 @@ std::vector<std::optional<fs::itemdata::price_data>> parse_compact(std::string_v
 
 	if (!json.is_array())
 	{
-		// TODO log invalid json
+		throw std::runtime_error("compact JSON must be an array but it is not");
 	}
 
 	std::vector<std::optional<fs::itemdata::price_data>> item_prices;
@@ -117,6 +117,10 @@ std::vector<std::optional<fs::itemdata::price_data>> parse_compact(std::string_v
 		{
 			max_id = id;
 			item_prices.resize(max_id * 2);
+		}
+		else if (id > max_id)
+		{
+			max_id = id;
 		}
 
 		if (item_prices[id].has_value()) // C++20: [[unlikely]]
@@ -332,8 +336,18 @@ item_price_data parse_item_prices(std::string_view itemdata_json, std::string_vi
 {
 	std::cout << "parsing item prices" << std::endl;
 	std::vector<std::optional<price_data>> item_prices = parse_compact(compact_json);
+	if (item_prices.empty())
+		throw std::runtime_error("parsed empty list of item prices");
+
+	std::cout << "got " << item_prices.size() << " entries" << std::endl;
+
+
 	std::cout << "parsing item data" << std::endl;
 	std::vector<item> itemdata = parse_itemdata(itemdata_json);
+	if (itemdata.empty())
+		throw std::runtime_error("parsed empty list of item data");
+
+	std::cout << "got " << itemdata.size() << " entries" << std::endl;
 
 	item_price_data result;
 	for (item& i : itemdata)
