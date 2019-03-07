@@ -106,6 +106,10 @@ const function_call_type function_call = "function call";
 const auto function_call_def = identifier >> '(' >> value_expression % ',' >> ')';
 BOOST_SPIRIT_DEFINE(function_call)
 
+const price_range_query_type price_range_query = "price range query";
+const auto price_range_query_def = '$' >> identifier >> '(' >> value_expression % ',' >> ')';
+BOOST_SPIRIT_DEFINE(price_range_query)
+
 const array_expression_type array_expression = "array expression";
 const auto array_expression_def = x3::lit('[') > (value_expression % x3::lit(',')) > x3::lit(']');
 BOOST_SPIRIT_DEFINE(array_expression)
@@ -114,7 +118,8 @@ const auto value_expression_def =
 	  literal_expression
 	| array_expression
 	| function_call
-	| identifier;
+	| identifier
+	| price_range_query;
 BOOST_SPIRIT_DEFINE(value_expression)
 
 // ---- definitions ----

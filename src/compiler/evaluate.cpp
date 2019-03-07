@@ -1,6 +1,8 @@
 #include "compiler/evaluate.hpp"
 #include "compiler/functions.hpp"
+#include "compiler/queries.hpp"
 #include "lang/functions.hpp"
+#include "lang/queries.hpp"
 #include <utility>
 #include <boost/spirit/home/x3/support/utility/lambda_visitor.hpp>
 
@@ -12,7 +14,8 @@ namespace ast = parser::ast;
 
 std::variant<lang::object, error::error_variant> evaluate_value_expression(
 	const ast::value_expression& value_expression,
-	const lang::constants_map& map)
+	const lang::constants_map& map,
+	const itemdata::item_price_data& item_price_data)
 {
 	using result_type = std::variant<lang::object, error::error_variant>;
 
@@ -25,6 +28,9 @@ std::variant<lang::object, error::error_variant> evaluate_value_expression(
 		},
 		[&](const ast::function_call& function_call) {
 			return evaluate_function_call(function_call, map);
+		},
+		[&](const ast::price_range_query& price_range_query) {
+			return evaluate_price_range_query(price_range_query, map, item_price_data);
 		},
 		[&](const ast::identifier& identifier) {
 			return evaluate_identifier(identifier, map);
@@ -170,6 +176,39 @@ std::variant<lang::object, error::error_variant> evaluate_function_call(
 	}
 
 	return error::no_such_function{parser::get_position_info(function_name)};
+}
+
+
+std::variant<lang::object, error::error_variant> evaluate_price_range_query(
+	const parser::ast::price_range_query& price_range_query,
+	const lang::constants_map& map,
+	const itemdata::item_price_data& item_price_data)
+{
+	std::variant<lang::price_range, error::error_variant> range_or_error = construct_price_range(price_range_query.arguments, map);
+	if (std::holds_alternative<error::error_variant>(range_or_error))
+		return std::get<error::error_variant>(range_or_error);
+
+	const auto& price_range = std::get<lang::price_range>(range_or_error);
+
+	/*
+	 * note: this is O(n) but relying on small string optimization
+	 * and much better memory layout makes it to run faster than a
+	 * tree-based or hash-based map. We can also optimize order of
+	 * comparisons.
+	 */
+	const ast::identifier& query_name = price_range_query.name;
+	if (query_name.value == lang::queries::divination)
+	{
+		const std::vector<itemdata::divination_card>& cards = item_price_data.divination_cards;
+		return evaluate_price_range_query_on_sorted_range(price_range, cards.begin(), cards.end());
+	}
+	else if (query_name.value == lang::queries::prophecies)
+	{
+		const std::vector<itemdata::prophecy>& prophecies = item_price_data.prophecies;
+		return evaluate_price_range_query_on_sorted_range(price_range, prophecies.begin(), prophecies.end());
+	}
+
+	return error::no_such_query{parser::get_position_info(query_name)};
 }
 
 std::variant<lang::object, error::error_variant> evaluate_identifier(

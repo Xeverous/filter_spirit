@@ -75,6 +75,11 @@ struct integer
 	int value;
 };
 
+struct floating_point
+{
+	double value;
+};
+
 struct level
 {
 	explicit level(integer n) : value(n.value) {}
@@ -192,6 +197,7 @@ struct alert_sound
 using single_object = std::variant<
 	boolean,
 	integer,
+	floating_point,
 	level,
 	quality,
 	font_size,
@@ -213,6 +219,7 @@ enum class single_object_type
 {
 	boolean,
 	integer,
+	floating_point,
 	level,
 	quality,
 	font_size,
@@ -304,6 +311,8 @@ single_object_type type_to_enum_impl<boolean>() { return single_object_type::boo
 template <> constexpr
 single_object_type type_to_enum_impl<integer>() { return single_object_type::integer; }
 template <> constexpr
+single_object_type type_to_enum_impl<floating_point>() { return single_object_type::floating_point; }
+template <> constexpr
 single_object_type type_to_enum_impl<level>() { return single_object_type::level; }
 template <> constexpr
 single_object_type type_to_enum_impl<quality>() { return single_object_type::quality; }
@@ -343,5 +352,11 @@ single_object_type type_to_enum()
 
 	return type_to_enum_impl<T>();
 }
+
+struct price_range
+{
+	double min;
+	double max;
+};
 
 }

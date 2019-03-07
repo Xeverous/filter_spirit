@@ -6,6 +6,7 @@
 #include "lang/filter_block.hpp"
 #include "parser/parser.hpp"
 #include "parser/ast.hpp"
+#include "itemdata/types.hpp"
 #include <utility>
 #include <vector>
 #include <optional>
@@ -19,13 +20,15 @@ public:
 	[[nodiscard]] static
 	std::variant<std::vector<lang::filter_block>, error::error_variant> build_filter(
 		const std::vector<parser::ast::statement>& top_level_statements,
-		const lang::constants_map& map);
+		const lang::constants_map& map,
+		const itemdata::item_price_data& item_price_data);
 
 private:
 	filter_builder(
 		const std::vector<parser::ast::statement>& top_level_statements,
-		const lang::constants_map& map)
-	: statements(top_level_statements), map(map)
+		const lang::constants_map& map,
+		const itemdata::item_price_data& item_price_data)
+	: statements(top_level_statements), map(map), item_price_data(item_price_data)
 	{}
 
 	[[nodiscard]]
@@ -52,6 +55,7 @@ private:
 
 	const std::vector<parser::ast::statement>& statements;
 	const lang::constants_map& map;
+	const itemdata::item_price_data& item_price_data;
 
 	std::vector<lang::filter_block> blocks;
 };

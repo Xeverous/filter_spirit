@@ -1,8 +1,11 @@
 #pragma once
+
 #include "parser/ast.hpp"
 #include "lang/types.hpp"
 #include "lang/constants_map.hpp"
 #include "compiler/error.hpp"
+#include "itemdata/types.hpp"
+
 #include <variant>
 
 namespace fs::compiler
@@ -11,7 +14,8 @@ namespace fs::compiler
 [[nodiscard]]
 std::variant<lang::object, error::error_variant> evaluate_value_expression(
 	const parser::ast::value_expression& value_expression,
-	const lang::constants_map& map);
+	const lang::constants_map& map,
+	const itemdata::item_price_data& item_price_data);
 
 [[nodiscard]]
 lang::object evaluate_literal(
@@ -26,6 +30,12 @@ std::variant<lang::object, error::error_variant> evaluate_array(
 std::variant<lang::object, error::error_variant> evaluate_function_call(
 	const parser::ast::function_call& function_call,
 	const lang::constants_map& map);
+
+[[nodiscard]]
+std::variant<lang::object, error::error_variant> evaluate_price_range_query(
+	const parser::ast::price_range_query& price_range_query,
+	const lang::constants_map& map,
+	const itemdata::item_price_data& item_price_data);
 
 [[nodiscard]]
 std::variant<lang::object, error::error_variant> evaluate_identifier(

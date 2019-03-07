@@ -12,7 +12,7 @@ std::variant<lang::socket_group, error::error_variant> construct_socket_group(
 	const parser::ast::function_arguments& arguments,
 	const lang::constants_map& map)
 {
-	int arguments_amount = arguments.size();
+	const int arguments_amount = arguments.size();
 	if (arguments_amount != 1)
 		return error::invalid_amount_of_arguments{1, 1, arguments_amount, parser::get_position_info(arguments)};
 
@@ -51,7 +51,7 @@ std::variant<lang::color, error::error_variant> construct_color(
 	const parser::ast::function_arguments& arguments,
 	const lang::constants_map& map)
 {
-	int arguments_amount = arguments.size();
+	const int arguments_amount = arguments.size();
 	if (arguments_amount != 3 && arguments_amount != 4)
 		return error::invalid_amount_of_arguments{3, 4, arguments_amount, parser::get_position_info(arguments)};
 
@@ -82,7 +82,7 @@ std::variant<lang::path, error::error_variant> construct_path(
 	const parser::ast::function_arguments& arguments,
 	const lang::constants_map& map)
 {
-	int arguments_amount = arguments.size();
+	const int arguments_amount = arguments.size();
 	if (arguments_amount != 1)
 		return error::invalid_amount_of_arguments{1, 1, arguments_amount, parser::get_position_info(arguments)};
 
@@ -97,7 +97,7 @@ std::variant<lang::minimap_icon, error::error_variant> construct_minimap_icon(
 	const parser::ast::function_arguments& arguments,
 	const lang::constants_map& map)
 {
-	int arguments_amount = arguments.size();
+	const int arguments_amount = arguments.size();
 	if (arguments_amount != 3)
 		return error::invalid_amount_of_arguments{3, 3, arguments_amount, parser::get_position_info(arguments)};
 
@@ -127,7 +127,7 @@ std::variant<lang::beam_effect, error::error_variant> construct_beam_effect(
 	const parser::ast::function_arguments& arguments,
 	const lang::constants_map& map)
 {
-	int arguments_amount = arguments.size();
+	const int arguments_amount = arguments.size();
 	if (arguments_amount != 1 && arguments_amount != 2)
 		return error::invalid_amount_of_arguments{1, 2, arguments_amount, parser::get_position_info(arguments)};
 

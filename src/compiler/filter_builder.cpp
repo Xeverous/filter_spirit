@@ -1,6 +1,7 @@
 #include "compiler/filter_builder.hpp"
 #include "compiler/actions.hpp"
 #include "compiler/conditions.hpp"
+
 #include <boost/spirit/home/x3/support/utility/lambda_visitor.hpp>
 #include <utility>
 
@@ -12,7 +13,8 @@ namespace x3 = boost::spirit::x3;
 
 std::variant<std::vector<lang::filter_block>, error::error_variant> filter_builder::build_filter(
 	const std::vector<parser::ast::statement>& top_level_statements,
-	const lang::constants_map& map)
+	const lang::constants_map& map,
+	const itemdata::item_price_data& item_price_data)
 {
 	filter_builder fb(top_level_statements, map);
 	return fb.build_filter();

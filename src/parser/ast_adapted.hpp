@@ -63,6 +63,10 @@ BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::function_call,
 	name, arguments)
 
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::price_range_query,
+	name, arguments)
+
 // ---- definitions ----
 
 BOOST_FUSION_ADAPT_STRUCT(

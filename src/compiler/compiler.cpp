@@ -36,7 +36,8 @@ namespace ast = parser::ast;
 [[nodiscard]]
 std::optional<compiler::error::error_variant> add_constant_from_definition(
 	const ast::constant_definition& def,
-	lang::constants_map& map)
+	lang::constants_map& map,
+	const itemdata::item_price_data& item_price_data)
 {
 	const ast::identifier& wanted_name = def.name;
 	const ast::value_expression& value_expression = def.value;
@@ -51,7 +52,7 @@ std::optional<compiler::error::error_variant> add_constant_from_definition(
 	}
 
 	std::variant<lang::object, compiler::error::error_variant> expr_result =
-		compiler::evaluate_value_expression(value_expression, map);
+		compiler::evaluate_value_expression(value_expression, map, item_price_data);
 
 	if (std::holds_alternative<compiler::error::error_variant>(expr_result))
 		return std::get<compiler::error::error_variant>(expr_result);
@@ -65,14 +66,15 @@ std::optional<compiler::error::error_variant> add_constant_from_definition(
 
 [[nodiscard]]
 std::variant<lang::constants_map, compiler::error::error_variant> resolve_constants(
-	const std::vector<parser::ast::constant_definition>& constant_definitions)
+	const std::vector<parser::ast::constant_definition>& constant_definitions,
+	const itemdata::item_price_data& item_price_data)
 {
 	lang::constants_map map;
 
 	for (const ast::constant_definition& def : constant_definitions)
 	{
 		const std::optional<compiler::error::error_variant> error =
-			add_constant_from_definition(def, map);
+			add_constant_from_definition(def, map, item_price_data);
 
 		if (error)
 			return *error;
@@ -100,7 +102,7 @@ bool generate_filter(const std::vector<lang::filter_block>& blocks)
 namespace fs::compiler
 {
 
-bool process_input(const std::string& input, const itemdata::item_price_data& /* items */, std::ostream& error_stream)
+bool process_input(const std::string& input, const itemdata::item_price_data& item_price_data, std::ostream& error_stream)
 {
 	std::optional<parser::parse_data> parse_result = parser::parse(input, error_stream);
 
@@ -108,7 +110,7 @@ bool process_input(const std::string& input, const itemdata::item_price_data& /*
 		return false;
 
 	parser::parse_data& parse_data = *parse_result;
-	std::variant<lang::constants_map, error::error_variant> map_or_error = resolve_constants(parse_data.ast.constant_definitions);
+	std::variant<lang::constants_map, error::error_variant> map_or_error = resolve_constants(parse_data.ast.constant_definitions, item_price_data);
 
 	if (std::holds_alternative<error::error_variant>(map_or_error))
 	{
@@ -117,7 +119,7 @@ bool process_input(const std::string& input, const itemdata::item_price_data& /*
 	}
 
 	const auto& map = std::get<lang::constants_map>(map_or_error);
-	std::variant<std::vector<lang::filter_block>, error::error_variant> filter_or_error = filter_builder::build_filter(parse_data.ast.statements, map);
+	std::variant<std::vector<lang::filter_block>, error::error_variant> filter_or_error = filter_builder::build_filter(parse_data.ast.statements, map, item_price_data);
 	if (std::holds_alternative<error::error_variant>(filter_or_error))
 	{
 		print::compile_error(std::get<error::error_variant>(filter_or_error), parse_data.lookup_data, error_stream);

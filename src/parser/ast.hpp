@@ -177,6 +177,12 @@ struct function_call : x3::position_tagged
 	function_arguments arguments;
 };
 
+struct price_range_query : x3::position_tagged
+{
+	identifier name;
+	function_arguments arguments;
+};
+
 struct array_expression : std::vector<struct value_expression>, x3::position_tagged
 {
 };
@@ -185,7 +191,8 @@ struct value_expression : x3::variant<
 		literal_expression,
 		array_expression,
 		function_call,
-		identifier
+		identifier,
+		price_range_query
 	>, x3::position_tagged
 {
 	using base_type::base_type;

@@ -15,8 +15,10 @@
 namespace fs::lang::keywords
 {
 
+// TODO are keywords for trivial types really needed?
 constexpr auto boolean      = "Boolean";
 constexpr auto integer      = "Integer";
+constexpr auto floating_point = "FloatingPoint";
 constexpr auto level        = "Level";
 constexpr auto sound_id     = "SoundId";
 constexpr auto volume       = "Volume";
