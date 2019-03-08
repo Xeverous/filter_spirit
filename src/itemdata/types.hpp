@@ -59,17 +59,52 @@ struct base_elder
 	price_data price_data;
 };
 
-struct unique_item
+struct unique_armour
 {
-	std::string name;      // eg "Tabula Rasa"
-	std::string base_name; // eg "Simple Robe"
+	std::string name;
+	std::string base_type_name;
+	price_data price_data;
+};
+
+struct unique_weapon
+{
+	std::string name;
+	std::string base_type_name;
+	price_data price_data;
+};
+
+struct unique_accessory
+{
+	std::string name;
+	std::string base_type_name;
+	price_data price_data;
+};
+
+struct unique_jewel
+{
+	std::string name;
+	std::string base_type_name;
+	price_data price_data;
+};
+
+struct unique_flask
+{
+	std::string name;
+	std::string base_type_name;
+	price_data price_data;
+};
+
+struct unique_map
+{
+	std::string name;
+	std::string base_type_name;
 	price_data price_data;
 };
 
 struct relic_item
 {
-	std::string name;      // eg "Tabula Rasa"
-	std::string base_name; // eg "Simple Robe"
+	std::string name;
+	std::string base_type_name;
 	price_data price_data;
 };
 
@@ -80,7 +115,14 @@ struct item_price_data
 	std::vector<base_without_influence> bases_without_influence; // sorted by ilvl
 	std::vector<base_shaper> bases_shaper;                       // sorted by ilvl
 	std::vector<base_elder> bases_elder;                         // sorted by ilvl
-	std::vector<unique_item> unique_items;                       // sorted by price
+
+	std::vector<unique_armour> unique_armours;                   // sorted by price
+	std::vector<unique_weapon> unique_weapons;                   // sorted by price
+	std::vector<unique_accessory> unique_accessories;            // sorted by price
+	std::vector<unique_jewel> unique_jewels;                     // sorted by price
+	std::vector<unique_flask> unique_flasks;                     // sorted by price
+	std::vector<unique_map> unique_maps;                         // sorted by price
+
 	std::vector<relic_item> relic_items;                         // sorted by price
 };
 

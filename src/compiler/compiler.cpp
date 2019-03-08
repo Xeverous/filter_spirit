@@ -126,7 +126,7 @@ bool process_input(const std::string& input, const itemdata::item_price_data& it
 		<< "bases no inf: " << item_price_data.bases_without_influence.size() << "\n"
 		<< "bases shaper: " << item_price_data.bases_shaper.size() << "\n"
 		<< "bases elder: " << item_price_data.bases_elder.size() << "\n"
-		<< "uniques: " << item_price_data.unique_items.size() << "\n"
+		//<< "uniques: " << item_price_data.unique_items.size() << "\n"
 		<< "relics: " << item_price_data.relic_items.size() << "\n";
 
 	const auto& map = std::get<lang::constants_map>(map_or_error);

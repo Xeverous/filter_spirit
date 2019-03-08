@@ -93,7 +93,7 @@ struct item
 	std::optional<int> ilvl;
 	std::optional<item_variation_variant> variation; // unique item variation (eg Vessel of Vinktar has 4 variations) OR shaper/elder
 	// url icon_path; // we do not care about item icons
-	item_category_variant item_category; // combined category and group
+	item_category_variant category; // combined category and group
 };
 
 // vector index is item ID
@@ -360,15 +360,15 @@ item_price_data parse_item_prices(std::string_view itemdata_json, std::string_vi
 
 		const fs::itemdata::price_data& price_data = *item_prices[i.id];
 
-		if (std::holds_alternative<categories::divination_card>(i.item_category))
+		if (std::holds_alternative<categories::divination_card>(i.category))
 		{
 			result.divination_cards.push_back(divination_card{std::move(i.name), price_data});
 		}
-		else if (std::holds_alternative<categories::prophecy>(i.item_category))
+		else if (std::holds_alternative<categories::prophecy>(i.category))
 		{
 			result.prophecies.push_back(prophecy{std::move(i.name), price_data});
 		}
-		else if (std::holds_alternative<categories::base>(i.item_category))
+		else if (std::holds_alternative<categories::base>(i.category))
 		{
 			if (!i.ilvl.has_value())
 			{
@@ -408,7 +408,38 @@ item_price_data parse_item_prices(std::string_view itemdata_json, std::string_vi
 				continue;
 			}
 
-			result.unique_items.push_back(unique_item{std::move(i.name), std::move(*i.base_type), price_data});
+			if (std::holds_alternative<categories::armour>(i.category))
+			{
+				result.unique_armours.push_back(unique_armour{std::move(i.name), std::move(*i.base_type), price_data});
+				continue;
+			}
+			if (std::holds_alternative<categories::weapon>(i.category))
+			{
+				result.unique_weapons.push_back(unique_weapon{std::move(i.name), std::move(*i.base_type), price_data});
+				continue;
+			}
+			if (std::holds_alternative<categories::accessory>(i.category))
+			{
+				result.unique_accessories.push_back(unique_accessory{std::move(i.name), std::move(*i.base_type), price_data});
+				continue;
+			}
+			if (std::holds_alternative<categories::jewel>(i.category))
+			{
+				result.unique_jewels.push_back(unique_jewel{std::move(i.name), std::move(*i.base_type), price_data});
+				continue;
+			}
+			if (std::holds_alternative<categories::flask>(i.category))
+			{
+				result.unique_flasks.push_back(unique_flask{std::move(i.name), std::move(*i.base_type), price_data});
+				continue;
+			}
+			if (std::holds_alternative<categories::map>(i.category))
+			{
+				result.unique_maps.push_back(unique_map{std::move(i.name), std::move(*i.base_type), price_data});
+				continue;
+			}
+
+			// TODO log that a unique was skipped
 		}
 		else if (i.frame == frame_type::relic)
 		{
@@ -461,7 +492,7 @@ item_price_data parse_item_prices(std::string_view itemdata_json, std::string_vi
 		});
 		std::stable_sort(items.begin(), items.end(), [](const auto& left, const auto& right)
 		{
-			return left.base_name < right.base_name;
+			return left.base_type_name < right.base_type_name;
 		});
 
 		// now items with the same base type are next to each other
@@ -472,14 +503,25 @@ item_price_data parse_item_prices(std::string_view itemdata_json, std::string_vi
 		// note: this is the erase-remove idiom
 		const auto last = std::unique(items.begin(), items.end(), [](const auto& left, const auto& right)
 		{
-			return left.base_name == right.base_name;
+			return left.base_type_name == right.base_type_name;
 		});
 		items.erase(last, items.end());
 	};
 
-	remove_duplicated_bases_with_lower_price(result.unique_items);
+	remove_duplicated_bases_with_lower_price(result.unique_armours);
+	remove_duplicated_bases_with_lower_price(result.unique_weapons);
+	remove_duplicated_bases_with_lower_price(result.unique_accessories);
+	remove_duplicated_bases_with_lower_price(result.unique_jewels);
+	remove_duplicated_bases_with_lower_price(result.unique_flasks);
+	remove_duplicated_bases_with_lower_price(result.unique_maps);
+	std::sort(result.unique_armours.begin(), result.unique_armours.end(), compare_by_mean_price);
+	std::sort(result.unique_weapons.begin(), result.unique_weapons.end(), compare_by_mean_price);
+	std::sort(result.unique_accessories.begin(), result.unique_accessories.end(), compare_by_mean_price);
+	std::sort(result.unique_jewels.begin(), result.unique_jewels.end(), compare_by_mean_price);
+	std::sort(result.unique_flasks.begin(), result.unique_flasks.end(), compare_by_mean_price);
+	std::sort(result.unique_maps.begin(), result.unique_maps.end(), compare_by_mean_price);
+
 	remove_duplicated_bases_with_lower_price(result.relic_items);
-	std::sort(result.unique_items.begin(), result.unique_items.end(), compare_by_mean_price);
 	std::sort(result.relic_items.begin(),  result.relic_items.end(),  compare_by_mean_price);
 
 	return result;

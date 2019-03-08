@@ -94,10 +94,12 @@ const alert_hitmarker         = "hitmarker.wav" # FIXME overused
 const alert_damn_son          = "damn_son.mp3"
 const alert_smoke_weed        = "smoke_weed.mp3"
 const alert_intervention      = "intervention.mp3" # FIXME overused
+const alert_andrzej_duda      = "andrzej_duda.mp3"
 const alert_john_cena         = "john_cena.mp3"
 const alert_metal_gear        = "metal_gear.mp3"
 const alert_explosion         = "explosion.mp3"
 const alert_unusual_drop      = 1
+const alert_whip              = "whip.mp3"
 
 const alert_misc_reliquary     = alert_mlg_airhorn
 const alert_currency_t1        = alert_mlg_airhorn
@@ -120,24 +122,25 @@ const alert_gem_quality        = alert_hitmarker
 const alert_gem_20_quality     = alert_airhorn
 const alert_gem_drop_only      = alert_hitmarker
 const alert_unique_piece       = alert_wow
-const alert_top_unique         = alert_john_cena
-const alert_mid_unique         = alert_damn_son
+const alert_top_unique         = alert_andrzej_duda
+const alert_mid_unique         = alert_john_cena
+const alert_unique_to_check    = "sudden_suspense.mp3"
 const alert_other_unique       = alert_damn_son
 const alert_divination_t1      = alert_john_cena
 const alert_divination_t2      = alert_intervention
-const alert_divination_t3      = alert_hitmarker
+const alert_divination_t3      = alert_intervention
 const alert_divination_t4      = alert_hitmarker
 const alert_divination_t5      = alert_hitmarker
 const alert_atlas_fragment     = alert_airhorn
-const alert_fishing_rod        = alert_mlg_airhorn
+const alert_fishing_rod        = alert_andrzej_duda
 const alert_microtransaction   = alert_mlg_airhorn
 const alert_leaguestone        = alert_intervention
 const alert_pale_court         = alert_unusual_drop
 const alert_map_t16            = alert_smoke_weed
-const alert_map_red            = alert_smoke_weed
-const alert_map_yellow         = alert_metal_gear
-const alert_map_white          = alert_metal_gear
-const alert_error              = sound_red_map
+const alert_map_red            = alert_metal_gear
+const alert_map_yellow         = alert_whip
+const alert_map_white          = alert_whip
+const alert_error              = "triggered.mp3"
 const alert_extra_base_drop    = alert_intervention
 const alert_chance_base        = 10
 const alert_crafting           = 4
@@ -172,6 +175,7 @@ const minimap_top_gem         = MinimapIcon(0, green, circle)
 const minimap_mid_gem         = MinimapIcon(1, green, circle)
 const minimap_low_gem         = MinimapIcon(2, green, circle)
 const minimap_top_unique      = MinimapIcon(0, brown, triangle)
+const minimap_mid_unique      = MinimapIcon(1, brown, triangle)
 const minimap_6L              = MinimapIcon(0, red, hexagon)
 const minimap_fishing_rod     = MinimapIcon(0, white, star)
 const minimap_currency_t1     = MinimapIcon(0, yellow, star)
@@ -468,6 +472,48 @@ Rarity unique && LinkedSockets 6 {
 	Show
 }
 
+Rarity unique {
+	SetTextColor color_unique
+	SetBorderColor color_unique
+
+	Class ["Amulets", "Rings", "Belts", "Jewel"] {
+		SetAlertSound alert_unique_to_check
+		Show
+	}
+
+	{
+		SetTextColor color_unique
+		SetBackgroundColor color_white
+		SetAlertSound alert_top_unique
+		SetBeam beam_top_unique
+		SetMinimapIcon minimap_top_unique
+		SetAlertSound alert_top_unique
+
+		BaseType $uniques_armour(100,999999) { Show }
+		BaseType $uniques_weapon(100,999999) { Show }
+		BaseType $uniques_flask (100,999999) { Show }
+	}
+
+	{
+		SetTextColor color_unique
+		SetBackgroundColor color_white
+		SetAlertSound alert_top_unique
+		SetBeam beam_top_unique
+		SetMinimapIcon minimap_mid_unique
+		SetAlertSound alert_mid_unique
+
+		BaseType $uniques_armour(5,100) { Show }
+		BaseType $uniques_weapon(5,100) { Show }
+		BaseType $uniques_flask (5,100) { Show }
+	}
+
+	# note that APIs may not list all possible uniques
+	# therefore always make a block with no price requirement
+	# any other unique:
+	SetAlertSound alert_other_unique
+	Show
+}
+
 # top uniques: use downloaded data
 Rarity unique {
 	SetTextColor color_unique
@@ -491,12 +537,6 @@ Rarity unique {
 #		SetAlertSound alert_mid_unique
 #		Show
 #	}
-
-	# note that APIs may not list all possible uniques
-	# therefore always make a block with no price requirement
-	# any other unique:
-	SetAlertSound alert_other_unique
-	Show
 }
 
 # random 6L drops

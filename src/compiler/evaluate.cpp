@@ -220,6 +220,66 @@ std::variant<lang::object, error::error_variant> evaluate_price_range_query(
 			prophecies.end());
 		return lang::object{std::move(array), position_of_query, std::nullopt};
 	}
+	else if (query_name.value == lang::queries::uniques_armour)
+	{
+		const std::vector<itemdata::unique_armour>& uniques_armour = item_price_data.unique_armours;
+		lang::array_object array = evaluate_price_range_query_on_sorted_range(
+			price_range,
+			position_of_query,
+			uniques_armour.begin(),
+			uniques_armour.end());
+		return lang::object{std::move(array), position_of_query, std::nullopt};
+	}
+	else if (query_name.value == lang::queries::uniques_weapon)
+	{
+		const std::vector<itemdata::unique_weapon>& uniques_weapon = item_price_data.unique_weapons;
+		lang::array_object array = evaluate_price_range_query_on_sorted_range(
+			price_range,
+			position_of_query,
+			uniques_weapon.begin(),
+			uniques_weapon.end());
+		return lang::object{std::move(array), position_of_query, std::nullopt};
+	}
+	else if (query_name.value == lang::queries::uniques_accessory)
+	{
+		const std::vector<itemdata::unique_accessory>& uniques_accessory = item_price_data.unique_accessories;
+		lang::array_object array = evaluate_price_range_query_on_sorted_range(
+			price_range,
+			position_of_query,
+			uniques_accessory.begin(),
+			uniques_accessory.end());
+		return lang::object{std::move(array), position_of_query, std::nullopt};
+	}
+	else if (query_name.value == lang::queries::uniques_jewel)
+	{
+		const std::vector<itemdata::unique_jewel>& uniques_jewel = item_price_data.unique_jewels;
+		lang::array_object array = evaluate_price_range_query_on_sorted_range(
+			price_range,
+			position_of_query,
+			uniques_jewel.begin(),
+			uniques_jewel.end());
+		return lang::object{std::move(array), position_of_query, std::nullopt};
+	}
+	else if (query_name.value == lang::queries::uniques_flask)
+	{
+		const std::vector<itemdata::unique_flask>& uniques_flask = item_price_data.unique_flasks;
+		lang::array_object array = evaluate_price_range_query_on_sorted_range(
+			price_range,
+			position_of_query,
+			uniques_flask.begin(),
+			uniques_flask.end());
+		return lang::object{std::move(array), position_of_query, std::nullopt};
+	}
+	else if (query_name.value == lang::queries::uniques_map)
+	{
+		const std::vector<itemdata::unique_map>& uniques_map = item_price_data.unique_maps;
+		lang::array_object array = evaluate_price_range_query_on_sorted_range(
+			price_range,
+			position_of_query,
+			uniques_map.begin(),
+			uniques_map.end());
+		return lang::object{std::move(array), position_of_query, std::nullopt};
+	}
 
 	return error::no_such_query{parser::get_position_info(query_name)};
 }
