@@ -94,6 +94,14 @@ BOOST_FUSION_ADAPT_STRUCT(
 // ---- filter structure ----
 
 BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::advanced_price_range_query,
+	name, arguments)
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::visibility_statement,
+	show, query)
+
+BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::rule_block,
 	conditions, statements)
 

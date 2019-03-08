@@ -5,6 +5,7 @@
  */
 #pragma once
 #include "lang/types.hpp"
+#include <boost/optional.hpp>
 #include <boost/spirit/home/x3/support/ast/variant.hpp>
 #include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
 #include <utility>
@@ -292,17 +293,16 @@ struct action : x3::position_tagged
 
 // ---- filter structure ----
 
+struct advanced_price_range_query : x3::position_tagged
+{
+	identifier name;
+	function_arguments arguments;
+};
+
 struct visibility_statement : x3::position_tagged
 {
-	visibility_statement& operator=(bool b)
-	{
-		show = b;
-		return *this;
-	}
-
-	bool get_value() const { return show; }
-
 	bool show;
+	boost::optional<advanced_price_range_query> query;
 };
 
 // rule_block defined earlier than statement due to circular dependency

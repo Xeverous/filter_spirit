@@ -45,8 +45,7 @@ std::optional<error::error_variant> filter_builder::build_nested(
 			},
 			[&, this](const ast::visibility_statement& vs)
 			{
-				add_block(vs.show, parent_conditions, parent_actions);
-				return std::nullopt;
+				return handle_visibility_statement(vs, parent_conditions, parent_actions);
 			},
 			[&, this](const ast::rule_block& nested_block)
 			{
@@ -66,6 +65,16 @@ std::optional<error::error_variant> filter_builder::build_nested(
 
 	return std::nullopt;
 }
+
+std::optional<error::error_variant> filter_builder::handle_visibility_statement(
+	const ast::visibility_statement& vs,
+	lang::condition_set parent_conditions,
+	lang::action_set parent_actions)
+{
+	add_block(vs.show, parent_conditions, parent_actions);
+	return std::nullopt;
+}
+
 
 void filter_builder::add_block(
 	bool show,

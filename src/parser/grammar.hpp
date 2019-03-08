@@ -123,6 +123,7 @@ struct action_class                          : error_on_error, annotate_on_succe
 
 // ---- filter structure ----
 
+struct advanced_price_range_query_class      : error_on_error, annotate_on_success {};
 struct visibility_statement_class            : error_on_error, annotate_on_success {};
 struct statement_class                       : error_on_error, annotate_on_success {};
 struct rule_block_class                      : error_on_error, annotate_on_success {};
@@ -245,6 +246,9 @@ using action_type = x3::rule<action_class, ast::action>;
 BOOST_SPIRIT_DECLARE(action_type)
 
 // ---- filter structure ----
+
+using advanced_price_range_query_type = x3::rule<advanced_price_range_query_class, ast::advanced_price_range_query>;
+BOOST_SPIRIT_DECLARE(advanced_price_range_query_type)
 
 using visibility_statement_type = x3::rule<visibility_statement_class, ast::visibility_statement>;
 BOOST_SPIRIT_DECLARE(visibility_statement_type)

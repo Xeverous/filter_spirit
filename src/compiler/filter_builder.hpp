@@ -48,10 +48,18 @@ private:
 		lang::condition_set parent_conditions,
 		lang::action_set parent_actions);
 
+	[[nodiscard]]
+	std::optional<error::error_variant> handle_visibility_statement(
+		const parser::ast::visibility_statement& vs,
+		lang::condition_set parent_conditions,
+		lang::action_set parent_actions);
+
 	void add_block(
 		bool show,
 		lang::condition_set conditions,
 		lang::action_set actions);
+
+
 
 	const std::vector<parser::ast::statement>& statements;
 	const lang::constants_map& map;
