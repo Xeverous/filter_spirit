@@ -155,11 +155,14 @@ void condition_set::generate(std::ostream& output_stream) const
 
 	output_socket_group_condition(socket_group, output_stream);
 
-	output_boolean_condition(is_identified,  lg::identified,  output_stream);
-	output_boolean_condition(is_corrupted,   lg::corrupted,   output_stream);
-	output_boolean_condition(is_elder_item,  lg::elder_item,  output_stream);
-	output_boolean_condition(is_shaper_item, lg::shaper_item, output_stream);
-	output_boolean_condition(is_shaped_map,  lg::shaped_map,  output_stream);
+	output_boolean_condition(is_identified,       lg::identified,       output_stream);
+	output_boolean_condition(is_corrupted,        lg::corrupted,        output_stream);
+	output_boolean_condition(is_elder_item,       lg::elder_item,       output_stream);
+	output_boolean_condition(is_shaper_item,      lg::shaper_item,      output_stream);
+	output_boolean_condition(is_fractured_item,   lg::fractured_item,   output_stream);
+	output_boolean_condition(is_synthesised_item, lg::synthesised_item, output_stream);
+	output_boolean_condition(is_enchanted,        lg::any_enchantment,  output_stream);
+	output_boolean_condition(is_shaped_map,       lg::shaped_map,       output_stream);
 
 	output_strings_condition(class_,           lg::class_,           output_stream);
 	output_strings_condition(base_type,        lg::base_type,        output_stream);

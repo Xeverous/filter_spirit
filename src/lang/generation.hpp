@@ -27,6 +27,9 @@ constexpr auto identified       = "Identified";
 constexpr auto corrupted        = "Corrupted";
 constexpr auto elder_item       = "ElderItem";
 constexpr auto shaper_item      = "ShaperItem";
+constexpr auto fractured_item   = "FracturedItem";
+constexpr auto synthesised_item = "SynthesisedItem";
+constexpr auto any_enchantment  = "AnyEnchantment";
 constexpr auto shaped_map       = "ShapedMap";
 constexpr auto map_tier         = "MapTier";
 

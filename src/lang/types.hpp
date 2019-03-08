@@ -49,6 +49,9 @@ enum class boolean_condition_property
 	corrupted,
 	elder_item,
 	shaper_item,
+	fractured_item,
+	synthesised_item,
+	any_enchantment,
 	shaped_map
 };
 
