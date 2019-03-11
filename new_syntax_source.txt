@@ -16,51 +16,53 @@ config {
 }
 
 # TODO predefined constants
-const color_white           = RGB(255, 255, 255)
-const color_black           = RGB(  0,   0,   0, 255)
-const color_red             = RGB(255,   0,   0)
-const color_error           = color_red
+const color_white            = RGB(255, 255, 255)
+const color_black            = RGB(  0,   0,   0, 255)
+const color_red              = RGB(255,   0,   0)
+const color_error            = color_red
 
-const color_golden          = RGB(240, 200, 150)
-const color_perandus        = RGB(255, 192, 128)
-const color_silver          = RGB(192, 192, 255)
-const color_chromatic_small = RGB(175, 255, 200)
-const color_chromatic_big   = RGB( 96,  96, 127)
-const color_breach          = RGB(255,  51, 204)
-const color_essence         = RGB(  0, 128, 192)
-const color_vaal            = RGB(255, 140, 120)
-const color_gem             = RGB( 27, 162, 155)
-const color_hammer          = RGB(162,  85,   0)
-const color_unique          = RGB(175,  96,  37)
-const color_rare_chance     = RGB(255, 255, 153)
-const color_rare_chaos      = RGB(255, 255, 119)
-const color_rare            = color_rare_chaos
-const color_rare_regal      = RGB(255, 173,   0)
-const color_magic           = RGB(136, 136, 255)
-const color_normal          = RGB(200, 200, 200)
-const color_6s              = RGB(152,   0, 152)
-const color_5L              = RGB(192, 128,   0)
-const color_sacrifice       = RGB(150, 100,   0)
-const color_mortal          = RGB( 60, 150,   0)
-const color_labirynth       = RGB(  0, 150,   0)
-const color_quest           = RGB( 74, 230,  58)
-const color_divination      = RGB(100, 210, 255)
-const color_map_red         = color_red
-const color_map_yellow      = color_rare
-const color_map_white       = color_normal
-const color_talisman        = RGB( 50, 130,  50)
-const color_rare_t1         = RGB(  0,  96,   0)
-const color_rare_t2         = RGB(  0,  64,   0)
-const color_chance_base     = RGB( 51, 204, 204)
-const color_extra_base_drop = RGB(208,  32, 144)
-const color_flask_utility   = RGB(122, 105,  28)
-const color_crafting        = RGB(191, 244,   0)
-const color_currency        = RGB(213, 159,  15)
-const color_currency_delve  = color_currency
-const color_corrupted       = RGB(255, 127, 127)
-const color_shaper_item     = RGB( 49, 127, 155)
-const color_elder_item      = RGB(102,   0, 128)
-const color_veiled_item     = RGB(150, 100, 158)
+const color_golden           = RGB(240, 200, 150)
+const color_perandus         = RGB(255, 192, 128)
+const color_silver           = RGB(192, 192, 255)
+const color_chromatic_small  = RGB(175, 255, 200)
+const color_chromatic_big    = RGB(128, 128, 192)
+const color_breach           = RGB(255,  51, 204)
+const color_essence          = RGB(  0, 128, 192)
+const color_vaal             = RGB(255, 140, 120)
+const color_gem              = RGB( 27, 162, 155)
+const color_hammer           = RGB(162,  85,   0)
+const color_unique           = RGB(175,  96,  37)
+const color_rare_chance      = RGB(255, 255, 153)
+const color_rare_chaos       = RGB(255, 255, 119)
+const color_rare             = color_rare_chaos
+const color_rare_regal       = RGB(255, 173,   0)
+const color_magic            = RGB(136, 136, 255)
+const color_normal           = RGB(200, 200, 200)
+const color_6s               = RGB(152,   0, 152)
+const color_5L               = RGB(192, 128,   0)
+const color_sacrifice        = RGB(150, 100,   0)
+const color_mortal           = RGB( 60, 150,   0)
+const color_labirynth        = RGB(  0, 150,   0)
+const color_quest            = RGB( 74, 230,  58)
+const color_divination       = RGB(100, 210, 255)
+const color_map_red          = color_red
+const color_map_yellow       = color_rare
+const color_map_white        = color_normal
+const color_talisman         = RGB( 50, 130,  50)
+const color_rare_t1          = RGB(  0,  96,   0)
+const color_rare_t2          = RGB(  0,  64,   0)
+const color_chance_base      = RGB( 51, 204, 204)
+const color_extra_base_drop  = RGB(208,  32, 144)
+const color_flask_utility    = RGB(122, 105,  28)
+const color_crafting         = RGB(191, 244,   0)
+const color_currency         = RGB(213, 159,  15)
+const color_currency_delve   = color_currency
+const color_corrupted        = RGB(255, 127, 127)
+const color_shaper_item      = RGB( 49, 127, 155)
+const color_elder_item       = RGB(102,   0, 128)
+const color_fractured_item   = RGB(150, 100, 158)
+const color_synthesised_item = RGB(150, 100, 200)
+const color_veiled_item      = RGB(150, 100, 158)
 
 const currency_t1 = ["Exalted Orb", "Divine Orb", "Mirror of Kalandra", "Eternal Orb", "Albino Rhoa Feather", "Mirror Shard" ]
 const currency_t2 = ["Chaos Orb", "Gemcutter's Prism", "Orb of Regret", "Regal Orb", "Stacked Deck", "Vaal Orb", "Apprentice Cartographer's Seal", "Apprentice Cartographer's Sextant", "Journeyman Cartographer's Seal", "Journeyman Cartographer's Sextant", "Master Cartographer's Seal", "Master Cartographer's Sextant", "Unshaping Orb", "Remnant of Corruption", "Exalted Shard", "Orb of Annulment", "Orb of Binding", "Orb of Horizons", "Harbinger's Orb", "Engineer's Orb", "Ancient Orb", "Stacked Deck", "Vial of" ]
@@ -82,6 +84,7 @@ const font_abyss_jewel    = font_max
 const font_jewel          = 40
 const font_talisman       = 40
 const font_crafting       = 40
+const font_unique         = font_max
 
 const sound_unusual_drop = 1
 const sound_red_map      = 3
@@ -100,6 +103,7 @@ const alert_metal_gear        = "metal_gear.mp3"
 const alert_explosion         = "explosion.mp3"
 const alert_unusual_drop      = 1
 const alert_whip              = "whip.mp3"
+const alert_sudden_suspense   = "sudden_suspense.mp3"
 
 const alert_misc_reliquary     = alert_mlg_airhorn
 const alert_currency_t1        = alert_mlg_airhorn
@@ -124,7 +128,7 @@ const alert_gem_drop_only      = alert_hitmarker
 const alert_unique_piece       = alert_wow
 const alert_top_unique         = alert_andrzej_duda
 const alert_mid_unique         = alert_john_cena
-const alert_unique_to_check    = "sudden_suspense.mp3"
+const alert_unique_to_check    = alert_whip
 const alert_other_unique       = alert_damn_son
 const alert_divination_t1      = alert_john_cena
 const alert_divination_t2      = alert_intervention
@@ -146,6 +150,8 @@ const alert_chance_base        = 10
 const alert_crafting           = 4
 const alert_shaper_item        = alert_wow
 const alert_elder_item         = alert_wow
+const alert_fractured_item     = alert_wow
+const alert_synthesised_item   = alert_wow
 const alert_veiled_item        = alert_wow
 const alert_6L                 = alert_mlg_airhorn
 const alert_5L                 = alert_wow
@@ -475,6 +481,7 @@ Rarity unique && LinkedSockets 6 {
 Rarity unique {
 	SetTextColor color_unique
 	SetBorderColor color_unique
+	SetFontSize font_unique
 
 	Class ["Amulets", "Rings", "Belts", "Jewel"] {
 		SetAlertSound alert_unique_to_check
@@ -518,7 +525,7 @@ Rarity unique {
 Rarity unique {
 	SetTextColor color_unique
 	SetBorderColor color_unique
-	SetFontSize font_max
+	SetFontSize font_unique
 
 	# >= 100c unique base types
 #	BaseType $uniques(100,) {
@@ -702,12 +709,13 @@ Class "Fishing Rods" {
 	Show
 }
 
-Class ["Quest", "Hideout", "PantheonSoul"] {
+Class ["Quest", "Hideout"] { # "PantheonSoul" doesnt work
 	SetTextColor color_quest
 	SetBorderColor color_quest
 	SetBackgroundColor color_black
 	SetFontSize font_max
 	SetAlertSound alert_quest_item
+	Show
 }
 
 Class "Microtransactions" {
@@ -934,6 +942,18 @@ Rarity <= rare {
 #		Show
 #	}
 
+	FracturedItem true {
+		SetBackgroundColor color_fractured_item
+		SetAlertSound alert_fractured_item
+		Show
+	}
+
+	SynthesisedItem true {
+		SetBackgroundColor color_fractured_item
+		SetAlertSound alert_fractured_item
+		Show
+	}
+
 	# Betrayal league items
 	HasExplicitMod "Veil" {
 		SetBackgroundColor color_veiled_item
@@ -962,9 +982,42 @@ Rarity <= rare {
 #		}
 #	}
 
+	Rarity normal {
+		SocketGroup Group("RGB") {
+			Width 2 && Height <= 2 {
+				SetBorderColor color_chromatic_small
+				Show
+			}
+
+			Width 1 && Height <= 4 {
+				SetBorderColor color_chromatic_small
+				Show
+			}
+
+			SetBorderColor color_chromatic_big
+			Show
+		}
+	}
+
 	Rarity magic {
 		SetTextColor color_magic
-		Show
+
+		SocketGroup Group("RGB") {
+			Width 2 && Height <= 2 {
+				SetBorderColor color_chromatic_small
+				Show
+			}
+
+			Width 1 && Height <= 4 {
+				SetBorderColor color_chromatic_small
+				Show
+			}
+
+			SetBorderColor color_chromatic_big
+			Show
+		}
+
+		Hide
 	}
 
 	Rarity rare {
@@ -973,6 +1026,37 @@ Rarity <= rare {
 
 			BaseType bases_t1 {
 				SetBackgroundColor color_rare_t1
+
+				SocketGroup Group("RGB") {
+					Width 2 && Height <= 2 {
+						SetBorderColor color_chromatic_small
+						Show
+					}
+
+					Width 1 && Height <= 4 {
+						SetBorderColor color_chromatic_small
+						Show
+					}
+
+					SetBorderColor color_chromatic_big
+					Show
+				}
+
+				Show
+			}
+
+			SocketGroup Group("RGB") {
+				Width 2 && Height <= 2 {
+					SetBorderColor color_chromatic_small
+					Show
+				}
+
+				Width 1 && Height <= 4 {
+					SetBorderColor color_chromatic_small
+					Show
+				}
+
+				SetBorderColor color_chromatic_big
 				Show
 			}
 
@@ -984,6 +1068,37 @@ Rarity <= rare {
 
 			BaseType bases_t1 {
 				SetBackgroundColor color_rare_t1
+
+				SocketGroup Group("RGB") {
+					Width 2 && Height <= 2 {
+						SetBorderColor color_chromatic_small
+						Show
+					}
+
+					Width 1 && Height <= 4 {
+						SetBorderColor color_chromatic_small
+						Show
+					}
+
+					SetBorderColor color_chromatic_big
+					Show
+				}
+
+				Show
+			}
+
+			SocketGroup Group("RGB") {
+				Width 2 && Height <= 2 {
+					SetBorderColor color_chromatic_small
+					Show
+				}
+
+				Width 1 && Height <= 4 {
+					SetBorderColor color_chromatic_small
+					Show
+				}
+
+				SetBorderColor color_chromatic_big
 				Show
 			}
 
@@ -994,6 +1109,37 @@ Rarity <= rare {
 
 		BaseType bases_t1 {
 			SetBackgroundColor color_rare_t1
+
+			SocketGroup Group("RGB") {
+				Width 2 && Height <= 2 {
+					SetBorderColor color_chromatic_small
+					Show
+				}
+
+				Width 1 && Height <= 4 {
+					SetBorderColor color_chromatic_small
+					Show
+				}
+
+				SetBorderColor color_chromatic_big
+				Show
+			}
+
+			Show
+		}
+
+		SocketGroup Group("RGB") {
+			Width 2 && Height <= 2 {
+				SetBorderColor color_chromatic_small
+				Show
+			}
+
+			Width 1 && Height <= 4 {
+				SetBorderColor color_chromatic_small
+				Show
+			}
+
+			SetBorderColor color_chromatic_big
 			Show
 		}
 
