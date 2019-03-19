@@ -147,7 +147,7 @@ const auto boolean_condition_def = symbols::boolean_condition_properties > value
 BOOST_SPIRIT_DEFINE(boolean_condition)
 
 const socket_group_condition_type socket_group_condition = "socket group condition";
-const auto socket_group_condition_def = value_expression;
+const auto socket_group_condition_def = lang::keywords::socket_group > value_expression;
 BOOST_SPIRIT_DEFINE(socket_group_condition)
 
 const condition_type condition = "condition";
