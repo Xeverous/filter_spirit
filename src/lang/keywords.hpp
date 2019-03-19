@@ -112,6 +112,9 @@ constexpr auto identified       = generation::identified;
 constexpr auto corrupted        = generation::corrupted;
 constexpr auto elder_item       = generation::elder_item;
 constexpr auto shaper_item      = generation::shaper_item;
+constexpr auto fractured_item   = generation::fractured_item;
+constexpr auto synthesised_item = generation::synthesised_item;
+constexpr auto any_enchantment  = generation::any_enchantment;
 constexpr auto shaped_map       = generation::shaped_map;
 constexpr auto map_tier         = generation::map_tier;
 

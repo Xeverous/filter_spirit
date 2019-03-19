@@ -323,6 +323,12 @@ struct statement : x3::variant<
 	using base_type::operator=;
 };
 
+// as above
+namespace
+{
+	using workaround3 = decltype(statement{*static_cast<const statement*>(nullptr)});
+}
+
 struct filter_structure : x3::position_tagged
 {
 	version_requirement_statement version_data;

@@ -161,11 +161,14 @@ struct boolean_condition_properties_ : x3::symbols<lang::boolean_condition_prope
 	boolean_condition_properties_()
 	{
 		add
-			(lang::keywords::identified,  lang::boolean_condition_property::identified)
-			(lang::keywords::corrupted,   lang::boolean_condition_property::corrupted)
-			(lang::keywords::elder_item,  lang::boolean_condition_property::elder_item)
-			(lang::keywords::shaper_item, lang::boolean_condition_property::shaper_item)
-			(lang::keywords::shaped_map,  lang::boolean_condition_property::shaped_map)
+			(lang::keywords::identified,        lang::boolean_condition_property::identified)
+			(lang::keywords::corrupted,         lang::boolean_condition_property::corrupted)
+			(lang::keywords::elder_item,        lang::boolean_condition_property::elder_item)
+			(lang::keywords::shaper_item,       lang::boolean_condition_property::shaper_item)
+			(lang::keywords::fractured_item,    lang::boolean_condition_property::fractured_item)
+			(lang::keywords::synthesised_item,  lang::boolean_condition_property::synthesised_item)
+			(lang::keywords::any_enchantment,   lang::boolean_condition_property::any_enchantment)
+			(lang::keywords::shaped_map,        lang::boolean_condition_property::shaped_map)
 		;
 	}
 };

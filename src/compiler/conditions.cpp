@@ -242,17 +242,27 @@ std::optional<error::error_variant> add_boolean_condition(
 		{
 			return add_boolean_condition(boolean, condition_origin, condition_set.is_shaper_item);
 		}
+		case lang::boolean_condition_property::fractured_item:
+		{
+			return add_boolean_condition(boolean, condition_origin, condition_set.is_fractured_item);
+		}
+		case lang::boolean_condition_property::synthesised_item:
+		{
+			return add_boolean_condition(boolean, condition_origin, condition_set.is_synthesised_item);
+		}
+		case lang::boolean_condition_property::any_enchantment:
+		{
+			return add_boolean_condition(boolean, condition_origin, condition_set.is_enchanted);
+		}
 		case lang::boolean_condition_property::shaped_map:
 		{
 			return add_boolean_condition(boolean, condition_origin, condition_set.is_shaped_map);
 		}
 		default:
 		{
-			break;
+			return error::internal_compiler_error_during_boolean_condition_evaluation{condition_origin};
 		}
 	}
-
-	return error::internal_compiler_error_during_boolean_condition_evaluation{condition_origin};
 }
 
 std::optional<error::error_variant> add_boolean_condition(

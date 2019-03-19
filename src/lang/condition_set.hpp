@@ -123,6 +123,9 @@ struct condition_set
 	std::optional<boolean> is_corrupted;
 	std::optional<boolean> is_elder_item;
 	std::optional<boolean> is_shaper_item;
+	std::optional<boolean> is_fractured_item;
+	std::optional<boolean> is_synthesised_item;
+	std::optional<boolean> is_enchanted;
 	std::optional<boolean> is_shaped_map;
 };
 
