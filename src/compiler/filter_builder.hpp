@@ -25,14 +25,14 @@ public:
 
 private:
 	filter_builder(
-		const std::vector<parser::ast::statement>& top_level_statements,
 		const lang::constants_map& map,
 		const itemdata::item_price_data& item_price_data)
-	: statements(top_level_statements), map(map), item_price_data(item_price_data)
+	: map(map), item_price_data(item_price_data)
 	{}
 
 	[[nodiscard]]
-	std::variant<std::vector<lang::filter_block>, error::error_variant> build_filter();
+	std::variant<std::vector<lang::filter_block>, error::error_variant> build_filter(
+		const std::vector<parser::ast::statement>& top_level_statements);
 
 	/*
 	 * copies of actions and conditions are intentional
@@ -48,20 +48,24 @@ private:
 		lang::condition_set parent_conditions,
 		lang::action_set parent_actions);
 
-	[[nodiscard]]
-	std::optional<error::error_variant> handle_visibility_statement(
-		const parser::ast::visibility_statement& vs,
-		lang::condition_set parent_conditions,
-		lang::action_set parent_actions);
-
 	void add_block(
 		bool show,
 		lang::condition_set conditions,
 		lang::action_set actions);
 
+	[[nodiscard]]
+	std::optional<error::error_variant> handle_visibility_statement(
+		const parser::ast::visibility_statement& vs,
+		const lang::condition_set& parent_conditions,
+		const lang::action_set& parent_actions);
 
+	[[nodiscard]]
+	std::optional<error::error_variant> handle_advanced_price_range_query(
+		bool show,
+		const parser::ast::advanced_price_range_query& query,
+		const lang::condition_set& parent_conditions,
+		const lang::action_set& parent_actions);
 
-	const std::vector<parser::ast::statement>& statements;
 	const lang::constants_map& map;
 	const itemdata::item_price_data& item_price_data;
 

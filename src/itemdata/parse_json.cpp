@@ -1,8 +1,10 @@
 #include "itemdata/parse_json.hpp"
 #include "itemdata/exceptions.hpp"
+#include "utility/algorithm.hpp"
 #include "utility/better_enum.hpp"
 #include <nlohmann/json.hpp>
 #include <algorithm>
+#include <iterator>
 #include <optional>
 #include <variant>
 #include <type_traits>
@@ -362,31 +364,31 @@ item_price_data parse_item_prices(std::string_view itemdata_json, std::string_vi
 
 		if (std::holds_alternative<categories::divination_card>(i.category))
 		{
-			result.divination_cards.push_back(divination_card{std::move(i.name), price_data});
+			result.divination_cards.push_back(elementary_item{std::move(i.name), price_data});
 		}
 		else if (std::holds_alternative<categories::prophecy>(i.category))
 		{
-			result.prophecies.push_back(prophecy{std::move(i.name), price_data});
+			result.prophecies.push_back(elementary_item{std::move(i.name), price_data});
 		}
 		else if (std::holds_alternative<categories::base>(i.category))
 		{
-			if (!i.ilvl.has_value())
+			if (!i.ilvl)
 			{
 				// TODO log that a base without item level has been encountered
 				continue;
 			}
 
-			if (!i.variation.has_value()) // non-influenced item
+			if (!i.variation) // non-influenced item
 			{
-				result.bases_without_influence.push_back(base_without_influence{*i.ilvl, std::move(i.name), price_data});
+				result.bases_without_influence.push_back(base_type_item{*i.ilvl, std::move(i.name), price_data});
 			}
 			else if (std::holds_alternative<shaper_item>(*i.variation))
 			{
-				result.bases_shaper.push_back(base_shaper{*i.ilvl, std::move(i.name), price_data});
+				result.bases_shaper.push_back(base_type_item{*i.ilvl, std::move(i.name), price_data});
 			}
 			else if (std::holds_alternative<elder_item>(*i.variation))
 			{
-				result.bases_elder.push_back(base_elder{*i.ilvl, std::move(i.name), price_data});
+				result.bases_elder.push_back(base_type_item{*i.ilvl, std::move(i.name), price_data});
 			}
 			else
 			{
@@ -394,68 +396,52 @@ item_price_data parse_item_prices(std::string_view itemdata_json, std::string_vi
 				continue;
 			}
 		}
-		else if (i.frame == frame_type::unique)
+		else if (i.frame == frame_type::unique || i.frame == frame_type::relic)
 		{
-			if (!i.base_type.has_value())
+			if (!i.base_type)
 			{
 				// TODO log that a unique item without base type has been encountered
 				continue;
 			}
 
-			if (i.links.has_value())
+			if (i.links)
 			{
-				// skip uniques which have links - we care about unique item value, 6L items are filtered earlier
+				// skip uniques which have links - we care about sole unique item value, not linked items
 				continue;
 			}
 
 			if (std::holds_alternative<categories::armour>(i.category))
 			{
-				result.unique_armours.push_back(unique_armour{std::move(i.name), std::move(*i.base_type), price_data});
+				result.ambiguous_unique_armours.push_back(unique_item{std::move(i.name), std::move(*i.base_type), price_data});
 				continue;
 			}
 			if (std::holds_alternative<categories::weapon>(i.category))
 			{
-				result.unique_weapons.push_back(unique_weapon{std::move(i.name), std::move(*i.base_type), price_data});
+				result.ambiguous_unique_weapons.push_back(unique_item{std::move(i.name), std::move(*i.base_type), price_data});
 				continue;
 			}
 			if (std::holds_alternative<categories::accessory>(i.category))
 			{
-				result.unique_accessories.push_back(unique_accessory{std::move(i.name), std::move(*i.base_type), price_data});
+				result.ambiguous_unique_accessories.push_back(unique_item{std::move(i.name), std::move(*i.base_type), price_data});
 				continue;
 			}
 			if (std::holds_alternative<categories::jewel>(i.category))
 			{
-				result.unique_jewels.push_back(unique_jewel{std::move(i.name), std::move(*i.base_type), price_data});
+				result.ambiguous_unique_jewels.push_back(unique_item{std::move(i.name), std::move(*i.base_type), price_data});
 				continue;
 			}
 			if (std::holds_alternative<categories::flask>(i.category))
 			{
-				result.unique_flasks.push_back(unique_flask{std::move(i.name), std::move(*i.base_type), price_data});
+				result.ambiguous_unique_flasks.push_back(unique_item{std::move(i.name), std::move(*i.base_type), price_data});
 				continue;
 			}
 			if (std::holds_alternative<categories::map>(i.category))
 			{
-				result.unique_maps.push_back(unique_map{std::move(i.name), std::move(*i.base_type), price_data});
+				result.ambiguous_unique_maps.push_back(unique_item{std::move(i.name), std::move(*i.base_type), price_data});
 				continue;
 			}
 
 			// TODO log that a unique was skipped
-		}
-		else if (i.frame == frame_type::relic)
-		{
-			if (!i.base_type.has_value())
-			{
-				// TODO log that a relic item without base type has been encountered
-				continue;
-			}
-
-			if (i.links.has_value())
-			{
-				// skip relics which have links - we care about relic item value, 6L items are filtered earlier
-				continue;
-			}
-
-			result.relic_items.push_back(relic_item{std::move(i.name), std::move(*i.base_type), price_data});
 		}
 	}
 
@@ -477,52 +463,51 @@ item_price_data parse_item_prices(std::string_view itemdata_json, std::string_vi
 
 	/*
 	 * Some unique (and relic) items share the same base type, eg "Headhunter Leather Belt" and "Wurm's Molt Leather Belt".
-	 * Unfortunately item filters can only filter by base type, so we have 2 choices:
-	 * - assume the found item has the value of less expensive unique
-	 * - assume the found item has the value of more expensive unique
-	 * Being cautious, we assume that the item is expensive - better to have some false alarms than a missed Headhunter
+	 * Unfortunately item filters can only filter by base type.
 	 *
-	 * The lambda will remove cheaper items that share the same base type with more expensive ones
+	 * I tried the way with assuming that each ambiguous base is an expensive item but it turns out that
+	 * a quite large amount of uniques share the same base type which results in a lot of false alarms
+	 * (Inpulsa shares base with Tinkerskin, Starforge with Oro's).
+	 *
+	 * Additionally, items from some categories are almost always ambiguous (jewels, rings, amulets).
+	 *
+	 * We separate ambiguous and unambiguous base types to allow separate filter rules for 'definitely an expensive item' and
+	 * 'maybe an expensive item'.
 	 */
-	const auto remove_duplicated_bases_with_lower_price = [&](auto& items)
+	const auto extract_unambiguous_items = [&](std::vector<unique_item>& ambiguous_items) [[nodiscard]] -> std::vector<unique_item>
 	{
-		std::sort(items.begin(), items.end(), [](const auto& left, const auto& right)
-		{
-			return left.price_data.mean > right.price_data.mean;
-		});
-		std::stable_sort(items.begin(), items.end(), [](const auto& left, const auto& right)
+		std::sort(ambiguous_items.begin(), ambiguous_items.end(), [](const auto& left, const auto& right)
 		{
 			return left.base_type_name < right.base_type_name;
 		});
 
-		// now items with the same base type are next to each other
-		// each group of same-base-type items is sorted descending by price
+		// now items with the same base type are next to each other, just move out unique (not repeated) bases
+		std::vector<unique_item> unambiguous_items;
+		const auto last = utility::unique_move( // unique_move is analogic to std::unique_copy
+			ambiguous_items.begin(),
+			ambiguous_items.end(),
+			std::back_inserter(unambiguous_items),
+			[](const auto& left, const auto& right)
+			{
+				return left.base_type_name == right.base_type_name;
+			});
+		ambiguous_items.erase(last, ambiguous_items.end()); // note: this is the erase-remove idiom
 
-		// std::unique is specified to remove all duplicates except the first
-		// thus after the call to erase, only 1 (the most expensive) item of each base type is present
-		// note: this is the erase-remove idiom
-		const auto last = std::unique(items.begin(), items.end(), [](const auto& left, const auto& right)
-		{
-			return left.base_type_name == right.base_type_name;
-		});
-		items.erase(last, items.end());
+		return unambiguous_items;
 	};
 
-	remove_duplicated_bases_with_lower_price(result.unique_armours);
-	remove_duplicated_bases_with_lower_price(result.unique_weapons);
-	remove_duplicated_bases_with_lower_price(result.unique_accessories);
-	remove_duplicated_bases_with_lower_price(result.unique_jewels);
-	remove_duplicated_bases_with_lower_price(result.unique_flasks);
-	remove_duplicated_bases_with_lower_price(result.unique_maps);
-	std::sort(result.unique_armours.begin(), result.unique_armours.end(), compare_by_mean_price);
-	std::sort(result.unique_weapons.begin(), result.unique_weapons.end(), compare_by_mean_price);
-	std::sort(result.unique_accessories.begin(), result.unique_accessories.end(), compare_by_mean_price);
-	std::sort(result.unique_jewels.begin(), result.unique_jewels.end(), compare_by_mean_price);
-	std::sort(result.unique_flasks.begin(), result.unique_flasks.end(), compare_by_mean_price);
-	std::sort(result.unique_maps.begin(), result.unique_maps.end(), compare_by_mean_price);
-
-	remove_duplicated_bases_with_lower_price(result.relic_items);
-	std::sort(result.relic_items.begin(),  result.relic_items.end(),  compare_by_mean_price);
+	result.unambiguous_unique_armours     = extract_unambiguous_items(result.ambiguous_unique_armours);
+	result.unambiguous_unique_weapons     = extract_unambiguous_items(result.ambiguous_unique_weapons);
+	result.unambiguous_unique_accessories = extract_unambiguous_items(result.ambiguous_unique_accessories);
+	result.unambiguous_unique_jewels      = extract_unambiguous_items(result.ambiguous_unique_jewels);
+	result.unambiguous_unique_flasks      = extract_unambiguous_items(result.ambiguous_unique_flasks);
+	result.unambiguous_unique_maps        = extract_unambiguous_items(result.ambiguous_unique_maps);
+	std::sort(result.unambiguous_unique_armours.begin(),     result.unambiguous_unique_armours.end(),     compare_by_mean_price);
+	std::sort(result.unambiguous_unique_weapons.begin(),     result.unambiguous_unique_weapons.end(),     compare_by_mean_price);
+	std::sort(result.unambiguous_unique_accessories.begin(), result.unambiguous_unique_accessories.end(), compare_by_mean_price);
+	std::sort(result.unambiguous_unique_jewels.begin(),      result.unambiguous_unique_jewels.end(),      compare_by_mean_price);
+	std::sort(result.unambiguous_unique_flasks.begin(),      result.unambiguous_unique_flasks.end(),      compare_by_mean_price);
+	std::sort(result.unambiguous_unique_maps.begin(),        result.unambiguous_unique_maps.end(),        compare_by_mean_price);
 
 	return result;
 }

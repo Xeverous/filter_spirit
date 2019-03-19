@@ -66,6 +66,19 @@ void print_compile_error(
 }
 
 void print_compile_error(
+	compiler::error::no_such_advanced_query error,
+	const parser::lookup_data& lookup_data,
+	std::ostream& error_stream)
+{
+	print::print_line_number_with_indication_and_texts(
+		error_stream,
+		lookup_data.get_range_of_whole_content(),
+		lookup_data.position_of(error.place_of_name),
+		print::compiler_error_string,
+		"no such advanced query exists");
+}
+
+void print_compile_error(
 	compiler::error::invalid_amount_of_arguments error,
 	const parser::lookup_data& lookup_data,
 	std::ostream& error_stream)

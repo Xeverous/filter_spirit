@@ -28,6 +28,11 @@ struct no_such_query
 	lang::position_tag place_of_name;
 };
 
+struct no_such_advanced_query
+{
+	lang::position_tag place_of_name;
+};
+
 struct invalid_amount_of_arguments
 {
 	int min_expected;
@@ -147,6 +152,7 @@ using error_variant = std::variant<
 	no_such_name,
 	no_such_function,
 	no_such_query,
+	no_such_advanced_query,
 	invalid_amount_of_arguments,
 	type_mismatch,
 	nested_arrays_not_allowed,

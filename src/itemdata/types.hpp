@@ -26,104 +26,53 @@ struct price_data
 	double accepted; // amount of accepted offers for price calculation (troll offers are ignored)
 };
 
-struct divination_card
+struct elementary_item
 {
 	std::string base_type_name;
 	price_data price_data;
 };
 
-struct prophecy
-{
-	std::string base_type_name;
-	price_data price_data;
-};
-
-struct base_without_influence
+struct base_type_item
 {
 	int ilvl;
 	std::string base_type_name;
 	price_data price_data;
 };
 
-struct base_shaper
-{
-	int ilvl;
-	std::string base_type_name;
-	price_data price_data;
-};
-
-struct base_elder
-{
-	int ilvl;
-	std::string base_type_name;
-	price_data price_data;
-};
-
-struct unique_armour
+struct unique_item
 {
 	std::string name;
 	std::string base_type_name;
 	price_data price_data;
 };
 
-struct unique_weapon
-{
-	std::string name;
-	std::string base_type_name;
-	price_data price_data;
-};
-
-struct unique_accessory
-{
-	std::string name;
-	std::string base_type_name;
-	price_data price_data;
-};
-
-struct unique_jewel
-{
-	std::string name;
-	std::string base_type_name;
-	price_data price_data;
-};
-
-struct unique_flask
-{
-	std::string name;
-	std::string base_type_name;
-	price_data price_data;
-};
-
-struct unique_map
-{
-	std::string name;
-	std::string base_type_name;
-	price_data price_data;
-};
-
-struct relic_item
-{
-	std::string name;
-	std::string base_type_name;
-	price_data price_data;
-};
 
 struct item_price_data
 {
-	std::vector<divination_card> divination_cards;               // sorted by price
-	std::vector<prophecy> prophecies;                            // sorted by price
-	std::vector<base_without_influence> bases_without_influence; // sorted by ilvl
-	std::vector<base_shaper> bases_shaper;                       // sorted by ilvl
-	std::vector<base_elder> bases_elder;                         // sorted by ilvl
+	// sorted by price
+	std::vector<elementary_item> divination_cards;
+	std::vector<elementary_item> prophecies;
 
-	std::vector<unique_armour> unique_armours;                   // sorted by price
-	std::vector<unique_weapon> unique_weapons;                   // sorted by price
-	std::vector<unique_accessory> unique_accessories;            // sorted by price
-	std::vector<unique_jewel> unique_jewels;                     // sorted by price
-	std::vector<unique_flask> unique_flasks;                     // sorted by price
-	std::vector<unique_map> unique_maps;                         // sorted by price
+	// sorted by ilvl
+	std::vector<base_type_item> bases_without_influence;
+	std::vector<base_type_item> bases_shaper;
+	std::vector<base_type_item> bases_elder;
 
-	std::vector<relic_item> relic_items;                         // sorted by price
+	// sorted by price
+	std::vector<unique_item> unambiguous_unique_armours;
+	std::vector<unique_item> unambiguous_unique_weapons;
+	std::vector<unique_item> unambiguous_unique_accessories;
+	std::vector<unique_item> unambiguous_unique_jewels;
+	std::vector<unique_item> unambiguous_unique_flasks;
+	std::vector<unique_item> unambiguous_unique_maps;
+
+	// sorted by base type
+	std::vector<unique_item> ambiguous_unique_armours;
+	std::vector<unique_item> ambiguous_unique_weapons;
+	std::vector<unique_item> ambiguous_unique_accessories;
+	std::vector<unique_item> ambiguous_unique_jewels;
+	std::vector<unique_item> ambiguous_unique_flasks;
+	std::vector<unique_item> ambiguous_unique_maps;
 };
 
 }

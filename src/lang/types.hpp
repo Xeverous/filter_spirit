@@ -291,6 +291,7 @@ struct object
 	position_tag value_origin;
 	// for printing error name already exists
 	// if object originated from a literal this should be empty
+	// TODO this is hardly ever needed, remove and implement elsewhere
 	std::optional<position_tag> name_origin;
 };
 
