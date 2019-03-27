@@ -1,5 +1,7 @@
 #pragma once
+
 #include "itemdata/types.hpp"
+
 #include <string_view>
 #include <vector>
 

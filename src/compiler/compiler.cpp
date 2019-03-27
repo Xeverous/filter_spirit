@@ -11,7 +11,7 @@
 #include <cassert>
 #include <string_view>
 #include <utility>
-#include <fstream>
+#include <sstream>
 
 namespace
 {
@@ -84,17 +84,14 @@ std::variant<lang::constants_map, compiler::error::error_variant> resolve_consta
 }
 
 [[nodiscard]]
-bool generate_filter(const std::vector<lang::filter_block>& blocks)
+std::string generate_filter(const std::vector<lang::filter_block>& blocks)
 {
-	std::ofstream output("output.filter");
-
-	if (!output.good())
-		return false;
+	std::stringstream ss;
 
 	for (const lang::filter_block& block : blocks)
-		block.generate(output);
+		block.generate(ss);
 
-	return true;
+	return ss.str();
 }
 
 } // namespace
@@ -104,12 +101,12 @@ bool generate_filter(const std::vector<lang::filter_block>& blocks)
 namespace fs::compiler
 {
 
-bool process_input(const std::string& input, const itemdata::item_price_data& item_price_data, std::ostream& error_stream)
+std::optional<std::string> process_input(const std::string& input, const itemdata::item_price_data& item_price_data, std::ostream& error_stream)
 {
 	std::optional<parser::parse_data> parse_result = parser::parse(input, error_stream);
 
 	if (!parse_result)
-		return false;
+		return std::nullopt;
 
 	parser::parse_data& parse_data = *parse_result;
 	std::variant<lang::constants_map, error::error_variant> map_or_error = resolve_constants(parse_data.ast.constant_definitions, item_price_data);
@@ -117,9 +114,10 @@ bool process_input(const std::string& input, const itemdata::item_price_data& it
 	if (std::holds_alternative<error::error_variant>(map_or_error))
 	{
 		print::compile_error(std::get<error::error_variant>(map_or_error), parse_data.lookup_data, error_stream);
-		return false;
+		return std::nullopt;
 	}
 
+	// TODO use logger, remove this
 	std::cout << "itemdata:\n"
 		<< "divination cards: " << item_price_data.divination_cards.size() << "\n"
 		<< "prophecies: " << item_price_data.prophecies.size() << "\n"
@@ -133,7 +131,7 @@ bool process_input(const std::string& input, const itemdata::item_price_data& it
 	if (std::holds_alternative<error::error_variant>(filter_or_error))
 	{
 		print::compile_error(std::get<error::error_variant>(filter_or_error), parse_data.lookup_data, error_stream);
-		return false;
+		return std::nullopt;
 	}
 
 	const auto& blocks = std::get<std::vector<lang::filter_block>>(filter_or_error);

@@ -47,7 +47,7 @@ std::future<std::vector<itemdata::league>> poe_watch_api::async_download_leagues
 	});
 }
 
-std::future<itemdata::item_price_data> poe_watch_api::async_download_item_prices(std::string league_name)
+std::future<itemdata::item_price_data> poe_watch_api::async_download_item_price_data(std::string league_name)
 {
 	return std::async(std::launch::async, [league = league_name]()
 	{

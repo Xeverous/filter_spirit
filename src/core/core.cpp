@@ -1,127 +1,88 @@
 #include "core/core.hpp"
-#include "core/version.hpp"
-#include "core/application_logic.hpp"
+#include "utility/file.hpp"
 #include "network/poe_watch_api.hpp"
-#include <boost/program_options.hpp>
-#include <boost/optional.hpp>
-#include <cstdlib>
+#include "compiler/compiler.hpp"
+#include "itemdata/parse_json.hpp"
+
 #include <iostream>
-#include <exception>
-#include <string>
+#include <fstream>
 
 namespace fs::core
 {
 
-int run(int argc, char* argv[])
+bool generate_item_filter(
+	const itemdata::item_price_data& item_price_data,
+	const std::string& source_filepath,
+	const std::string& output_filepath)
 {
-	try {
-		namespace po = boost::program_options;
+	std::optional<std::string> source_file_content = fs::utility::load_file(source_filepath);
 
-		bool opt_list_leagues = false;
-		boost::optional<std::string> league_name;
-		bool opt_generate = false;
-		po::options_description main_options("main options");
-		main_options.add_options()
-			("list-leagues,l", po::bool_switch(&opt_list_leagues), "list available leagues (this option will query the API)")
-			("download,d", po::value(&league_name), "download item price data from api.poe.watch for specified league\n(this option can be combined with -g)")
-			("generate,g", po::bool_switch(&opt_generate), "generate an item filter using currently saved item price data")
-		;
-
-		boost::optional<std::string> input_path;
-		boost::optional<std::string> output_path;
-		constexpr auto input_path_str = "input-path";
-		constexpr auto output_path_str = "output-path";
-		po::options_description positional_options("positional options required by -g (option names not required)");
-		positional_options.add_options()
-			(input_path_str,  po::value(&input_path),  "file path to Filter Spirit source")
-			(output_path_str, po::value(&output_path), "file path where to generate the filter")
-		;
-
-		bool opt_help = false;
-		bool opt_version = false;
-		po::options_description generic_options("generic options");
-		generic_options.add_options()
-			("help,h",     po::bool_switch(&opt_help),    "print this message")
-			("version,v",  po::bool_switch(&opt_version), "print version number")
-		;
-
-		po::positional_options_description positional_options_description;
-		positional_options_description.add(input_path_str, 1).add(output_path_str, 1);
-
-		po::options_description all_options;
-		all_options.add(main_options).add(positional_options).add(generic_options);
-
-		po::variables_map vm;
-		po::store(po::command_line_parser(argc, argv).options(all_options).positional(positional_options_description).run(), vm);
-		po::notify(vm);
-
-		if (argc == 0 || argc == 1)
-		{
-			// later: run with GUI
-			// now: print help and exit
-			std::cout << all_options << '\n';
-			return 0;
-		}
-
-		// running through the command line
-
-		if (opt_help)
-		{
-			std::cout << all_options << '\n';
-			return 0;
-		}
-
-		if (opt_version)
-		{
-			std::cout << version::major << '.'  << version::minor << '.'  << version::patch << '\n';
-			return EXIT_SUCCESS;
-		}
-
-		application_logic al;
-
-		if (opt_list_leagues)
-		{
-			al.list_leagues();
-			return EXIT_SUCCESS;
-		}
-
-		if (opt_generate)
-		{
-			if (!input_path)
-			{
-				std::cout << "error: no input path given\n";
-				return EXIT_FAILURE;
-			}
-
-			if (!output_path)
-			{
-				std::cout << "error: no output path given\n";
-				return EXIT_FAILURE;
-			}
-
-			if (!league_name)
-			{
-				std::cout << "error: no league name given\n";
-				return EXIT_FAILURE;
-			}
-
-			if (!al.generate_filter(*league_name, *input_path, *output_path))
-			{
-				std::cout << "errors occured during filter generation\n";
-				return EXIT_FAILURE;
-			}
-		}
-	}
-	catch (const std::exception& e) {
-		std::cerr << e.what() << '\n';
-		return EXIT_FAILURE;
-	}
-	catch (...) {
-		std::cerr << "unknown error occured\n";
-		return EXIT_FAILURE;
+	if (!source_file_content)
+	{
+		std::cout << "error: can not open input file\n"; // TODO replace with logger
+		return false;
 	}
 
-	return EXIT_SUCCESS;
+	std::optional<std::string> filter_content = fs::compiler::process_input(*source_file_content, item_price_data, std::cout); // TODO pass logger instance instead of std::cout
+	if (!filter_content)
+		return false;
+
+	std::ofstream output_file(output_filepath);
+	if (!output_file.good())
+	{
+		std::cout << "error: can not open output file\n";
+		return false;
+	}
+
+	output_file << *filter_content;
+	return true;
+}
+
+void list_leagues()
+{
+	std::future<std::vector<itemdata::league>> leagues_future = network::poe_watch_api::async_download_leagues();
+	const auto& leagues = leagues_future.get();
+	for (const itemdata::league& league : leagues)
+		std::cout << league.display_name << '\n';
+}
+
+itemdata::item_price_data download_item_price_data(const std::string& league_name)
+{
+	try
+	{
+		std::future<itemdata::item_price_data> ipd_future = network::poe_watch_api::async_download_item_price_data(league_name);
+		return ipd_future.get();
+	}
+	catch (const std::exception& e)
+	{
+		std::cout << "error: " << e.what() << "\n"; // TODO replace with logger
+		throw;
+	}
+}
+
+std::optional<itemdata::item_price_data> load_item_price_data(const std::string& directory_path)
+{
+	std::optional<std::string> compact = utility::load_file(directory_path + "/compact.json");
+
+	if (!compact)
+	{
+		std::cout << "error: can not open compact.json\n";
+		return std::nullopt;
+	}
+
+	std::optional<std::string> itemdata = utility::load_file(directory_path + "/itemdata.json");
+
+	if (!compact)
+	{
+		std::cout << "error: can not open itemdata.json\n";
+		return std::nullopt;
+	}
+
+	const std::string& compact_json = *compact;
+	const std::string& itemdata_json = *itemdata;
+	return itemdata::parse_item_prices(
+		std::string_view(itemdata_json.c_str(), itemdata_json.size()),
+		std::string_view(compact_json.c_str(), compact_json.size()));
 }
 
 }
