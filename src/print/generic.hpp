@@ -1,5 +1,8 @@
 #pragma once
+
 #include "parser/config.hpp"
+#include "log/logger.hpp"
+
 #include <utility>
 
 namespace fs::print
@@ -13,7 +16,6 @@ constexpr auto indicator_foreground = '~';
 constexpr auto compiler_error_string = "compile error: ";
 constexpr auto internal_compiler_error_string = "internal compile error: ";
 constexpr auto internal_compiler_error_info = "please report a bug with attached minimal filter source that reproduces it";
-constexpr auto parser_error_string = "parse error: ";
 constexpr auto note_string = "note: ";
 
 /**
@@ -44,65 +46,14 @@ iterator_type skip_whitespace(iterator_type it, iterator_type last);
 range_type skip_whitespace(range_type range, iterator_type last);
 
 
-template <typename OutputStream>
-void print_line_number(OutputStream& os, int line)
-{
-	os << "line " << line << ": ";
-}
+void print_line_number(logger& logger, int line);
+void print_line(logger& logger, iterator_type start, iterator_type last);
+void print_indicator(logger& logger, iterator_type line_start, range_type error_range);
+void print_line_with_indicator(logger& logger, range_type content_range, range_type error_range);
 
-template <typename OutputStream>
-void print_line(OutputStream& os, iterator_type start, iterator_type last)
-{
-	auto end = start;
-	while (end != last)
-	{
-		auto c = *end;
-		if (c == '\r' || c == '\n')
-			break;
-		else
-			++end;
-	}
-
-	os << range_type(start, end) << '\n';
-}
-
-template <typename OutputStream>
-void print_indicator(OutputStream& os, iterator_type line_start, range_type error_range)
-{
-	for (; line_start != error_range.begin(); ++line_start)
-	{
-		auto c = *line_start;
-		if (c == '\r' || c == '\n')
-			break;
-		else if (c == '\t')
-			for (int i = 0; i < tab_length; ++i)
-				os << indicator_background;
-		else
-			os << indicator_background;
-	}
-
-	for (auto it = error_range.begin(); it != error_range.end(); ++it)
-	{
-		os << indicator_foreground;
-	}
-
-	os << '\n';
-}
-
-template<typename OutputStream>
-void print_line_with_indicator(OutputStream& os, range_type content_range, range_type error_range)
-{
-	iterator_type line_start = get_line_start(content_range.begin(), error_range.begin());
-	if (line_start != content_range.begin())
-		++line_start;
-
-	print_line(os, line_start, content_range.end());
-	print_indicator(os, line_start, error_range);
-}
-
-template <typename OutputStream, typename... Texts>
+template <typename... Texts>
 void print_line_number_with_indication_and_texts(
-	OutputStream& os,
+	logger& logger,
 	range_type content_range,
 	range_type indicated_range,
 	Texts&&... texts)
@@ -116,9 +67,9 @@ void print_line_number_with_indication_and_texts(
 	indicated_range = skip_whitespace(indicated_range, content_range.end());
 	const int line_number = count_line_number(content_range.begin(), indicated_range.begin());
 
-	print_line_number(os, line_number);
-	(os << ... << std::forward<Texts>(texts)) << '\n';
-	print_line_with_indicator(os, content_range, indicated_range);
+	print_line_number(logger, line_number);
+	(logger << ... << std::forward<Texts>(texts)) << '\n';
+	print_line_with_indicator(logger, content_range, indicated_range);
 }
 
 }

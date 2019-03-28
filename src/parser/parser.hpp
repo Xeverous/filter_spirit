@@ -1,8 +1,10 @@
 #pragma once
+
 #include "parser/ast.hpp"
 #include "parser/config.hpp"
+#include "log/logger.hpp"
+
 #include <string>
-#include <iosfwd>
 #include <optional>
 #include <utility>
 
@@ -48,6 +50,6 @@ struct parse_data
 };
 
 [[nodiscard]]
-std::optional<parse_data> parse(const std::string& file_content, std::ostream& error_stream);
+std::optional<parse_data> parse(const std::string& file_content, logger& logger);
 
 }

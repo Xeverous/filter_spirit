@@ -51,7 +51,7 @@ std::pair<p::lookup_data, std::variant<p::ast::ast_type, p::error_holder_type>> 
 namespace fs::parser
 {
 
-std::optional<parse_data> parse(const std::string& file_content, std::ostream& error_stream)
+std::optional<parse_data> parse(const std::string& file_content, logger& logger)
 {
 	std::pair<lookup_data, std::variant<ast::ast_type, error_holder_type>> parse_result = parse_impl(file_content);
 
@@ -63,7 +63,7 @@ std::optional<parse_data> parse(const std::string& file_content, std::ostream& e
 		auto& errors = std::get<error_holder_type>(ast_or_error);
 
 		for (const parse_error& error : errors)
-			print::print_parse_error(error, lookup_data, error_stream);
+			print::print_parse_error(error, lookup_data, logger);
 
 		return std::nullopt;
 	}

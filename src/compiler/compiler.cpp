@@ -8,6 +8,7 @@
 #include "lang/constants_map.hpp"
 #include "print/compile_error.hpp"
 #include "utility/holds_alternative.hpp"
+
 #include <cassert>
 #include <string_view>
 #include <utility>
@@ -96,14 +97,12 @@ std::string generate_filter(const std::vector<lang::filter_block>& blocks)
 
 } // namespace
 
-#include <iostream> // TODO implement logging, remove
-
 namespace fs::compiler
 {
 
-std::optional<std::string> process_input(const std::string& input, const itemdata::item_price_data& item_price_data, std::ostream& error_stream)
+std::optional<std::string> process_input(const std::string& input, const itemdata::item_price_data& item_price_data, logger& logger)
 {
-	std::optional<parser::parse_data> parse_result = parser::parse(input, error_stream);
+	std::optional<parser::parse_data> parse_result = parser::parse(input, logger);
 
 	if (!parse_result)
 		return std::nullopt;
@@ -113,24 +112,17 @@ std::optional<std::string> process_input(const std::string& input, const itemdat
 
 	if (std::holds_alternative<error::error_variant>(map_or_error))
 	{
-		print::compile_error(std::get<error::error_variant>(map_or_error), parse_data.lookup_data, error_stream);
+		print::compile_error(std::get<error::error_variant>(map_or_error), parse_data.lookup_data, logger);
 		return std::nullopt;
 	}
 
-	// TODO use logger, remove this
-	std::cout << "itemdata:\n"
-		<< "divination cards: " << item_price_data.divination_cards.size() << "\n"
-		<< "prophecies: " << item_price_data.prophecies.size() << "\n"
-		<< "bases no inf: " << item_price_data.bases_without_influence.size() << "\n"
-		<< "bases shaper: " << item_price_data.bases_shaper.size() << "\n"
-		<< "bases elder: " << item_price_data.bases_elder.size() << "\n";
-		//<< "uniques: " << item_price_data.unique_items.size() << "\n"
+	item_price_data.log_info(logger);
 
 	const auto& map = std::get<lang::constants_map>(map_or_error);
 	std::variant<std::vector<lang::filter_block>, error::error_variant> filter_or_error = filter_builder::build_filter(parse_data.ast.statements, map, item_price_data);
 	if (std::holds_alternative<error::error_variant>(filter_or_error))
 	{
-		print::compile_error(std::get<error::error_variant>(filter_or_error), parse_data.lookup_data, error_stream);
+		print::compile_error(std::get<error::error_variant>(filter_or_error), parse_data.lookup_data, logger);
 		return std::nullopt;
 	}
 

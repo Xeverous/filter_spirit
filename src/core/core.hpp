@@ -5,6 +5,7 @@
 #pragma once
 
 #include "itemdata/types.hpp"
+#include "log/logger.hpp"
 
 #include <string>
 #include <optional>
@@ -15,9 +16,10 @@ namespace fs::core
 bool generate_item_filter(
 	const itemdata::item_price_data& item_price_data,
 	const std::string& source_filepath,
-	const std::string& output_filepath);
+	const std::string& output_filepath,
+	logger& logger);
 
-void list_leagues(/* TODO pass logger instance here instead of using std::cout inside */);
+void list_leagues(logger& logger);
 
 /**
  * @brief download item price data from poe.watch's API
@@ -28,7 +30,7 @@ void list_leagues(/* TODO pass logger instance here instead of using std::cout i
  *
  * this function throws upon network and parsing failures
  */
-itemdata::item_price_data download_item_price_data(const std::string& league_name);
+itemdata::item_price_data download_item_price_data(const std::string& league_name, logger& logger);
 /**
  * @brief load item price data from saved JSON files
  * @param directory_path path where compact.json and itemdata.json are present
@@ -36,6 +38,6 @@ itemdata::item_price_data download_item_price_data(const std::string& league_nam
  *
  * @details you can download JSON files from poe.watch
  */
-std::optional<itemdata::item_price_data> load_item_price_data(const std::string& directory_path);
+std::optional<itemdata::item_price_data> load_item_price_data(const std::string& directory_path, logger& logger);
 
 }

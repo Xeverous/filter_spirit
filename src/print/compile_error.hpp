@@ -1,7 +1,7 @@
 #pragma once
 #include "parser/parser.hpp"
 #include "compiler/error.hpp"
-#include <iosfwd>
+#include "log/logger.hpp"
 
 namespace fs::print
 {
@@ -9,6 +9,6 @@ namespace fs::print
 void compile_error(
 	compiler::error::error_variant error,
 	const parser::lookup_data& lookup_data,
-	std::ostream& error_stream);
+	logger& logger);
 
 }

@@ -2,6 +2,8 @@
 #include <vector>
 #include <string>
 
+namespace fs { class logger; }
+
 namespace fs::itemdata
 {
 
@@ -49,6 +51,8 @@ struct unique_item
 
 struct item_price_data
 {
+	void log_info(logger& logger) const;
+
 	// sorted by price
 	std::vector<elementary_item> divination_cards;
 	std::vector<elementary_item> prophecies;

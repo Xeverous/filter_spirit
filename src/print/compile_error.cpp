@@ -10,16 +10,16 @@ using namespace fs;
 void print_compile_error(
 	compiler::error::name_already_exists error,
 	const parser::lookup_data& lookup_data,
-	std::ostream& error_stream)
+	logger& logger)
 {
 	print::print_line_number_with_indication_and_texts(
-		error_stream,
+		logger,
 		lookup_data.get_range_of_whole_content(),
 		lookup_data.position_of(error.place_of_duplicated_name),
 		print::compiler_error_string,
 		"name already exists");
 	print::print_line_number_with_indication_and_texts(
-		error_stream,
+		logger,
 		lookup_data.get_range_of_whole_content(),
 		lookup_data.position_of(error.place_of_original_name),
 		print::note_string,
@@ -29,10 +29,10 @@ void print_compile_error(
 void print_compile_error(
 	compiler::error::no_such_name error,
 	const parser::lookup_data& lookup_data,
-	std::ostream& error_stream)
+	logger& logger)
 {
 	print::print_line_number_with_indication_and_texts(
-		error_stream,
+		logger,
 		lookup_data.get_range_of_whole_content(),
 		lookup_data.position_of(error.place_of_name),
 		print::compiler_error_string,
@@ -42,10 +42,10 @@ void print_compile_error(
 void print_compile_error(
 	compiler::error::no_such_function error,
 	const parser::lookup_data& lookup_data,
-	std::ostream& error_stream)
+	logger& logger)
 {
 	print::print_line_number_with_indication_and_texts(
-		error_stream,
+		logger,
 		lookup_data.get_range_of_whole_content(),
 		lookup_data.position_of(error.place_of_name),
 		print::compiler_error_string,
@@ -55,10 +55,10 @@ void print_compile_error(
 void print_compile_error(
 	compiler::error::no_such_query error,
 	const parser::lookup_data& lookup_data,
-	std::ostream& error_stream)
+	logger& logger)
 {
 	print::print_line_number_with_indication_and_texts(
-		error_stream,
+		logger,
 		lookup_data.get_range_of_whole_content(),
 		lookup_data.position_of(error.place_of_name),
 		print::compiler_error_string,
@@ -68,10 +68,10 @@ void print_compile_error(
 void print_compile_error(
 	compiler::error::no_such_advanced_query error,
 	const parser::lookup_data& lookup_data,
-	std::ostream& error_stream)
+	logger& logger)
 {
 	print::print_line_number_with_indication_and_texts(
-		error_stream,
+		logger,
 		lookup_data.get_range_of_whole_content(),
 		lookup_data.position_of(error.place_of_name),
 		print::compiler_error_string,
@@ -81,7 +81,7 @@ void print_compile_error(
 void print_compile_error(
 	compiler::error::invalid_amount_of_arguments error,
 	const parser::lookup_data& lookup_data,
-	std::ostream& error_stream)
+	logger& logger)
 {
 	std::string expected_arguments_string = [&error]()
 	{
@@ -92,7 +92,7 @@ void print_compile_error(
 	}();
 
 	print::print_line_number_with_indication_and_texts(
-		error_stream,
+		logger,
 		lookup_data.get_range_of_whole_content(),
 		lookup_data.position_of(error.place_of_arguments),
 		print::compiler_error_string,
@@ -105,10 +105,10 @@ void print_compile_error(
 void print_compile_error(
 	compiler::error::type_mismatch error,
 	const parser::lookup_data& lookup_data,
-	std::ostream& error_stream)
+	logger& logger)
 {
 	print::print_line_number_with_indication_and_texts(
-		error_stream,
+		logger,
 		lookup_data.get_range_of_whole_content(),
 		lookup_data.position_of(error.place_of_expression),
 		print::compiler_error_string,
@@ -122,10 +122,10 @@ void print_compile_error(
 void print_compile_error(
 	compiler::error::nested_arrays_not_allowed error,
 	const parser::lookup_data& lookup_data,
-	std::ostream& error_stream)
+	logger& logger)
 {
 	print::print_line_number_with_indication_and_texts(
-		error_stream,
+		logger,
 		lookup_data.get_range_of_whole_content(),
 		lookup_data.position_of(error.place_of_nested_array_expression),
 		print::compiler_error_string,
@@ -135,10 +135,10 @@ void print_compile_error(
 void print_compile_error(
 	compiler::error::non_homogeneous_array error,
 	const parser::lookup_data& lookup_data,
-	std::ostream& error_stream)
+	logger& logger)
 {
 	print::print_line_number_with_indication_and_texts(
-		error_stream,
+		logger,
 		lookup_data.get_range_of_whole_content(),
 		lookup_data.position_of(error.place_of_first_element),
 		print::compiler_error_string,
@@ -147,7 +147,7 @@ void print_compile_error(
 		"'");
 
 	print::print_line_number_with_indication_and_texts(
-		error_stream,
+		logger,
 		lookup_data.get_range_of_whole_content(),
 		lookup_data.position_of(error.place_of_second_element),
 		print::note_string,
@@ -159,10 +159,10 @@ void print_compile_error(
 void print_compile_error(
 	compiler::error::empty_socket_group error,
 	const parser::lookup_data& lookup_data,
-	std::ostream& error_stream)
+	logger& logger)
 {
 	print::print_line_number_with_indication_and_texts(
-		error_stream,
+		logger,
 		lookup_data.get_range_of_whole_content(),
 		lookup_data.position_of(error.place_of_socket_group_string),
 		print::compiler_error_string,
@@ -172,10 +172,10 @@ void print_compile_error(
 void print_compile_error(
 	compiler::error::illegal_characters_in_socket_group error,
 	const parser::lookup_data& lookup_data,
-	std::ostream& error_stream)
+	logger& logger)
 {
 	print::print_line_number_with_indication_and_texts(
-		error_stream,
+		logger,
 		lookup_data.get_range_of_whole_content(),
 		lookup_data.position_of(error.place_of_socket_group_string),
 		print::compiler_error_string,
@@ -185,10 +185,10 @@ void print_compile_error(
 void print_compile_error(
 	compiler::error::invalid_socket_group error,
 	const parser::lookup_data& lookup_data,
-	std::ostream& error_stream)
+	logger& logger)
 {
 	print::print_line_number_with_indication_and_texts(
-		error_stream,
+		logger,
 		lookup_data.get_range_of_whole_content(),
 		lookup_data.position_of(error.place_of_socket_group_string),
 		print::compiler_error_string,
@@ -198,10 +198,10 @@ void print_compile_error(
 void print_compile_error(
 	compiler::error::invalid_minimap_icon_size error,
 	const parser::lookup_data& lookup_data,
-	std::ostream& error_stream)
+	logger& logger)
 {
 	print::print_line_number_with_indication_and_texts(
-		error_stream,
+		logger,
 		lookup_data.get_range_of_whole_content(),
 		lookup_data.position_of(error.place_of_size_argument),
 		print::compiler_error_string,
@@ -212,10 +212,10 @@ void print_compile_error(
 void print_compile_error(
 	compiler::error::positional_sound_not_supported error,
 	const parser::lookup_data& lookup_data,
-	std::ostream& error_stream)
+	logger& logger)
 {
 	print::print_line_number_with_indication_and_texts(
-		error_stream,
+		logger,
 		lookup_data.get_range_of_whole_content(),
 		lookup_data.position_of(error.place_of_action),
 		print::compiler_error_string,
@@ -225,10 +225,10 @@ void print_compile_error(
 void print_compile_error(
 	compiler::error::disable_drop_sound_not_supported error,
 	const parser::lookup_data& lookup_data,
-	std::ostream& error_stream)
+	logger& logger)
 {
 	print::print_line_number_with_indication_and_texts(
-		error_stream,
+		logger,
 		lookup_data.get_range_of_whole_content(),
 		lookup_data.position_of(error.place_of_action),
 		print::compiler_error_string,
@@ -238,10 +238,10 @@ void print_compile_error(
 void print_compile_error(
 	compiler::error::temporary_beam_effect_not_supported error,
 	const parser::lookup_data& lookup_data,
-	std::ostream& error_stream)
+	logger& logger)
 {
 	print::print_line_number_with_indication_and_texts(
-		error_stream,
+		logger,
 		lookup_data.get_range_of_whole_content(),
 		lookup_data.position_of(error.place_of_2nd_argument),
 		print::compiler_error_string,
@@ -251,10 +251,10 @@ void print_compile_error(
 void print_compile_error(
 	compiler::error::condition_redefinition error,
 	const parser::lookup_data& lookup_data,
-	std::ostream& error_stream)
+	logger& logger)
 {
 	print::print_line_number_with_indication_and_texts(
-		error_stream,
+		logger,
 		lookup_data.get_range_of_whole_content(),
 		lookup_data.position_of(error.place_of_redefinition),
 		print::compiler_error_string,
@@ -264,10 +264,10 @@ void print_compile_error(
 void print_compile_error(
 	compiler::error::lower_bound_redefinition error,
 	const parser::lookup_data& lookup_data,
-	std::ostream& error_stream)
+	logger& logger)
 {
 	print::print_line_number_with_indication_and_texts(
-		error_stream,
+		logger,
 		lookup_data.get_range_of_whole_content(),
 		lookup_data.position_of(error.place_of_redefinition),
 		print::compiler_error_string,
@@ -277,10 +277,10 @@ void print_compile_error(
 void print_compile_error(
 	compiler::error::upper_bound_redefinition error,
 	const parser::lookup_data& lookup_data,
-	std::ostream& error_stream)
+	logger& logger)
 {
 	print::print_line_number_with_indication_and_texts(
-		error_stream,
+		logger,
 		lookup_data.get_range_of_whole_content(),
 		lookup_data.position_of(error.place_of_redefinition),
 		print::compiler_error_string,
@@ -290,10 +290,10 @@ void print_compile_error(
 void print_compile_error(
 	compiler::error::exact_comparison_redefinition error,
 	const parser::lookup_data& lookup_data,
-	std::ostream& error_stream)
+	logger& logger)
 {
 	print::print_line_number_with_indication_and_texts(
-		error_stream,
+		logger,
 		lookup_data.get_range_of_whole_content(),
 		lookup_data.position_of(error.place_of_redefinition),
 		print::compiler_error_string,
@@ -303,10 +303,10 @@ void print_compile_error(
 void print_compile_error(
 	compiler::error::exact_comparison_outside_parent_range error,
 	const parser::lookup_data& lookup_data,
-	std::ostream& error_stream)
+	logger& logger)
 {
 	print::print_line_number_with_indication_and_texts(
-		error_stream,
+		logger,
 		lookup_data.get_range_of_whole_content(),
 		lookup_data.position_of(error.place_of_redefinition),
 		print::compiler_error_string,
@@ -316,10 +316,10 @@ void print_compile_error(
 void print_compile_error(
 	compiler::error::internal_compiler_error_during_action_evaluation error,
 	const parser::lookup_data& lookup_data,
-	std::ostream& error_stream)
+	logger& logger)
 {
 	print::print_line_number_with_indication_and_texts(
-		error_stream,
+		logger,
 		lookup_data.get_range_of_whole_content(),
 		lookup_data.position_of(error.place_of_action),
 		print::internal_compiler_error_string,
@@ -330,10 +330,10 @@ void print_compile_error(
 void print_compile_error(
 	compiler::error::internal_compiler_error_during_range_evaluation error,
 	const parser::lookup_data& lookup_data,
-	std::ostream& error_stream)
+	logger& logger)
 {
 	print::print_line_number_with_indication_and_texts(
-		error_stream,
+		logger,
 		lookup_data.get_range_of_whole_content(),
 		lookup_data.position_of(error.place_of_comparison_condition),
 		print::internal_compiler_error_string,
@@ -344,10 +344,10 @@ void print_compile_error(
 void print_compile_error(
 	compiler::error::internal_compiler_error_during_comparison_condition_evaluation error,
 	const parser::lookup_data& lookup_data,
-	std::ostream& error_stream)
+	logger& logger)
 {
 	print::print_line_number_with_indication_and_texts(
-		error_stream,
+		logger,
 		lookup_data.get_range_of_whole_content(),
 		lookup_data.position_of(error.place_of_comparison_condition),
 		print::internal_compiler_error_string,
@@ -358,10 +358,10 @@ void print_compile_error(
 void print_compile_error(
 	compiler::error::internal_compiler_error_during_string_condition_evaluation error,
 	const parser::lookup_data& lookup_data,
-	std::ostream& error_stream)
+	logger& logger)
 {
 	print::print_line_number_with_indication_and_texts(
-		error_stream,
+		logger,
 		lookup_data.get_range_of_whole_content(),
 		lookup_data.position_of(error.place_of_string_condition),
 		print::internal_compiler_error_string,
@@ -372,10 +372,10 @@ void print_compile_error(
 void print_compile_error(
 	compiler::error::internal_compiler_error_during_boolean_condition_evaluation error,
 	const parser::lookup_data& lookup_data,
-	std::ostream& error_stream)
+	logger& logger)
 {
 	print::print_line_number_with_indication_and_texts(
-		error_stream,
+		logger,
 		lookup_data.get_range_of_whole_content(),
 		lookup_data.position_of(error.place_of_boolean_condition),
 		print::internal_compiler_error_string,
@@ -391,11 +391,14 @@ namespace fs::print
 void compile_error(
 	compiler::error::error_variant error,
 	const parser::lookup_data& lookup_data,
-	std::ostream& error_stream)
+	logger& logger)
 {
+	logger.begin_error_message();
+	logger << "compile error\n";
 	std::visit(
-		[&](auto error) { print_compile_error(error, lookup_data, error_stream); },
+		[&](auto error) { print_compile_error(error, lookup_data, logger); },
 		error);
+	logger.end_message();
 }
 
 }

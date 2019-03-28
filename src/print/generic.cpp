@@ -1,4 +1,5 @@
 #include "print/generic.hpp"
+
 #include <cctype>
 #include <iterator>
 
@@ -75,6 +76,58 @@ int count_line_number(iterator_type first, iterator_type it)
 	}
 
 	return line;
+}
+
+void print_line_number(logger& logger, int line)
+{
+	logger << "line " << line << ": ";
+}
+
+void print_line(logger& logger, iterator_type start, iterator_type last)
+{
+	auto end = start;
+	while (end != last)
+	{
+		auto c = *end;
+		if (c == '\r' || c == '\n')
+			break;
+		else
+			++end;
+	}
+
+	logger << range_type(start, end) << '\n';
+}
+
+void print_indicator(logger& logger, iterator_type line_start, range_type error_range)
+{
+	for (; line_start != error_range.begin(); ++line_start)
+	{
+		auto c = *line_start;
+		if (c == '\r' || c == '\n')
+			break;
+		else if (c == '\t')
+			for (int i = 0; i < tab_length; ++i)
+				logger << indicator_background;
+		else
+			logger << indicator_background;
+	}
+
+	for (auto it = error_range.begin(); it != error_range.end(); ++it)
+	{
+		logger << indicator_foreground;
+	}
+
+	logger << '\n';
+}
+
+void print_line_with_indicator(logger& logger, range_type content_range, range_type error_range)
+{
+	iterator_type line_start = get_line_start(content_range.begin(), error_range.begin());
+	if (line_start != content_range.begin())
+		++line_start;
+
+	print_line(logger, line_start, content_range.end());
+	print_indicator(logger, line_start, error_range);
 }
 
 }

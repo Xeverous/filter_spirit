@@ -1,6 +1,7 @@
 #include "core/parse_args.hpp"
 #include "core/version.hpp"
 #include "core/core.hpp"
+#include "log/console_logger.hpp"
 
 #include <boost/program_options.hpp>
 #include <boost/optional.hpp>
@@ -45,6 +46,8 @@ namespace fs::core
 
 int run(int argc, char* argv[])
 {
+	console_logger logger;
+
 	try {
 		namespace po = boost::program_options;
 
@@ -122,7 +125,7 @@ int run(int argc, char* argv[])
 
 		if (opt_list_leagues)
 		{
-			list_leagues();
+			list_leagues(logger);
 			return EXIT_SUCCESS;
 		}
 
@@ -130,53 +133,53 @@ int run(int argc, char* argv[])
 
 		if (download_league_name && data_read_dir)
 		{
-			std::cout << "error: more than 1 data obtaining option specified\n";
+			logger.error() << "more than 1 data obtaining option specified";
 			return EXIT_FAILURE;
 		}
 
 		if (download_league_name)
 		{
-			item_price_data = download_item_price_data(*download_league_name);
+			item_price_data = download_item_price_data(*download_league_name, logger);
 		}
 
 		if (data_read_dir)
 		{
-			item_price_data = load_item_price_data(*data_read_dir);
+			item_price_data = load_item_price_data(*data_read_dir, logger);
 		}
 
 		if (opt_generate)
 		{
 			if (!item_price_data)
 			{
-				std::cout << "error: no item price data, giving up on filter generation\n";
+				logger.error() << "no item price data, giving up on filter generation";
 				return EXIT_FAILURE;
 			}
 
 			if (!input_path)
 			{
-				std::cout << "error: no input path given\n";
+				logger.error() << "no input path given";
 				return EXIT_FAILURE;
 			}
 
 			if (!output_path)
 			{
-				std::cout << "error: no output path given\n";
+				logger.error() << "error: no output path given";
 				return EXIT_FAILURE;
 			}
 
-			if (!generate_item_filter(*item_price_data, *input_path, *output_path))
+			if (!generate_item_filter(*item_price_data, *input_path, *output_path, logger))
 			{
-				std::cout << "errors occured during filter generation\n";
+				logger.info() << "errors occured during filter generation";
 				return EXIT_FAILURE;
 			}
 		}
 	}
 	catch (const std::exception& e) {
-		std::cerr << e.what() << '\n';
+		logger.error() << e.what();
 		return EXIT_FAILURE;
 	}
 	catch (...) {
-		std::cerr << "unknown error occured\n";
+		logger.error() << "unknown error occured";
 		return EXIT_FAILURE;
 	}
 
