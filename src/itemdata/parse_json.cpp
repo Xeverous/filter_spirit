@@ -53,12 +53,23 @@ namespace categories // avoids name conflicts with types in fs::itemdata
 	struct flask {};
 
 	BETTER_ENUM(gem_type, int, skill, support, vaal, unknown)
-	struct gem { gem_type type; };
+	struct gem
+	{
+		gem_type type;
+		int level;
+		int quality;
+		bool corrupted;
+	};
 
 	struct jewel {};
 
 	BETTER_ENUM(map_type, int, map, fragment, unique, scarab, leaguestone, unknown)
-	struct map { map_type type; };
+	struct map
+	{
+		map_type type;
+		std::optional<int> series;
+		std::optional<int> tier;
+	};
 
 	struct prophecy {};
 
@@ -66,7 +77,14 @@ namespace categories // avoids name conflicts with types in fs::itemdata
 	struct weapon { weapon_type type; };
 
 	BETTER_ENUM(base_type, int, ring, belt, amulet, helmet, chest, gloves, boots, onemace, sceptre, bow, wand, onesword, claw, shield, dagger, twosword, staff, oneaxe, quiver, twoaxe, twomace, jewel, unknown)
-	struct base { base_type type; };
+	struct base
+	{
+		enum class influence_type { none, shaper, elder };
+
+		base_type type;
+		influence_type influence;
+		int ilvl;
+	};
 
 	struct unknown {};
 
@@ -74,13 +92,6 @@ namespace categories // avoids name conflicts with types in fs::itemdata
 
 using item_category_variant = std::variant<
 	categories::accessory, categories::armour, categories::divination_card, categories::currency, categories::enchantment, categories::flask, categories::gem, categories::jewel, categories::map, categories::prophecy, categories::weapon, categories::base, categories::unknown>;
-
-struct unique_with_variations {};
-struct shaper_item {};
-struct elder_item {};
-
-using item_variation_variant = std::variant<
-	unique_with_variations, shaper_item, elder_item>;
 
 struct item
 {
@@ -90,15 +101,9 @@ struct item
 	std::string name;                     // item main name, eg "Tabula Rasa"
 	std::optional<std::string> base_type; // item base type, eg "Simple Robe", null for non-wearable items
 	frame_type frame;                  // frame displayed in game UI
-	std::optional<int> map_tier;       // only for maps
 	std::optional<int> max_stack_size; // only for stackable items
-	std::optional<int> gem_lvl;        // only for gems
-	std::optional<int> gem_quality;    // only for gems
-	std::optional<bool> gem_corrupted; // only for gems
 	std::optional<int> links;
-	std::optional<int> ilvl;
-	std::optional<item_variation_variant> variation; // unique item variation (eg Vessel of Vinktar has 4 variations) OR shaper/elder
-	// url icon_path; // we do not care about item icons
+	bool has_unique_variations; // (eg Vessel of Vinktar has 4 variations)
 	item_category_variant category; // combined category and group
 };
 
@@ -111,7 +116,7 @@ void item::log_info(fs::logger& logger) const
 		"base type       : " << base_type.value_or("(none)") << "\n"
 		"frame           : " << (frame == +frame_type::unknown ? "(unknown)" : frame._to_string()) << "\n";
 
-	const auto log_optional = [&, this](const char* name, std::optional<int> opt)
+	const auto log_optional = [&logger](const char* name, std::optional<int> opt)
 	{
 		logger << name;
 		if (opt)
@@ -121,54 +126,48 @@ void item::log_info(fs::logger& logger) const
 		logger << "\n";
 	};
 
-	log_optional("map tier        : ", map_tier);
 	log_optional("max stack size  : ", max_stack_size);
-	log_optional("gem level       : ", gem_lvl);
-	log_optional("gem quality     : ", gem_quality);
-
-	logger << "is corrupted gem: ";
-	if (gem_corrupted && *gem_corrupted)
-		logger << "true";
-	else if (gem_corrupted && !gem_corrupted)
-		logger << "false";
-	else
-		logger << "(none)";
-	logger << "\n";
 
 	log_optional("links           : ", links);
-	log_optional("item level      : ", ilvl);
 
-	logger << "variation       : ";
-	if (variation)
-	{
-		logger << std::visit(
-			fs::utility::visitor{
-				[](unique_with_variations) { return "one of unique variations"; },
-				[](shaper_item) { return "shaper item"; },
-				[](elder_item) { return "elder item"; }
-			}, *variation);
-	}
-	else
-	{
-		logger << "(none)";
-	}
-	logger << "\n";
+	logger << "has variations  : " << (has_unique_variations ? "true" : "false") << "\n";
 
-	logger << "category        : " << std::visit(fs::utility::visitor{
-			[](categories::accessory)       { return "accessory"; },
-			[](categories::armour)          { return "armour"; },
-			[](categories::divination_card) { return "divination card"; },
-			[](categories::currency)        { return "currency"; },
-			[](categories::enchantment)     { return "enchantment"; },
-			[](categories::flask)           { return "flask"; },
-			[](categories::gem)             { return "gem"; },
-			[](categories::jewel)           { return "jewel"; },
-			[](categories::map)             { return "map"; },
-			[](categories::prophecy)        { return "prophecy"; },
-			[](categories::weapon)          { return "weapon"; },
-			[](categories::base)            { return "base"; },
-			[](categories::unknown)         { return "(unknown)"; },
-		}, category) << "\n";
+	logger << "category        : ";
+
+	std::visit(fs::utility::visitor{
+		[&](categories::accessory)       { logger << "accessory\n"; },
+		[&](categories::armour)          { logger << "armour\n"; },
+		[&](categories::divination_card) { logger << "divination card\n"; },
+		[&](categories::currency)        { logger << "currency\n"; },
+		[&](categories::enchantment)     { logger << "enchantment\n"; },
+		[&](categories::flask)           { logger << "flask\n"; },
+		[&](categories::gem gem)
+		{
+			logger << "gem:\n"
+				"\tlevel    : " << gem.level << "\n"
+				"\tquality  : " << gem.quality << "\n"
+				"\tcorrupted: " << (gem.corrupted ? "true" : "false") << "\n";
+		},
+		[&](categories::jewel)           { logger << "jewel\n"; },
+		[&](categories::map map)
+		{
+			logger << "map\n\ttype  : " << map.type._name() << "\n";
+			log_optional("\ttier  : ", map.tier);
+			log_optional("\tseries: ", map.series);
+		},
+		[&](categories::prophecy)        { logger << "prophecy\n"; },
+		[&](categories::weapon)          { logger << "weapon\n"; },
+		[&](categories::base base)
+		{
+			logger << "base:\n"
+				"\ttype      : " << base.type._name() << "\n"
+				"\tinfluence : " << (
+					base.influence == categories::base::influence_type::shaper ? "shaper" :
+					base.influence == categories::base::influence_type::elder  ? "elder"  : "none") <<
+				"\titem level: " << base.ilvl << "\n";
+		},
+		[&](categories::unknown)         { logger << "(unknown)\n"; },
+	}, category);
 
 	logger.end_message();
 }
@@ -247,19 +246,10 @@ std::optional<int> parse_single_json_element(const nlohmann::json& json)
 		return std::nullopt;
 }
 
-template <>
-std::optional<bool> parse_single_json_element(const nlohmann::json& json)
-{
-	if (json.is_boolean())
-		return json.get<bool>();
-	else
-		return std::nullopt;
-}
-
-std::optional<item_variation_variant> parse_item_variation(const nlohmann::json& json)
+bool parse_item_variation(const nlohmann::json& json)
 {
 	if (json.is_null())
-		return std::nullopt;
+		return false;
 
 	if (!json.is_string())
 		throw fs::itemdata::unknown_item_variation(
@@ -269,13 +259,7 @@ std::optional<item_variation_variant> parse_item_variation(const nlohmann::json&
 				true,                                       // escape non-ASCII characters as \xXXXX
 				nlohmann::json::error_handler_t::replace)); // replace invalid UTF-8 sequences with U+FFFD
 
-	if (json == "shaper")
-		return shaper_item{};
-
-	if (json == "elder")
-		return elder_item{};
-
-	return unique_with_variations{};
+	return true;
 }
 
 frame_type parse_item_frame(const nlohmann::json& json)
@@ -309,37 +293,89 @@ EnumType json_to_enum(const nlohmann::json& json)
 		return EnumType::unknown;
 }
 
-item_category_variant parse_item_category_and_group(const nlohmann::json& category, const nlohmann::json& group)
+item_category_variant parse_item_category(const nlohmann::json& entry)
 {
+	const nlohmann::json& category = entry.at("category");
+	const nlohmann::json& group = entry.at("group");
+
 	if (!category.is_string())
 		return categories::unknown{};
 
 	const auto& category_str = category.get_ref<const nlohmann::json::string_t&>();
 
 	if (category_str == "accessory")
+	{
 		return categories::accessory{json_to_enum<categories::accessory_type>(group)};
+	}
 	if (category_str == "armour")
+	{
 		return categories::armour{json_to_enum<categories::armour_type>(group)};
+	}
 	if (category_str == "card")
+	{
 		return categories::divination_card{};
+	}
 	if (category_str == "currency")
+	{
 		return categories::currency{json_to_enum<categories::currency_type>(group)};
+	}
 	if (category_str == "enchantment")
+	{
 		return categories::enchantment{};
+	}
 	if (category_str == "flask")
+	{
 		return categories::flask{};
+	}
 	if (category_str == "gem")
-		return categories::gem{json_to_enum<categories::gem_type>(group)};
+	{
+		const nlohmann::json& gem = entry.at("gem");
+		const int  gem_lvl      = gem.at("level")  .get<int>();
+		const int  gem_quality  = gem.at("quality").get<int>();
+		const bool is_corrupted = gem.at("corrupted").get<bool>();
+
+		return categories::gem{json_to_enum<categories::gem_type>(group), gem_lvl, gem_quality, is_corrupted};
+	}
 	if (category_str == "jewel")
+	{
 		return categories::jewel{};
+	}
 	if (category_str == "map")
-		return categories::map{json_to_enum<categories::map_type>(group)};
+	{
+		const nlohmann::json& map = entry.at("map");
+		const std::optional<int> series = parse_single_json_element<int>(map.at("series"));
+		const std::optional<int> tier   = parse_single_json_element<int>(map.at("tier"));
+
+		return categories::map{json_to_enum<categories::map_type>(group), series, tier};
+	}
 	if (category_str == "prophecy")
+	{
 		return categories::prophecy{};
+	}
 	if (category_str == "weapon")
+	{
 		return categories::weapon{json_to_enum<categories::weapon_type>(group)};
+	}
 	if (category_str == "base")
-		return categories::base{json_to_enum<categories::base_type>(group)};
+	{
+		const nlohmann::json& base = entry.at("base");
+		const bool is_shaper = base.at("shaper").get<bool>();
+		const bool is_elder  = base.at("elder") .get<bool>();
+
+		if (is_shaper && is_elder)
+		{
+			// TODO log logic error: an item can not be shaper and elder at the same time
+			return categories::unknown{};
+		}
+
+		const auto influence =
+			is_shaper ? categories::base::influence_type::shaper :
+			is_elder  ? categories::base::influence_type::elder  :
+			            categories::base::influence_type::none;
+
+		const int ilvl = base.at("itemLevel").get<int>();
+		return categories::base{json_to_enum<categories::base_type>(group), influence, ilvl};
+	}
 
 	// TODO log unknown category
 	return categories::unknown{};
@@ -363,15 +399,10 @@ std::vector<item> parse_itemdata(std::string_view itemdata_json)
 			entry.at("name").get<std::string>(),
 			parse_single_json_element<std::string>(entry.at("type")),
 			parse_item_frame(entry.at("frame")),
-			parse_single_json_element<int>(entry.at("tier")),
 			parse_single_json_element<int>(entry.at("stack")),
-			parse_single_json_element<int>(entry.at("lvl")),
-			parse_single_json_element<int>(entry.at("quality")),
-			parse_single_json_element<bool>(entry.at("corrupted")),
 			parse_single_json_element<int>(entry.at("links")),
-			parse_single_json_element<int>(entry.at("ilvl")),
 			parse_item_variation(entry.at("variation")),
-			parse_item_category_and_group(entry.at("category"), entry.at("group"))});
+			parse_item_category(entry)});
 	}
 
 	return items;
@@ -444,28 +475,23 @@ item_price_data parse_item_prices(std::string_view itemdata_json, std::string_vi
 		}
 		else if (std::holds_alternative<categories::base>(i.category))
 		{
-			if (!i.ilvl)
-			{
-				logger.warning() << "A base type item without item level has been found";
-				i.log_info(logger);
-				continue;
-			}
+			const auto& base = std::get<categories::base>(i.category);
 
-			if (!i.variation) // non-influenced item
+			if (base.influence == categories::base::influence_type::none)
 			{
-				result.bases_without_influence.push_back(base_type_item{*i.ilvl, std::move(i.name), price_data});
+				result.bases_without_influence.push_back(base_type_item{base.ilvl, std::move(i.name), price_data});
 			}
-			else if (std::holds_alternative<shaper_item>(*i.variation))
+			else if (base.influence == categories::base::influence_type::shaper)
 			{
-				result.bases_shaper.push_back(base_type_item{*i.ilvl, std::move(i.name), price_data});
+				result.bases_shaper.push_back(base_type_item{base.ilvl, std::move(i.name), price_data});
 			}
-			else if (std::holds_alternative<elder_item>(*i.variation))
+			else if (base.influence == categories::base::influence_type::elder)
 			{
-				result.bases_elder.push_back(base_type_item{*i.ilvl, std::move(i.name), price_data});
+				result.bases_elder.push_back(base_type_item{base.ilvl, std::move(i.name), price_data});
 			}
 			else
 			{
-				logger.warning() << "A base type item with unknown variation has been found";
+				logger.warning() << "A base type item with unknown influence type has been found";
 				i.log_info(logger);
 				continue;
 			}
