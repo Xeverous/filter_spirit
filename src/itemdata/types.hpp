@@ -48,14 +48,23 @@ struct unique_item
 	price_data price_data;
 };
 
-
 struct item_price_data
 {
 	void log_info(logger& logger) const;
+	/*
+	 * Some items (eg very rare uniques and cards, Harbinger pieces)
+	 * may not have associated entry in price data.
+	 *
+	 * This is not a bug, some items may simply have undetermined value.
+	 * We can at most just log them, it's the filter writer's responsibility
+	 * to be prepared that not all items have reliable prices.
+	 */
+	int count_of_items_without_price_data = 0;
 
 	// sorted by price
 	std::vector<elementary_item> divination_cards;
 	std::vector<elementary_item> prophecies;
+	std::vector<unique_item> harbinger_pieces;
 
 	// sorted by ilvl
 	std::vector<base_type_item> bases_without_influence;

@@ -1,6 +1,5 @@
 #include "parser/parser.hpp"
 #include "parser/grammar.hpp"
-#include "print/structure_printer.hpp"
 #include "print/parse_error.hpp"
 
 namespace
@@ -28,11 +27,7 @@ std::pair<p::lookup_data, std::variant<p::ast::ast_type, p::error_holder_type>> 
 		end,
 		parser,
 		fs::skipper(),
-		ast
-	);
-
-	if (true) // allow easy switching on/off for now (before full implemenation of command line args)
-		fs::print::structure_printer()(ast);
+		ast);
 
 	using result_variant = std::variant<p::ast::ast_type, p::error_holder_type>;
 

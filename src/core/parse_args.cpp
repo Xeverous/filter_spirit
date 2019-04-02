@@ -19,7 +19,7 @@ void print_help(const boost::program_options::options_description& options)
 	std::cout <<
 		"Filter Spirit - advanced item filter generator for Path of Exile game client\n\n"
 		"Usage:\n"
-		"./filter_spirit <data_obtaining_option> [data_storing_option] [<generation_option> input_path output_path]\n"
+		"./filter_spirit <data_obtaining_option> [data_storing_option] [-g input_path output_path [generation_option]...]\n"
 		"./filter_spirit <generic_option>\n"
 		"\n"
 		"Examples:\n"
@@ -66,9 +66,11 @@ int run(int argc, char* argv[])
 		;
 
 		bool opt_generate = false;
+		bool opt_print_ast = false;
 		po::options_description generation_options("generation options");
 		generation_options.add_options()
-			("generate,g", po::bool_switch(&opt_generate), "generate an item filter")
+			("generate,g",  po::bool_switch(&opt_generate),  "generate an item filter")
+			("print-ast,a", po::bool_switch(&opt_print_ast), "print abstract syntax tree (for debug purposes)")
 		;
 
 		boost::optional<std::string> input_path;
@@ -167,7 +169,7 @@ int run(int argc, char* argv[])
 				return EXIT_FAILURE;
 			}
 
-			if (!generate_item_filter(*item_price_data, *input_path, *output_path, logger))
+			if (!generate_item_filter(*item_price_data, *input_path, *output_path, opt_print_ast, logger))
 			{
 				logger.info() << "errors occured during filter generation";
 				return EXIT_FAILURE;

@@ -13,9 +13,10 @@ bool generate_item_filter(
 	const itemdata::item_price_data& item_price_data,
 	const std::string& source_filepath,
 	const std::string& output_filepath,
+	bool print_ast,
 	logger& logger)
 {
-	std::optional<std::string> source_file_content = fs::utility::load_file(source_filepath);
+	std::optional<std::string> source_file_content = utility::load_file(source_filepath);
 
 	if (!source_file_content)
 	{
@@ -23,7 +24,7 @@ bool generate_item_filter(
 		return false;
 	}
 
-	std::optional<std::string> filter_content = fs::compiler::process_input(*source_file_content, item_price_data, logger);
+	std::optional<std::string> filter_content = compiler::process_input(*source_file_content, item_price_data, print_ast, logger);
 	if (!filter_content)
 		return false;
 
@@ -56,7 +57,7 @@ itemdata::item_price_data download_item_price_data(const std::string& league_nam
 {
 	try
 	{
-		std::future<itemdata::item_price_data> ipd_future = network::poe_watch_api::async_download_item_price_data(league_name);
+		std::future<itemdata::item_price_data> ipd_future = network::poe_watch_api::async_download_item_price_data(league_name, logger);
 		return ipd_future.get();
 	}
 	catch (const std::exception& e)
@@ -88,7 +89,8 @@ std::optional<itemdata::item_price_data> load_item_price_data(const std::string&
 	const std::string& itemdata_json = *itemdata;
 	return itemdata::parse_item_prices(
 		std::string_view(itemdata_json.c_str(), itemdata_json.size()),
-		std::string_view(compact_json.c_str(), compact_json.size()));
+		std::string_view(compact_json.c_str(), compact_json.size()),
+		logger);
 }
 
 }

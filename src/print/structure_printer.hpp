@@ -1,7 +1,9 @@
 #pragma once
+
 #include "parser/ast_adapted.hpp"
 #include "utility/type_traits.hpp"
 #include "utility/type_name.hpp"
+
 #include <boost/fusion/include/for_each.hpp>
 #include <iostream>
 

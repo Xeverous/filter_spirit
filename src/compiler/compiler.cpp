@@ -7,6 +7,7 @@
 #include "parser/parser.hpp"
 #include "lang/constants_map.hpp"
 #include "print/compile_error.hpp"
+#include "print/structure_printer.hpp"
 #include "utility/holds_alternative.hpp"
 
 #include <cassert>
@@ -100,7 +101,11 @@ std::string generate_filter(const std::vector<lang::filter_block>& blocks)
 namespace fs::compiler
 {
 
-std::optional<std::string> process_input(const std::string& input, const itemdata::item_price_data& item_price_data, logger& logger)
+std::optional<std::string> process_input(
+	const std::string& input,
+	const itemdata::item_price_data& item_price_data,
+	bool print_ast,
+	logger& logger)
 {
 	std::optional<parser::parse_data> parse_result = parser::parse(input, logger);
 
@@ -108,6 +113,10 @@ std::optional<std::string> process_input(const std::string& input, const itemdat
 		return std::nullopt;
 
 	parser::parse_data& parse_data = *parse_result;
+
+	if (print_ast)
+		fs::print::structure_printer()(parse_data.ast);
+
 	std::variant<lang::constants_map, error::error_variant> map_or_error = resolve_constants(parse_data.ast.constant_definitions, item_price_data);
 
 	if (std::holds_alternative<error::error_variant>(map_or_error))

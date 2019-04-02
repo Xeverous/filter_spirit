@@ -1,9 +1,13 @@
 #include "network/poe_watch_api.hpp"
 #include "network/network.hpp"
 #include "itemdata/parse_json.hpp"
-#include <future>
+#include "log/logger.hpp"
+
 #include <boost/asio.hpp>
 #include <nlohmann/json.hpp>
+
+#include <future>
+#include <utility>
 
 namespace
 {
@@ -47,9 +51,9 @@ std::future<std::vector<itemdata::league>> poe_watch_api::async_download_leagues
 	});
 }
 
-std::future<itemdata::item_price_data> poe_watch_api::async_download_item_price_data(std::string league_name)
+std::future<itemdata::item_price_data> poe_watch_api::async_download_item_price_data(std::string league_name, logger& logger)
 {
-	return std::async(std::launch::async, [league = league_name]()
+	return std::async(std::launch::async, [&logger, league = std::move(league_name)]()
 	{
 		boost::asio::io_context ioc;
 		boost::asio::ssl::context ctx{boost::asio::ssl::context::tls_client};
@@ -69,7 +73,8 @@ std::future<itemdata::item_price_data> poe_watch_api::async_download_item_price_
 		const std::string& result_itemdata = response_itemdata.body();
 		return itemdata::parse_item_prices(
 			std::string_view(result_itemdata.c_str(), result_itemdata.size()),
-			std::string_view(result_compact.c_str(), result_compact.size()));
+			std::string_view(result_compact.c_str(), result_compact.size()),
+			logger);
 	});
 }
 

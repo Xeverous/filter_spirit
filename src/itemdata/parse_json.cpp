@@ -2,7 +2,11 @@
 #include "itemdata/exceptions.hpp"
 #include "utility/algorithm.hpp"
 #include "utility/better_enum.hpp"
+#include "utility/visitor.hpp"
+#include "log/logger.hpp"
+
 #include <nlohmann/json.hpp>
+
 #include <algorithm>
 #include <iterator>
 #include <optional>
@@ -15,9 +19,8 @@
 namespace
 {
 
-enum class frame_type
-{
-	// NOTE: values are exactly in this order - they must match
+BETTER_ENUM(frame_type, int,
+	// NOTE: values must be exactly in this order - they must match
 	// https://pathofexile.gamepedia.com/Public_stash_tab_API#frameType
 	normal,
 	magic,
@@ -29,9 +32,8 @@ enum class frame_type
 	quest_item,
 	prophecy,
 	relic,
-
-	unknown // must be last
-};
+	// should be last
+	unknown)
 
 namespace categories // avoids name conflicts with types in fs::itemdata
 {
@@ -82,6 +84,8 @@ using item_variation_variant = std::variant<
 
 struct item
 {
+	void log_info(fs::logger& logger) const;
+
 	int id = 0;
 	std::string name;                     // item main name, eg "Tabula Rasa"
 	std::optional<std::string> base_type; // item base type, eg "Simple Robe", null for non-wearable items
@@ -98,8 +102,79 @@ struct item
 	item_category_variant category; // combined category and group
 };
 
+void item::log_info(fs::logger& logger) const
+{
+	logger.begin_info_message();
+	logger << "item:\n"
+		"ID              : " << id << "\n"
+		"name            : " << name << "\n"
+		"base type       : " << base_type.value_or("(none)") << "\n"
+		"frame           : " << (frame == +frame_type::unknown ? "(unknown)" : frame._to_string()) << "\n";
+
+	const auto log_optional = [&, this](const char* name, std::optional<int> opt)
+	{
+		logger << name;
+		if (opt)
+			logger << *opt;
+		else
+			logger << "(none)";
+		logger << "\n";
+	};
+
+	log_optional("map tier        : ", map_tier);
+	log_optional("max stack size  : ", max_stack_size);
+	log_optional("gem level       : ", gem_lvl);
+	log_optional("gem quality     : ", gem_quality);
+
+	logger << "is corrupted gem: ";
+	if (gem_corrupted && *gem_corrupted)
+		logger << "true";
+	else if (gem_corrupted && !gem_corrupted)
+		logger << "false";
+	else
+		logger << "(none)";
+	logger << "\n";
+
+	log_optional("links           : ", links);
+	log_optional("item level      : ", ilvl);
+
+	logger << "variation       : ";
+	if (variation)
+	{
+		logger << std::visit(
+			fs::utility::visitor{
+				[](unique_with_variations) { return "one of unique variations"; },
+				[](shaper_item) { return "shaper item"; },
+				[](elder_item) { return "elder item"; }
+			}, *variation);
+	}
+	else
+	{
+		logger << "(none)";
+	}
+	logger << "\n";
+
+	logger << "category        : " << std::visit(fs::utility::visitor{
+			[](categories::accessory)       { return "accessory"; },
+			[](categories::armour)          { return "armour"; },
+			[](categories::divination_card) { return "divination card"; },
+			[](categories::currency)        { return "currency"; },
+			[](categories::enchantment)     { return "enchantment"; },
+			[](categories::flask)           { return "flask"; },
+			[](categories::gem)             { return "gem"; },
+			[](categories::jewel)           { return "jewel"; },
+			[](categories::map)             { return "map"; },
+			[](categories::prophecy)        { return "prophecy"; },
+			[](categories::weapon)          { return "weapon"; },
+			[](categories::base)            { return "base"; },
+			[](categories::unknown)         { return "(unknown)"; },
+		}, category) << "\n";
+
+	logger.end_message();
+}
+
 // vector index is item ID
-std::vector<std::optional<fs::itemdata::price_data>> parse_compact(std::string_view compact_json)
+std::vector<std::optional<fs::itemdata::price_data>> parse_compact(std::string_view compact_json, fs::logger& logger)
 {
 	nlohmann::json json = nlohmann::json::parse(compact_json);
 
@@ -127,8 +202,7 @@ std::vector<std::optional<fs::itemdata::price_data>> parse_compact(std::string_v
 
 		if (item_prices[id].has_value()) // C++20: [[unlikely]]
 		{
-			// TODO warn about duplicated ID
-			// log the problem, but still continue
+			logger.warning() << "A price data entry with duplicated ID has been found, ID = " << id;
 			continue;
 		}
 
@@ -210,11 +284,12 @@ frame_type parse_item_frame(const nlohmann::json& json)
 		return frame_type::unknown;
 
 	const int val = json.get<int>();
+	const auto maybe_enum = frame_type::_from_index_nothrow(val);
 
-	if (val < 0 || val >= static_cast<int>(frame_type::unknown))
+	if (maybe_enum)
+		return *maybe_enum;
+	else
 		return frame_type::unknown;
-
-	return static_cast<frame_type>(val);
 }
 
 template <typename EnumType>
@@ -334,29 +409,26 @@ std::vector<league> parse_league_info(std::string_view league_json)
 	return leagues;
 }
 
-item_price_data parse_item_prices(std::string_view itemdata_json, std::string_view compact_json)
+item_price_data parse_item_prices(std::string_view itemdata_json, std::string_view compact_json, logger& logger)
 {
-	std::cout << "parsing item prices" << std::endl;
-	std::vector<std::optional<price_data>> item_prices = parse_compact(compact_json);
+	logger.info() << "parsing item prices";
+	std::vector<std::optional<price_data>> item_prices = parse_compact(compact_json, logger);
 	if (item_prices.empty())
 		throw std::runtime_error("parsed empty list of item prices");
 
-	std::cout << "got " << item_prices.size() << " entries" << std::endl;
-
-
-	std::cout << "parsing item data" << std::endl;
+	logger.info() << "parsing item data";
 	std::vector<item> itemdata = parse_itemdata(itemdata_json);
 	if (itemdata.empty())
 		throw std::runtime_error("parsed empty list of item data");
 
-	std::cout << "got " << itemdata.size() << " entries" << std::endl;
+	logger.info() << "got " << itemdata.size() << " item entries";
 
 	item_price_data result;
 	for (item& i : itemdata)
 	{
 		if (i.id > static_cast<int>(item_prices.size()) || !item_prices[i.id].has_value())
 		{
-			// TODO log thet an item without associated price data has been encountered
+			++result.count_of_items_without_price_data;
 			continue;
 		}
 
@@ -374,7 +446,8 @@ item_price_data parse_item_prices(std::string_view itemdata_json, std::string_vi
 		{
 			if (!i.ilvl)
 			{
-				// TODO log that a base without item level has been encountered
+				logger.warning() << "A base type item without item level has been found";
+				i.log_info(logger);
 				continue;
 			}
 
@@ -392,15 +465,17 @@ item_price_data parse_item_prices(std::string_view itemdata_json, std::string_vi
 			}
 			else
 			{
-				// TODO log that a base type entry with unknown variation has been encountered
+				logger.warning() << "A base type item with unknown variation has been found";
+				i.log_info(logger);
 				continue;
 			}
 		}
-		else if (i.frame == frame_type::unique || i.frame == frame_type::relic)
+		else if (i.frame == +frame_type::unique || i.frame == +frame_type::relic)
 		{
 			if (!i.base_type)
 			{
-				// TODO log that a unique item without base type has been encountered
+				logger.warning() << "A unique item without base type has been found";
+				i.log_info(logger);
 				continue;
 			}
 
@@ -440,8 +515,18 @@ item_price_data parse_item_prices(std::string_view itemdata_json, std::string_vi
 				result.ambiguous_unique_maps.push_back(unique_item{std::move(i.name), std::move(*i.base_type), price_data});
 				continue;
 			}
+			if (std::holds_alternative<categories::currency>(i.category))
+			{
+				const auto currency = std::get<categories::currency>(i.category);
+				if (currency.type == +categories::currency_type::piece)
+				{
+					result.harbinger_pieces.push_back(unique_item{std::move(i.name), std::move(*i.base_type), price_data});
+					continue;
+				}
+			}
 
-			// TODO log that a unique was skipped
+			logger.warning() << "A unique item has been skipped because it's category was not recognized";
+			i.log_info(logger);
 		}
 	}
 
@@ -457,6 +542,7 @@ item_price_data parse_item_prices(std::string_view itemdata_json, std::string_vi
 
 	std::sort(result.divination_cards.begin(),        result.divination_cards.end(),        compare_by_mean_price);
 	std::sort(result.prophecies.begin(),              result.prophecies.end(),              compare_by_mean_price);
+	std::sort(result.harbinger_pieces.begin(),        result.harbinger_pieces.end(),        compare_by_mean_price);
 	std::sort(result.bases_without_influence.begin(), result.bases_without_influence.end(), compare_by_ilvl);
 	std::sort(result.bases_shaper.begin(),            result.bases_shaper.end(),            compare_by_ilvl);
 	std::sort(result.bases_elder.begin(),             result.bases_elder.end(),             compare_by_ilvl);
@@ -508,6 +594,8 @@ item_price_data parse_item_prices(std::string_view itemdata_json, std::string_vi
 	std::sort(result.unambiguous_unique_jewels.begin(),      result.unambiguous_unique_jewels.end(),      compare_by_mean_price);
 	std::sort(result.unambiguous_unique_flasks.begin(),      result.unambiguous_unique_flasks.end(),      compare_by_mean_price);
 	std::sort(result.unambiguous_unique_maps.begin(),        result.unambiguous_unique_maps.end(),        compare_by_mean_price);
+
+	logger.info() << "items without associated price: " << result.count_of_items_without_price_data;
 
 	return result;
 }

@@ -17,6 +17,7 @@ bool generate_item_filter(
 	const itemdata::item_price_data& item_price_data,
 	const std::string& source_filepath,
 	const std::string& output_filepath,
+	bool print_ast,
 	logger& logger);
 
 void list_leagues(logger& logger);
