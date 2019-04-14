@@ -14,8 +14,6 @@
 #include <type_traits>
 #include <utility>
 
-#include <iostream> // TODO refactor logging and get rid of this
-
 namespace
 {
 
@@ -85,13 +83,21 @@ namespace categories // avoids name conflicts with types in fs::itemdata
 		influence_type influence;
 		int ilvl;
 	};
-
-	struct unknown {};
-
 } // namespace categories
 
 using item_category_variant = std::variant<
-	categories::accessory, categories::armour, categories::divination_card, categories::currency, categories::enchantment, categories::flask, categories::gem, categories::jewel, categories::map, categories::prophecy, categories::weapon, categories::base, categories::unknown>;
+	categories::accessory,
+	categories::armour,
+	categories::divination_card,
+	categories::currency,
+	categories::enchantment,
+	categories::flask,
+	categories::gem,
+	categories::jewel,
+	categories::map,
+	categories::prophecy,
+	categories::weapon,
+	categories::base>;
 
 struct item
 {
@@ -165,8 +171,7 @@ void item::log_info(fs::logger& logger) const
 					base.influence == categories::base::influence_type::shaper ? "shaper" :
 					base.influence == categories::base::influence_type::elder  ? "elder"  : "none") <<
 				"\titem level: " << base.ilvl << "\n";
-		},
-		[&](categories::unknown)         { logger << "(unknown)\n"; },
+		}
 	}, category);
 
 	logger.end_message();
@@ -179,7 +184,7 @@ std::vector<std::optional<fs::itemdata::price_data>> parse_compact(std::string_v
 
 	if (!json.is_array())
 	{
-		throw std::runtime_error("compact JSON must be an array but it is not");
+		throw fs::itemdata::json_parse_error("compact JSON must be an array but it is not");
 	}
 
 	std::vector<std::optional<fs::itemdata::price_data>> item_prices;
@@ -222,6 +227,16 @@ std::vector<std::optional<fs::itemdata::price_data>> parse_compact(std::string_v
 	return item_prices;
 }
 
+[[nodiscard]]
+nlohmann::json::string_t dump_json(const nlohmann::json& json)
+{
+	return json.dump(
+		-1,                                        // do not indent
+		' ',                                       // indentation character (ignored in case of no indent)
+		true,                                      // escape non-ASCII characters as \xXXXX
+		nlohmann::json::error_handler_t::replace); // replace invalid UTF-8 sequences with U+FFFD
+}
+
 template <typename T>
 std::optional<T> parse_single_json_element(const nlohmann::json& json)
 {
@@ -249,18 +264,7 @@ std::optional<int> parse_single_json_element(const nlohmann::json& json)
 // return whether a given item has unique variations
 bool parse_item_variation(const nlohmann::json& json)
 {
-	if (json.is_null())
-		return false;
-
-	if (!json.is_string())
-		throw fs::itemdata::unknown_item_variation(
-			json.dump( // dump the sub-json where error happened
-				-1,                                         // do not indent
-				' ',                                        // indentation character (ignored in case of no indent)
-				true,                                       // escape non-ASCII characters as \xXXXX
-				nlohmann::json::error_handler_t::replace)); // replace invalid UTF-8 sequences with U+FFFD
-
-	return true;
+	return !json.is_null();
 }
 
 frame_type parse_item_frame(const nlohmann::json& json)
@@ -300,7 +304,7 @@ item_category_variant parse_item_category(const nlohmann::json& entry)
 	const nlohmann::json& group = entry.at("group");
 
 	if (!category.is_string())
-		return categories::unknown{};
+		throw fs::itemdata::json_parse_error("item category should be a string but it is not");
 
 	const auto& category_str = category.get_ref<const nlohmann::json::string_t&>();
 
@@ -365,8 +369,7 @@ item_category_variant parse_item_category(const nlohmann::json& entry)
 
 		if (is_shaper && is_elder)
 		{
-			// TODO log logic error: an item can not be shaper and elder at the same time
-			return categories::unknown{};
+			throw fs::itemdata::json_parse_error("item can not be shaper and elder at the same time");
 		}
 
 		const auto influence =
@@ -378,32 +381,44 @@ item_category_variant parse_item_category(const nlohmann::json& entry)
 		return categories::base{json_to_enum<categories::base_type>(group), influence, ilvl};
 	}
 
-	// TODO log unknown category
-	return categories::unknown{};
+	throw fs::itemdata::json_parse_error("item has unrecognized category");
 }
 
-std::vector<item> parse_itemdata(std::string_view itemdata_json)
+std::vector<item> parse_itemdata(std::string_view itemdata_json, fs::logger& logger)
 {
 	nlohmann::json json = nlohmann::json::parse(itemdata_json);
 
 	if (!json.is_array())
 	{
-		// TODO log invalid json
+		throw fs::itemdata::json_parse_error("itemdata JSON must be an array but it is not");
 	}
 
 	std::vector<item> items;
 	items.reserve(32768); // expect about 30 000 items
 	for (const auto& entry : json)
 	{
-		items.push_back(item{
-			entry.at("id").get<int>(),
-			entry.at("name").get<std::string>(),
-			parse_single_json_element<std::string>(entry.at("type")),
-			parse_item_frame(entry.at("frame")),
-			parse_single_json_element<int>(entry.at("stack")),
-			parse_single_json_element<int>(entry.at("links")),
-			parse_item_variation(entry.at("variation")),
-			parse_item_category(entry)});
+		try
+		{
+			items.push_back(item{
+				entry.at("id").get<int>(),
+				entry.at("name").get<std::string>(),
+				parse_single_json_element<std::string>(entry.at("type")),
+				parse_item_frame(entry.at("frame")),
+				parse_single_json_element<int>(entry.at("stack")),
+				parse_single_json_element<int>(entry.at("links")),
+				parse_item_variation(entry.at("variation")),
+				parse_item_category(entry)});
+		}
+		catch (const fs::itemdata::json_parse_error& e)
+		{
+			logger.warning() << "failed to parse item entry in itemdata JSON: " << e.what() << ", skipping this item";
+			logger.info() << "entry: " << dump_json(json);
+		}
+		catch (const nlohmann::json::exception& e)
+		{
+			logger.warning() << "failed to parse item entry in itemdata JSON: " << e.what() << ", skipping this item";
+			logger.info() << "entry: " << dump_json(json);
+		}
 	}
 
 	return items;
@@ -420,7 +435,7 @@ std::vector<league> parse_league_info(std::string_view league_json)
 
 	if (!json.is_array())
 	{
-		// TODO log invalid json
+		throw fs::itemdata::json_parse_error("league JSON must be an array but it is not");
 	}
 
 	std::vector<league> leagues;
@@ -446,12 +461,12 @@ item_price_data parse_item_prices(std::string_view itemdata_json, std::string_vi
 	logger.info() << "parsing item prices";
 	std::vector<std::optional<price_data>> item_prices = parse_compact(compact_json, logger);
 	if (item_prices.empty())
-		throw std::runtime_error("parsed empty list of item prices");
+		throw fs::itemdata::json_parse_error("parsed empty list of item prices");
 
 	logger.info() << "parsing item data";
-	std::vector<item> itemdata = parse_itemdata(itemdata_json);
+	std::vector<item> itemdata = parse_itemdata(itemdata_json, logger);
 	if (itemdata.empty())
-		throw std::runtime_error("parsed empty list of item data");
+		throw fs::itemdata::json_parse_error("parsed empty list of item data");
 
 	logger.info() << "got " << itemdata.size() << " item entries";
 

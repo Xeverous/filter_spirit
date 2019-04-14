@@ -45,7 +45,6 @@ std::future<std::vector<itemdata::league>> poe_watch_api::async_download_leagues
 		}
 		catch (const nlohmann::json::parse_error& error)
 		{
-			// TODO log it instead
 			throw std::runtime_error("unable to parse received JSON of length " + std::to_string(result.size()) + ":\n" + result);
 		}
 	});
