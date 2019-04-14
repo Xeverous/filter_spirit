@@ -283,6 +283,7 @@ struct object
 		return std::holds_alternative<array_object>(value);
 	}
 
+	[[nodiscard]]
 	array_object promote_to_array() const
 	{
 		assert(!is_array());
@@ -290,12 +291,7 @@ struct object
 	}
 
 	std::variant<single_object, array_object> value;
-	// for printing errors about mismatched types
 	position_tag value_origin;
-	// for printing error name already exists
-	// if object originated from a literal this should be empty
-	// TODO this is hardly ever needed, remove and implement elsewhere
-	std::optional<position_tag> name_origin;
 };
 
 [[nodiscard]]

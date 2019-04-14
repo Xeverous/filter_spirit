@@ -246,6 +246,7 @@ std::optional<int> parse_single_json_element(const nlohmann::json& json)
 		return std::nullopt;
 }
 
+// return whether a given item has unique variations
 bool parse_item_variation(const nlohmann::json& json)
 {
 	if (json.is_null())

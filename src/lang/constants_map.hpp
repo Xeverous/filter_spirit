@@ -6,6 +6,12 @@
 namespace fs::lang
 {
 
-using constants_map = std::unordered_map<std::string, object>;
+struct named_object
+{
+	object object_instance;
+	position_tag name_origin;
+};
+
+using constants_map = std::unordered_map<std::string, named_object>;
 
 }

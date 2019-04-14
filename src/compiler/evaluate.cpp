@@ -66,8 +66,7 @@ lang::object evaluate_literal(
 
 	return lang::object{
 		std::move(object),
-		parser::get_position_info(expression),
-		std::nullopt};
+		parser::get_position_info(expression)};
 }
 
 std::variant<lang::object, error::error_variant> evaluate_array(
@@ -97,8 +96,7 @@ std::variant<lang::object, error::error_variant> evaluate_array(
 
 	return lang::object{
 		std::move(array),
-		parser::get_position_info(expression),
-		std::nullopt};
+		parser::get_position_info(expression)};
 }
 
 std::variant<lang::object, error::error_variant> evaluate_function_call(
@@ -129,8 +127,7 @@ std::variant<lang::object, error::error_variant> evaluate_function_call(
 
 		return lang::object{
 			lang::single_object(std::get<lang::color>(color_or_error)),
-			parser::get_position_info(function_call),
-			std::nullopt};
+			parser::get_position_info(function_call)};
 	}
 	else if (function_name.value == lang::functions::group)
 	{
@@ -140,8 +137,7 @@ std::variant<lang::object, error::error_variant> evaluate_function_call(
 
 		return lang::object{
 			lang::single_object(std::get<lang::socket_group>(socket_group_or_error)),
-			parser::get_position_info(function_call),
-			std::nullopt};
+			parser::get_position_info(function_call)};
 	}
 	else if (function_name.value == lang::functions::minimap_icon)
 	{
@@ -151,8 +147,7 @@ std::variant<lang::object, error::error_variant> evaluate_function_call(
 
 		return lang::object{
 			lang::single_object(std::get<lang::minimap_icon>(icon_or_error)),
-			parser::get_position_info(function_call),
-			std::nullopt};
+			parser::get_position_info(function_call)};
 	}
 	else if (function_name.value == lang::functions::beam_effect)
 	{
@@ -162,8 +157,7 @@ std::variant<lang::object, error::error_variant> evaluate_function_call(
 
 		return lang::object{
 			lang::single_object(std::get<lang::beam_effect>(beam_effect_or_error)),
-			parser::get_position_info(function_call),
-			std::nullopt};
+			parser::get_position_info(function_call)};
 	}
 	else if (function_name.value == lang::functions::path)
 	{
@@ -173,8 +167,7 @@ std::variant<lang::object, error::error_variant> evaluate_function_call(
 
 		return lang::object{
 			lang::single_object(std::get<lang::path>(path_or_error)),
-			parser::get_position_info(function_call),
-			std::nullopt};
+			parser::get_position_info(function_call)};
 	}
 
 	return error::no_such_function{parser::get_position_info(function_name)};
@@ -208,7 +201,7 @@ std::variant<lang::object, error::error_variant> evaluate_price_range_query(
 			position_of_query,
 			cards.begin(),
 			cards.end());
-		return lang::object{std::move(array), position_of_query, std::nullopt};
+		return lang::object{std::move(array), position_of_query};
 	}
 	else if (query_name.value == lang::queries::prophecies)
 	{
@@ -218,7 +211,7 @@ std::variant<lang::object, error::error_variant> evaluate_price_range_query(
 			position_of_query,
 			prophecies.begin(),
 			prophecies.end());
-		return lang::object{std::move(array), position_of_query, std::nullopt};
+		return lang::object{std::move(array), position_of_query};
 	}
 	else if (query_name.value == lang::queries::uniques_ambiguous_armour)
 	{
@@ -228,7 +221,7 @@ std::variant<lang::object, error::error_variant> evaluate_price_range_query(
 			position_of_query,
 			uniques_armour.begin(),
 			uniques_armour.end());
-		return lang::object{std::move(array), position_of_query, std::nullopt};
+		return lang::object{std::move(array), position_of_query};
 	}
 	else if (query_name.value == lang::queries::uniques_ambiguous_weapon)
 	{
@@ -238,7 +231,7 @@ std::variant<lang::object, error::error_variant> evaluate_price_range_query(
 			position_of_query,
 			uniques_weapon.begin(),
 			uniques_weapon.end());
-		return lang::object{std::move(array), position_of_query, std::nullopt};
+		return lang::object{std::move(array), position_of_query};
 	}
 	else if (query_name.value == lang::queries::uniques_ambiguous_accessory)
 	{
@@ -248,7 +241,7 @@ std::variant<lang::object, error::error_variant> evaluate_price_range_query(
 			position_of_query,
 			uniques_accessory.begin(),
 			uniques_accessory.end());
-		return lang::object{std::move(array), position_of_query, std::nullopt};
+		return lang::object{std::move(array), position_of_query};
 	}
 	else if (query_name.value == lang::queries::uniques_ambiguous_jewel)
 	{
@@ -258,7 +251,7 @@ std::variant<lang::object, error::error_variant> evaluate_price_range_query(
 			position_of_query,
 			uniques_jewel.begin(),
 			uniques_jewel.end());
-		return lang::object{std::move(array), position_of_query, std::nullopt};
+		return lang::object{std::move(array), position_of_query};
 	}
 	else if (query_name.value == lang::queries::uniques_ambiguous_flask)
 	{
@@ -268,7 +261,7 @@ std::variant<lang::object, error::error_variant> evaluate_price_range_query(
 			position_of_query,
 			uniques_flask.begin(),
 			uniques_flask.end());
-		return lang::object{std::move(array), position_of_query, std::nullopt};
+		return lang::object{std::move(array), position_of_query};
 	}
 	else if (query_name.value == lang::queries::uniques_ambiguous_map)
 	{
@@ -278,7 +271,7 @@ std::variant<lang::object, error::error_variant> evaluate_price_range_query(
 			position_of_query,
 			uniques_map.begin(),
 			uniques_map.end());
-		return lang::object{std::move(array), position_of_query, std::nullopt};
+		return lang::object{std::move(array), position_of_query};
 	}
 	else if (query_name.value == lang::queries::uniques_unambiguous_armour)
 	{
@@ -288,7 +281,7 @@ std::variant<lang::object, error::error_variant> evaluate_price_range_query(
 			position_of_query,
 			uniques_armour.begin(),
 			uniques_armour.end());
-		return lang::object{std::move(array), position_of_query, std::nullopt};
+		return lang::object{std::move(array), position_of_query};
 	}
 	else if (query_name.value == lang::queries::uniques_unambiguous_weapon)
 	{
@@ -298,7 +291,7 @@ std::variant<lang::object, error::error_variant> evaluate_price_range_query(
 			position_of_query,
 			uniques_weapon.begin(),
 			uniques_weapon.end());
-		return lang::object{std::move(array), position_of_query, std::nullopt};
+		return lang::object{std::move(array), position_of_query};
 	}
 	else if (query_name.value == lang::queries::uniques_unambiguous_accessory)
 	{
@@ -308,7 +301,7 @@ std::variant<lang::object, error::error_variant> evaluate_price_range_query(
 			position_of_query,
 			uniques_accessory.begin(),
 			uniques_accessory.end());
-		return lang::object{std::move(array), position_of_query, std::nullopt};
+		return lang::object{std::move(array), position_of_query};
 	}
 	else if (query_name.value == lang::queries::uniques_unambiguous_jewel)
 	{
@@ -318,7 +311,7 @@ std::variant<lang::object, error::error_variant> evaluate_price_range_query(
 			position_of_query,
 			uniques_jewel.begin(),
 			uniques_jewel.end());
-		return lang::object{std::move(array), position_of_query, std::nullopt};
+		return lang::object{std::move(array), position_of_query};
 	}
 	else if (query_name.value == lang::queries::uniques_unambiguous_flask)
 	{
@@ -328,7 +321,7 @@ std::variant<lang::object, error::error_variant> evaluate_price_range_query(
 			position_of_query,
 			uniques_flask.begin(),
 			uniques_flask.end());
-		return lang::object{std::move(array), position_of_query, std::nullopt};
+		return lang::object{std::move(array), position_of_query};
 	}
 	else if (query_name.value == lang::queries::uniques_unambiguous_map)
 	{
@@ -338,7 +331,7 @@ std::variant<lang::object, error::error_variant> evaluate_price_range_query(
 			position_of_query,
 			uniques_map.begin(),
 			uniques_map.end());
-		return lang::object{std::move(array), position_of_query, std::nullopt};
+		return lang::object{std::move(array), position_of_query};
 	}
 
 	return error::no_such_query{parser::get_position_info(query_name)};
@@ -354,11 +347,7 @@ std::variant<lang::object, error::error_variant> evaluate_identifier(
 	if (it == map.end())
 		return error::no_such_name{place_of_name};
 
-	return lang::object{
-		it->second.value,
-		place_of_name,
-		std::nullopt
-	};
+	return lang::object{it->second.object_instance.value, place_of_name};
 }
 
 std::optional<error::non_homogeneous_array> verify_array_homogeneity(

@@ -47,9 +47,8 @@ std::optional<compiler::error::error_variant> add_constant_from_definition(
 	const auto it = map.find(wanted_name.value); // C++17: use if (expr; cond)
 	if (it != map.end())
 	{
-		assert(it->second.name_origin);
-		lang::position_tag place_of_original_name = parser::get_position_info(*it->second.name_origin);
-		lang::position_tag place_of_duplicated_name = parser::get_position_info(wanted_name);
+		const lang::position_tag place_of_original_name = parser::get_position_info(it->second.name_origin);
+		const lang::position_tag place_of_duplicated_name = parser::get_position_info(wanted_name);
 		return compiler::error::name_already_exists{place_of_duplicated_name, place_of_original_name};
 	}
 
@@ -59,9 +58,11 @@ std::optional<compiler::error::error_variant> add_constant_from_definition(
 	if (std::holds_alternative<compiler::error::error_variant>(expr_result))
 		return std::get<compiler::error::error_variant>(expr_result);
 
-	lang::object& object = std::get<lang::object>(expr_result);
-	object.name_origin = parser::get_position_info(wanted_name);
-	const auto pair = map.emplace(wanted_name.value, std::move(object));
+	const auto pair = map.emplace(
+		wanted_name.value,
+		lang::named_object{
+			std::get<lang::object>(std::move(expr_result)),
+			parser::get_position_info(wanted_name)});
 	assert(pair.second);
 	return std::nullopt;
 }
