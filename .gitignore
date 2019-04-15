@@ -1,5 +1,7 @@
 Debug/
 Release/
+test_release/
 *.code-workspace
 .vscode/
 notes/
+

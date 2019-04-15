@@ -163,14 +163,14 @@ TEST_F(parser_fixture, nested_rule_definition)
 SetBackgroundColor color_black
 
 Class "Currency" {
-	SetBackgroundColor color_currency
+	SetBorderColor color_currency
 
 	BaseType currency_t1 {
-		SetTextColor color_golden
+		SetAlertSound sound_currency
 		Show
 	}
 
-	Show
+	Hide
 }
 
 Show
@@ -184,7 +184,72 @@ Show
 	const std::vector<pa::statement>& statements = ast.statements;
 	ASSERT_EQ(static_cast<int>(statements.size()), 3);
 
+	ASSERT_TRUE(holds_alternative<pa::action>(statements[0].var)); // SetBackgroundColor color_black
+	const auto& st0_action = boost::get<pa::action>(statements[0].var);
+	EXPECT_EQ(st0_action.action_type, lang::action_type::set_background_color);
+	ASSERT_TRUE(holds_alternative<pa::identifier>(st0_action.value.var));
+	const auto& st0_action_id = boost::get<pa::identifier>(st0_action.value.var);
+	EXPECT_EQ(st0_action_id.value, "color_black");
 
+	ASSERT_TRUE(holds_alternative<pa::rule_block>(statements[1].var)); // Class "Currency" {
+	const auto& st1_rule_block = boost::get<pa::rule_block>(statements[1].var);
+	ASSERT_EQ(static_cast<int>(st1_rule_block.conditions.size()), 1);
+	const auto& st1_rule_block_cond = st1_rule_block.conditions[0];
+	ASSERT_TRUE(holds_alternative<pa::string_condition>(st1_rule_block_cond.var));
+	const auto& st1_rule_block_cond_str = boost::get<pa::string_condition>(st1_rule_block_cond.var);
+	EXPECT_EQ(st1_rule_block_cond_str.property, lang::string_condition_property::class_);
+	ASSERT_TRUE(holds_alternative<pa::literal_expression>(st1_rule_block_cond_str.value.var));
+	const auto& st1_rule_block_cond_str_lit = boost::get<pa::literal_expression>(st1_rule_block_cond_str.value.var);
+	ASSERT_TRUE(holds_alternative<pa::string_literal>(st1_rule_block_cond_str_lit.var));
+	const auto& st1_rule_block_cond_str_lit_str = boost::get<pa::string_literal>(st1_rule_block_cond_str_lit.var);
+	EXPECT_EQ(st1_rule_block_cond_str_lit_str, "Currency");
+
+	ASSERT_EQ(static_cast<int>(st1_rule_block.statements.size()), 3);
+
+	const auto& st1_st0 = st1_rule_block.statements[0]; // SetBorderColor color_currency
+	ASSERT_TRUE(holds_alternative<pa::action>(st1_st0.var));
+	const auto& st1_st0_action = boost::get<pa::action>(st1_st0.var);
+	EXPECT_EQ(st1_st0_action.action_type, lang::action_type::set_border_color);
+	ASSERT_TRUE(holds_alternative<pa::identifier>(st1_st0_action.value.var));
+	const auto& st1_st0_action_id = boost::get<pa::identifier>(st1_st0_action.value.var);
+	EXPECT_EQ(st1_st0_action_id.value, "color_currency");
+
+	const auto& st1_st1 = st1_rule_block.statements[1]; // BaseType currency_t1
+	ASSERT_TRUE(holds_alternative<pa::rule_block>(st1_st1.var));
+	const auto& st1_st1_cond = boost::get<pa::rule_block>(st1_st1.var);
+	ASSERT_EQ(static_cast<int>(st1_st1_cond.conditions.size()), 1);
+	const auto& st1_st1_cond0 = st1_st1_cond.conditions[0];
+	ASSERT_TRUE(holds_alternative<pa::string_condition>(st1_st1_cond0.var));
+	const auto& st1_st1_cond0_str = boost::get<pa::string_condition>(st1_st1_cond0.var);
+	EXPECT_EQ(st1_st1_cond0_str.property, lang::string_condition_property::base_type);
+	ASSERT_TRUE(holds_alternative<pa::identifier>(st1_st1_cond0_str.value.var));
+	const auto& st1_st1_cond0_str_lit = boost::get<pa::identifier>(st1_st1_cond0_str.value.var);
+	EXPECT_EQ(st1_st1_cond0_str_lit.value, "currency_t1");
+
+	ASSERT_EQ(static_cast<int>(st1_st1_cond.statements.size()), 2);
+
+	const auto& st1_st1_cond_st0 = st1_st1_cond.statements[0]; // SetAlertSound sound_currency
+	ASSERT_TRUE(holds_alternative<pa::action>(st1_st1_cond_st0.var));
+	const auto& st1_st1_cond_st0_action = boost::get<pa::action>(st1_st1_cond_st0.var);
+	EXPECT_EQ(st1_st1_cond_st0_action.action_type, lang::action_type::set_alert_sound);
+	ASSERT_TRUE(holds_alternative<pa::identifier>(st1_st1_cond_st0_action.value.var));
+	const auto& st1_st1_cond_st0_action_id = boost::get<pa::identifier>(st1_st1_cond_st0_action.value.var);
+	EXPECT_EQ(st1_st1_cond_st0_action_id.value, "sound_currency");
+
+	const auto& st1_st1_cond_st1 = st1_st1_cond.statements[1]; // Show
+	ASSERT_TRUE(holds_alternative<pa::visibility_statement>(st1_st1_cond_st1.var));
+	const auto& st1_st1_cond_st1_vs = boost::get<pa::visibility_statement>(st1_st1_cond_st1.var);
+	EXPECT_EQ(st1_st1_cond_st1_vs.show, true);
+
+	const auto& st1_st2 = st1_rule_block.statements[2]; // Hide
+	ASSERT_TRUE(holds_alternative<pa::visibility_statement>(st1_st2.var));
+	const auto& st1_st2_vs = boost::get<pa::visibility_statement>(st1_st2.var);
+	EXPECT_EQ(st1_st2_vs.show, false);
+
+	const auto& st2 = statements[2];
+	ASSERT_TRUE(holds_alternative<pa::visibility_statement>(st2.var));
+	const auto& st2_vs = boost::get<pa::visibility_statement>(st2.var);
+	EXPECT_EQ(st2_vs.show, true);
 }
 
 } // namespace
