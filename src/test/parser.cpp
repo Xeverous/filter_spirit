@@ -153,5 +153,39 @@ TEST_F(parser_fixture, array_definition)
 	}
 }
 
+TEST_F(parser_fixture, nested_rule_definition)
+{
+	// note: parser does not evaluate identifier references
+	// it's done later by the compiler which would error upon
+	// this source but for the parser - AST is correct here
+	const std::string input = minimal_input + R"(
+# sample comment
+SetBackgroundColor color_black
+
+Class "Currency" {
+	SetBackgroundColor color_currency
+
+	BaseType currency_t1 {
+		SetTextColor color_golden
+		Show
+	}
+
+	Show
+}
+
+Show
+)";
+
+	const std::optional<parser::parse_data> parse_result = parser::parse(input, buffer_log);
+	ASSERT_TRUE(parse_result.has_value()) << "parse of:\n" << input << "\nfailed\n" << buffer_log.flush_out();
+	namespace pa = parser::ast;
+	const pa::ast_type& ast = (*parse_result).ast;
+
+	const std::vector<pa::statement>& statements = ast.statements;
+	ASSERT_EQ(static_cast<int>(statements.size()), 3);
+
+
+}
+
 } // namespace
 
