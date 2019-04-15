@@ -85,3 +85,4 @@ Dependencies:
 - Boost.Spirit develop branch (using and bug-report-fixing bleeding edge Spirit X3 parser)
 - nlohmann/json
 - OpenSSL (preferably 1.1)
+- Google Test (for building tests)

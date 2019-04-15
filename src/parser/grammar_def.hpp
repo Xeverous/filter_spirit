@@ -54,7 +54,7 @@ const auto config_param_def = identifier > ':' > symbols::yes_no > (('{' > *conf
 BOOST_SPIRIT_DEFINE(config_param)
 
 const config_type config = "config";
-const auto config_def = x3::lit(lang::keywords::config) > '{' > *config_param > '}';
+const auto config_def = x3::lit(lang::keywords::config) > ':' > '{' > *config_param > '}';
 BOOST_SPIRIT_DEFINE(config)
 
 // ---- literal types ----
