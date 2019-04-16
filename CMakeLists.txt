@@ -3,21 +3,16 @@
 cmake_minimum_required(VERSION 3.8)
 project(filter_spirit VERSION 0.0.0 LANGUAGES CXX)
 
-##############################################
+##############################################################################
 # declare dependencies
+
 find_package(Boost 1.68 REQUIRED COMPONENTS
-	spirit
-	fusion
-	variant
-	optional
-	range
 	program_options
-	beast
-	asio
 )
 find_package(nlohmann_json 3.0.0 REQUIRED)
+find_package(OpenSSL REQUIRED)
 
-##############################################
+##############################################################################
 # create target and set its properties
 
 add_executable(filter_spirit
@@ -56,15 +51,20 @@ target_include_directories(filter_spirit
 # we do not export any public interface
 #	PUBLIC
 # add required top-level directory of our own includes
-    PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src
+	PRIVATE
+		${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
+##############################################################################
 # setup compiler flags
+
+# Filter Spirit requires C++17
 target_compile_features(filter_spirit
 	PRIVATE
 		cxx_std_17
 )
+
+# add warnings if supported
 target_compile_options(filter_spirit
 	PRIVATE
 		$<$<CXX_COMPILER_ID:GNU>:-Wall>
@@ -72,15 +72,17 @@ target_compile_options(filter_spirit
 		$<$<CXX_COMPILER_ID:GNU>:-Wpedantic>
 )
 
+##############################################################################
+# add libs that require linking and/or include paths
+
 target_link_libraries(filter_spirit
-    PRIVATE
-        Boost::spirit
-		Boost::fusion
-		Boost::variant
-		Boost::optional
-		Boost::range
+	PRIVATE
 		Boost::program_options
-		Boost::beast
-		Boost::asio
 		nlohmann_json::nlohmann_json
+		OpenSSL::SSL
 )
+
+# Windows requires additional networking libraries for Boost ASIO
+if(WIN32)
+	target_link_libraries(filter_spirit PRIVATE wsock32 ws2_32)
+endif()
