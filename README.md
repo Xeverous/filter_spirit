@@ -1,35 +1,48 @@
 # Filter Spirit
 
-Advanced item filter generator for Path of Exile that uses it's own DSL and online item price APIs. Basically a separate pseudo-programming language that lets you write item filters that pull item prices from online API and dynamically generate filter rules based on item prices and filter's code.
+Advanced item filter generator for Path of Exile that uses it's own [DSL](https://en.wikipedia.org/wiki/Domain-specific_language) and online item price APIs. Basically a separate pseudo-programming language that lets you write item filters that pull item prices from online API and dynamically generate filter rules based on item prices and filter's code.
 
 The project is under construction, message /u/Xeverous on reddit or Xeverous#2151 on Discord if you are interested in it's early development or have any questions/suggestions/whatever. You can also open an issue.
 
-## short overview
+## overview
 
 Core features:
 
-- static typing safety, error checking
-- constants for colors/base-types etc and other data
-statements can be nested (inherit conditions and override actions), no code duplication
-- filter's source code is a template, you write BaseType `$divination(10, 100)` and it pulls data from API to list div cards worth 10-100c at generation time, refresh whenever you want
-- support for filter config and variants (eg color-blind mode, strict mode, uber-strict, Animate Weapon support etc)
+- static typing safety
+- generation-time error checking
+- language elements dedicated to elimination of code duplication:
+  - ability to define constants
+  - statements work top-down like in regular filters but they can be nested to inherit conditions and override actions
+- dynamic rules: `BaseType $divination(10, 100)` pulls data from API to list div cards worth 10-100c at generation time, refresh whenever you want - your filter is always up-to-date with market prices
+- support for filter variants (eg color-blind, strict, uber-strict, Animate Weapon support etc)
+
+## example code
 
 ```
+const color_white  = RGB(255, 255, 255, 255)
+const color_hammer = RGB(162,  85,   0) # (default opacity)
+
 BaseType ["Gavel", "Stone Hammer", "Rock Breaker"] {
     SetTextColor color_white
     SetBackgroundColor color_hammer
+    # above BaseType conditon will be inherited by all nested blocks
+    # above actions will be inherited and can be overriden by nested blocks
 
     Rarity normal {
-        Show
+        Show # show normal hammers
     }
 
-    Rarity magic && Quality > 12 {
-        Show
+    Rarity magic && Quality >= 12 {
+        Show # show magic hammers with 12+ quality
     }
 
-    Rarity rare && Quality > 16 {
-        Show
+    Rarity rare && Quality >= 16 {
+        Show # show rare hammers with 16+ quality
     }
+
+    # hide any other hammers
+    # actually discouraged as you might lose RGB recipe material for later blocks
+    Hide
 }
 
 Class "Divination Card" {
@@ -64,7 +77,10 @@ Class "Divination Card" {
         Show
     }
 
-    [...]
+    # if you really hate these cards
+    BaseType ["Rain of Chaos", "Carrion Crow"] {
+	Hide
+    }
 }
 ```
 
@@ -74,15 +90,30 @@ Under construction... the filter language and spec is not yet complete.
 
 You can view example filter's source in the repository although the syntax is a subject to change.
 
-## building
-
-CMake script soon... right now there is only Eclipse project file
-
-Dependencies:
+## dependencies:
 
 - C++17 compiler (`<filesystem>` not required)
-- Boost 1.68+
-- Boost.Spirit develop branch (using and bug-report-fixing bleeding edge Spirit X3 parser)
+- Boost 1.70 OR older with Spirit headers updated to 1.70; this project uses:
+  - spirit (using bleeding-edge X3 parser)
+  - fusion
+  - optional
+  - variant
+  - **program_options**
+  - beast
+  - asio
+  - system
+  - **unit_test_framework** (only if you build tests)
 - nlohmann/json
-- OpenSSL (preferably 1.1)
-- Google Test (for building tests)
+- **OpenSSL** (preferably 1.1)
+
+bolded dependencies require linking
+
+## building
+
+standard CMake based build
+
+```
+mkdir build
+cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release [your_options...]
+```

@@ -4,13 +4,26 @@ cmake_minimum_required(VERSION 3.8)
 project(filter_spirit VERSION 0.0.0 LANGUAGES CXX)
 
 ##############################################################################
+# options for customizing the build
+
+option(FILTER_SPIRIT_BUILD_TESTS "Build unit tests" ON)
+
+##############################################################################
 # declare dependencies
 
-find_package(Boost 1.68 REQUIRED COMPONENTS
-	program_options
+find_package(Boost 1.68 REQUIRED
+	COMPONENTS
+		program_options
 )
 find_package(nlohmann_json 3.0.0 REQUIRED)
 find_package(OpenSSL REQUIRED)
+
+##############################################################################
+# specify explicitly where to output all binary objects
+
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 ##############################################################################
 # create target and set its properties
@@ -67,9 +80,9 @@ target_compile_features(filter_spirit
 # add warnings if supported
 target_compile_options(filter_spirit
 	PRIVATE
-		$<$<CXX_COMPILER_ID:GNU>:-Wall>
-		$<$<CXX_COMPILER_ID:GNU>:-Wextra>
-		$<$<CXX_COMPILER_ID:GNU>:-Wpedantic>
+		$<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -Wpedantic -fvisibility=hidden -ffast-math>
+		$<$<CXX_COMPILER_ID:Clang>:-Wall -Wpedantic -fvisibility=hidden -ffast-math>
+		$<$<CXX_COMPILER_ID:MSVC>:/W4>
 )
 
 ##############################################################################
@@ -85,4 +98,14 @@ target_link_libraries(filter_spirit
 # Windows requires additional networking libraries for Boost ASIO
 if(WIN32)
 	target_link_libraries(filter_spirit PRIVATE wsock32 ws2_32)
+endif()
+
+##############################################################################
+# add directory with build recipe for tests
+
+include(CTest) # adds option BUILD_TESTING (default ON)
+
+if(BUILD_TESTING AND FILTER_SPIRIT_BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(test)
 endif()
