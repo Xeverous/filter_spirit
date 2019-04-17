@@ -42,9 +42,9 @@ BOOST_FIXTURE_TEST_SUITE(parser_suite, parser_fixture)
 		BOOST_TEST(config.params.empty());
 
 		const auto version = ast.version_data.get_value();
-		BOOST_TEST(version.major, core::version::major);
-		BOOST_TEST(version.minor, core::version::minor);
-		BOOST_TEST(version.patch, core::version::patch);
+		BOOST_TEST(version.major == core::version::major);
+		BOOST_TEST(version.minor == core::version::minor);
+		BOOST_TEST(version.patch == core::version::patch);
 	}
 
 	BOOST_AUTO_TEST_CASE(color_definitions)
