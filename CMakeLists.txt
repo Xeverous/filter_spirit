@@ -21,14 +21,19 @@ find_package(OpenSSL REQUIRED)
 ##############################################################################
 # specify explicitly where to output all binary objects
 
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 ##############################################################################
 # create target and set its properties
 
-add_executable(filter_spirit
+# some source files are shared with unit test executable
+# compile these as shared library so that it can be reused by both
+# without the need to list and compile the same sources twice
+add_library(filter_spirit_compiler SHARED
+	src/parser/grammar.cpp
+	src/parser/parser.cpp
 	src/compiler/actions.cpp
 	src/compiler/compiler.cpp
 	src/compiler/conditions.cpp
@@ -37,33 +42,36 @@ add_executable(filter_spirit
 	src/compiler/filter_builder.cpp
 	src/compiler/functions.cpp
 	src/compiler/queries.cpp
-	src/core/core.cpp
-	src/core/parse_args.cpp
-	src/itemdata/parse_json.cpp
-	src/itemdata/types.cpp
 	src/lang/action_set.cpp
 	src/lang/condition_set.cpp
 	src/lang/filter_block.cpp
 	src/lang/types.cpp
+	src/itemdata/parse_json.cpp
+	src/itemdata/types.cpp
 	src/log/buffered_logger.cpp
 	src/log/console_logger.cpp
 	src/log/logger.cpp
-	src/main.cpp
-	src/network/network.cpp
-	src/network/poe_watch_api.cpp
-	src/network/session.cpp
-	src/parser/grammar.cpp
-	src/parser/parser.cpp
 	src/print/compile_error.cpp
 	src/print/generic.cpp
 	src/print/parse_error.cpp
 	src/utility/file.cpp
 )
 
+add_executable(filter_spirit
+	src/core/core.cpp
+	src/core/parse_args.cpp
+	src/main.cpp
+	src/network/network.cpp
+	src/network/poe_watch_api.cpp
+	src/network/session.cpp
+)
+
+target_include_directories(filter_spirit_compiler
+	PRIVATE
+		${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+
 target_include_directories(filter_spirit
-# we do not export any public interface
-#	PUBLIC
-# add required top-level directory of our own includes
 	PRIVATE
 		${CMAKE_CURRENT_SOURCE_DIR}/src
 )
@@ -72,24 +80,43 @@ target_include_directories(filter_spirit
 # setup compiler flags
 
 # Filter Spirit requires C++17
+target_compile_features(filter_spirit_compiler
+	PRIVATE
+		cxx_std_17
+)
+
 target_compile_features(filter_spirit
 	PRIVATE
 		cxx_std_17
 )
 
-# add warnings if supported
+# add warnings
+
+target_compile_options(filter_spirit_compiler
+	PRIVATE
+		$<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -Wpedantic -ffast-math>
+		$<$<CXX_COMPILER_ID:Clang>:-Wall -Wpedantic -ffast-math>
+		$<$<CXX_COMPILER_ID:MSVC>:/W4>
+)
+
 target_compile_options(filter_spirit
 	PRIVATE
-		$<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -Wpedantic -fvisibility=hidden -ffast-math>
-		$<$<CXX_COMPILER_ID:Clang>:-Wall -Wpedantic -fvisibility=hidden -ffast-math>
+		$<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -Wpedantic -ffast-math>
+		$<$<CXX_COMPILER_ID:Clang>:-Wall -Wpedantic -ffast-math>
 		$<$<CXX_COMPILER_ID:MSVC>:/W4>
 )
 
 ##############################################################################
 # add libs that require linking and/or include paths
 
+target_link_libraries(filter_spirit_compiler
+	PRIVATE
+		nlohmann_json::nlohmann_json
+)
+
 target_link_libraries(filter_spirit
 	PRIVATE
+		filter_spirit_compiler
 		Boost::program_options
 		nlohmann_json::nlohmann_json
 		OpenSSL::SSL

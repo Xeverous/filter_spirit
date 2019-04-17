@@ -1,6 +1,6 @@
 Debug/
 Release/
-test_release/
+build/
 *.code-workspace
 .vscode/
 notes/
