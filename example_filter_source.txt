@@ -6,7 +6,7 @@ version: 0.0.0
 # use this to tweak filter variants
 # note: all options can be overriden in the application
 # yes/no provided here are only defaults
-config {
+config: {
 	chance_bases: yes
 	animate_weapon: no {
 		ranged_weapons: no
