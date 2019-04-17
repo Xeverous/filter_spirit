@@ -10,8 +10,8 @@ find_package(nlohmann_json 3.0.0 REQUIRED)
 # create target and set its properties
 
 add_executable(filter_spirit_test
-	main.cpp
-	parser/positive.cpp
+	fsut/main.cpp
+	fsut/parser/positive.cpp
 )
 
 target_include_directories(filter_spirit_test

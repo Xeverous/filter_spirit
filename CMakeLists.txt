@@ -32,38 +32,38 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 # compile these as shared library so that it can be reused by both
 # without the need to list and compile the same sources twice
 add_library(filter_spirit_compiler SHARED
-	src/parser/grammar.cpp
-	src/parser/parser.cpp
-	src/compiler/actions.cpp
-	src/compiler/compiler.cpp
-	src/compiler/conditions.cpp
-	src/compiler/convertions.cpp
-	src/compiler/evaluate.cpp
-	src/compiler/filter_builder.cpp
-	src/compiler/functions.cpp
-	src/compiler/queries.cpp
-	src/lang/action_set.cpp
-	src/lang/condition_set.cpp
-	src/lang/filter_block.cpp
-	src/lang/types.cpp
-	src/itemdata/parse_json.cpp
-	src/itemdata/types.cpp
-	src/log/buffered_logger.cpp
-	src/log/console_logger.cpp
-	src/log/logger.cpp
-	src/print/compile_error.cpp
-	src/print/generic.cpp
-	src/print/parse_error.cpp
-	src/utility/file.cpp
+	src/fs/parser/grammar.cpp
+	src/fs/parser/parser.cpp
+	src/fs/compiler/actions.cpp
+	src/fs/compiler/compiler.cpp
+	src/fs/compiler/conditions.cpp
+	src/fs/compiler/convertions.cpp
+	src/fs/compiler/evaluate.cpp
+	src/fs/compiler/filter_builder.cpp
+	src/fs/compiler/functions.cpp
+	src/fs/compiler/queries.cpp
+	src/fs/lang/action_set.cpp
+	src/fs/lang/condition_set.cpp
+	src/fs/lang/filter_block.cpp
+	src/fs/lang/types.cpp
+	src/fs/itemdata/parse_json.cpp
+	src/fs/itemdata/types.cpp
+	src/fs/log/buffered_logger.cpp
+	src/fs/log/console_logger.cpp
+	src/fs/log/logger.cpp
+	src/fs/print/compile_error.cpp
+	src/fs/print/generic.cpp
+	src/fs/print/parse_error.cpp
+	src/fs/utility/file.cpp
 )
 
 add_executable(filter_spirit
-	src/core/core.cpp
-	src/core/parse_args.cpp
-	src/main.cpp
-	src/network/network.cpp
-	src/network/poe_watch_api.cpp
-	src/network/session.cpp
+	src/fs/core/core.cpp
+	src/fs/core/parse_args.cpp
+	src/fs/main.cpp
+	src/fs/network/network.cpp
+	src/fs/network/poe_watch_api.cpp
+	src/fs/network/session.cpp
 )
 
 target_include_directories(filter_spirit_compiler

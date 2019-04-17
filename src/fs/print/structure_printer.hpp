@@ -1,0 +1,150 @@
+#pragma once
+
+#include "fs/parser/ast_adapted.hpp"
+#include "fs/utility/type_traits.hpp"
+#include "fs/utility/type_name.hpp"
+
+#include <boost/fusion/include/for_each.hpp>
+#include <iostream>
+
+namespace fs::print
+{
+
+// recursive printer for any nested structure
+struct structure_printer
+{
+	structure_printer(int indent = 0) : indent(indent) {}
+
+	// required by boost's Visitor concept
+	using result_type = void;
+
+	template <typename T>
+	std::enable_if_t<fs::traits::is_iterable_v<T>>
+	operator()(const T& ast) const
+	{
+		tab(indent);
+		std::cout << fs::utility::type_name<T>().get() << " [\n";
+		for (const auto& elem : ast)
+		{
+			structure_printer(indent + 1)(elem);
+		}
+		tab(indent);
+		std::cout << "]\n";
+	}
+
+	template <typename T>
+	std::enable_if_t<std::is_arithmetic_v<T>>
+	operator()(const T& arithmetic) const
+	{
+		tab(indent);
+		std::cout << fs::utility::type_name<T>().get() << " { " << arithmetic << " }\n";
+	}
+
+	template <typename T>
+	std::enable_if_t<fs::traits::has_pointer_semantics_v<T>>
+	operator()(const T& obj) const
+	{
+		if (obj)
+		{
+			// do not indent optionals (they contain only 1 value)
+			// do not remove extra () - vexing parse
+			(structure_printer(indent))(*obj);
+		}
+		else
+		{
+			tab(indent);
+			std::cout << "(empty)\n";
+		}
+	}
+
+	template <typename T>
+	std::enable_if_t<boost::fusion::traits::is_sequence<T>::value>
+	operator()(const T& seq) const
+	{
+		tab(indent);
+		std::cout << fs::utility::type_name<T>().get() << " {\n";
+		boost::fusion::for_each(
+			seq,
+			[this](const auto& arg) {
+				structure_printer(indent + 1)(arg);
+			}
+		);
+		tab(indent);
+		std::cout << "}\n";
+	}
+
+	template <typename T>
+	std::enable_if_t<traits::has_get_value_v<T>>
+	operator()(const T& obj) const
+	{
+		tab(indent);
+		std::cout << fs::utility::type_name<T>().get() << " {\n";
+		structure_printer(indent + 1)(obj.get_value());
+		tab(indent);
+		std::cout << "}\n";
+	}
+
+	template <typename T>
+	std::enable_if_t<std::is_enum_v<T>>
+	operator()(T value) const
+	{
+		tab(indent);
+		std::cout << "enum " << fs::utility::type_name<T>().get() << " { " << static_cast<int>(value) << " }\n";
+	}
+
+	template <typename... T>
+	void operator()(const boost::spirit::x3::variant<T...>& v) const
+	{
+		// do not indent variants - they hold 1 element only
+		boost::apply_visitor(structure_printer(indent), v);
+	}
+
+	template <typename T>
+	void operator()(const boost::spirit::x3::forward_ast<T>& ast) const
+	{
+		// do not remove extra () - vexing parse
+		(structure_printer(indent))(ast.get());
+	}
+
+	// print strings as strings, do not split them as a sequence of characters
+	void operator()(const std::string& text) const
+	{
+		tab(indent);
+		std::cout << text << '\n';
+	}
+
+	void operator()(std::string_view text) const
+	{
+		tab(indent);
+		std::cout << text << '\n';
+	}
+
+	void operator()(bool b) const
+	{
+		tab(indent);
+		std::cout << "bool { ";
+		if (b)
+			std::cout << "true";
+		else
+			std::cout << "false";
+		std::cout << " }\n";
+	}
+
+	// lowest priority overload for unmatched Ts
+	template <typename T = void>
+	void operator()(...) const
+	{
+		static_assert(sizeof(T) == 0, "Missing overload for some T");
+	}
+
+	static
+	void tab(int spaces)
+	{
+		for (int i = 0; i < spaces; ++i)
+			std::cout << "  ";
+	}
+
+	const int indent;
+};
+
+}
