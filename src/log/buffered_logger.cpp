@@ -31,9 +31,14 @@ void buffered_logger::add(std::string_view text)
 	buffer += text;
 }
 
+void buffered_logger::add(char character)
+{
+	buffer += character;
+}
+
 void buffered_logger::add(int number)
 {
-	buffer += number;
+	buffer += std::to_string(number);
 }
 
 std::string buffered_logger::flush_out()

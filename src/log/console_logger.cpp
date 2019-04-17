@@ -30,6 +30,11 @@ void console_logger::add(std::string_view text)
 	std::cout << text;
 }
 
+void console_logger::add(char character)
+{
+	std::cout << character;
+}
+
 void console_logger::add(int number)
 {
 	std::cout << number;

@@ -61,6 +61,7 @@ public:
 	virtual void end_message() = 0;
 
 	virtual void add(std::string_view text) = 0;
+	virtual void add(char character) = 0;
 	virtual void add(int number) = 0;
 };
 

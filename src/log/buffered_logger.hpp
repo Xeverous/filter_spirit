@@ -20,6 +20,7 @@ public:
 	void end_message() override;
 
 	void add(std::string_view text) override;
+	void add(char character) override;
 	void add(int number) override;
 
 	std::string flush_out();

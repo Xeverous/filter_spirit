@@ -468,7 +468,7 @@ item_price_data parse_item_prices(std::string_view itemdata_json, std::string_vi
 	if (itemdata.empty())
 		throw fs::itemdata::json_parse_error("parsed empty list of item data");
 
-	logger.info() << "got " << itemdata.size() << " item entries";
+	logger.info() << "item entries: " << static_cast<int>(itemdata.size());
 
 	item_price_data result;
 	for (item& i : itemdata)
