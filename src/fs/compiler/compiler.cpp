@@ -63,7 +63,8 @@ std::optional<compiler::error::error_variant> add_constant_from_definition(
 		lang::named_object{
 			std::get<lang::object>(std::move(expr_result)),
 			parser::get_position_info(wanted_name)});
-	assert(pair.second);
+	assert(pair.second); // C++20: use [[assert]]
+	(void) pair; // ignore insertion result in release builds
 	return std::nullopt;
 }
 
