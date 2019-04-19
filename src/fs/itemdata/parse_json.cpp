@@ -609,7 +609,7 @@ item_price_data parse_item_prices(std::string_view itemdata_json, std::string_vi
 	 * We separate ambiguous and unambiguous base types to allow separate filter rules for 'definitely an expensive item' and
 	 * 'maybe an expensive item'.
 	 */
-	const auto extract_unambiguous_items = [&](std::vector<unique_item>& ambiguous_items) [[nodiscard]] -> std::vector<unique_item>
+	const auto extract_unambiguous_items = [](std::vector<unique_item>& ambiguous_items) [[nodiscard]] -> std::vector<unique_item>
 	{
 		std::sort(ambiguous_items.begin(), ambiguous_items.end(), [](const auto& left, const auto& right)
 		{

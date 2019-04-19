@@ -54,6 +54,37 @@ BOOST_FIXTURE_TEST_SUITE(algorithm_suite, algorithm_fixture)
 			BOOST_TEST(output.empty());
 		}
 
+
+		BOOST_AUTO_TEST_CASE(single_element)
+		{
+			const std::vector<int> initial_input = { 1 };
+			std::vector<int> input = initial_input;
+			const std::vector<int> output = run_remove_unique(input);
+
+			BOOST_TEST(input.empty());
+			BOOST_TEST(output == initial_input, tt::per_element());
+		}
+
+		BOOST_AUTO_TEST_CASE(two_same_elements)
+		{
+			const std::vector<int> initial_input = { 1, 1 };
+			std::vector<int> input = initial_input;
+			const std::vector<int> output = run_remove_unique(input);
+
+			BOOST_TEST(output.empty());
+			BOOST_TEST(input == initial_input, tt::per_element());
+		}
+
+		BOOST_AUTO_TEST_CASE(two_different_elements)
+		{
+			const std::vector<int> initial_input = { 1, 2 };
+			std::vector<int> input = initial_input;
+			const std::vector<int> output = run_remove_unique(input);
+
+			BOOST_TEST(input.empty());
+			BOOST_TEST(output == initial_input, tt::per_element());
+		}
+
 		BOOST_AUTO_TEST_CASE(only_unique_elements)
 		{
 			const std::vector<int> initial_input = { 1, 2, 3, 4, 5 };
