@@ -4,30 +4,6 @@ namespace fs::utility
 {
 
 /**
- * @brief algorithm very similar to std::unique_copy
- * except that duplicates are moved out, not copied
- */
-template <typename ForwardIt, typename OutputIt, typename BinaryPredicate>
-ForwardIt unique_move(ForwardIt first, ForwardIt last, OutputIt d_first, BinaryPredicate p)
-{
-	if (first == last)
-		return last;
-
-	ForwardIt result = first;
-	while (++first != last)
-	{
-		if (!p(*result, *first) && ++result != first)
-		{
-			*d_first = std::move(*result);
-			++d_first;
-			*result = std::move(*first);
-		}
-	}
-
-	return ++result;
-}
-
-/**
  * @brief algorithm that moves out unique elements
  *
  * @param first beginning of input range
@@ -36,8 +12,14 @@ ForwardIt unique_move(ForwardIt first, ForwardIt last, OutputIt d_first, BinaryP
  * @param p BinaryPredicate used to compare elements (represents operator==)
  * @return pair of: new end of input range, new end of output range
  *
+ * @details
  * Precondition: input range must be sorted (only adjacent elements may
  * compare equal), otherwise the behaviour is undefined
+ *
+ * Complexity: linear with the size of input range
+ *
+ * Exception safety: none; supplied predicate and move constructor of iterated
+ * elements must never throw
  *
  * input range: 1 2 2 2 3 3 4 5 5 6
  * output range: (empty)
@@ -45,15 +27,18 @@ ForwardIt unique_move(ForwardIt first, ForwardIt last, OutputIt d_first, BinaryP
  *             ||
  *            \||/
  *             \/
- * input range: 2 2 2 3 3 5 5
+ * input range: 2 2 2 3 3 5 5 X X X
  * output range: 1 4 6
+ *
+ * to complete the erase-remove idiom (remove elements X which have indeterminate values),
+ * after calling this algorithm call input.erase(return_val.first, input.end())
  */
 template <typename ForwardIt, typename OutputIt, typename BinaryPredicate>
 std::pair<ForwardIt, OutputIt> remove_unique(ForwardIt first, ForwardIt last, OutputIt d_first, BinaryPredicate p)
 {
 	// the place where we move unique elements: d_first
 	// the place where we move repeated elements:
-	ForwardIt rep_last = first;
+	ForwardIt new_input_end = first;
 
 	// pick first instance of (potentially repeated) element
 	ForwardIt first_instance = first;
@@ -75,14 +60,14 @@ std::pair<ForwardIt, OutputIt> remove_unique(ForwardIt first, ForwardIt last, Ou
 			// move copies to the beginning of input range
 			for (; temp != first; ++temp)
 			{
-				*rep_last = std::move(*temp);
-				++rep_last;
+				*new_input_end = std::move(*temp);
+				++new_input_end;
 			}
 			first_instance = temp;
 		}
 	}
 
-	return std::make_pair(rep_last, d_first);
+	return std::make_pair(new_input_end, d_first);
 }
 
 }

@@ -521,6 +521,13 @@ item_price_data parse_item_prices(std::string_view itemdata_json, std::string_vi
 				continue;
 			}
 
+			if (*i.base_type == "")
+			{
+				logger.warning() << "A unique item with empty string base type has been found";
+				i.log_info(logger);
+				continue;
+			}
+
 			if (i.links)
 			{
 				// skip uniques which have links - we care about sole unique item value, not linked items
@@ -611,14 +618,14 @@ item_price_data parse_item_prices(std::string_view itemdata_json, std::string_vi
 
 		// now items with the same base type are next to each other, just move out unique (not repeated) bases
 		std::vector<unique_item> unambiguous_items;
-		const auto last = utility::unique_move( // unique_move is analogic to std::unique_copy
+		const auto last = utility::remove_unique(
 			ambiguous_items.begin(),
 			ambiguous_items.end(),
 			std::back_inserter(unambiguous_items),
 			[](const auto& left, const auto& right)
 			{
 				return left.base_type_name == right.base_type_name;
-			});
+			}).first;
 		ambiguous_items.erase(last, ambiguous_items.end()); // note: this is the erase-remove idiom
 
 		return unambiguous_items;
