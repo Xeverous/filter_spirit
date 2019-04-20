@@ -12,6 +12,8 @@ Filter Sprit uses the following terms accross the documentation. These exist mos
 
 ## core grammar
 
+TODO THIS AND ALL BELOW IS OUTDATED.
+
 Filter Spirit uses [*context-sensitive grammar*](https://en.wikipedia.org/wiki/Chomsky_hierarchy#The_hierarchy) that uses whitespace to delimit tokens and ignores any redundant non-newline whitespace. The only exception is the newline character, which delimits conditions, actions and other expressions. I could make it also ignore newlines, but then there would be something needed as a delimeter - having to write `;` at the end of each line is an unnecessary noise I would like to avoid. While the C-like curcly brace syntax with semicolons is quite popular for many languages, I think Path of Exile filters are simple enough to be able to avoid such thing and just have the rule of 1 statement per line. I aim to be as close to the original item filter syntax as possible.
 
 The language type system is strong, which means that the tool will error upon incompatible types:
@@ -89,3 +91,7 @@ Here it's ambiguous whether the right-side expressions are arrays of 1 element o
 ```
 
 Obviously there would be some way to deal with such problems but I prefer to have a context-free grammar rather than something that requires to write a ton of if-else to handle all corner cases.
+
+**Is this program allowed (does not break GGG's ToS)?**
+
+Yes. this program does not interact with the game client in any way. It only produces a text file that is later read by it.

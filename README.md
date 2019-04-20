@@ -106,7 +106,7 @@ You can view example filter's source in the repository although the syntax is a 
 - nlohmann/json
 - **OpenSSL** (preferably 1.1)
 
-bolded dependencies require linking
+bolded dependencies require linking, all dependencies are exposed as targets in CMake script
 
 ## building
 

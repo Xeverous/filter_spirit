@@ -1,5 +1,7 @@
 # program depencencies
 
+TODO this file duplicates content with top-level README
+
 ## compiler
 
 - C++17 support (`<filesystem>` not required)
