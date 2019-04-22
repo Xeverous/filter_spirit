@@ -42,6 +42,7 @@ add_library(filter_spirit_compiler SHARED
 	src/fs/compiler/filter_builder.cpp
 	src/fs/compiler/functions.cpp
 	src/fs/compiler/queries.cpp
+	src/fs/compiler/process_input.cpp
 	src/fs/lang/action_set.cpp
 	src/fs/lang/condition_set.cpp
 	src/fs/lang/filter_block.cpp

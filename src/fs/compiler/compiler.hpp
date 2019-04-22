@@ -1,28 +1,23 @@
 #pragma once
 
+#include "fs/compiler/error.hpp"
+#include "fs/parser/ast.hpp"
+#include "fs/lang/constants_map.hpp"
+#include "fs/lang/filter_block.hpp"
 #include "fs/itemdata/types.hpp"
-#include "fs/log/logger.hpp"
 
 #include <string>
-#include <optional>
+#include <vector>
 
 namespace fs::compiler
 {
 
-/**
- * @brief end-to-end filter generation function
- *
- * @param input filter template source code
- * @param item_price_data item price data
- * @param print_ast output abstract syntax tree if true
- * @param logger logger instance
- * @return filter file content or nothing if error occured
- */
 [[nodiscard]]
-std::optional<std::string> process_input(
-	const std::string& input,
-	const itemdata::item_price_data& item_price_data,
-	bool print_ast,
-	logger& logger);
+std::variant<lang::constants_map, compiler::error::error_variant> resolve_constants(
+	const std::vector<parser::ast::constant_definition>& constant_definitions,
+	const itemdata::item_price_data& item_price_data);
+
+[[nodiscard]]
+std::string generate_filter(const std::vector<lang::filter_block>& blocks);
 
 }

@@ -1,7 +1,7 @@
 #include "fs/core/core.hpp"
 #include "fs/utility/file.hpp"
 #include "fs/network/poe_watch_api.hpp"
-#include "fs/compiler/compiler.hpp"
+#include "fs/compiler/process_input.hpp"
 #include "fs/itemdata/parse_json.hpp"
 
 #include <fstream>
