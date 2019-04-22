@@ -17,7 +17,7 @@ const std::string& minimal_input()
 	return str;
 }
 
-fs::parser::ast::ast_type parser_fixture::parse(const std::string& input)
+fs::parser::ast::ast_type parser_fixture::parse(std::string_view input)
 {
 	const std::optional<fs::parser::parse_data> parse_result = fs::parser::parse(input, log_buf);
 	BOOST_TEST_REQUIRE(parse_result.has_value(), "parse of:\n" << input << "\nfailed\n" << log_buf.flush_out());
