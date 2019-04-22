@@ -11,20 +11,7 @@
 
 #include <string>
 
-class parser_fixture
-{
-protected:
-	fs::parser::ast::ast_type parse(const std::string& input)
-	{
-		const std::optional<fs::parser::parse_data> parse_result = fs::parser::parse(input, log_buf);
-		BOOST_TEST_REQUIRE(parse_result.has_value(), "parse of:\n" << input << "\nfailed\n" << log_buf.flush_out());
-		return (*parse_result).ast;
-	}
-
-	fs::buffered_logger log_buf;
-};
-
-BOOST_FIXTURE_TEST_SUITE(parser_suite, parser_fixture)
+BOOST_FIXTURE_TEST_SUITE(parser_suite, fsut::parser::parser_fixture)
 
 	BOOST_AUTO_TEST_CASE(version_requirement)
 	{

@@ -1,20 +1,21 @@
 #pragma once
 
-#include "fs/core/version.hpp"
+#include "fs/parser/ast.hpp"
+#include "fs/log/buffered_logger.hpp"
 
 #include <string>
 
 namespace fsut::parser
 {
 
-inline
-const std::string& minimal_input()
+const std::string& minimal_input();
+
+class parser_fixture
 {
-	namespace v = fs::core::version;
-	static const std::string str =
-		"version: " + std::to_string(v::major) + "." + std::to_string(v::minor) + "." + std::to_string(v::patch) + "\n"
-		"config: {}";
-	return str;
-}
+protected:
+	fs::parser::ast::ast_type parse(const std::string& input);
+
+	fs::buffered_logger log_buf;
+};
 
 }
