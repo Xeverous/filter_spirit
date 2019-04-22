@@ -4,6 +4,7 @@
 #include "fs/utility/holds_alternative.hpp"
 
 #include "fsut/parser/print_type.hpp"
+#include "fsut/parser/common.hpp"
 
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
@@ -16,17 +17,9 @@ protected:
 	fs::parser::ast::ast_type parse(const std::string& input)
 	{
 		const std::optional<fs::parser::parse_data> parse_result = fs::parser::parse(input, log_buf);
-		BOOST_TEST_REQUIRE(parse_result.has_value(), "parse of:\n" << minimal_input << "\nfailed\n" << log_buf.flush_out());
+		BOOST_TEST_REQUIRE(parse_result.has_value(), "parse of:\n" << input << "\nfailed\n" << log_buf.flush_out());
 		return (*parse_result).ast;
 	}
-
-	const std::string minimal_input = []()
-	{
-		namespace v = fs::core::version;
-		return
-			"version: " + std::to_string(v::major) + "." + std::to_string(v::minor) + "." + std::to_string(v::patch) + "\n"
-			"config: {}";
-	}();
 
 	fs::buffered_logger log_buf;
 };
@@ -36,7 +29,7 @@ BOOST_FIXTURE_TEST_SUITE(parser_suite, parser_fixture)
 	BOOST_AUTO_TEST_CASE(version_requirement)
 	{
 		using namespace fs;
-		const parser::ast::ast_type ast = parse(minimal_input);
+		const parser::ast::ast_type ast = parse(fsut::parser::minimal_input());
 
 		const parser::ast::config& config = ast.config;
 		BOOST_TEST(config.params.empty());
@@ -49,7 +42,7 @@ BOOST_FIXTURE_TEST_SUITE(parser_suite, parser_fixture)
 
 	BOOST_AUTO_TEST_CASE(color_definitions)
 	{
-		const std::string input = minimal_input + "\n"
+		const std::string input = fsut::parser::minimal_input() + "\n"
 			"const color_first = RGB( 11,  22,  33)\n"
 			"const color_black = RGB(  0,   1,   2, 255)\n"
 			"const color_other = color_black";
@@ -124,7 +117,7 @@ BOOST_FIXTURE_TEST_SUITE(parser_suite, parser_fixture)
 
 	BOOST_AUTO_TEST_CASE(array_definition)
 	{
-		const std::string input = minimal_input + "\n"
+		const std::string input = fsut::parser::minimal_input() + "\n"
 			"const currency_t1 = [\"Exalted Orb\", \"Mirror of Kalandra\", \"Eternal Orb\", \"Mirror Shard\"]";
 
 		using namespace fs;
@@ -157,7 +150,7 @@ BOOST_FIXTURE_TEST_SUITE(parser_suite, parser_fixture)
 		// note: parser does not evaluate identifier references
 		// it's done later by the compiler which would error upon
 		// this source but for the parser - AST is correct here
-		const std::string input = minimal_input + R"(
+		const std::string input = fsut::parser::minimal_input() + R"(
 # sample comment
 SetBackgroundColor color_black
 
