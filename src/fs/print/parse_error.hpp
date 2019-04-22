@@ -2,7 +2,8 @@
 
 #include "fs/parser/error.hpp"
 #include "fs/parser/parser.hpp"
-#include "fs/log/logger.hpp"
+
+namespace fs { class logger; }
 
 namespace fs::print
 {

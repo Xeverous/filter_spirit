@@ -1,6 +1,7 @@
 #include "fs/parser/parser.hpp"
 #include "fs/parser/grammar.hpp"
 #include "fs/print/parse_error.hpp"
+#include "fs/log/logger.hpp"
 
 namespace
 {
@@ -8,11 +9,11 @@ namespace
 namespace p = fs::parser;
 namespace x3 = boost::spirit::x3;
 
-std::pair<p::lookup_data, std::variant<p::ast::ast_type, p::error_holder_type>> parse_impl(const std::string& file_content)
+std::pair<p::lookup_data, std::variant<p::ast::ast_type, p::error_holder_type>> parse_impl(std::string_view input)
 {
-	      p::iterator_type it   {file_content.begin()};
-	const p::iterator_type begin{file_content.begin()};
-	const p::iterator_type end  {file_content.end()};
+	      p::iterator_type it   {input.begin()};
+	const p::iterator_type begin{input.begin()};
+	const p::iterator_type end  {input.end()};
 	p::position_cache_type position_cache(begin, end);
 	p::error_holder_type error_holder;
 	// note: x3::with<> must match with grammar's context_type, otherwise you will get linker errors
@@ -46,9 +47,9 @@ std::pair<p::lookup_data, std::variant<p::ast::ast_type, p::error_holder_type>> 
 namespace fs::parser
 {
 
-std::optional<parse_data> parse(const std::string& file_content, logger& logger)
+std::optional<parse_data> parse(std::string_view input, logger& logger)
 {
-	std::pair<lookup_data, std::variant<ast::ast_type, error_holder_type>> parse_result = parse_impl(file_content);
+	std::pair<lookup_data, std::variant<ast::ast_type, error_holder_type>> parse_result = parse_impl(input);
 
 	auto& lookup_data = parse_result.first;
 	auto& ast_or_error = parse_result.second;

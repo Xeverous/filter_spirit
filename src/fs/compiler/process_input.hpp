@@ -3,7 +3,7 @@
 #include "fs/itemdata/types.hpp"
 #include "fs/log/logger.hpp"
 
-#include <string>
+#include <string_view>
 #include <optional>
 
 namespace fs::compiler
@@ -20,7 +20,7 @@ namespace fs::compiler
  */
 [[nodiscard]]
 std::optional<std::string> process_input(
-	const std::string& input,
+	std::string_view input,
 	const itemdata::item_price_data& item_price_data,
 	bool print_ast,
 	logger& logger);

@@ -37,10 +37,12 @@ range_type skip_whitespace(range_type range, iterator_type last)
 	// make sure we havent accidentally advanced range beginning so that the range is empty
 	// move end 1 position forward unless last has been reached
 	if (it == range.end() && range.end() != last)
-		return range_type(it, ++range.end());
-	else
-		return range_type(it, range.end());
+	{
+		iterator_type new_end = range.end();
+		return range_type(it, ++new_end);
+	}
 
+	return range_type(it, range.end());
 }
 
 iterator_type get_line_start(iterator_type first, iterator_type pos)

@@ -9,7 +9,7 @@ namespace fs::compiler
 {
 
 std::optional<std::string> process_input(
-	const std::string& input,
+	std::string_view input,
 	const itemdata::item_price_data& item_price_data,
 	bool print_ast,
 	logger& logger)

@@ -4,7 +4,7 @@
 #include "fs/parser/config.hpp"
 #include "fs/log/logger.hpp"
 
-#include <string>
+#include <string_view>
 #include <optional>
 #include <utility>
 
@@ -50,6 +50,6 @@ struct parse_data
 };
 
 [[nodiscard]]
-std::optional<parse_data> parse(const std::string& file_content, logger& logger);
+std::optional<parse_data> parse(std::string_view input, logger& logger);
 
 }

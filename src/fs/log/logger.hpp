@@ -2,7 +2,6 @@
 
 #include <boost/range/iterator_range.hpp>
 
-#include <string>
 #include <string_view>
 
 /**
@@ -80,12 +79,14 @@ logger& operator<<(logger& logger, const T& val)
 }
 
 inline
-logger& operator<<(logger& logger, boost::iterator_range<std::string::const_iterator> range)
+logger& operator<<(logger& logger, boost::iterator_range<std::string_view::const_iterator> range)
 {
-	// std::string iterators guuarantee continuous storage
 	const auto first = range.begin();
 	const auto last  = range.end();
-	logger.add(std::string_view(&*first, last - first)); // use std::string_view(const char*, size_type) ctor overload
+	// surprise: std::string_view does not have a ctor that takes its own iterators!
+	// but ... since std::string_view iterators guuarantee continuous storage
+	// we can use std::string_view(const char*, size_type) ctor
+	logger.add(std::string_view(&*first, last - first));
 	return logger;
 }
 
