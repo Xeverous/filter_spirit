@@ -81,33 +81,8 @@ std::optional<error::error_variant> filter_builder::handle_visibility_statement(
 	const lang::condition_set& parent_conditions,
 	const lang::action_set& parent_actions)
 {
-	if (!vs.query) // C++20: [[likely]]
-	{
-		add_block(vs.show, parent_conditions, parent_actions);
-		return std::nullopt;
-	}
-
-	return handle_advanced_price_range_query(vs.show, *vs.query, parent_conditions, parent_actions);
-}
-
-/*
- * we are moving away from 'advanced price range query' for a simpler design:
- * different queries will evaluate to objects of different type:
- *
- * $divination(10, 100) => array of strings (item base types)
- * $bases_elder(10, 100) => array of nested arrays (item base name and ilvl)
- *
- * Right now there is no support for nested arrays or even heterogenous ones
- * so just shut up the warnings and mark this as TODO
- */
-std::optional<error::error_variant> filter_builder::handle_advanced_price_range_query(
-	bool /* show */,
-	const ast::advanced_price_range_query& query,
-	const lang::condition_set& /* parent_conditions */,
-	const lang::action_set& /* parent_actions */)
-{
-	// TODO get rid of this and implement heterogenous arrays and nested arrays
-	return error::no_such_advanced_query{parser::get_position_info(query.name)};
+	add_block(vs.show, parent_conditions, parent_actions);
+	return std::nullopt;
 }
 
 }

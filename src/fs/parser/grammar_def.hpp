@@ -164,12 +164,8 @@ BOOST_SPIRIT_DEFINE(action)
 
 // ---- filter structure ----
 
-const advanced_price_range_query_type advanced_price_range_query = "advanced price range query";
-const auto advanced_price_range_query_def = x3::lexeme["$$" >> identifier] >> '(' >> value_expression % ',' >> ')';
-BOOST_SPIRIT_DEFINE(advanced_price_range_query)
-
 const visibility_statement_type visibility_statement = "visibility statement";
-const auto visibility_statement_def = symbols::visibility_literals >> -advanced_price_range_query;
+const auto visibility_statement_def = symbols::visibility_literals;
 BOOST_SPIRIT_DEFINE(visibility_statement)
 
 // moved here due to circular dependency

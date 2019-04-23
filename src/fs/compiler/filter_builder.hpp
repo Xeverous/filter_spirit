@@ -59,13 +59,6 @@ private:
 		const lang::condition_set& parent_conditions,
 		const lang::action_set& parent_actions);
 
-	[[nodiscard]]
-	std::optional<error::error_variant> handle_advanced_price_range_query(
-		bool show,
-		const parser::ast::advanced_price_range_query& query,
-		const lang::condition_set& parent_conditions,
-		const lang::action_set& parent_actions);
-
 	const lang::constants_map& map;
 	const itemdata::item_price_data& item_price_data;
 

@@ -293,16 +293,17 @@ struct action : x3::position_tagged
 
 // ---- filter structure ----
 
-struct advanced_price_range_query : x3::position_tagged
-{
-	identifier name;
-	function_arguments arguments;
-};
-
 struct visibility_statement : x3::position_tagged
 {
+	visibility_statement operator=(bool value)
+	{
+		show = value;
+		return *this;
+	}
+
+	bool get_value() const { return show; }
+
 	bool show;
-	boost::optional<advanced_price_range_query> query;
 };
 
 // rule_block defined earlier than statement due to circular dependency
