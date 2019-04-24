@@ -209,6 +209,53 @@ const group = Group("")
 			BOOST_TEST(compare_ranges(expected_place_of_expression, reported_place_of_expression, input_range));
 		}
 
+		BOOST_AUTO_TEST_CASE(illegal_characters_in_socket_group)
+		{
+			const std::string input_str = fsut::parser::minimal_input() + R"(
+const group = Group("GBAC")
+)";
+			const auto input = std::string_view(input_str.data(), input_str.size());
+			const fs::parser::parse_data parse_data = parse(input);
+			const auto error_desc = expect_error_when_resolving_constants<error::illegal_characters_in_socket_group>(parse_data.ast.constant_definitions);
+
+			const range_type input_range(input.begin(), input.end());
+			const range_type expected_place_of_expression = search(input_range, "\"GBAC\"");
+			const range_type reported_place_of_expression = parse_data.lookup_data.position_of(error_desc.place_of_socket_group_string);
+			BOOST_TEST(compare_ranges(expected_place_of_expression, reported_place_of_expression, input_range));
+		}
+
+		BOOST_AUTO_TEST_CASE(invalid_socket_group)
+		{
+			const std::string input_str = fsut::parser::minimal_input() + R"(
+const group = Group("RRRRRRR") # 7 characters
+)";
+			const auto input = std::string_view(input_str.data(), input_str.size());
+			const fs::parser::parse_data parse_data = parse(input);
+			const auto error_desc = expect_error_when_resolving_constants<error::invalid_socket_group>(parse_data.ast.constant_definitions);
+
+			const range_type input_range(input.begin(), input.end());
+			const range_type expected_place_of_expression = search(input_range, "\"RRRRRRR\"");
+			const range_type reported_place_of_expression = parse_data.lookup_data.position_of(error_desc.place_of_socket_group_string);
+			BOOST_TEST(compare_ranges(expected_place_of_expression, reported_place_of_expression, input_range));
+		}
+
+		BOOST_AUTO_TEST_CASE(invalid_minimap_icon_size)
+		{
+			const std::string input_str = fsut::parser::minimal_input() + R"(
+const icon = MinimapIcon(5, green, circle) # size must be in range [0, 2]
+)";
+			const auto input = std::string_view(input_str.data(), input_str.size());
+			const fs::parser::parse_data parse_data = parse(input);
+			const auto error_desc = expect_error_when_resolving_constants<error::invalid_minimap_icon_size>(parse_data.ast.constant_definitions);
+
+			BOOST_TEST(error_desc.requested_size == 5);
+
+			const range_type input_range(input.begin(), input.end());
+			const range_type expected_place_of_expression = search(input_range, "5");
+			const range_type reported_place_of_expression = parse_data.lookup_data.position_of(error_desc.place_of_size_argument);
+			BOOST_TEST(compare_ranges(expected_place_of_expression, reported_place_of_expression, input_range));
+		}
+
 	BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE_END()
