@@ -67,7 +67,7 @@ tt::predicate_result compare_ranges(
 
 BOOST_FIXTURE_TEST_SUITE(compiler_suite, fsut::compiler::compiler_fixture)
 
-	BOOST_AUTO_TEST_CASE(minimal_input)
+	BOOST_AUTO_TEST_CASE(minimal_input_resolve_constants)
 	{
 		const fs::parser::parse_data parse_data = parse(fsut::parser::minimal_input());
 		const std::variant<fs::lang::constants_map, fs::compiler::error::error_variant> map_or_error =
@@ -100,7 +100,7 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, fsut::compiler::compiler_fixture)
 		}
 	};
 
-	BOOST_FIXTURE_TEST_SUITE(compiler_error_suite, compiler_error_fixture, * ut::depends_on("compiler_suite/minimal_input"))
+	BOOST_FIXTURE_TEST_SUITE(compiler_error_suite, compiler_error_fixture, * ut::depends_on("compiler_suite/minimal_input_resolve_constants"))
 		namespace error = fs::compiler::error;
 
 		BOOST_AUTO_TEST_CASE(name_already_exists)

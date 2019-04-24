@@ -14,7 +14,8 @@ add_executable(filter_spirit_test
 	fst/parser/common.cpp
 	fst/parser/tests.cpp
 	fst/compiler/common.cpp
-	fst/compiler/tests.cpp
+	fst/compiler/compiler_error_tests.cpp
+	fst/compiler/filter_generation_tests.cpp
 	fst/utility/algorithm.cpp
 )
 
