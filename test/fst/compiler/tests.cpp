@@ -1,10 +1,10 @@
+#include "fst/compiler/common.hpp"
+#include "fst/lang/print_type.hpp"
+#include "fst/parser/common.hpp"
+
 #include "fs/compiler/compiler.hpp"
 #include "fs/log/buffered_logger.hpp"
 #include "fs/print/generic.hpp"
-
-#include "fsut/compiler/common.hpp"
-#include "fsut/parser/common.hpp"
-#include "fsut/lang/print_type.hpp"
 
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
