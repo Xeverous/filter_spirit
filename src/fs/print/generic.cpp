@@ -132,4 +132,9 @@ void print_line_with_indicator(logger& logger, range_type content_range, range_t
 	print_indicator(logger, line_start, error_range);
 }
 
+void print_internal_error(logger& logger, std::string_view desc)
+{
+	logger.error() << internal_error_string << desc;
+}
+
 }

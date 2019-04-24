@@ -1,6 +1,5 @@
 #include "fs/log/buffered_logger.hpp"
 
-#include <iostream>
 #include <utility>
 
 namespace fs

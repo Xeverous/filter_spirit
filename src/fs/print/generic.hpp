@@ -4,6 +4,7 @@
 #include "fs/log/logger.hpp"
 
 #include <utility>
+#include <string_view>
 
 namespace fs::print
 {
@@ -14,7 +15,8 @@ constexpr auto tab_length = 8;
 constexpr auto indicator_background = ' ';
 constexpr auto indicator_foreground = '~';
 constexpr auto compiler_error_string = "compile error: ";
-constexpr auto internal_compiler_error_string = "internal compile error: ";
+constexpr auto internal_error_string = "internal error: ";
+constexpr auto internal_compiler_error_string = "internal compiler error: ";
 constexpr auto internal_compiler_error_info = "please report a bug with attached minimal filter source that reproduces it";
 constexpr auto note_string = "note: ";
 
@@ -50,6 +52,10 @@ void print_line_number(logger& logger, int line);
 void print_line(logger& logger, iterator_type start, iterator_type last);
 void print_indicator(logger& logger, iterator_type line_start, range_type error_range);
 void print_line_with_indicator(logger& logger, range_type content_range, range_type error_range);
+
+// a generic internal error reporter
+// add any meaningful description as second argument
+void print_internal_error(logger& logger, std::string_view desc);
 
 template <typename... Texts>
 void print_line_number_with_indication_and_texts(

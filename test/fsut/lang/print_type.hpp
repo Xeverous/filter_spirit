@@ -25,14 +25,22 @@
 namespace fs::lang
 {
 
+inline
 std::ostream& boost_test_print_type(std::ostream& os, action_type at)
 {
 	return os << "(action_type: " << static_cast<int>(at) << ")";
 }
 
+inline
 std::ostream& boost_test_print_type(std::ostream& os, string_condition_property scp)
 {
 	return os << "(string_condition_property: " << static_cast<int>(scp) << ")";
+}
+
+inline
+std::ostream& boost_test_print_type(std::ostream& os, single_object_type sot)
+{
+	return os << "(single_object_type: " << to_string(sot) << ")";
 }
 
 }

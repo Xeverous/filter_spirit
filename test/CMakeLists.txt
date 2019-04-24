@@ -11,8 +11,10 @@ find_package(nlohmann_json 3.0.0 REQUIRED)
 
 add_executable(filter_spirit_test
 	fsut/main.cpp
-	fsut/parser/positive.cpp
 	fsut/parser/common.cpp
+	fsut/parser/tests.cpp
+	fsut/compiler/common.cpp
+	fsut/compiler/tests.cpp
 	fsut/utility/algorithm.cpp
 )
 

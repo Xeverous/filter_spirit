@@ -3,7 +3,7 @@
 #include "fs/core/version.hpp"
 #include "fs/utility/holds_alternative.hpp"
 
-#include "fsut/parser/print_type.hpp"
+#include "fsut/lang/print_type.hpp"
 #include "fsut/parser/common.hpp"
 
 #define BOOST_TEST_DYN_LINK
@@ -27,6 +27,26 @@ BOOST_FIXTURE_TEST_SUITE(parser_suite, fsut::parser::parser_fixture)
 		BOOST_TEST(version.patch == core::version::patch);
 	}
 
+	BOOST_AUTO_TEST_CASE(empty_string)
+	{
+		const std::string input = fsut::parser::minimal_input() + "\n"
+			"const empty_string = \"\"";
+
+		namespace pa = fs::parser::ast;
+		const pa::ast_type ast = parse(input);
+
+		const std::vector<pa::constant_definition>& defs = ast.constant_definitions;
+		BOOST_TEST_REQUIRE(static_cast<int>(defs.size()) == 1);
+
+		const auto& constant = defs[0];
+		BOOST_TEST(constant.name.value == "empty_string");
+		BOOST_TEST_REQUIRE(holds_alternative<pa::literal_expression>(constant.value.var));
+		const auto& literal_expression = boost::get<pa::literal_expression>(constant.value.var);
+		BOOST_TEST_REQUIRE(holds_alternative<pa::string_literal>(literal_expression.var));
+		const auto& string_literal = boost::get<pa::string_literal>(literal_expression.var);
+		BOOST_TEST(string_literal.empty());
+	}
+
 	BOOST_AUTO_TEST_CASE(color_definitions)
 	{
 		const std::string input = fsut::parser::minimal_input() + "\n"
@@ -34,8 +54,7 @@ BOOST_FIXTURE_TEST_SUITE(parser_suite, fsut::parser::parser_fixture)
 			"const color_black = RGB(  0,   1,   2, 255)\n"
 			"const color_other = color_black";
 
-		using namespace fs;
-		namespace pa = parser::ast;
+		namespace pa = fs::parser::ast;
 		const pa::ast_type ast = parse(input);
 
 		const std::vector<pa::constant_definition>& defs = ast.constant_definitions;
@@ -107,8 +126,7 @@ BOOST_FIXTURE_TEST_SUITE(parser_suite, fsut::parser::parser_fixture)
 		const std::string input = fsut::parser::minimal_input() + "\n"
 			"const currency_t1 = [\"Exalted Orb\", \"Mirror of Kalandra\", \"Eternal Orb\", \"Mirror Shard\"]";
 
-		using namespace fs;
-		namespace pa = parser::ast;
+		namespace pa = fs::parser::ast;
 		const pa::ast_type ast = parse(input);
 
 		const std::vector<pa::constant_definition>& defs = ast.constant_definitions;
@@ -154,8 +172,8 @@ Class "Currency" {
 
 Show
 )";
-		using namespace fs;
-		namespace pa = parser::ast;
+		namespace lang = fs::lang;
+		namespace pa = fs::parser::ast;
 		const pa::ast_type ast = parse(input);
 
 		const std::vector<pa::statement>& statements = ast.statements;

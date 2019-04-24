@@ -20,7 +20,8 @@ const std::string& minimal_input()
 fs::parser::ast::ast_type parser_fixture::parse(std::string_view input)
 {
 	const std::optional<fs::parser::parse_data> parse_result = fs::parser::parse(input, log_buf);
-	BOOST_TEST_REQUIRE(parse_result.has_value(), "parse of:\n" << input << "\nfailed\n" << log_buf.flush_out());
+	const auto log_data = log_buf.flush_out(); // needs to be here, side effects in BOOST_TEST* macros do not work
+	BOOST_TEST_REQUIRE(parse_result.has_value(), "parse of:\n" << input << "\nfailed\n" << log_data);
 	return (*parse_result).ast;
 }
 

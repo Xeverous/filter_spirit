@@ -1,6 +1,7 @@
 #include "fs/parser/parser.hpp"
 #include "fs/parser/grammar.hpp"
 #include "fs/print/parse_error.hpp"
+#include "fs/print/generic.hpp"
 #include "fs/log/logger.hpp"
 
 namespace
@@ -57,6 +58,12 @@ std::optional<parse_data> parse(std::string_view input, logger& logger)
 	if (std::holds_alternative<error_holder_type>(ast_or_error))
 	{
 		auto& errors = std::get<error_holder_type>(ast_or_error);
+
+		if (errors.empty())
+		{
+			print::print_internal_error(logger, "parse failed but no error information has been reported");
+			return std::nullopt;
+		}
 
 		for (const parse_error& error : errors)
 			print::print_parse_error(error, lookup_data, logger);
