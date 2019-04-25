@@ -102,6 +102,7 @@ struct suit_literal_class                    : error_on_error, annotate_on_succe
 // ---- expressions ----
 
 struct literal_expression_class              : error_on_error, annotate_on_success {};
+struct value_expression_list_class           : error_on_error, annotate_on_success {};
 struct function_call_class                   : error_on_error, annotate_on_success {};
 struct price_range_query_class               : error_on_error, annotate_on_success {};
 struct array_expression_class                : error_on_error, annotate_on_success {};
@@ -203,6 +204,9 @@ BOOST_SPIRIT_DECLARE(suit_literal_type)
 
 using literal_expression_type = x3::rule<literal_expression_class, ast::literal_expression>;
 BOOST_SPIRIT_DECLARE(literal_expression_type)
+
+using value_expression_list_type = x3::rule<value_expression_list_class, ast::value_expression_list>;
+BOOST_SPIRIT_DECLARE(value_expression_list_type)
 
 using function_call_type = x3::rule<function_call_class, ast::function_call>;
 BOOST_SPIRIT_DECLARE(function_call_type)

@@ -135,15 +135,16 @@ BOOST_FIXTURE_TEST_SUITE(parser_suite, fsut::parser::parser_fixture)
 		BOOST_TEST(defs[0].name.value == "currency_t1");
 		BOOST_TEST_REQUIRE(holds_alternative<pa::array_expression>(defs[0].value.var));
 		const auto& array_expr = boost::get<pa::array_expression>(defs[0].value.var);
-		BOOST_TEST_REQUIRE(static_cast<int>(array_expr.size()) == 4);
+		BOOST_TEST_REQUIRE(static_cast<int>(array_expr.elements.size()) == 4);
 
 		const std::vector<std::string> names = { "Exalted Orb", "Mirror of Kalandra", "Eternal Orb", "Mirror Shard" };
-		BOOST_TEST_REQUIRE(array_expr.size() == names.size()); // sanity check
+		BOOST_TEST_REQUIRE(array_expr.elements.size() == names.size()); // sanity check
 
-		for (int i = 0; i < static_cast<int>(array_expr.size()); ++i)
+		for (int i = 0; i < static_cast<int>(array_expr.elements.size()); ++i)
 		{
-			BOOST_TEST_REQUIRE(holds_alternative<pa::literal_expression>(array_expr[i].var), "i = " << i);
-			const auto& lit = boost::get<pa::literal_expression>(array_expr[i].var);
+			const pa::value_expression& elem = array_expr.elements[i];
+			BOOST_TEST_REQUIRE(holds_alternative<pa::literal_expression>(elem.var), "i = " << i);
+			const auto& lit = boost::get<pa::literal_expression>(elem.var);
 			BOOST_TEST_REQUIRE(holds_alternative<pa::string_literal>(lit.var), "i = " << i);
 			const auto& str = boost::get<pa::string_literal>(lit.var);
 			BOOST_TEST(str == names[i], "i = " << i);

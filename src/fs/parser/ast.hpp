@@ -168,24 +168,33 @@ struct literal_expression : x3::variant<
 	using base_type::operator=;
 };
 
-struct function_arguments : std::vector<struct value_expression>, x3::position_tagged
+struct value_expression_list : std::vector<struct value_expression>, x3::position_tagged
 {
 };
 
 struct function_call : x3::position_tagged
 {
 	identifier name;
-	function_arguments arguments;
+	value_expression_list arguments;
 };
 
 struct price_range_query : x3::position_tagged
 {
 	identifier name;
-	function_arguments arguments;
+	value_expression_list arguments;
 };
 
-struct array_expression : std::vector<struct value_expression>, x3::position_tagged
+struct array_expression : x3::position_tagged
 {
+	array_expression& operator=(value_expression_list list)
+	{
+		elements = std::move(list);
+		return *this;
+	}
+
+	const value_expression_list& get_value() const { return elements; }
+
+	value_expression_list elements;
 };
 
 struct value_expression : x3::variant<

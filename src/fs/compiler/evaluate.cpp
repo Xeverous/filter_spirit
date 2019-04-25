@@ -76,7 +76,7 @@ std::variant<lang::object, error::error_variant> evaluate_array(
 {
 	// note: the entire function should work also in case of empty array
 	lang::array_object array;
-	for (const ast::value_expression& value_expression : expression)
+	for (const ast::value_expression& value_expression : expression.elements)
 	{
 		std::variant<lang::object, error::error_variant> object_or_error = evaluate_value_expression(value_expression, map, item_price_data);
 		if (std::holds_alternative<error::error_variant>(object_or_error))
@@ -112,7 +112,7 @@ std::variant<lang::object, error::error_variant> evaluate_function_call(
 	 * they can be stored in the map
 	 */
 	const ast::identifier& function_name = function_call.name;
-	const ast::function_arguments& arguments = function_call.arguments;
+	const ast::value_expression_list& arguments = function_call.arguments;
 	/*
 	 * note: this is O(n) but relying on small string optimization
 	 * and much better memory layout makes it to run faster than a

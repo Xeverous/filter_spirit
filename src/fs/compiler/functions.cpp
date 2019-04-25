@@ -9,7 +9,7 @@ namespace fs::compiler
 {
 
 std::variant<lang::socket_group, error::error_variant> construct_socket_group(
-	const parser::ast::function_arguments& arguments,
+	const parser::ast::value_expression_list& arguments,
 	const lang::constants_map& map,
 	const itemdata::item_price_data& item_price_data)
 {
@@ -49,7 +49,7 @@ std::variant<lang::socket_group, error::error_variant> construct_socket_group(
 }
 
 std::variant<lang::color, error::error_variant> construct_color(
-	const parser::ast::function_arguments& arguments,
+	const parser::ast::value_expression_list& arguments,
 	const lang::constants_map& map,
 	const itemdata::item_price_data& item_price_data)
 {
@@ -81,7 +81,7 @@ std::variant<lang::color, error::error_variant> construct_color(
 }
 
 std::variant<lang::path, error::error_variant> construct_path(
-	const parser::ast::function_arguments& arguments,
+	const parser::ast::value_expression_list& arguments,
 	const lang::constants_map& map,
 	const itemdata::item_price_data& item_price_data)
 {
@@ -97,7 +97,7 @@ std::variant<lang::path, error::error_variant> construct_path(
 }
 
 std::variant<lang::minimap_icon, error::error_variant> construct_minimap_icon(
-	const parser::ast::function_arguments& arguments,
+	const parser::ast::value_expression_list& arguments,
 	const lang::constants_map& map,
 	const itemdata::item_price_data& item_price_data)
 {
@@ -128,7 +128,7 @@ std::variant<lang::minimap_icon, error::error_variant> construct_minimap_icon(
 }
 
 std::variant<lang::beam_effect, error::error_variant> construct_beam_effect(
-	const parser::ast::function_arguments& arguments,
+	const parser::ast::value_expression_list& arguments,
 	const lang::constants_map& map,
 	const itemdata::item_price_data& item_price_data)
 {

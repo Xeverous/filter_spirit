@@ -14,7 +14,7 @@ namespace fs::compiler
 
 [[nodiscard]]
 std::variant<lang::price_range, error::error_variant> construct_price_range(
-	const parser::ast::function_arguments& arguments,
+	const parser::ast::value_expression_list& arguments,
 	const lang::constants_map& map,
 	const itemdata::item_price_data& item_price_data);
 

@@ -102,16 +102,20 @@ BOOST_SPIRIT_DEFINE(literal_expression)
 // moved here due to circular dependency
 const value_expression_type value_expression = "expression";
 
+const value_expression_list_type value_expression_list = "value expression list";
+const auto value_expression_list_def = (value_expression % ',') | x3::attr(ast::value_expression_list());
+BOOST_SPIRIT_DEFINE(value_expression_list)
+
 const function_call_type function_call = "function call";
-const auto function_call_def = identifier >> '(' >> value_expression % ',' >> ')';
+const auto function_call_def = identifier >> '(' >> value_expression_list >> ')';
 BOOST_SPIRIT_DEFINE(function_call)
 
 const price_range_query_type price_range_query = "price range query";
-const auto price_range_query_def = '$' >> identifier >> '(' >> value_expression % ',' >> ')';
+const auto price_range_query_def = '$' >> identifier >> '(' >> value_expression_list >> ')';
 BOOST_SPIRIT_DEFINE(price_range_query)
 
 const array_expression_type array_expression = "array expression";
-const auto array_expression_def = x3::lit('[') > (value_expression % x3::lit(',')) > x3::lit(']');
+const auto array_expression_def = '[' > value_expression_list > ']';
 BOOST_SPIRIT_DEFINE(array_expression)
 
 const auto value_expression_def =
