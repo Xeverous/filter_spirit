@@ -21,18 +21,34 @@ constexpr auto internal_compiler_error_info = "please report a bug with attached
 constexpr auto note_string = "note: ";
 
 /**
+ * @brief find first character after last line break in range [@p first, @p last)
+ * @return iterator pointing to first-of-line character or first if no line break was found
+ * @details supports Windows (CRLF) and Unix (LF) endlines
+ */
+[[nodiscard]]
+iterator_type find_line_beginning_backward(iterator_type first, iterator_type last);
+/**
+ * @brief find last character before first line break in range [@p first, @p last)
+ * @return iterator pointing to last-of-line character or last if no line break was found
+ * @details supports Windows (CRLF) and Unix (LF) endlines
+ */
+[[nodiscard]]
+iterator_type find_line_end(iterator_type first, iterator_type last);
+
+/**
  * @param first beginning of the input, or something further
  * @param pos position of interest
  * @return iterator to first character of the line where pos is
  *
  * @note function assumes that first <= pos
  */
-[[nodiscard]]
+[[nodiscard]] [[deprecated]]
 iterator_type get_line_start(iterator_type first, iterator_type pos);
 /**
  * @param first beginning of the input
  * @param it position of interest
  * @return amount of encountered line breaks + 1
+ * @details supports any line break format
  */
 [[nodiscard]]
 int count_line_number(iterator_type first, iterator_type it);
