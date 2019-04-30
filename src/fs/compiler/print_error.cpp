@@ -95,9 +95,9 @@ void print_error_impl(
 		lookup_data.position_of(error.place_of_expression),
 		log::strings::error,
 		"type mismatch in expression, expected expression of type '",
-		fs::lang::to_string(error.expected_type),
+		fs::lang::to_string_view(error.expected_type),
 		"' but got '",
-		fs::lang::to_string(error.actual_type),
+		fs::lang::to_string_view(error.actual_type),
 		"'");
 }
 
@@ -123,14 +123,14 @@ void print_error_impl(
 		lookup_data.position_of(error.place_of_first_element),
 		log::strings::error,
 		"non homogeneous array, one operand of type '",
-		fs::lang::to_string(error.first_element_type),
+		fs::lang::to_string_view(error.first_element_type),
 		"'");
 	logger.error_with_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_second_element),
 		log::strings::note,
 		"and one operand of type '",
-		fs::lang::to_string(error.second_element_type),
+		fs::lang::to_string_view(error.second_element_type),
 		"'");
 }
 

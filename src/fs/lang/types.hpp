@@ -1,5 +1,10 @@
 #pragma once
+
 #include "fs/utility/type_traits.hpp"
+#include "fs/utility/better_enum.hpp"
+
+#include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
+
 #include <cassert>
 #include <string>
 #include <string_view>
@@ -7,7 +12,7 @@
 #include <utility>
 #include <variant>
 #include <vector>
-#include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
+#include <map>
 
 namespace fs::lang
 {
@@ -122,7 +127,7 @@ struct volume
 
 struct socket_group
 {
-	bool is_valid() const
+	bool is_valid() const noexcept
 	{
 		int sum = r + g + b + w;
 		return 0 < sum && sum <= 6;
@@ -199,29 +204,13 @@ struct alert_sound
 	std::optional<volume> vol;
 };
 
-using single_object = std::variant<
-	boolean,
-	integer,
-	floating_point,
-	level,
-	quality,
-	font_size,
-	sound_id,
-	volume,
-	socket_group,
-	rarity,
-	shape,
-	suit,
-	color,
-	minimap_icon,
-	beam_effect,
-	string,
-	path,
-	alert_sound
->;
+class object;
 
-enum class single_object_type
-{
+using array_object = std::vector<object>;
+using dict_object = std::map<std::string, object>;
+
+using object_variant = std::variant<
+	// primitive types
 	boolean,
 	integer,
 	floating_point,
@@ -240,47 +229,59 @@ enum class single_object_type
 	string,
 	path,
 	alert_sound,
+	// array
+	array_object,
+	// dictionary
+	dict_object
+>;
 
-	generic // for generic constructs such as empty arrays
-};
-
-struct object_type
-{
-	object_type(single_object_type type, bool is_array = false)
-	: type(type), is_array(is_array)
-	{
-	}
-
-	single_object_type type;
-	bool is_array;
-};
-
-inline
-bool operator==(object_type left, object_type right)
-{
-	return left.is_array == right.is_array && left.type == right.type;
-}
-
-inline
-bool operator!=(object_type left, object_type right)
-{
-	return !(left == right);
-}
-
-[[nodiscard]]
-std::string_view to_string(single_object_type type);
-[[nodiscard]]
-std::string to_string(object_type type);
+BETTER_ENUM(object_type, int,
+	// primitive types
+	boolean,
+	integer,
+	floating_point,
+	level,
+	quality,
+	font_size,
+	sound_id,
+	volume,
+	socket_group,
+	rarity,
+	shape,
+	suit,
+	color,
+	minimap_icon,
+	beam_effect,
+	string,
+	path,
+	alert_sound,
+	// array
+	array,
+	// dictionary
+	dictionary)
 
 using position_tag = boost::spirit::x3::position_tagged;
 
-using array_object = std::vector<struct object>;
-
 struct object
 {
-	bool is_array() const
+	bool is_array() const noexcept
 	{
 		return std::holds_alternative<array_object>(value);
+	}
+
+	bool is_dict() const noexcept
+	{
+		return std::holds_alternative<dict_object>(value);
+	}
+
+	bool is_structured() const noexcept
+	{
+		return is_array() || is_dict();
+	}
+
+	bool is_primitive() const noexcept
+	{
+		return !is_structured();
 	}
 
 	[[nodiscard]]
@@ -290,66 +291,69 @@ struct object
 		return array_object(1, *this);
 	}
 
-	std::variant<single_object, array_object> value;
+	object_variant value;
 	position_tag value_origin;
 };
 
 [[nodiscard]]
-single_object_type type_of_single_object(const single_object& object);
+std::string_view to_string_view(object_type type);
+
 [[nodiscard]]
 object_type type_of_object(const object& object);
-[[nodiscard]]
-object_type type_of_object(const single_object& object);
 
 template <typename T> [[nodiscard]] constexpr
-single_object_type type_to_enum_impl()
+object_type type_to_enum_impl()
 {
 	static_assert(sizeof(T) == 0, "missing implementation for this type");
-	return single_object_type::generic;
+	return object_type::dictionary;
 }
 
 template <> constexpr
-single_object_type type_to_enum_impl<boolean>() { return single_object_type::boolean; }
+object_type type_to_enum_impl<boolean>() { return object_type::boolean; }
 template <> constexpr
-single_object_type type_to_enum_impl<integer>() { return single_object_type::integer; }
+object_type type_to_enum_impl<integer>() { return object_type::integer; }
 template <> constexpr
-single_object_type type_to_enum_impl<floating_point>() { return single_object_type::floating_point; }
+object_type type_to_enum_impl<floating_point>() { return object_type::floating_point; }
 template <> constexpr
-single_object_type type_to_enum_impl<level>() { return single_object_type::level; }
+object_type type_to_enum_impl<level>() { return object_type::level; }
 template <> constexpr
-single_object_type type_to_enum_impl<quality>() { return single_object_type::quality; }
+object_type type_to_enum_impl<quality>() { return object_type::quality; }
 template <> constexpr
-single_object_type type_to_enum_impl<font_size>() { return single_object_type::font_size; }
+object_type type_to_enum_impl<font_size>() { return object_type::font_size; }
 template <> constexpr
-single_object_type type_to_enum_impl<sound_id>() { return single_object_type::sound_id; }
+object_type type_to_enum_impl<sound_id>() { return object_type::sound_id; }
 template <> constexpr
-single_object_type type_to_enum_impl<volume>() { return single_object_type::volume; }
+object_type type_to_enum_impl<volume>() { return object_type::volume; }
 template <> constexpr
-single_object_type type_to_enum_impl<socket_group>() { return single_object_type::socket_group; }
+object_type type_to_enum_impl<socket_group>() { return object_type::socket_group; }
 template <> constexpr
-single_object_type type_to_enum_impl<rarity>() { return single_object_type::rarity; }
+object_type type_to_enum_impl<rarity>() { return object_type::rarity; }
 template <> constexpr
-single_object_type type_to_enum_impl<shape>() { return single_object_type::shape; }
+object_type type_to_enum_impl<shape>() { return object_type::shape; }
 template <> constexpr
-single_object_type type_to_enum_impl<suit>() { return single_object_type::suit; }
+object_type type_to_enum_impl<suit>() { return object_type::suit; }
 template <> constexpr
-single_object_type type_to_enum_impl<color>() { return single_object_type::color; }
+object_type type_to_enum_impl<color>() { return object_type::color; }
 template <> constexpr
-single_object_type type_to_enum_impl<minimap_icon>() { return single_object_type::minimap_icon; }
+object_type type_to_enum_impl<minimap_icon>() { return object_type::minimap_icon; }
 template <> constexpr
-single_object_type type_to_enum_impl<beam_effect>() { return single_object_type::beam_effect; }
+object_type type_to_enum_impl<beam_effect>() { return object_type::beam_effect; }
 template <> constexpr
-single_object_type type_to_enum_impl<string>() { return single_object_type::string; }
+object_type type_to_enum_impl<string>() { return object_type::string; }
 template <> constexpr
-single_object_type type_to_enum_impl<path>() { return single_object_type::path; }
+object_type type_to_enum_impl<path>() { return object_type::path; }
 template <> constexpr
-single_object_type type_to_enum_impl<alert_sound>() { return single_object_type::alert_sound; }
+object_type type_to_enum_impl<alert_sound>() { return object_type::alert_sound; }
+template <> constexpr
+object_type type_to_enum_impl<array_object>() { return object_type::array; }
+template <> constexpr
+object_type type_to_enum_impl<dict_object>() { return object_type::dictionary; }
 
 template <typename T> [[nodiscard]] constexpr
-single_object_type type_to_enum()
+object_type type_to_enum()
 {
 	static_assert(
-		traits::is_variant_alternative_v<T, single_object>,
+		traits::is_variant_alternative_v<T, object_variant>,
 		"T must be one of object type alternatives");
 
 	return type_to_enum_impl<T>();

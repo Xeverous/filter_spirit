@@ -41,7 +41,7 @@ std::variant<lang::object, error::error_variant> evaluate_value_expression(
 lang::object evaluate_literal(
 	const ast::literal_expression& expression)
 {
-	using result_type = lang::single_object;
+	using result_type = lang::object_variant;
 
 	result_type object = expression.apply_visitor(x3::make_lambda_visitor<result_type>(
 		[](ast::boolean_literal literal) -> result_type {
@@ -126,7 +126,7 @@ std::variant<lang::object, error::error_variant> evaluate_function_call(
 			return std::get<error::error_variant>(color_or_error);
 
 		return lang::object{
-			lang::single_object(std::get<lang::color>(color_or_error)),
+			std::get<lang::color>(color_or_error),
 			parser::get_position_info(function_call)};
 	}
 	else if (function_name.value == lang::functions::group)
@@ -136,7 +136,7 @@ std::variant<lang::object, error::error_variant> evaluate_function_call(
 			return std::get<error::error_variant>(socket_group_or_error);
 
 		return lang::object{
-			lang::single_object(std::get<lang::socket_group>(socket_group_or_error)),
+			std::get<lang::socket_group>(socket_group_or_error),
 			parser::get_position_info(function_call)};
 	}
 	else if (function_name.value == lang::functions::minimap_icon)
@@ -146,7 +146,7 @@ std::variant<lang::object, error::error_variant> evaluate_function_call(
 			return std::get<error::error_variant>(icon_or_error);
 
 		return lang::object{
-			lang::single_object(std::get<lang::minimap_icon>(icon_or_error)),
+			std::get<lang::minimap_icon>(icon_or_error),
 			parser::get_position_info(function_call)};
 	}
 	else if (function_name.value == lang::functions::beam_effect)
@@ -156,7 +156,7 @@ std::variant<lang::object, error::error_variant> evaluate_function_call(
 			return std::get<error::error_variant>(beam_effect_or_error);
 
 		return lang::object{
-			lang::single_object(std::get<lang::beam_effect>(beam_effect_or_error)),
+			std::get<lang::beam_effect>(beam_effect_or_error),
 			parser::get_position_info(function_call)};
 	}
 	else if (function_name.value == lang::functions::path)
@@ -166,7 +166,7 @@ std::variant<lang::object, error::error_variant> evaluate_function_call(
 			return std::get<error::error_variant>(path_or_error);
 
 		return lang::object{
-			lang::single_object(std::get<lang::path>(path_or_error)),
+			std::get<lang::path>(path_or_error),
 			parser::get_position_info(function_call)};
 	}
 

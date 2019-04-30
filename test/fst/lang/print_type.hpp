@@ -38,9 +38,9 @@ std::ostream& boost_test_print_type(std::ostream& os, string_condition_property 
 }
 
 inline
-std::ostream& boost_test_print_type(std::ostream& os, single_object_type sot)
+std::ostream& boost_test_print_type(std::ostream& os, object_type type)
 {
-	return os << "(single_object_type: " << to_string(sot) << ")";
+	return os << "(single_object_type: " << to_string_view(type) << ")";
 }
 
 }

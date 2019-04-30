@@ -11,16 +11,13 @@ std::variant<std::vector<std::string>, error::error_variant> array_to_strings(
 	std::vector<std::string> result;
 	for (lang::object& obj : array)
 	{
-		assert(std::holds_alternative<lang::single_object>(obj.value));
-		auto& single_object = std::get<lang::single_object>(obj.value);
-
-		if (!std::holds_alternative<lang::string>(single_object))
+		if (!std::holds_alternative<lang::string>(obj.value))
 			return error::type_mismatch{
-				lang::object_type{lang::single_object_type::string},
-				lang::type_of_object(single_object),
+				lang::object_type::string,
+				lang::type_of_object(obj),
 				obj.value_origin};
 
-		auto& string = std::get<lang::string>(single_object);
+		auto& string = std::get<lang::string>(obj.value);
 		result.push_back(std::move(string.value));
 	}
 
