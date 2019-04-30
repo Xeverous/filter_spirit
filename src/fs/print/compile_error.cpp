@@ -100,9 +100,9 @@ void print_compile_error(
 		lookup_data.position_of(error.place_of_expression),
 		print::compiler_error_string,
 		"type mismatch in expression, expected expression of type '",
-		fs::lang::to_string(error.expected_type),
+		fs::lang::to_string_view(error.expected_type),
 		"' but got '",
-		fs::lang::to_string(error.actual_type),
+		fs::lang::to_string_view(error.actual_type),
 		"'");
 }
 
@@ -130,7 +130,7 @@ void print_compile_error(
 		lookup_data.position_of(error.place_of_first_element),
 		print::compiler_error_string,
 		"non homogeneous array, one operand of type '",
-		fs::lang::to_string(error.first_element_type),
+		fs::lang::to_string_view(error.first_element_type),
 		"'");
 
 	print::print_line_number_with_indication_and_texts(
@@ -139,7 +139,7 @@ void print_compile_error(
 		lookup_data.position_of(error.place_of_second_element),
 		print::note_string,
 		"and one operand of type '",
-		fs::lang::to_string(error.second_element_type),
+		fs::lang::to_string_view(error.second_element_type),
 		"'");
 }
 

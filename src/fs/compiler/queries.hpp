@@ -51,7 +51,7 @@ lang::array_object evaluate_price_range_query_on_sorted_range(
 	{
 		array.push_back(
 			lang::object{
-				lang::single_object{lang::string{it->base_type_name}},
+				lang::string{it->base_type_name},
 				position_of_range});
 	}
 

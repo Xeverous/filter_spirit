@@ -48,53 +48,32 @@ template <> // note: the implementation does not allow to chain promotions (henc
 struct allowed_promotions<lang::alert_sound> : promotion_list<lang::sound_id, lang::integer, lang::path, lang::string> {};
 
 template <typename T, typename P, typename... Ps>
-std::variant<T, error::error_variant> attempt_to_promote(
-	const lang::single_object& single_object,
-	lang::position_tag object_position,
-	type_list<P, Ps...>)
+std::variant<T, error::error_variant> attempt_to_promote(const lang::object& object, type_list<P, Ps...>)
 {
 	static_assert(std::is_constructible_v<T, P>, "T must define a constructor that takes P");
 
-	if (std::holds_alternative<P>(single_object))
-		return T(std::get<P>(single_object));
+	if (std::holds_alternative<P>(object.value))
+		return T(std::get<P>(object.value));
 	else
-		return attempt_to_promote<T>(single_object, object_position, type_list<Ps...>{});
+		return attempt_to_promote<T>(object, type_list<Ps...>{});
 }
 
 template <typename T>
-std::variant<T, error::error_variant> attempt_to_promote(
-	const lang::single_object& single_object,
-	lang::position_tag object_position,
-	type_list<>)
+std::variant<T, error::error_variant> attempt_to_promote(const lang::object& object, type_list<>)
 {
 	return error::type_mismatch{
 		lang::type_to_enum<T>(),
-		lang::type_of_object(single_object),
-		object_position};
-}
-
-template <typename T>
-std::variant<T, error::error_variant> get_non_array_value_as(
-	const lang::single_object& single_object,
-	lang::position_tag object_position)
-{
-	if (std::holds_alternative<T>(single_object))
-		return std::get<T>(single_object);
-	else
-		return attempt_to_promote<T>(single_object, object_position, typename allowed_promotions<T>::types{});
+		lang::type_of_object(object),
+		object.value_origin};
 }
 
 template <typename T>
 std::variant<T, error::error_variant> get_non_array_value_as(const lang::object& object)
 {
-	if (object.is_array())
-		return error::type_mismatch{
-			lang::type_to_enum<T>(),
-			type_of_object(object),
-			object.value_origin};
-
-	const auto& single_object = std::get<lang::single_object>(object.value);
-	return get_non_array_value_as<T>(single_object, object.value_origin);
+	if (std::holds_alternative<T>(object.value))
+		return std::get<T>(object.value);
+	else
+		return attempt_to_promote<T>(object, typename allowed_promotions<T>::types{});
 }
 
 template <typename T>

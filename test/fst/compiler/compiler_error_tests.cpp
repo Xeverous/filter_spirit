@@ -182,11 +182,8 @@ const color = RGB(11, 22, "33")
 			const fs::parser::parse_data parse_data = parse(input);
 			const auto error_desc = expect_error_when_resolving_constants<error::type_mismatch>(parse_data.ast.constant_definitions);
 
-			BOOST_TEST(error_desc.expected_type.is_array == false);
-			BOOST_TEST(error_desc.expected_type.type == fs::lang::single_object_type::integer);
-
-			BOOST_TEST(error_desc.actual_type.is_array == false);
-			BOOST_TEST(error_desc.actual_type.type == fs::lang::single_object_type::string);
+			BOOST_TEST(error_desc.expected_type == +fs::lang::object_type::integer);
+			BOOST_TEST(error_desc.actual_type == +fs::lang::object_type::string);
 
 			const range_type input_range(input.begin(), input.end());
 			const range_type expected_place_of_expression = search(input_range, "\"33\"");
