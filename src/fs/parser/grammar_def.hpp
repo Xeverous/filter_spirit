@@ -59,9 +59,13 @@ BOOST_SPIRIT_DEFINE(config)
 
 // ---- literal types ----
 
-const integer_literal_type integer_literal = "integer";
+const integer_literal_type integer_literal = "number (integer)";
 const auto integer_literal_def = x3::int_;
 BOOST_SPIRIT_DEFINE(integer_literal)
+
+const floating_point_literal_type floating_point_literal = "number (fractional)";
+const auto floating_point_literal_def = x3::double_;
+BOOST_SPIRIT_DEFINE(floating_point_literal)
 
 const string_literal_type string_literal = "string";
 const auto string_literal_def = x3::lexeme['"' > *(x3::char_ - '"') > '"'];
@@ -92,6 +96,7 @@ const auto literal_expression_def =
 // we can clearly assume that integers and strings will be the most popular
 // note: order should match types in literal_expression_type::attribute_type
 	  integer_literal
+	| floating_point_literal
 	| string_literal
 	| boolean_literal
 	| rarity_literal
@@ -102,7 +107,7 @@ BOOST_SPIRIT_DEFINE(literal_expression)
 // moved here due to circular dependency
 const value_expression_type value_expression = "expression";
 
-const value_expression_list_type value_expression_list = "value expression list";
+const value_expression_list_type value_expression_list = "expression list";
 const auto value_expression_list_def = (value_expression % ',') | x3::attr(ast::value_expression_list());
 BOOST_SPIRIT_DEFINE(value_expression_list)
 

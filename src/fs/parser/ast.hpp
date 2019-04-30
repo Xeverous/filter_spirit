@@ -97,6 +97,19 @@ struct integer_literal : x3::position_tagged
 	int value;
 };
 
+struct floating_point_literal : x3::position_tagged
+{
+	floating_point_literal& operator=(double n)
+	{
+		value = n;
+		return *this;
+	}
+
+	double get_value() const { return value; }
+
+	double value;
+};
+
 struct string_literal : std::string, x3::position_tagged
 {
 };
@@ -157,6 +170,7 @@ struct suit_literal : x3::position_tagged
 
 struct literal_expression : x3::variant<
 		integer_literal,
+		floating_point_literal,
 		string_literal,
 		boolean_literal,
 		rarity_literal,

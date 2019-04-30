@@ -92,9 +92,10 @@ struct config_class                          : error_on_error, annotate_on_succe
 
 // ---- literal types ----
 
-struct integer_class                         : error_on_error, annotate_on_success {};
+struct integer_literal_class                 : error_on_error, annotate_on_success {};
+struct floating_point_literal_class          : error_on_error, annotate_on_success {};
 struct string_literal_class                  : error_on_error, annotate_on_success {};
-struct boolean_class                         : error_on_error, annotate_on_success {};
+struct boolean_literal_class                 : error_on_error, annotate_on_success {};
 struct rarity_literal_class                  : error_on_error, annotate_on_success {};
 struct shape_literal_class                   : error_on_error, annotate_on_success {};
 struct suit_literal_class                    : error_on_error, annotate_on_success {};
@@ -182,13 +183,16 @@ BOOST_SPIRIT_DECLARE(config_type)
 
 // ---- literal types ----
 
-using integer_literal_type = x3::rule<integer_class, ast::integer_literal>;
+using integer_literal_type = x3::rule<integer_literal_class, ast::integer_literal>;
 BOOST_SPIRIT_DECLARE(integer_literal_type)
+
+using floating_point_literal_type = x3::rule<floating_point_literal_class, ast::floating_point_literal>;
+BOOST_SPIRIT_DECLARE(floating_point_literal_type)
 
 using string_literal_type = x3::rule<string_literal_class, ast::string_literal>;
 BOOST_SPIRIT_DECLARE(string_literal_type)
 
-using boolean_literal_type = x3::rule<boolean_class, ast::boolean_literal>;
+using boolean_literal_type = x3::rule<boolean_literal_class, ast::boolean_literal>;
 BOOST_SPIRIT_DECLARE(boolean_literal_type)
 
 using rarity_literal_type = x3::rule<rarity_literal_class, ast::rarity_literal>;
