@@ -50,6 +50,9 @@ lang::object evaluate_literal(
 		[](ast::integer_literal literal) -> result_type {
 			return lang::integer{literal.value};
 		},
+		[](ast::floating_point_literal literal) -> result_type {
+			return lang::floating_point{literal.value};
+		},
 		[](ast::rarity_literal literal) -> result_type {
 			return lang::rarity{literal.value};
 		},

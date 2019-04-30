@@ -83,8 +83,10 @@ struct integer
 	int value;
 };
 
+// should be above integer for consistency but it has a dependency in ctor
 struct floating_point
 {
+	explicit floating_point(double value) : value(value) {}
 	explicit floating_point(integer n) : value(n.value) {}
 
 	double value;
@@ -212,8 +214,8 @@ using dict_object = std::map<std::string, object>;
 using object_variant = std::variant<
 	// primitive types
 	boolean,
-	integer,
 	floating_point,
+	integer,
 	level,
 	quality,
 	font_size,
@@ -238,8 +240,8 @@ using object_variant = std::variant<
 BETTER_ENUM(object_type, int,
 	// primitive types
 	boolean,
-	integer,
 	floating_point,
+	integer,
 	level,
 	quality,
 	font_size,
@@ -311,9 +313,9 @@ object_type type_to_enum_impl()
 template <> constexpr
 object_type type_to_enum_impl<boolean>() { return object_type::boolean; }
 template <> constexpr
-object_type type_to_enum_impl<integer>() { return object_type::integer; }
-template <> constexpr
 object_type type_to_enum_impl<floating_point>() { return object_type::floating_point; }
+template <> constexpr
+object_type type_to_enum_impl<integer>() { return object_type::integer; }
 template <> constexpr
 object_type type_to_enum_impl<level>() { return object_type::level; }
 template <> constexpr
