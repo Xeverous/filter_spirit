@@ -1,6 +1,8 @@
 #pragma once
+
 #include "fs/compiler/evaluate.hpp"
 #include "fs/compiler/get_value_as.hpp"
+
 #include <utility>
 
 namespace fs::compiler
