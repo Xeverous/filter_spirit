@@ -1,5 +1,6 @@
 #include "fs/lang/types.hpp"
 #include "fs/utility/visitor.hpp"
+#include "fs/utility/type_traits.hpp"
 
 #include <type_traits>
 
@@ -21,5 +22,10 @@ object_type type_of_object(const object& object)
 		}
 	}, object.value);
 }
+
+// this could be in the header but there is no need for it to be parsed multiple times
+static_assert(
+	object_type::_size() == traits::variant_size_v<object_variant>,
+	"there must be exactly one enum for each object variant type");
 
 }

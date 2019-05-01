@@ -140,6 +140,17 @@ constexpr bool is_printable_v = is_printable<T>::value;
 
 
 
+template <typename...>
+struct variant_size;
+
+template <typename... Ts>
+struct variant_size<std::variant<Ts...>> : std::integral_constant<std::size_t, sizeof...(Ts)> {};
+
+template <typename... Ts>
+constexpr auto variant_size_v = variant_size<Ts...>::value;
+
+
+
 template <typename T, typename Variant>
 struct is_variant_alternative : detail::is_variant_alternative_impl<T, Variant> {};
 
