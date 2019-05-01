@@ -8,7 +8,7 @@ namespace fs::lang
 
 std::string_view to_string_view(object_type type)
 {
-	return type._name();
+	return type._to_string();
 }
 
 object_type type_of_object(const object& object)
