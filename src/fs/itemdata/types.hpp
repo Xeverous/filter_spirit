@@ -1,8 +1,9 @@
 #pragma once
+
 #include <vector>
 #include <string>
 
-namespace fs { class logger; }
+namespace fs::log { class logger; }
 
 namespace fs::itemdata
 {
@@ -50,7 +51,7 @@ struct unique_item
 
 struct item_price_data
 {
-	void log_info(logger& logger) const;
+	void log_info(log::logger& logger) const;
 	/*
 	 * Some items (eg very rare uniques and cards, Harbinger pieces)
 	 * may not have associated entry in price data.

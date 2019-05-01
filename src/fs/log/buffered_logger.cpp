@@ -2,7 +2,7 @@
 
 #include <utility>
 
-namespace fs
+namespace fs::log
 {
 
 void buffered_logger::begin_info_message()

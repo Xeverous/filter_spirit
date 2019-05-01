@@ -2,7 +2,7 @@
 
 #include "fs/log/logger.hpp"
 
-namespace fs
+namespace fs::log
 {
 
 /**

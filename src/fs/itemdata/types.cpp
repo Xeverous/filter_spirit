@@ -4,7 +4,7 @@
 namespace fs::itemdata
 {
 
-void item_price_data::log_info(logger& logger) const
+void item_price_data::log_info(log::logger& logger) const
 {
 	logger.info() << "item price data:\n"
 		"\tdivination cards    : " << static_cast<int>(divination_cards.size()) << "\n"

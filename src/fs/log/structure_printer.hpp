@@ -1,16 +1,21 @@
 #pragma once
 
-#include "fs/parser/ast_adapted.hpp"
 #include "fs/utility/type_traits.hpp"
 #include "fs/utility/type_name.hpp"
 
 #include <boost/fusion/include/for_each.hpp>
+
 #include <iostream>
 
-namespace fs::print
+namespace fs::log
 {
 
-// recursive printer for any nested structure
+/**
+ * @class recursive printer for any nested structure
+ *
+ * @details this class can require non-transitive dependencies, eg if you want to print
+ * Boost's Fusion struct, you need to include adaptation header before using this class
+ */
 struct structure_printer
 {
 	structure_printer(int indent = 0) : indent(indent) {}

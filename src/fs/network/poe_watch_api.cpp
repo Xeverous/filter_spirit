@@ -50,7 +50,7 @@ std::future<std::vector<itemdata::league>> poe_watch_api::async_download_leagues
 	});
 }
 
-std::future<itemdata::item_price_data> poe_watch_api::async_download_item_price_data(std::string league_name, logger& logger)
+std::future<itemdata::item_price_data> poe_watch_api::async_download_item_price_data(std::string league_name, log::logger& logger)
 {
 	return std::async(std::launch::async, [&logger, league = std::move(league_name)]()
 	{

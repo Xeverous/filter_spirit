@@ -101,7 +101,7 @@ using item_category_variant = std::variant<
 
 struct item
 {
-	void log_info(fs::logger& logger) const;
+	void log_info(fs::log::logger& logger) const;
 
 	int id = 0;
 	std::string name;                     // item main name, eg "Tabula Rasa"
@@ -113,7 +113,7 @@ struct item
 	item_category_variant category; // combined category and group
 };
 
-void item::log_info(fs::logger& logger) const
+void item::log_info(fs::log::logger& logger) const
 {
 	logger.begin_info_message();
 	logger << "item:\n"
@@ -178,7 +178,7 @@ void item::log_info(fs::logger& logger) const
 }
 
 // vector index is item ID
-std::vector<std::optional<fs::itemdata::price_data>> parse_compact(std::string_view compact_json, fs::logger& logger)
+std::vector<std::optional<fs::itemdata::price_data>> parse_compact(std::string_view compact_json, fs::log::logger& logger)
 {
 	nlohmann::json json = nlohmann::json::parse(compact_json);
 
@@ -384,7 +384,7 @@ item_category_variant parse_item_category(const nlohmann::json& entry)
 	throw fs::itemdata::json_parse_error("item has unrecognized category");
 }
 
-std::vector<item> parse_itemdata(std::string_view itemdata_json, fs::logger& logger)
+std::vector<item> parse_itemdata(std::string_view itemdata_json, fs::log::logger& logger)
 {
 	nlohmann::json json = nlohmann::json::parse(itemdata_json);
 
@@ -456,7 +456,7 @@ std::vector<league> parse_league_info(std::string_view league_json)
 	return leagues;
 }
 
-item_price_data parse_item_prices(std::string_view itemdata_json, std::string_view compact_json, logger& logger)
+item_price_data parse_item_prices(std::string_view itemdata_json, std::string_view compact_json, log::logger& logger)
 {
 	logger.info() << "parsing item prices";
 	std::vector<std::optional<price_data>> item_prices = parse_compact(compact_json, logger);

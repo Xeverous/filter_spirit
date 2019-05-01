@@ -1,10 +1,11 @@
 #pragma once
 
 #include "fs/itemdata/types.hpp"
-#include "fs/log/logger.hpp"
 
 #include <string_view>
 #include <optional>
+
+namespace fs::log { class logger; }
 
 namespace fs::compiler
 {
@@ -23,6 +24,6 @@ std::optional<std::string> process_input(
 	std::string_view input,
 	const itemdata::item_price_data& item_price_data,
 	bool print_ast,
-	logger& logger);
+	log::logger& logger);
 
 }

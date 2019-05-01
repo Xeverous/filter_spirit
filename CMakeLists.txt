@@ -34,6 +34,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 add_library(filter_spirit_compiler SHARED
 	src/fs/parser/grammar.cpp
 	src/fs/parser/parser.cpp
+	src/fs/parser/print_error.cpp
 	src/fs/compiler/actions.cpp
 	src/fs/compiler/compiler.cpp
 	src/fs/compiler/conditions.cpp
@@ -43,6 +44,7 @@ add_library(filter_spirit_compiler SHARED
 	src/fs/compiler/functions.cpp
 	src/fs/compiler/queries.cpp
 	src/fs/compiler/process_input.cpp
+	src/fs/compiler/print_error.cpp
 	src/fs/lang/action_set.cpp
 	src/fs/lang/condition_set.cpp
 	src/fs/lang/filter_block.cpp
@@ -52,9 +54,7 @@ add_library(filter_spirit_compiler SHARED
 	src/fs/log/buffered_logger.cpp
 	src/fs/log/console_logger.cpp
 	src/fs/log/logger.cpp
-	src/fs/print/compile_error.cpp
-	src/fs/print/generic.cpp
-	src/fs/print/parse_error.cpp
+	src/fs/log/utility.cpp
 	src/fs/utility/file.cpp
 )
 

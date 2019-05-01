@@ -3,14 +3,14 @@
 #include "fs/parser/error.hpp"
 #include "fs/parser/parser.hpp"
 
-namespace fs { class logger; }
+namespace fs::log { class logger; }
 
-namespace fs::print
+namespace fs::parser
 {
 
-void print_parse_error(
+void print_error(
 	const parser::parse_error& error,
 	const parser::lookup_data& lookup_data,
-	logger& logger);
+	log::logger& logger);
 
 }

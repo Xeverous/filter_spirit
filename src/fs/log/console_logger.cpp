@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-namespace fs
+namespace fs::log
 {
 
 void console_logger::begin_info_message()

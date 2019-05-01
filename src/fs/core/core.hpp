@@ -5,10 +5,11 @@
 #pragma once
 
 #include "fs/itemdata/types.hpp"
-#include "fs/log/logger.hpp"
 
 #include <string>
 #include <optional>
+
+namespace fs::log { class logger; }
 
 namespace fs::core
 {
@@ -18,9 +19,9 @@ bool generate_item_filter(
 	const std::string& source_filepath,
 	const std::string& output_filepath,
 	bool print_ast,
-	logger& logger);
+	log::logger& logger);
 
-void list_leagues(logger& logger);
+void list_leagues(log::logger& logger);
 
 /**
  * @brief download item price data from poe.watch's API
@@ -31,7 +32,7 @@ void list_leagues(logger& logger);
  *
  * this function throws upon network and parsing failures
  */
-itemdata::item_price_data download_item_price_data(const std::string& league_name, logger& logger);
+itemdata::item_price_data download_item_price_data(const std::string& league_name, log::logger& logger);
 /**
  * @brief load item price data from saved JSON files
  * @param directory_path path where compact.json and itemdata.json are present
@@ -39,6 +40,6 @@ itemdata::item_price_data download_item_price_data(const std::string& league_nam
  *
  * @details you can download JSON files from poe.watch
  */
-std::optional<itemdata::item_price_data> load_item_price_data(const std::string& directory_path, logger& logger);
+std::optional<itemdata::item_price_data> load_item_price_data(const std::string& directory_path, log::logger& logger);
 
 }

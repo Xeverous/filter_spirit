@@ -14,14 +14,11 @@
 namespace ut = boost::unit_test;
 namespace tt = boost::test_tools;
 
-using range_type = fs::parser::range_type;
-using iterator_type = fs::parser::iterator_type;
-
 std::string generate_filter(
 	std::string_view input,
 	const fs::itemdata::item_price_data& ipd = {})
 {
-	fs::buffered_logger logger;
+	fs::log::buffered_logger logger;
 	std::optional<std::string> filter = fs::compiler::process_input(input, ipd, false, logger);
 	const auto log_data = logger.flush_out();
 	BOOST_TEST_REQUIRE(filter.has_value(), "filter generation failed:\n" << log_data);

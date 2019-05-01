@@ -3,6 +3,7 @@
 #include "fs/network/poe_watch_api.hpp"
 #include "fs/compiler/process_input.hpp"
 #include "fs/itemdata/parse_json.hpp"
+#include "fs/log/logger.hpp"
 
 #include <fstream>
 
@@ -14,7 +15,7 @@ bool generate_item_filter(
 	const std::string& source_filepath,
 	const std::string& output_filepath,
 	bool print_ast,
-	logger& logger)
+	log::logger& logger)
 {
 	std::optional<std::string> source_file_content = utility::load_file(source_filepath);
 
@@ -39,7 +40,7 @@ bool generate_item_filter(
 	return true;
 }
 
-void list_leagues(logger& logger)
+void list_leagues(log::logger& logger)
 {
 	std::future<std::vector<itemdata::league>> leagues_future = network::poe_watch_api::async_download_leagues();
 	const auto& leagues = leagues_future.get();
@@ -53,7 +54,7 @@ void list_leagues(logger& logger)
 	logger.end_message();
 }
 
-itemdata::item_price_data download_item_price_data(const std::string& league_name, logger& logger)
+itemdata::item_price_data download_item_price_data(const std::string& league_name, log::logger& logger)
 {
 	try
 	{
@@ -67,7 +68,7 @@ itemdata::item_price_data download_item_price_data(const std::string& league_nam
 	}
 }
 
-std::optional<itemdata::item_price_data> load_item_price_data(const std::string& directory_path, logger& logger)
+std::optional<itemdata::item_price_data> load_item_price_data(const std::string& directory_path, log::logger& logger)
 {
 	std::optional<std::string> compact = utility::load_file(directory_path + "/compact.json");
 

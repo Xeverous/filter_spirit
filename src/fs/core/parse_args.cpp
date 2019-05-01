@@ -46,7 +46,7 @@ namespace fs::core
 
 int run(int argc, char* argv[])
 {
-	console_logger logger;
+	log::console_logger logger;
 
 	try {
 		namespace po = boost::program_options;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <boost/range/iterator_range.hpp>
+#include "fs/log/utility.hpp"
 
 #include <string_view>
 
@@ -19,7 +19,7 @@
  *     logger.end_message();
  */
 
-namespace fs
+namespace fs::log
 {
 
 class logger;
@@ -50,9 +50,23 @@ class logger
 public:
 	virtual ~logger() = default;
 
-	logger_wrapper info();
-	logger_wrapper warning();
-	logger_wrapper error();
+	logger_wrapper info()
+	{
+		begin_info_message();
+		return logger_wrapper(*this);
+	}
+
+	logger_wrapper warning()
+	{
+		begin_warning_message();
+		return logger_wrapper(*this);
+	}
+
+	logger_wrapper error()
+	{
+		begin_error_message();
+		return logger_wrapper(*this);
+	}
 
 	virtual void begin_info_message   () = 0;
 	virtual void begin_warning_message() = 0;
@@ -62,6 +76,33 @@ public:
 	virtual void add(std::string_view text) = 0;
 	virtual void add(char character) = 0;
 	virtual void add(int number) = 0;
+
+	/**
+	 * @details print error with detailed code information
+	 * @param all_code range of all code, used to calculate line number (do not trim it)
+	 * @param code_to_underline fragment of code to underline, must be a subview of @p all_code
+	 * @param description anything accepted by logger, used as error description
+	 *
+	 * @details example:
+	 *
+	 *     line 12: error: expected object of type 'int', got 'array'
+	 *     const white = RGB([2, 5, 5], 255, 255)
+	 *                       ~~~~~~~~~
+	 */
+	template <typename... Printable>
+	void error_with_underlined_code(
+		std::string_view all_code,
+		std::string_view code_to_underline,
+		Printable&&... description);
+
+	/**
+	 * @brief print code with underlined part
+	 * @param all_code all code to search for line breaks
+	 * @param underlined_code code to underline, must be a subview of @p all_code, may span multiple lines
+	 */
+	void print_underlined_code(std::string_view all_code, std::string_view underlined_code);
+
+	void internal_error(std::string_view description);
 };
 
 template <typename T>
@@ -74,20 +115,20 @@ logger_wrapper& logger_wrapper::operator<<(const T& val)
 template <typename T>
 logger& operator<<(logger& logger, const T& val)
 {
-	logger.add(val);
+	logger.add(val); // if you get an error here with boost::iterator_range use fs::parser::to_string_view from parser/utility.hpp
 	return logger;
 }
 
-inline
-logger& operator<<(logger& logger, boost::iterator_range<std::string_view::const_iterator> range)
+// this needs to be outside class definition due to depency on operator<<
+template <typename... Printable>
+void logger::error_with_underlined_code(
+	std::string_view all_code,
+	std::string_view code_to_underline,
+	Printable&&... description)
 {
-	const auto first = range.begin();
-	const auto last  = range.end();
-	// surprise: std::string_view does not have a ctor that takes its own iterators!
-	// but ... since std::string_view iterators guuarantee continuous storage
-	// we can use std::string_view(const char*, size_type) ctor
-	logger.add(std::string_view(&*first, last - first));
-	return logger;
+	((*this << "line " << count_lines(all_code.data(), code_to_underline.data())
+		<< ": ") << ... << description) << '\n';
+	print_underlined_code(all_code, code_to_underline);
 }
 
 }

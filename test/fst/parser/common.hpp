@@ -16,7 +16,7 @@ class parser_fixture
 protected:
 	fs::parser::ast::ast_type parse(std::string_view input);
 
-	fs::buffered_logger log_buf;
+	fs::log::buffered_logger log_buf;
 };
 
 }

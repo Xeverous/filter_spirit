@@ -1,7 +1,6 @@
 #include "fs/parser/parser.hpp"
 #include "fs/parser/grammar.hpp"
-#include "fs/print/parse_error.hpp"
-#include "fs/print/generic.hpp"
+#include "fs/parser/print_error.hpp"
 #include "fs/log/logger.hpp"
 
 namespace
@@ -35,6 +34,7 @@ std::pair<p::lookup_data, std::variant<p::ast::ast_type, p::error_holder_type>> 
 
 	if (it != end || !result)
 	{
+		// TODO
 		//error_stream << "parse failure\nstopped at:\n";
 		//fs::print::print_line_with_indicator(error_stream, range_type(begin, end), range_type(it, ++iterator_type(it)));
 		return std::make_pair(p::lookup_data(std::move(position_cache)), result_variant(std::move(error_holder)));
@@ -48,7 +48,7 @@ std::pair<p::lookup_data, std::variant<p::ast::ast_type, p::error_holder_type>> 
 namespace fs::parser
 {
 
-std::optional<parse_data> parse(std::string_view input, logger& logger)
+std::optional<parse_data> parse(std::string_view input, log::logger& logger)
 {
 	std::pair<lookup_data, std::variant<ast::ast_type, error_holder_type>> parse_result = parse_impl(input);
 
@@ -61,12 +61,12 @@ std::optional<parse_data> parse(std::string_view input, logger& logger)
 
 		if (errors.empty())
 		{
-			print::print_internal_error(logger, "parse failed but no error information has been reported");
+			logger.internal_error("parse failed but no error information has been reported");
 			return std::nullopt;
 		}
 
 		for (const parse_error& error : errors)
-			print::print_parse_error(error, lookup_data, logger);
+			print_error(error, lookup_data, logger);
 
 		return std::nullopt;
 	}

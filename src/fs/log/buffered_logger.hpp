@@ -4,7 +4,7 @@
 
 #include <string>
 
-namespace fs
+namespace fs::log
 {
 
 /**

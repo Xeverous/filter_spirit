@@ -1,9 +1,11 @@
+#include "fs/parser/parser.hpp"
+#include "fs/parser/ast_adapted.hpp" // required adaptation info for fs::log::structure_printer
 #include "fs/compiler/process_input.hpp"
 #include "fs/compiler/compiler.hpp"
 #include "fs/compiler/filter_builder.hpp"
-#include "fs/parser/parser.hpp"
-#include "fs/print/structure_printer.hpp"
-#include "fs/print/compile_error.hpp"
+#include "fs/compiler/print_error.hpp"
+#include "fs/log/logger.hpp"
+#include "fs/log/structure_printer.hpp"
 
 namespace fs::compiler
 {
@@ -12,7 +14,7 @@ std::optional<std::string> process_input(
 	std::string_view input,
 	const itemdata::item_price_data& item_price_data,
 	bool print_ast,
-	logger& logger)
+	log::logger& logger)
 {
 	item_price_data.log_info(logger);
 	logger.info() << "parsing filter template";
@@ -26,14 +28,14 @@ std::optional<std::string> process_input(
 	parser::parse_data& parse_data = *parse_result;
 
 	if (print_ast)
-		fs::print::structure_printer()(parse_data.ast);
+		fs::log::structure_printer()(parse_data.ast);
 
 	logger.info() << "compiling filter template";
 
 	std::variant<lang::constants_map, error::error_variant> map_or_error = resolve_constants(parse_data.ast.constant_definitions, item_price_data);
 	if (std::holds_alternative<error::error_variant>(map_or_error))
 	{
-		print::compile_error(std::get<error::error_variant>(map_or_error), parse_data.lookup_data, logger);
+		print_error(std::get<error::error_variant>(map_or_error), parse_data.lookup_data, logger);
 		return std::nullopt;
 	}
 
@@ -43,7 +45,7 @@ std::optional<std::string> process_input(
 
 	if (std::holds_alternative<error::error_variant>(filter_or_error))
 	{
-		print::compile_error(std::get<error::error_variant>(filter_or_error), parse_data.lookup_data, logger);
+		print_error(std::get<error::error_variant>(filter_or_error), parse_data.lookup_data, logger);
 		return std::nullopt;
 	}
 
