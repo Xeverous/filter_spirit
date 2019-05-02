@@ -26,8 +26,8 @@ const char* find_line_beginning_backward(const char* first, const char* last)
 	return it;
 }
 /**
- * @brief find last character before first line break in range [@p first, @p last)
- * @return iterator pointing to '\n' or last if no line break was found
+ * @brief find line break in range [@p first, @p last)
+ * @return iterator pointing to '\n' or '\r' or last if no line break was found
  * @details supports any line break format
  */
 [[nodiscard]]
@@ -85,7 +85,6 @@ void logger::print_underlined_code(std::string_view all_code, std::string_view u
 
 	logger& self = *this;
 	const char* code_it = code_first;
-	const char* underline_it = underline_first;
 	while (code_it != code_last)
 	{
 		const char *const code_line_first = code_it;
@@ -93,24 +92,42 @@ void logger::print_underlined_code(std::string_view all_code, std::string_view u
 		self << make_string_view(code_line_first, code_line_last) << '\n';
 
 		const char *const indent_first = code_line_first;
-		const char *const indent_last  = skip_indent(code_line_first, code_line_last);
+		const char *      indent_last  = skip_indent(code_line_first, code_line_last);
 		self << make_string_view(indent_first, indent_last);
 
-		const char *const non_underline_first = indent_last;
-		const char *const non_underline_last  = underline_it;
-		for (auto it = non_underline_first; it != non_underline_last; ++it)
-			self << ' ';
+		if (indent_last < underline_first) // should happen at most once: only when underline starts mid-line
+			for (; indent_last != underline_first; ++indent_last)
+				self << ' ';
 
-		const char *const underline_line_first = non_underline_last;
+		const char *const underline_line_first = indent_last;
 		const char *const underline_line_last  = find_line_end(underline_line_first, underline_last);
 		for (auto it = underline_line_first; it != underline_line_last; ++it)
 			self << '~';
 
 		self << '\n';
-
-		code_it      = skip_lf_cr(code_line_last, code_last);
-		underline_it = skip_lf_cr(underline_line_last, underline_last);
+		code_it = skip_lf_cr(code_line_last, code_last);
 	}
+}
+
+void logger::print_pointed_code(std::string_view all_code, const char* point)
+{
+	const char *const all_first = all_code.data();
+	const char *const all_last  = all_code.data() + all_code.size();
+
+	const char *const line_first = find_line_beginning_backward(all_first, point);
+	const char *const line_last  = find_line_end(point, all_last);
+	logger& self = *this;
+	self << make_string_view(line_first, line_last) << '\n';
+
+	for (auto it = line_first; it != point; ++it)
+	{
+		if (*it == '\t')
+			self << '\t';
+		else
+			self << ' ';
+	}
+
+	self << "^\n";
 }
 
 void logger::internal_error(std::string_view description)

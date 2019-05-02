@@ -1,6 +1,5 @@
 #include "fs/parser/print_error.hpp"
 #include "fs/parser/detail/config.hpp"
-#include "fs/parser/detail/utility.hpp"
 #include "fs/log/logger.hpp"
 
 namespace fs::parser
@@ -11,26 +10,18 @@ void print_error(
 	const parser::lookup_data& lookup_data,
 	log::logger&logger)
 {
-	const std::string_view content_range = lookup_data.get_view_of_whole_content();
-	const detail::iterator_type& error_first = error.error_place;
-	// make the error range at least 1 position unless error_first already points at end
-	const detail::iterator_type error_last = [&]()
-	{
-		if (error_first == content_range.end())
-			return error_first;
-
-		detail::iterator_type error_last = error_first;
-		return ++error_last;
-	}();
-
 	logger.begin_error_message();
 	logger << "parse failure\n";
-	logger.error_with_underlined_code(
+	logger.print_line_number_with_description_and_pointed_code(
 		lookup_data.get_view_of_whole_content(),
-		detail::to_string_view(detail::range_type(error_first, error_last)),
-		"expected '",
+		error.error_place,
+		"expected ",
 		error.what_was_expected,
-		"' here");
+		" here");
+	logger.print_line_number_with_description_and_pointed_code(
+		lookup_data.get_view_of_whole_content(),
+		error.backtracking_place,
+		"backtracking parser here");
 	logger.end_message();
 }
 

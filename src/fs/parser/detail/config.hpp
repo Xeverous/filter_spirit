@@ -3,7 +3,6 @@
 #include <boost/spirit/home/x3.hpp>
 #include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
 #include <boost/spirit/home/x3/support/utility/error_reporting.hpp>
-#include <string_view>
 #include <vector>
 
 namespace fs::parser
@@ -23,7 +22,7 @@ using error_holder_type = std::vector<parse_error>;
 using whitespace_type = x3::rule<struct whitespace_class>;
 using skipper_type = whitespace_type;
 
-using iterator_type = std::string_view::const_iterator;
+using iterator_type = const char*;
 using range_type = boost::iterator_range<iterator_type>;
 using position_cache_type = x3::position_cache<std::vector<iterator_type>>;
 using phrase_context_type = x3::phrase_parse_context<skipper_type>::type;

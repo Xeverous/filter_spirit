@@ -57,13 +57,13 @@ struct error_on_error
 {
 	template <typename Iterator, typename Exception, typename Context>
 	x3::error_handler_result on_error(
-		Iterator& /* first */,
+		Iterator& first,
 		const Iterator& /* last */,
 		const Exception& ex,
 		const Context& context)
 	{
 		error_holder_type& error_holder = x3::get<error_holder_tag>(context).get();
-		error_holder.push_back(parse_error{ex.where(), ex.which()});
+		error_holder.push_back(parse_error{ex.where(), first, ex.which()});
 		return x3::error_handler_result::fail;
 	}
 };

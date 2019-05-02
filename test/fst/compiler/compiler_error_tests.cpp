@@ -41,7 +41,7 @@ std::string range_info_to_string(
 	std::string_view code_to_underline)
 {
 	fs::log::buffered_logger logger;
-	logger.error_with_underlined_code(all_code, code_to_underline);
+	logger.print_underlined_code(all_code, code_to_underline);
 	return logger.flush_out();
 }
 

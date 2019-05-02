@@ -9,7 +9,8 @@ namespace fs::parser
 
 struct parse_error
 {
-	detail::iterator_type error_place; // TODO this exposes internals
+	const char* error_place;
+	const char* backtracking_place;
 	std::string what_was_expected;
 };
 

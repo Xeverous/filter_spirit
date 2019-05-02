@@ -11,10 +11,10 @@ namespace x3 = boost::spirit::x3;
 
 std::pair<pr::lookup_data, std::variant<pr::ast::ast_type, pr::detail::error_holder_type>> parse_impl(std::string_view input)
 {
-	      pr::detail::iterator_type it   {input.begin()};
-	const pr::detail::iterator_type begin{input.begin()};
-	const pr::detail::iterator_type end  {input.end()};
-	pr::detail::position_cache_type position_cache(begin, end);
+	const char *      it   {input.data()};
+	const char *const first{input.data()};
+	const char *const last {input.data() + input.size()};
+	pr::detail::position_cache_type position_cache(first, last);
 	pr::detail::error_holder_type error_holder;
 	// note: x3::with<> must match with grammar's context_type, otherwise you will get linker errors
 	const auto parser = x3::with<pr::detail::position_cache_tag>(std::ref(position_cache))
@@ -25,14 +25,14 @@ std::pair<pr::lookup_data, std::variant<pr::ast::ast_type, pr::detail::error_hol
 	pr::ast::ast_type ast;
 	const bool result = x3::phrase_parse(
 		it,
-		end,
+		last,
 		parser,
 		pr::skipper(),
 		ast);
 
 	using result_variant = std::variant<pr::ast::ast_type, pr::detail::error_holder_type>;
 
-	if (it != end || !result)
+	if (it != last || !result)
 	{
 		// TODO
 		//error_stream << "parse failure\nstopped at:\n";

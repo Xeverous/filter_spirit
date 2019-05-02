@@ -14,12 +14,12 @@ void print_error_impl(
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
-	logger.error_with_underlined_code(
+	logger.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_duplicated_name),
 		log::strings::error,
 		"name already exists");
-	logger.error_with_underlined_code(
+	logger.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_original_name),
 		log::strings::note,
@@ -31,7 +31,7 @@ void print_error_impl(
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
-	logger.error_with_underlined_code(
+	logger.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_name),
 		log::strings::error,
@@ -43,7 +43,7 @@ void print_error_impl(
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
-	logger.error_with_underlined_code(
+	logger.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_name),
 		log::strings::error,
@@ -55,7 +55,7 @@ void print_error_impl(
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
-	logger.error_with_underlined_code(
+	logger.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_name),
 		log::strings::error,
@@ -75,7 +75,7 @@ void print_error_impl(
 			return std::to_string(error.min_expected) + " - " + std::to_string(error.max_expected);
 	}();
 
-	logger.error_with_underlined_code(
+	logger.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_arguments),
 		log::strings::error,
@@ -90,7 +90,7 @@ void print_error_impl(
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
-	logger.error_with_underlined_code(
+	logger.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_expression),
 		log::strings::error,
@@ -106,7 +106,7 @@ void print_error_impl(
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
-	logger.error_with_underlined_code(
+	logger.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_nested_array_expression),
 		log::strings::error,
@@ -118,14 +118,14 @@ void print_error_impl(
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
-	logger.error_with_underlined_code(
+	logger.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_first_element),
 		log::strings::error,
 		"non homogeneous array, one operand of type '",
 		fs::lang::to_string_view(error.first_element_type),
 		"'");
-	logger.error_with_underlined_code(
+	logger.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_second_element),
 		log::strings::note,
@@ -139,7 +139,7 @@ void print_error_impl(
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
-	logger.error_with_underlined_code(
+	logger.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_socket_group_string),
 		log::strings::error,
@@ -151,7 +151,7 @@ void print_error_impl(
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
-	logger.error_with_underlined_code(
+	logger.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_socket_group_string),
 		log::strings::error,
@@ -163,7 +163,7 @@ void print_error_impl(
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
-	logger.error_with_underlined_code(
+	logger.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_socket_group_string),
 		log::strings::error,
@@ -175,7 +175,7 @@ void print_error_impl(
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
-	logger.error_with_underlined_code(
+	logger.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_size_argument),
 		log::strings::error,
@@ -188,7 +188,7 @@ void print_error_impl(
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
-	logger.error_with_underlined_code(
+	logger.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_action),
 		log::strings::error,
@@ -200,7 +200,7 @@ void print_error_impl(
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
-	logger.error_with_underlined_code(
+	logger.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_action),
 		log::strings::error,
@@ -212,7 +212,7 @@ void print_error_impl(
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
-	logger.error_with_underlined_code(
+	logger.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_2nd_argument),
 		log::strings::error,
@@ -224,7 +224,7 @@ void print_error_impl(
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
-	logger.error_with_underlined_code(
+	logger.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_redefinition),
 		log::strings::error,
@@ -236,7 +236,7 @@ void print_error_impl(
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
-	logger.error_with_underlined_code(
+	logger.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_redefinition),
 		log::strings::error,
@@ -248,7 +248,7 @@ void print_error_impl(
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
-	logger.error_with_underlined_code(
+	logger.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_redefinition),
 		log::strings::error,
@@ -260,7 +260,7 @@ void print_error_impl(
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
-	logger.error_with_underlined_code(
+	logger.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_redefinition),
 		log::strings::error,
@@ -272,7 +272,7 @@ void print_error_impl(
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
-	logger.error_with_underlined_code(
+	logger.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_redefinition),
 		log::strings::error,
@@ -284,7 +284,7 @@ void print_error_impl(
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
-	logger.error_with_underlined_code(
+	logger.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_action),
 		log::strings::internal_compiler_error,
@@ -297,7 +297,7 @@ void print_error_impl(
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
-	logger.error_with_underlined_code(
+	logger.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_comparison_condition),
 		log::strings::internal_compiler_error,
@@ -310,7 +310,7 @@ void print_error_impl(
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
-	logger.error_with_underlined_code(
+	logger.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_comparison_condition),
 		log::strings::internal_compiler_error,
@@ -323,7 +323,7 @@ void print_error_impl(
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
-	logger.error_with_underlined_code(
+	logger.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_string_condition),
 		log::strings::internal_compiler_error,
@@ -336,7 +336,7 @@ void print_error_impl(
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
-	logger.error_with_underlined_code(
+	logger.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_boolean_condition),
 		log::strings::internal_compiler_error,

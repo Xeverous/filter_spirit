@@ -2,7 +2,7 @@
 
 #include "fs/parser/ast.hpp"
 #include "fs/parser/detail/config.hpp"
-#include "fs/parser/detail/utility.hpp"
+#include "fs/log/utility.hpp"
 
 #include <string_view>
 #include <optional>
@@ -25,7 +25,8 @@ public:
 	[[nodiscard]]
 	std::string_view get_view_of_whole_content() const
 	{
-		return detail::to_string_view(get_range_of_whole_content());
+		const detail::range_type range = get_range_of_whole_content();
+		return fs::log::make_string_view(range.begin(), range.end());
 	}
 	/**
 	 * @note This wrapper functions have important aim: boost::position_cache::position_of() has 2
@@ -38,7 +39,8 @@ public:
 	[[nodiscard]]
 	std::string_view position_of(const x3::position_tagged& ast) const
 	{
-		return detail::to_string_view(range_of(ast));
+		const detail::range_type range = range_of(ast);
+		return fs::log::make_string_view(range.begin(), range.end());
 	}
 
 private:
