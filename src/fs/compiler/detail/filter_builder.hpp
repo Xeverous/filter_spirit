@@ -33,7 +33,7 @@ private:
 
 	[[nodiscard]]
 	std::variant<std::vector<lang::filter_block>, error::error_variant> build_filter(
-		const std::vector<parser::ast::statement>& top_level_statements);
+		const std::vector<parser::ast::statement>& top_level_statements) &&;
 
 	/*
 	 * copies of actions and conditions are intentional

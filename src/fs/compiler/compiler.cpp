@@ -1,6 +1,7 @@
 #include "fs/compiler/compiler.hpp"
 #include "fs/compiler/error.hpp"
 #include "fs/compiler/detail/evaluate.hpp"
+#include "fs/compiler/detail/filter_builder.hpp"
 #include "fs/parser/ast.hpp"
 #include "fs/lang/constants_map.hpp"
 
@@ -66,7 +67,6 @@ std::optional<compiler::error::error_variant> add_constant_from_definition(
 namespace fs::compiler
 {
 
-[[nodiscard]]
 std::variant<lang::constants_map, compiler::error::error_variant> resolve_constants(
 	const std::vector<parser::ast::constant_definition>& constant_definitions,
 	const itemdata::item_price_data& item_price_data)
@@ -85,15 +85,12 @@ std::variant<lang::constants_map, compiler::error::error_variant> resolve_consta
 	return map;
 }
 
-[[nodiscard]]
-std::string generate_filter(const std::vector<lang::filter_block>& blocks)
+std::variant<std::vector<lang::filter_block>, error::error_variant> compile_statements(
+	const std::vector<parser::ast::statement>& statements,
+	const lang::constants_map& map,
+	const itemdata::item_price_data& item_price_data)
 {
-	std::stringstream ss;
-
-	for (const lang::filter_block& block : blocks)
-		block.generate(ss);
-
-	return ss.str();
+	return detail::filter_builder::build_filter(statements, map, item_price_data);
 }
 
-} // namespace
+} // namespace fs::compiler

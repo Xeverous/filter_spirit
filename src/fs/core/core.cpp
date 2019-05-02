@@ -1,7 +1,7 @@
 #include "fs/core/core.hpp"
 #include "fs/utility/file.hpp"
 #include "fs/network/poe_watch_api.hpp"
-#include "fs/compiler/process_input.hpp"
+#include "fs/generator/generate_filter.hpp"
 #include "fs/itemdata/parse_json.hpp"
 #include "fs/log/logger.hpp"
 
@@ -25,7 +25,13 @@ bool generate_item_filter(
 		return false;
 	}
 
-	std::optional<std::string> filter_content = compiler::process_input(*source_file_content, item_price_data, print_ast, logger);
+	std::optional<std::string> filter_content = generator::generate_filter(
+		*source_file_content,
+		item_price_data,
+		generator::options{print_ast},
+		generator::metadata{},
+		logger);
+
 	if (!filter_content)
 		return false;
 

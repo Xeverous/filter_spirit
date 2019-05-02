@@ -1,7 +1,7 @@
 #include "fst/compiler/common.hpp"
 #include "fst/parser/common.hpp"
 
-#include "fs/compiler/process_input.hpp"
+#include "fs/generator/generate_filter.hpp"
 #include "fs/log/buffered_logger.hpp"
 #include "fs/itemdata/types.hpp"
 
@@ -19,7 +19,7 @@ std::string generate_filter(
 	const fs::itemdata::item_price_data& ipd = {})
 {
 	fs::log::buffered_logger logger;
-	std::optional<std::string> filter = fs::compiler::process_input(input, ipd, false, logger);
+	std::optional<std::string> filter = fs::generator::generate_filter_without_preamble(input, ipd, fs::generator::options{}, logger);
 	const auto log_data = logger.flush_out();
 	BOOST_TEST_REQUIRE(filter.has_value(), "filter generation failed:\n" << log_data);
 	return *filter;

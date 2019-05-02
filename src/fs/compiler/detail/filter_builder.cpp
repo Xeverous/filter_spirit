@@ -17,12 +17,11 @@ std::variant<std::vector<lang::filter_block>, error::error_variant> filter_build
 	const lang::constants_map& map,
 	const itemdata::item_price_data& item_price_data)
 {
-	filter_builder fb(map, item_price_data);
-	return fb.build_filter(top_level_statements);
+	return filter_builder(map, item_price_data).build_filter(top_level_statements);
 }
 
 std::variant<std::vector<lang::filter_block>, error::error_variant> filter_builder::build_filter(
-	const std::vector<ast::statement>& top_level_statements)
+	const std::vector<ast::statement>& top_level_statements) &&
 {
 	lang::condition_set conditions;
 	lang::action_set actions;

@@ -18,6 +18,9 @@ std::variant<lang::constants_map, compiler::error::error_variant> resolve_consta
 	const itemdata::item_price_data& item_price_data);
 
 [[nodiscard]]
-std::string generate_filter(const std::vector<lang::filter_block>& blocks);
+std::variant<std::vector<lang::filter_block>, error::error_variant> compile_statements(
+	const std::vector<parser::ast::statement>& statements,
+	const lang::constants_map& map,
+	const itemdata::item_price_data& item_price_data);
 
 }
