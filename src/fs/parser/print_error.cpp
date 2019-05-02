@@ -3,6 +3,22 @@
 #include "fs/parser/detail/utility.hpp"
 #include "fs/log/logger.hpp"
 
+namespace
+{
+
+using iterator = fs::parser::detail::iterator_type;
+
+[[nodiscard]]
+iterator increment_if_not_last(iterator it, iterator last)
+{
+	if (it == last)
+		return last;
+
+	return ++it;
+}
+
+}
+
 namespace fs::parser
 {
 
@@ -13,15 +29,7 @@ void print_error(
 {
 	const std::string_view content_range = lookup_data.get_view_of_whole_content();
 	const detail::iterator_type& error_first = error.error_place;
-	// make the error range at least 1 position unless error_first already points at end
-	const detail::iterator_type error_last = [&]()
-	{
-		if (error_first == content_range.end())
-			return error_first;
-
-		detail::iterator_type error_last = error_first;
-		return ++error_last;
-	}();
+	const detail::iterator_type error_last = increment_if_not_last(error_first, content_range.end());
 
 	logger.begin_error_message();
 	logger << "parse failure\n";
@@ -30,7 +38,15 @@ void print_error(
 		detail::to_string_view(detail::range_type(error_first, error_last)),
 		"expected '",
 		error.what_was_expected,
-		"' here");
+		"'");
+
+	const detail::iterator_type parsed_place_first = error.parsed_place;
+	const detail::iterator_type parsed_place_last = increment_if_not_last(parsed_place_first, content_range.end());
+	logger.error_with_underlined_code(
+		lookup_data.get_view_of_whole_content(),
+		detail::to_string_view(detail::range_type(parsed_place_first, parsed_place_last)),
+		"when parsing token starting here");
+
 	logger.end_message();
 }
 
