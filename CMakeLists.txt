@@ -32,9 +32,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 # compile these as shared library so that it can be reused by both
 # without the need to list and compile the same sources twice
 add_library(filter_spirit_compiler SHARED
-	src/fs/parser/grammar.cpp
 	src/fs/parser/parser.cpp
 	src/fs/parser/print_error.cpp
+	src/fs/parser/detail/grammar.cpp
 	src/fs/compiler/actions.cpp
 	src/fs/compiler/compiler.cpp
 	src/fs/compiler/conditions.cpp

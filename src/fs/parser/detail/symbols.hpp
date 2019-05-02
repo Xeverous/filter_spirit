@@ -1,9 +1,11 @@
 #pragma once
+
 #include "fs/lang/types.hpp"
 #include "fs/lang/keywords.hpp"
+
 #include <boost/spirit/home/x3/string/symbols.hpp>
 
-namespace fs::parser::symbols
+namespace fs::parser::detail::symbols
 {
 
 // symbols that denote filter's language constants

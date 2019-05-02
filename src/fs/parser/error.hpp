@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fs/parser/config.hpp"
+#include "fs/parser/detail/config.hpp"
 
 #include <string>
 
@@ -9,7 +9,7 @@ namespace fs::parser
 
 struct parse_error
 {
-	iterator_type error_place;
+	detail::iterator_type error_place; // TODO this exposes internals
 	std::string what_was_expected;
 };
 

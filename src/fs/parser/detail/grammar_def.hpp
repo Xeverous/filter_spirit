@@ -5,10 +5,10 @@
  * Use BOOST_SPIRIT_DEFINE here.
  */
 #pragma once
-#include "fs/parser/symbols.hpp"
-#include "fs/parser/grammar.hpp"
+#include "fs/parser/detail/symbols.hpp"
+#include "fs/parser/detail/grammar.hpp"
 
-namespace fs::parser
+namespace fs::parser::detail
 {
 
 // Spirit coding style:

@@ -6,9 +6,11 @@
  * Use BOOST_SPIRIT_DECLARE here.
  */
 #pragma once
+
 #include "fs/parser/ast.hpp"
-#include "fs/parser/config.hpp"
 #include "fs/parser/error.hpp"
+#include "fs/parser/detail/config.hpp"
+
 #include <boost/spirit/home/x3.hpp>
 #include <boost/spirit/home/x3/support/utility/lambda_visitor.hpp>
 
@@ -17,7 +19,7 @@
 template <typename T>
 struct boost::spirit::x3::traits::is_substitute<T, T> : boost::mpl::true_ {};
 
-namespace fs::parser
+namespace fs::parser::detail
 {
 
 // Inherit rule ID type from these type if you want Spirit to call on_success/on_error
@@ -271,10 +273,10 @@ BOOST_SPIRIT_DECLARE(grammar_type)
 
 }
 
-namespace fs
+namespace fs::parser
 {
 
-parser::grammar_type grammar();
-parser::skipper_type skipper();
+detail::grammar_type grammar();
+detail::skipper_type skipper();
 
 }

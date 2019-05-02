@@ -5,9 +5,9 @@
  * Use BOOST_SPIRIT_INSTANTIATE here.
  */
 #include "fs/parser/ast_adapted.hpp"
-#include "fs/parser/grammar_def.hpp"
+#include "fs/parser/detail/grammar_def.hpp"
 
-namespace fs::parser
+namespace fs::parser::detail
 {
 
 BOOST_SPIRIT_INSTANTIATE(grammar_type, iterator_type, context_type)
@@ -31,17 +31,17 @@ BOOST_SPIRIT_INSTANTIATE(skipper_type, iterator_type, boost::spirit::x3::unused_
 
 }
 
-namespace fs
+namespace fs::parser
 {
 
-parser::grammar_type grammar()
+detail::grammar_type grammar()
 {
-	return parser::grammar;
+	return detail::grammar;
 }
 
-parser::skipper_type skipper()
+detail::skipper_type skipper()
 {
-	return parser::whitespace;
+	return detail::whitespace;
 }
 
 }

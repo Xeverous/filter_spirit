@@ -1,13 +1,13 @@
 #pragma once
 
-#include "fs/parser/config.hpp"
+#include "fs/parser/detail/config.hpp"
 
 #include <boost/range/iterator_range_core.hpp>
 
 #include <string_view>
 #include <type_traits>
 
-namespace fs::parser
+namespace fs::parser::detail
 {
 
 inline

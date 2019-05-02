@@ -1,8 +1,8 @@
 #pragma once
 
 #include "fs/parser/ast.hpp"
-#include "fs/parser/config.hpp"
-#include "fs/parser/utility.hpp"
+#include "fs/parser/detail/config.hpp"
+#include "fs/parser/detail/utility.hpp"
 
 #include <string_view>
 #include <optional>
@@ -17,7 +17,7 @@ namespace fs::parser
 class lookup_data
 {
 public:
-	lookup_data(position_cache_type position_cache)
+	lookup_data(detail::position_cache_type position_cache)
 	: position_cache(std::move(position_cache))
 	{
 	}
@@ -25,7 +25,7 @@ public:
 	[[nodiscard]]
 	std::string_view get_view_of_whole_content() const
 	{
-		return to_string_view(get_range_of_whole_content());
+		return detail::to_string_view(get_range_of_whole_content());
 	}
 	/**
 	 * @note This wrapper functions have important aim: boost::position_cache::position_of() has 2
@@ -38,24 +38,24 @@ public:
 	[[nodiscard]]
 	std::string_view position_of(const x3::position_tagged& ast) const
 	{
-		return to_string_view(range_of(ast));
+		return detail::to_string_view(range_of(ast));
 	}
 
 private:
 	[[nodiscard]]
-	range_type range_of(const x3::position_tagged& ast) const
+	detail::range_type range_of(const x3::position_tagged& ast) const
 	{
 		return position_cache.position_of(ast);
 	}
 
 	[[nodiscard]]
-	range_type get_range_of_whole_content() const
+	detail::range_type get_range_of_whole_content() const
 	{
 		assert(!position_cache.get_positions().empty());
-		return range_type(position_cache.first(), position_cache.last());
+		return detail::range_type(position_cache.first(), position_cache.last());
 	}
 
-	position_cache_type position_cache;
+	detail::position_cache_type position_cache;
 };
 
 struct parse_data
