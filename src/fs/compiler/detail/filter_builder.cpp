@@ -1,12 +1,12 @@
-#include "fs/compiler/filter_builder.hpp"
-#include "fs/compiler/actions.hpp"
-#include "fs/compiler/conditions.hpp"
+#include "fs/compiler/detail/filter_builder.hpp"
+#include "fs/compiler/detail/actions.hpp"
+#include "fs/compiler/detail/conditions.hpp"
 #include "fs/lang/queries.hpp"
 
 #include <boost/spirit/home/x3/support/utility/lambda_visitor.hpp>
 #include <utility>
 
-namespace fs::compiler
+namespace fs::compiler::detail
 {
 
 namespace ast = parser::ast;

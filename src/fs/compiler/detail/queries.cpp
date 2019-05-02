@@ -1,7 +1,7 @@
-#include "fs/compiler/queries.hpp"
-#include "fs/compiler/evaluate_as.hpp"
+#include "fs/compiler/detail/queries.hpp"
+#include "fs/compiler/detail/evaluate_as.hpp"
 
-namespace fs::compiler
+namespace fs::compiler::detail
 {
 
 std::variant<lang::price_range, error::error_variant> construct_price_range(

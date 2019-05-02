@@ -1,11 +1,12 @@
-#include "fs/compiler/functions.hpp"
-#include "fs/compiler/evaluate_as.hpp"
+#include "fs/compiler/detail/functions.hpp"
+#include "fs/compiler/detail/evaluate_as.hpp"
 #include "fs/lang/keywords.hpp"
+
 #include <array>
 #include <cassert>
 #include <utility>
 
-namespace fs::compiler
+namespace fs::compiler::detail
 {
 
 std::variant<lang::socket_group, error::error_variant> construct_socket_group(

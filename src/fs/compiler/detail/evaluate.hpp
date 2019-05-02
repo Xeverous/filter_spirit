@@ -8,7 +8,7 @@
 
 #include <variant>
 
-namespace fs::compiler
+namespace fs::compiler::detail
 {
 
 [[nodiscard]]

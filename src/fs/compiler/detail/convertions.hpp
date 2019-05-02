@@ -5,7 +5,7 @@
 #include <vector>
 #include <variant>
 
-namespace fs::compiler
+namespace fs::compiler::detail
 {
 
 std::variant<std::vector<std::string>, error::error_variant> array_to_strings(

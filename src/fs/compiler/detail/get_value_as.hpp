@@ -9,7 +9,7 @@
 #include <variant>
 #include <type_traits>
 
-namespace fs::compiler
+namespace fs::compiler::detail
 {
 
 template <typename T>

@@ -2,8 +2,8 @@
 #include "fs/parser/ast_adapted.hpp" // required adaptation info for fs::log::structure_printer
 #include "fs/compiler/process_input.hpp"
 #include "fs/compiler/compiler.hpp"
-#include "fs/compiler/filter_builder.hpp"
 #include "fs/compiler/print_error.hpp"
+#include "fs/compiler/detail/filter_builder.hpp"
 #include "fs/log/logger.hpp"
 #include "fs/log/structure_printer.hpp"
 
@@ -41,7 +41,7 @@ std::optional<std::string> process_input(
 
 	const auto& map = std::get<lang::constants_map>(map_or_error);
 	const std::variant<std::vector<lang::filter_block>, error::error_variant> filter_or_error =
-		filter_builder::build_filter(parse_data.ast.statements, map, item_price_data);
+		detail::filter_builder::build_filter(parse_data.ast.statements, map, item_price_data);
 
 	if (std::holds_alternative<error::error_variant>(filter_or_error))
 	{

@@ -1,6 +1,6 @@
 #include "fs/compiler/compiler.hpp"
-#include "fs/compiler/evaluate.hpp"
 #include "fs/compiler/error.hpp"
+#include "fs/compiler/detail/evaluate.hpp"
 #include "fs/parser/ast.hpp"
 #include "fs/lang/constants_map.hpp"
 
@@ -46,7 +46,7 @@ std::optional<compiler::error::error_variant> add_constant_from_definition(
 	}
 
 	std::variant<lang::object, compiler::error::error_variant> expr_result =
-		compiler::evaluate_value_expression(value_expression, map, item_price_data);
+		compiler::detail::evaluate_value_expression(value_expression, map, item_price_data);
 
 	if (std::holds_alternative<compiler::error::error_variant>(expr_result))
 		return std::get<compiler::error::error_variant>(expr_result);

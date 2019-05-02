@@ -1,8 +1,9 @@
-#include "fs/compiler/convertions.hpp"
+#include "fs/compiler/detail/convertions.hpp"
+
 #include <cassert>
 #include <utility>
 
-namespace fs::compiler
+namespace fs::compiler::detail
 {
 
 std::variant<std::vector<std::string>, error::error_variant> array_to_strings(

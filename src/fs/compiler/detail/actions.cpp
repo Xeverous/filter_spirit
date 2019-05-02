@@ -1,7 +1,7 @@
-#include "fs/compiler/actions.hpp"
-#include "fs/compiler/evaluate_as.hpp"
+#include "fs/compiler/detail/actions.hpp"
+#include "fs/compiler/detail/evaluate_as.hpp"
 
-namespace fs::compiler
+namespace fs::compiler::detail
 {
 
 namespace ast = parser::ast;

@@ -1,12 +1,14 @@
-#include "fs/compiler/evaluate.hpp"
-#include "fs/compiler/functions.hpp"
-#include "fs/compiler/queries.hpp"
+#include "fs/compiler/detail/evaluate.hpp"
+#include "fs/compiler/detail/functions.hpp"
+#include "fs/compiler/detail/queries.hpp"
 #include "fs/lang/functions.hpp"
 #include "fs/lang/queries.hpp"
+
 #include <utility>
+
 #include <boost/spirit/home/x3/support/utility/lambda_visitor.hpp>
 
-namespace fs::compiler
+namespace fs::compiler::detail
 {
 
 namespace x3 = boost::spirit::x3;

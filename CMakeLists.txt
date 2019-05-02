@@ -35,16 +35,16 @@ add_library(filter_spirit_compiler SHARED
 	src/fs/parser/parser.cpp
 	src/fs/parser/print_error.cpp
 	src/fs/parser/detail/grammar.cpp
-	src/fs/compiler/actions.cpp
 	src/fs/compiler/compiler.cpp
-	src/fs/compiler/conditions.cpp
-	src/fs/compiler/convertions.cpp
-	src/fs/compiler/evaluate.cpp
-	src/fs/compiler/filter_builder.cpp
-	src/fs/compiler/functions.cpp
-	src/fs/compiler/queries.cpp
 	src/fs/compiler/process_input.cpp
 	src/fs/compiler/print_error.cpp
+	src/fs/compiler/detail/actions.cpp
+	src/fs/compiler/detail/conditions.cpp
+	src/fs/compiler/detail/convertions.cpp
+	src/fs/compiler/detail/evaluate.cpp
+	src/fs/compiler/detail/filter_builder.cpp
+	src/fs/compiler/detail/functions.cpp
+	src/fs/compiler/detail/queries.cpp
 	src/fs/lang/action_set.cpp
 	src/fs/lang/condition_set.cpp
 	src/fs/lang/filter_block.cpp

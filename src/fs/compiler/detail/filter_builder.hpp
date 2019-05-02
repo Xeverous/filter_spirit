@@ -7,11 +7,12 @@
 #include "fs/parser/parser.hpp"
 #include "fs/parser/ast.hpp"
 #include "fs/itemdata/types.hpp"
+
 #include <utility>
 #include <vector>
 #include <optional>
 
-namespace fs::compiler
+namespace fs::compiler::detail
 {
 
 class filter_builder

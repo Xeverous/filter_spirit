@@ -1,10 +1,12 @@
-#include "fs/compiler/conditions.hpp"
-#include "fs/compiler/evaluate_as.hpp"
-#include "fs/compiler/convertions.hpp"
+#include "fs/compiler/detail/conditions.hpp"
+#include "fs/compiler/detail/evaluate_as.hpp"
+#include "fs/compiler/detail/convertions.hpp"
+
 #include <boost/spirit/home/x3/support/utility/lambda_visitor.hpp>
+
 #include <utility>
 
-namespace fs::compiler
+namespace fs::compiler::detail
 {
 
 namespace ast = parser::ast;

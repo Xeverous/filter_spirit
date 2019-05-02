@@ -1,11 +1,11 @@
 #pragma once
 
-#include "fs/compiler/evaluate.hpp"
-#include "fs/compiler/get_value_as.hpp"
+#include "fs/compiler/detail/evaluate.hpp"
+#include "fs/compiler/detail/get_value_as.hpp"
 
 #include <utility>
 
-namespace fs::compiler
+namespace fs::compiler::detail
 {
 
 template <typename T>
