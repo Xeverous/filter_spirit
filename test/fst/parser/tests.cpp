@@ -11,6 +11,57 @@
 
 #include <string>
 
+template <typename Value>
+bool test_literal(const fs::parser::ast::string_literal& str_lit, const Value& value)
+{
+	if (str_lit != value)
+	{
+		BOOST_ERROR("failed comparison of " << str_lit << " and " << value);
+		return false;
+	}
+
+	return true;
+}
+
+template <typename T, typename Value>
+bool test_literal(const T& literal, const Value& value)
+{
+	if (literal.value != value)
+	{
+		BOOST_ERROR("failed comparison of " << literal.value << " and " << value);
+		return false;
+	}
+
+	return true;
+}
+
+template <typename T, typename Value>
+bool test_literal_expression(const fs::parser::ast::value_expression& expr, const Value& value)
+{
+	if (!holds_alternative<fs::parser::ast::literal_expression>(expr.var))
+	{
+		BOOST_ERROR("definition does not hold literal_expression variant");
+		return false;
+	}
+
+	const auto& literal_expression = boost::get<fs::parser::ast::literal_expression>(expr.var);
+	if (!holds_alternative<T>(literal_expression.var))
+	{
+		BOOST_ERROR("definition is literal_expression but does not hold expected literal");
+		return false;
+	}
+
+	const auto& literal = boost::get<T>(literal_expression.var);
+	return test_literal(literal, value);
+}
+
+template <typename T, typename Value>
+bool test_literal_definition(const fs::parser::ast::constant_definition& def, const char* name, const Value& value)
+{
+	BOOST_TEST(def.name.value == name);
+	return test_literal_expression<T>(def.value, value);
+}
+
 BOOST_FIXTURE_TEST_SUITE(parser_suite, fst::parser_fixture)
 
 	BOOST_AUTO_TEST_CASE(version_requirement)
@@ -44,21 +95,34 @@ const n2 = 2 ## #text
 		const std::vector<pa::constant_definition>& defs = ast.constant_definitions;
 		BOOST_TEST_REQUIRE(static_cast<int>(defs.size()) == 2);
 
-		const auto& n1 = defs[0];
-		BOOST_TEST(n1.name.value == "n1");
-		BOOST_TEST_REQUIRE(holds_alternative<pa::literal_expression>(n1.value.var));
-		const auto& n1_literal_expression = boost::get<pa::literal_expression>(n1.value.var);
-		BOOST_TEST_REQUIRE(holds_alternative<pa::integer_literal>(n1_literal_expression.var));
-		const auto& n1_literal = boost::get<pa::integer_literal>(n1_literal_expression.var);
-		BOOST_TEST(n1_literal.value == 1);
+		test_literal_definition<pa::integer_literal>(defs[0], "n1", 1);
+		test_literal_definition<pa::integer_literal>(defs[1], "n2", 2);
+	}
 
-		const auto& n2 = defs[1];
-		BOOST_TEST(n2.name.value == "n2");
-		BOOST_TEST_REQUIRE(holds_alternative<pa::literal_expression>(n2.value.var));
-		const auto& n2_literal_expression = boost::get<pa::literal_expression>(n2.value.var);
-		BOOST_TEST_REQUIRE(holds_alternative<pa::integer_literal>(n2_literal_expression.var));
-		const auto& n2_literal = boost::get<pa::integer_literal>(n2_literal_expression.var);
-		BOOST_TEST(n2_literal.value == 2);
+	BOOST_AUTO_TEST_CASE(identifiers)
+	{
+		const std::string input = fst::minimal_input() + R"(
+# test that parser can correctly parse various identifiers
+const n1 = 1
+const n_2 = 2
+const n__3__ = 3
+const bUt_RaIdEr_Is_fAsTeR = 4
+const gOtTa_BuIlD_sOmE_dEfEnSe = 5
+const GGG = 666
+)";
+
+		namespace pa = fs::parser::ast;
+		const pa::ast_type ast = parse(input).ast;
+
+		const std::vector<pa::constant_definition>& defs = ast.constant_definitions;
+		BOOST_TEST_REQUIRE(static_cast<int>(defs.size()) == 6);
+
+		test_literal_definition<pa::integer_literal>(defs[0], "n1", 1);
+		test_literal_definition<pa::integer_literal>(defs[1], "n_2", 2);
+		test_literal_definition<pa::integer_literal>(defs[2], "n__3__", 3);
+		test_literal_definition<pa::integer_literal>(defs[3], "bUt_RaIdEr_Is_fAsTeR", 4);
+		test_literal_definition<pa::integer_literal>(defs[4], "gOtTa_BuIlD_sOmE_dEfEnSe", 5);
+		test_literal_definition<pa::integer_literal>(defs[5], "GGG", 666);
 	}
 
 	BOOST_AUTO_TEST_CASE(empty_string)
@@ -72,13 +136,7 @@ const n2 = 2 ## #text
 		const std::vector<pa::constant_definition>& defs = ast.constant_definitions;
 		BOOST_TEST_REQUIRE(static_cast<int>(defs.size()) == 1);
 
-		const auto& constant = defs[0];
-		BOOST_TEST(constant.name.value == "empty_string");
-		BOOST_TEST_REQUIRE(holds_alternative<pa::literal_expression>(constant.value.var));
-		const auto& literal_expression = boost::get<pa::literal_expression>(constant.value.var);
-		BOOST_TEST_REQUIRE(holds_alternative<pa::string_literal>(literal_expression.var));
-		const auto& string_literal = boost::get<pa::string_literal>(literal_expression.var);
-		BOOST_TEST(string_literal.empty());
+		test_literal_definition<pa::string_literal>(defs[0], "empty_string", "");
 	}
 
 	BOOST_AUTO_TEST_CASE(color_definitions)
@@ -103,52 +161,19 @@ const n2 = 2 ## #text
 		BOOST_TEST(f0.name.value == "RGB");
 		BOOST_TEST_REQUIRE(static_cast<int>(f0.arguments.size()) == 3);
 
-		BOOST_TEST_REQUIRE(holds_alternative<pa::literal_expression>(f0.arguments[0].var));
-		const auto& f0_arg0 = boost::get<pa::literal_expression>(f0.arguments[0].var);
-		BOOST_TEST_REQUIRE(holds_alternative<pa::integer_literal>(f0_arg0.var));
-		const auto& f0_arg0_int = boost::get<pa::integer_literal>(f0_arg0.var);
-		BOOST_TEST(f0_arg0_int.value == 11);
-
-		BOOST_TEST_REQUIRE(holds_alternative<pa::literal_expression>(f0.arguments[1].var));
-		const auto& f0_arg1 = boost::get<pa::literal_expression>(f0.arguments[1].var);
-		BOOST_TEST_REQUIRE(holds_alternative<pa::integer_literal>(f0_arg1.var));
-		const auto& f0_arg1_int = boost::get<pa::integer_literal>(f0_arg1.var);
-		BOOST_TEST(f0_arg1_int.value == 22);
-
-		BOOST_TEST_REQUIRE(holds_alternative<pa::literal_expression>(f0.arguments[2].var));
-		const auto& f0_arg2 = boost::get<pa::literal_expression>(f0.arguments[2].var);
-		BOOST_TEST_REQUIRE(holds_alternative<pa::integer_literal>(f0_arg2.var));
-		const auto& f0_arg2_int = boost::get<pa::integer_literal>(f0_arg2.var);
-		BOOST_TEST(f0_arg2_int.value == 33);
+		test_literal_expression<pa::integer_literal>(f0.arguments[0], 11);
+		test_literal_expression<pa::integer_literal>(f0.arguments[1], 22);
+		test_literal_expression<pa::integer_literal>(f0.arguments[2], 33);
 
 		BOOST_TEST_REQUIRE(holds_alternative<pa::function_call>(defs[1].value.var));
 		const auto& f1 = boost::get<pa::function_call>(defs[1].value.var);
 		BOOST_TEST(f1.name.value == "RGB");
 		BOOST_TEST_REQUIRE(static_cast<int>(f1.arguments.size()) == 4);
 
-		BOOST_TEST_REQUIRE(holds_alternative<pa::literal_expression>(f1.arguments[0].var));
-		const auto& f1_arg0 = boost::get<pa::literal_expression>(f1.arguments[0].var);
-		BOOST_TEST_REQUIRE(holds_alternative<pa::integer_literal>(f1_arg0.var));
-		const auto& f1_arg0_int = boost::get<pa::integer_literal>(f1_arg0.var);
-		BOOST_TEST(f1_arg0_int.value == 0);
-
-		BOOST_TEST_REQUIRE(holds_alternative<pa::literal_expression>(f1.arguments[1].var));
-		const auto& f1_arg1 = boost::get<pa::literal_expression>(f1.arguments[1].var);
-		BOOST_TEST_REQUIRE(holds_alternative<pa::integer_literal>(f1_arg1.var));
-		const auto& f1_arg1_int = boost::get<pa::integer_literal>(f1_arg1.var);
-		BOOST_TEST(f1_arg1_int.value == 1);
-
-		BOOST_TEST_REQUIRE(holds_alternative<pa::literal_expression>(f1.arguments[2].var));
-		const auto& f1_arg2 = boost::get<pa::literal_expression>(f1.arguments[2].var);
-		BOOST_TEST_REQUIRE(holds_alternative<pa::integer_literal>(f1_arg2.var));
-		const auto& f1_arg2_int = boost::get<pa::integer_literal>(f1_arg2.var);
-		BOOST_TEST(f1_arg2_int.value == 2);
-
-		BOOST_TEST_REQUIRE(holds_alternative<pa::literal_expression>(f1.arguments[3].var));
-		const auto& f1_arg3 = boost::get<pa::literal_expression>(f1.arguments[3].var);
-		BOOST_TEST_REQUIRE(holds_alternative<pa::integer_literal>(f1_arg3.var));
-		const auto& f1_arg3_int = boost::get<pa::integer_literal>(f1_arg3.var);
-		BOOST_TEST(f1_arg3_int.value == 255);
+		test_literal_expression<pa::integer_literal>(f1.arguments[0], 0);
+		test_literal_expression<pa::integer_literal>(f1.arguments[1], 1);
+		test_literal_expression<pa::integer_literal>(f1.arguments[2], 2);
+		test_literal_expression<pa::integer_literal>(f1.arguments[3], 255);
 
 		BOOST_TEST_REQUIRE(holds_alternative<pa::identifier>(defs[2].value.var));
 		const auto& iden = boost::get<pa::identifier>(defs[2].value.var);
@@ -176,12 +201,10 @@ const n2 = 2 ## #text
 
 		for (int i = 0; i < static_cast<int>(array_expr.elements.size()); ++i)
 		{
-			const pa::value_expression& elem = array_expr.elements[i];
-			BOOST_TEST_REQUIRE(holds_alternative<pa::literal_expression>(elem.var), "i = " << i);
-			const auto& lit = boost::get<pa::literal_expression>(elem.var);
-			BOOST_TEST_REQUIRE(holds_alternative<pa::string_literal>(lit.var), "i = " << i);
-			const auto& str = boost::get<pa::string_literal>(lit.var);
-			BOOST_TEST(str == names[i], "i = " << i);
+			if (!test_literal_expression<pa::string_literal>(array_expr.elements[i], names[i]))
+			{
+				BOOST_ERROR("failed literal expressino for i = " << i);
+			}
 		}
 	}
 
