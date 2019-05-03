@@ -4,6 +4,7 @@
 #include "fs/parser/ast_adapted.hpp" // required adaptation info for fs::log::structure_printer
 #include "fs/compiler/compiler.hpp"
 #include "fs/compiler/print_error.hpp"
+#include "fs/lang/constants_map.hpp"
 #include "fs/log/logger.hpp"
 #include "fs/log/structure_printer.hpp"
 
@@ -35,14 +36,16 @@ std::optional<std::string> generate_filter_without_preamble(
 {
 	item_price_data.log_info(logger);
 	logger.info() << "parsing filter template";
-	std::optional<parser::parse_data> parse_result = parser::parse(input, logger);
+	std::variant<parser::parse_success_data, parser::parse_failure_data> parse_result = parser::parse(input);
 
-	if (!parse_result)
+	if (std::holds_alternative<parser::parse_failure_data>(parse_result))
+	{
+		parser::print_parse_errors(std::get<parser::parse_failure_data>(parse_result), logger);
 		return std::nullopt;
+	}
 
 	logger.info() << "parse successful";
-
-	parser::parse_data& parse_data = *parse_result;
+	const auto& parse_data = std::get<parser::parse_success_data>(parse_result);
 
 	if (options.print_ast)
 		fs::log::structure_printer()(parse_data.ast);

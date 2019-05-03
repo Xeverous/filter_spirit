@@ -1,7 +1,5 @@
 #pragma once
 
-#include "fs/parser/detail/config.hpp"
-
 #include <string>
 
 namespace fs::parser

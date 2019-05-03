@@ -1,5 +1,5 @@
-#include "fst/lang/print_type.hpp"
-#include "fst/parser/common.hpp"
+#include "fst/common/print_type.hpp"
+#include "fst/common/test_fixtures.hpp"
 
 #include "fs/parser/parser.hpp"
 #include "fs/log/buffered_logger.hpp"
@@ -11,12 +11,12 @@
 
 #include <string>
 
-BOOST_FIXTURE_TEST_SUITE(parser_suite, fsut::parser::parser_fixture)
+BOOST_FIXTURE_TEST_SUITE(parser_suite, fst::parser_fixture)
 
 	BOOST_AUTO_TEST_CASE(version_requirement)
 	{
 		using namespace fs;
-		const parser::ast::ast_type ast = parse(fsut::parser::minimal_input());
+		const parser::ast::ast_type ast = parse(fst::minimal_input()).ast;
 
 		const parser::ast::config& config = ast.config;
 		BOOST_TEST(config.params.empty());
@@ -29,11 +29,11 @@ BOOST_FIXTURE_TEST_SUITE(parser_suite, fsut::parser::parser_fixture)
 
 	BOOST_AUTO_TEST_CASE(empty_string)
 	{
-		const std::string input = fsut::parser::minimal_input() + "\n"
+		const std::string input = fst::minimal_input() + "\n"
 			"const empty_string = \"\"";
 
 		namespace pa = fs::parser::ast;
-		const pa::ast_type ast = parse(input);
+		const pa::ast_type ast = parse(input).ast;
 
 		const std::vector<pa::constant_definition>& defs = ast.constant_definitions;
 		BOOST_TEST_REQUIRE(static_cast<int>(defs.size()) == 1);
@@ -49,13 +49,13 @@ BOOST_FIXTURE_TEST_SUITE(parser_suite, fsut::parser::parser_fixture)
 
 	BOOST_AUTO_TEST_CASE(color_definitions)
 	{
-		const std::string input = fsut::parser::minimal_input() + "\n"
+		const std::string input = fst::minimal_input() + "\n"
 			"const color_first = RGB( 11,  22,  33)\n"
 			"const color_black = RGB(  0,   1,   2, 255)\n"
 			"const color_other = color_black";
 
 		namespace pa = fs::parser::ast;
-		const pa::ast_type ast = parse(input);
+		const pa::ast_type ast = parse(input).ast;
 
 		const std::vector<pa::constant_definition>& defs = ast.constant_definitions;
 		BOOST_TEST_REQUIRE(static_cast<int>(defs.size()) == 3);
@@ -123,11 +123,11 @@ BOOST_FIXTURE_TEST_SUITE(parser_suite, fsut::parser::parser_fixture)
 
 	BOOST_AUTO_TEST_CASE(array_definition)
 	{
-		const std::string input = fsut::parser::minimal_input() + "\n"
+		const std::string input = fst::minimal_input() + "\n"
 			"const currency_t1 = [\"Exalted Orb\", \"Mirror of Kalandra\", \"Eternal Orb\", \"Mirror Shard\"]";
 
 		namespace pa = fs::parser::ast;
-		const pa::ast_type ast = parse(input);
+		const pa::ast_type ast = parse(input).ast;
 
 		const std::vector<pa::constant_definition>& defs = ast.constant_definitions;
 		BOOST_TEST_REQUIRE(static_cast<int>(defs.size()) == 1);
@@ -156,7 +156,7 @@ BOOST_FIXTURE_TEST_SUITE(parser_suite, fsut::parser::parser_fixture)
 		// note: parser does not evaluate identifier references
 		// it's done later by the compiler which would error upon
 		// this source but for the parser - AST is correct here
-		const std::string input = fsut::parser::minimal_input() + R"(
+		const std::string input = fst::minimal_input() + R"(
 # sample comment
 SetBackgroundColor color_black
 
@@ -175,7 +175,7 @@ Show
 )";
 		namespace lang = fs::lang;
 		namespace pa = fs::parser::ast;
-		const pa::ast_type ast = parse(input);
+		const pa::ast_type ast = parse(input).ast;
 
 		const std::vector<pa::statement>& statements = ast.statements;
 		BOOST_TEST_REQUIRE(static_cast<int>(statements.size()) == 3);

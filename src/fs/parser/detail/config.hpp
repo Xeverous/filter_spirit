@@ -1,8 +1,11 @@
 #pragma once
 
+#include "fs/parser/error.hpp"
+
 #include <boost/spirit/home/x3.hpp>
 #include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
 #include <boost/spirit/home/x3/support/utility/error_reporting.hpp>
+
 #include <vector>
 
 namespace fs::parser
@@ -10,14 +13,12 @@ namespace fs::parser
 
 namespace x3 = boost::spirit::x3;
 
-struct parse_error;
+using error_holder_type = std::vector<parse_error>;
 
 }
 
 namespace fs::parser::detail
 {
-
-using error_holder_type = std::vector<parse_error>;
 
 using whitespace_type = x3::rule<struct whitespace_class>;
 using skipper_type = whitespace_type;

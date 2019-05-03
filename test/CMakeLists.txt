@@ -11,12 +11,11 @@ find_package(nlohmann_json 3.0.0 REQUIRED)
 
 add_executable(filter_spirit_test
 	fst/main.cpp
-	fst/parser/common.cpp
 	fst/parser/tests.cpp
-	fst/compiler/common.cpp
 	fst/compiler/compiler_error_tests.cpp
 	fst/compiler/filter_generation_tests.cpp
-	fst/utility/algorithm.cpp
+	fst/common/test_fixtures.cpp
+	fst/utility/algorithm_tests.cpp
 )
 
 target_include_directories(filter_spirit_test

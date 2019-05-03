@@ -1,6 +1,5 @@
-#include "fst/compiler/common.hpp"
-#include "fst/lang/print_type.hpp"
-#include "fst/parser/common.hpp"
+#include "fst/common/print_type.hpp"
+#include "fst/common/test_fixtures.hpp"
 
 #include "fs/compiler/compiler.hpp"
 #include "fs/log/buffered_logger.hpp"
@@ -63,11 +62,11 @@ tt::predicate_result compare_ranges(
 	return result;
 }
 
-BOOST_FIXTURE_TEST_SUITE(compiler_suite, fsut::compiler::compiler_fixture)
+BOOST_FIXTURE_TEST_SUITE(compiler_suite, fst::compiler_fixture)
 
 	BOOST_AUTO_TEST_CASE(minimal_input_resolve_constants)
 	{
-		const fs::parser::parse_data parse_data = parse(fsut::parser::minimal_input());
+		const fs::parser::parse_success_data parse_data = parse(fst::minimal_input());
 		const std::variant<fs::lang::constants_map, fs::compiler::error::error_variant> map_or_error =
 			resolve_constants(parse_data.ast.constant_definitions);
 		BOOST_TEST_REQUIRE(std::holds_alternative<fs::lang::constants_map>(map_or_error));
@@ -83,7 +82,7 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, fsut::compiler::compiler_fixture)
 	 *   - check the the error variant holds correct error type
 	 *   - check that error information points to relevant place in input
 	 */
-	class compiler_error_fixture : public fsut::compiler::compiler_fixture
+	class compiler_error_fixture : public fst::compiler_fixture
 	{
 	protected:
 		template <typename T>
@@ -103,14 +102,14 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, fsut::compiler::compiler_fixture)
 
 		BOOST_AUTO_TEST_CASE(name_already_exists)
 		{
-			const std::string input_str = fsut::parser::minimal_input() + R"(
+			const std::string input_str = fst::minimal_input() + R"(
 const some_var = 0
 const xyz = 1
 const some_other_var = 2
 const xyz = 3
 )";
 			const std::string_view input = input_str;
-			const fs::parser::parse_data parse_data = parse(input);
+			const fs::parser::parse_success_data parse_data = parse(input);
 			const auto error_desc = expect_error_when_resolving_constants<error::name_already_exists>(parse_data.ast.constant_definitions);
 
 			const std::string_view pattern = "xyz";
@@ -127,12 +126,12 @@ const xyz = 3
 
 		BOOST_AUTO_TEST_CASE(no_such_name)
 		{
-			const std::string input_str = fsut::parser::minimal_input() + R"(
+			const std::string input_str = fst::minimal_input() + R"(
 const abc = 0
 const xyz = non_existent_obj
 )";
 			const std::string_view input = input_str;
-			const fs::parser::parse_data parse_data = parse(input);
+			const fs::parser::parse_success_data parse_data = parse(input);
 			const auto error_desc = expect_error_when_resolving_constants<error::no_such_name>(parse_data.ast.constant_definitions);
 
 			const std::string_view expected_place_of_name = search(input, "non_existent_obj");
@@ -142,11 +141,11 @@ const xyz = non_existent_obj
 
 		BOOST_AUTO_TEST_CASE(no_such_function)
 		{
-			const std::string input_str = fsut::parser::minimal_input() + R"(
+			const std::string input_str = fst::minimal_input() + R"(
 const abc = non_existent_func(0)
 )";
 			const std::string_view input = input_str;
-			const fs::parser::parse_data parse_data = parse(input);
+			const fs::parser::parse_success_data parse_data = parse(input);
 			const auto error_desc = expect_error_when_resolving_constants<error::no_such_function>(parse_data.ast.constant_definitions);
 
 			const std::string_view expected_place_of_name = search(input, "non_existent_func");
@@ -156,11 +155,11 @@ const abc = non_existent_func(0)
 
 		BOOST_AUTO_TEST_CASE(invalid_amount_of_arguments)
 		{
-			const std::string input_str = fsut::parser::minimal_input() + R"(
+			const std::string input_str = fst::minimal_input() + R"(
 const color = Path(11, 22)
 )";
 			const std::string_view input = input_str;
-			const fs::parser::parse_data parse_data = parse(input);
+			const fs::parser::parse_success_data parse_data = parse(input);
 			const auto error_desc = expect_error_when_resolving_constants<error::invalid_amount_of_arguments>(parse_data.ast.constant_definitions);
 
 			const std::string_view expected_place_of_arguments = search(input, "11, 22");
@@ -170,11 +169,11 @@ const color = Path(11, 22)
 
 		BOOST_AUTO_TEST_CASE(type_mismatch)
 		{
-			const std::string input_str = fsut::parser::minimal_input() + R"(
+			const std::string input_str = fst::minimal_input() + R"(
 const color = RGB(11, 22, "33")
 )";
 			const std::string_view input = input_str;
-			const fs::parser::parse_data parse_data = parse(input);
+			const fs::parser::parse_success_data parse_data = parse(input);
 			const auto error_desc = expect_error_when_resolving_constants<error::type_mismatch>(parse_data.ast.constant_definitions);
 
 			BOOST_TEST(error_desc.expected_type == +fs::lang::object_type::integer);
@@ -187,11 +186,11 @@ const color = RGB(11, 22, "33")
 
 		BOOST_AUTO_TEST_CASE(empty_socket_group)
 		{
-			const std::string input_str = fsut::parser::minimal_input() + R"(
+			const std::string input_str = fst::minimal_input() + R"(
 const group = Group("")
 )";
 			const std::string_view input = input_str;
-			const fs::parser::parse_data parse_data = parse(input);
+			const fs::parser::parse_success_data parse_data = parse(input);
 			const auto error_desc = expect_error_when_resolving_constants<error::empty_socket_group>(parse_data.ast.constant_definitions);
 
 			const std::string_view expected_place_of_expression = search(input, "\"\"");
@@ -201,11 +200,11 @@ const group = Group("")
 
 		BOOST_AUTO_TEST_CASE(illegal_characters_in_socket_group)
 		{
-			const std::string input_str = fsut::parser::minimal_input() + R"(
+			const std::string input_str = fst::minimal_input() + R"(
 const group = Group("GBAC")
 )";
 			const std::string_view input = input_str;
-			const fs::parser::parse_data parse_data = parse(input);
+			const fs::parser::parse_success_data parse_data = parse(input);
 			const auto error_desc = expect_error_when_resolving_constants<error::illegal_characters_in_socket_group>(parse_data.ast.constant_definitions);
 
 			const std::string_view expected_place_of_expression = search(input, "\"GBAC\"");
@@ -215,11 +214,11 @@ const group = Group("GBAC")
 
 		BOOST_AUTO_TEST_CASE(invalid_socket_group)
 		{
-			const std::string input_str = fsut::parser::minimal_input() + R"(
+			const std::string input_str = fst::minimal_input() + R"(
 const group = Group("RRRRRRR") # 7 characters
 )";
 			const std::string_view input = input_str;
-			const fs::parser::parse_data parse_data = parse(input);
+			const fs::parser::parse_success_data parse_data = parse(input);
 			const auto error_desc = expect_error_when_resolving_constants<error::invalid_socket_group>(parse_data.ast.constant_definitions);
 
 			const std::string_view expected_place_of_expression = search(input, "\"RRRRRRR\"");
@@ -229,11 +228,11 @@ const group = Group("RRRRRRR") # 7 characters
 
 		BOOST_AUTO_TEST_CASE(invalid_minimap_icon_size)
 		{
-			const std::string input_str = fsut::parser::minimal_input() + R"(
+			const std::string input_str = fst::minimal_input() + R"(
 const icon = MinimapIcon(5, green, circle) # size must be in range [0, 2]
 )";
 			const std::string_view input = input_str;
-			const fs::parser::parse_data parse_data = parse(input);
+			const fs::parser::parse_success_data parse_data = parse(input);
 			const auto error_desc = expect_error_when_resolving_constants<error::invalid_minimap_icon_size>(parse_data.ast.constant_definitions);
 
 			BOOST_TEST(error_desc.requested_size == 5);

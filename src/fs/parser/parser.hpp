@@ -5,7 +5,7 @@
 #include "fs/log/utility.hpp"
 
 #include <string_view>
-#include <optional>
+#include <variant>
 #include <utility>
 #include <cassert>
 
@@ -33,8 +33,8 @@ public:
 	 * overloads and will accept objects both of x3::position_tagged derived and non-derived types.
 	 *
 	 * For non-derived types it returns empty, invalid range - this is not wanted,
-	 * empty ranges have no use in this program. Wrap the overload and force compiler
-	 * errror instead - much better than a segfault from unexpectedly invalid/empty range.
+	 * empty ranges have no use in this program. Wrap the overload to force compiler
+	 * error instead - much better than a segfault from unexpectedly invalid/empty range.
 	 */
 	[[nodiscard]]
 	std::string_view position_of(const x3::position_tagged& ast) const
@@ -60,13 +60,22 @@ private:
 	detail::position_cache_type position_cache;
 };
 
-struct parse_data
+struct parse_success_data
 {
 	ast::ast_type ast;
 	lookup_data lookup_data;
 };
 
+struct parse_failure_data
+{
+	lookup_data lookup_data;
+	error_holder_type errors;
+	const char* parser_stop_position;
+};
+
 [[nodiscard]]
-std::optional<parse_data> parse(std::string_view input, log::logger& logger);
+std::variant<parse_success_data, parse_failure_data> parse(std::string_view input);
+
+void print_parse_errors(const parse_failure_data& parse_data, log::logger& logger);
 
 }
