@@ -19,8 +19,6 @@ class parser_fixture
 protected:
 	static
 	fs::parser::parse_success_data parse(std::string_view input);
-
-	fs::log::buffered_logger log_buf;
 };
 
 class compiler_fixture : public parser_fixture
