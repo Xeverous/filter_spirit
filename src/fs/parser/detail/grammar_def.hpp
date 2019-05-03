@@ -20,7 +20,7 @@ namespace fs::parser::detail
 // ---- whitespace ----
 
 const comment_type comment = "comment";
-const auto comment_def = x3::lit('#') >> *(x3::char_ - x3::eol) >> (x3::eol | x3::eoi);
+const auto comment_def = x3::lit('#') > *(x3::char_ - x3::eol) > (x3::eol | x3::eoi);
 BOOST_SPIRIT_DEFINE(comment)
 
 const whitespace_type whitespace = "whitespace";
@@ -112,11 +112,11 @@ const auto value_expression_list_def = (value_expression % ',') | x3::attr(ast::
 BOOST_SPIRIT_DEFINE(value_expression_list)
 
 const function_call_type function_call = "function call";
-const auto function_call_def = identifier >> '(' >> value_expression_list >> ')';
+const auto function_call_def = identifier >> '(' > value_expression_list > ')';
 BOOST_SPIRIT_DEFINE(function_call)
 
 const price_range_query_type price_range_query = "price range query";
-const auto price_range_query_def = '$' >> identifier >> '(' >> value_expression_list >> ')';
+const auto price_range_query_def = '$' > identifier > '(' > value_expression_list > ')';
 BOOST_SPIRIT_DEFINE(price_range_query)
 
 const array_expression_type array_expression = "array expression";
