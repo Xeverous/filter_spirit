@@ -68,7 +68,7 @@ const auto integer_literal_def = x3::int_;
 BOOST_SPIRIT_DEFINE(integer_literal)
 
 const string_literal_type string_literal = "string";
-const auto string_literal_def = x3::lexeme['"' > *(x3::char_ - '"') > '"'];
+const auto string_literal_def = x3::lexeme['"' > *(x3::char_ - (x3::lit('"') | '\n' | '\r')) > '"'];
 BOOST_SPIRIT_DEFINE(string_literal)
 
 const boolean_literal_type boolean_literal = "boolean literal";
