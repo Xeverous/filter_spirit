@@ -27,6 +27,40 @@ BOOST_FIXTURE_TEST_SUITE(parser_suite, fst::parser_fixture)
 		BOOST_TEST(version.patch == core::version::patch);
 	}
 
+	BOOST_AUTO_TEST_CASE(comments)
+	{
+		const std::string input = fst::minimal_input() + R"(
+#
+# test that parser correctly handles all comments, including this one
+##
+# #
+const n1 = 1 #
+const n2 = 2 ## #text
+)";
+
+		namespace pa = fs::parser::ast;
+		const pa::ast_type ast = parse(input).ast;
+
+		const std::vector<pa::constant_definition>& defs = ast.constant_definitions;
+		BOOST_TEST_REQUIRE(static_cast<int>(defs.size()) == 2);
+
+		const auto& n1 = defs[0];
+		BOOST_TEST(n1.name.value == "n1");
+		BOOST_TEST_REQUIRE(holds_alternative<pa::literal_expression>(n1.value.var));
+		const auto& n1_literal_expression = boost::get<pa::literal_expression>(n1.value.var);
+		BOOST_TEST_REQUIRE(holds_alternative<pa::integer_literal>(n1_literal_expression.var));
+		const auto& n1_literal = boost::get<pa::integer_literal>(n1_literal_expression.var);
+		BOOST_TEST(n1_literal.value == 1);
+
+		const auto& n2 = defs[1];
+		BOOST_TEST(n2.name.value == "n2");
+		BOOST_TEST_REQUIRE(holds_alternative<pa::literal_expression>(n2.value.var));
+		const auto& n2_literal_expression = boost::get<pa::literal_expression>(n2.value.var);
+		BOOST_TEST_REQUIRE(holds_alternative<pa::integer_literal>(n2_literal_expression.var));
+		const auto& n2_literal = boost::get<pa::integer_literal>(n2_literal_expression.var);
+		BOOST_TEST(n2_literal.value == 2);
+	}
+
 	BOOST_AUTO_TEST_CASE(empty_string)
 	{
 		const std::string input = fst::minimal_input() + "\n"
