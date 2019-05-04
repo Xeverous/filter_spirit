@@ -29,15 +29,13 @@ std::variant<lang::socket_group, error::error_variant> construct_socket_group(
 	lang::socket_group sg;
 	for (char c : string.value)
 	{
-		namespace kw = lang::keywords;
-
-		if (c == kw::r)
+		if (c == 'R')
 			++sg.r;
-		else if (c == kw::g)
+		else if (c == 'G')
 			++sg.g;
-		else if (c == kw::b)
+		else if (c == 'B')
 			++sg.b;
-		else if (c == kw::w)
+		else if (c == 'W')
 			++sg.w;
 		else
 			return error::illegal_characters_in_socket_group{parser::get_position_info(arguments.front())};

@@ -78,10 +78,16 @@ struct boolean
 	bool value;
 };
 
+inline bool operator==(boolean lhs, boolean rhs) { return lhs.value == rhs.value; }
+inline bool operator!=(boolean lhs, boolean rhs) { return !(lhs == rhs); }
+
 struct integer
 {
 	int value;
 };
+
+inline bool operator==(integer lhs, integer rhs) { return lhs.value == rhs.value; }
+inline bool operator!=(integer lhs, integer rhs) { return !(lhs == rhs); }
 
 // should be above integer for consistency but it has a dependency in ctor
 struct floating_point
@@ -92,40 +98,63 @@ struct floating_point
 	double value;
 };
 
+inline bool operator==(floating_point lhs, floating_point rhs) { return lhs.value == rhs.value; }
+inline bool operator!=(floating_point lhs, floating_point rhs) { return !(lhs == rhs); }
+
 struct level
 {
+	explicit level(int value) : value(value) {}
 	explicit level(integer n) : value(n.value) {}
 
 	int value;
 };
 
+inline bool operator==(level lhs, level rhs) { return lhs.value == rhs.value; }
+inline bool operator!=(level lhs, level rhs) { return !(lhs == rhs); }
+
 struct quality
 {
+	explicit quality(int value) : value(value) {}
 	explicit quality(integer n) : value(n.value) {}
 
 	int value;
 };
 
+inline bool operator==(quality lhs, quality rhs) { return lhs.value == rhs.value; }
+inline bool operator!=(quality lhs, quality rhs) { return !(lhs == rhs); }
+
 struct font_size
 {
+	explicit font_size(int value) : value(value) {}
 	explicit font_size(integer n) : value(n.value) {}
 
 	int value;
 };
 
+inline bool operator==(font_size lhs, font_size rhs) { return lhs.value == rhs.value; }
+inline bool operator!=(font_size lhs, font_size rhs) { return !(lhs == rhs); }
+
 struct sound_id
 {
+	explicit sound_id(int value) : value(value) {}
 	explicit sound_id(integer n) : value(n.value) {}
 
 	int value;
 };
 
+inline bool operator==(sound_id lhs, sound_id rhs) { return lhs.value == rhs.value; }
+inline bool operator!=(sound_id lhs, sound_id rhs) { return !(lhs == rhs); }
+
 struct volume
 {
+	explicit volume(int value) : value(value) {}
 	explicit volume(integer n) : value(n.value) {}
 
 	int value;
 };
+
+inline bool operator==(volume lhs, volume rhs) { return lhs.value == rhs.value; }
+inline bool operator!=(volume lhs, volume rhs) { return !(lhs == rhs); }
 
 struct socket_group
 {
@@ -140,6 +169,12 @@ struct socket_group
 	int b = 0;
 	int w = 0;
 };
+
+inline bool operator==(socket_group lhs, socket_group rhs)
+{
+	return std::tie(lhs.r, lhs.g, lhs.b, lhs.w) == std::tie(rhs.r, rhs.g, rhs.b, rhs.w);
+}
+inline bool operator!=(socket_group lhs, socket_group rhs) { return !(lhs == rhs); }
 
 enum class rarity { normal, magic, rare, unique };
 enum class shape { circle, diamond, hexagon, square, star, triangle };
@@ -159,12 +194,24 @@ struct color
 	std::optional<int> a;
 };
 
+inline bool operator==(color lhs, color rhs)
+{
+	return std::tie(lhs.r, lhs.g, lhs.b, lhs.a) == std::tie(rhs.r, rhs.g, rhs.b, rhs.a);
+}
+inline bool operator!=(color lhs, color rhs) { return !(lhs == rhs); }
+
 struct minimap_icon
 {
 	int size;
 	suit color;
 	shape shape;
 };
+
+inline bool operator==(minimap_icon lhs, minimap_icon rhs)
+{
+	return std::tie(lhs.size, lhs.color, lhs.shape) == std::tie(rhs.size, rhs.color, rhs.shape);
+}
+inline bool operator!=(minimap_icon lhs, minimap_icon rhs) { return !(lhs == rhs); }
 
 struct beam_effect
 {
@@ -175,26 +222,41 @@ struct beam_effect
 	bool is_temporary;
 };
 
+inline bool operator==(beam_effect lhs, beam_effect rhs)
+{
+	return std::tie(lhs.color, lhs.is_temporary) == std::tie(rhs.color, rhs.is_temporary);
+}
+inline bool operator!=(beam_effect lhs, beam_effect rhs) { return !(lhs == rhs); }
+
 struct string
 {
 	std::string value;
 };
 
+inline bool operator==(const string& lhs, const string& rhs) { return lhs.value == rhs.value; }
+inline bool operator!=(const string& lhs, const string& rhs) { return !(lhs == rhs); }
+
 struct path
 {
+	explicit path(std::string str)
+	: value(std::move(str)) {}
+
 	explicit path(string s)
 	: value(std::move(s.value)) {}
 
 	std::string value;
 };
 
+inline bool operator==(const path& lhs, const path& rhs) { return lhs.value == rhs.value; }
+inline bool operator!=(const path& lhs, const path& rhs) { return !(lhs == rhs); }
+
 struct alert_sound
 {
-	explicit alert_sound(sound_id id)
-	: sound(id) {}
-
 	explicit alert_sound(integer n)
 	: sound(sound_id(n)) {}
+
+	explicit alert_sound(sound_id id)
+	: sound(id) {}
 
 	explicit alert_sound(path p)
 	: sound(std::move(p)) {}
@@ -203,8 +265,14 @@ struct alert_sound
 	: sound(path(std::move(s))) {}
 
 	std::variant<sound_id, path> sound;
-	std::optional<volume> vol;
+	std::optional<volume> volume;
 };
+
+inline bool operator==(const alert_sound& lhs, const alert_sound& rhs)
+{
+	return std::tie(lhs.sound, lhs.volume) == std::tie(rhs.sound, rhs.volume);
+}
+inline bool operator!=(const alert_sound& lhs, const alert_sound& rhs) { return !(lhs == rhs); }
 
 class object;
 
@@ -297,11 +365,20 @@ struct object
 	position_tag value_origin;
 };
 
+inline bool operator==(const object& lhs, const object& rhs)
+{
+	// we intentionally do not compare origins
+	// this operator is used by tests and potentially in the language
+	return lhs.value == rhs.value;
+}
+inline bool operator!=(const object& lhs, const object& rhs) { return !(lhs == rhs); }
+
+
 [[nodiscard]]
 std::string_view to_string_view(object_type type);
 
 [[nodiscard]]
-object_type type_of_object(const object& object);
+object_type type_of_object(const object_variant& object);
 
 template <typename T> [[nodiscard]] constexpr
 object_type type_to_enum_impl()

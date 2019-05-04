@@ -24,11 +24,14 @@ std::string generate_filter(
 	return *filter;
 }
 
+namespace fst
+{
+
 BOOST_AUTO_TEST_SUITE(compiler_suite)
 
 	BOOST_AUTO_TEST_CASE(minimal_input_generate_filter)
 	{
-		const std::string filter = generate_filter(fst::minimal_input());
+		const std::string filter = generate_filter(minimal_input());
 		BOOST_TEST(filter.empty());
 	}
 
@@ -37,3 +40,5 @@ BOOST_AUTO_TEST_SUITE(compiler_suite)
 	BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE_END()
+
+}

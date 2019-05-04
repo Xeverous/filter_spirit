@@ -62,12 +62,15 @@ bool test_literal_definition(const fs::parser::ast::constant_definition& def, co
 	return test_literal_expression<T>(def.value, value);
 }
 
-BOOST_FIXTURE_TEST_SUITE(parser_suite, fst::parser_fixture)
+namespace fst
+{
+
+BOOST_FIXTURE_TEST_SUITE(parser_suite, parser_fixture)
 
 	BOOST_AUTO_TEST_CASE(version_requirement)
 	{
 		using namespace fs;
-		const parser::ast::ast_type ast = parse(fst::minimal_input()).ast;
+		const parser::ast::ast_type ast = parse(minimal_input()).ast;
 
 		const parser::ast::config& config = ast.config;
 		BOOST_TEST(config.params.empty());
@@ -80,7 +83,7 @@ BOOST_FIXTURE_TEST_SUITE(parser_suite, fst::parser_fixture)
 
 	BOOST_AUTO_TEST_CASE(comments)
 	{
-		const std::string input = fst::minimal_input() + R"(
+		const std::string input = minimal_input() + R"(
 #
 # test that parser correctly handles all comments, including this one
 ##
@@ -101,7 +104,7 @@ const n2 = 2 ## #text
 
 	BOOST_AUTO_TEST_CASE(identifiers)
 	{
-		const std::string input = fst::minimal_input() + R"(
+		const std::string input = minimal_input() + R"(
 # test that parser can correctly parse various identifiers
 const n1 = 1
 const n_2 = 2
@@ -127,7 +130,7 @@ const GGG = 666
 
 	BOOST_AUTO_TEST_CASE(empty_string)
 	{
-		const std::string input = fst::minimal_input() + "\n"
+		const std::string input = minimal_input() + "\n"
 			"const empty_string = \"\"";
 
 		namespace pa = fs::parser::ast;
@@ -141,7 +144,7 @@ const GGG = 666
 
 	BOOST_AUTO_TEST_CASE(color_definitions)
 	{
-		const std::string input = fst::minimal_input() + "\n"
+		const std::string input = minimal_input() + "\n"
 			"const color_first = RGB( 11,  22,  33)\n"
 			"const color_black = RGB(  0,   1,   2, 255)\n"
 			"const color_other = color_black";
@@ -182,7 +185,7 @@ const GGG = 666
 
 	BOOST_AUTO_TEST_CASE(array_definition)
 	{
-		const std::string input = fst::minimal_input() + "\n"
+		const std::string input = minimal_input() + "\n"
 			"const currency_t1 = [\"Exalted Orb\", \"Mirror of Kalandra\", \"Eternal Orb\", \"Mirror Shard\"]";
 
 		namespace pa = fs::parser::ast;
@@ -213,7 +216,7 @@ const GGG = 666
 		// note: parser does not evaluate identifier references
 		// it's done later by the compiler which would error upon
 		// this source but for the parser - AST is correct here
-		const std::string input = fst::minimal_input() + R"(
+		const std::string input = minimal_input() + R"(
 # sample comment
 SetBackgroundColor color_black
 
@@ -306,3 +309,5 @@ Show
 	}
 
 BOOST_AUTO_TEST_SUITE_END()
+
+}

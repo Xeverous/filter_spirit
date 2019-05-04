@@ -362,10 +362,10 @@ std::optional<error::non_homogeneous_array> verify_array_homogeneity(
 		return std::nullopt;
 
 	const lang::object& first_object = array.front();
-	const lang::object_type first_type = lang::type_of_object(first_object);
+	const lang::object_type first_type = lang::type_of_object(first_object.value);
 	for (const lang::object& element : array)
 	{
-		const lang::object_type tested_type = lang::type_of_object(element);
+		const lang::object_type tested_type = lang::type_of_object(element.value);
 		if (tested_type != first_type) // C++20: [[unlikely]]
 		{
 			return error::non_homogeneous_array{

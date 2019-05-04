@@ -17,7 +17,7 @@ std::variant<T, error::error_variant> attempt_to_promote(const lang::object& obj
 {
 	return error::type_mismatch{
 		lang::type_to_enum<T>(),
-		lang::type_of_object(object),
+		lang::type_of_object(object.value),
 		object.value_origin};
 }
 

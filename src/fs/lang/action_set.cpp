@@ -2,6 +2,8 @@
 #include "fs/lang/generation.hpp"
 #include "fs/utility/visitor.hpp"
 
+#include <ostream>
+
 namespace
 {
 
@@ -52,8 +54,8 @@ void output_alert_sound(
 		}
 	}, as.sound);
 
-	if (as.vol.has_value())
-		output_stream << ' ' << (*as.vol).value;
+	if (as.volume.has_value())
+		output_stream << ' ' << (*as.volume).value;
 
 	output_stream << '\n';
 }

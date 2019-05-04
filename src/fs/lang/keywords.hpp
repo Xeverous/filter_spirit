@@ -15,29 +15,23 @@
 namespace fs::lang::keywords
 {
 
-// TODO are keywords for trivial types really needed?
-constexpr auto boolean      = "Boolean";
-constexpr auto integer      = "Integer";
-constexpr auto floating_point = "FloatingPoint";
 constexpr auto level        = "Level";
+/*
+ * name clash: Quality() function to create an object
+ * of type Quality and a Quality condition
+ *
+ * resign of the function, we still need the Quality type
+ * but users will not be to construct it directly
+ */
+// constexpr auto quality      = "Quality";
+constexpr auto font_size    = "FontSize";
 constexpr auto sound_id     = "SoundId";
 constexpr auto volume       = "Volume";
-constexpr auto font_size    = "FontSize";
 constexpr auto group        = "Group";
-constexpr auto rarity_type  = "RarityType";
-constexpr auto shape        = "Shape";
-constexpr auto suit         = "Suit";
-constexpr auto color        = "Color";
 constexpr auto minimap_icon = "MinimapIcon";
-constexpr auto beam_effect  = "BeamEffect";
-constexpr auto string       = "String";
+constexpr auto beam_effect  = "Beam";
 constexpr auto path         = "Path";
 constexpr auto alert_sound  = "AlertSound";
-
-constexpr auto r = generation::r;
-constexpr auto g = generation::g;
-constexpr auto b = generation::b;
-constexpr auto w = generation::w;
 
 constexpr auto show = generation::show;
 constexpr auto hide = generation::hide;

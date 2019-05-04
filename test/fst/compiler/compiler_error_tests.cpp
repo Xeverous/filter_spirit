@@ -1,5 +1,6 @@
 #include "fst/common/print_type.hpp"
 #include "fst/common/test_fixtures.hpp"
+#include "fst/common/string_operations.hpp"
 
 #include "fs/compiler/compiler.hpp"
 #include "fs/log/buffered_logger.hpp"
@@ -15,58 +16,14 @@
 namespace ut = boost::unit_test;
 namespace tt = boost::test_tools;
 
-std::string_view search(std::string_view input, std::string_view pattern)
+namespace fst
 {
-	BOOST_TEST_REQUIRE(!input.empty(), "test is written incorrectly, input is empty");
-	BOOST_TEST_REQUIRE(!pattern.empty(), "test is written incorrectly, pattern is empty");
 
-	/*
-	 * We use this function to search within input for the text that causes compiler error.
-	 * Since we always want to get that text in order to compare it with error description,
-	 * a failed search should be flagged as internal test error.
-	 */
-	const char *const pattern_first = pattern.data();
-	const char *const pattern_last  = pattern.data() + pattern.size();
-	std::default_searcher<const char*> searcher(pattern_first, pattern_last);
-	const char *const input_first = input.data();
-	const char *const input_last  = input.data() + input.size();
-	const auto pair = searcher(input_first, input_last);
-	BOOST_TEST_REQUIRE((pair.first != input_last), "test is written incorrectly, search within tested input code failed");
-	return fs::log::make_string_view(pair.first, pair.second);
-}
-
-std::string range_info_to_string(
-	std::string_view all_code,
-	std::string_view code_to_underline)
-{
-	fs::log::buffered_logger logger;
-	logger.print_underlined_code(all_code, code_to_underline);
-	return logger.flush_out();
-}
-
-tt::predicate_result compare_ranges(
-	std::string_view expected,
-	std::string_view actual,
-	std::string_view whole_input /* <- for pretty-printing */)
-{
-	if (expected.empty())
-		BOOST_FAIL("test written incorrectly: an empty range should never be expected");
-
-	if (expected == actual)
-		return true;
-
-	tt::predicate_result result(false);
-	result.message()
-		<< "EXPECTED:\n" << range_info_to_string(whole_input, expected)
-		<< "ACTUAL:\n" << range_info_to_string(whole_input, actual);
-	return result;
-}
-
-BOOST_FIXTURE_TEST_SUITE(compiler_suite, fst::compiler_fixture)
+BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 
 	BOOST_AUTO_TEST_CASE(minimal_input_resolve_constants)
 	{
-		const fs::parser::parse_success_data parse_data = parse(fst::minimal_input());
+		const fs::parser::parse_success_data parse_data = parse(minimal_input());
 		const std::variant<fs::lang::constants_map, fs::compiler::error::error_variant> map_or_error =
 			resolve_constants(parse_data.ast.constant_definitions);
 		BOOST_TEST_REQUIRE(std::holds_alternative<fs::lang::constants_map>(map_or_error));
@@ -82,7 +39,7 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, fst::compiler_fixture)
 	 *   - check the the error variant holds correct error type
 	 *   - check that error information points to relevant place in input
 	 */
-	class compiler_error_fixture : public fst::compiler_fixture
+	class compiler_error_fixture : public compiler_fixture
 	{
 	protected:
 		template <typename T>
@@ -102,7 +59,7 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, fst::compiler_fixture)
 
 		BOOST_AUTO_TEST_CASE(name_already_exists)
 		{
-			const std::string input_str = fst::minimal_input() + R"(
+			const std::string input_str = minimal_input() + R"(
 const some_var = 0
 const xyz = 1
 const some_other_var = 2
@@ -126,7 +83,7 @@ const xyz = 3
 
 		BOOST_AUTO_TEST_CASE(no_such_name)
 		{
-			const std::string input_str = fst::minimal_input() + R"(
+			const std::string input_str = minimal_input() + R"(
 const abc = 0
 const xyz = non_existent_obj
 )";
@@ -141,7 +98,7 @@ const xyz = non_existent_obj
 
 		BOOST_AUTO_TEST_CASE(no_such_function)
 		{
-			const std::string input_str = fst::minimal_input() + R"(
+			const std::string input_str = minimal_input() + R"(
 const abc = non_existent_func(0)
 )";
 			const std::string_view input = input_str;
@@ -155,7 +112,7 @@ const abc = non_existent_func(0)
 
 		BOOST_AUTO_TEST_CASE(invalid_amount_of_arguments)
 		{
-			const std::string input_str = fst::minimal_input() + R"(
+			const std::string input_str = minimal_input() + R"(
 const color = Path(11, 22)
 )";
 			const std::string_view input = input_str;
@@ -169,7 +126,7 @@ const color = Path(11, 22)
 
 		BOOST_AUTO_TEST_CASE(type_mismatch)
 		{
-			const std::string input_str = fst::minimal_input() + R"(
+			const std::string input_str = minimal_input() + R"(
 const color = RGB(11, 22, "33")
 )";
 			const std::string_view input = input_str;
@@ -186,7 +143,7 @@ const color = RGB(11, 22, "33")
 
 		BOOST_AUTO_TEST_CASE(empty_socket_group)
 		{
-			const std::string input_str = fst::minimal_input() + R"(
+			const std::string input_str = minimal_input() + R"(
 const group = Group("")
 )";
 			const std::string_view input = input_str;
@@ -200,7 +157,7 @@ const group = Group("")
 
 		BOOST_AUTO_TEST_CASE(illegal_characters_in_socket_group)
 		{
-			const std::string input_str = fst::minimal_input() + R"(
+			const std::string input_str = minimal_input() + R"(
 const group = Group("GBAC")
 )";
 			const std::string_view input = input_str;
@@ -214,7 +171,7 @@ const group = Group("GBAC")
 
 		BOOST_AUTO_TEST_CASE(invalid_socket_group)
 		{
-			const std::string input_str = fst::minimal_input() + R"(
+			const std::string input_str = minimal_input() + R"(
 const group = Group("RRRRRRR") # 7 characters
 )";
 			const std::string_view input = input_str;
@@ -228,7 +185,7 @@ const group = Group("RRRRRRR") # 7 characters
 
 		BOOST_AUTO_TEST_CASE(invalid_minimap_icon_size)
 		{
-			const std::string input_str = fst::minimal_input() + R"(
+			const std::string input_str = minimal_input() + R"(
 const icon = MinimapIcon(5, green, circle) # size must be in range [0, 2]
 )";
 			const std::string_view input = input_str;
@@ -245,3 +202,5 @@ const icon = MinimapIcon(5, green, circle) # size must be in range [0, 2]
 	BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE_END()
+
+}
