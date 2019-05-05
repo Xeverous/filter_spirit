@@ -72,6 +72,11 @@ logger_wrapper::~logger_wrapper()
 	logger.end_message();
 }
 
+void logger::print_line_number(int line_number)
+{
+	*this << "line " << line_number << ": ";
+}
+
 void logger::print_underlined_code(std::string_view all_code, std::string_view underlined_code)
 {
 	const char *const all_first = all_code.data();

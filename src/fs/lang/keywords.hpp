@@ -84,7 +84,7 @@ constexpr auto yellow      = "yellow";
 
 // ---- definitions ----
 
-constexpr const char* const const_ = "const"; // (for meme purposes only)
+constexpr const char* const const_ = "const"; // const
 
 // ---- rules ----
 
@@ -117,7 +117,16 @@ constexpr auto set_text_color             = generation::set_text_color;
 constexpr auto set_background_color       = generation::set_background_color;
 constexpr auto set_font_size              = generation::set_font_size;
 constexpr auto set_alert_sound            = "SetAlertSound";
-constexpr auto set_alert_sound_positional = "SetAlertSoundPositional";
+/*
+ * Not used: instead of a separate actions that perform (non)positional
+ * effect we add a boolean parameter to built_in_alert_sound constructor.
+ *
+ * This way we have a simpler and only 1 interface that allows all:
+ * - built in sound
+ * - built in sound positional
+ * - custom alert sound
+ */
+// constexpr auto set_alert_sound_positional = "SetAlertSoundPositional";
 constexpr auto disable_drop_sound         = generation::disable_drop_sound;
 constexpr auto set_minimap_icon           = "SetMinimapIcon";
 constexpr auto set_beam                   = "SetBeam";

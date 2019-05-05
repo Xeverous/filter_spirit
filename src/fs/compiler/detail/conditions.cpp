@@ -39,7 +39,7 @@ std::optional<error::error_variant> add_conditions(
 			}));
 
 		if (error)
-			return *error;
+			return error;
 	}
 
 	return std::nullopt;
@@ -59,7 +59,7 @@ std::optional<error::error_variant> add_comparison_condition(
 		{
 			std::variant<lang::level, error::error_variant> level_or_error = evaluate_as<lang::level>(condition.value, map, item_price_data);
 			if (std::holds_alternative<error::error_variant>(level_or_error))
-				return std::get<error::error_variant>(level_or_error);
+				return std::get<error::error_variant>(std::move(level_or_error));
 
 			const auto& level = std::get<lang::level>(level_or_error);
 			return add_range_condition(condition.comparison_type.value, level.value, condition_origin, condition_set.item_level);
@@ -68,7 +68,7 @@ std::optional<error::error_variant> add_comparison_condition(
 		{
 			std::variant<lang::level, error::error_variant> level_or_error = evaluate_as<lang::level>(condition.value, map, item_price_data);
 			if (std::holds_alternative<error::error_variant>(level_or_error))
-				return std::get<error::error_variant>(level_or_error);
+				return std::get<error::error_variant>(std::move(level_or_error));
 
 			const auto& level = std::get<lang::level>(level_or_error);
 			return add_range_condition(condition.comparison_type.value, level.value, condition_origin, condition_set.drop_level);
@@ -77,7 +77,7 @@ std::optional<error::error_variant> add_comparison_condition(
 		{
 			std::variant<lang::quality, error::error_variant> quality_or_error = evaluate_as<lang::quality>(condition.value, map, item_price_data);
 			if (std::holds_alternative<error::error_variant>(quality_or_error))
-				return std::get<error::error_variant>(quality_or_error);
+				return std::get<error::error_variant>(std::move(quality_or_error));
 
 			const auto& quality = std::get<lang::quality>(quality_or_error);
 			return add_range_condition(condition.comparison_type.value, quality.value, condition_origin, condition_set.quality);
@@ -86,7 +86,7 @@ std::optional<error::error_variant> add_comparison_condition(
 		{
 			std::variant<lang::rarity, error::error_variant> rarity_or_error = evaluate_as<lang::rarity>(condition.value, map, item_price_data);
 			if (std::holds_alternative<error::error_variant>(rarity_or_error))
-				return std::get<error::error_variant>(rarity_or_error);
+				return std::get<error::error_variant>(std::move(rarity_or_error));
 
 			const auto& rarity = std::get<lang::rarity>(rarity_or_error);
 			return add_range_condition(condition.comparison_type.value, rarity, condition_origin, condition_set.rarity);
@@ -95,7 +95,7 @@ std::optional<error::error_variant> add_comparison_condition(
 		{
 			std::variant<lang::integer, error::error_variant> integer_or_error = evaluate_as<lang::integer>(condition.value, map, item_price_data);
 			if (std::holds_alternative<error::error_variant>(integer_or_error))
-				return std::get<error::error_variant>(integer_or_error);
+				return std::get<error::error_variant>(std::move(integer_or_error));
 
 			const auto& integer = std::get<lang::integer>(integer_or_error);
 			return add_range_condition(condition.comparison_type.value, integer.value, condition_origin, condition_set.sockets);
@@ -104,7 +104,7 @@ std::optional<error::error_variant> add_comparison_condition(
 		{
 			std::variant<lang::integer, error::error_variant> integer_or_error = evaluate_as<lang::integer>(condition.value, map, item_price_data);
 			if (std::holds_alternative<error::error_variant>(integer_or_error))
-				return std::get<error::error_variant>(integer_or_error);
+				return std::get<error::error_variant>(std::move(integer_or_error));
 
 			const auto& integer = std::get<lang::integer>(integer_or_error);
 			return add_range_condition(condition.comparison_type.value, integer.value, condition_origin, condition_set.links);
@@ -113,7 +113,7 @@ std::optional<error::error_variant> add_comparison_condition(
 		{
 			std::variant<lang::integer, error::error_variant> integer_or_error = evaluate_as<lang::integer>(condition.value, map, item_price_data);
 			if (std::holds_alternative<error::error_variant>(integer_or_error))
-				return std::get<error::error_variant>(integer_or_error);
+				return std::get<error::error_variant>(std::move(integer_or_error));
 
 			const auto& integer = std::get<lang::integer>(integer_or_error);
 			return add_range_condition(condition.comparison_type.value, integer.value, condition_origin, condition_set.height);
@@ -122,7 +122,7 @@ std::optional<error::error_variant> add_comparison_condition(
 		{
 			std::variant<lang::integer, error::error_variant> integer_or_error = evaluate_as<lang::integer>(condition.value, map, item_price_data);
 			if (std::holds_alternative<error::error_variant>(integer_or_error))
-				return std::get<error::error_variant>(integer_or_error);
+				return std::get<error::error_variant>(std::move(integer_or_error));
 
 			const auto& integer = std::get<lang::integer>(integer_or_error);
 			return add_range_condition(condition.comparison_type.value, integer.value, condition_origin, condition_set.width);
@@ -131,7 +131,7 @@ std::optional<error::error_variant> add_comparison_condition(
 		{
 			std::variant<lang::integer, error::error_variant> integer_or_error = evaluate_as<lang::integer>(condition.value, map, item_price_data);
 			if (std::holds_alternative<error::error_variant>(integer_or_error))
-				return std::get<error::error_variant>(integer_or_error);
+				return std::get<error::error_variant>(std::move(integer_or_error));
 
 			const auto& integer = std::get<lang::integer>(integer_or_error);
 			return add_range_condition(condition.comparison_type.value, integer.value, condition_origin, condition_set.stack_size);
@@ -140,7 +140,7 @@ std::optional<error::error_variant> add_comparison_condition(
 		{
 			std::variant<lang::integer, error::error_variant> integer_or_error = evaluate_as<lang::integer>(condition.value, map, item_price_data);
 			if (std::holds_alternative<error::error_variant>(integer_or_error))
-				return std::get<error::error_variant>(integer_or_error);
+				return std::get<error::error_variant>(std::move(integer_or_error));
 
 			const auto& integer = std::get<lang::integer>(integer_or_error);
 			return add_range_condition(condition.comparison_type.value, integer.value, condition_origin, condition_set.gem_level);
@@ -149,7 +149,7 @@ std::optional<error::error_variant> add_comparison_condition(
 		{
 			std::variant<lang::integer, error::error_variant> integer_or_error = evaluate_as<lang::integer>(condition.value, map, item_price_data);
 			if (std::holds_alternative<error::error_variant>(integer_or_error))
-				return std::get<error::error_variant>(integer_or_error);
+				return std::get<error::error_variant>(std::move(integer_or_error));
 
 			const auto& integer = std::get<lang::integer>(integer_or_error);
 			return add_range_condition(condition.comparison_type.value, integer.value, condition_origin, condition_set.map_tier);
@@ -169,12 +169,12 @@ std::optional<error::error_variant> add_string_condition(
 {
 	std::variant<lang::array_object, error::error_variant> array_or_error = evaluate_as<lang::array_object>(condition.value, map, item_price_data);
 	if (std::holds_alternative<error::error_variant>(array_or_error))
-		return std::get<error::error_variant>(array_or_error);
+		return std::get<error::error_variant>(std::move(array_or_error));
 
 	auto& array = std::get<lang::array_object>(array_or_error);
 	std::variant<std::vector<std::string>, error::error_variant> strings_or_error = array_to_strings(std::move(array));
 	if (std::holds_alternative<error::error_variant>(strings_or_error))
-		return std::get<error::error_variant>(strings_or_error);
+		return std::get<error::error_variant>(std::move(strings_or_error));
 
 	auto& strings = std::get<std::vector<std::string>>(strings_or_error);
 	lang::position_tag condition_origin = parser::get_position_info(condition);
@@ -221,7 +221,7 @@ std::optional<error::error_variant> add_boolean_condition(
 {
 	std::variant<lang::boolean, error::error_variant> boolean_or_error = evaluate_as<lang::boolean>(condition.value, map, item_price_data);
 	if (std::holds_alternative<error::error_variant>(boolean_or_error))
-			return std::get<error::error_variant>(boolean_or_error);
+		return std::get<error::error_variant>(std::move(boolean_or_error));
 
 	auto& boolean = std::get<lang::boolean>(boolean_or_error);
 	lang::position_tag condition_origin = parser::get_position_info(condition);
@@ -287,7 +287,7 @@ std::optional<error::error_variant> add_socket_group_condition(
 {
 	std::variant<lang::socket_group, error::error_variant> socket_group_or_error = evaluate_as<lang::socket_group>(condition.value, map, item_price_data);
 	if (std::holds_alternative<error::error_variant>(socket_group_or_error))
-			return std::get<error::error_variant>(socket_group_or_error);
+		return std::get<error::error_variant>(std::move(socket_group_or_error));
 
 	const auto& socket_group = std::get<lang::socket_group>(socket_group_or_error);
 	lang::position_tag condition_origin = parser::get_position_info(condition);

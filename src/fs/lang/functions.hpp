@@ -7,7 +7,7 @@ namespace fs::lang::functions
 // names of built-in functions
 constexpr auto rgb = "RGB";
 constexpr auto level        = keywords::level;
-constexpr auto quality      = keywords::quality;
+// constexpr auto quality      = keywords::quality;
 constexpr auto font_size    = keywords::font_size;
 constexpr auto sound_id     = keywords::sound_id;
 constexpr auto volume       = keywords::volume;

@@ -27,7 +27,7 @@ std::variant<std::vector<lang::filter_block>, error::error_variant> filter_build
 	lang::action_set actions;
 	std::optional<error::error_variant> error = build_nested(top_level_statements, conditions, actions);
 	if (error)
-		return *error;
+		return *std::move(error);
 
 	return blocks;
 }

@@ -1,6 +1,11 @@
 #pragma once
+
 #include "fs/lang/types.hpp"
+
 #include <variant>
+#include <vector>
+#include <optional>
+#include <memory>
 
 // all possible compilation errors
 
@@ -30,8 +35,7 @@ struct no_such_query
 
 struct invalid_amount_of_arguments
 {
-	int min_expected;
-	int max_expected;
+	int expected;
 	int actual;
 	lang::position_tag place_of_arguments;
 };
@@ -41,6 +45,16 @@ struct type_mismatch
 	lang::object_type expected_type;
 	lang::object_type actual_type;
 	lang::position_tag place_of_expression;
+};
+
+struct failed_constructor_call;
+
+struct no_matching_constructor_found
+{
+	lang::object_type attempted_type_to_construct;
+	std::vector<std::optional<lang::object_type>> supplied_types;
+	lang::position_tag place_of_function_call;
+	std::vector<struct unmatched_function_call> errors;
 };
 
 struct nested_arrays_not_allowed
@@ -77,19 +91,9 @@ struct invalid_minimap_icon_size
 	lang::position_tag place_of_size_argument;
 };
 
-struct positional_sound_not_supported
-{
-	lang::position_tag place_of_action;
-};
-
 struct disable_drop_sound_not_supported
 {
 	lang::position_tag place_of_action;
-};
-
-struct temporary_beam_effect_not_supported
-{
-	lang::position_tag place_of_2nd_argument;
 };
 
 struct condition_redefinition
@@ -149,15 +153,15 @@ using error_variant = std::variant<
 	no_such_query,
 	invalid_amount_of_arguments,
 	type_mismatch,
+	failed_constructor_call,
+	no_matching_constructor_found,
 	nested_arrays_not_allowed,
 	non_homogeneous_array,
 	empty_socket_group,
 	illegal_characters_in_socket_group,
 	invalid_socket_group,
 	invalid_minimap_icon_size,
-	positional_sound_not_supported,
 	disable_drop_sound_not_supported,
-	temporary_beam_effect_not_supported,
 	condition_redefinition,
 	lower_bound_redefinition,
 	upper_bound_redefinition,
@@ -169,5 +173,31 @@ using error_variant = std::variant<
 	internal_compiler_error_during_string_condition_evaluation,
 	internal_compiler_error_during_boolean_condition_evaluation
 >;
+
+struct failed_constructor_call
+{
+	lang::object_type attempted_type_to_construct;
+	std::vector<lang::object_type> ctor_argument_types;
+	lang::position_tag place_of_function_call;
+	/*
+	 * we can not hold error_variant directly because this type is already
+	 * one of error_variant variants (infinite memory would be needed)
+	 * so allocate on the heap instead
+	 *
+	 * also, we can not use a simpler version of error_variant that does not contain
+	 * complex error types because it is pretty much impossible to prove all invariants
+	 * of this in the program - there are simply too many intermediate functions which
+	 * thanks to recursion can not really prove they will be always a base case that
+	 * results in simpler error type
+	 */
+	std::unique_ptr<error_variant> error;
+};
+
+struct unmatched_function_call
+{
+	std::vector<lang::object_type> expected_argument_types;
+	error_variant error;
+};
+
 
 }

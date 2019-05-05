@@ -42,8 +42,8 @@ add_library(filter_spirit_compiler SHARED
 	src/fs/compiler/detail/convertions.cpp
 	src/fs/compiler/detail/evaluate.cpp
 	src/fs/compiler/detail/filter_builder.cpp
-	src/fs/compiler/detail/functions.cpp
 	src/fs/compiler/detail/queries.cpp
+	src/fs/compiler/detail/determine_types_of.cpp
 	src/fs/generator/generate_filter.cpp
 	src/fs/generator/generator.cpp
 	src/fs/lang/action_set.cpp

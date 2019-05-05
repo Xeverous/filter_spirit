@@ -1,13 +1,21 @@
 #include "fs/compiler/print_error.hpp"
+#include "fs/parser/parser.hpp"
 #include "fs/log/logger.hpp"
 #include "fs/log/strings.hpp"
+#include "fs/utility/algorithm.hpp"
 
-#include <string>
+#include <cassert>
 
 namespace
 {
 
 using namespace fs;
+
+// recursion point for errors that contain other errors
+void print_error_variant(
+	const compiler::error::error_variant& error,
+	const parser::lookup_data& lookup_data,
+	log::logger& logger);
 
 void print_error_impl(
 	compiler::error::name_already_exists error,
@@ -67,20 +75,12 @@ void print_error_impl(
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
-	const std::string expected_arguments_string = [&error]()
-	{
-		if (error.min_expected == error.max_expected)
-			return std::to_string(error.min_expected);
-		else
-			return std::to_string(error.min_expected) + " - " + std::to_string(error.max_expected);
-	}();
-
 	logger.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_arguments),
 		log::strings::error,
 		"invalid amount of arguments, expected ",
-		expected_arguments_string,
+		error.expected,
 		" but got ",
 		error.actual);
 }
@@ -99,6 +99,78 @@ void print_error_impl(
 		"' but got '",
 		fs::lang::to_string_view(error.actual_type),
 		"'");
+}
+
+void print_unmatched_function_call(
+	std::string_view function_name,
+	const compiler::error::unmatched_function_call& error,
+	const parser::lookup_data& lookup_data,
+	log::logger& logger)
+{
+	logger << "candidate " << function_name << "(";
+	utility::for_each_and_between(
+		error.expected_argument_types.begin(),
+		error.expected_argument_types.end(),
+		[&logger](fs::lang::object_type type) { logger << fs::lang::to_string_view(type); },
+		[&logger]() { logger << ", "; });
+	logger << "):\n";
+
+	print_error_variant(error.error, lookup_data, logger);
+}
+
+void print_error_impl(
+	const compiler::error::failed_constructor_call& error,
+	const parser::lookup_data& lookup_data,
+	log::logger& logger)
+{
+	const std::string_view attempted_type_name = fs::lang::to_string_view(error.attempted_type_to_construct);
+
+	const std::string_view all_code = lookup_data.get_view_of_whole_content();
+	const std::string_view code_to_underline = lookup_data.position_of(error.place_of_function_call);
+
+	logger.print_line_number(log::count_lines(all_code.data(), code_to_underline.data()));
+	logger << log::strings::error << "failed constructor call " << attempted_type_name << "(";
+	utility::for_each_and_between(
+		error.ctor_argument_types.begin(),
+		error.ctor_argument_types.end(),
+		[&logger](fs::lang::object_type type) { logger << fs::lang::to_string_view(type); },
+		[&logger]() { logger << ", "; });
+	logger << "):\n";
+	logger.print_underlined_code(all_code, code_to_underline);
+
+	assert(error.error != nullptr);
+	print_error_variant(*error.error, lookup_data, logger);
+}
+
+void print_error_impl(
+	const compiler::error::no_matching_constructor_found& error,
+	const parser::lookup_data& lookup_data,
+	log::logger& logger)
+{
+	const std::string_view attempted_type_name = fs::lang::to_string_view(error.attempted_type_to_construct);
+
+	const std::string_view all_code = lookup_data.get_view_of_whole_content();
+	const std::string_view code_to_underline = lookup_data.position_of(error.place_of_function_call);
+
+	logger.print_line_number(log::count_lines(all_code.data(), code_to_underline.data()));
+	logger << log::strings::error << "no matching constructor for call to " << attempted_type_name << "(";
+	utility::for_each_and_between(
+		error.supplied_types.begin(),
+		error.supplied_types.end(),
+		[&logger](std::optional<fs::lang::object_type> type)
+		{
+			if (type.has_value())
+				logger << fs::lang::to_string_view(*type);
+			else
+				logger << "?";
+		},
+		[&logger]() { logger << ", "; });
+	logger << "):\n";
+
+	logger.print_underlined_code(all_code, code_to_underline);
+
+	for (const compiler::error::unmatched_function_call& inner_error : error.errors)
+		print_unmatched_function_call(attempted_type_name, inner_error, lookup_data, logger);
 }
 
 void print_error_impl(
@@ -184,18 +256,6 @@ void print_error_impl(
 }
 
 void print_error_impl(
-	compiler::error::positional_sound_not_supported error,
-	const parser::lookup_data& lookup_data,
-	log::logger& logger)
-{
-	logger.print_line_number_with_description_and_underlined_code(
-		lookup_data.get_view_of_whole_content(),
-		lookup_data.position_of(error.place_of_action),
-		log::strings::error,
-		"sorry, positional sound is not [yet] supported");
-}
-
-void print_error_impl(
 	compiler::error::disable_drop_sound_not_supported error,
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
@@ -205,18 +265,6 @@ void print_error_impl(
 		lookup_data.position_of(error.place_of_action),
 		log::strings::error,
 		"sorry, disabling default drop sound is not [yet] supported");
-}
-
-void print_error_impl(
-	compiler::error::temporary_beam_effect_not_supported error,
-	const parser::lookup_data& lookup_data,
-	log::logger& logger)
-{
-	logger.print_line_number_with_description_and_underlined_code(
-		lookup_data.get_view_of_whole_content(),
-		lookup_data.position_of(error.place_of_2nd_argument),
-		log::strings::error,
-		"sorry, temporary beam effect is not [yet] supported");
 }
 
 void print_error_impl(
@@ -344,21 +392,32 @@ void print_error_impl(
 		log::strings::request_bug_report);
 }
 
+void print_error_variant(
+	const compiler::error::error_variant& error,
+	const parser::lookup_data& lookup_data,
+	log::logger& logger)
+{
+	std::visit(
+		[&](const auto& error) { print_error_impl(error, lookup_data, logger); },
+		error);
+}
+
 }
 
 namespace fs::compiler
 {
 
 void print_error(
-	error::error_variant error,
+	const error::error_variant& error,
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
 	logger.begin_error_message();
 	logger << "compile error\n";
-	std::visit(
-		[&](auto error) { print_error_impl(error, lookup_data, logger); },
-		error);
+	// some errors are recursive (contain other errors)
+	// print_error_variant() is a helper for recursion
+	// if we recursed print_error() we would get multiple log messages
+	print_error_variant(error, lookup_data, logger);
 	logger.end_message();
 }
 

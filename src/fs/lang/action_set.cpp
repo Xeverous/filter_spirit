@@ -35,6 +35,33 @@ void output_font_size(
 	output_stream << '\t' << lang::generation::set_font_size << ' ' << (*font_size).value << '\n';
 }
 
+void output_built_in_alert_sound(
+	lang::built_in_alert_sound alert_sound,
+	std::ostream& output_stream)
+{
+	output_stream << '\t';
+
+	if (alert_sound.is_positional.value)
+		output_stream << lang::generation::play_alert_sound_positional;
+	else
+		output_stream << lang::generation::play_alert_sound;
+
+	output_stream << ' ' << alert_sound.id.value;
+
+	if (alert_sound.volume.has_value())
+		output_stream << ' ' << (*alert_sound.volume).value;
+
+	output_stream << '\n';
+}
+
+void output_custom_alert_sound(
+	const lang::custom_alert_sound& alert_sound,
+	std::ostream& output_stream)
+{
+	output_stream << '\t' << lang::generation::custom_alert_sound
+		<< " \"" << alert_sound.path.value << "\"\n";
+}
+
 void output_alert_sound(
 	const std::optional<lang::alert_sound>& alert_sound,
 	std::ostream& output_stream)
@@ -44,20 +71,15 @@ void output_alert_sound(
 
 	const lang::alert_sound& as = *alert_sound;
 	std::visit(utility::visitor{
-		[&](lang::sound_id sid)
+		[&output_stream](lang::built_in_alert_sound sound)
 		{
-			output_stream << '\t' << lang::generation::play_alert_sound << ' ' << sid.value;
+			output_built_in_alert_sound(sound, output_stream);
 		},
-		[&](const lang::path& path)
+		[&output_stream](const lang::custom_alert_sound& sound)
 		{
-			output_stream << '\t' << lang::generation::custom_alert_sound << " \"" << path.value << '"';
+			output_custom_alert_sound(sound, output_stream);
 		}
 	}, as.sound);
-
-	if (as.volume.has_value())
-		output_stream << ' ' << (*as.volume).value;
-
-	output_stream << '\n';
 }
 
 void output_disabled_drop_sound(
@@ -132,7 +154,7 @@ void output_minimap_icon(
 		return;
 
 	const lang::minimap_icon& mi = *minimap_icon;
-	output_stream << '\t' << lang::generation::minimap_icon << ' ' << mi.size << ' ';
+	output_stream << '\t' << lang::generation::minimap_icon << ' ' << mi.size.value << ' ';
 
 	output_suit(mi.color, output_stream);
 	output_stream << ' ';
@@ -151,7 +173,7 @@ void output_beam_effect(
 	output_stream << '\t' << lang::generation::play_effect << ' ';
 	output_suit(be.color, output_stream);
 	if (be.is_temporary)
-		output_stream << lang::generation::temp;
+		output_stream << ' ' << lang::generation::temp;
 
 	output_stream << '\n';
 }

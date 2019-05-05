@@ -50,7 +50,7 @@ std::optional<compiler::error::error_variant> add_constant_from_definition(
 		compiler::detail::evaluate_value_expression(value_expression, map, item_price_data);
 
 	if (std::holds_alternative<compiler::error::error_variant>(expr_result))
-		return std::get<compiler::error::error_variant>(expr_result);
+		return std::get<compiler::error::error_variant>(std::move(expr_result));
 
 	const auto pair = map.emplace(
 		wanted_name.value,
@@ -75,11 +75,11 @@ std::variant<lang::constants_map, compiler::error::error_variant> resolve_consta
 
 	for (const ast::constant_definition& def : constant_definitions)
 	{
-		const std::optional<compiler::error::error_variant> error =
+		std::optional<compiler::error::error_variant> error =
 			add_constant_from_definition(def, map, item_price_data);
 
 		if (error)
-			return *error;
+			return *std::move(error);
 	}
 
 	return map;

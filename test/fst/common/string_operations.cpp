@@ -24,7 +24,9 @@ std::string_view search(std::string_view input, std::string_view pattern)
 	const char *const input_first = input.data();
 	const char *const input_last  = input.data() + input.size();
 	const auto pair = searcher(input_first, input_last);
-	BOOST_TEST_REQUIRE((pair.first != input_last), "test is written incorrectly, search within tested input code failed");
+	BOOST_TEST_REQUIRE((pair.first != input_last),
+		"test is written incorrectly, search within tested input code failed\n"
+		"input:\n" << input << "\npattern:\n" << pattern);
 	return fs::log::make_string_view(pair.first, pair.second);
 }
 

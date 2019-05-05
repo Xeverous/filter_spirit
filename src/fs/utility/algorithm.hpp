@@ -1,4 +1,5 @@
 #include <utility>
+#include <iterator>
 
 namespace fs::utility
 {
@@ -89,6 +90,37 @@ std::pair<ForwardIt, OutputIt> remove_unique(ForwardIt first, ForwardIt last, Ou
 	}
 
 	return std::make_pair(new_input_end, dest_first);
+}
+
+/**
+ * @brief just like std::for_each, but additionally executes nullary function between iterationa,
+ * requires binary iterators
+ *
+ * @details
+ * UnaryFunction is called std::distance(first, last) times
+ * NullaryFunction is called
+ * - 0 times if first == last
+ * - std::distance(first, last) - 1 times otherwise
+ */
+template <typename BidirIt, typename UnaryFunction, typename NullaryFunction>
+std::pair<UnaryFunction, NullaryFunction> for_each_and_between(
+	BidirIt first,
+	BidirIt last,
+	UnaryFunction unary_func,
+	NullaryFunction nullary_func)
+{
+	if (first == last)
+		return std::make_pair(unary_func, nullary_func);
+
+	const auto pre_last = std::prev(last);
+	for (; first != pre_last; ++first)
+	{
+		unary_func(*first);
+		nullary_func();
+	}
+
+	unary_func(*first);
+	return std::make_pair(unary_func, nullary_func);
 }
 
 }

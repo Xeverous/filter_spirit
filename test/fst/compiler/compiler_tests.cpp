@@ -34,7 +34,14 @@ void expect_object_in_map(
 
 	const fs::lang::named_object& named_object = it->second;
 	const fs::lang::object& object = named_object.object_instance;
-	BOOST_TEST((object.value == value), "expected " << fs::lang::type_of_object(value) << " but got " << fs::lang::type_of_object(object.value));
+	if (object.value != value)
+	{
+		const std::string_view all_code = lookup_data.get_view_of_whole_content();
+		BOOST_ERROR("expected " << fs::lang::type_of_object(value) << " but got " << fs::lang::type_of_object(object.value) << "\n"
+			<< range_info_to_string(all_code, lookup_data.position_of(named_object.name_origin))
+			<< range_info_to_string(all_code, lookup_data.position_of(object.value_origin)));
+	}
+
 	const std::string_view input_range = lookup_data.get_view_of_whole_content();
 	const std::string_view object_name_origin = lookup_data.position_of(named_object.name_origin);
 	const std::string_view object_value_origin = lookup_data.position_of(object.value_origin);
@@ -61,7 +68,7 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 				fs::log::buffered_logger logger;
 				fs::compiler::print_error(error, lookup_data, logger);
 				const auto log = logger.flush_out();
-				BOOST_FAIL("parse failed but should not:\n" << log);
+				BOOST_FAIL("resolve_constants failed but should not:\n" << log);
 			}
 
 			return std::get<fs::lang::constants_map>(std::move(map_or_error));
@@ -89,7 +96,7 @@ const shape          = hexagon
 const suit           = brown
 const color          = RGB(101, 102, 103)
 const icon           = MinimapIcon(0, green, square)
-const beam           = yellow
+const beam           = Beam(yellow)
 const string         = "Leather Belt"
 const path           = Path("pop.wav")
 # const alert          = AlertSound(1)
@@ -114,8 +121,8 @@ const array          = [1, 2, 3]
 			expect_object_in_map(map, lookup_data, "shape", fs::lang::shape::hexagon, search(input, "shape"), search(input, "hexagon"));
 			expect_object_in_map(map, lookup_data, "suit", fs::lang::suit::brown, search(input, "suit"), search(input, "brown"));
 			expect_object_in_map(map, lookup_data, "color", fs::lang::color{101, 102, 103}, search(input, "color"), search(input, "RGB(101, 102, 103)"));
-			expect_object_in_map(map, lookup_data, "icon", fs::lang::minimap_icon{0, fs::lang::suit::green, fs::lang::shape::square}, search(input, "icon"), search(input, "MinimapIcon(0, green, square)"));
-			expect_object_in_map(map, lookup_data, "beam", fs::lang::beam_effect{fs::lang::suit::yellow}, search(input, "beam"), search(input, "yellow"));
+			expect_object_in_map(map, lookup_data, "icon", fs::lang::minimap_icon{fs::lang::integer{0}, fs::lang::suit::green, fs::lang::shape::square}, search(input, "icon"), search(input, "MinimapIcon(0, green, square)"));
+			expect_object_in_map(map, lookup_data, "beam", fs::lang::beam_effect{fs::lang::suit::yellow}, search(input, "beam"), search(input, "Beam(yellow)"));
 			expect_object_in_map(map, lookup_data, "string", fs::lang::string{"Leather Belt"}, search(input, "string"), search(input, "\"Leather Belt\""));
 			expect_object_in_map(map, lookup_data, "path", fs::lang::path{"pop.wav"}, search(input, "path"), search(input, "Path(\"pop.wav\")"));
 			// expect_object_in_map(map, lookup_data, "alert", fs::lang::alert_sound{1}, search(input, "alert"), search(input, "AlertSound(1)"));

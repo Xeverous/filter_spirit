@@ -77,6 +77,8 @@ public:
 	virtual void add(char character) = 0;
 	virtual void add(int number) = 0;
 
+	void print_line_number(int line_number);
+
 	template <typename... Printable>
 	void print_line_number_with_description(
 		int line_number,
@@ -160,7 +162,8 @@ void logger::print_line_number_with_description(
 	int line_number,
 	Printable&&... printable)
 {
-	((*this << "line " << line_number << ": ") << ... << std::forward<Printable>(printable)) << '\n';
+	print_line_number(line_number);
+	(*this << ... << std::forward<Printable>(printable)) << '\n';
 }
 
 template <typename... Printable>

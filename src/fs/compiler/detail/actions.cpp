@@ -1,6 +1,8 @@
 #include "fs/compiler/detail/actions.hpp"
 #include "fs/compiler/detail/evaluate_as.hpp"
 
+#include <utility>
+
 namespace fs::compiler::detail
 {
 
@@ -19,7 +21,7 @@ std::optional<error::error_variant> add_action(
 		{
 			std::variant<lang::color, error::error_variant> color_or_error = evaluate_as<lang::color>(action.value, map, item_price_data);
 			if (std::holds_alternative<error::error_variant>(color_or_error))
-				return std::get<error::error_variant>(color_or_error);
+				return std::get<error::error_variant>(std::move(color_or_error));
 
 			action_set.override_border_color(std::get<lang::color>(color_or_error));
 			return std::nullopt;
@@ -28,7 +30,7 @@ std::optional<error::error_variant> add_action(
 		{
 			std::variant<lang::color, error::error_variant> color_or_error = evaluate_as<lang::color>(action.value, map, item_price_data);
 			if (std::holds_alternative<error::error_variant>(color_or_error))
-				return std::get<error::error_variant>(color_or_error);
+				return std::get<error::error_variant>(std::move(color_or_error));
 
 			action_set.override_text_color(std::get<lang::color>(color_or_error));
 			return std::nullopt;
@@ -37,7 +39,7 @@ std::optional<error::error_variant> add_action(
 		{
 			std::variant<lang::color, error::error_variant> color_or_error = evaluate_as<lang::color>(action.value, map, item_price_data);
 			if (std::holds_alternative<error::error_variant>(color_or_error))
-				return std::get<error::error_variant>(color_or_error);
+				return std::get<error::error_variant>(std::move(color_or_error));
 
 			action_set.override_background_color(std::get<lang::color>(color_or_error));
 			return std::nullopt;
@@ -46,7 +48,7 @@ std::optional<error::error_variant> add_action(
 		{
 			std::variant<lang::font_size, error::error_variant> font_size_or_error = evaluate_as<lang::font_size>(action.value, map, item_price_data);
 			if (std::holds_alternative<error::error_variant>(font_size_or_error))
-				return std::get<error::error_variant>(font_size_or_error);
+				return std::get<error::error_variant>(std::move(font_size_or_error));
 
 			action_set.override_font_size(std::get<lang::font_size>(font_size_or_error));
 			return std::nullopt;
@@ -55,14 +57,10 @@ std::optional<error::error_variant> add_action(
 		{
 			std::variant<lang::alert_sound, error::error_variant> alert_or_error = evaluate_as<lang::alert_sound>(action.value, map, item_price_data);
 			if (std::holds_alternative<error::error_variant>(alert_or_error))
-				return std::get<error::error_variant>(alert_or_error);
+				return std::get<error::error_variant>(std::move(alert_or_error));
 
 			action_set.override_alert_sound(std::get<lang::alert_sound>(std::move(alert_or_error)));
 			return std::nullopt;
-		}
-		case lang::action_type::set_alert_sound_positional:
-		{
-			return error::positional_sound_not_supported{parser::get_position_info(action)};
 		}
 		case lang::action_type::disable_drop_sound:
 		{
@@ -72,7 +70,7 @@ std::optional<error::error_variant> add_action(
 		{
 			std::variant<lang::minimap_icon, error::error_variant> icon_or_error = evaluate_as<lang::minimap_icon>(action.value, map, item_price_data);
 			if (std::holds_alternative<error::error_variant>(icon_or_error))
-				return std::get<error::error_variant>(icon_or_error);
+				return std::get<error::error_variant>(std::move(icon_or_error));
 
 			action_set.override_minimap_icon(std::get<lang::minimap_icon>(icon_or_error));
 			return std::nullopt;
@@ -81,7 +79,7 @@ std::optional<error::error_variant> add_action(
 		{
 			std::variant<lang::beam_effect, error::error_variant> beam_or_error = evaluate_as<lang::beam_effect>(action.value, map, item_price_data);
 			if (std::holds_alternative<error::error_variant>(beam_or_error))
-				return std::get<error::error_variant>(beam_or_error);
+				return std::get<error::error_variant>(std::move(beam_or_error));
 
 			action_set.override_beam_effect(std::get<lang::beam_effect>(beam_or_error));
 			return std::nullopt;

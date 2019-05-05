@@ -3,7 +3,7 @@
 #include "fs/lang/types.hpp"
 
 #include <ostream>
-#include <type_traits>
+#include <optional>
 
 /*
  * Boost Test requires all types to be printable, otherwise
@@ -40,7 +40,17 @@ std::ostream& boost_test_print_type(std::ostream& os, string_condition_property 
 inline
 std::ostream& boost_test_print_type(std::ostream& os, object_type type)
 {
-	return os << "(single_object_type: " << to_string_view(type) << ")";
+	return os << "(object_type: " << to_string_view(type) << ")";
 }
+
+inline
+std::ostream& boost_test_print_type(std::ostream& os, std::optional<object_type> type)
+{
+	if (type.has_value())
+		return boost_test_print_type(os, *type);
+	else
+		return os << "(object_type: ?)";
+}
+
 
 }

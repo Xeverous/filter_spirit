@@ -1,6 +1,6 @@
 #include "fs/compiler/detail/evaluate.hpp"
-#include "fs/compiler/detail/functions.hpp"
 #include "fs/compiler/detail/queries.hpp"
+#include "fs/compiler/detail/construct.hpp"
 #include "fs/lang/functions.hpp"
 #include "fs/lang/queries.hpp"
 
@@ -85,7 +85,7 @@ std::variant<lang::object, error::error_variant> evaluate_array(
 	{
 		std::variant<lang::object, error::error_variant> object_or_error = evaluate_value_expression(value_expression, map, item_price_data);
 		if (std::holds_alternative<error::error_variant>(object_or_error))
-			return std::get<error::error_variant>(object_or_error);
+			return std::get<error::error_variant>(std::move(object_or_error));
 
 		auto& object = std::get<lang::object>(object_or_error);
 
@@ -117,7 +117,6 @@ std::variant<lang::object, error::error_variant> evaluate_function_call(
 	 * they can be stored in the map
 	 */
 	const ast::identifier& function_name = function_call.name;
-	const ast::value_expression_list& arguments = function_call.arguments;
 	/*
 	 * note: this is O(n) but relying on small string optimization
 	 * and much better memory layout makes it to run faster than a
@@ -126,19 +125,59 @@ std::variant<lang::object, error::error_variant> evaluate_function_call(
 	 */
 	if (function_name.value == lang::functions::rgb)
 	{
-		std::variant<lang::color, error::error_variant> color_or_error = construct_color(arguments, map, item_price_data);
+		std::variant<lang::color, error::error_variant> color_or_error = construct<lang::color>(function_call, map, item_price_data);
 		if (std::holds_alternative<error::error_variant>(color_or_error))
-			return std::get<error::error_variant>(color_or_error);
+			return std::get<error::error_variant>(std::move(color_or_error));
 
 		return lang::object{
 			std::get<lang::color>(color_or_error),
 			parser::get_position_info(function_call)};
 	}
+	else if (function_name.value == lang::functions::level)
+	{
+		std::variant<lang::level, error::error_variant> level_or_error = construct<lang::level>(function_call, map, item_price_data);
+		if (std::holds_alternative<error::error_variant>(level_or_error))
+			return std::get<error::error_variant>(std::move(level_or_error));
+
+		return lang::object{
+			std::get<lang::level>(level_or_error),
+			parser::get_position_info(function_call)};
+	}
+	else if (function_name.value == lang::functions::font_size)
+	{
+		std::variant<lang::font_size, error::error_variant> font_size_or_error = construct<lang::font_size>(function_call, map, item_price_data);
+		if (std::holds_alternative<error::error_variant>(font_size_or_error))
+			return std::get<error::error_variant>(std::move(font_size_or_error));
+
+		return lang::object{
+			std::get<lang::font_size>(font_size_or_error),
+			parser::get_position_info(function_call)};
+	}
+	else if (function_name.value == lang::functions::sound_id)
+	{
+		std::variant<lang::sound_id, error::error_variant> sound_id_or_error = construct<lang::sound_id>(function_call, map, item_price_data);
+		if (std::holds_alternative<error::error_variant>(sound_id_or_error))
+			return std::get<error::error_variant>(std::move(sound_id_or_error));
+
+		return lang::object{
+			std::get<lang::sound_id>(sound_id_or_error),
+			parser::get_position_info(function_call)};
+	}
+	else if (function_name.value == lang::functions::volume)
+	{
+		std::variant<lang::volume, error::error_variant> volume_or_error = construct<lang::volume>(function_call, map, item_price_data);
+		if (std::holds_alternative<error::error_variant>(volume_or_error))
+			return std::get<error::error_variant>(std::move(volume_or_error));
+
+		return lang::object{
+			std::get<lang::volume>(volume_or_error),
+			parser::get_position_info(function_call)};
+	}
 	else if (function_name.value == lang::functions::group)
 	{
-		std::variant<lang::socket_group, error::error_variant> socket_group_or_error = construct_socket_group(arguments, map, item_price_data);
+		std::variant<lang::socket_group, error::error_variant> socket_group_or_error = construct<lang::socket_group>(function_call, map, item_price_data);
 		if (std::holds_alternative<error::error_variant>(socket_group_or_error))
-			return std::get<error::error_variant>(socket_group_or_error);
+			return std::get<error::error_variant>(std::move(socket_group_or_error));
 
 		return lang::object{
 			std::get<lang::socket_group>(socket_group_or_error),
@@ -146,9 +185,9 @@ std::variant<lang::object, error::error_variant> evaluate_function_call(
 	}
 	else if (function_name.value == lang::functions::minimap_icon)
 	{
-		std::variant<lang::minimap_icon, error::error_variant> icon_or_error = construct_minimap_icon(arguments, map, item_price_data);
+		std::variant<lang::minimap_icon, error::error_variant> icon_or_error = construct<lang::minimap_icon>(function_call, map, item_price_data);
 		if (std::holds_alternative<error::error_variant>(icon_or_error))
-			return std::get<error::error_variant>(icon_or_error);
+			return std::get<error::error_variant>(std::move(icon_or_error));
 
 		return lang::object{
 			std::get<lang::minimap_icon>(icon_or_error),
@@ -156,9 +195,9 @@ std::variant<lang::object, error::error_variant> evaluate_function_call(
 	}
 	else if (function_name.value == lang::functions::beam_effect)
 	{
-		std::variant<lang::beam_effect, error::error_variant> beam_effect_or_error = construct_beam_effect(arguments, map, item_price_data);
+		std::variant<lang::beam_effect, error::error_variant> beam_effect_or_error = construct<lang::beam_effect>(function_call, map, item_price_data);
 		if (std::holds_alternative<error::error_variant>(beam_effect_or_error))
-			return std::get<error::error_variant>(beam_effect_or_error);
+			return std::get<error::error_variant>(std::move(beam_effect_or_error));
 
 		return lang::object{
 			std::get<lang::beam_effect>(beam_effect_or_error),
@@ -166,18 +205,27 @@ std::variant<lang::object, error::error_variant> evaluate_function_call(
 	}
 	else if (function_name.value == lang::functions::path)
 	{
-		std::variant<lang::path, error::error_variant> path_or_error = construct_path(arguments, map, item_price_data);
+		std::variant<lang::path, error::error_variant> path_or_error = construct<lang::path>(function_call, map, item_price_data);
 		if (std::holds_alternative<error::error_variant>(path_or_error))
-			return std::get<error::error_variant>(path_or_error);
+			return std::get<error::error_variant>(std::move(path_or_error));
 
 		return lang::object{
 			std::get<lang::path>(path_or_error),
 			parser::get_position_info(function_call)};
 	}
+	else if (function_name.value == lang::functions::alert_sound)
+	{
+		std::variant<lang::alert_sound, error::error_variant> alert_sound_or_error = construct<lang::alert_sound>(function_call, map, item_price_data);
+		if (std::holds_alternative<error::error_variant>(alert_sound_or_error))
+			return std::get<error::error_variant>(std::move(alert_sound_or_error));
+
+		return lang::object{
+			std::get<lang::alert_sound>(alert_sound_or_error),
+			parser::get_position_info(function_call)};
+	}
 
 	return error::no_such_function{parser::get_position_info(function_name)};
 }
-
 
 std::variant<lang::object, error::error_variant> evaluate_price_range_query(
 	const ast::price_range_query& price_range_query,
@@ -186,7 +234,7 @@ std::variant<lang::object, error::error_variant> evaluate_price_range_query(
 {
 	std::variant<lang::price_range, error::error_variant> range_or_error = construct_price_range(price_range_query.arguments, map, item_price_data);
 	if (std::holds_alternative<error::error_variant>(range_or_error))
-		return std::get<error::error_variant>(range_or_error);
+		return std::get<error::error_variant>(std::move(range_or_error));
 
 	const auto& price_range = std::get<lang::price_range>(range_or_error);
 	const lang::position_tag position_of_query = parser::get_position_info(price_range_query);

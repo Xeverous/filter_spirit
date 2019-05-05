@@ -67,7 +67,6 @@ enum class action_type
 	set_background_color,
 	set_font_size,
 	set_alert_sound,
-	set_alert_sound_positional,
 	disable_drop_sound,
 	set_minimap_icon,
 	set_beam
@@ -188,6 +187,12 @@ struct color
 	color(int r, int g, int b, int a)
 	: r(r), g(g), b(b), a(a) {}
 
+	color(integer r, integer g, integer b)
+	: r(r.value), g(g.value), b(b.value) {}
+
+	color(integer r, integer g, integer b, integer a)
+	: r(r.value), g(g.value), b(b.value), a(a.value) {}
+
 	int r;
 	int g;
 	int b;
@@ -202,7 +207,13 @@ inline bool operator!=(color lhs, color rhs) { return !(lhs == rhs); }
 
 struct minimap_icon
 {
-	int size;
+	explicit minimap_icon(int size, suit color, shape shape)
+	: size(integer{size}), color(color), shape(shape) {}
+
+	explicit minimap_icon(integer size, suit color, shape shape)
+	: size(size), color(color), shape(shape) {}
+
+	integer size;
 	suit color;
 	shape shape;
 };
@@ -217,6 +228,9 @@ struct beam_effect
 {
 	explicit beam_effect(suit s)
 	: color(s), is_temporary(false) {}
+
+	explicit beam_effect(suit s, boolean b)
+	: color(s), is_temporary(b.value) {}
 
 	suit color;
 	bool is_temporary;
@@ -250,28 +264,81 @@ struct path
 inline bool operator==(const path& lhs, const path& rhs) { return lhs.value == rhs.value; }
 inline bool operator!=(const path& lhs, const path& rhs) { return !(lhs == rhs); }
 
+struct built_in_alert_sound
+{
+	explicit built_in_alert_sound(integer n)
+	: id(n) {}
+
+	explicit built_in_alert_sound(sound_id id)
+	: id(id) {}
+
+	explicit built_in_alert_sound(sound_id id, volume volume)
+	: id(id), volume(volume) {}
+
+	explicit built_in_alert_sound(sound_id id, boolean is_positional)
+	: id(id), is_positional(is_positional) {}
+
+	explicit built_in_alert_sound(sound_id id, volume volume, boolean is_positional)
+	: id(id), volume(volume), is_positional(is_positional) {}
+
+	sound_id id;
+	std::optional<volume> volume;
+	boolean is_positional = boolean{false};
+};
+
+inline bool operator==(built_in_alert_sound lhs, built_in_alert_sound rhs)
+{
+	return std::tie(lhs.id, lhs.volume, lhs.is_positional) == std::tie(rhs.id, rhs.volume, rhs.is_positional);
+}
+inline bool operator!=(built_in_alert_sound lhs, built_in_alert_sound rhs) { return !(lhs == rhs); }
+
+struct custom_alert_sound
+{
+	explicit custom_alert_sound(string str)
+	: path(std::move(str)) {}
+
+	explicit custom_alert_sound(path path)
+	: path(std::move(path)) {}
+
+	path path;
+};
+
+inline bool operator==(const custom_alert_sound& lhs, const custom_alert_sound& rhs) { return lhs.path == rhs.path; }
+inline bool operator!=(const custom_alert_sound& lhs, const custom_alert_sound& rhs) { return !(lhs == rhs); }
+
 struct alert_sound
 {
 	explicit alert_sound(integer n)
-	: sound(sound_id(n)) {}
+	: sound(built_in_alert_sound(sound_id(n))) {}
 
 	explicit alert_sound(sound_id id)
-	: sound(id) {}
+	: sound(built_in_alert_sound(id)) {}
 
-	explicit alert_sound(path p)
-	: sound(std::move(p)) {}
+	explicit alert_sound(sound_id id, volume volume)
+	: sound(built_in_alert_sound(id, volume)) {}
+
+	explicit alert_sound(sound_id id, boolean boolean)
+	: sound(built_in_alert_sound(id, boolean)) {}
+
+	explicit alert_sound(sound_id id, volume volume, boolean boolean)
+	: sound(built_in_alert_sound(id, volume, boolean)) {}
+
+	explicit alert_sound(built_in_alert_sound sound)
+	: sound(sound) {}
 
 	explicit alert_sound(string s)
-	: sound(path(std::move(s))) {}
+	: sound(custom_alert_sound(path(std::move(s)))) {}
 
-	std::variant<sound_id, path> sound;
-	std::optional<volume> volume;
+	explicit alert_sound(path p)
+	: sound(custom_alert_sound(std::move(p))) {}
+
+	explicit alert_sound(custom_alert_sound sound)
+	: sound(std::move(sound)) {}
+
+	std::variant<built_in_alert_sound, custom_alert_sound> sound;
 };
 
-inline bool operator==(const alert_sound& lhs, const alert_sound& rhs)
-{
-	return std::tie(lhs.sound, lhs.volume) == std::tie(rhs.sound, rhs.volume);
-}
+inline bool operator==(const alert_sound& lhs, const alert_sound& rhs) { return lhs.sound == rhs.sound; }
 inline bool operator!=(const alert_sound& lhs, const alert_sound& rhs) { return !(lhs == rhs); }
 
 class object;
@@ -298,6 +365,8 @@ using object_variant = std::variant<
 	beam_effect,
 	string,
 	path,
+	built_in_alert_sound,
+	custom_alert_sound,
 	alert_sound,
 	// array
 	array_object,
@@ -324,6 +393,8 @@ BETTER_ENUM(object_type, int,
 	beam_effect,
 	string,
 	path,
+	built_in_alert_sound,
+	custom_alert_sound,
 	alert_sound,
 	// array
 	array,
@@ -421,6 +492,10 @@ template <> constexpr
 object_type type_to_enum_impl<string>() { return object_type::string; }
 template <> constexpr
 object_type type_to_enum_impl<path>() { return object_type::path; }
+template <> constexpr
+object_type type_to_enum_impl<built_in_alert_sound>() { return object_type::built_in_alert_sound; }
+template <> constexpr
+object_type type_to_enum_impl<custom_alert_sound>() { return object_type::custom_alert_sound; }
 template <> constexpr
 object_type type_to_enum_impl<alert_sound>() { return object_type::alert_sound; }
 template <> constexpr
