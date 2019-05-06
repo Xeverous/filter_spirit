@@ -75,7 +75,7 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 		}
 	};
 
-	BOOST_FIXTURE_TEST_SUITE(compiler_error_suite, compiler_success_fixture,
+	BOOST_FIXTURE_TEST_SUITE(compiler_success_suite, compiler_success_fixture,
 		* ut::depends_on("compiler_suite/minimal_input_resolve_constants"))
 
 		BOOST_AUTO_TEST_CASE(all_possible_constants,
@@ -99,7 +99,7 @@ const icon           = MinimapIcon(0, green, square)
 const beam           = Beam(yellow)
 const string         = "Leather Belt"
 const path           = Path("pop.wav")
-# const alert          = AlertSound(1)
+const alert          = AlertSound(1, 300, false)
 const array          = [1, 2, 3]
 # const dict           = { "a": 1, "b": 2 }
 )";
@@ -108,24 +108,30 @@ const array          = [1, 2, 3]
 			const fs::parser::lookup_data& lookup_data = parse_data.lookup_data;
 			const fs::lang::constants_map map = expect_success_when_resolving_constants(parse_data.ast.constant_definitions, lookup_data);
 
-			expect_object_in_map(map, lookup_data, "boolean", fs::lang::boolean{false}, search(input, "boolean"), search(input, "false"));
-			expect_object_in_map(map, lookup_data, "floating_point", fs::lang::floating_point{3.5}, search(input, "floating_point"), search(input, "3.5"));
-			expect_object_in_map(map, lookup_data, "integer", fs::lang::integer{123}, search(input, "integer"), search(input, "123"));
-			expect_object_in_map(map, lookup_data, "level", fs::lang::level{10}, search(input, "level"), search(input, "Level(10)"));
+			expect_object_in_map(map, lookup_data, "boolean",        fs::lang::boolean{false},            search(input, "boolean"),        search(input, "false"));
+			expect_object_in_map(map, lookup_data, "floating_point", fs::lang::floating_point{3.5},       search(input, "floating_point"), search(input, "3.5"));
+			expect_object_in_map(map, lookup_data, "integer",        fs::lang::integer{123},              search(input, "integer"),        search(input, "123"));
+			expect_object_in_map(map, lookup_data, "level",          fs::lang::level{10},                 search(input, "level"),          search(input, "Level(10)"));
 			// expect_object_in_map(map, lookup_data, "quality", fs::lang::quality{20}, search(input, "quality"), search(input, "Quality(20)"));
-			expect_object_in_map(map, lookup_data, "font_size", fs::lang::font_size{30}, search(input, "font_size"), search(input, "FontSize(30)"));
-			expect_object_in_map(map, lookup_data, "sound_id", fs::lang::sound_id{7}, search(input, "sound_id"), search(input, "SoundId(7)"));
-			expect_object_in_map(map, lookup_data, "volume", fs::lang::volume{300}, search(input, "volume"), search(input, "Volume(300)"));
-			expect_object_in_map(map, lookup_data, "group", fs::lang::socket_group{1, 1 , 1, 0}, search(input, "group"), search(input, "Group(\"RGB\")"));
-			expect_object_in_map(map, lookup_data, "rarity", fs::lang::rarity::rare, search(input, "rarity"), search(input, "rare"));
-			expect_object_in_map(map, lookup_data, "shape", fs::lang::shape::hexagon, search(input, "shape"), search(input, "hexagon"));
-			expect_object_in_map(map, lookup_data, "suit", fs::lang::suit::brown, search(input, "suit"), search(input, "brown"));
-			expect_object_in_map(map, lookup_data, "color", fs::lang::color{101, 102, 103}, search(input, "color"), search(input, "RGB(101, 102, 103)"));
-			expect_object_in_map(map, lookup_data, "icon", fs::lang::minimap_icon{fs::lang::integer{0}, fs::lang::suit::green, fs::lang::shape::square}, search(input, "icon"), search(input, "MinimapIcon(0, green, square)"));
-			expect_object_in_map(map, lookup_data, "beam", fs::lang::beam_effect{fs::lang::suit::yellow}, search(input, "beam"), search(input, "Beam(yellow)"));
-			expect_object_in_map(map, lookup_data, "string", fs::lang::string{"Leather Belt"}, search(input, "string"), search(input, "\"Leather Belt\""));
-			expect_object_in_map(map, lookup_data, "path", fs::lang::path{"pop.wav"}, search(input, "path"), search(input, "Path(\"pop.wav\")"));
-			// expect_object_in_map(map, lookup_data, "alert", fs::lang::alert_sound{1}, search(input, "alert"), search(input, "AlertSound(1)"));
+			expect_object_in_map(map, lookup_data, "font_size",      fs::lang::font_size{30},             search(input, "font_size"),      search(input, "FontSize(30)"));
+			expect_object_in_map(map, lookup_data, "sound_id",       fs::lang::sound_id{7},               search(input, "sound_id"),       search(input, "SoundId(7)"));
+			expect_object_in_map(map, lookup_data, "volume",         fs::lang::volume{300},               search(input, "volume"),         search(input, "Volume(300)"));
+			expect_object_in_map(map, lookup_data, "group",          fs::lang::socket_group{1, 1 , 1, 0}, search(input, "group"),          search(input, "Group(\"RGB\")"));
+			expect_object_in_map(map, lookup_data, "rarity",         fs::lang::rarity::rare,              search(input, "rarity"),         search(input, "rare"));
+			expect_object_in_map(map, lookup_data, "shape",          fs::lang::shape::hexagon,            search(input, "shape"),          search(input, "hexagon"));
+			expect_object_in_map(map, lookup_data, "suit",           fs::lang::suit::brown,               search(input, "suit"),           search(input, "brown"));
+			expect_object_in_map(map, lookup_data, "color",          fs::lang::color{101, 102, 103},      search(input, "color"),          search(input, "RGB(101, 102, 103)"));
+			expect_object_in_map(map, lookup_data, "icon",
+				fs::lang::minimap_icon{fs::lang::integer{0}, fs::lang::suit::green, fs::lang::shape::square},
+				search(input, "icon"), search(input, "MinimapIcon(0, green, square)"));
+			expect_object_in_map(map, lookup_data, "beam",
+				fs::lang::beam_effect{fs::lang::suit::yellow},
+				search(input, "beam"), search(input, "Beam(yellow)"));
+			expect_object_in_map(map, lookup_data, "string",         fs::lang::string{"Leather Belt"},    search(input, "string"),         search(input, "\"Leather Belt\""));
+			expect_object_in_map(map, lookup_data, "path",           fs::lang::path{"pop.wav"},           search(input, "path"),           search(input, "Path(\"pop.wav\")"));
+			expect_object_in_map(map, lookup_data, "alert",
+				fs::lang::alert_sound{fs::lang::built_in_alert_sound{fs::lang::sound_id{1}, fs::lang::volume{300}, fs::lang::boolean{false}}},
+				search(input, "alert"), search(input, "AlertSound(1, 300, false)"));
 			expect_object_in_map(map, lookup_data, "array",
 				fs::lang::array_object{
 					fs::lang::object{fs::lang::integer{1}, fs::lang::position_tag()},
