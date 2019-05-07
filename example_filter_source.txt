@@ -440,11 +440,13 @@ BaseType ["Gavel", "Stone Hammer", "Rock Breaker"] {
 		Show
 	}
 
-	Rarity magic && Quality > 12 {
+	Rarity magic
+	Quality > 12 {
 		Show
 	}
 
-	Rarity rare && Quality > 16 {
+	Rarity rare
+	Quality > 16 {
 		Show
 	}
 }
@@ -460,7 +462,8 @@ Class "Piece" {
 
 # Tabula Rasa and Skin of the Loyal
 # ...and any unique that drops 6L'd (Synthesis seems to drop them)
-Rarity unique && LinkedSockets 6 {
+Rarity unique
+LinkedSockets 6 {
 	SetTextColor color_unique
 	SetBorderColor color_unique
 	SetBackgroundColor color_white
@@ -550,7 +553,8 @@ Sockets 6 {
 }
 
 # Incursion items
-Class "Incursion Item" && BaseType ["Stone of Passage", "Flashpowder Keg"] {
+Class "Incursion Item"
+BaseType ["Stone of Passage", "Flashpowder Keg"] {
 	SetTextColor color_black
 	SetBackgroundColor color_labirynth
 	SetFontSize font_max
@@ -834,7 +838,8 @@ Class "Jewel" {
 	Show # show normal jewels (in case of future drops)
 }
 
-Class "Amulet" && BaseType "Talisman" {
+Class "Amulet"
+BaseType "Talisman" {
 	SetBackgroundColor color_talisman
 	SetFontSize font_talisman
 
@@ -850,19 +855,24 @@ Class "Amulet" && BaseType "Talisman" {
 }
 
 # bases you want to pickup for crafting
-Rarity <= rare && Corrupted false {
+Rarity <= rare
+Corrupted false {
 	SetTextColor color_black
 	SetBackgroundColor color_crafting
 	SetFontSize font_crafting
 	SetAlertSound alert_base_crafting
 
-	ItemLevel >= 85 && BaseType ["Hubris Circlet"] { Show }
+	ItemLevel >= 85
+	BaseType ["Hubris Circlet"] {
+		Show
+	}
 }
 
 # corrupted items
 # note: 6L and 6s will be catched earlier
 # note: you might want a separate block for breach rings
-Rarity <= rare && Corrupted true {
+Rarity <= rare
+Corrupted true {
 	SetBackgroundColor color_corrupted
 	Show
 }
@@ -969,12 +979,14 @@ Rarity <= rare {
 
 	Rarity normal {
 		SocketGroup Group("RGB") {
-			Width 2 && Height <= 2 {
+			Width 2
+			Height <= 2 {
 				SetBorderColor color_chromatic_small
 				Show
 			}
 
-			Width 1 && Height <= 4 {
+			Width 1
+			Height <= 4 {
 				SetBorderColor color_chromatic_small
 				Show
 			}
@@ -988,12 +1000,14 @@ Rarity <= rare {
 		SetTextColor color_magic
 
 		SocketGroup Group("RGB") {
-			Width 2 && Height <= 2 {
+			Width 2
+			Height <= 2 {
 				SetBorderColor color_chromatic_small
 				Show
 			}
 
-			Width 1 && Height <= 4 {
+			Width 1
+			Height <= 4 {
 				SetBorderColor color_chromatic_small
 				Show
 			}
@@ -1013,12 +1027,14 @@ Rarity <= rare {
 				SetBackgroundColor color_rare_t1
 
 				SocketGroup Group("RGB") {
-					Width 2 && Height <= 2 {
+					Width 2
+					Height <= 2 {
 						SetBorderColor color_chromatic_small
 						Show
 					}
 
-					Width 1 && Height <= 4 {
+					Width 1
+					Height <= 4 {
 						SetBorderColor color_chromatic_small
 						Show
 					}
@@ -1031,12 +1047,14 @@ Rarity <= rare {
 			}
 
 			SocketGroup Group("RGB") {
-				Width 2 && Height <= 2 {
+				Width 2
+				Height <= 2 {
 					SetBorderColor color_chromatic_small
 					Show
 				}
 
-				Width 1 && Height <= 4 {
+				Width 1
+				Height <= 4 {
 					SetBorderColor color_chromatic_small
 					Show
 				}
@@ -1055,12 +1073,14 @@ Rarity <= rare {
 				SetBackgroundColor color_rare_t1
 
 				SocketGroup Group("RGB") {
-					Width 2 && Height <= 2 {
+					Width 2
+					Height <= 2 {
 						SetBorderColor color_chromatic_small
 						Show
 					}
 
-					Width 1 && Height <= 4 {
+					Width 1
+					Height <= 4 {
 						SetBorderColor color_chromatic_small
 						Show
 					}
@@ -1073,12 +1093,14 @@ Rarity <= rare {
 			}
 
 			SocketGroup Group("RGB") {
-				Width 2 && Height <= 2 {
+				Width 2
+				Height <= 2 {
 					SetBorderColor color_chromatic_small
 					Show
 				}
 
-				Width 1 && Height <= 4 {
+				Width 1
+				Height <= 4 {
 					SetBorderColor color_chromatic_small
 					Show
 				}
@@ -1096,12 +1118,14 @@ Rarity <= rare {
 			SetBackgroundColor color_rare_t1
 
 			SocketGroup Group("RGB") {
-				Width 2 && Height <= 2 {
+				Width 2
+				Height <= 2 {
 					SetBorderColor color_chromatic_small
 					Show
 				}
 
-				Width 1 && Height <= 4 {
+				Width 1
+				Height <= 4 {
 					SetBorderColor color_chromatic_small
 					Show
 				}
@@ -1114,12 +1138,14 @@ Rarity <= rare {
 		}
 
 		SocketGroup Group("RGB") {
-			Width 2 && Height <= 2 {
+			Width 2
+			Height <= 2 {
 				SetBorderColor color_chromatic_small
 				Show
 			}
 
-			Width 1 && Height <= 4 {
+			Width 1
+			Height <= 4 {
 				SetBorderColor color_chromatic_small
 				Show
 			}
@@ -1133,7 +1159,8 @@ Rarity <= rare {
 }
 
 # base types you want to pickup for chancing
-Rarity normal && BaseType ["Leather Belt"] {
+Rarity normal
+BaseType ["Leather Belt"] {
 	SetTextColor color_black
 	SetBackgroundColor color_chance_base
 	SetAlertSound alert_base_chance
@@ -1190,13 +1217,15 @@ Class "Flasks" {
 
 # leveling - 4Ls
 # ilvl cap: stop showing 4Ls once you reach maps
-ItemLevel <= 67 && LinkedSockets 4 {
+ItemLevel <= 67
+LinkedSockets 4 {
 	Show
 }
 
 # leveling - 3Ls
 # raise the ilvl cap if you have bad RNG and can't find 3L
-ItemLevel <= 30 && LinkedSockets 3 {
+ItemLevel <= 30
+LinkedSockets 3 {
 	Show
 }
 
@@ -1207,7 +1236,8 @@ ItemLevel <= 15 {
 
 # show IDed blue items (Atzoatzl and Warband drops)
 # TODO could be done better with HasExplicitMod
-Rarity magic && Identified true {
+Rarity magic
+Identified true {
 	SetBorderColor color_magic
 	Show
 }

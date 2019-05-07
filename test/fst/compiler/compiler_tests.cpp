@@ -205,7 +205,7 @@ const a3 = [1, 2, 3]
 		BOOST_AUTO_TEST_CASE(promotions)
 		{
 			const std::string input_str = minimal_input() + R"(
-ItemLevel 10 &&
+ItemLevel 10
 SocketGroup "RGBW"
 {
 	SetAlertSound 7
