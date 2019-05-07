@@ -1,3 +1,7 @@
+# Filter Spirit - example filter template
+# This file is public domain. You can freely modify and reuse it in any way.
+# more about Filter Spirit tool on https://github.com/Xeverous/filter_spirit
+
 # test supported version, if source file requirement is too high
 # the user will be prompted to update
 version: 0.0.0
