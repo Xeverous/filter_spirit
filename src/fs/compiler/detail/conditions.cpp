@@ -75,12 +75,12 @@ std::optional<error::error_variant> add_comparison_condition(
 		}
 		case lang::comparison_condition_property::quality:
 		{
-			std::variant<lang::quality, error::error_variant> quality_or_error = evaluate_as<lang::quality>(condition.value, map, item_price_data);
-			if (std::holds_alternative<error::error_variant>(quality_or_error))
-				return std::get<error::error_variant>(std::move(quality_or_error));
+			std::variant<lang::integer, error::error_variant> integer_or_error = evaluate_as<lang::integer>(condition.value, map, item_price_data);
+			if (std::holds_alternative<error::error_variant>(integer_or_error))
+				return std::get<error::error_variant>(std::move(integer_or_error));
 
-			const auto& quality = std::get<lang::quality>(quality_or_error);
-			return add_range_condition(condition.comparison_type.value, quality.value, condition_origin, condition_set.quality);
+			const auto& integer = std::get<lang::integer>(integer_or_error);
+			return add_range_condition(condition.comparison_type.value, integer.value, condition_origin, condition_set.quality);
 		}
 		case lang::comparison_condition_property::rarity:
 		{

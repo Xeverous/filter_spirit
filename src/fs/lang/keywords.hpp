@@ -16,14 +16,6 @@ namespace fs::lang::keywords
 {
 
 constexpr auto level        = "Level";
-/*
- * name clash: Quality() function to create an object
- * of type Quality and a Quality condition
- *
- * resign of the function, we still need the Quality type
- * but users will not be to construct it directly
- */
-// constexpr auto quality      = "Quality";
 constexpr auto font_size    = "FontSize";
 constexpr auto sound_id     = "SoundId";
 constexpr auto volume       = "Volume";

@@ -111,17 +111,6 @@ struct level
 inline bool operator==(level lhs, level rhs) { return lhs.value == rhs.value; }
 inline bool operator!=(level lhs, level rhs) { return !(lhs == rhs); }
 
-struct quality
-{
-	explicit quality(int value) : value(value) {}
-	explicit quality(integer n) : value(n.value) {}
-
-	int value;
-};
-
-inline bool operator==(quality lhs, quality rhs) { return lhs.value == rhs.value; }
-inline bool operator!=(quality lhs, quality rhs) { return !(lhs == rhs); }
-
 struct font_size
 {
 	explicit font_size(int value) : value(value) {}
@@ -352,7 +341,6 @@ using object_variant = std::variant<
 	floating_point,
 	integer,
 	level,
-	quality,
 	font_size,
 	sound_id,
 	volume,
@@ -380,7 +368,6 @@ BETTER_ENUM(object_type, int,
 	floating_point,
 	integer,
 	level,
-	quality,
 	font_size,
 	sound_id,
 	volume,
@@ -466,8 +453,6 @@ template <> constexpr
 object_type type_to_enum_impl<integer>() { return object_type::integer; }
 template <> constexpr
 object_type type_to_enum_impl<level>() { return object_type::level; }
-template <> constexpr
-object_type type_to_enum_impl<quality>() { return object_type::quality; }
 template <> constexpr
 object_type type_to_enum_impl<font_size>() { return object_type::font_size; }
 template <> constexpr

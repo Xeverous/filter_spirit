@@ -86,7 +86,6 @@ const boolean        = false
 const floating_point = 3.5
 const integer        = 123
 const level          = Level(10)
-# const quality        = Quality(20) # disabled because name clash with Quality condition 
 const font_size      = FontSize(30)
 const sound_id       = SoundId(7)
 const volume         = Volume(300)
@@ -112,7 +111,6 @@ const array          = [1, 2, 3]
 			expect_object_in_map(map, lookup_data, "floating_point", fs::lang::floating_point{3.5},       search(input, "floating_point"), search(input, "3.5"));
 			expect_object_in_map(map, lookup_data, "integer",        fs::lang::integer{123},              search(input, "integer"),        search(input, "123"));
 			expect_object_in_map(map, lookup_data, "level",          fs::lang::level{10},                 search(input, "level"),          search(input, "Level(10)"));
-			// expect_object_in_map(map, lookup_data, "quality", fs::lang::quality{20}, search(input, "quality"), search(input, "Quality(20)"));
 			expect_object_in_map(map, lookup_data, "font_size",      fs::lang::font_size{30},             search(input, "font_size"),      search(input, "FontSize(30)"));
 			expect_object_in_map(map, lookup_data, "sound_id",       fs::lang::sound_id{7},               search(input, "sound_id"),       search(input, "SoundId(7)"));
 			expect_object_in_map(map, lookup_data, "volume",         fs::lang::volume{300},               search(input, "volume"),         search(input, "Volume(300)"));

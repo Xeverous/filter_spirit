@@ -73,11 +73,6 @@ struct type_traits<level> : type_traits_base <
 	promotion_list<integer>> {};
 
 template <>
-struct type_traits<quality> : type_traits_base <
-	empty_constructor_list,
-	promotion_list<integer>> {};
-
-template <>
 struct type_traits<font_size> : type_traits_base <
 	constructor_list <
 		constructor_argument_list<integer>
