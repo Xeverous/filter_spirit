@@ -1,3 +1,0 @@
-Number num = 1
-Level lvl = num
-Color col = Hexagon # 1/1
