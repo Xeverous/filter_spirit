@@ -1,559 +1,617 @@
-# filter writing tutorial
+# actual filter
 
-The following article aims to establish a set of good practices and conventions for writing a spirit filter (and in general, any filter).
+In order to write spirit filters well, you first need to understand what an actual filter can do (and what it can not).
 
-- If you have no clue how Filter Spirit works, read "how it works" article first.
-- If you want detailed spec what can be done in the Filter Spirit language, read "language documentation" article
+Related articles on wiki (not maintained by me):
 
-## filter writing guidelines
+- pathofexile.gamepedia.com/Item_filter
+- pathofexile.gamepedia.com/Item_filter_guide
 
-Items can be filtered by different **properties** (no formal use of this word from GGG side but I picked this one to avoid any name conflict). Properties are independent of each other (although some combinations do not exist, like quest items with sockets). Filters support many different properties but because *every item that goes through the filter gets the style of first matched block* **the order of blocks is crucial to ensure correct filtering**.
+Please be aware that actual filters have no access / information of:
 
-This naturally arises the questions:
+- player level
+- league
+- zone level, although there is a strong correlation of `ItemLevel` of dropped items
+- item full name (after identification) - this pretty much makes filtering unique jewels impossible because all the filter sees are Crimson, Viridian, Cobalt and Prismatic jewels
+- whether the item is mirrored (TODO `HasExplicitMod "Mirrored"` ???)
+- whether the item has abyss sockets
+- whether the item has been allocated to you (while playing in a party)
+- whether the item has multiple variants (some uniques have)
+- whether the item has alternate art
 
-- How strictly (in the sense of amount of conditions, not item value) we should filter stuff?
-  - strict (very detailed checking): we can apply different styles to very narrow set of items, but risk that some items may be not catched
-  - generic: apply the same style to a wider set of items, this has the benefit that we likely do not need to modify / need less modifications to accomodate the filter for new items introduced in the future
-- What should be the order of blocks?
-- What if an item has multiple "interesting" properties?
+Additionally
 
-### generic vs strict filtering
+- Some items can not be hidden (`Hide` will be ignored). Read FAQ for more details.
+- Many unique items share the same base type. So your next Inpulsa's drop is very likely to actually be Tinkerskin (both are `Sadist Garb`).
 
-Because filter rules are first-match, we can do both without losing any benefits and without attracting drawbacks.
+# FS templates
 
-```
-Class "Maps" {
-	MapTier >= 16 {
-		# apply styles in this block to any T16+ map
-		SetTextColor ...
-		SetMinimapIcon ...
-		...
-		Show
-	}
+## syntax
 
-	ShapedMap true {
-		MapTier >= 11 {
-			# red, shaped maps
-			Set...
-			Show
-		}
+FS enchances filter syntax with strong typing (supporting arrays and compound types) and additional operators. These are explained further in the article - first get familar with how blocks work.
 
-		# apply styles in this block to any shaped map
-		SetTextColor ...
-		SetMinimapIcon ...
-		...
-		Show
-	}
+Source files must be UTF-8 encoded. [UTF-8 everywhere.](http://utf8everywhere.org/)
 
-	# apply styles in this block to any map (just map)
-	SetTextColor ...
-	SetMinimapIcon ...
-	...
+## ignored tokens
+
+FS skips any whitespace characters (tabs, spaces, line breaks), except when quoted (so `"Leather Belt"` is correctly parsed).
+
+Comments start with `#` and span until end of line. Unlike with actual filters, `#` always can be placed anywhere in the line - it just inhibits actual code from that point to the end of line.
+
+Regarding line breaks, any are valid but POSIX ones (sole LF) are recommended.
+
+- Notepad++: Edit => EOL Convertion => Unix (LF)
+- Visual Studio Code: bottom right corner, click LF / CRLF on the status bar
+- Windows Notepad: stop using it
+
+## actions and conditions
+
+- **condition** - a complete requirement for the item to be matched. `ItemLevel > 3`, `Rarity unique` and such.
+- **action** - a thing that is performed upon matched items. `SetFontSize 18`, `SetBeam blue` and such.
+- Conditions and actions are mutually exclusive. There is no thing that is both at the same time.
+
+## blocks
+
+Blocks in actual filters start with either `Show` or `Hide` while in FS these are **placed after all actions and conditions**.
+
+**Conditions** are placed before braces and **actions** are placed inside the block. In other words, an item enters block (gets the style) if it matches **all** conditions.
+
+<table>
+<tr>
+<th>FS template</th>
+<th>generated filter</th>
+</tr>
+<tr>
+
+<td>
+<pre>
+Class "Curency"
+BaseType "Portal Scroll" {
+	SetFontSize 30
 	Show
 }
-```
+</pre>
+</td>
 
-We simply **filter with details first and later with a very broad condition** - here the last `Show` requires an item only to be just a map.
+<td>
+<pre>
+Show
+	Class "Curency"
+	BaseType "Portal Scroll"
+	SetFontSize 30
+</pre>
+</td>
 
-Sometimes you may want to style the last (generic) block as an error block:
-
-```
-Class "Currency" {
-	BaseType "Scroll" {
-                ...
-        }
-
-        BaseType ["Mirror of Kalandra", "Exalted Orb"] {
-                ...
-        }
-
-        # more BaseType blocks...
-        # ...
+</tr>
+</table>
 
 
-        # something is currency, but was not catched earlier
-        # likely some newly introduced currency or something that was forgotten
-        # give it some very loud colors / icons / sounds so we are notified
-        # that the filter needs fixing
-        SetBackgroundColor RGB(255, 0, 0)
-        SetAlertSound "error.wav"
-        Show
-}
-```
+Nested blocks inherit all conditions and actions from the parent block. Nested blocks can override actions.
 
-### filter core structure: class condition blocks
+<table>
+<tr>
+<th>FS template</th>
+<th>generated filter</th>
+</tr>
+<tr>
 
-Each item in Path of Exile has an associated **class** (exactly 1). Some classes are subclasses of others ("One Hand Maces" is a subclass of "One Hand" which is a subclass of "One").
-
-It is recommended to build a filter around classes because:
-
-- They are unique (no item has multiple associated classes) - this gives freedom for the order of blocks because no item can be misclassified (pun intended) due to having multiple classes. Freedom of order allows to optimize the filter - the more items are catched earlier the better - there have been some reports from people using very large filters that they can impact (slow down) UI so much it is noticeable for humans (even without highlight key on).
-- Classes are strongly related to items purpose
-  - filtering by class allows to easily style items based on their intended usage (and often value)
-  - new items may be introduced in the future - no action is required to modify the filter if in every class you leave a final show block with no additional conditions
-- Classes have no name clashes. Actual filter uses very naive approach of checking whether given class is a substring of filtered item class. For classes, there is no problem because all are unique strings. This is not true for base types: for example, the full name of `The Wolf` card is a substring of the `The Wolf's Shadow` card. Filtering for `The Wolf` catches both cards. To workaround, filter longer names (superset strings) first.
-
-### non-class properties
-
-Some items are valueable (or just "interesting") not because of their class but of other properties (eg links, colors). Correct placement of these blocks is hard because:
-
-- For some items, having a rare non-class propety is often meaningless or has practically no impact on item value (eg top-tier unique with RGB links).
-- Some non-class properties can be interesting by items of very varying classes. They may have very varying impact on item value.
-- We would like to collect RGB items but some of them are more valuable (eg 6-socket RGB items). Multiple interesting properties can interleave.
-
-So, before filtering by colors and links, filter out all items that can have these but also have more important properties.
-
-See the checklist which is further down in this article.
-
-### price-based filtering
-
-Filter Spirit allows to use market item prices when generating the filter. This is one of core features of FS, but please bear in mind that:
-
-- You need to select the correct league when downloading the prices. If you play on multiple leagues, generate a filter for each.
-- Some items have very scarce supply and may have no price information. Be prepared for it - **don't write div card block with only price-based nested blocks**.
-- Not all items have stable and/or reliable market prices. This is especially true at the league start. You may want to refresh the filter as often as per hour.
-- While some items have a very clear market value, it is impossible to filter them. Unique jewels are a primary example - since the filter only sees item base type, it is impossible to determine which unique it is.
-
-### tips and tricks
-
-- There is no generic "Equipment" class that would allow to easily catch chaos/regal recipe scrap-metal etc. However `Rarity` condition is as good because it not only catches only items with specified rarity, it also limits catched items to only these that can have `Rarity` property - a block with `Rarity >= normal` condition will never catch any currency, because currency has no such property.
-- You can reuse the same sound for multiple sets of items without conflicts if they never drop together. Example: stones drop only during incursions and trinkets drop only in lab.
-
-## checklist
-
-- Talismans should be filtered before rares.
-- Uniques should be filtered before RGB and linked items.
-- Filter 6L uniques before uniques.
-- Filter white socket items after RGB items and uniques
-- Chance/crafting bases: don't forget `Corrupted false` 
-- don't forget to disable leveling gear once a certain character level was reached - for example, you can display any item with `LinkedSockets 4` but only if they have `ItemLevel < 50`. If you reach higher-lvl zones they will simply have too high ilvl to appear.
-- don't forget the very last block in the filter that has no conditions (either use it as an error or to hide everything else)
-
-Things you have to decide:
-
-- 6s 5L - at the start of a league might be worth few chaos, later vendor for jewellers. You may want to:
-  - treat these as 5L (filter in order: 6L, 5L, 6s) because they can be worth at the start of a league and later ... a quite rare chance of losing a 6s or just getting the highlight wrong.
-  - make a separate block for them (filter in oder: 6L, 5L 6s, 5L, 6s)
-- Hammers that are RGB:
-  - filter for RGB first (chromatic recipe prority)
-  - filter for hammers first (chisel recipe priority)
-  - filter for RGB hammers first (if you are pedantic)
-
-## corner cases
-
-Basically a list of name clashes.
-
-- `Sai` (a dagger base) also catches
-  - Saint's Hauberk
-  - Saintly Chainmail
-  - Mo**sai**c Kite Shield
-
-Solution: add `Class "Dagger"`. None of other items are daggers.
-
-- `The Wolf` divination card is a substring of the `The Wolf's Shadow` card.
-
-Solution: filter the one with longer name first.
-
-# filter template
-
-The following code is the recommended order of blocks in a filter.
-
-For each item set, the strictest possible rules are provided - you can use fewer rules (in most cases, sole `BaseType` is enough) but having strict rules results in better error handling. You can also use strict rules to split blocks, eg to separate 1-3 socket resonators and 4 socket resonators.
-
-You can use this file as a starting point if writing spirit filter from scratch.
-
-Notes:
-
-- This is a recommendation, constructive criticizm welcomed.
-- The following template is not the only one possible.
-- The following template is a generic mapping filter - if you are very into racing/leveling or private leagues you may have a very different structure.
-- The following template is targeted at middle-experienced player. If you measure your clear speed in maps per minute and DPS in Shapers per second you will likely have a very different view on what should be picked up.
-
-## currency
-
-```
-# NOTE: you can also use "Stackable Currency" for a more narrow results
-# NOTE: Fossils are stackable as far as filter is concerned (known bug)
-# NOTE: you can also use "Delve Socketable Currency" (currently only resonators)
-
-# if you use any of narrow classes listed above, make sure to also
-# use a generic "Currency" block to filter remaining currency items
-
-Class "Currency" {
-	# add favourite orb blocks here
-	# ...
-
-	# fossils
-	BaseType "Fossil" {
+<td>
+<pre>
+Class "Curency" {
+	SetFontSize 36
+<div></div>
+	BaseType "Portal Scroll" {
 		Show
 	}
-
-	# resonators
-	BaseType "Resonator" {
-		Sockets 4 {
-			Show
-		}
-
+<div></div>
+	BaseType "Orb" {
+		# overwrites SetFontSize 36
+		SetFontSize 42
 		Show
 	}
-
-	# Perandus coins
-	BaseType "Perandus Coin" {
-		Show
-	}
-
-	# prophecies
-	BaseType "Prophecy" {
-		Show
-	}
-
-	# Breach splinters
-	BaseType "Splinter" {
-		Show
-	}
-
-	# Breach blessings
-	BaseType "Blessing" {
-		Show
-	}
-
-	# Incursion vials
-	BaseType "Vial of" {
-		Show
-	}
-
-	# essences - corruption only
-	BaseType [
-		"Essence of Hysteria",
-		"Essence of Insanity",
-		"Essence of Horror",
-		"Essence of Delirium"] {
-		Show
-	}
-
-	# essences - top 2 tiers
-	BaseType ["Deafening Essence of", "Shrieking Essence of"] {
-		Show
-	}
-
-	# essences - anything else
-	BaseType "Essence" {
-		Show
-	}
-
-	# shards
-	BaseType "Shard" {
-		Show
-	}
-
-	# recomemnded place for an error block - any other currency will be catched here
-	SetTextColor error
-	SetAlertSound "error.wav"
+<div></div>
 	Show
 }
-```
+</pre>
+</td>
 
-## gems
+<td>
+<pre>
+Show
+	Class "Curency"
+	BaseType "Portal Scroll"
+	SetFontSize 36
+<div></div>
+Show
+	Class "Currency"
+	BaseType "Orb"
+	SetFontSize 42
+<div></div>
+Show
+	Class "Currency"
+	SetFontSize 36
+</pre>
+</td>
 
-```
-# Note: you can also use these classes, which are more narrow:
-# "Active Skill Gems"
-# "Support Skill Gems"
+</tr>
+</table>
 
-Class "Gems" {
-	# drop only gems
-	BaseType ["Empower", "Enhance", "Enlighten", "Portal"] {
-		Show
-	}
+Actions must be always in the inner block. Further conditions must be after actions. In other words, you can not interleave actions and conditions in the same scope
 
-	# vaal gems
-	BaseType "Vaal" {
-		Show
-	}
+<table>
+<tr>
+<th>FS template</th>
+<th>output</th>
+</tr>
+<tr>
 
-	# quality or any other filterting you would like
-	# here: shwow gems with quality and hide any remaining gems
-	Quality > 0 {
-		Show
-	}
+<td>
+<pre>
+Class "Gem"
+SetFontSize 42 # action before {
+Quality == 20
+</pre>
+</td>
 
-	Hide
-}
-```
+<td>
+<pre>
+error something something parse failed
+</pre>
+</td>
 
-## hammers for chisel recipe
+</tr>
+</table>
 
-```
-Class "One Hand Maces" &&
+Each `Show`/`Hide` directly corresponds to a generation of a block. **If you don't place `Show`/`Hide` a block will not be generated.** If you place multiple `Show`/`Hide`, multiple blocks will be generated.
+
+<table>
+<tr>
+<th>FS template</th>
+<th>generated filter</th>
+</tr>
+<tr>
+
+<td>
+<pre>
 BaseType ["Gavel", "Stone Hammer", "Rock Breaker"] {
+	SetBackgroundColor RGB(162, 85, 0)
+<div></div>
 	Rarity normal {
 		Show
 	}
-
-	Rarity magic && Quality > 12 {
+<div></div>
+	Rarity magic
+	Quality > 12 {
 		Show
 	}
-
-	Rarity rare && Quality > 16 {
+<div></div>
+	Rarity rare
+	Quality > 16 {
 		Show
 	}
+<div></div>
+	# no Show/Hide here: a block for a just hammer
+	# (without quality or rarity conditions) is not generated
+	# this might be useful if you would like the rest of hammers
+	# to be catched later eg for a chromatic orb recipe
 }
-```
+</pre>
+</td>
 
-## harbinger pieces
+<td>
+<pre>
+Show
+        Rarity = Normal
+        BaseType "Gavel" "Stone Hammer" "Rock Breaker"
+        SetBackgroundColor 162 85 0
+<div></div>
+Show
+        Quality > 12
+        Rarity = Magic
+        BaseType "Gavel" "Stone Hammer" "Rock Breaker"
+        SetBackgroundColor 162 85 0
+<div></div>
+Show
+        Quality > 16
+        Rarity = Rare
+        BaseType "Gavel" "Stone Hammer" "Rock Breaker"
+        SetBackgroundColor 162 85 0
+</pre>
+</td>
 
-```
-Class "Piece" {
+</tr>
+</table>
+
+Nested blocks can only add more conditions. Specifying the same condition again is an error.
+
+<table>
+<tr>
+<th>FS template</th>
+<th>output</th>
+</tr>
+<tr>
+
+<td>
+<pre>
+Class "Curency" {
+	SetFontSize 30
+<div></div>
+	Class "Stackable Currency" {
+		Show
+	}
+<div></div>
 	Show
 }
-```
+</pre>
+</td>
 
-## uniques
+<td>
+<pre>
+line 3: error: condition redefinition (the same condition can not be specified again in the same block or nested blocks)
+        Class "Stackable Currency" {
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~
+line 1: note: first defined here
+        Class "Curency" {
+        ~~~~~~~~~~~~~~~
+</pre>
+</td>
 
-Note: for a detailed example of using price-based filters, read the source code of example filter in the repository.
+</tr>
+</table>
 
-```
-Rarity unique {
-	# Tabula Rasa and Skin of the Loyal
-	# and also a very rare case that a unique drops 6L'd - Delve
-	# and Synthesis was reported to drop some already linked items
-	LinkedSockets 6 {
+An exception to this are conditions that have ranges. You can specify a bound again if it's a bound of a different side.
+
+<table>
+<tr>
+<th>FS template</th>
+<th>generated filter</th>
+</tr>
+<tr>
+
+<td>
+<pre>
+Class "Gem"
+Quality > 0 {
+	# here we specify quality again but
+	# since it's a different side it's OK
+	Quality < 20 {
+		SetFontSize 36
 		Show
 	}
+<div></div>
+	Show
+}
+</pre>
+</td>
 
-	# price-based filters
+<td>
+<pre>
+Show
+        Quality > 0
+        Quality < 20
+        Class "Gem"
+        SetFontSize 36
+<div></div>
+Show
+        Quality > 0
+        Class "Gem"
+</pre>
+</td>
+
+</tr>
+</table>
+
+Exact comparisons are treated as both ranges at once. So `Quality == 20` is treated like `Quality <= 20` and `Quality >= 20`. Since you can not narrow exact comparisons, anything more is an error.
+
+<table>
+<tr>
+<th>FS template</th>
+<th>output</th>
+</tr>
+<tr>
+
+<td>
+<pre>
+Class "Gem"
+Quality == 20 {
+	# won't work, it's impossible
+	Quality < 20 {
+		SetFontSize 36
+		Show
+	}
+<div></div>
+	Show
+}
+</pre>
+</td>
+
+<td>
+<pre>
+line 4: error: upper bound redefinition (the same bound for comparison can not be specified again in the same block or nested blocks)
+        Quality < 20 {
+        ~~~~~~~~~~~~
+line 2: note: first defined here
+        Quality == 20 {
+        ~~~~~~~~~~~~~
+</pre>
+</td>
+
+</tr>
+</table>
+
+No conditions or actions are required. You can use condition-less blocks to limit scope of actions:
+
+```
+# nothing here
+{
+	SetFontSize 42
+
+	# multiple blocks here
+	# each will inherit font size 42
 	# ...
+}
 
-	# anything else
-	Show
+# font size no longer works here
+```
+
+If you place an action before any block begins, it will apply globally to all blocks in the entire filter.
+
+```
+# If you don't like semi-transparent background
+# that is by default in actual filters.
+# This will add a truly opaque black background to
+# every block in the filter (unless overriden).
+SetBackgroundColor RGB(0, 0, 0, 255)
+# Or maybe you don't like default font size
+SetFontSize 40
+
+# filter starts here...
+Class "Currency" {
+	# ...
+}
+
+# ...
+```
+## types
+
+Each value in FS language has an associated type.
+
+
+When compiling the filter template, actions and conditions check that they have got values of appropriate types: something like `SetFontSize "abc"` will result in an error.
+
+`Suit` is named suit to avoid name conflict with `Color`. Since there are very few possible values, you can think of it as a suit of playing cards.
+
+expression(s) | type | notes
+--------------|------|------
+`false`, `true` | Boolean |
+`123` | Integer | leading zeros accepted
+`3.14` | FloatingPoint | `.` required
+`-1.2e-3` | FloatingPoint | syntax as defined by C99 or C++11 standard
+`normal`, `magic`, `rare`, `unique` | Rarity |
+`circle`, `diamond`, `hexagon`, `square`, `star`, `triangle` | Shape |
+`red`, `green`, `blue`, `white`, `brown`, `yellow` | Suit |
+`"abc"` | String | UTF-8 encoding, line breaking characters not allowed (LF and CR)
+`["Leather Belt", "Sorcerer Boots"]`, `[10, 20, 30]` | Array | empty arrays are allowed
+
+Complex types need to be created using built-in functions.
+
+`Group` is not named `SocketGroup` to avoid name conflict with condition.
+
+function | result type | notes
+---------|-------------|------
+`RGB(<Integer>, <Integer>, <Integer>)` | Color (RGB format) | can add more formats in the future
+`RGB(<Integer>, <Integer>, <Integer>, <Integer>)` | Color (RGBA format: last value is opacity) | there is a planned feature to globally override opacity of all colors
+`Path(<String>)` | Path | not verified: passed as-is to generated filter
+`Level(<Integer>)` | Level |
+`FontSize(<Integer>)` | FontSize |
+`SoundId(<Integer>)` | SoundId |
+`Volume(<Integer>)` | Volume |
+`Group(<String>)` | Group | string may consist of only `R`, `G`, `B`, `W` characters
+`Beam(<Suit>, <Boolean> = false)` | Beam (permanent by default) | second argument is optional
+`MinimapIcon(<Integer>, <Suit>, <Shape>)` | MinimapIcon
+
+TODO built-in/custom alert sound type?
+
+## conditions
+
+FS supports all conditions that the actual filters support. Some conditions allow values of multiple types. Conditions will automatically promote the value if possible so writing `SocketGroup Group("RGB")` is not necessary, `SocketGroup "RGB"` is enough.
+
+Operator is one of `<`, `>`, `<=`, `>=`, `==`. (`!=` is not yet supported). Operator is optional (defaults to `==`).
+
+```
+Rarity        [operator] <Rarity>
+ItemLevel     [operator] <Level | Integer>
+DropLevel     [operator] <Level | Integer>
+Quality       [operator] <Integer>
+Sockets       [operator] <Integer>
+LinkedSockets [operator] <Integer>
+Height        [operator] <Integer>
+Width         [operator] <Integer>
+StackSize     [operator] <Integer>
+GemLevel      [operator] <Integer>
+MapTier       [operator] <Integer>
+
+Class    [operator] <String | Array>
+BaseType [operator] <String | Array>
+
+SocketGroup <Group | String>
+
+HasExplicitMod <String>
+HasEnchantment <String>
+
+AnyEnchantment  <Boolean>
+Identified      <Boolean>
+Corrupted       <Boolean>
+ElderItem       <Boolean>
+ShaperItem      <Boolean>
+FracturedItem   <Boolean>
+SynthesisedItem <Boolean>
+ShapedMap       <Boolean>
+```
+
+Examples:
+
+```
+Class "Currency"
+BaseType ["Shard", "Splinter"]
+MapTier == 16
+```
+
+## actions
+
+For consistency with itself, **some actions have been renamed and built-in alert sound has been merged with custom alert sounds** (which one it is is determined from the type of the argument).
+
+All actions begin with `Set` except `DisableDropSound`.
+
+The only types you have to create values of using functions are `Color` and `MinimapIcon` (they require multiple arguments).
+
+```
+SetBorderColor     <Color>
+SetTextColor       <Color>
+SetBackgroundColor <Color>
+
+SetFontSize <Integer>
+
+SetAlertSound <Sound | Integer | Path | String>
+
+DisableDropSound
+
+SetMinimapIcon <MinimapIcon>
+
+SetBeam <Beam | Suit>
+```
+
+Examples:
+
+```
+SetTextColor RGB(240, 200, 150)
+SetBackgroundColor RGB(0, 0, 0, 255)
+SetAlertSound "pop.wav"
+SetAlertSound AlertSound(1, 300)
+SetBeam green              # permanent beam
+SetBeam Beam(green, false) # permanent beam, just verbose
+SetBeam Beam(yellow, true) # temporary beam
+SetMinimapIcon MinimapIcon(0, blue, square)
+```
+
+## constants
+
+FS adds the feature of being able to name constants.
+
+```
+const <identifier> = <expression>
+```
+
+Where identifier is an alpha character (one of `a-zA-Z_`) optionally followed by a sequence of alphanumeric characters (`a-zA-Z_0-9`) (identifiers can not start with a digit). Identifiers that start with `_` are reserved (you should not use them) for future additions like predefined color names.
+
+Examples:
+
+```
+const currency_t0 = ["Exalted Orb", "Mirror of Kalandra", "Eternal Orb", "Albino Rhoa Feather", "Mirror Shard"]
+const red = RGB(255, 0, 0)
+const white = RGB(255, 255, 255)
+const icon_currency = MinimapIcon(0, yellow, star)
+
+# ...
+
+Class "Currency" {
+	BaseType currency_t0 {
+		SetBorderColor red
+		SetTextColor red
+		SetBackgroundColor white
+		SetMinimapIcon icon_currency
+	}
 }
 ```
 
-## vendor items
+**All constants must be defined before any actions/conditions.** Otherwise you will get parse errors.
+
+## price queries
+
+One of the core fancy features of FS.
+
+All queries start with `$` (obviously, there is no better operator for price queries) and work like functions: they return a value of certain type.
+
 
 ```
-LinkedSockets 6 {
-	Show
-}
-
-LinkedSockets 5 {
-	Show
-}
-
-Sockets 6 {
-	Show
-}
+        minimum price (inclusive)
+               ~~~~~~~~~~~~~
+$<identifier>(<FloatingPoint>, <FloatingPoint>)
+  ~~~~~~~~~~                    ~~~~~~~~~~~~~
+  query name               maximum price (exclusive)
 ```
-
-## Incursion items
+You can use queries directly or assign their results to constants.
 
 ```
-Class "Incursion Item" &&
-BaseType ["Stone of Passage", "Flashpowder Keg"] {
-	Show
-}
-```
+const top_cards = $divination(100, 999999)
 
-## fragments
-
-```
-Class "Map Fragments" {
-	# Pantheon stuff
-	BaseType "Divine Vessel" {
+Class "Divination Card" {
+	BaseType top_cards {
+		SetAlertSound "maybe_doctor.wav"
 		Show
 	}
 
-	# scarabs
-	# note: there are price queries for scarabs
-	BaseType "Scarab" {
-		Show
-	}
-
-	# normal Atziri
-	BaseType "Sacrifice" {
-		Show
-	}
-
-	# uber Atziri
-	BaseType "Mortal" {
-		Show
-	}
-
-	# Shaper guardian fragments
-	BaseType [
-		"Fragment of the Phoenix",
-		"Fragment of the Minotaur",
-		"Fragment of the Chimera",
-		"Fragment of the Hydra"] {
-		Show
+	BaseType $divination(0, 0.5) {
+		Hide
 	}
 }
 ```
 
-## leaguestones
-
-```
-Class "Leaguestones" {
-	Show
-}
-```
-
-## miscellaneous
-
-```
-Class "Misc Map Items" {
-	# breachstones
-	BaseType "Breachstone" {
-		Show
-	}
-
-	# reliquary keys
-	# Ancient Reliquary Key - dropped during Legacy league
-	# Timeworn Reliquary Key - dropped during Delve league
-	BaseType "Reliquary Key" {
-		Show
-	}
-
-	# Pale Court keys
-	BaseType ["Eber's Key", "Yriel's Key", "Inya's Key", "Volkuur's Key"] {
-		Show
-	}
-}
-```
-
-## Labyrinth stuff
-
-```
-# NOTE: you can use Class "Labirynth" if you want to
-# filter all of lab items with a single block
-
-Class "Labyrinth Map Item" &&
-BaseType "Offering to the Goddess" {
-	Show
-}
-
-Class "Labyrinth Item" {
-	BaseType "Treasure Key" {
-		Show
-	}
-
-	# NOTE: Izaro speaks upon Golden and Silver key drops
-	# so generally you do not want to add alert sounds here
-	BaseType "Golden Key" {
-		Show
-	}
-
-	BaseType "Silver Key" {
-		Show
-	}
-
-	# any future lab item
-	Show
-}
-
-Class "Labyrinth Trinket" {
-	Show
-}
-```
-
-## other classes
-
-```
-Class "Quest Items" {
-	Show
-}
-
-# no idea what this is actually catching
-Class "Hideout Doodads" {
-	Show
-}
-
-# as above, no idea
-# maybe items with skin transfer?
-Class "Microtransactions" {
-	Show
-}
-
-# NOTE: the following class was working previously but has been removed
-# TODO verify this
-# Class "Pantheon Soul" {
-	# Show
-# }
-
-# The game has this class to refer to skills types that can be
-# used on Facebreaker and Doryani's Fist but AFAIK no items
-# with such class ever appeared in the game
-Class "Unarmed" {
-	Show
-}
-
-# NOTE: fishing rods are a separate class
-# so far there is only 1 item that fits here
-# and it's BaseType name is ... also "Fishing Rod"
-Class "Fishing Rod" {
-	BaseType "Fishing Rod" {
-		Show
-	}
-
-	# right now: nothing, just in case we get new
-	# fishing rod base types in the future
-	Show
-}
-```
-
-## divination cards
+Query range is (inclusive, exclusive) to facilitate range/iterator idioms. This way two ranges with the same bound do not overlap.
 
 ```
 Class "Divination Card" {
-        # low-value cards that you always want to pick up
-        BaseType ["The Gambler", "The Void"] {
-                ...
-                Show
-        }
+	# cards worth >= 100c and < 150c
+	BaseType $divination(100, 150) {
+		# ...
+	}
 
-        # whatever, these cards are immediate drops
-        StackSize 1 {
-                ...
-                Show
-        }
-
-        # price-based blocks here
-        BaseType $divination(100, 999999) {
-                ...
-                Show
-        }
-
-        BaseType $divination(10, 100) {
-                ...
-                Show
-        }
-
-        BaseType $divination(1, 10) {
-                ...
-                Show
-        }
-
-        # dont want garbage like Carrion Crow
-        BaseType $divination(0, 1) {
-                ...
-                Hide
-        }
-
-        # cards with unknown value
-        ...
-        Show
+	# cards worth >= 10c and < 100c
+	BaseType $divination(10, 100) {
+		# ...
+	}
 }
 ```
 
-TODO this is unfinished, missing some items
+Available queries:
 
-## remaining items
+name | result type | description
+-----|-------------|------------
+divination | `Array` (of `String`s) | divination cards
+prophecies | `Array` (of `String`s) | sealed prophecies
+fossils | `Array` (of `String`s) | fossils
+vials | `Array` (of `String`s) | Incursion vials (drop from Omnitect)
+essences | `Array` (of `String`s) | essences
+scarabs | `Array` (of `String`s) | scarabs
+uniques | `Array` (of `String`s) | base types of all unique items (merged set of 2 below)
+uniques_unambiguous | `Array` (of `String`s) | base types of unique items that have only 1 unique
+uniques_ambiguous | `Array` (of `String`s) | base types of unique items that have multiple uniques
+uniques_armour | `Array` (of `String`s) | base types of all armour (body armour, helmet, gloves, boots) unique items (merged set of 2 below)
+uniques_unambiguous_armour | `Array` (of `String`s) | base types of armour unique items that have only 1 unique
+uniques_ambiguous_armour | `Array` (of `String`s) | base types of armour unique items that have multiple uniques
+uniques_weapon | `Array` (of `String`s) | base types of all weapon unique items (merged set of 2 below)
+uniques_unambiguous_weapon | `Array` (of `String`s) | base types of weapon unique items that have only 1 unique
+uniques_ambiguous_weapon | `Array` (of `String`s) | base types of weapon unique items that have multiple uniques
+uniques_accessory | `Array` (of `String`s) | base types of all accessory (rings, amulets, belts) unique items (merged set of 2 below)
+uniques_unambiguous_accessory | `Array` (of `String`s) | base types of accessory unique items that have only 1 unique
+uniques_ambiguous_accessory | `Array` (of `String`s) | base types of accessory unique items that have multiple uniques
+uniques_flask | `Array` (of `String`s) | base types of all flask unique items (merged set of 2 below)
+uniques_unambiguous_flask | `Array` (of `String`s) | base types of flask unique items that have only 1 unique
+uniques_ambiguous_flask | `Array` (of `String`s) | base types of flask unique items that have multiple uniques
+uniques_jewels | `Array` (of `String`s) | uniques_ambiguous_jewels
+uniques_unambiguous_jewels | `Array` (of `String`s) | I guess nothing?
+uniques_ambiguous_jewels | `Array` (of `String`s) | `["Crimson Jewel", "Cobalt Jewel", "Viridian Jewel", "Prismatic Jewel"]` unless no unique of each was put on sale (which never happens)
+uniques_maps | `Array` (of `String`s) | base types of all map unique items (merged set of 2 below)
+uniques_unambiguous_jewels | `Array` (of `String`s) | base types of map unique items that have only 1 unique
+uniques_ambiguous_jewels | `Array` (of `String`s) | nothing? are there any maps bases with multiple uniques?
 
-```
-# place this at the end of the filter
-# it will catch anything that was not catched or explicitly hidden earlier
-# if something appears there it will mean that the filter does not cover
-# all items in the game
-SetAlertSound "error.wav"
-Show
-```
+TODO shields where?
+
+TODO do uniques really need split for armour/accessory/weapon etc? They are not used in chaos recipe.
+
+TODO what to do with:
+
+- enchants (how they are even priced?)
+- gems
+- bases
+- harbinger pieces

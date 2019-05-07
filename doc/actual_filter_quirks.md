@@ -48,8 +48,8 @@ Show
 	PlayAlertSoundPositional 1 300 # this comment works
 	CustomAlertSound "airhorn.wav" # this comment works
 ```
-- generally, in many places text that should cause syntax errors is accepted because characters are skipped in some contexts. Optional `+` or `-` character is accepted for numbers - negative quality when? This would buff Blood of the Karui. Almost sure GGG uses string-to-int functions like `strtol()` with base = 10 which stop on first non-digit character. Null terminated strings were a huge mistake, but that's a completely different topic.
-- custom alert sounds have a really buggy implementation (looks like very naive approach of searching for `"`)
+- generally, in many places text that should cause syntax errors is accepted because characters are skipped in some contexts. Optional `+` or `-` character is accepted for numbers (btw, negative quality would buff Blood of the Karui). Almost sure GGG uses string-to-int functions like `strtol()` with base = 10 which stop on first non-digit character. Null terminated strings were a huge mistake, but that's a completely different topic.
+- custom alert sounds have a really buggy implementation (looks like very naive approach of searching for `"`):
 
 ```
 # as expected: error: Incorrect format: CustomAlertSound [filepath]
@@ -82,7 +82,7 @@ Show
   - if custom alert is last, custom sound is played
   - if custom alert is not last, nothing is played
 - you can repeat the same action, the last one wins
-- negative numbers are accepted but `Quality > -3` did not catch anything
+- negative numbers are accepted but `Quality > -3` does not catch anything (do they parse signed numbers to unsigned integer type?)
 
 ## undocumented features
 
@@ -115,8 +115,7 @@ Quality > -3           |   |   |   |   |   |   |   |   |   |   |    |
 ## other observations
 
 - `SocketGroup` accepts only RGBW letters, however, when you ctrl+C an item in game abyss sockets are denoted with A and fossil sockets (on resonators) are denoted with D
-- `Hide` on some items is ignored (usually items of new category introduced by newest game content) (in the past: shaper and elder bases). It is intentional from GGG side - the motivation is to force new game content to be visible in case an outdated filter accidentally hides something important. The drawback is that advanced users can not hide some truly unwanted items.
-- Filters were/are never meant to be backwards-compatible. Any future game patch can break existing filters.
+- Filters were/are never meant to be backwards-compatible. Any future game patch can break existing filters. This has already happened in the past.
 - `""` is a valid string. It is consistent with other (non-empty) strings: rules that have empty strings will match all items because any item name also contains an empty string.
 - It is possible to specify font size that is outside allowed range (\[18, 42\]). If so happens, the value is clamped in this range. No such thing happens for volume (must be in range \[0, 300\]).
 - Game client assumes that the filter file is in unicode. [BOM](https://en.wikipedia.org/wiki/Byte_order_mark) is accepted but not required. ASNI encoding breaks where it differs from UTF-8 such as `ö` in `Maelström Staff`. If you get an error that some gibberish string could not be parsed convert file's encoding to UTF-8.
