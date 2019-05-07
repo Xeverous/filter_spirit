@@ -38,6 +38,12 @@ std::ostream& boost_test_print_type(std::ostream& os, string_condition_property 
 }
 
 inline
+std::ostream& boost_test_print_type(std::ostream& os, suit s)
+{
+	return os << "(suit: " << static_cast<int>(s) << ")";
+}
+
+inline
 std::ostream& boost_test_print_type(std::ostream& os, object_type type)
 {
 	return os << "(object_type: " << to_string_view(type) << ")";

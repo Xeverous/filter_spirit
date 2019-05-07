@@ -4,6 +4,7 @@
 
 #include "fs/compiler/compiler.hpp"
 #include "fs/compiler/print_error.hpp"
+#include "fs/compiler/detail/filter_builder.hpp"
 #include "fs/log/buffered_logger.hpp"
 
 #define BOOST_TEST_DYN_LINK
@@ -73,6 +74,28 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 
 			return std::get<fs::lang::constants_map>(std::move(map_or_error));
 		}
+
+		static
+		std::vector<fs::lang::filter_block> expect_succes_when_building_filter(
+			const std::vector<fs::parser::ast::statement>& top_level_statements,
+			const fs::parser::lookup_data& lookup_data,
+			const fs::lang::constants_map& map)
+		{
+			std::variant<std::vector<fs::lang::filter_block>, fs::compiler::error::error_variant> result =
+				fs::compiler::detail::filter_builder::build_filter(
+					top_level_statements, map, fs::itemdata::item_price_data{});
+
+			if (std::holds_alternative<fs::compiler::error::error_variant>(result))
+			{
+				const auto& error = std::get<fs::compiler::error::error_variant>(result);
+				fs::log::buffered_logger logger;
+				fs::compiler::print_error(error, lookup_data, logger);
+				const auto log = logger.flush_out();
+				BOOST_FAIL("building filter blocks failed but should not:\n" << log);
+			}
+
+			return std::get<std::vector<fs::lang::filter_block>>(std::move(result));
+		}
 	};
 
 	BOOST_FIXTURE_TEST_SUITE(compiler_success_suite, compiler_success_fixture,
@@ -141,6 +164,117 @@ const array          = [1, 2, 3]
 					{"a", fs::lang::object{fs::lang::integer{1}, fs::lang::position_tag()}},
 					{"b", fs::lang::object{fs::lang::integer{2}, fs::lang::position_tag()}}},
 				search(input, "dict"), search(input, R"({ "a": 1, "b": 2 })")); */
+		}
+
+		BOOST_AUTO_TEST_CASE(array_definitions, * ut::description("test that arrays of various sizes are correctly interpreted"))
+		{
+			const std::string input_str = minimal_input() + R"(
+const a0 = []
+const a1 = [1]
+const a2 = [1, 2]
+const a3 = [1, 2, 3]
+)";
+			const std::string_view input = input_str;
+			const fs::parser::parse_success_data parse_data = parse(input);
+			const fs::parser::lookup_data& lookup_data = parse_data.lookup_data;
+			const fs::lang::constants_map map = expect_success_when_resolving_constants(parse_data.ast.constant_definitions, lookup_data);
+
+			expect_object_in_map(map, lookup_data, "a0",
+				fs::lang::array_object{},
+				search(input, "a0"), search(input, "[]"));
+
+			expect_object_in_map(map, lookup_data, "a1",
+				fs::lang::array_object{
+					fs::lang::object{fs::lang::integer{1}, fs::lang::position_tag()}},
+				search(input, "a1"), search(input, "[1]"));
+
+			expect_object_in_map(map, lookup_data, "a2",
+				fs::lang::array_object{
+					fs::lang::object{fs::lang::integer{1}, fs::lang::position_tag()},
+					fs::lang::object{fs::lang::integer{2}, fs::lang::position_tag()}},
+				search(input, "a2"), search(input, "[1, 2]"));
+
+			expect_object_in_map(map, lookup_data, "a3",
+				fs::lang::array_object{
+					fs::lang::object{fs::lang::integer{1}, fs::lang::position_tag()},
+					fs::lang::object{fs::lang::integer{2}, fs::lang::position_tag()},
+					fs::lang::object{fs::lang::integer{3}, fs::lang::position_tag()}},
+				search(input, "a3"), search(input, "[1, 2, 3]"));
+		}
+
+		BOOST_AUTO_TEST_CASE(promotions)
+		{
+			const std::string input_str = minimal_input() + R"(
+ItemLevel 10 &&
+SocketGroup "RGBW"
+{
+	SetAlertSound 7
+	SetBeam green
+	Hide
+}
+
+SetAlertSound "error.wav"
+Show
+)";
+			const std::string_view input = input_str;
+			const fs::parser::parse_success_data parse_data = parse(input);
+			const fs::parser::lookup_data& lookup_data = parse_data.lookup_data;
+			const fs::lang::constants_map map = expect_success_when_resolving_constants(parse_data.ast.constant_definitions, lookup_data);
+			const std::vector<fs::lang::filter_block> blocks =
+				expect_succes_when_building_filter(parse_data.ast.statements, parse_data.lookup_data, map);
+			BOOST_TEST_REQUIRE(static_cast<int>(blocks.size()) == 2);
+
+			const fs::lang::filter_block& b0 = blocks[0];
+			BOOST_TEST(b0.show == false);
+
+			const fs::lang::condition_set& b0_cond = b0.conditions;
+			BOOST_TEST(b0_cond.item_level.is_exact());
+			BOOST_TEST(b0_cond.item_level.includes(10));
+			if (b0_cond.socket_group.has_value())
+			{
+				const fs::lang::socket_group& sg = *b0_cond.socket_group;
+				BOOST_TEST(sg.is_valid());
+				BOOST_TEST(sg.r == 1);
+				BOOST_TEST(sg.g == 1);
+				BOOST_TEST(sg.b == 1);
+				BOOST_TEST(sg.w == 1);
+			}
+			else
+			{
+				BOOST_ERROR("block 0 has no socket group but it should have");
+			}
+
+			const fs::lang::action_set& b0_act = b0.actions;
+			if (b0_act.beam_effect.has_value())
+			{
+				BOOST_TEST((*b0_act.beam_effect).color == fs::lang::suit::green);
+				BOOST_TEST((*b0_act.beam_effect).is_temporary == false);
+			}
+			else
+			{
+				BOOST_ERROR("block 0 has no beam effect but it should have");
+			}
+
+			const fs::lang::filter_block& b1 = blocks[1];
+			BOOST_TEST(b1.show == true);
+
+			const fs::lang::action_set& b1_act = b1.actions;
+			if (b1_act.alert_sound.has_value())
+			{
+				if (std::holds_alternative<fs::lang::custom_alert_sound>((*b1_act.alert_sound).sound))
+				{
+					const auto& sound = std::get<fs::lang::custom_alert_sound>((*b1_act.alert_sound).sound);
+					BOOST_TEST(sound.path.value == "error.wav");
+				}
+				else
+				{
+					BOOST_ERROR("block 1 has wrong alert sound");
+				}
+			}
+			else
+			{
+				BOOST_ERROR("block 1 has no alert sound but it should have");
+			}
 		}
 
 	BOOST_AUTO_TEST_SUITE_END()
