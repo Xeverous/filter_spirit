@@ -20,7 +20,7 @@ Could be added very easily. The problem is that the game client is not aware tha
 
 There is an idea to support `(X, _)` but since the current workaround is very easy it's a low priority feature.
 
-**I'm getting an error with some gibberish string. What's wrong?**
+**When loading the filter, I'm getting an error with some gibberish string. What's wrong?**
 
 You likely saved a file with non-Unicode encoding. Convert it to UTF-8:
 
@@ -53,7 +53,21 @@ This block is invalid but since there is nothing it should catch such blocks are
 
 Yes. this program does not interact with the game client in any way. It only produces a text file that is later read by it.
 
-## design of FS language
+## design of FS
+
+**Why this name?**
+
+2 main reasons:
+
+- I wanted the thing to be searchable - being easy to find and distinguish from other tools. "Yet another filter tool" or "Filter generator/compiler" are to broad terms, so I picked something unique that intentionally has no direct meaning to avoid misinterpretation.
+- The heart of the program is the LL parser made using Boost Spirit library. It (ab)uses operator overloading and expressions templates to express language syntax using plain C++ code - each operator implements 1 particular action (skip, alternate, loop until, look ahead etc) and thanks to templates you can freely combine them to form very nested types that merge all these loops and if-elses into a single parse function. [Wikipedia has a short article on it.](https://en.wikipedia.org/wiki/Spirit_Parser_Framework)
+
+**Why this library in particular?**
+
+There are more parser libraries available, namely: YACC (used by GDB), Bison and Lemon (used by SQLite) but they all share the same problems:
+
+- They are not really libraries. They have some library parts but mostly they are separate programs that given grammar spec, they generate code. This complicates the build process, complicates your own code and breaks working with any IDE.
+- They all generate C. So forget about automatic memory management (in the form of garbage collection or RAII), you will have to code it yourself. And forget about type safety - everything is `void*`, any wrong cast will likely result in a segfault.
 
 **Why `==` and not `=` like in the original filter?**
 
