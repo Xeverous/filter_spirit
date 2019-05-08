@@ -239,6 +239,15 @@ std::variant<lang::object, error::error_variant> evaluate_price_range_query(
 	const auto& price_range = std::get<lang::price_range>(range_or_error);
 	const lang::position_tag position_of_query = parser::get_position_info(price_range_query);
 
+	const auto eval_query = [&](const auto& items) [[nodiscard]]
+	{
+		lang::array_object array = evaluate_price_range_query_on_sorted_range(
+			price_range,
+			position_of_query,
+			items.begin(),
+			items.end());
+		return lang::object{std::move(array), position_of_query};
+	};
 	/*
 	 * note: this is O(n) but relying on small string optimization
 	 * and much better memory layout makes it to run faster than a
@@ -248,143 +257,91 @@ std::variant<lang::object, error::error_variant> evaluate_price_range_query(
 	const ast::identifier& query_name = price_range_query.name;
 	if (query_name.value == lang::queries::divination)
 	{
-		const std::vector<itemdata::elementary_item>& cards = item_price_data.divination_cards;
-		lang::array_object array = evaluate_price_range_query_on_sorted_range(
-			price_range,
-			position_of_query,
-			cards.begin(),
-			cards.end());
-		return lang::object{std::move(array), position_of_query};
+		return eval_query(item_price_data.divination_cards);
 	}
 	else if (query_name.value == lang::queries::prophecies)
 	{
-		const std::vector<itemdata::elementary_item>& prophecies = item_price_data.prophecies;
-		lang::array_object array = evaluate_price_range_query_on_sorted_range(
-			price_range,
-			position_of_query,
-			prophecies.begin(),
-			prophecies.end());
-		return lang::object{std::move(array), position_of_query};
+		return eval_query(item_price_data.prophecies);
+	}
+	else if (query_name.value == lang::queries::essences)
+	{
+		return eval_query(item_price_data.essences);
+	}
+	else if (query_name.value == lang::queries::leaguestones)
+	{
+		return eval_query(item_price_data.leaguestones);
+	}
+	else if (query_name.value == lang::queries::pieces)
+	{
+		return eval_query(item_price_data.pieces);
+	}
+	else if (query_name.value == lang::queries::nets)
+	{
+		return eval_query(item_price_data.nets);
+	}
+	else if (query_name.value == lang::queries::vials)
+	{
+		return eval_query(item_price_data.vials);
+	}
+	else if (query_name.value == lang::queries::fossils)
+	{
+		return eval_query(item_price_data.fossils);
+	}
+	else if (query_name.value == lang::queries::resonators)
+	{
+		return eval_query(item_price_data.resonators);
+	}
+	else if (query_name.value == lang::queries::scarabs)
+	{
+		return eval_query(item_price_data.scarabs);
 	}
 	else if (query_name.value == lang::queries::uniques_ambiguous_armour)
 	{
-		const std::vector<itemdata::unique_item>& uniques_armour = item_price_data.ambiguous_unique_armours;
-		lang::array_object array = evaluate_price_range_query_on_sorted_range(
-			price_range,
-			position_of_query,
-			uniques_armour.begin(),
-			uniques_armour.end());
-		return lang::object{std::move(array), position_of_query};
+		return eval_query(item_price_data.ambiguous_unique_armours);
 	}
 	else if (query_name.value == lang::queries::uniques_ambiguous_weapon)
 	{
-		const std::vector<itemdata::unique_item>& uniques_weapon = item_price_data.ambiguous_unique_weapons;
-		lang::array_object array = evaluate_price_range_query_on_sorted_range(
-			price_range,
-			position_of_query,
-			uniques_weapon.begin(),
-			uniques_weapon.end());
-		return lang::object{std::move(array), position_of_query};
+		return eval_query(item_price_data.ambiguous_unique_weapons);
 	}
 	else if (query_name.value == lang::queries::uniques_ambiguous_accessory)
 	{
-		const std::vector<itemdata::unique_item>& uniques_accessory = item_price_data.ambiguous_unique_accessories;
-		lang::array_object array = evaluate_price_range_query_on_sorted_range(
-			price_range,
-			position_of_query,
-			uniques_accessory.begin(),
-			uniques_accessory.end());
-		return lang::object{std::move(array), position_of_query};
+		return eval_query(item_price_data.ambiguous_unique_accessories);
 	}
 	else if (query_name.value == lang::queries::uniques_ambiguous_jewel)
 	{
-		const std::vector<itemdata::unique_item>& uniques_jewel = item_price_data.ambiguous_unique_jewels;
-		lang::array_object array = evaluate_price_range_query_on_sorted_range(
-			price_range,
-			position_of_query,
-			uniques_jewel.begin(),
-			uniques_jewel.end());
-		return lang::object{std::move(array), position_of_query};
+		return eval_query(item_price_data.ambiguous_unique_jewels);
 	}
 	else if (query_name.value == lang::queries::uniques_ambiguous_flask)
 	{
-		const std::vector<itemdata::unique_item>& uniques_flask = item_price_data.ambiguous_unique_flasks;
-		lang::array_object array = evaluate_price_range_query_on_sorted_range(
-			price_range,
-			position_of_query,
-			uniques_flask.begin(),
-			uniques_flask.end());
-		return lang::object{std::move(array), position_of_query};
+		return eval_query(item_price_data.ambiguous_unique_flasks);
 	}
 	else if (query_name.value == lang::queries::uniques_ambiguous_map)
 	{
-		const std::vector<itemdata::unique_item>& uniques_map = item_price_data.ambiguous_unique_maps;
-		lang::array_object array = evaluate_price_range_query_on_sorted_range(
-			price_range,
-			position_of_query,
-			uniques_map.begin(),
-			uniques_map.end());
-		return lang::object{std::move(array), position_of_query};
+		return eval_query(item_price_data.ambiguous_unique_maps);
 	}
 	else if (query_name.value == lang::queries::uniques_unambiguous_armour)
 	{
-		const std::vector<itemdata::unique_item>& uniques_armour = item_price_data.unambiguous_unique_armours;
-		lang::array_object array = evaluate_price_range_query_on_sorted_range(
-			price_range,
-			position_of_query,
-			uniques_armour.begin(),
-			uniques_armour.end());
-		return lang::object{std::move(array), position_of_query};
+		return eval_query(item_price_data.unambiguous_unique_armours);
 	}
 	else if (query_name.value == lang::queries::uniques_unambiguous_weapon)
 	{
-		const std::vector<itemdata::unique_item>& uniques_weapon = item_price_data.unambiguous_unique_weapons;
-		lang::array_object array = evaluate_price_range_query_on_sorted_range(
-			price_range,
-			position_of_query,
-			uniques_weapon.begin(),
-			uniques_weapon.end());
-		return lang::object{std::move(array), position_of_query};
+		return eval_query(item_price_data.unambiguous_unique_weapons);
 	}
 	else if (query_name.value == lang::queries::uniques_unambiguous_accessory)
 	{
-		const std::vector<itemdata::unique_item>& uniques_accessory = item_price_data.unambiguous_unique_accessories;
-		lang::array_object array = evaluate_price_range_query_on_sorted_range(
-			price_range,
-			position_of_query,
-			uniques_accessory.begin(),
-			uniques_accessory.end());
-		return lang::object{std::move(array), position_of_query};
+		return eval_query(item_price_data.unambiguous_unique_accessories);
 	}
 	else if (query_name.value == lang::queries::uniques_unambiguous_jewel)
 	{
-		const std::vector<itemdata::unique_item>& uniques_jewel = item_price_data.unambiguous_unique_jewels;
-		lang::array_object array = evaluate_price_range_query_on_sorted_range(
-			price_range,
-			position_of_query,
-			uniques_jewel.begin(),
-			uniques_jewel.end());
-		return lang::object{std::move(array), position_of_query};
+		return eval_query(item_price_data.unambiguous_unique_jewels);
 	}
 	else if (query_name.value == lang::queries::uniques_unambiguous_flask)
 	{
-		const std::vector<itemdata::unique_item>& uniques_flask = item_price_data.unambiguous_unique_flasks;
-		lang::array_object array = evaluate_price_range_query_on_sorted_range(
-			price_range,
-			position_of_query,
-			uniques_flask.begin(),
-			uniques_flask.end());
-		return lang::object{std::move(array), position_of_query};
+		return eval_query(item_price_data.unambiguous_unique_flasks);
 	}
 	else if (query_name.value == lang::queries::uniques_unambiguous_map)
 	{
-		const std::vector<itemdata::unique_item>& uniques_map = item_price_data.unambiguous_unique_maps;
-		lang::array_object array = evaluate_price_range_query_on_sorted_range(
-			price_range,
-			position_of_query,
-			uniques_map.begin(),
-			uniques_map.end());
-		return lang::object{std::move(array), position_of_query};
+		return eval_query(item_price_data.unambiguous_unique_maps);
 	}
 
 	return error::no_such_query{parser::get_position_info(query_name)};

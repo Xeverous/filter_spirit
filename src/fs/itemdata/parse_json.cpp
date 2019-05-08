@@ -481,13 +481,53 @@ item_price_data parse_item_prices(std::string_view itemdata_json, std::string_vi
 
 		const fs::itemdata::price_data& price_data = *item_prices[i.id];
 
-		if (std::holds_alternative<categories::divination_card>(i.category))
+		if (std::holds_alternative<categories::currency>(i.category))
+		{
+			const auto& curr = std::get<categories::currency>(i.category);
+			if (curr.type == +categories::currency_type::essense)
+			{
+				result.essences.push_back(elementary_item{std::move(i.name), price_data});
+			}
+			else if (curr.type == +categories::currency_type::piece)
+			{
+				result.pieces.push_back(elementary_item{std::move(i.name), price_data});
+			}
+			else if (curr.type == +categories::currency_type::net)
+			{
+				result.nets.push_back(elementary_item{std::move(i.name), price_data});
+			}
+			else if (curr.type == +categories::currency_type::vial)
+			{
+				result.vials.push_back(elementary_item{std::move(i.name), price_data});
+			}
+			else if (curr.type == +categories::currency_type::fossil)
+			{
+				result.fossils.push_back(elementary_item{std::move(i.name), price_data});
+			}
+			else if (curr.type == +categories::currency_type::resonator)
+			{
+				result.resonators.push_back(elementary_item{std::move(i.name), price_data});
+			}
+		}
+		else if (std::holds_alternative<categories::divination_card>(i.category))
 		{
 			result.divination_cards.push_back(elementary_item{std::move(i.name), price_data});
 		}
 		else if (std::holds_alternative<categories::prophecy>(i.category))
 		{
 			result.prophecies.push_back(elementary_item{std::move(i.name), price_data});
+		}
+		else if (std::holds_alternative<categories::map>(i.category))
+		{
+			const auto& map = std::get<categories::map>(i.category);
+			if (map.type == +categories::map_type::leaguestone)
+			{
+				result.leaguestones.push_back(elementary_item{std::move(i.name), price_data});
+			}
+			else if (map.type == +categories::map_type::scarab)
+			{
+				result.scarabs.push_back(elementary_item{std::move(i.name), price_data});
+			}
 		}
 		else if (std::holds_alternative<categories::base>(i.category))
 		{
@@ -564,15 +604,6 @@ item_price_data parse_item_prices(std::string_view itemdata_json, std::string_vi
 				result.ambiguous_unique_maps.push_back(unique_item{std::move(i.name), std::move(*i.base_type), price_data});
 				continue;
 			}
-			if (std::holds_alternative<categories::currency>(i.category))
-			{
-				const auto currency = std::get<categories::currency>(i.category);
-				if (currency.type == +categories::currency_type::piece)
-				{
-					result.harbinger_pieces.push_back(unique_item{std::move(i.name), std::move(*i.base_type), price_data});
-					continue;
-				}
-			}
 
 			logger.warning() << "A unique item has been skipped because it's category was not recognized";
 			i.log_info(logger);
@@ -591,7 +622,14 @@ item_price_data parse_item_prices(std::string_view itemdata_json, std::string_vi
 
 	std::sort(result.divination_cards.begin(),        result.divination_cards.end(),        compare_by_mean_price);
 	std::sort(result.prophecies.begin(),              result.prophecies.end(),              compare_by_mean_price);
-	std::sort(result.harbinger_pieces.begin(),        result.harbinger_pieces.end(),        compare_by_mean_price);
+	std::sort(result.essences.begin(),                result.essences.end(),                compare_by_mean_price);
+	std::sort(result.leaguestones.begin(),            result.leaguestones.end(),            compare_by_mean_price);
+	std::sort(result.pieces.begin(),                  result.pieces.end(),                  compare_by_mean_price);
+	std::sort(result.nets.begin(),                    result.nets.end(),                    compare_by_mean_price);
+	std::sort(result.vials.begin(),                   result.vials.end(),                   compare_by_mean_price);
+	std::sort(result.fossils.begin(),                 result.fossils.end(),                 compare_by_mean_price);
+	std::sort(result.scarabs.begin(),                 result.scarabs.end(),                 compare_by_mean_price);
+
 	std::sort(result.bases_without_influence.begin(), result.bases_without_influence.end(), compare_by_ilvl);
 	std::sort(result.bases_shaper.begin(),            result.bases_shaper.end(),            compare_by_ilvl);
 	std::sort(result.bases_elder.begin(),             result.bases_elder.end(),             compare_by_ilvl);

@@ -65,7 +65,14 @@ struct item_price_data
 	// sorted by price
 	std::vector<elementary_item> divination_cards;
 	std::vector<elementary_item> prophecies;
-	std::vector<unique_item> harbinger_pieces;
+	std::vector<elementary_item> essences;
+	std::vector<elementary_item> leaguestones;
+	std::vector<elementary_item> pieces;
+	std::vector<elementary_item> nets;
+	std::vector<elementary_item> vials;
+	std::vector<elementary_item> fossils;
+	std::vector<elementary_item> resonators;
+	std::vector<elementary_item> scarabs;
 
 	// sorted by ilvl
 	std::vector<base_type_item> bases_without_influence;

@@ -579,9 +579,13 @@ name | result type | description
 -----|-------------|------------
 divination | `Array` (of `String`s) | divination cards
 prophecies | `Array` (of `String`s) | sealed prophecies
-fossils | `Array` (of `String`s) | fossils
-vials | `Array` (of `String`s) | Incursion vials (drop from Omnitect)
 essences | `Array` (of `String`s) | essences
+leaguestones | `Array` (of `String`s) | leaguestones
+pieces | `Array` (of `String`s) | Harbinger pieces
+nets | `Array` (of `String`s) | Bestiary nets
+vials | `Array` (of `String`s) | Incursion vials
+fossils | `Array` (of `String`s) | fossils
+resonators | `Array` (of `String`s) | resonators
 scarabs | `Array` (of `String`s) | scarabs
 uniques | `Array` (of `String`s) | base types of all unique items (merged set of 2 below)
 uniques_unambiguous | `Array` (of `String`s) | base types of unique items that have only 1 unique
@@ -614,4 +618,3 @@ TODO what to do with:
 - enchants (how they are even priced?)
 - gems
 - bases
-- harbinger pieces
