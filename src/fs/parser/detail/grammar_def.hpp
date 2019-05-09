@@ -167,8 +167,16 @@ const auto condition_def =
 	| socket_group_condition;
 BOOST_SPIRIT_DEFINE(condition)
 
-const action_type action= "action";
-const auto action_def = symbols::action_types > value_expression;
+const nullary_action_type nullary_action = "nullary action";
+const auto nullary_action_def = symbols::nullary_action_types;
+BOOST_SPIRIT_DEFINE(nullary_action)
+
+const unary_action_type unary_action = "unary action";
+const auto unary_action_def = symbols::unary_action_types > value_expression;
+BOOST_SPIRIT_DEFINE(unary_action)
+
+const action_type action = "action";
+const auto action_def = nullary_action | unary_action;
 BOOST_SPIRIT_DEFINE(action)
 
 // ---- filter structure ----

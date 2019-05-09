@@ -120,6 +120,7 @@ constexpr auto set_alert_sound            = "SetAlertSound";
  */
 // constexpr auto set_alert_sound_positional = "SetAlertSoundPositional";
 constexpr auto disable_drop_sound         = generation::disable_drop_sound;
+constexpr auto enable_drop_sound          = "EnableDropSound";
 constexpr auto set_minimap_icon           = "SetMinimapIcon";
 constexpr auto set_beam                   = "SetBeam";
 

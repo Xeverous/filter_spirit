@@ -474,12 +474,15 @@ SetFontSize <Integer>
 
 SetAlertSound <Sound | Integer | Path | String>
 
+EnableDropSound
 DisableDropSound
 
 SetMinimapIcon <MinimapIcon>
 
 SetBeam <Beam | Suit>
 ```
+
+`EnableDropSound` is an FS extension (actual filters don't have such thing). It exists so you can overwrite parent action (blocks with enabled drop sound simply do not generate `DisableDropSound` in actual filter).
 
 Examples:
 

@@ -26,7 +26,7 @@ namespace fs::lang
 {
 
 inline
-std::ostream& boost_test_print_type(std::ostream& os, action_type at)
+std::ostream& boost_test_print_type(std::ostream& os, unary_action_type at)
 {
 	return os << "(action_type: " << static_cast<int>(at) << ")";
 }

@@ -242,9 +242,11 @@ Show
 
 		BOOST_TEST_REQUIRE(holds_alternative<pa::action>(statements[0].var)); // SetBackgroundColor color_black
 		const auto& st0_action = boost::get<pa::action>(statements[0].var);
-		BOOST_TEST(st0_action.action_type == lang::action_type::set_background_color);
-		BOOST_TEST_REQUIRE(holds_alternative<pa::identifier>(st0_action.value.var));
-		const auto& st0_action_id = boost::get<pa::identifier>(st0_action.value.var);
+		BOOST_TEST_REQUIRE(holds_alternative<pa::unary_action>(st0_action.var));
+		const auto st0_unary_action = boost::get<pa::unary_action>(st0_action.var);
+		BOOST_TEST(st0_unary_action.action_type == lang::unary_action_type::set_background_color);
+		BOOST_TEST_REQUIRE(holds_alternative<pa::identifier>(st0_unary_action.value.var));
+		const auto& st0_action_id = boost::get<pa::identifier>(st0_unary_action.value.var);
 		BOOST_TEST(st0_action_id.value =="color_black");
 
 		BOOST_TEST_REQUIRE(holds_alternative<pa::rule_block>(statements[1].var)); // Class "Currency" {
@@ -265,9 +267,11 @@ Show
 		const auto& st1_st0 = st1_rule_block.statements[0]; // SetBorderColor color_currency
 		BOOST_TEST_REQUIRE(holds_alternative<pa::action>(st1_st0.var));
 		const auto& st1_st0_action = boost::get<pa::action>(st1_st0.var);
-		BOOST_TEST(st1_st0_action.action_type == lang::action_type::set_border_color);
-		BOOST_TEST_REQUIRE(holds_alternative<pa::identifier>(st1_st0_action.value.var));
-		const auto& st1_st0_action_id = boost::get<pa::identifier>(st1_st0_action.value.var);
+		BOOST_TEST_REQUIRE(holds_alternative<pa::unary_action>(st1_st0_action.var));
+		const auto& st1_st0_unary_action = boost::get<pa::unary_action>(st1_st0_action.var);
+		BOOST_TEST(st1_st0_unary_action.action_type == lang::unary_action_type::set_border_color);
+		BOOST_TEST_REQUIRE(holds_alternative<pa::identifier>(st1_st0_unary_action.value.var));
+		const auto& st1_st0_action_id = boost::get<pa::identifier>(st1_st0_unary_action.value.var);
 		BOOST_TEST(st1_st0_action_id.value == "color_currency");
 
 		const auto& st1_st1 = st1_rule_block.statements[1]; // BaseType currency_t1
@@ -287,9 +291,11 @@ Show
 		const auto& st1_st1_cond_st0 = st1_st1_cond.statements[0]; // SetAlertSound sound_currency
 		BOOST_TEST_REQUIRE(holds_alternative<pa::action>(st1_st1_cond_st0.var));
 		const auto& st1_st1_cond_st0_action = boost::get<pa::action>(st1_st1_cond_st0.var);
-		BOOST_TEST(st1_st1_cond_st0_action.action_type == lang::action_type::set_alert_sound);
-		BOOST_TEST_REQUIRE(holds_alternative<pa::identifier>(st1_st1_cond_st0_action.value.var));
-		const auto& st1_st1_cond_st0_action_id = boost::get<pa::identifier>(st1_st1_cond_st0_action.value.var);
+		BOOST_TEST_REQUIRE(holds_alternative<pa::unary_action>(st1_st1_cond_st0_action.var));
+		const auto& st1_st1_cond_st0_unary_action = boost::get<pa::unary_action>(st1_st1_cond_st0_action.var);
+		BOOST_TEST(st1_st1_cond_st0_unary_action.action_type == lang::unary_action_type::set_alert_sound);
+		BOOST_TEST_REQUIRE(holds_alternative<pa::identifier>(st1_st1_cond_st0_unary_action.value.var));
+		const auto& st1_st1_cond_st0_action_id = boost::get<pa::identifier>(st1_st1_cond_st0_unary_action.value.var);
 		BOOST_TEST(st1_st1_cond_st0_action_id.value == "sound_currency");
 
 		const auto& st1_st1_cond_st1 = st1_st1_cond.statements[1]; // Show

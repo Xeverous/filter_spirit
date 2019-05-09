@@ -4,10 +4,13 @@
  * @brief This file is intended for type definitions that will be used for AST
  */
 #pragma once
+
 #include "fs/lang/types.hpp"
+
 #include <boost/optional.hpp>
 #include <boost/spirit/home/x3/support/ast/variant.hpp>
 #include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
+
 #include <utility>
 #include <string>
 #include <type_traits>
@@ -308,11 +311,39 @@ namespace
 	using workaround2 = decltype(condition{*static_cast<const condition*>(nullptr)});
 }
 
-struct action : x3::position_tagged
+struct nullary_action : x3::position_tagged
 {
-	lang::action_type action_type;
+	nullary_action& operator=(lang::nullary_action_type action)
+	{
+		action_type = action;
+		return *this;
+	}
+
+	lang::nullary_action_type get_value() const { return action_type; }
+
+	lang::nullary_action_type action_type;
+};
+
+struct unary_action : x3::position_tagged
+{
+	lang::unary_action_type action_type;
 	value_expression value;
 };
+
+struct action : x3::variant<
+		nullary_action,
+		unary_action
+	>, x3::position_tagged
+{
+	using base_type::base_type;
+	using base_type::operator=;
+};
+
+// as above
+namespace
+{
+	using workaround3 = decltype(action{*static_cast<const action*>(nullptr)});
+}
 
 // ---- filter structure ----
 
@@ -350,7 +381,7 @@ struct statement : x3::variant<
 // as above
 namespace
 {
-	using workaround3 = decltype(statement{*static_cast<const statement*>(nullptr)});
+	using workaround4 = decltype(statement{*static_cast<const statement*>(nullptr)});
 }
 
 struct filter_structure : x3::position_tagged
