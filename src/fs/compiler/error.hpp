@@ -94,6 +94,7 @@ struct invalid_minimap_icon_size
 struct condition_redefinition
 {
 	lang::position_tag place_of_redefinition;
+	lang::position_tag place_of_original_definition;
 };
 
 struct lower_bound_redefinition

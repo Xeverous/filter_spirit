@@ -7,6 +7,7 @@
 #include "fs/lang/constants_map.hpp"
 #include "fs/itemdata/types.hpp"
 
+#include <cassert>
 #include <optional>
 
 namespace fs::compiler::detail
@@ -38,7 +39,7 @@ std::optional<error::error_variant> add_string_condition(
 std::optional<error::error_variant> add_strings_condition(
 	std::vector<std::string> strings,
 	lang::position_tag condition_origin,
-	std::shared_ptr<std::vector<std::string>>& target);
+	lang::strings_condition& target);
 
 [[nodiscard]]
 std::optional<error::error_variant> add_boolean_condition(
@@ -52,7 +53,7 @@ std::optional<error::error_variant> add_boolean_condition(
 std::optional<error::error_variant> add_boolean_condition(
 	lang::boolean boolean,
 	lang::position_tag condition_origin,
-	std::optional<lang::boolean>& target);
+	std::optional<lang::boolean_condition>& target);
 
 [[nodiscard]]
 std::optional<error::error_variant> add_socket_group_condition(
@@ -66,7 +67,7 @@ std::optional<error::error_variant> add_socket_group_condition(
 std::optional<error::error_variant> add_socket_group_condition(
 	lang::socket_group socket_group,
 	lang::position_tag condition_origin,
-	std::optional<lang::socket_group>& target);
+	std::optional<lang::socket_group_condition>& target);
 
 template <typename T>
 std::optional<error::error_variant> add_range_condition(
@@ -80,7 +81,10 @@ std::optional<error::error_variant> add_range_condition(
 		case lang::comparison_type::equal:
 		{
 			if (target.is_exact())
+			{
+				assert((*target.lower_bound).origin == (*target.upper_bound).origin);
 				return error::exact_comparison_redefinition{condition_origin};
+			}
 
 			if (!target.includes(value))
 				return error::exact_comparison_outside_parent_range{condition_origin};
