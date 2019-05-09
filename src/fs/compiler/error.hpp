@@ -91,11 +91,6 @@ struct invalid_minimap_icon_size
 	lang::position_tag place_of_size_argument;
 };
 
-struct disable_drop_sound_not_supported
-{
-	lang::position_tag place_of_action;
-};
-
 struct condition_redefinition
 {
 	lang::position_tag place_of_redefinition;
@@ -161,7 +156,6 @@ using error_variant = std::variant<
 	illegal_characters_in_socket_group,
 	invalid_socket_group,
 	invalid_minimap_icon_size,
-	disable_drop_sound_not_supported,
 	condition_redefinition,
 	lower_bound_redefinition,
 	upper_bound_redefinition,

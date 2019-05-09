@@ -60,14 +60,19 @@ enum class boolean_condition_property
 	shaped_map
 };
 
-enum class action_type
+enum class nullary_action_type
+{
+	enable_drop_sound,
+	disable_drop_sound
+};
+
+enum class unary_action_type
 {
 	set_border_color,
 	set_text_color,
 	set_background_color,
 	set_font_size,
 	set_alert_sound,
-	disable_drop_sound,
 	set_minimap_icon,
 	set_beam
 };

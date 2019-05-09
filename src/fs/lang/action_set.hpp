@@ -1,5 +1,7 @@
 #pragma once
+
 #include "fs/lang/types.hpp"
+
 #include <utility>
 #include <iosfwd>
 
@@ -36,6 +38,11 @@ struct action_set
 	void disable_drop_sound()
 	{
 		disabled_drop_sound = true;
+	}
+
+	void enable_drop_sound()
+	{
+		disabled_drop_sound = false;
 	}
 
 	void override_minimap_icon(minimap_icon new_minimap_icon)

@@ -11,7 +11,9 @@
  *   lookup Boost Fusion documentation for more details
  */
 #pragma once
+
 #include "fs/parser/ast.hpp"
+
 #include <boost/fusion/include/adapt_struct.hpp>
 
 // uncomment if adapting any such members
@@ -88,7 +90,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 	property, value)
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::action,
+	fs::parser::ast::unary_action,
 	action_type, value)
 
 // ---- filter structure ----

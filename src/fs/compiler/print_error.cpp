@@ -256,18 +256,6 @@ void print_error_impl(
 }
 
 void print_error_impl(
-	compiler::error::disable_drop_sound_not_supported error,
-	const parser::lookup_data& lookup_data,
-	log::logger& logger)
-{
-	logger.print_line_number_with_description_and_underlined_code(
-		lookup_data.get_view_of_whole_content(),
-		lookup_data.position_of(error.place_of_action),
-		log::strings::error,
-		"sorry, disabling default drop sound is not [yet] supported");
-}
-
-void print_error_impl(
 	compiler::error::condition_redefinition error,
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
