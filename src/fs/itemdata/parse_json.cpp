@@ -44,7 +44,7 @@ namespace categories // avoids name conflicts with types in fs::itemdata
 
 	struct divination_card {};
 
-	BETTER_ENUM(currency_type, int, currency, essense, piece, fossil, resonator, vial, net, unknown)
+	BETTER_ENUM(currency_type, int, currency, essence, piece, fossil, resonator, vial, net, unknown)
 	struct currency { currency_type type; };
 
 	struct enchantment {}; // we do not care about lab enchants, Path of Exile filters don't support filtering them
@@ -484,7 +484,7 @@ item_price_data parse_item_prices(std::string_view itemdata_json, std::string_vi
 		if (std::holds_alternative<categories::currency>(i.category))
 		{
 			const auto& curr = std::get<categories::currency>(i.category);
-			if (curr.type == +categories::currency_type::essense)
+			if (curr.type == +categories::currency_type::essence)
 			{
 				result.essences.push_back(elementary_item{std::move(i.name), price_data});
 			}
