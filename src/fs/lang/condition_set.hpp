@@ -1,8 +1,9 @@
 #pragma once
+
 #include "fs/lang/types.hpp"
+
 #include <memory>
 #include <optional>
-#include <variant>
 #include <vector>
 
 namespace fs::lang
@@ -13,6 +14,7 @@ struct range_bound
 {
 	T value;
 	bool inclusive;
+	position_tag origin;
 };
 
 template <typename T>
@@ -67,19 +69,19 @@ struct range_condition
 		return lower_bound.has_value() || upper_bound.has_value();
 	}
 
-	void set_exact(T value)
+	void set_exact(T value, position_tag origin)
 	{
-		lower_bound = upper_bound = range_bound<T>{value, true};
+		lower_bound = upper_bound = range_bound<T>{value, true, origin};
 	}
 
-	void set_lower_bound(T value, bool inclusive)
+	void set_lower_bound(T value, bool inclusive, position_tag origin)
 	{
-		lower_bound = range_bound<T>{value, inclusive};
+		lower_bound = range_bound<T>{value, inclusive, origin};
 	}
 
-	void set_upper_bound(T value, bool inclusive)
+	void set_upper_bound(T value, bool inclusive, position_tag origin)
 	{
-		upper_bound = range_bound<T>{value, inclusive};
+		upper_bound = range_bound<T>{value, inclusive, origin};
 	}
 
 	std::optional<range_bound<T>> lower_bound;
@@ -88,6 +90,24 @@ struct range_condition
 
 using numeric_range_condition = range_condition<int>;
 using rarity_range_condition = range_condition<rarity>;
+
+struct boolean_condition
+{
+	boolean value;
+	position_tag origin;
+};
+
+struct socket_group_condition
+{
+	socket_group group;
+	position_tag origin;
+};
+
+struct strings_condition
+{
+	std::shared_ptr<std::vector<std::string>> strings;
+	position_tag origin;
+};
 
 struct condition_set
 {
@@ -108,25 +128,25 @@ struct condition_set
 	numeric_range_condition drop_level;
 	numeric_range_condition quality;
 	rarity_range_condition rarity;
-	std::shared_ptr<std::vector<std::string>> class_;
-	std::shared_ptr<std::vector<std::string>> base_type;
+	strings_condition class_;
+	strings_condition base_type;
 	numeric_range_condition sockets;
 	numeric_range_condition links;
-	std::optional<socket_group> socket_group;
+	std::optional<socket_group_condition> socket_group;
 	numeric_range_condition height;
 	numeric_range_condition width;
-	std::shared_ptr<std::vector<std::string>> has_explicit_mod;
+	strings_condition has_explicit_mod;
 	numeric_range_condition stack_size;
 	numeric_range_condition gem_level;
 	numeric_range_condition map_tier;
-	std::optional<boolean> is_identified;
-	std::optional<boolean> is_corrupted;
-	std::optional<boolean> is_elder_item;
-	std::optional<boolean> is_shaper_item;
-	std::optional<boolean> is_fractured_item;
-	std::optional<boolean> is_synthesised_item;
-	std::optional<boolean> is_enchanted;
-	std::optional<boolean> is_shaped_map;
+	std::optional<boolean_condition> is_identified;
+	std::optional<boolean_condition> is_corrupted;
+	std::optional<boolean_condition> is_elder_item;
+	std::optional<boolean_condition> is_shaper_item;
+	std::optional<boolean_condition> is_fractured_item;
+	std::optional<boolean_condition> is_synthesised_item;
+	std::optional<boolean_condition> is_enchanted;
+	std::optional<boolean_condition> is_shaped_map;
 };
 
 }

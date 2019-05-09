@@ -204,12 +204,13 @@ std::optional<error::error_variant> add_string_condition(
 std::optional<error::error_variant> add_strings_condition(
 	std::vector<std::string> strings,
 	lang::position_tag condition_origin,
-	std::shared_ptr<std::vector<std::string>>& target)
+	lang::strings_condition& target)
 {
-	if (target != nullptr)
-		return error::condition_redefinition{condition_origin};
+	if (target.strings != nullptr)
+		return error::condition_redefinition{condition_origin, target.origin};
 
-	target = std::make_shared<std::vector<std::string>>(std::move(strings));
+	target.strings = std::make_shared<std::vector<std::string>>(std::move(strings));
+	target.origin = condition_origin;
 	return std::nullopt;
 }
 
@@ -270,12 +271,12 @@ std::optional<error::error_variant> add_boolean_condition(
 std::optional<error::error_variant> add_boolean_condition(
 	lang::boolean boolean,
 	lang::position_tag condition_origin,
-	std::optional<lang::boolean>& target)
+	std::optional<lang::boolean_condition>& target)
 {
 	if (target.has_value())
-		return error::condition_redefinition{condition_origin};
+		return error::condition_redefinition{condition_origin, (*target).origin};
 
-	target = boolean;
+	target = lang::boolean_condition{boolean, condition_origin};
 	return std::nullopt;
 }
 
@@ -297,12 +298,12 @@ std::optional<error::error_variant> add_socket_group_condition(
 std::optional<error::error_variant> add_socket_group_condition(
 	lang::socket_group socket_group,
 	lang::position_tag condition_origin,
-	std::optional<lang::socket_group>& target)
+	std::optional<lang::socket_group_condition>& target)
 {
 	if (target.has_value())
-		return error::condition_redefinition{condition_origin};
+		return error::condition_redefinition{condition_origin, (*target).origin};
 
-	target = socket_group;
+	target = lang::socket_group_condition{socket_group, condition_origin};
 	return std::nullopt;
 }
 

@@ -265,6 +265,11 @@ void print_error_impl(
 		lookup_data.position_of(error.place_of_redefinition),
 		log::strings::error,
 		"condition redefinition (the same condition can not be specified again in the same block or nested blocks)");
+	logger.print_line_number_with_description_and_underlined_code(
+		lookup_data.get_view_of_whole_content(),
+		lookup_data.position_of(error.place_of_original_definition),
+		log::strings::note,
+		"first defined here");
 }
 
 void print_error_impl(
@@ -277,6 +282,11 @@ void print_error_impl(
 		lookup_data.position_of(error.place_of_redefinition),
 		log::strings::error,
 		"lower bound redefinition (the same bound for comparison can not be specified again in the same block or nested blocks)");
+	logger.print_line_number_with_description_and_underlined_code(
+		lookup_data.get_view_of_whole_content(),
+		lookup_data.position_of(error.place_of_original_definition),
+		log::strings::note,
+		"first defined here");
 }
 
 void print_error_impl(
@@ -289,30 +299,11 @@ void print_error_impl(
 		lookup_data.position_of(error.place_of_redefinition),
 		log::strings::error,
 		"upper bound redefinition (the same bound for comparison can not be specified again in the same block or nested blocks)");
-}
-
-void print_error_impl(
-	compiler::error::exact_comparison_redefinition error,
-	const parser::lookup_data& lookup_data,
-	log::logger& logger)
-{
 	logger.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
-		lookup_data.position_of(error.place_of_redefinition),
-		log::strings::error,
-		"exact comparison redefinition (exact comparison can not be specified again in the same block or nested blocks)");
-}
-
-void print_error_impl(
-	compiler::error::exact_comparison_outside_parent_range error,
-	const parser::lookup_data& lookup_data,
-	log::logger& logger)
-{
-	logger.print_line_number_with_description_and_underlined_code(
-		lookup_data.get_view_of_whole_content(),
-		lookup_data.position_of(error.place_of_redefinition),
-		log::strings::error,
-		"exact comparison outside parent range (no item can ever satisfy this requirement because specified value does not fit into parent block range)");
+		lookup_data.position_of(error.place_of_original_definition),
+		log::strings::note,
+		"first defined here");
 }
 
 void print_error_impl(

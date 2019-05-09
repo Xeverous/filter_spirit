@@ -232,7 +232,7 @@ Show
 			BOOST_TEST(b0_cond.item_level.includes(10));
 			if (b0_cond.socket_group.has_value())
 			{
-				const fs::lang::socket_group& sg = *b0_cond.socket_group;
+				const fs::lang::socket_group& sg = (*b0_cond.socket_group).group;
 				BOOST_TEST(sg.is_valid());
 				BOOST_TEST(sg.r == 1);
 				BOOST_TEST(sg.g == 1);

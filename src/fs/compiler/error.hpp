@@ -94,26 +94,19 @@ struct invalid_minimap_icon_size
 struct condition_redefinition
 {
 	lang::position_tag place_of_redefinition;
+	lang::position_tag place_of_original_definition;
 };
 
 struct lower_bound_redefinition
 {
 	lang::position_tag place_of_redefinition;
+	lang::position_tag place_of_original_definition;
 };
 
 struct upper_bound_redefinition
 {
 	lang::position_tag place_of_redefinition;
-};
-
-struct exact_comparison_redefinition
-{
-	lang::position_tag place_of_redefinition;
-};
-
-struct exact_comparison_outside_parent_range
-{
-	lang::position_tag place_of_redefinition;
+	lang::position_tag place_of_original_definition;
 };
 
 struct internal_compiler_error_during_action_evaluation
@@ -159,8 +152,6 @@ using error_variant = std::variant<
 	condition_redefinition,
 	lower_bound_redefinition,
 	upper_bound_redefinition,
-	exact_comparison_redefinition,
-	exact_comparison_outside_parent_range,
 	internal_compiler_error_during_action_evaluation,
 	internal_compiler_error_during_range_evaluation,
 	internal_compiler_error_during_comparison_condition_evaluation,

@@ -1,5 +1,6 @@
 #include "fs/lang/condition_set.hpp"
 #include "fs/lang/generation.hpp"
+
 #include <cassert>
 
 namespace
@@ -75,10 +76,10 @@ void output_range_condition(
 }
 
 void output_socket_group_condition(
-	std::optional<lang::socket_group> socket_group,
+	std::optional<lang::socket_group_condition> cond,
 	std::ostream& output_stream)
 {
-	if (!socket_group.has_value())
+	if (!cond.has_value())
 		return;
 
 	const auto output_letter = [&](char letter, int times)
@@ -88,7 +89,7 @@ void output_socket_group_condition(
 	};
 
 	namespace lg = lang::generation;
-	const lang::socket_group& sg = *socket_group;
+	const lang::socket_group& sg = (*cond).group;
 	assert(sg.is_valid());
 
 	output_stream << '\t' << lg::socket_group << ' ';
@@ -100,32 +101,32 @@ void output_socket_group_condition(
 }
 
 void output_strings_condition(
-	const std::shared_ptr<std::vector<std::string>>& strings_ptr,
+	const lang::strings_condition& cond,
 	const char* name,
 	std::ostream& output_stream)
 {
-	if (strings_ptr == nullptr)
+	if (cond.strings == nullptr)
 		return;
 
 	output_stream << '\t' << name;
-	for (const std::string& str : *strings_ptr)
+	for (const std::string& str : *cond.strings)
 		output_stream << " \"" << str << '"';
 
 	output_stream << '\n';
 }
 
 void output_boolean_condition(
-	std::optional<lang::boolean> boolean,
+	std::optional<lang::boolean_condition> cond,
 	const char* name,
 	std::ostream& output_stream)
 {
-	if (!boolean.has_value())
+	if (!cond.has_value())
 		return;
 
 	output_stream << '\t' << name << ' ';
 
-	const lang::boolean& b = *boolean;
-	if (b.value)
+	const lang::boolean_condition& bc = *cond;
+	if (bc.value.value)
 		output_stream << lang::generation::true_;
 	else
 		output_stream << lang::generation::false_;
@@ -133,7 +134,7 @@ void output_boolean_condition(
 	output_stream << '\n';
 }
 
-}
+} // namespace
 
 namespace fs::lang
 {
@@ -171,15 +172,15 @@ void condition_set::generate(std::ostream& output_stream) const
 
 bool condition_set::is_valid() const
 {
-	const auto is_valid_strings_condition = [](const std::shared_ptr<std::vector<std::string>>& sptr)
+	const auto is_valid_strings_condition = [](const strings_condition& cond)
 	{
 		// no condition: ok, we just don't require item to have this property
-		if (sptr == nullptr)
+		if (cond.strings == nullptr)
 			return true;
 
 		// empty list of allowed values: there are no items that can match this block
 		// game client will not accept an empty list so return that the block is invalid
-		if (sptr->empty())
+		if ((*cond.strings).empty())
 			return false;
 
 		return true;
