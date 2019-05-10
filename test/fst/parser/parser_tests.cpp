@@ -66,6 +66,7 @@ namespace fst
 {
 
 BOOST_FIXTURE_TEST_SUITE(parser_suite, parser_fixture)
+BOOST_AUTO_TEST_SUITE(parser_success_suite)
 
 	BOOST_AUTO_TEST_CASE(version_requirement)
 	{
@@ -314,6 +315,7 @@ Show
 		BOOST_TEST(st2_vs.show == true);
 	}
 
+BOOST_AUTO_TEST_SUITE_END()
 BOOST_AUTO_TEST_SUITE_END()
 
 }
