@@ -65,9 +65,6 @@ struct action_set
 	bool disabled_drop_sound = false;
 	std::optional<minimap_icon> minimap_icon;
 	std::optional<beam_effect> beam_effect;
-
-	[[nodiscard]]
-	action_set override_by(const action_set& other) const; // TODO is this used at all?
 };
 
 }
