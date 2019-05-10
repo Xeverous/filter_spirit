@@ -409,14 +409,17 @@ function | result type | notes
 `Group(<String>)` | Group | string may consist of only `R`, `G`, `B`, `W` characters
 `Beam(<Suit>, <Boolean> = false)` | Beam (permanent by default) | second argument is optional
 `MinimapIcon(<Integer>, <Suit>, <Shape>)` | MinimapIcon
-
-TODO built-in/custom alert sound type?
+`AlertSound(<SoundId | Integer>)` | AlertSound | built-in sound
+`AlertSound(<SoundId | Integer>, <Volume | Integer>)` | AlertSound | built-in sound (wih specified volume)
+`AlertSound(<SoundId | Integer>, <Boolean>)` | AlertSound | built-in sound (being positional or not)
+`AlertSound(<SoundId | Integer>, <Volume | Integer>, <Boolean>)` | AlertSound | built-in sound (wih specified volume and being positional or not)
+`AlertSound(<Path | String>)` | AlertSound | custom sound (note that filters do not support volume and positionality for custom sounds)
 
 ## conditions
 
-FS supports all conditions that the actual filters support. Some conditions allow values of multiple types. Conditions will automatically promote the value if possible so writing `SocketGroup Group("RGB")` is not necessary, `SocketGroup "RGB"` is enough.
+FS supports all conditions that the actual filters support. Some conditions allow values of multiple types. Conditions will automatically promote the value if possible so writing `SocketGroup Group("RGB")` or `SetAlertSound AlertSound("pop.wav")` is not necessary, `SocketGroup "RGB"` and `SetAlertSound "pop.wav"` is enough.
 
-Operator is one of `<`, `>`, `<=`, `>=`, `==`. (`!=` is not yet supported). Operator is optional (defaults to `==`).
+Operator is one of `<`, `>`, `<=`, `>=`, `==`. (there is no `!=` in actual filters). Operator is optional (defaults to `==`).
 
 ```
 Rarity        [operator] <Rarity>
@@ -511,8 +514,9 @@ Examples:
 
 ```
 const currency_t0 = ["Exalted Orb", "Mirror of Kalandra", "Eternal Orb", "Albino Rhoa Feather", "Mirror Shard"]
-const red = RGB(255, 0, 0)
 const white = RGB(255, 255, 255)
+const red = RGB(255, 0, 0)
+const color_error = red
 const icon_currency = MinimapIcon(0, yellow, star)
 
 # ...
