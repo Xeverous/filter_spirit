@@ -594,6 +594,11 @@ vials | `Array` (of `String`s) | Incursion vials
 fossils | `Array` (of `String`s) | fossils
 resonators | `Array` (of `String`s) | resonators
 scarabs | `Array` (of `String`s) | scarabs
+
+Planned/unimplemented queries:
+
+name | result type | description
+-----|-------------|------------
 uniques | `Array` (of `String`s) | base types of all unique items (merged set of 2 below)
 uniques_unambiguous | `Array` (of `String`s) | base types of unique items that have only 1 unique
 uniques_ambiguous | `Array` (of `String`s) | base types of unique items that have multiple uniques

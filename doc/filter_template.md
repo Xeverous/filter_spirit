@@ -1,11 +1,8 @@
-# filter writing tutorial
+# filter writing guidelines
 
 The following article aims to establish a set of good practices and conventions for writing a spirit filter (and in general, any filter).
 
-- If you have no clue how Filter Spirit works, read "how it works" article first.
-- If you want detailed spec what can be done in the Filter Spirit language, read "language documentation" article
-
-## filter writing guidelines
+If you have no clue how Filter Spirit works, read "filter writing" article first
 
 Items can be filtered by different **properties** (no formal use of this word from GGG side but I picked this one to avoid any name conflict). Properties are independent of each other (although some combinations do not exist, like quest items with sockets). Filters support many different properties but because *every item that goes through the filter gets the style of first matched block* **the order of blocks is crucial to ensure correct filtering**.
 
@@ -126,6 +123,7 @@ Filter Spirit allows to use market item prices when generating the filter. This 
 - Filter 6L uniques before uniques.
 - Filter white socket items after RGB items and uniques.
 - Chance/crafting bases: don't forget `Corrupted false`.
+- Filter as many items by class as possible before you use other conditions.
 - Don't forget to disable leveling gear once a certain character level was reached - for example, you can display any item with `LinkedSockets 4` but only if they have `ItemLevel < 50`. If you reach higher-lvl zones they will simply have too high ilvl to appear.
 - Don't forget the very last block in the filter that has no conditions (either use it as an error block or to hide everything remaining).
 - If you place multiple price blocks, go with highest prices first - in case of name clashes you will get false alarms which is better than hidden worthy items.
@@ -134,7 +132,9 @@ Things you have to decide:
 
 - 6s 5L - at the start of a league might be worth few chaos, later vendor for jewellers. You may want to:
   - treat these as 5L (filter in order: 6L, 5L, 6s) because they can be worth at the start of a league and later ... a quite rare chance of losing a 6s or just getting the highlight wrong.
+  - treat these as 6s (filter in order: 6L, 6s, 5L) - just remember to pickup all 6s at the start of the league
   - make a separate block for them (filter in oder: 6L, 5L 6s, 5L, 6s)
+  - some config shenanigans?
 - Hammers that are RGB:
   - filter for RGB first (chromatic recipe prority)
   - filter for hammers first (chisel recipe priority)
@@ -155,9 +155,11 @@ Solution: add `Class "Dagger"`. None of other items are daggers.
 
 Solution: filter the one with longer name first.
 
+- `Class "Jewels"` is a superset of `Class "Abyss Jewels"`
+
 # filter template
 
-The following code is the recommended order of blocks in a filter.
+The following code presents all potential blocks in the filter.
 
 For each item set, the strictest possible rules are provided - you can use fewer rules (in most cases, sole `BaseType` is enough) but having strict rules results in better error handling. You can also use strict rules to split blocks, eg to separate 1-3 socket resonators and 4 socket resonators.
 
@@ -165,9 +167,8 @@ You can use this file as a starting point if writing spirit filter from scratch.
 
 Notes:
 
-- This is a recommendation, constructive criticizm welcomed.
-- The following template is not the only one possible.
-- The following template is a generic mapping filter - if you are very into racing/leveling or private leagues you may have a very different structure.
+- The following template is not the only one possible. The order of blocks is not (yet) optimized.
+- The following template is a generic solo mapping filter - if you are very into racing/leveling/MF parties or private leagues you may have a very different structure.
 - The following template is targeted at middle-experienced player. If you measure your clear speed in maps per minute and DPS in Shapers per second you will likely have a very different view on what should be picked up.
 
 ## currency
@@ -546,7 +547,136 @@ Class "Divination Card" {
 }
 ```
 
-TODO this is unfinished, missing some items
+## maps
+
+```
+Class "Maps" {
+	MapTier >= 16 {
+		...
+	}
+
+	MapTier >= 11 {
+		...
+	}
+
+	...
+}
+```
+
+## jewels
+
+```
+# note: these must be before "jewel" because of name containing the same string
+Class "Abyss Jewel" {
+	...
+}
+
+Class "Jewel" {
+
+}
+```
+
+## talismans
+
+```
+Class "Amulet"
+BaseType "Talisman" {
+	...
+}
+```
+
+## bases
+
+```
+# what you want to craft
+
+Rarity <= rare
+Corrupted false {
+	ItemLevel >= 86
+	BaseType ["Hubris Circlet"] {
+		Show
+	}
+}
+```
+
+## special items
+
+```
+Rarity <= rare {
+	ShaperItem true {
+		...
+	}
+
+	ElderItem true {
+		...
+	}
+
+	FracturedItem true {
+		...
+	}
+
+	SynthesisedItem true {
+		...
+	}
+
+	# Betrayal league items
+	HasExplicitMod "Veil" {
+		...
+	}
+
+	# drops from Incursion rooms, Warbants etc
+	HasExplicitMod ["Estazuni", ...] {
+		...
+	}
+}
+```
+
+## chaos recipe
+
+```
+Rarity rare {
+	???
+}
+```
+
+## chance bases
+
+```
+Rarity normal
+Corrupted false
+BaseType ["Leather Belt"] {
+	...
+}
+```
+
+## animate weapon support
+
+???
+
+## flasks
+
+```
+Class "Utility Flasks" {
+	SetTextColor color_white
+	SetBackgroundColor color_flask_utility
+	Show
+}
+
+# item/drop level maybe?
+Class "Flasks" {
+	Quality 20 {
+		...
+		SetBorderColor color_white
+		Show
+	}
+
+	Show
+}
+```
+
+## leeling
+
+4-links? sceptres for +1 gem lvl recipe?
 
 ## remaining items
 
