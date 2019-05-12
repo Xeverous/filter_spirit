@@ -1,8 +1,8 @@
 #include "fs/core/core.hpp"
 #include "fs/utility/file.hpp"
-#include "fs/network/poe_watch_api.hpp"
 #include "fs/generator/generate_filter.hpp"
-#include "fs/itemdata/parse_json.hpp"
+#include "fs/network/poe_watch/api.hpp"
+#include "fs/network/poe_watch/parse_json.hpp" // TODO avoid including this
 #include "fs/log/logger.hpp"
 
 #include <fstream>
@@ -11,7 +11,7 @@ namespace fs::core
 {
 
 bool generate_item_filter(
-	const itemdata::item_price_data& item_price_data,
+	const lang::item_price_data& item_price_data,
 	const std::string& source_filepath,
 	const std::string& output_filepath,
 	bool print_ast,
@@ -48,24 +48,30 @@ bool generate_item_filter(
 
 void list_leagues(log::logger& logger)
 {
-	std::future<std::vector<itemdata::league>> leagues_future = network::poe_watch_api::async_download_leagues();
-	const auto& leagues = leagues_future.get();
+	std::future<std::string> leagues_future = network::poe_watch::async_download_leagues(logger);
+	const auto leagues_str = leagues_future.get();
+	const std::vector<lang::league> leagues = network::poe_watch::parse_leagues(leagues_str);
 
 	logger.begin_info_message();
 	logger.add("available leagues:\n");
 
-	for (const itemdata::league& league : leagues)
-		logger << league.display_name << "\n";
+	// print leaue.name because that's the name that the API expects
+	// printing different name style would confuse users - these names are quered
+	// to be later to the API as league name
+	for (const lang::league& league : leagues)
+		logger << league.name << "\n";
 
 	logger.end_message();
 }
 
-itemdata::item_price_data download_item_price_data(const std::string& league_name, log::logger& logger)
+lang::item_price_data download_item_price_data(const std::string& league_name, log::logger& logger)
 {
 	try
 	{
-		std::future<itemdata::item_price_data> ipd_future = network::poe_watch_api::async_download_item_price_data(league_name, logger);
-		return ipd_future.get();
+		std::future<network::poe_watch::item_price_data> ipd_future =
+			network::poe_watch::async_download_item_price_data(league_name, logger);
+		const network::poe_watch::item_price_data ipd = ipd_future.get();
+		return network::poe_watch::parse_item_price_data(ipd, logger);
 	}
 	catch (const std::exception& e)
 	{
@@ -74,7 +80,7 @@ itemdata::item_price_data download_item_price_data(const std::string& league_nam
 	}
 }
 
-std::optional<itemdata::item_price_data> load_item_price_data(const std::string& directory_path, log::logger& logger)
+std::optional<lang::item_price_data> load_item_price_data(const std::string& directory_path, log::logger& logger)
 {
 	std::optional<std::string> compact = utility::load_file(directory_path + "/compact.json");
 
@@ -94,7 +100,7 @@ std::optional<itemdata::item_price_data> load_item_price_data(const std::string&
 
 	const std::string& compact_json = *compact;
 	const std::string& itemdata_json = *itemdata;
-	return itemdata::parse_item_prices(
+	return network::poe_watch::parse_item_prices(
 		std::string_view(itemdata_json.c_str(), itemdata_json.size()),
 		std::string_view(compact_json.c_str(), compact_json.size()),
 		logger);

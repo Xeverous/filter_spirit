@@ -4,11 +4,11 @@
 #include "fs/lang/types.hpp"
 #include "fs/lang/constants_map.hpp"
 #include "fs/lang/type_traits.hpp"
+#include "fs/lang/item_price_data.hpp"
 #include "fs/compiler/error.hpp"
 #include "fs/compiler/detail/evaluate_as.hpp"
 #include "fs/compiler/detail/type_constructors.hpp"
 #include "fs/compiler/detail/determine_types_of.hpp"
-#include "fs/itemdata/types.hpp"
 #include "fs/utility/if_constexpr_workaround.hpp"
 
 #include <array>
@@ -46,7 +46,7 @@ namespace impl
 	std::variant<T, error::error_variant> unpack_args_and_call_constructor(
 		const parser::ast::value_expression_list& arguments,
 		const lang::constants_map& /* map */,
-		const itemdata::item_price_data& /* item_price_data */,
+		const lang::item_price_data& /* item_price_data */,
 		lang::traits::constructor_argument_list<>,
 		Args&&... args)
 	{
@@ -68,7 +68,7 @@ namespace impl
 	std::variant<T, error::error_variant> unpack_args_and_call_constructor(
 		const parser::ast::value_expression_list& arguments,
 		const lang::constants_map& map,
-		const itemdata::item_price_data& item_price_data,
+		const lang::item_price_data& item_price_data,
 		lang::traits::constructor_argument_list<ConstructorArgType, OtherConstructorArgTypes...>,
 		Args&&... args)
 	{
@@ -95,7 +95,7 @@ namespace impl
 	std::variant<T, error::error_variant> construct_check_arguments_amount(
 		const parser::ast::value_expression_list& arguments,
 		const lang::constants_map& map,
-		const itemdata::item_price_data& item_price_data,
+		const lang::item_price_data& item_price_data,
 		lang::traits::constructor_argument_list<ConstructorArgTypes...>)
 	{
 		const auto expected_arguments_count = sizeof...(ConstructorArgTypes);
@@ -164,7 +164,7 @@ namespace impl
 	std::variant<T, error::error_variant> construct_attempt(
 		const parser::ast::function_call& function_call,
 		const lang::constants_map& map,
-		const itemdata::item_price_data& item_price_data,
+		const lang::item_price_data& item_price_data,
 		lang::traits::constructor_list<> /* ctors_to_attempt */,
 		lang::traits::constructor_list<FailedConstructors...> /* failed_constructors */,
 		Errors&&... errors_so_far)
@@ -216,7 +216,7 @@ namespace impl
 	std::variant<T, error::error_variant> construct_attempt(
 		const parser::ast::function_call& function_call,
 		const lang::constants_map& map,
-		const itemdata::item_price_data& item_price_data,
+		const lang::item_price_data& item_price_data,
 		lang::traits::constructor_list<ConstructorArgumentList, OtherConstructorArgumentLists...> /* ctors_to_attempt */,
 		lang::traits::constructor_list<FailedConstructors...> /* failed_constructors */,
 		Errors&&... errors_so_far)
@@ -245,7 +245,7 @@ template <typename T> [[nodiscard]]
 std::variant<T, error::error_variant> construct(
 	const parser::ast::function_call& function_call,
 	const lang::constants_map& map,
-	const itemdata::item_price_data& item_price_data)
+	const lang::item_price_data& item_price_data)
 {
 	using constructors = typename lang::traits::type_traits<T>::allowed_constructors;
 	return impl::construct_attempt<T>(function_call, map, item_price_data, constructors{}, lang::traits::constructor_list<>{});

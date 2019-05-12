@@ -18,7 +18,7 @@ using namespace fs::compiler;
 std::optional<error::error_variant> add_unary_action(
 	const ast::unary_action& action,
 	const lang::constants_map& map,
-	const itemdata::item_price_data& item_price_data,
+	const lang::item_price_data& item_price_data,
 	lang::action_set& action_set)
 {
 	switch (action.action_type)
@@ -125,7 +125,7 @@ namespace fs::compiler::detail
 std::optional<error::error_variant> add_action(
 	const ast::action& action,
 	const lang::constants_map& map,
-	const itemdata::item_price_data& item_price_data,
+	const lang::item_price_data& item_price_data,
 	lang::action_set& action_set)
 {
 	return action.apply_visitor(x3::make_lambda_visitor<std::optional<error::error_variant>>(

@@ -50,8 +50,7 @@ add_library(filter_spirit_compiler SHARED
 	src/fs/lang/condition_set.cpp
 	src/fs/lang/filter_block.cpp
 	src/fs/lang/types.cpp
-	src/fs/itemdata/parse_json.cpp
-	src/fs/itemdata/types.cpp
+	src/fs/lang/item_price_data.cpp
 	src/fs/log/buffered_logger.cpp
 	src/fs/log/console_logger.cpp
 	src/fs/log/logger.cpp
@@ -64,8 +63,9 @@ add_executable(filter_spirit
 	src/fs/core/parse_args.cpp
 	src/fs/main.cpp
 	src/fs/network/network.cpp
-	src/fs/network/poe_watch_api.cpp
 	src/fs/network/session.cpp
+	src/fs/network/poe_watch/api.cpp
+	src/fs/network/poe_watch/parse_json.cpp
 )
 
 target_include_directories(filter_spirit_compiler

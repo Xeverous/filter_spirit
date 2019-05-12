@@ -85,7 +85,7 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 		{
 			std::variant<std::vector<lang::filter_block>, compiler::error::error_variant> result =
 				compiler::detail::filter_builder::build_filter(
-					top_level_statements, map, itemdata::item_price_data{});
+					top_level_statements, map, lang::item_price_data{});
 
 			if (std::holds_alternative<compiler::error::error_variant>(result))
 			{

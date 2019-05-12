@@ -5,15 +5,8 @@
 
 namespace fs::log { class logger; }
 
-namespace fs::itemdata
+namespace fs::lang
 {
-
-struct league
-{
-	int id;
-	std::string name;         // name used by the API
-	std::string display_name; // name intended for display to users
-};
 
 struct price_data
 {

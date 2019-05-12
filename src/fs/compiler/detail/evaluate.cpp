@@ -17,7 +17,7 @@ namespace ast = parser::ast;
 std::variant<lang::object, error::error_variant> evaluate_value_expression(
 	const ast::value_expression& value_expression,
 	const lang::constants_map& map,
-	const itemdata::item_price_data& item_price_data)
+	const lang::item_price_data& item_price_data)
 {
 	using result_type = std::variant<lang::object, error::error_variant>;
 
@@ -77,7 +77,7 @@ lang::object evaluate_literal(
 std::variant<lang::object, error::error_variant> evaluate_array(
 	const ast::array_expression& expression,
 	const lang::constants_map& map,
-	const itemdata::item_price_data& item_price_data)
+	const lang::item_price_data& item_price_data)
 {
 	// note: the entire function should work also in case of empty array
 	lang::array_object array;
@@ -107,7 +107,7 @@ std::variant<lang::object, error::error_variant> evaluate_array(
 std::variant<lang::object, error::error_variant> evaluate_function_call(
 	const ast::function_call& function_call,
 	const lang::constants_map& map,
-	const itemdata::item_price_data& item_price_data)
+	const lang::item_price_data& item_price_data)
 {
 	/*
 	 * right now there is no support for user-defined functions
@@ -230,7 +230,7 @@ std::variant<lang::object, error::error_variant> evaluate_function_call(
 std::variant<lang::object, error::error_variant> evaluate_price_range_query(
 	const ast::price_range_query& price_range_query,
 	const lang::constants_map& map,
-	const itemdata::item_price_data& item_price_data)
+	const lang::item_price_data& item_price_data)
 {
 	std::variant<lang::price_range, error::error_variant> range_or_error = construct_price_range(price_range_query.arguments, map, item_price_data);
 	if (std::holds_alternative<error::error_variant>(range_or_error))

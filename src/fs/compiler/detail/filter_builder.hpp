@@ -4,9 +4,9 @@
 #include "fs/lang/action_set.hpp"
 #include "fs/lang/condition_set.hpp"
 #include "fs/lang/filter_block.hpp"
+#include "fs/lang/item_price_data.hpp"
 #include "fs/parser/parser.hpp"
 #include "fs/parser/ast.hpp"
-#include "fs/itemdata/types.hpp"
 
 #include <utility>
 #include <vector>
@@ -22,12 +22,12 @@ public:
 	std::variant<std::vector<lang::filter_block>, error::error_variant> build_filter(
 		const std::vector<parser::ast::statement>& top_level_statements,
 		const lang::constants_map& map,
-		const itemdata::item_price_data& item_price_data);
+		const lang::item_price_data& item_price_data);
 
 private:
 	filter_builder(
 		const lang::constants_map& map,
-		const itemdata::item_price_data& item_price_data)
+		const lang::item_price_data& item_price_data)
 	: map(map), item_price_data(item_price_data)
 	{}
 
@@ -61,7 +61,7 @@ private:
 		const lang::action_set& parent_actions);
 
 	const lang::constants_map& map;
-	const itemdata::item_price_data& item_price_data;
+	const lang::item_price_data& item_price_data;
 
 	std::vector<lang::filter_block> blocks;
 };

@@ -9,7 +9,7 @@ namespace fs::compiler::detail
 std::variant<lang::price_range, error::error_variant> construct_price_range(
 	const parser::ast::value_expression_list& arguments,
 	const lang::constants_map& map,
-	const itemdata::item_price_data& item_price_data)
+	const lang::item_price_data& item_price_data)
 {
 	const int arguments_amount = arguments.size();
 	if (arguments_amount != 2)

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "fs/itemdata/types.hpp"
+#include "fs/lang/item_price_data.hpp"
 
 #include <string>
 #include <optional>
@@ -15,7 +15,7 @@ namespace fs::core
 {
 
 bool generate_item_filter(
-	const itemdata::item_price_data& item_price_data,
+	const lang::item_price_data& item_price_data,
 	const std::string& source_filepath,
 	const std::string& output_filepath,
 	bool print_ast,
@@ -32,7 +32,7 @@ void list_leagues(log::logger& logger);
  *
  * this function throws upon network and parsing failures
  */
-itemdata::item_price_data download_item_price_data(const std::string& league_name, log::logger& logger);
+lang::item_price_data download_item_price_data(const std::string& league_name, log::logger& logger);
 /**
  * @brief load item price data from saved JSON files
  * @param directory_path path where compact.json and itemdata.json are present
@@ -40,6 +40,6 @@ itemdata::item_price_data download_item_price_data(const std::string& league_nam
  *
  * @details you can download JSON files from poe.watch
  */
-std::optional<itemdata::item_price_data> load_item_price_data(const std::string& directory_path, log::logger& logger);
+std::optional<lang::item_price_data> load_item_price_data(const std::string& directory_path, log::logger& logger);
 
 }

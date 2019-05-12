@@ -15,7 +15,7 @@ namespace x3 = boost::spirit::x3;
 std::optional<error::error_variant> add_conditions(
 	const std::vector<ast::condition>& conditions,
 	const lang::constants_map& map,
-	const itemdata::item_price_data& item_price_data,
+	const lang::item_price_data& item_price_data,
 	lang::condition_set& condition_set)
 {
 	for (const ast::condition& condition : conditions)
@@ -48,7 +48,7 @@ std::optional<error::error_variant> add_conditions(
 std::optional<error::error_variant> add_comparison_condition(
 	const ast::comparison_condition& condition,
 	const lang::constants_map& map,
-	const itemdata::item_price_data& item_price_data,
+	const lang::item_price_data& item_price_data,
 	lang::condition_set& condition_set)
 {
 	lang::position_tag condition_origin = parser::get_position_info(condition);
@@ -164,7 +164,7 @@ std::optional<error::error_variant> add_comparison_condition(
 std::optional<error::error_variant> add_string_condition(
 	const parser::ast::string_condition& condition,
 	const lang::constants_map& map,
-	const itemdata::item_price_data& item_price_data,
+	const lang::item_price_data& item_price_data,
 	lang::condition_set& condition_set)
 {
 	std::variant<lang::array_object, error::error_variant> array_or_error = evaluate_as<lang::array_object>(condition.value, map, item_price_data);
@@ -217,7 +217,7 @@ std::optional<error::error_variant> add_strings_condition(
 std::optional<error::error_variant> add_boolean_condition(
 	const parser::ast::boolean_condition& condition,
 	const lang::constants_map& map,
-	const itemdata::item_price_data& item_price_data,
+	const lang::item_price_data& item_price_data,
 	lang::condition_set& condition_set)
 {
 	std::variant<lang::boolean, error::error_variant> boolean_or_error = evaluate_as<lang::boolean>(condition.value, map, item_price_data);
@@ -283,7 +283,7 @@ std::optional<error::error_variant> add_boolean_condition(
 std::optional<error::error_variant> add_socket_group_condition(
 	const parser::ast::socket_group_condition& condition,
 	const lang::constants_map& map,
-	const itemdata::item_price_data& item_price_data,
+	const lang::item_price_data& item_price_data,
 	lang::condition_set& condition_set)
 {
 	std::variant<lang::socket_group, error::error_variant> socket_group_or_error = evaluate_as<lang::socket_group>(condition.value, map, item_price_data);

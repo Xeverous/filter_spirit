@@ -2,7 +2,7 @@
 
 #include "fs/generator/generate_filter.hpp"
 #include "fs/log/buffered_logger.hpp"
-#include "fs/itemdata/types.hpp"
+#include "fs/lang/item_price_data.hpp"
 
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
@@ -15,7 +15,7 @@ namespace tt = boost::test_tools;
 
 std::string generate_filter(
 	std::string_view input,
-	const fs::itemdata::item_price_data& ipd = {})
+	const fs::lang::item_price_data& ipd = {})
 {
 	fs::log::buffered_logger logger;
 	std::optional<std::string> filter = fs::generator::generate_filter_without_preamble(input, ipd, fs::generator::options{}, logger);

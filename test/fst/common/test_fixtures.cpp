@@ -1,5 +1,6 @@
 #include "fst/common/test_fixtures.hpp"
 
+#include "fs/lang/item_price_data.hpp"
 #include "fs/parser/parser.hpp"
 #include "fs/compiler/compiler.hpp"
 #include "fs/core/version.hpp"
@@ -44,7 +45,7 @@ std::variant<fs::lang::constants_map, fs::compiler::error::error_variant>
 compiler_fixture::resolve_constants(
 	const std::vector<pr::ast::constant_definition>& defs)
 {
-	return fs::compiler::resolve_constants(defs, fs::itemdata::item_price_data{});
+	return fs::compiler::resolve_constants(defs, fs::lang::item_price_data{});
 }
 
 }

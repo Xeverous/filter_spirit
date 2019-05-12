@@ -1,5 +1,5 @@
-#include "fs/itemdata/parse_json.hpp"
-#include "fs/itemdata/exceptions.hpp"
+#include "fs/network/poe_watch/parse_json.hpp"
+#include "fs/network/poe_watch/exceptions.hpp"
 #include "fs/utility/algorithm.hpp"
 #include "fs/utility/better_enum.hpp"
 #include "fs/utility/visitor.hpp"
@@ -17,6 +17,8 @@
 namespace
 {
 
+using namespace fs;
+
 BETTER_ENUM(frame_type, int,
 	// NOTE: values must be exactly in this order - they must match
 	// https://pathofexile.gamepedia.com/Public_stash_tab_API#frameType
@@ -33,7 +35,7 @@ BETTER_ENUM(frame_type, int,
 	// should be last
 	unknown)
 
-namespace categories // avoids name conflicts with types in fs::itemdata
+namespace categories // avoids name conflicts with types in lang namespace
 {
 
 	BETTER_ENUM(accessory_type, int, amulet, belt, ring, unknown)
@@ -101,7 +103,7 @@ using item_category_variant = std::variant<
 
 struct item
 {
-	void log_info(fs::log::logger& logger) const;
+	void log_info(log::logger& logger) const;
 
 	int id = 0;
 	std::string name;                     // item main name, eg "Tabula Rasa"
@@ -113,7 +115,7 @@ struct item
 	item_category_variant category; // combined category and group
 };
 
-void item::log_info(fs::log::logger& logger) const
+void item::log_info(log::logger& logger) const
 {
 	logger.begin_info_message();
 	logger << "item:\n"
@@ -140,7 +142,7 @@ void item::log_info(fs::log::logger& logger) const
 
 	logger << "category        : ";
 
-	std::visit(fs::utility::visitor{
+	std::visit(utility::visitor{
 		[&](categories::accessory)       { logger << "accessory\n"; },
 		[&](categories::armour)          { logger << "armour\n"; },
 		[&](categories::divination_card) { logger << "divination card\n"; },
@@ -178,16 +180,16 @@ void item::log_info(fs::log::logger& logger) const
 }
 
 // vector index is item ID
-std::vector<std::optional<fs::itemdata::price_data>> parse_compact(std::string_view compact_json, fs::log::logger& logger)
+std::vector<std::optional<lang::price_data>> parse_compact(std::string_view compact_json, log::logger& logger)
 {
 	nlohmann::json json = nlohmann::json::parse(compact_json);
 
 	if (!json.is_array())
 	{
-		throw fs::itemdata::json_parse_error("compact JSON must be an array but it is not");
+		throw network::poe_watch::json_parse_error("compact JSON must be an array but it is not");
 	}
 
-	std::vector<std::optional<fs::itemdata::price_data>> item_prices;
+	std::vector<std::optional<lang::price_data>> item_prices;
 	item_prices.resize(32768); // expect about 30 000 items
 	int max_id = 0;
 	for (const auto& item : json)
@@ -210,7 +212,7 @@ std::vector<std::optional<fs::itemdata::price_data>> parse_compact(std::string_v
 			continue;
 		}
 
-		item_prices[id] = fs::itemdata::price_data{
+		item_prices[id] = lang::price_data{
 			item.at("mean")    .get<double>(),
 			item.at("median")  .get<double>(),
 			item.at("mode")    .get<double>(),
@@ -304,7 +306,7 @@ item_category_variant parse_item_category(const nlohmann::json& entry)
 	const nlohmann::json& group = entry.at("group");
 
 	if (!category.is_string())
-		throw fs::itemdata::json_parse_error("item category should be a string but it is not");
+		throw network::poe_watch::json_parse_error("item category should be a string but it is not");
 
 	const auto& category_str = category.get_ref<const nlohmann::json::string_t&>();
 
@@ -369,7 +371,7 @@ item_category_variant parse_item_category(const nlohmann::json& entry)
 
 		if (is_shaper && is_elder)
 		{
-			throw fs::itemdata::json_parse_error("item can not be shaper and elder at the same time");
+			throw network::poe_watch::json_parse_error("item can not be shaper and elder at the same time");
 		}
 
 		const auto influence =
@@ -381,16 +383,16 @@ item_category_variant parse_item_category(const nlohmann::json& entry)
 		return categories::base{json_to_enum<categories::base_type>(group), influence, ilvl};
 	}
 
-	throw fs::itemdata::json_parse_error("item has unrecognized category");
+	throw network::poe_watch::json_parse_error("item has unrecognized category");
 }
 
-std::vector<item> parse_itemdata(std::string_view itemdata_json, fs::log::logger& logger)
+std::vector<item> parse_itemdata(std::string_view itemdata_json, log::logger& logger)
 {
 	nlohmann::json json = nlohmann::json::parse(itemdata_json);
 
 	if (!json.is_array())
 	{
-		throw fs::itemdata::json_parse_error("itemdata JSON must be an array but it is not");
+		throw network::poe_watch::json_parse_error("itemdata JSON must be an array but it is not");
 	}
 
 	std::vector<item> items;
@@ -409,7 +411,7 @@ std::vector<item> parse_itemdata(std::string_view itemdata_json, fs::log::logger
 				parse_item_variation(entry.at("variation")),
 				parse_item_category(entry)});
 		}
-		catch (const fs::itemdata::json_parse_error& e)
+		catch (const network::poe_watch::json_parse_error& e)
 		{
 			logger.warning() << "failed to parse item entry in itemdata JSON: " << e.what() << ", skipping this item";
 			logger.info() << "entry: " << dump_json(json);
@@ -426,29 +428,29 @@ std::vector<item> parse_itemdata(std::string_view itemdata_json, fs::log::logger
 
 } // namespace
 
-namespace fs::itemdata
+namespace fs::network::poe_watch
 {
 
-std::vector<league> parse_league_info(std::string_view league_json)
+std::vector<lang::league> parse_league_info(std::string_view league_json)
 {
 	nlohmann::json json = nlohmann::json::parse(league_json);
 
 	if (!json.is_array())
 	{
-		throw fs::itemdata::json_parse_error("league JSON must be an array but it is not");
+		throw network::poe_watch::json_parse_error("league JSON must be an array but it is not");
 	}
 
-	std::vector<league> leagues;
+	std::vector<lang::league> leagues;
 	for (const auto& item : json)
 	{
 		leagues.push_back(
-			league{
+			lang::league{
 				item.at("id").get<int>(),
 				item.at("name").get<std::string>(),
 				item.at("display").get<std::string>()});
 	}
 
-	std::sort(leagues.begin(), leagues.end(), [](const league& left, const league& right)
+	std::sort(leagues.begin(), leagues.end(), [](const lang::league& left, const lang::league& right)
 	{
 		return left.id < right.id;
 	});
@@ -456,21 +458,21 @@ std::vector<league> parse_league_info(std::string_view league_json)
 	return leagues;
 }
 
-item_price_data parse_item_prices(std::string_view itemdata_json, std::string_view compact_json, log::logger& logger)
+lang::item_price_data parse_item_prices(std::string_view itemdata_json, std::string_view compact_json, log::logger& logger)
 {
 	logger.info() << "parsing item prices";
-	std::vector<std::optional<price_data>> item_prices = parse_compact(compact_json, logger);
+	std::vector<std::optional<lang::price_data>> item_prices = parse_compact(compact_json, logger);
 	if (item_prices.empty())
-		throw fs::itemdata::json_parse_error("parsed empty list of item prices");
+		throw network::poe_watch::json_parse_error("parsed empty list of item prices");
 
 	logger.info() << "parsing item data";
 	std::vector<item> itemdata = parse_itemdata(itemdata_json, logger);
 	if (itemdata.empty())
-		throw fs::itemdata::json_parse_error("parsed empty list of item data");
+		throw network::poe_watch::json_parse_error("parsed empty list of item data");
 
 	logger.info() << "item entries: " << static_cast<int>(itemdata.size());
 
-	item_price_data result;
+	lang::item_price_data result;
 	for (item& i : itemdata)
 	{
 		if (i.id > static_cast<int>(item_prices.size()) || !item_prices[i.id].has_value())
@@ -479,7 +481,10 @@ item_price_data parse_item_prices(std::string_view itemdata_json, std::string_vi
 			continue;
 		}
 
-		const fs::itemdata::price_data& price_data = *item_prices[i.id];
+		const lang::price_data& price_data = *item_prices[i.id];
+		using lang::elementary_item;
+		using lang::unique_item;
+		using lang::base_type_item;
 
 		if (std::holds_alternative<categories::currency>(i.category))
 		{
@@ -647,7 +652,8 @@ item_price_data parse_item_prices(std::string_view itemdata_json, std::string_vi
 	 * We separate ambiguous and unambiguous base types to allow separate filter rules for 'definitely an expensive item' and
 	 * 'maybe an expensive item'.
 	 */
-	const auto extract_unambiguous_items = [](std::vector<unique_item>& ambiguous_items) [[nodiscard]] -> std::vector<unique_item>
+	const auto extract_unambiguous_items = [](std::vector<lang::unique_item>& ambiguous_items)
+		[[nodiscard]] -> std::vector<lang::unique_item>
 	{
 		std::sort(ambiguous_items.begin(), ambiguous_items.end(), [](const auto& left, const auto& right)
 		{
@@ -655,7 +661,7 @@ item_price_data parse_item_prices(std::string_view itemdata_json, std::string_vi
 		});
 
 		// now items with the same base type are next to each other, just move out unique (not repeated) bases
-		std::vector<unique_item> unambiguous_items;
+		std::vector<lang::unique_item> unambiguous_items;
 		const auto last = utility::remove_unique(
 			ambiguous_items.begin(),
 			ambiguous_items.end(),

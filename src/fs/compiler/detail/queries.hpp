@@ -2,8 +2,8 @@
 
 #include "fs/parser/ast.hpp"
 #include "fs/lang/constants_map.hpp"
+#include "fs/lang/item_price_data.hpp"
 #include "fs/compiler/error.hpp"
-#include "fs/itemdata/types.hpp"
 
 #include <algorithm>
 #include <variant>
@@ -16,7 +16,7 @@ namespace fs::compiler::detail
 std::variant<lang::price_range, error::error_variant> construct_price_range(
 	const parser::ast::value_expression_list& arguments,
 	const lang::constants_map& map,
-	const itemdata::item_price_data& item_price_data);
+	const lang::item_price_data& item_price_data);
 
 /**
  * @brief run the [mix, max) query against given sequence of sorted items
@@ -31,7 +31,7 @@ lang::array_object evaluate_price_range_query_on_sorted_range(
 	RandomAccessIterator last)
 {
 	static_assert(
-		std::is_same_v<itemdata::price_data, decltype(first->price_data)>,
+		std::is_same_v<lang::price_data, decltype(first->price_data)>,
 		"iterator must dereference to an object with price_data field");
 
 	const auto lower_bound = std::lower_bound(first, last, range.min,

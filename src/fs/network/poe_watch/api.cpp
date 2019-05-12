@@ -1,6 +1,6 @@
-#include "fs/network/poe_watch_api.hpp"
+#include "fs/network/poe_watch/api.hpp"
+#include "fs/network/poe_watch/parse_json.hpp"
 #include "fs/network/network.hpp"
-#include "fs/itemdata/parse_json.hpp"
 #include "fs/log/logger.hpp"
 
 #include <boost/asio.hpp>
@@ -56,38 +56,41 @@ std::string url_encode_param(std::string_view param_name, std::string_view param
 	return url_encode(param_name) + "=" + url_encode(param_value);
 }
 
+std::future<boost::beast::http::response<boost::beast::http::string_body>> download(
+	boost::asio::io_context& ioc,
+	boost::asio::ssl::context& ctx,
+	std::string_view target,
+	fs::log::logger& logger)
+{
+	constexpr auto host = "api.poe.watch";
+	logger.info() << "downloading from: " << host << target;
+	return fs::network::async_http_get(ioc, ctx, host, "443", target);
+}
+
 } // namespace
 
-namespace fs::network
+namespace fs::network::poe_watch
 {
 
-std::future<std::vector<itemdata::league>> poe_watch_api::async_download_leagues()
+std::future<std::string> async_download_leagues(log::logger& logger)
 {
-	return std::async(std::launch::async, []()
+	return std::async(std::launch::async, [&]()
 	{
 		boost::asio::io_context ioc;
 		boost::asio::ssl::context ctx{boost::asio::ssl::context::tls_client};
 		ctx.set_verify_mode(boost::asio::ssl::verify_none);
 
 		std::future<boost::beast::http::response<boost::beast::http::string_body>> request =
-			async_http_get(ioc, ctx, poe_watch_api::target, poe_watch_api::port, "/leagues");
+			download(ioc, ctx, "/leagues", logger);
 
 		ioc.run();
 
-		const auto response = request.get();
-		const std::string& result = response.body();
-
-		try {
-			return itemdata::parse_league_info(std::string_view(result.c_str(), result.size()));
-		}
-		catch (const nlohmann::json::parse_error& error)
-		{
-			throw std::runtime_error("unable to parse received JSON of length " + std::to_string(result.size()) + ":\n" + result);
-		}
+		auto response = request.get();
+		return std::move(response.body());
 	});
 }
 
-std::future<itemdata::item_price_data> poe_watch_api::async_download_item_price_data(std::string league_name, log::logger& logger)
+std::future<item_price_data> async_download_item_price_data(std::string league_name, log::logger& logger)
 {
 	return std::async(std::launch::async, [&logger, league = std::move(league_name)]()
 	{
@@ -97,24 +100,43 @@ std::future<itemdata::item_price_data> poe_watch_api::async_download_item_price_
 
 		const std::string compact_query = "/compact?" + url_encode_param("league", league);
 		std::future<boost::beast::http::response<boost::beast::http::string_body>> request_compact =
-			async_http_get(ioc, ctx, poe_watch_api::target, poe_watch_api::port, compact_query);
+			download(ioc, ctx, compact_query, logger);
 
 		const std::string itemdata_query = "/itemdata";
 		std::future<boost::beast::http::response<boost::beast::http::string_body>> request_itemdata =
-			async_http_get(ioc, ctx, poe_watch_api::target, poe_watch_api::port, itemdata_query);
+			download(ioc, ctx, itemdata_query, logger);
 
-		logger.info() << "querying: " << poe_watch_api::target << compact_query;
-		logger.info() << "querying: " << poe_watch_api::target << itemdata_query;
 		ioc.run();
 
-		const auto response_compact = request_compact.get();
-		const auto response_itemdata = request_itemdata.get();
-		const std::string& result_compact = response_compact.body();
-		const std::string& result_itemdata = response_itemdata.body();
-		return itemdata::parse_item_prices(
-			std::string_view(result_itemdata.c_str(), result_itemdata.size()),
-			std::string_view(result_compact.c_str(), result_compact.size()),
-			logger);
+		auto response_compact = request_compact.get();
+		auto response_itemdata = request_itemdata.get();
+		return item_price_data{std::move(response_compact.body()), std::move(response_itemdata.body())};
+	});
+}
+
+template <typename F>
+auto invoke_wrap_exceptions(F f)
+{
+	try {
+		return f();
+	}
+	catch (const nlohmann::json::parse_error& error)
+	{
+		throw std::runtime_error(std::string("unable to parse received JSON: ") + error.what());
+	}
+}
+
+std::vector<lang::league> parse_leagues(std::string_view leagues_json)
+{
+	return invoke_wrap_exceptions([&]() {
+		return parse_league_info(leagues_json);
+	});
+}
+
+lang::item_price_data parse_item_price_data(const item_price_data& data, log::logger& logger)
+{
+	return invoke_wrap_exceptions([&]() {
+		return parse_item_prices(data.itemdata_json, data.compact_json, logger);
 	});
 }
 

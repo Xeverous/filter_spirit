@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-namespace fs::itemdata
+namespace fs::network::poe_watch
 {
 
 // use this type to indicate logic errors (eg item has missing / invalid field type)

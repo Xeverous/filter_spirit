@@ -5,7 +5,7 @@
 #include "fs/lang/types.hpp"
 #include "fs/lang/condition_set.hpp"
 #include "fs/lang/constants_map.hpp"
-#include "fs/itemdata/types.hpp"
+#include "fs/lang/item_price_data.hpp"
 
 #include <optional>
 
@@ -16,21 +16,21 @@ namespace fs::compiler::detail
 std::optional<error::error_variant> add_conditions(
 	const std::vector<parser::ast::condition>& conditions,
 	const lang::constants_map& map,
-	const itemdata::item_price_data& item_price_data,
+	const lang::item_price_data& item_price_data,
 	lang::condition_set& condition_set);
 
 [[nodiscard]]
 std::optional<error::error_variant> add_comparison_condition(
 	const parser::ast::comparison_condition& condition,
 	const lang::constants_map& map,
-	const itemdata::item_price_data& item_price_data,
+	const lang::item_price_data& item_price_data,
 	lang::condition_set& condition_set);
 
 [[nodiscard]]
 std::optional<error::error_variant> add_string_condition(
 	const parser::ast::string_condition& condition,
 	const lang::constants_map& map,
-	const itemdata::item_price_data& item_price_data,
+	const lang::item_price_data& item_price_data,
 	lang::condition_set& condition_set);
 
 // helper for the function above
@@ -44,7 +44,7 @@ std::optional<error::error_variant> add_strings_condition(
 std::optional<error::error_variant> add_boolean_condition(
 	const parser::ast::boolean_condition& condition,
 	const lang::constants_map& map,
-	const itemdata::item_price_data& item_price_data,
+	const lang::item_price_data& item_price_data,
 	lang::condition_set& condition_set);
 
 // helper for the function above
@@ -58,7 +58,7 @@ std::optional<error::error_variant> add_boolean_condition(
 std::optional<error::error_variant> add_socket_group_condition(
 	const parser::ast::socket_group_condition& condition,
 	const lang::constants_map& map,
-	const itemdata::item_price_data& item_price_data,
+	const lang::item_price_data& item_price_data,
 	lang::condition_set& condition_set);
 
 // helper for the function above

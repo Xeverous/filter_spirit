@@ -9,7 +9,7 @@ namespace fs::compiler::detail
 std::vector<std::optional<lang::object_type>> determine_types_of(
 	const parser::ast::value_expression_list& expressions,
 	const lang::constants_map& map,
-	const itemdata::item_price_data& item_price_data)
+	const lang::item_price_data& item_price_data)
 {
 	std::vector<std::optional<lang::object_type>> result;
 	result.reserve(expressions.size());

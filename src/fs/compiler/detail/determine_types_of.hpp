@@ -3,7 +3,7 @@
 #include "fs/parser/ast.hpp"
 #include "fs/lang/types.hpp"
 #include "fs/lang/constants_map.hpp"
-#include "fs/itemdata/types.hpp"
+#include "fs/lang/item_price_data.hpp"
 
 #include <vector>
 #include <optional>
@@ -20,6 +20,6 @@ namespace fs::compiler::detail
 std::vector<std::optional<lang::object_type>> determine_types_of(
 	const parser::ast::value_expression_list& expressions,
 	const lang::constants_map& map,
-	const itemdata::item_price_data& item_price_data);
+	const lang::item_price_data& item_price_data);
 
 }

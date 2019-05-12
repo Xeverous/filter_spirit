@@ -1,7 +1,7 @@
-#include "fs/itemdata/types.hpp"
+#include "fs/lang/item_price_data.hpp"
 #include "fs/log/logger.hpp"
 
-namespace fs::itemdata
+namespace fs::lang
 {
 
 void item_price_data::log_info(log::logger& logger) const

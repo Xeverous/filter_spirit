@@ -15,7 +15,7 @@ namespace x3 = boost::spirit::x3;
 std::variant<std::vector<lang::filter_block>, error::error_variant> filter_builder::build_filter(
 	const std::vector<parser::ast::statement>& top_level_statements,
 	const lang::constants_map& map,
-	const itemdata::item_price_data& item_price_data)
+	const lang::item_price_data& item_price_data)
 {
 	return filter_builder(map, item_price_data).build_filter(top_level_statements);
 }

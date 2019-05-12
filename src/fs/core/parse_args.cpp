@@ -131,7 +131,7 @@ int run(int argc, char* argv[])
 			return EXIT_SUCCESS;
 		}
 
-		std::optional<itemdata::item_price_data> item_price_data;
+		std::optional<lang::item_price_data> item_price_data;
 
 		if (download_league_name && data_read_dir)
 		{

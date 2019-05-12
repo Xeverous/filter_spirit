@@ -13,7 +13,7 @@ namespace fs::generator
 
 std::optional<std::string> generate_filter(
 	std::string_view input,
-	const itemdata::item_price_data& item_price_data,
+	const lang::item_price_data& item_price_data,
 	options options,
 	metadata metadata,
 	log::logger& logger)
@@ -30,7 +30,7 @@ std::optional<std::string> generate_filter(
 
 std::optional<std::string> generate_filter_without_preamble(
 	std::string_view input,
-	const itemdata::item_price_data& item_price_data,
+	const lang::item_price_data& item_price_data,
 	options options,
 	log::logger& logger)
 {
