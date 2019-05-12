@@ -12,14 +12,51 @@
 namespace
 {
 
-std::string url_encode(std::string_view param_name, std::string_view param_value)
+std::pair<unsigned char, unsigned char> hexchar(unsigned char c)
 {
-	// TODO right now the implementation allows SQL injection type vulnerabilities
-	// TODO add actual URI encoding (leagues with spaces in names won't work)
-	return "?" + std::string(param_name) + "=" + std::string(param_value);
+	unsigned char hex1 = c / 16;
+	unsigned char hex2 = c % 16;
+	hex1 += hex1 <= 9 ? '0' : 'a' - 10;
+	hex2 += hex2 <= 9 ? '0' : 'a' - 10;
+	return {hex1, hex2};
 }
 
+std::string url_encode(std::string_view str)
+{
+	std::string result;
+	result.reserve(str.size() + str.size() / 2);
+	for (char c : str)
+	{
+		if ((c >= '0' && c <= '9') ||
+		        (c >= 'a' && c <= 'z') ||
+		        (c >= 'A' && c <= 'Z') ||
+		        c == '-' || c == '_' || c == '.' || c == '!' || c == '~' ||
+		        c == '*' || c == '\'' || c == '(' || c == ')')
+		{
+			result.push_back(c);
+		}
+		else if (c == ' ')
+		{
+			result.push_back('+');
+		}
+		else
+		{
+			result.push_back('%');
+			const auto pair = hexchar(c);
+			result.push_back(pair.first);
+			result.push_back(pair.second);
+		}
+	}
+
+	return result;
 }
+
+std::string url_encode_param(std::string_view param_name, std::string_view param_value)
+{
+	return url_encode(param_name) + "=" + url_encode(param_value);
+}
+
+} // namespace
 
 namespace fs::network
 {
@@ -58,12 +95,16 @@ std::future<itemdata::item_price_data> poe_watch_api::async_download_item_price_
 		boost::asio::ssl::context ctx{boost::asio::ssl::context::tls_client};
 		ctx.set_verify_mode(boost::asio::ssl::verify_none);
 
+		const std::string compact_query = "/compact?" + url_encode_param("league", league);
 		std::future<boost::beast::http::response<boost::beast::http::string_body>> request_compact =
-			async_http_get(ioc, ctx, poe_watch_api::target, poe_watch_api::port, "/compact" + url_encode("league", league));
+			async_http_get(ioc, ctx, poe_watch_api::target, poe_watch_api::port, compact_query);
 
+		const std::string itemdata_query = "/itemdata";
 		std::future<boost::beast::http::response<boost::beast::http::string_body>> request_itemdata =
-			async_http_get(ioc, ctx, poe_watch_api::target, poe_watch_api::port, "/itemdata");
+			async_http_get(ioc, ctx, poe_watch_api::target, poe_watch_api::port, itemdata_query);
 
+		logger.info() << "querying: " << poe_watch_api::target << compact_query;
+		logger.info() << "querying: " << poe_watch_api::target << itemdata_query;
 		ioc.run();
 
 		const auto response_compact = request_compact.get();
