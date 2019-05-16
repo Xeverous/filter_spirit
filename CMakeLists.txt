@@ -1,12 +1,34 @@
 # https://pabloariasal.github.io/2018/02/19/its-time-to-do-cmake-right/
+# https://cliutils.gitlab.io/modern-cmake/
 
-cmake_minimum_required(VERSION 3.8)
-project(filter_spirit VERSION 0.0.0 LANGUAGES CXX)
+cmake_minimum_required(VERSION 3.8...3.14)
+
+if(${CMAKE_VERSION} VERSION_LESS 3.12)
+    cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
+endif()
+
+project(filter_spirit
+	VERSION 0.0.0
+	DESCRIPTION "advanced item filter generator for the game Path of Exile using own DSL and online APIs"
+	LANGUAGES CXX)
+	
+set(default_build_type "Release")
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+	message(STATUS "Setting build type to '${default_build_type}' as none was specified.")
+	set(CMAKE_BUILD_TYPE "${default_build_type}" CACHE
+		STRING "Choose the type of build." FORCE)
+	# Set the possible values of build type for cmake-gui
+	set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS
+		"Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+endif()
 
 ##############################################################################
 # options for customizing the build
 
-option(FILTER_SPIRIT_BUILD_TESTS "Build unit tests" ON)
+option(FILTER_SPIRIT_BUILD_EXECUTABLE_CLI
+	"build Filter Spirit command line program" ON)
+option(FILTER_SPIRIT_BUILD_TESTS
+	"build Filter Spirit tests" ON)
 
 ##############################################################################
 # declare dependencies
@@ -31,7 +53,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 # some source files are shared with unit test executable
 # compile these as shared library so that it can be reused by both
 # without the need to list and compile the same sources twice
-add_library(filter_spirit_compiler SHARED
+add_library(filter_spirit SHARED
 	src/fs/parser/parser.cpp
 	src/fs/parser/print_error.cpp
 	src/fs/parser/detail/grammar.cpp
@@ -58,22 +80,22 @@ add_library(filter_spirit_compiler SHARED
 	src/fs/utility/file.cpp
 )
 
-add_executable(filter_spirit
+add_executable(filter_spirit_cli
 	src/fs/core/core.cpp
-	src/fs/core/parse_args.cpp
-	src/fs/main.cpp
+	src/fs/cli/parse_args.cpp
+	src/fs/cli/main.cpp
 	src/fs/network/network.cpp
 	src/fs/network/session.cpp
 	src/fs/network/poe_watch/api.cpp
 	src/fs/network/poe_watch/parse_json.cpp
 )
 
-target_include_directories(filter_spirit_compiler
+target_include_directories(filter_spirit
 	PRIVATE
 		${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-target_include_directories(filter_spirit
+target_include_directories(filter_spirit_cli
 	PRIVATE
 		${CMAKE_CURRENT_SOURCE_DIR}/src
 )
@@ -82,26 +104,26 @@ target_include_directories(filter_spirit
 # setup compiler flags
 
 # Filter Spirit requires C++17
-target_compile_features(filter_spirit_compiler
+target_compile_features(filter_spirit
 	PRIVATE
 		cxx_std_17
 )
 
-target_compile_features(filter_spirit
+target_compile_features(filter_spirit_cli
 	PRIVATE
 		cxx_std_17
 )
 
 # add warnings
 
-target_compile_options(filter_spirit_compiler
+target_compile_options(filter_spirit
 	PRIVATE
 		$<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -Wpedantic -ffast-math>
 		$<$<CXX_COMPILER_ID:Clang>:-Wall -Wpedantic -ffast-math>
 		$<$<CXX_COMPILER_ID:MSVC>:/W4>
 )
 
-target_compile_options(filter_spirit
+target_compile_options(filter_spirit_cli
 	PRIVATE
 		$<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -Wpedantic -ffast-math>
 		$<$<CXX_COMPILER_ID:Clang>:-Wall -Wpedantic -ffast-math>
@@ -111,18 +133,22 @@ target_compile_options(filter_spirit
 ##############################################################################
 # add libs that require linking and/or include paths
 
-target_link_libraries(filter_spirit_compiler
+target_link_libraries(filter_spirit
 	PRIVATE
 		nlohmann_json::nlohmann_json
 )
 
-target_link_libraries(filter_spirit
+target_link_libraries(filter_spirit_cli
 	PRIVATE
-		filter_spirit_compiler
+		filter_spirit
 		Boost::program_options
 		nlohmann_json::nlohmann_json
 		OpenSSL::SSL
 )
+
+# basically -flto
+set_target_properties(filter_spirit PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
+set_target_properties(filter_spirit_cli PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
 
 # Windows requires additional networking libraries for Boost ASIO
 if(WIN32)

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace fs::core
+namespace fs::cli
 {
 
 int run(int argc, char* argv[]);
