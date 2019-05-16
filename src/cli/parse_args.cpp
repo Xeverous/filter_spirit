@@ -1,7 +1,8 @@
-#include "fs/core/parse_args.hpp"
-#include "fs/core/version.hpp"
-#include "fs/core/core.hpp"
-#include "fs/log/console_logger.hpp"
+#include "parse_args.hpp"
+
+#include <fs/core/version.hpp>
+#include <fs/core/core.hpp>
+#include <fs/log/console_logger.hpp>
 
 #include <boost/program_options.hpp>
 #include <boost/optional.hpp>
@@ -41,12 +42,9 @@ void print_help(const boost::program_options::options_description& options)
 
 }
 
-namespace fs::core
-{
-
 int run(int argc, char* argv[])
 {
-	log::console_logger logger;
+	fs::log::console_logger logger;
 
 	try {
 		namespace po = boost::program_options;
@@ -121,17 +119,18 @@ int run(int argc, char* argv[])
 
 		if (opt_version)
 		{
-			std::cout << version::major << '.' << version::minor << '.' << version::patch << '\n';
+			namespace v = fs::core::version;
+			std::cout << v::major << '.' << v::minor << '.' << v::patch << '\n';
 			return EXIT_SUCCESS;
 		}
 
 		if (opt_list_leagues)
 		{
-			list_leagues(logger);
+			fs::core::list_leagues(logger);
 			return EXIT_SUCCESS;
 		}
 
-		std::optional<lang::item_price_data> item_price_data;
+		std::optional<fs::lang::item_price_data> item_price_data;
 
 		if (download_league_name && data_read_dir)
 		{
@@ -141,12 +140,12 @@ int run(int argc, char* argv[])
 
 		if (download_league_name)
 		{
-			item_price_data = download_item_price_data(*download_league_name, logger);
+			item_price_data = fs::core::download_item_price_data(*download_league_name, logger);
 		}
 
 		if (data_read_dir)
 		{
-			item_price_data = load_item_price_data(*data_read_dir, logger);
+			item_price_data = fs::core::load_item_price_data(*data_read_dir, logger);
 		}
 
 		if (opt_generate)
@@ -169,7 +168,7 @@ int run(int argc, char* argv[])
 				return EXIT_FAILURE;
 			}
 
-			if (!generate_item_filter(*item_price_data, *input_path, *output_path, opt_print_ast, logger))
+			if (!fs::core::generate_item_filter(*item_price_data, *input_path, *output_path, opt_print_ast, logger))
 			{
 				logger.info() << "errors occured during filter generation";
 				return EXIT_FAILURE;
@@ -188,4 +187,3 @@ int run(int argc, char* argv[])
 	return EXIT_SUCCESS;
 }
 
-}
