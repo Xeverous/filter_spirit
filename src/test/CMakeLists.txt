@@ -4,7 +4,6 @@ find_package(Boost 1.68 REQUIRED
 	COMPONENTS
 		unit_test_framework
 )
-find_package(nlohmann_json 3.0.0 REQUIRED)
 
 ##############################################################################
 # create target and set its properties
@@ -23,8 +22,7 @@ add_executable(filter_spirit_test
 
 target_include_directories(filter_spirit_test
 	PRIVATE
-		${CMAKE_SOURCE_DIR}/src
-		${CMAKE_SOURCE_DIR}/test
+		${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 ##############################################################################
@@ -49,9 +47,8 @@ target_compile_options(filter_spirit_test
 
 target_link_libraries(filter_spirit_test
 	PRIVATE
-		filter_spirit_compiler
+		filter_spirit
 		Boost::unit_test_framework
-		nlohmann_json::nlohmann_json
 )
 
 ##############################################################################
