@@ -26,11 +26,11 @@ endif()
 # options for customizing the build
 
 option(FILTER_SPIRIT_BUILD_EXECUTABLE_CLI
-	"build Filter Spirit command line interface program" ON)
+	"build Filter Spirit command line interface program" OFF)
 option(FILTER_SPIRIT_BUILD_EXECUTABLE_GUI
 	"build Filter Spirit graphic user interface program" ON)
 option(FILTER_SPIRIT_BUILD_TESTS
-	"build Filter Spirit tests" ON)
+	"build Filter Spirit tests" OFF)
 
 ##############################################################################
 # specify explicitly where to output all binary objects
@@ -50,5 +50,9 @@ else()
 endif()
 
 ##############################################################################
+
+# add our own cmake files to CMake module path - this will
+# make CMake aware of our own FindLibraryName.cmake files
+list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 add_subdirectory(src)
