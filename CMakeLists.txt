@@ -53,6 +53,6 @@ endif()
 
 # add our own cmake files to CMake module path - this will
 # make CMake aware of our own FindLibraryName.cmake files
-list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+# list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 add_subdirectory(src)

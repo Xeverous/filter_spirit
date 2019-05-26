@@ -1,4 +1,9 @@
-find_package(nana REQUIRED)
+# find_package(nana REQUIRED)
+if(NOT DEFINED NANA_REPO_DIR OR NOT DEFINED NANA_BUILD_DIR)
+	message(SEND_ERROR "Define NANA_REPO_DIR to point to nana's GUI library repository and NANA_BUILD_DIR to nana's build directory")
+else()
+	add_subdirectory(${NANA_REPO_DIR} ${NANA_BUILD_DIR})
+endif()
 
 add_executable(filter_spirit_gui
 	main.cpp
@@ -24,5 +29,5 @@ target_compile_options(filter_spirit_gui
 target_link_libraries(filter_spirit_gui
 	PRIVATE
 		filter_spirit
-		nana::nana
+		nana
 )
