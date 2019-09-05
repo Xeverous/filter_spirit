@@ -414,12 +414,12 @@ std::vector<item> parse_itemdata(std::string_view itemdata_json, log::logger& lo
 		catch (const network::poe_watch::json_parse_error& e)
 		{
 			logger.warning() << "failed to parse item entry in itemdata JSON: " << e.what() << ", skipping this item";
-			logger.info() << "entry: " << dump_json(json);
+			logger.info() << "entry: " << dump_json(entry);
 		}
 		catch (const nlohmann::json::exception& e)
 		{
 			logger.warning() << "failed to parse item entry in itemdata JSON: " << e.what() << ", skipping this item";
-			logger.info() << "entry: " << dump_json(json);
+			logger.info() << "entry: " << dump_json(entry);
 		}
 	}
 
