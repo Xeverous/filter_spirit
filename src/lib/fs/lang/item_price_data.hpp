@@ -8,18 +8,20 @@ namespace fs::log { class logger; }
 namespace fs::lang
 {
 
+// note: this needs to be API-agnostic (currently very centered around poe.watch)
+// refactor this (eg remove unused fields) once poe.ninja support is present
 struct price_data
 {
-	double mean;     // arithmetic mean
-	double median;   // when sorted, value in the middle
-	double mode;     // most repeated value
-	double min;      // lower bound of price calculation
-	double max;      // upper bound of price calculation
-	double exalted;  // same as mean, just in exalted
-	double total;    // amount of currently listed items
-	double daily;    // amount of new listed items in last 24h
-	double current;  // amount of currently listed items that have a price
-	double accepted; // amount of accepted offers for price calculation (troll offers are ignored)
+	double mean = 0;     // arithmetic mean
+	double median = 0;   // when sorted, value in the middle
+	double mode = 0;     // most repeated value
+	double min = 0;      // lower bound of price calculation
+	double max = 0;      // upper bound of price calculation
+	double exalted = 0;  // same as mean, just in exalted
+	double total = 0;    // amount of currently listed items
+	double daily = 0;    // amount of new listed items in last 24h
+	double current = 0;  // amount of currently listed items that have a price
+	double accepted = 0; // amount of accepted offers for price calculation (troll offers are ignored)
 };
 
 struct elementary_item

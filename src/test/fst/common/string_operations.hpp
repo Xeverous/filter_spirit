@@ -22,4 +22,10 @@ boost::test_tools::predicate_result compare_ranges(
 	std::string_view actual,
 	std::string_view whole_input /* <- for pretty-printing */);
 
+// TODO improve logs for endline mismatches
+[[nodiscard]]
+boost::test_tools::predicate_result compare_strings(
+	std::string_view expected,
+	std::string_view actual);
+
 }

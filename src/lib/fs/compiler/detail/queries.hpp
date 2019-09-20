@@ -19,7 +19,7 @@ std::variant<lang::price_range, error::error_variant> construct_price_range(
 	const lang::item_price_data& item_price_data);
 
 /**
- * @brief run the [mix, max) query against given sequence of sorted items
+ * @brief run the [min, max) query against given sequence of sorted items
  *
  * @details the range MUST BE sorted, otherwise the behaviour is undefined
  */
@@ -43,7 +43,7 @@ lang::array_object evaluate_price_range_query_on_sorted_range(
 	const auto upper_bound = std::upper_bound(first, last, range.max,
 		[](const auto& max, const auto& item)
 		{
-			return max < item.price_data.mean;
+			return max <= item.price_data.mean;
 		});
 
 	lang::array_object array;
