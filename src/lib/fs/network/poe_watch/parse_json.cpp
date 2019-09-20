@@ -239,42 +239,12 @@ nlohmann::json::string_t dump_json(const nlohmann::json& json)
 		nlohmann::json::error_handler_t::replace); // replace invalid UTF-8 sequences with U+FFFD
 }
 
-template <typename T>
-std::optional<T> parse_single_json_element(const nlohmann::json& json)
-{
-	static_assert(sizeof(T) == 0, "missing overload for this T");
-}
-
-template <>
-std::optional<std::string> parse_single_json_element(const nlohmann::json& json)
-{
-	if (json.is_string())
-		return json.get<std::string>();
-	else
-		return std::nullopt;
-}
-
-template <>
-std::optional<int> parse_single_json_element(const nlohmann::json& json)
-{
-	if (json.is_number())
-		return json.get<int>();
-	else
-		return std::nullopt;
-}
-
-// return whether a given item has unique variations
-bool parse_item_variation(const nlohmann::json& json)
-{
-	return !json.is_null();
-}
-
 frame_type parse_item_frame(const nlohmann::json& json)
 {
 	if (!json.is_number())
 		return frame_type::unknown;
 
-	const int val = json.get<int>();
+	const auto val = json.get<int>();
 	const auto maybe_enum = frame_type::_from_index_nothrow(val);
 
 	if (maybe_enum)
@@ -298,6 +268,22 @@ EnumType json_to_enum(const nlohmann::json& json)
 		return *maybe_result;
 	else
 		return EnumType::unknown;
+}
+
+template <typename T, typename Arg> [[nodiscard]]
+std::optional<T> get_optional_subelement(const nlohmann::json& obj_json, Arg&& arg)
+{
+	assert(obj_json.is_object());
+
+	if (auto it = obj_json.find(std::forward<Arg>(arg)); it != obj_json.end())
+	{
+		auto& item = *it;
+
+		if (!item.is_null())
+			return item.template get<T>();
+	}
+
+	return std::nullopt;
 }
 
 item_category_variant parse_item_category(const nlohmann::json& entry)
@@ -336,10 +322,9 @@ item_category_variant parse_item_category(const nlohmann::json& entry)
 	}
 	if (category_str == "gem")
 	{
-		const nlohmann::json& gem = entry.at("gem");
-		const int  gem_lvl      = gem.at("level")  .get<int>();
-		const int  gem_quality  = gem.at("quality").get<int>();
-		const bool is_corrupted = gem.at("corrupted").get<bool>();
+		const auto gem_lvl      = entry.at("gemLevel")  .get<int>();
+		const auto gem_quality  = entry.at("gemQuality").get<int>();
+		const auto is_corrupted = entry.at("gemIsCorrupted").get<bool>();
 
 		return categories::gem{json_to_enum<categories::gem_type>(group), gem_lvl, gem_quality, is_corrupted};
 	}
@@ -349,9 +334,8 @@ item_category_variant parse_item_category(const nlohmann::json& entry)
 	}
 	if (category_str == "map")
 	{
-		const nlohmann::json& map = entry.at("map");
-		const std::optional<int> series = parse_single_json_element<int>(map.at("series"));
-		const std::optional<int> tier   = parse_single_json_element<int>(map.at("tier"));
+		const auto series = get_optional_subelement<int>(entry, "mapSeries");
+		const auto tier   = get_optional_subelement<int>(entry, "mapTier");
 
 		return categories::map{json_to_enum<categories::map_type>(group), series, tier};
 	}
@@ -365,9 +349,8 @@ item_category_variant parse_item_category(const nlohmann::json& entry)
 	}
 	if (category_str == "base")
 	{
-		const nlohmann::json& base = entry.at("base");
-		const bool is_shaper = base.at("shaper").get<bool>();
-		const bool is_elder  = base.at("elder") .get<bool>();
+		const auto is_shaper = entry.at("baseIsShaper").get<bool>();
+		const auto is_elder  = entry.at("baseIsElder") .get<bool>();
 
 		if (is_shaper && is_elder)
 		{
@@ -379,11 +362,27 @@ item_category_variant parse_item_category(const nlohmann::json& entry)
 			is_elder  ? categories::base::influence_type::elder  :
 			            categories::base::influence_type::none;
 
-		const int ilvl = base.at("itemLevel").get<int>();
+		const auto ilvl = entry.at("baseItemLevel").get<int>();
 		return categories::base{json_to_enum<categories::base_type>(group), influence, ilvl};
 	}
 
-	throw network::poe_watch::json_parse_error("item has unrecognized category");
+	throw network::poe_watch::json_parse_error("item has unrecognized category: " + category_str);
+}
+
+[[nodiscard]]
+item parse_item(const nlohmann::json& item_json)
+{
+	assert(item_json.is_object());
+
+	return item{
+		item_json.at("id").get<int>(),
+		item_json.at("name").get<std::string>(),
+		get_optional_subelement<std::string>(item_json, "type"),
+		parse_item_frame(item_json.at("frame")),
+		get_optional_subelement<int>(item_json, "stackSize"),
+		get_optional_subelement<int>(item_json, "linkCount"),
+		item_json.find("variation") != item_json.end(),
+		parse_item_category(item_json)};
 }
 
 std::vector<item> parse_itemdata(std::string_view itemdata_json, log::logger& logger)
@@ -401,15 +400,7 @@ std::vector<item> parse_itemdata(std::string_view itemdata_json, log::logger& lo
 	{
 		try
 		{
-			items.push_back(item{
-				entry.at("id").get<int>(),
-				entry.at("name").get<std::string>(),
-				parse_single_json_element<std::string>(entry.at("type")),
-				parse_item_frame(entry.at("frame")),
-				parse_single_json_element<int>(entry.at("stack")),
-				parse_single_json_element<int>(entry.at("links")),
-				parse_item_variation(entry.at("variation")),
-				parse_item_category(entry)});
+			items.push_back(parse_item(entry));
 		}
 		catch (const network::poe_watch::json_parse_error& e)
 		{
@@ -653,7 +644,7 @@ lang::item_price_data parse_item_prices(std::string_view itemdata_json, std::str
 	 * 'maybe an expensive item'.
 	 */
 	const auto extract_unambiguous_items = [](std::vector<lang::unique_item>& ambiguous_items)
-		[[nodiscard]] -> std::vector<lang::unique_item>
+		-> std::vector<lang::unique_item>
 	{
 		std::sort(ambiguous_items.begin(), ambiguous_items.end(), [](const auto& left, const auto& right)
 		{

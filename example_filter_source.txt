@@ -68,8 +68,8 @@ const color_fractured_item   = RGB(150, 100, 158)
 const color_synthesised_item = RGB(150, 100, 200)
 const color_veiled_item      = RGB(150, 100, 158)
 
-const currency_t1 = ["Exalted Orb", "Divine Orb", "Mirror of Kalandra", "Eternal Orb", "Albino Rhoa Feather", "Mirror Shard" ]
-const currency_t2 = ["Chaos Orb", "Gemcutter's Prism", "Orb of Regret", "Regal Orb", "Stacked Deck", "Vaal Orb", "Apprentice Cartographer's Seal", "Apprentice Cartographer's Sextant", "Journeyman Cartographer's Seal", "Journeyman Cartographer's Sextant", "Master Cartographer's Seal", "Master Cartographer's Sextant", "Unshaping Orb", "Remnant of Corruption", "Exalted Shard", "Orb of Annulment", "Orb of Binding", "Orb of Horizons", "Harbinger's Orb", "Engineer's Orb", "Ancient Orb", "Stacked Deck", "Vial of" ]
+const currency_t1 = ["Exalted Orb", "Mirror of Kalandra", "Eternal Orb", "Albino Rhoa Feather", "Mirror Shard" ]
+const currency_t2 = ["Divine Orb", "Chaos Orb", "Gemcutter's Prism", "Orb of Regret", "Regal Orb", "Stacked Deck", "Vaal Orb", "Apprentice Cartographer's Seal", "Apprentice Cartographer's Sextant", "Journeyman Cartographer's Seal", "Journeyman Cartographer's Sextant", "Master Cartographer's Seal", "Master Cartographer's Sextant", "Unshaping Orb", "Remnant of Corruption", "Exalted Shard", "Orb of Annulment", "Orb of Binding", "Orb of Horizons", "Harbinger's Orb", "Engineer's Orb", "Ancient Orb", "Stacked Deck", "Vial of" ]
 const currency_t3 = ["Cartographer's Chisel", "Jeweller's Orb", "Orb of Alchemy", "Orb of Chance", "Orb of Fusing", "Orb of Scouring", "Silver Coin", "Blessed Orb" ]
 const currency_t4 = ["Annulment Shard", "Binding Shard", "Horizon Shard", "Harbinger's Shard", "Engineer's Shard", "Ancient Shard", "Chaos Shard", "Regal Shard", "Alchemy Shard" ]
 
@@ -114,7 +114,7 @@ const alert_currency_resonator = alert_airhorn
 const alert_currency_perandus  = alert_hitmarker
 const alert_currency_prophecy  = alert_intervention
 const alert_currency_splinter  = alert_hitmarker
-const alert_currency_blessing  = alert_explosion
+const alert_currency_blessing  = alert_mlg_airhorn
 const alert_currency_vial      = alert_intervention # TODO API pricing
 const alert_currency_essence_best  = alert_explosion
 const alert_currency_essence_other = alert_hitmarker
@@ -136,7 +136,7 @@ const alert_fragment_sacrifice = alert_hitmarker
 const alert_fragment_mortal    = alert_airhorn
 const alert_fragment_atlas     = alert_airhorn
 const alert_leaguestone        = alert_intervention
-const alert_misc_breachstone   = alert_airhorn
+const alert_misc_breachstone   = alert_mlg_airhorn
 const alert_misc_reliquary     = alert_wombo_combo
 const alert_misc_pale_court    = alert_unusual_drop
 const alert_lab_offering       = alert_unusual_drop
@@ -606,6 +606,15 @@ Class "Map Fragments" {
 		SetAlertSound alert_fragment_atlas
 		Show
 	}
+
+	BaseType "Breachstone" {
+		SetTextColor color_breach
+		SetBorderColor color_breach
+		SetBackgroundColor color_white
+		SetFontSize font_max
+		SetAlertSound alert_misc_breachstone
+		Show
+	}
 }
 
 Class "Leaguestones" {
@@ -619,15 +628,6 @@ Class "Leaguestones" {
 }
 
 Class "Misc Map Item" {
-	BaseType "Breachstone" {
-		SetTextColor color_breach
-		SetBorderColor color_breach
-		SetBackgroundColor color_white
-		SetFontSize font_max
-		SetAlertSound alert_misc_breachstone
-		Show
-	}
-
 	# reliquary keys from Legacy ("Ancient") and Delve ("Timeworn")
 	# ...and any future reliquary keys
 	BaseType "Reliquary Key" {
