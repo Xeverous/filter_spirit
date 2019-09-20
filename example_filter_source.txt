@@ -394,7 +394,7 @@ Class "Gem" {
 #	# implicit creation of 9 blocks (3 * 3)
 #	Show
 
-	BaseType ["Empower", "Enhance", "Enlighten", "Portal", "Detonate Mines", "Added Chaos Damage"] {
+	BaseType ["Empower", "Enhance", "Enlighten", "Portal", "Vaal Breach"] {
 		SetFontSize 40
 		SetAlertSound alert_gem_drop_only
 		Show
