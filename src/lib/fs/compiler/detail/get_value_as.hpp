@@ -1,7 +1,8 @@
 #pragma once
 
 #include "fs/lang/types.hpp"
-#include "fs/lang/type_traits.hpp"
+#include "fs/lang/traits/promotions.hpp"
+#include "fs/lang/traits/is_lang_type.hpp"
 #include "fs/utility/type_list.hpp"
 #include "fs/compiler/error.hpp"
 #include "fs/compiler/detail/type_constructors.hpp"
@@ -51,6 +52,8 @@ namespace impl
 template <typename T>
 std::variant<T, error::error_variant> get_value_as(const lang::object& object)
 {
+	static_assert(lang::traits::is_lang_type_v<T>, "T should be one of FS language types");
+
 	if constexpr (std::is_same_v<T, lang::array_object>)
 	{
 		if (!object.is_array())
