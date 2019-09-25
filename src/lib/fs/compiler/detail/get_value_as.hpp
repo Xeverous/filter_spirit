@@ -3,7 +3,6 @@
 #include "fs/lang/types.hpp"
 #include "fs/lang/type_traits.hpp"
 #include "fs/utility/type_list.hpp"
-#include "fs/utility/if_constexpr_workaround.hpp"
 #include "fs/compiler/error.hpp"
 #include "fs/compiler/detail/type_constructors.hpp"
 
@@ -52,7 +51,7 @@ namespace impl
 template <typename T>
 std::variant<T, error::error_variant> get_value_as(const lang::object& object)
 {
-	if ECLIPSE_CONSTEXPR (std::is_same_v<T, lang::array_object>)
+	if constexpr (std::is_same_v<T, lang::array_object>)
 	{
 		if (!object.is_array())
 			return object.promote_to_array();

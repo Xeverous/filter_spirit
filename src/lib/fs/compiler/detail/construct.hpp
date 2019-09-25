@@ -9,7 +9,6 @@
 #include "fs/compiler/detail/evaluate_as.hpp"
 #include "fs/compiler/detail/type_constructors.hpp"
 #include "fs/compiler/detail/determine_types_of.hpp"
-#include "fs/utility/if_constexpr_workaround.hpp"
 
 #include <array>
 #include <cassert>
@@ -176,7 +175,7 @@ namespace impl
 		 * if there is only 1 constructor don't report "no matching ctor found"
 		 * as there clearly is only 1 candidate - report "failed ctor" instead
 		 */
-		if ECLIPSE_CONSTEXPR (sizeof...(FailedConstructors) == 1)
+		if constexpr (sizeof...(FailedConstructors) == 1)
 		{
 			static_assert(sizeof...(Errors) == 1, "logic flaw: see comment above");
 			// return error::error_variant(std::forward<Errors>(errors_so_far)...);
