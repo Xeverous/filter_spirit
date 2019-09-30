@@ -109,6 +109,9 @@ struct value_expression_list_class           : error_on_error, annotate_on_succe
 struct function_call_class                   : error_on_error, annotate_on_success {};
 struct price_range_query_class               : error_on_error, annotate_on_success {};
 struct array_expression_class                : error_on_error, annotate_on_success {};
+struct primary_expression_class              : error_on_error, annotate_on_success {};
+struct subscript_class                       : error_on_error, annotate_on_success {};
+struct postfix_expression_class              : error_on_error, annotate_on_success {};
 struct value_expression_class                : error_on_error, annotate_on_success {};
 
 // ---- definitions ----
@@ -224,6 +227,15 @@ BOOST_SPIRIT_DECLARE(price_range_query_type)
 
 using array_expression_type = x3::rule<array_expression_class, ast::array_expression>;
 BOOST_SPIRIT_DECLARE(array_expression_type)
+
+using primary_expression_type = x3::rule<primary_expression_class, ast::primary_expression>;
+BOOST_SPIRIT_DECLARE(primary_expression_type)
+
+using subscript_type = x3::rule<subscript_class, ast::subscript>;
+BOOST_SPIRIT_DECLARE(subscript_type)
+
+using postfix_expression_type = x3::rule<postfix_expression_class, ast::postfix_expression>;
+BOOST_SPIRIT_DECLARE(postfix_expression_type)
 
 using value_expression_type = x3::rule<value_expression_class, ast::value_expression>;
 BOOST_SPIRIT_DECLARE(value_expression_type)

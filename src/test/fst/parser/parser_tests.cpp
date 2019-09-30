@@ -38,13 +38,15 @@ bool test_literal(const T& literal, const Value& value)
 template <typename T, typename Value>
 bool test_literal_expression(const fs::parser::ast::value_expression& expr, const Value& value)
 {
-	if (!holds_alternative<fs::parser::ast::literal_expression>(expr.var))
+	BOOST_TEST(expr.postfix_exprs.empty(), "definition should not contain postfix expressions");
+
+	if (!holds_alternative<fs::parser::ast::literal_expression>(expr.primary_expr.var))
 	{
 		BOOST_ERROR("definition does not hold literal_expression variant");
 		return false;
 	}
 
-	const auto& literal_expression = boost::get<fs::parser::ast::literal_expression>(expr.var);
+	const auto& literal_expression = boost::get<fs::parser::ast::literal_expression>(expr.primary_expr.var);
 	if (!holds_alternative<T>(literal_expression.var))
 	{
 		BOOST_ERROR("definition is literal_expression but does not hold expected literal");
@@ -160,8 +162,9 @@ const GGG = 666
 		BOOST_TEST(defs[1].name.value == "color_black");
 		BOOST_TEST(defs[2].name.value == "color_other");
 
-		BOOST_TEST_REQUIRE(holds_alternative<pa::function_call>(defs[0].value.var));
-		const auto& f0 = boost::get<pa::function_call>(defs[0].value.var);
+		BOOST_TEST(defs[0].value.postfix_exprs.empty());
+		BOOST_TEST_REQUIRE(holds_alternative<pa::function_call>(defs[0].value.primary_expr.var));
+		const auto& f0 = boost::get<pa::function_call>(defs[0].value.primary_expr.var);
 		BOOST_TEST(f0.name.value == "RGB");
 		BOOST_TEST_REQUIRE(static_cast<int>(f0.arguments.size()) == 3);
 
@@ -169,8 +172,9 @@ const GGG = 666
 		test_literal_expression<pa::integer_literal>(f0.arguments[1], 22);
 		test_literal_expression<pa::integer_literal>(f0.arguments[2], 33);
 
-		BOOST_TEST_REQUIRE(holds_alternative<pa::function_call>(defs[1].value.var));
-		const auto& f1 = boost::get<pa::function_call>(defs[1].value.var);
+		BOOST_TEST(defs[1].value.postfix_exprs.empty());
+		BOOST_TEST_REQUIRE(holds_alternative<pa::function_call>(defs[1].value.primary_expr.var));
+		const auto& f1 = boost::get<pa::function_call>(defs[1].value.primary_expr.var);
 		BOOST_TEST(f1.name.value == "RGB");
 		BOOST_TEST_REQUIRE(static_cast<int>(f1.arguments.size()) == 4);
 
@@ -179,8 +183,9 @@ const GGG = 666
 		test_literal_expression<pa::integer_literal>(f1.arguments[2], 2);
 		test_literal_expression<pa::integer_literal>(f1.arguments[3], 255);
 
-		BOOST_TEST_REQUIRE(holds_alternative<pa::identifier>(defs[2].value.var));
-		const auto& iden = boost::get<pa::identifier>(defs[2].value.var);
+		BOOST_TEST(defs[2].value.postfix_exprs.empty());
+		BOOST_TEST_REQUIRE(holds_alternative<pa::identifier>(defs[2].value.primary_expr.var));
+		const auto& iden = boost::get<pa::identifier>(defs[2].value.primary_expr.var);
 		BOOST_TEST(iden.value == "color_black");
 	}
 
@@ -196,8 +201,9 @@ const GGG = 666
 		BOOST_TEST_REQUIRE(static_cast<int>(defs.size()) == 1);
 
 		BOOST_TEST(defs[0].name.value == "currency_t1");
-		BOOST_TEST_REQUIRE(holds_alternative<pa::array_expression>(defs[0].value.var));
-		const auto& array_expr = boost::get<pa::array_expression>(defs[0].value.var);
+		BOOST_TEST(defs[0].value.postfix_exprs.empty());
+		BOOST_TEST_REQUIRE(holds_alternative<pa::array_expression>(defs[0].value.primary_expr.var));
+		const auto& array_expr = boost::get<pa::array_expression>(defs[0].value.primary_expr.var);
 		BOOST_TEST_REQUIRE(static_cast<int>(array_expr.elements.size()) == 4);
 
 		const std::vector<std::string> names = { "Exalted Orb", "Mirror of Kalandra", "Eternal Orb", "Mirror Shard" };
@@ -246,8 +252,9 @@ Show
 		BOOST_TEST_REQUIRE(holds_alternative<pa::unary_action>(st0_action.var));
 		const auto st0_unary_action = boost::get<pa::unary_action>(st0_action.var);
 		BOOST_TEST(st0_unary_action.action_type == lang::unary_action_type::set_background_color);
-		BOOST_TEST_REQUIRE(holds_alternative<pa::identifier>(st0_unary_action.value.var));
-		const auto& st0_action_id = boost::get<pa::identifier>(st0_unary_action.value.var);
+		BOOST_TEST(st0_unary_action.value.postfix_exprs.empty());
+		BOOST_TEST_REQUIRE(holds_alternative<pa::identifier>(st0_unary_action.value.primary_expr.var));
+		const auto& st0_action_id = boost::get<pa::identifier>(st0_unary_action.value.primary_expr.var);
 		BOOST_TEST(st0_action_id.value =="color_black");
 
 		BOOST_TEST_REQUIRE(holds_alternative<pa::rule_block>(statements[1].var)); // Class "Currency" {
@@ -257,8 +264,9 @@ Show
 		BOOST_TEST_REQUIRE(holds_alternative<pa::string_condition>(st1_rule_block_cond.var));
 		const auto& st1_rule_block_cond_str = boost::get<pa::string_condition>(st1_rule_block_cond.var);
 		BOOST_TEST(st1_rule_block_cond_str.property == lang::string_condition_property::class_);
-		BOOST_TEST_REQUIRE(holds_alternative<pa::literal_expression>(st1_rule_block_cond_str.value.var));
-		const auto& st1_rule_block_cond_str_lit = boost::get<pa::literal_expression>(st1_rule_block_cond_str.value.var);
+		BOOST_TEST(st1_rule_block_cond_str.value.postfix_exprs.empty());
+		BOOST_TEST_REQUIRE(holds_alternative<pa::literal_expression>(st1_rule_block_cond_str.value.primary_expr.var));
+		const auto& st1_rule_block_cond_str_lit = boost::get<pa::literal_expression>(st1_rule_block_cond_str.value.primary_expr.var);
 		BOOST_TEST_REQUIRE(holds_alternative<pa::string_literal>(st1_rule_block_cond_str_lit.var));
 		const auto& st1_rule_block_cond_str_lit_str = boost::get<pa::string_literal>(st1_rule_block_cond_str_lit.var);
 		BOOST_TEST(st1_rule_block_cond_str_lit_str == "Currency");
@@ -271,8 +279,9 @@ Show
 		BOOST_TEST_REQUIRE(holds_alternative<pa::unary_action>(st1_st0_action.var));
 		const auto& st1_st0_unary_action = boost::get<pa::unary_action>(st1_st0_action.var);
 		BOOST_TEST(st1_st0_unary_action.action_type == lang::unary_action_type::set_border_color);
-		BOOST_TEST_REQUIRE(holds_alternative<pa::identifier>(st1_st0_unary_action.value.var));
-		const auto& st1_st0_action_id = boost::get<pa::identifier>(st1_st0_unary_action.value.var);
+		BOOST_TEST(st1_st0_unary_action.value.postfix_exprs.empty());
+		BOOST_TEST_REQUIRE(holds_alternative<pa::identifier>(st1_st0_unary_action.value.primary_expr.var));
+		const auto& st1_st0_action_id = boost::get<pa::identifier>(st1_st0_unary_action.value.primary_expr.var);
 		BOOST_TEST(st1_st0_action_id.value == "color_currency");
 
 		const auto& st1_st1 = st1_rule_block.statements[1]; // BaseType currency_t1
@@ -283,8 +292,9 @@ Show
 		BOOST_TEST_REQUIRE(holds_alternative<pa::string_condition>(st1_st1_cond0.var));
 		const auto& st1_st1_cond0_str = boost::get<pa::string_condition>(st1_st1_cond0.var);
 		BOOST_TEST(st1_st1_cond0_str.property == lang::string_condition_property::base_type);
-		BOOST_TEST_REQUIRE(holds_alternative<pa::identifier>(st1_st1_cond0_str.value.var));
-		const auto& st1_st1_cond0_str_lit = boost::get<pa::identifier>(st1_st1_cond0_str.value.var);
+		BOOST_TEST(st1_st1_cond0_str.value.postfix_exprs.empty());
+		BOOST_TEST_REQUIRE(holds_alternative<pa::identifier>(st1_st1_cond0_str.value.primary_expr.var));
+		const auto& st1_st1_cond0_str_lit = boost::get<pa::identifier>(st1_st1_cond0_str.value.primary_expr.var);
 		BOOST_TEST(st1_st1_cond0_str_lit.value == "currency_t1");
 
 		BOOST_TEST_REQUIRE(static_cast<int>(st1_st1_cond.statements.size()) == 2);
@@ -295,8 +305,9 @@ Show
 		BOOST_TEST_REQUIRE(holds_alternative<pa::unary_action>(st1_st1_cond_st0_action.var));
 		const auto& st1_st1_cond_st0_unary_action = boost::get<pa::unary_action>(st1_st1_cond_st0_action.var);
 		BOOST_TEST(st1_st1_cond_st0_unary_action.action_type == lang::unary_action_type::set_alert_sound);
-		BOOST_TEST_REQUIRE(holds_alternative<pa::identifier>(st1_st1_cond_st0_unary_action.value.var));
-		const auto& st1_st1_cond_st0_action_id = boost::get<pa::identifier>(st1_st1_cond_st0_unary_action.value.var);
+		BOOST_TEST(st1_st1_cond_st0_unary_action.value.postfix_exprs.empty());
+		BOOST_TEST_REQUIRE(holds_alternative<pa::identifier>(st1_st1_cond_st0_unary_action.value.primary_expr.var));
+		const auto& st1_st1_cond_st0_action_id = boost::get<pa::identifier>(st1_st1_cond_st0_unary_action.value.primary_expr.var);
 		BOOST_TEST(st1_st1_cond_st0_action_id.value == "sound_currency");
 
 		const auto& st1_st1_cond_st1 = st1_st1_cond.statements[1]; // Show

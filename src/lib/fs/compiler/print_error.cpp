@@ -194,16 +194,31 @@ void print_error_impl(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_first_element),
 		log::strings::error,
-		"non homogeneous array, one operand of type '",
+		"non homogeneous array, one element of type '",
 		fs::lang::to_string_view(error.first_element_type),
 		"'");
 	logger.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_second_element),
 		log::strings::note,
-		"and one operand of type '",
+		"and one element of type '",
 		fs::lang::to_string_view(error.second_element_type),
 		"'");
+}
+
+void print_error_impl(
+	compiler::error::index_out_of_range error,
+	const parser::lookup_data& lookup_data,
+	log::logger& logger)
+{
+	logger.print_line_number_with_description_and_underlined_code(
+		lookup_data.get_view_of_whole_content(),
+		lookup_data.position_of(error.place_of_subscript),
+		log::strings::error,
+		"index out of range, requested ",
+		error.requested_index,
+		" but array size is ",
+		error.array_size);
 }
 
 void print_error_impl(

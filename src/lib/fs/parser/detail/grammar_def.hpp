@@ -123,12 +123,24 @@ const array_expression_type array_expression = "array expression";
 const auto array_expression_def = '[' > value_expression_list > ']';
 BOOST_SPIRIT_DEFINE(array_expression)
 
-const auto value_expression_def =
+const primary_expression_type primary_expression = "primary expression";
+const auto primary_expression_def =
 	  literal_expression
 	| array_expression
 	| function_call
 	| identifier
 	| price_range_query;
+BOOST_SPIRIT_DEFINE(primary_expression)
+
+const subscript_type subscript = "subscript";
+const auto subscript_def = '[' >> value_expression > ']';
+BOOST_SPIRIT_DEFINE(subscript)
+
+const postfix_expression_type postfix_expression = "postfix expression";
+const auto postfix_expression_def = subscript; // note: likely to contain some alternatives in the future such as ".member" or "| filter()"
+BOOST_SPIRIT_DEFINE(postfix_expression)
+
+const auto value_expression_def = primary_expression >> *postfix_expression;
 BOOST_SPIRIT_DEFINE(value_expression)
 
 // ---- definitions ----

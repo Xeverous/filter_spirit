@@ -70,6 +70,13 @@ struct non_homogeneous_array
 	lang::object_type second_element_type;
 };
 
+struct index_out_of_range
+{
+	lang::position_tag place_of_subscript;
+	int requested_index;
+	int array_size;
+};
+
 struct empty_socket_group
 {
 	lang::position_tag place_of_socket_group_string;
@@ -145,6 +152,7 @@ using error_variant = std::variant<
 	no_matching_constructor_found,
 	nested_arrays_not_allowed,
 	non_homogeneous_array,
+	index_out_of_range,
 	empty_socket_group,
 	illegal_characters_in_socket_group,
 	invalid_socket_group,
@@ -183,6 +191,5 @@ struct unmatched_function_call
 	std::vector<lang::object_type> expected_argument_types;
 	error_variant error;
 };
-
 
 }

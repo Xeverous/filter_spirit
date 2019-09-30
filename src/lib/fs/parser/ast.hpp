@@ -214,7 +214,7 @@ struct array_expression : x3::position_tagged
 	value_expression_list elements;
 };
 
-struct value_expression : x3::variant<
+struct primary_expression : x3::variant<
 		literal_expression,
 		array_expression,
 		function_call,
@@ -236,8 +236,42 @@ struct value_expression : x3::variant<
  */
 namespace
 {
-	using workaround = decltype(value_expression{*static_cast<const value_expression*>(nullptr)});
+	using workaround = decltype(primary_expression{*static_cast<const primary_expression*>(nullptr)});
 }
+
+struct postfix_expression;
+
+struct value_expression : x3::position_tagged
+{
+	primary_expression primary_expr;
+	std::vector<postfix_expression> postfix_exprs;
+};
+
+struct subscript : x3::position_tagged
+{
+	subscript& operator=(value_expression ve)
+	{
+		expr = std::move(ve);
+		return *this;
+	}
+
+	const value_expression& get_value() const { return expr; }
+
+	value_expression expr;
+};
+
+struct postfix_expression : x3::position_tagged
+{
+	postfix_expression& operator=(subscript s)
+	{
+		expr = std::move(s);
+		return *this;
+	}
+
+	const subscript& get_value() const { return expr; }
+
+	subscript expr;
+};
 
 // ---- definitions ----
 

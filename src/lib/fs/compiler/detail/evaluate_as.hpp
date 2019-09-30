@@ -8,7 +8,7 @@
 namespace fs::compiler::detail
 {
 
-template <typename T>
+template <typename T, bool AllowPromotions = true>
 std::variant<T, error::error_variant> evaluate_as(
 	const parser::ast::value_expression& expression,
 	const lang::constants_map& map,
@@ -20,7 +20,7 @@ std::variant<T, error::error_variant> evaluate_as(
 		return std::get<error::error_variant>(std::move(object_or_error));
 
 	auto& object = std::get<lang::object>(object_or_error);
-	std::variant<T, error::error_variant> value_or_error = get_value_as<T>(object);
+	std::variant<T, error::error_variant> value_or_error = get_value_as<T, AllowPromotions>(object);
 
 	if (std::holds_alternative<error::error_variant>(value_or_error))
 		return std::get<error::error_variant>(std::move(value_or_error));
