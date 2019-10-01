@@ -204,6 +204,38 @@ const a3 = [1, 2, 3]
 				search(input, "a3"), search(input, "[1, 2, 3]"));
 		}
 
+		BOOST_AUTO_TEST_CASE(array_subscript, * ut::description("test that array subscript returns correct objects"))
+		{
+			const std::string input_str = minimal_input() + R"(
+const arr = [100, 101, 102, 103]
+const first   = arr[ 0]
+const second  = arr[ 1]
+const prelast = arr[-2]
+const last    = arr[-1]
+
+const elem = [1, 2, 3][1]
+)";
+			const std::string_view input = input_str;
+			const parser::parse_success_data parse_data = parse(input);
+			const parser::lookup_data& lookup_data = parse_data.lookup_data;
+			const lang::constants_map map = expect_success_when_resolving_constants(parse_data.ast.constant_definitions, lookup_data);
+
+			expect_object_in_map(map, lookup_data, "first",
+				lang::integer{100}, search(input, "first"), search(input, "[ 0]"));
+
+			expect_object_in_map(map, lookup_data, "second",
+				lang::integer{101}, search(input, "second"), search(input, "[ 1]"));
+
+			expect_object_in_map(map, lookup_data, "prelast",
+				lang::integer{102}, search(input, "prelast"), search(input, "[-2]"));
+
+			expect_object_in_map(map, lookup_data, "last",
+				lang::integer{103}, search(input, "last"), search(input, "[-1]"));
+
+			expect_object_in_map(map, lookup_data, "elem",
+				lang::integer{2}, search(input, "elem"), search(input, "[1]"));
+		}
+
 		BOOST_AUTO_TEST_CASE(promotions)
 		{
 			const std::string input_str = minimal_input() + R"(
