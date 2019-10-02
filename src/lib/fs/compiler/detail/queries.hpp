@@ -12,8 +12,8 @@
 namespace fs::compiler::detail
 {
 
-[[nodiscard]]
-std::variant<lang::price_range, error::error_variant> construct_price_range(
+[[nodiscard]] std::variant<lang::price_range, compile_error>
+construct_price_range(
 	const parser::ast::value_expression_list& arguments,
 	const lang::constants_map& map,
 	const lang::item_price_data& item_price_data);
@@ -23,8 +23,9 @@ std::variant<lang::price_range, error::error_variant> construct_price_range(
  *
  * @details the range MUST BE sorted, otherwise the behaviour is undefined
  */
-template <typename RandomAccessIterator> [[nodiscard]]
-lang::array_object evaluate_price_range_query_on_sorted_range(
+template <typename RandomAccessIterator>
+[[nodiscard]] lang::array_object
+evaluate_price_range_query_on_sorted_range(
 	lang::price_range range,
 	lang::position_tag position_of_range,
 	RandomAccessIterator first,

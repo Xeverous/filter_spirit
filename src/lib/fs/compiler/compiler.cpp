@@ -14,7 +14,8 @@ namespace
 {
 
 using namespace fs;
-namespace ast = parser::ast;
+using namespace fs::compiler;
+namespace ast = fs::parser::ast;
 
 /*
  * core entry point into adding constants
@@ -29,8 +30,8 @@ namespace ast = parser::ast;
  *   (as of now, filter's language has no scoping/name shadowing)
  * - convert expression to language object and proceed
  */
-[[nodiscard]]
-std::optional<compiler::error::error_variant> add_constant_from_definition(
+[[nodiscard]] std::optional<compile_error>
+add_constant_from_definition(
 	const ast::constant_definition& def,
 	lang::constants_map& map,
 	const lang::item_price_data& item_price_data)
@@ -43,14 +44,14 @@ std::optional<compiler::error::error_variant> add_constant_from_definition(
 	{
 		const lang::position_tag place_of_original_name = parser::get_position_info(it->second.name_origin);
 		const lang::position_tag place_of_duplicated_name = parser::get_position_info(wanted_name);
-		return compiler::error::name_already_exists{place_of_duplicated_name, place_of_original_name};
+		return errors::name_already_exists{place_of_duplicated_name, place_of_original_name};
 	}
 
-	std::variant<lang::object, compiler::error::error_variant> expr_result =
+	std::variant<lang::object, compile_error> expr_result =
 		compiler::detail::evaluate_value_expression(value_expression, map, item_price_data);
 
-	if (std::holds_alternative<compiler::error::error_variant>(expr_result))
-		return std::get<compiler::error::error_variant>(std::move(expr_result));
+	if (std::holds_alternative<compile_error>(expr_result))
+		return std::get<compile_error>(std::move(expr_result));
 
 	const auto pair = map.emplace(
 		wanted_name.value,
@@ -67,7 +68,8 @@ std::optional<compiler::error::error_variant> add_constant_from_definition(
 namespace fs::compiler
 {
 
-std::variant<lang::constants_map, compiler::error::error_variant> resolve_constants(
+std::variant<lang::constants_map, compile_error>
+resolve_constants(
 	const std::vector<parser::ast::constant_definition>& constant_definitions,
 	const lang::item_price_data& item_price_data)
 {
@@ -75,8 +77,7 @@ std::variant<lang::constants_map, compiler::error::error_variant> resolve_consta
 
 	for (const ast::constant_definition& def : constant_definitions)
 	{
-		std::optional<compiler::error::error_variant> error =
-			add_constant_from_definition(def, map, item_price_data);
+		std::optional<compile_error> error = add_constant_from_definition(def, map, item_price_data);
 
 		if (error)
 			return *std::move(error);
@@ -85,7 +86,8 @@ std::variant<lang::constants_map, compiler::error::error_variant> resolve_consta
 	return map;
 }
 
-std::variant<std::vector<lang::filter_block>, error::error_variant> compile_statements(
+std::variant<std::vector<lang::filter_block>, compile_error>
+compile_statements(
 	const std::vector<parser::ast::statement>& statements,
 	const lang::constants_map& map,
 	const lang::item_price_data& item_price_data)

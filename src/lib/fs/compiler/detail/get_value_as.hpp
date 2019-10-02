@@ -18,16 +18,16 @@ namespace impl
 {
 
 	template <typename T>
-	std::variant<T, error::error_variant> attempt_to_promote(const lang::object& object, lang::traits::promotion_list<>)
+	std::variant<T, compile_error> attempt_to_promote(const lang::object& object, lang::traits::promotion_list<>)
 	{
-		return error::type_mismatch{
+		return errors::type_mismatch{
 			lang::type_to_enum<T>(),
 			lang::type_of_object(object.value),
 			object.value_origin};
 	}
 
 	template <typename T, typename P, typename... Ps>
-	std::variant<T, error::error_variant> attempt_to_promote(const lang::object& object, lang::traits::promotion_list<P, Ps...>)
+	std::variant<T, compile_error> attempt_to_promote(const lang::object& object, lang::traits::promotion_list<P, Ps...>)
 	{
 		if (std::holds_alternative<P>(object.value))
 			return type_constructor<T>::call(
@@ -39,7 +39,7 @@ namespace impl
 	}
 
 	template <typename T>
-	std::variant<T, error::error_variant> get_non_array_value_as(const lang::object& object)
+	std::variant<T, compile_error> get_non_array_value_as(const lang::object& object)
 	{
 		if (std::holds_alternative<T>(object.value))
 			return std::get<T>(object.value);
@@ -50,7 +50,7 @@ namespace impl
 }
 
 template <typename T, bool AllowPromotions = true>
-std::variant<T, error::error_variant> get_value_as(const lang::object& object)
+std::variant<T, compile_error> get_value_as(const lang::object& object)
 {
 	static_assert(lang::traits::is_lang_type_v<T>, "T should be one of FS language types");
 
@@ -73,7 +73,7 @@ std::variant<T, error::error_variant> get_value_as(const lang::object& object)
 		if (std::holds_alternative<T>(object.value))
 			return std::get<T>(object.value);
 		else
-			return error::type_mismatch{
+			return errors::type_mismatch{
 				lang::type_to_enum<T>(),
 				lang::type_of_object(object.value),
 				object.value_origin};

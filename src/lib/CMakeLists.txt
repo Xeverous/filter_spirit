@@ -13,7 +13,6 @@ add_library(filter_spirit SHARED
 	fs/compiler/print_error.cpp
 	fs/compiler/detail/actions.cpp
 	fs/compiler/detail/conditions.cpp
-	fs/compiler/detail/convertions.cpp
 	fs/compiler/detail/evaluate.cpp
 	fs/compiler/detail/filter_builder.cpp
 	fs/compiler/detail/queries.cpp

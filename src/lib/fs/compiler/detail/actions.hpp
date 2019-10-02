@@ -12,7 +12,8 @@ namespace fs::compiler::detail
 {
 
 [[nodiscard]]
-std::optional<error::error_variant> add_action(
+std::optional<compile_error>
+add_action(
 	const parser::ast::action& action,
 	const lang::constants_map& map,
 	const lang::item_price_data& item_price_data,

@@ -62,12 +62,12 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 			const std::vector<parser::ast::constant_definition>& defs,
 			const parser::lookup_data& lookup_data)
 		{
-			const std::variant<lang::constants_map, compiler::error::error_variant> map_or_error =
+			const std::variant<lang::constants_map, compiler::compile_error> map_or_error =
 				resolve_constants(defs);
 
-			if (std::holds_alternative<compiler::error::error_variant>(map_or_error))
+			if (std::holds_alternative<compiler::compile_error>(map_or_error))
 			{
-				const auto& error = std::get<compiler::error::error_variant>(map_or_error);
+				const auto& error = std::get<compiler::compile_error>(map_or_error);
 				log::buffered_logger logger;
 				compiler::print_error(error, lookup_data, logger);
 				const auto log = logger.flush_out();
@@ -83,13 +83,13 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 			const parser::lookup_data& lookup_data,
 			const lang::constants_map& map)
 		{
-			std::variant<std::vector<lang::filter_block>, compiler::error::error_variant> result =
+			std::variant<std::vector<lang::filter_block>, compiler::compile_error> result =
 				compiler::detail::filter_builder::build_filter(
 					top_level_statements, map, lang::item_price_data{});
 
-			if (std::holds_alternative<compiler::error::error_variant>(result))
+			if (std::holds_alternative<compiler::compile_error>(result))
 			{
-				const auto& error = std::get<compiler::error::error_variant>(result);
+				const auto& error = std::get<compiler::compile_error>(result);
 				log::buffered_logger logger;
 				compiler::print_error(error, lookup_data, logger);
 				const auto log = logger.flush_out();

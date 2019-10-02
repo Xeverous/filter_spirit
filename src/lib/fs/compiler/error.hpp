@@ -9,7 +9,7 @@
 
 // all possible compilation errors
 
-namespace fs::compiler::error
+namespace fs::compiler::errors
 {
 
 struct name_already_exists
@@ -141,31 +141,39 @@ struct internal_compiler_error_during_boolean_condition_evaluation
 	lang::position_tag place_of_boolean_condition;
 };
 
-using error_variant = std::variant<
-	name_already_exists,
-	no_such_name,
-	no_such_function,
-	no_such_query,
-	invalid_amount_of_arguments,
-	type_mismatch,
-	failed_constructor_call,
-	no_matching_constructor_found,
-	nested_arrays_not_allowed,
-	non_homogeneous_array,
-	index_out_of_range,
-	empty_socket_group,
-	illegal_characters_in_socket_group,
-	invalid_socket_group,
-	invalid_minimap_icon_size,
-	condition_redefinition,
-	lower_bound_redefinition,
-	upper_bound_redefinition,
-	internal_compiler_error_during_action_evaluation,
-	internal_compiler_error_during_range_evaluation,
-	internal_compiler_error_during_comparison_condition_evaluation,
-	internal_compiler_error_during_string_condition_evaluation,
-	internal_compiler_error_during_boolean_condition_evaluation
+}
+
+namespace fs::compiler
+{
+
+using compile_error = std::variant<
+	errors::name_already_exists,
+	errors::no_such_name,
+	errors::no_such_function,
+	errors::no_such_query,
+	errors::invalid_amount_of_arguments,
+	errors::type_mismatch,
+	errors::failed_constructor_call,
+	errors::no_matching_constructor_found,
+	errors::nested_arrays_not_allowed,
+	errors::non_homogeneous_array,
+	errors::index_out_of_range,
+	errors::empty_socket_group,
+	errors::illegal_characters_in_socket_group,
+	errors::invalid_socket_group,
+	errors::invalid_minimap_icon_size,
+	errors::condition_redefinition,
+	errors::lower_bound_redefinition,
+	errors::upper_bound_redefinition,
+	errors::internal_compiler_error_during_action_evaluation,
+	errors::internal_compiler_error_during_range_evaluation,
+	errors::internal_compiler_error_during_comparison_condition_evaluation,
+	errors::internal_compiler_error_during_string_condition_evaluation,
+	errors::internal_compiler_error_during_boolean_condition_evaluation
 >;
+
+namespace errors
+{
 
 struct failed_constructor_call
 {
@@ -173,23 +181,25 @@ struct failed_constructor_call
 	std::vector<lang::object_type> ctor_argument_types;
 	lang::position_tag place_of_function_call;
 	/*
-	 * we can not hold error_variant directly because this type is already
-	 * one of error_variant variants (infinite memory would be needed)
+	 * we can not hold compile_error directly because this type is already
+	 * one of compile_error variants (infinite memory would be needed)
 	 * so allocate on the heap instead
 	 *
-	 * also, we can not use a simpler version of error_variant that does not contain
+	 * also, we can not use a simpler version of compile_error that does not contain
 	 * complex error types because it is pretty much impossible to prove all invariants
 	 * of this in the program - there are simply too many intermediate functions which
 	 * thanks to recursion can not really prove they will be always a base case that
 	 * results in simpler error type
 	 */
-	std::unique_ptr<error_variant> error;
+	std::unique_ptr<compile_error> error;
 };
 
 struct unmatched_function_call
 {
 	std::vector<lang::object_type> expected_argument_types;
-	error_variant error;
+	compile_error error;
 };
 
-}
+} // namespace errors
+
+} // namespace fs::compiler

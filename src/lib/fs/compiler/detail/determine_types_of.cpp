@@ -16,7 +16,7 @@ std::vector<std::optional<lang::object_type>> determine_types_of(
 
 	for (const parser::ast::value_expression& expression : expressions)
 	{
-		std::variant<lang::object, error::error_variant> object_or_error =
+		std::variant<lang::object, compile_error> object_or_error =
 			evaluate_value_expression(expression, map, item_price_data);
 
 		if (std::holds_alternative<lang::object>(object_or_error))

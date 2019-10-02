@@ -9,7 +9,7 @@ namespace fs::compiler
 {
 
 void print_error(
-	const compiler::error::error_variant& error,
+	const compiler::compile_error& error,
 	const parser::lookup_data& lookup_data,
 	log::logger& logger);
 

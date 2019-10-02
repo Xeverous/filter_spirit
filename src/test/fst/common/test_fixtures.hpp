@@ -25,7 +25,7 @@ class compiler_fixture : public parser_fixture
 {
 protected:
 	static
-	std::variant<fs::lang::constants_map, fs::compiler::error::error_variant>
+	std::variant<fs::lang::constants_map, fs::compiler::compile_error>
 	resolve_constants(const std::vector<fs::parser::ast::constant_definition>& defs);
 };
 

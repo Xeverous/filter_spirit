@@ -10,8 +10,8 @@
 namespace fs::compiler::detail
 {
 
-[[nodiscard]]
-std::variant<lang::object, error::error_variant> evaluate_value_expression(
+[[nodiscard]] std::variant<lang::object, compile_error>
+evaluate_value_expression(
 	const parser::ast::value_expression& value_expression,
 	const lang::constants_map& map,
 	const lang::item_price_data& item_price_data);

@@ -12,7 +12,7 @@ namespace fs::compiler::detail
 namespace ast = parser::ast;
 namespace x3 = boost::spirit::x3;
 
-std::variant<std::vector<lang::filter_block>, error::error_variant> filter_builder::build_filter(
+std::variant<std::vector<lang::filter_block>, compile_error> filter_builder::build_filter(
 	const std::vector<parser::ast::statement>& top_level_statements,
 	const lang::constants_map& map,
 	const lang::item_price_data& item_price_data)
@@ -20,26 +20,26 @@ std::variant<std::vector<lang::filter_block>, error::error_variant> filter_build
 	return filter_builder(map, item_price_data).build_filter(top_level_statements);
 }
 
-std::variant<std::vector<lang::filter_block>, error::error_variant> filter_builder::build_filter(
+std::variant<std::vector<lang::filter_block>, compile_error> filter_builder::build_filter(
 	const std::vector<ast::statement>& top_level_statements) &&
 {
 	lang::condition_set conditions;
 	lang::action_set actions;
-	std::optional<error::error_variant> error = build_nested(top_level_statements, conditions, actions);
+	std::optional<compile_error> error = build_nested(top_level_statements, conditions, actions);
 	if (error)
 		return *std::move(error);
 
 	return blocks;
 }
 
-std::optional<error::error_variant> filter_builder::build_nested(
+std::optional<compile_error> filter_builder::build_nested(
 	const std::vector<ast::statement>& statements,
 	lang::condition_set parent_conditions,
 	lang::action_set parent_actions)
 {
 	for (const ast::statement& statement : statements)
 	{
-		auto error = statement.apply_visitor(x3::make_lambda_visitor<std::optional<error::error_variant>>(
+		auto error = statement.apply_visitor(x3::make_lambda_visitor<std::optional<compile_error>>(
 			[&, this](const ast::action& action)
 			{
 				return add_action(action, map, item_price_data, parent_actions);
@@ -53,7 +53,7 @@ std::optional<error::error_variant> filter_builder::build_nested(
 				// explicitly make a copy of parent conditions - the call stack will preserve
 				// old instance while nested blocks can add additional conditions that have limited lifetime
 				lang::condition_set nested_conditions(parent_conditions);
-				std::optional<error::error_variant> error = add_conditions(nested_block.conditions, map, item_price_data, nested_conditions);
+				std::optional<compile_error> error = add_conditions(nested_block.conditions, map, item_price_data, nested_conditions);
 				if (error)
 					return error;
 
@@ -75,7 +75,7 @@ void filter_builder::add_block(
 	blocks.push_back(lang::filter_block{show, std::move(conditions), std::move(actions)});
 }
 
-std::optional<error::error_variant> filter_builder::handle_visibility_statement(
+std::optional<compile_error> filter_builder::handle_visibility_statement(
 	const ast::visibility_statement& vs,
 	const lang::condition_set& parent_conditions,
 	const lang::action_set& parent_actions)

@@ -41,7 +41,7 @@ pr::parse_success_data parser_fixture::parse(std::string_view input)
 	return std::get<pr::parse_success_data>(std::move(parse_result));
 }
 
-std::variant<fs::lang::constants_map, fs::compiler::error::error_variant>
+std::variant<fs::lang::constants_map, fs::compiler::compile_error>
 compiler_fixture::resolve_constants(
 	const std::vector<pr::ast::constant_definition>& defs)
 {

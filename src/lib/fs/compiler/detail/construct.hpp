@@ -42,7 +42,7 @@ namespace impl
 	// base case: all arguments unpacked
 	// proceed to call constructor
 	template <typename T, typename... Args> [[nodiscard]]
-	std::variant<T, error::error_variant> unpack_args_and_call_constructor(
+	std::variant<T, compile_error> unpack_args_and_call_constructor(
 		const parser::ast::value_expression_list& arguments,
 		const lang::constants_map& /* map */,
 		const lang::item_price_data& /* item_price_data */,
@@ -64,7 +64,7 @@ namespace impl
 		typename... OtherConstructorArgTypes,
 		typename... Args
 	> [[nodiscard]]
-	std::variant<T, error::error_variant> unpack_args_and_call_constructor(
+	std::variant<T, compile_error> unpack_args_and_call_constructor(
 		const parser::ast::value_expression_list& arguments,
 		const lang::constants_map& map,
 		const lang::item_price_data& item_price_data,
@@ -72,11 +72,11 @@ namespace impl
 		Args&&... args)
 	{
 		constexpr auto index = sizeof...(Args);
-		std::variant<ConstructorArgType, error::error_variant> arg_or_error =
+		std::variant<ConstructorArgType, compile_error> arg_or_error =
 			evaluate_as<ConstructorArgType>(arguments[index], map, item_price_data);
 
-		if (std::holds_alternative<error::error_variant>(arg_or_error))
-			return std::get<error::error_variant>(std::move(arg_or_error));
+		if (std::holds_alternative<compile_error>(arg_or_error))
+			return std::get<compile_error>(std::move(arg_or_error));
 
 		return unpack_args_and_call_constructor<T>(
 			arguments,
@@ -89,9 +89,9 @@ namespace impl
 
 	// check if arguments amount matches
 	// if so, unpack arguments and call constructor
-	// if not, return error::invalid_amount_of_arguments
+	// if not, return errors::invalid_amount_of_arguments
 	template <typename T, typename... ConstructorArgTypes> [[nodiscard]]
-	std::variant<T, error::error_variant> construct_check_arguments_amount(
+	std::variant<T, compile_error> construct_check_arguments_amount(
 		const parser::ast::value_expression_list& arguments,
 		const lang::constants_map& map,
 		const lang::item_price_data& item_price_data,
@@ -101,7 +101,7 @@ namespace impl
 		const auto actual_arguments_count = arguments.size();
 		if (actual_arguments_count != expected_arguments_count)
 		{
-			return error::invalid_amount_of_arguments{
+			return errors::invalid_amount_of_arguments{
 				static_cast<int>(expected_arguments_count),
 				static_cast<int>(actual_arguments_count),
 				parser::get_position_info(arguments)};
@@ -127,7 +127,7 @@ namespace impl
 
 	// base case
 	void append_function_call_errors(
-		std::vector<error::unmatched_function_call>&,
+		std::vector<errors::unmatched_function_call>&,
 		lang::traits::constructor_list<>)
 	{
 	}
@@ -138,18 +138,18 @@ namespace impl
 		typename... OtherFailedConstructors,
 		typename... Errors>
 	void append_function_call_errors(
-		std::vector<error::unmatched_function_call>& v,
+		std::vector<errors::unmatched_function_call>& v,
 		lang::traits::constructor_list<FirstFailedConstructor, OtherFailedConstructors...>,
-		error::error_variant&& error,
+		compile_error&& error,
 		Errors&&... remaining_errors)
 	{
 		static_assert(
 			sizeof...(Errors) == sizeof...(OtherFailedConstructors),
 			"logic error in code: some error objects are lost or duplicated");
 
-		v.push_back(error::unmatched_function_call{
+		v.push_back(errors::unmatched_function_call{
 			argument_types_to_vector(typename FirstFailedConstructor::types{}),
-			std::forward<error::error_variant>(error)});
+			std::forward<compile_error>(error)});
 		append_function_call_errors(
 			v,
 			lang::traits::constructor_list<OtherFailedConstructors...>{},
@@ -157,10 +157,10 @@ namespace impl
 	}
 
 	// base case
-	// no more constructors available - return error::no_matching_constructor_found
+	// no more constructors available - return errors::no_matching_constructor_found
 	// that contains error information about each failed attempt
 	template <typename T, typename... FailedConstructors, typename... Errors> [[nodiscard]]
-	std::variant<T, error::error_variant> construct_attempt(
+	std::variant<T, compile_error> construct_attempt(
 		const parser::ast::function_call& function_call,
 		const lang::constants_map& map,
 		const lang::item_price_data& item_price_data,
@@ -178,24 +178,24 @@ namespace impl
 		if constexpr (sizeof...(FailedConstructors) == 1)
 		{
 			static_assert(sizeof...(Errors) == 1, "logic flaw: see comment above");
-			// return error::error_variant(std::forward<Errors>(errors_so_far)...);
-			return error::failed_constructor_call{
+			// return compile_error(std::forward<Errors>(errors_so_far)...);
+			return errors::failed_constructor_call{
 				lang::type_to_enum<T>(),
 				// we have to expand parameter packs with ... but we assert that their size is 1
 				argument_types_to_vector(typename FailedConstructors::types{}...),
 				parser::get_position_info(function_call),
-				std::make_unique<error::error_variant>(std::forward<Errors>(errors_so_far)...)};
+				std::make_unique<compile_error>(std::forward<Errors>(errors_so_far)...)};
 		}
 		else
 		{
-			std::vector<error::unmatched_function_call> errors;
+			std::vector<errors::unmatched_function_call> errors;
 			errors.reserve(sizeof...(Errors));
 			append_function_call_errors(
 				errors,
 				lang::traits::constructor_list<FailedConstructors...>{},
 				std::forward<Errors>(errors_so_far)...);
 
-			return error::no_matching_constructor_found{
+			return errors::no_matching_constructor_found{
 				lang::type_to_enum<T>(),
 				determine_types_of(function_call.arguments, map, item_price_data),
 				parser::get_position_info(function_call),
@@ -210,9 +210,9 @@ namespace impl
 		typename ConstructorArgumentList,
 		typename... OtherConstructorArgumentLists,
 		typename... FailedConstructors,
-		typename... Errors // = error::error_variant; we template it only for perfect forwarding and wait for homogenous packs feature
+		typename... Errors // = compile_error; we template it only for perfect forwarding and wait for homogenous packs feature
 	> [[nodiscard]]
-	std::variant<T, error::error_variant> construct_attempt(
+	std::variant<T, compile_error> construct_attempt(
 		const parser::ast::function_call& function_call,
 		const lang::constants_map& map,
 		const lang::item_price_data& item_price_data,
@@ -220,10 +220,10 @@ namespace impl
 		lang::traits::constructor_list<FailedConstructors...> /* failed_constructors */,
 		Errors&&... errors_so_far)
 	{
-		std::variant<T, error::error_variant> result = construct_check_arguments_amount<T>(
+		std::variant<T, compile_error> result = construct_check_arguments_amount<T>(
 			function_call.arguments, map, item_price_data, ConstructorArgumentList{});
 
-		if (std::holds_alternative<error::error_variant>(result))
+		if (std::holds_alternative<compile_error>(result))
 		{
 			return construct_attempt<T>(
 				function_call,
@@ -232,7 +232,7 @@ namespace impl
 				lang::traits::constructor_list<OtherConstructorArgumentLists...>{},
 				lang::traits::constructor_list<FailedConstructors..., ConstructorArgumentList>{},
 				std::forward<Errors>(errors_so_far)...,
-				std::get<error::error_variant>(std::move(result)));
+				std::get<compile_error>(std::move(result)));
 		}
 
 		return std::get<T>(std::move(result));
@@ -241,7 +241,7 @@ namespace impl
 } // namespace impl
 
 template <typename T> [[nodiscard]]
-std::variant<T, error::error_variant> construct(
+std::variant<T, compile_error> construct(
 	const parser::ast::function_call& function_call,
 	const lang::constants_map& map,
 	const lang::item_price_data& item_price_data)

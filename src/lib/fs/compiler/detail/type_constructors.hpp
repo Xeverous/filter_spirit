@@ -15,7 +15,7 @@ template <typename T>
 struct type_constructor
 {
 	template <std::size_t N, typename... Args> [[nodiscard]] static
-	std::variant<T, error::error_variant> call(
+	std::variant<T, compile_error> call(
 		lang::position_tag /* origin */,
 		std::array<lang::position_tag, N> /* argument_origins */,
 		Args&&... args)
@@ -30,13 +30,13 @@ template <>
 struct type_constructor<lang::socket_group>
 {
 	[[nodiscard]] static
-	std::variant<lang::socket_group, error::error_variant> call(
+	std::variant<lang::socket_group, compile_error> call(
 		lang::position_tag origin,
 		std::array<lang::position_tag, 1> argument_origins,
 		const lang::string& string)
 	{
 		if (string.value.empty())
-			return error::empty_socket_group{argument_origins[0]};
+			return errors::empty_socket_group{argument_origins[0]};
 
 		lang::socket_group sg;
 		for (char c : string.value)
@@ -50,12 +50,12 @@ struct type_constructor<lang::socket_group>
 			else if (c == 'W')
 				++sg.w;
 			else
-				return error::illegal_characters_in_socket_group{
+				return errors::illegal_characters_in_socket_group{
 					parser::get_position_info(argument_origins[0])};
 		}
 
 		if (!sg.is_valid())
-			return error::invalid_socket_group{origin};
+			return errors::invalid_socket_group{origin};
 
 		return sg;
 	}
@@ -65,7 +65,7 @@ template <>
 struct type_constructor<lang::minimap_icon>
 {
 	[[nodiscard]] static
-	std::variant<lang::minimap_icon, error::error_variant> call(
+	std::variant<lang::minimap_icon, compile_error> call(
 		lang::position_tag /* origin */,
 		std::array<lang::position_tag, 3> argument_origins,
 		lang::integer size,
@@ -73,7 +73,7 @@ struct type_constructor<lang::minimap_icon>
 		lang::shape shape)
 	{
 		if (size.value != 0 && size.value != 1 && size.value != 2)
-			return error::invalid_minimap_icon_size{size.value, argument_origins[0]};
+			return errors::invalid_minimap_icon_size{size.value, argument_origins[0]};
 
 		return lang::minimap_icon{size, suit, shape};
 	}

@@ -59,7 +59,7 @@ struct error_on_error
 	x3::error_handler_result on_error(
 		Iterator& first,
 		const Iterator& /* last */,
-		const Exception& ex,
+		const Exception& ex, // x3::expectation_failure<Iterator> or similar type
 		const Context& context)
 	{
 		error_holder_type& error_holder = x3::get<error_holder_tag>(context).get();

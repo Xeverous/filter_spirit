@@ -14,15 +14,15 @@
 
 namespace x3 = boost::spirit::x3;
 
-namespace ast = fs::parser::ast;
-namespace error = fs::compiler::error;
 using namespace fs;
+using namespace fs::compiler;
+namespace ast = fs::parser::ast;
 
 namespace
 {
 
-[[nodiscard]]
-lang::object evaluate_literal(
+[[nodiscard]] lang::object
+evaluate_literal(
 	const ast::literal_expression& expression)
 {
 	using result_type = lang::object_variant;
@@ -51,13 +51,11 @@ lang::object evaluate_literal(
 		}
 	));
 
-	return lang::object{
-		std::move(object),
-		parser::get_position_info(expression)};
+	return lang::object{std::move(object), parser::get_position_info(expression)};
 }
 
-[[nodiscard]]
-std::optional<error::non_homogeneous_array> verify_array_homogeneity(
+[[nodiscard]] std::optional<errors::non_homogeneous_array>
+verify_array_homogeneity(
 	const lang::array_object& array)
 {
 	if (array.empty())
@@ -70,7 +68,7 @@ std::optional<error::non_homogeneous_array> verify_array_homogeneity(
 		const lang::object_type tested_type = lang::type_of_object(element.value);
 		if (tested_type != first_type) // C++20: [[unlikely]]
 		{
-			return error::non_homogeneous_array{
+			return errors::non_homogeneous_array{
 				first_object.value_origin,
 				element.value_origin,
 				first_type,
@@ -81,8 +79,8 @@ std::optional<error::non_homogeneous_array> verify_array_homogeneity(
 	return std::nullopt;
 }
 
-[[nodiscard]]
-std::variant<lang::object, error::error_variant> evaluate_array(
+[[nodiscard]] std::variant<lang::object, compile_error>
+evaluate_array(
 	const ast::array_expression& expression,
 	const lang::constants_map& map,
 	const lang::item_price_data& item_price_data)
@@ -91,20 +89,20 @@ std::variant<lang::object, error::error_variant> evaluate_array(
 	lang::array_object array;
 	for (const ast::value_expression& value_expression : expression.elements)
 	{
-		std::variant<lang::object, error::error_variant> object_or_error =
+		std::variant<lang::object, compile_error> object_or_error =
 			compiler::detail::evaluate_value_expression(value_expression, map, item_price_data);
-		if (std::holds_alternative<error::error_variant>(object_or_error))
-			return std::get<error::error_variant>(std::move(object_or_error));
+		if (std::holds_alternative<compile_error>(object_or_error))
+			return std::get<compile_error>(std::move(object_or_error));
 
 		auto& object = std::get<lang::object>(object_or_error);
 
 		if (object.is_array())
-			return error::nested_arrays_not_allowed{parser::get_position_info(value_expression)};
+			return errors::nested_arrays_not_allowed{parser::get_position_info(value_expression)};
 
 		array.push_back(std::move(object));
 	}
 
-	std::optional<error::non_homogeneous_array> homogenity_error = verify_array_homogeneity(array);
+	std::optional<errors::non_homogeneous_array> homogenity_error = verify_array_homogeneity(array);
 	if (homogenity_error)
 		return *homogenity_error;
 
@@ -127,8 +125,8 @@ std::variant<lang::object, error::error_variant> evaluate_array(
  * array[-4] => 0
  * array[-5] => error (empty result)
  */
-[[nodiscard]]
-std::optional<int> subscript_index_to_array_index(int n, int array_size)
+[[nodiscard]] std::optional<int>
+subscript_index_to_array_index(int n, int array_size)
 {
 	assert(array_size >= 0);
 
@@ -148,20 +146,20 @@ std::optional<int> subscript_index_to_array_index(int n, int array_size)
 	}
 }
 
-[[nodiscard]]
-std::variant<lang::object, error::error_variant> evaluate_subscript(
+[[nodiscard]] std::variant<lang::object, compile_error>
+evaluate_subscript(
 	const lang::object& obj,
 	const ast::subscript& subscript,
 	const lang::constants_map& map,
 	const lang::item_price_data& item_price_data)
 {
-	std::variant<lang::array_object, error::error_variant> array_or_error = fs::compiler::detail::get_value_as<lang::array_object, false>(obj);
-	if (std::holds_alternative<error::error_variant>(array_or_error))
-		return std::get<error::error_variant>(std::move(array_or_error));
+	std::variant<lang::array_object, compile_error> array_or_error = fs::compiler::detail::get_value_as<lang::array_object, false>(obj);
+	if (std::holds_alternative<compile_error>(array_or_error))
+		return std::get<compile_error>(std::move(array_or_error));
 
-	std::variant<lang::integer, error::error_variant> subscript_or_error = fs::compiler::detail::evaluate_as<lang::integer, false>(subscript.expr, map, item_price_data);
-	if (std::holds_alternative<error::error_variant>(subscript_or_error))
-		return std::get<error::error_variant>(std::move(subscript_or_error));
+	std::variant<lang::integer, compile_error> subscript_or_error = fs::compiler::detail::evaluate_as<lang::integer, false>(subscript.expr, map, item_price_data);
+	if (std::holds_alternative<compile_error>(subscript_or_error))
+		return std::get<compile_error>(std::move(subscript_or_error));
 
 	auto& array = std::get<lang::array_object>(array_or_error);
 	auto& subscript_index = std::get<lang::integer>(subscript_or_error);
@@ -170,14 +168,14 @@ std::variant<lang::object, error::error_variant> evaluate_subscript(
 	std::optional<int> index = subscript_index_to_array_index(subscript_index.value, array_size);
 	if (!index)
 	{
-		return error::index_out_of_range{parser::get_position_info(subscript), subscript_index.value, array_size};
+		return errors::index_out_of_range{parser::get_position_info(subscript), subscript_index.value, array_size};
 	}
 
 	return lang::object{std::move(array[*index].value), parser::get_position_info(subscript)};
 }
 
-[[nodiscard]]
-std::variant<lang::object, error::error_variant> evaluate_function_call(
+[[nodiscard]] std::variant<lang::object, compile_error>
+evaluate_function_call(
 	const ast::function_call& function_call,
 	const lang::constants_map& map,
 	const lang::item_price_data& item_price_data)
@@ -199,9 +197,9 @@ std::variant<lang::object, error::error_variant> evaluate_function_call(
 	using compiler::detail::construct;
 	if (function_name.value == lang::functions::rgb)
 	{
-		std::variant<lang::color, error::error_variant> color_or_error = construct<lang::color>(function_call, map, item_price_data);
-		if (std::holds_alternative<error::error_variant>(color_or_error))
-			return std::get<error::error_variant>(std::move(color_or_error));
+		std::variant<lang::color, compile_error> color_or_error = construct<lang::color>(function_call, map, item_price_data);
+		if (std::holds_alternative<compile_error>(color_or_error))
+			return std::get<compile_error>(std::move(color_or_error));
 
 		return lang::object{
 			std::get<lang::color>(color_or_error),
@@ -209,9 +207,9 @@ std::variant<lang::object, error::error_variant> evaluate_function_call(
 	}
 	else if (function_name.value == lang::functions::level)
 	{
-		std::variant<lang::level, error::error_variant> level_or_error = construct<lang::level>(function_call, map, item_price_data);
-		if (std::holds_alternative<error::error_variant>(level_or_error))
-			return std::get<error::error_variant>(std::move(level_or_error));
+		std::variant<lang::level, compile_error> level_or_error = construct<lang::level>(function_call, map, item_price_data);
+		if (std::holds_alternative<compile_error>(level_or_error))
+			return std::get<compile_error>(std::move(level_or_error));
 
 		return lang::object{
 			std::get<lang::level>(level_or_error),
@@ -219,9 +217,9 @@ std::variant<lang::object, error::error_variant> evaluate_function_call(
 	}
 	else if (function_name.value == lang::functions::font_size)
 	{
-		std::variant<lang::font_size, error::error_variant> font_size_or_error = construct<lang::font_size>(function_call, map, item_price_data);
-		if (std::holds_alternative<error::error_variant>(font_size_or_error))
-			return std::get<error::error_variant>(std::move(font_size_or_error));
+		std::variant<lang::font_size, compile_error> font_size_or_error = construct<lang::font_size>(function_call, map, item_price_data);
+		if (std::holds_alternative<compile_error>(font_size_or_error))
+			return std::get<compile_error>(std::move(font_size_or_error));
 
 		return lang::object{
 			std::get<lang::font_size>(font_size_or_error),
@@ -229,9 +227,9 @@ std::variant<lang::object, error::error_variant> evaluate_function_call(
 	}
 	else if (function_name.value == lang::functions::sound_id)
 	{
-		std::variant<lang::sound_id, error::error_variant> sound_id_or_error = construct<lang::sound_id>(function_call, map, item_price_data);
-		if (std::holds_alternative<error::error_variant>(sound_id_or_error))
-			return std::get<error::error_variant>(std::move(sound_id_or_error));
+		std::variant<lang::sound_id, compile_error> sound_id_or_error = construct<lang::sound_id>(function_call, map, item_price_data);
+		if (std::holds_alternative<compile_error>(sound_id_or_error))
+			return std::get<compile_error>(std::move(sound_id_or_error));
 
 		return lang::object{
 			std::get<lang::sound_id>(sound_id_or_error),
@@ -239,9 +237,9 @@ std::variant<lang::object, error::error_variant> evaluate_function_call(
 	}
 	else if (function_name.value == lang::functions::volume)
 	{
-		std::variant<lang::volume, error::error_variant> volume_or_error = construct<lang::volume>(function_call, map, item_price_data);
-		if (std::holds_alternative<error::error_variant>(volume_or_error))
-			return std::get<error::error_variant>(std::move(volume_or_error));
+		std::variant<lang::volume, compile_error> volume_or_error = construct<lang::volume>(function_call, map, item_price_data);
+		if (std::holds_alternative<compile_error>(volume_or_error))
+			return std::get<compile_error>(std::move(volume_or_error));
 
 		return lang::object{
 			std::get<lang::volume>(volume_or_error),
@@ -249,9 +247,9 @@ std::variant<lang::object, error::error_variant> evaluate_function_call(
 	}
 	else if (function_name.value == lang::functions::group)
 	{
-		std::variant<lang::socket_group, error::error_variant> socket_group_or_error = construct<lang::socket_group>(function_call, map, item_price_data);
-		if (std::holds_alternative<error::error_variant>(socket_group_or_error))
-			return std::get<error::error_variant>(std::move(socket_group_or_error));
+		std::variant<lang::socket_group, compile_error> socket_group_or_error = construct<lang::socket_group>(function_call, map, item_price_data);
+		if (std::holds_alternative<compile_error>(socket_group_or_error))
+			return std::get<compile_error>(std::move(socket_group_or_error));
 
 		return lang::object{
 			std::get<lang::socket_group>(socket_group_or_error),
@@ -259,9 +257,9 @@ std::variant<lang::object, error::error_variant> evaluate_function_call(
 	}
 	else if (function_name.value == lang::functions::minimap_icon)
 	{
-		std::variant<lang::minimap_icon, error::error_variant> icon_or_error = construct<lang::minimap_icon>(function_call, map, item_price_data);
-		if (std::holds_alternative<error::error_variant>(icon_or_error))
-			return std::get<error::error_variant>(std::move(icon_or_error));
+		std::variant<lang::minimap_icon, compile_error> icon_or_error = construct<lang::minimap_icon>(function_call, map, item_price_data);
+		if (std::holds_alternative<compile_error>(icon_or_error))
+			return std::get<compile_error>(std::move(icon_or_error));
 
 		return lang::object{
 			std::get<lang::minimap_icon>(icon_or_error),
@@ -269,9 +267,9 @@ std::variant<lang::object, error::error_variant> evaluate_function_call(
 	}
 	else if (function_name.value == lang::functions::beam_effect)
 	{
-		std::variant<lang::beam_effect, error::error_variant> beam_effect_or_error = construct<lang::beam_effect>(function_call, map, item_price_data);
-		if (std::holds_alternative<error::error_variant>(beam_effect_or_error))
-			return std::get<error::error_variant>(std::move(beam_effect_or_error));
+		std::variant<lang::beam_effect, compile_error> beam_effect_or_error = construct<lang::beam_effect>(function_call, map, item_price_data);
+		if (std::holds_alternative<compile_error>(beam_effect_or_error))
+			return std::get<compile_error>(std::move(beam_effect_or_error));
 
 		return lang::object{
 			std::get<lang::beam_effect>(beam_effect_or_error),
@@ -279,9 +277,9 @@ std::variant<lang::object, error::error_variant> evaluate_function_call(
 	}
 	else if (function_name.value == lang::functions::path)
 	{
-		std::variant<lang::path, error::error_variant> path_or_error = construct<lang::path>(function_call, map, item_price_data);
-		if (std::holds_alternative<error::error_variant>(path_or_error))
-			return std::get<error::error_variant>(std::move(path_or_error));
+		std::variant<lang::path, compile_error> path_or_error = construct<lang::path>(function_call, map, item_price_data);
+		if (std::holds_alternative<compile_error>(path_or_error))
+			return std::get<compile_error>(std::move(path_or_error));
 
 		return lang::object{
 			std::get<lang::path>(path_or_error),
@@ -289,28 +287,28 @@ std::variant<lang::object, error::error_variant> evaluate_function_call(
 	}
 	else if (function_name.value == lang::functions::alert_sound)
 	{
-		std::variant<lang::alert_sound, error::error_variant> alert_sound_or_error = construct<lang::alert_sound>(function_call, map, item_price_data);
-		if (std::holds_alternative<error::error_variant>(alert_sound_or_error))
-			return std::get<error::error_variant>(std::move(alert_sound_or_error));
+		std::variant<lang::alert_sound, compile_error> alert_sound_or_error = construct<lang::alert_sound>(function_call, map, item_price_data);
+		if (std::holds_alternative<compile_error>(alert_sound_or_error))
+			return std::get<compile_error>(std::move(alert_sound_or_error));
 
 		return lang::object{
 			std::get<lang::alert_sound>(alert_sound_or_error),
 			parser::get_position_info(function_call)};
 	}
 
-	return error::no_such_function{parser::get_position_info(function_name)};
+	return errors::no_such_function{parser::get_position_info(function_name)};
 }
 
-[[nodiscard]]
-std::variant<lang::object, error::error_variant> evaluate_price_range_query(
+[[nodiscard]] std::variant<lang::object, compile_error>
+evaluate_price_range_query(
 	const ast::price_range_query& price_range_query,
 	const lang::constants_map& map,
 	const lang::item_price_data& item_price_data)
 {
-	std::variant<lang::price_range, error::error_variant> range_or_error =
+	std::variant<lang::price_range, compile_error> range_or_error =
 		compiler::detail::construct_price_range(price_range_query.arguments, map, item_price_data);
-	if (std::holds_alternative<error::error_variant>(range_or_error))
-		return std::get<error::error_variant>(std::move(range_or_error));
+	if (std::holds_alternative<compile_error>(range_or_error))
+		return std::get<compile_error>(std::move(range_or_error));
 
 	const auto& price_range = std::get<lang::price_range>(range_or_error);
 	const lang::position_tag position_of_query = parser::get_position_info(price_range_query);
@@ -420,11 +418,11 @@ std::variant<lang::object, error::error_variant> evaluate_price_range_query(
 		return eval_query(item_price_data.unambiguous_unique_maps);
 	}
 
-	return error::no_such_query{parser::get_position_info(query_name)};
+	return errors::no_such_query{parser::get_position_info(query_name)};
 }
 
-[[nodiscard]]
-std::variant<lang::object, error::error_variant> evaluate_identifier(
+[[nodiscard]] std::variant<lang::object, compile_error>
+evaluate_identifier(
 	const ast::identifier& identifier,
 	const lang::constants_map& map)
 {
@@ -432,18 +430,18 @@ std::variant<lang::object, error::error_variant> evaluate_identifier(
 
 	const auto it = map.find(identifier.value); // C++17: use if (expr; cond)
 	if (it == map.end())
-		return error::no_such_name{place_of_name};
+		return errors::no_such_name{place_of_name};
 
 	return lang::object{it->second.object_instance.value, place_of_name};
 }
 
-[[nodiscard]]
-std::variant<lang::object, error::error_variant> evaluate_primary_expression(
+[[nodiscard]] std::variant<lang::object, compile_error>
+evaluate_primary_expression(
 	const ast::primary_expression& primary_expression,
 	const lang::constants_map& map,
 	const lang::item_price_data& item_price_data)
 {
-	using result_type = std::variant<lang::object, error::error_variant>;
+	using result_type = std::variant<lang::object, compile_error>;
 
 	return primary_expression.apply_visitor(x3::make_lambda_visitor<result_type>(
 		[](const ast::literal_expression& literal) -> result_type {
@@ -469,23 +467,24 @@ std::variant<lang::object, error::error_variant> evaluate_primary_expression(
 namespace fs::compiler::detail
 {
 
-std::variant<lang::object, error::error_variant> evaluate_value_expression(
+std::variant<lang::object, compile_error>
+evaluate_value_expression(
 	const ast::value_expression& value_expression,
 	const lang::constants_map& map,
 	const lang::item_price_data& item_price_data)
 {
-	using result_type = std::variant<lang::object, error::error_variant>;
+	using result_type = std::variant<lang::object, compile_error>;
 
 	result_type result = evaluate_primary_expression(value_expression.primary_expr, map, item_price_data);
-	if (std::holds_alternative<error::error_variant>(result))
-		return std::get<error::error_variant>(std::move(result));
+	if (std::holds_alternative<compile_error>(result))
+		return std::get<compile_error>(std::move(result));
 
 	auto& obj = std::get<lang::object>(result);
 	for (auto& expr : value_expression.postfix_exprs)
 	{
 		result_type res = evaluate_subscript(obj, expr.expr, map, item_price_data);
-		if (std::holds_alternative<error::error_variant>(res))
-			return std::get<error::error_variant>(std::move(res));
+		if (std::holds_alternative<compile_error>(res))
+			return std::get<compile_error>(std::move(res));
 		else
 			obj = std::get<lang::object>(std::move(res));
 	}

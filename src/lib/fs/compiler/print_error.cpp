@@ -10,15 +10,16 @@ namespace
 {
 
 using namespace fs;
+using namespace fs::compiler;
 
 // recursion point for errors that contain other errors
 void print_error_variant(
-	const compiler::error::error_variant& error,
+	const compile_error& error,
 	const parser::lookup_data& lookup_data,
 	log::logger& logger);
 
 void print_error_impl(
-	compiler::error::name_already_exists error,
+	errors::name_already_exists error,
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
@@ -35,7 +36,7 @@ void print_error_impl(
 }
 
 void print_error_impl(
-	compiler::error::no_such_name error,
+	errors::no_such_name error,
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
@@ -47,7 +48,7 @@ void print_error_impl(
 }
 
 void print_error_impl(
-	compiler::error::no_such_function error,
+	errors::no_such_function error,
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
@@ -59,7 +60,7 @@ void print_error_impl(
 }
 
 void print_error_impl(
-	compiler::error::no_such_query error,
+	errors::no_such_query error,
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
@@ -71,7 +72,7 @@ void print_error_impl(
 }
 
 void print_error_impl(
-	compiler::error::invalid_amount_of_arguments error,
+	errors::invalid_amount_of_arguments error,
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
@@ -86,7 +87,7 @@ void print_error_impl(
 }
 
 void print_error_impl(
-	compiler::error::type_mismatch error,
+	errors::type_mismatch error,
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
@@ -103,7 +104,7 @@ void print_error_impl(
 
 void print_unmatched_function_call(
 	std::string_view function_name,
-	const compiler::error::unmatched_function_call& error,
+	const errors::unmatched_function_call& error,
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
@@ -119,7 +120,7 @@ void print_unmatched_function_call(
 }
 
 void print_error_impl(
-	const compiler::error::failed_constructor_call& error,
+	const errors::failed_constructor_call& error,
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
@@ -143,7 +144,7 @@ void print_error_impl(
 }
 
 void print_error_impl(
-	const compiler::error::no_matching_constructor_found& error,
+	const errors::no_matching_constructor_found& error,
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
@@ -169,12 +170,12 @@ void print_error_impl(
 
 	logger.print_underlined_code(all_code, code_to_underline);
 
-	for (const compiler::error::unmatched_function_call& inner_error : error.errors)
+	for (const errors::unmatched_function_call& inner_error : error.errors)
 		print_unmatched_function_call(attempted_type_name, inner_error, lookup_data, logger);
 }
 
 void print_error_impl(
-	compiler::error::nested_arrays_not_allowed error,
+	errors::nested_arrays_not_allowed error,
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
@@ -186,7 +187,7 @@ void print_error_impl(
 }
 
 void print_error_impl(
-	compiler::error::non_homogeneous_array error,
+	errors::non_homogeneous_array error,
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
@@ -207,7 +208,7 @@ void print_error_impl(
 }
 
 void print_error_impl(
-	compiler::error::index_out_of_range error,
+	errors::index_out_of_range error,
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
@@ -222,7 +223,7 @@ void print_error_impl(
 }
 
 void print_error_impl(
-	compiler::error::empty_socket_group error,
+	errors::empty_socket_group error,
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
@@ -234,7 +235,7 @@ void print_error_impl(
 }
 
 void print_error_impl(
-	compiler::error::illegal_characters_in_socket_group error,
+	errors::illegal_characters_in_socket_group error,
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
@@ -246,7 +247,7 @@ void print_error_impl(
 }
 
 void print_error_impl(
-	compiler::error::invalid_socket_group error,
+	errors::invalid_socket_group error,
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
@@ -258,7 +259,7 @@ void print_error_impl(
 }
 
 void print_error_impl(
-	compiler::error::invalid_minimap_icon_size error,
+	errors::invalid_minimap_icon_size error,
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
@@ -271,7 +272,7 @@ void print_error_impl(
 }
 
 void print_error_impl(
-	compiler::error::condition_redefinition error,
+	errors::condition_redefinition error,
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
@@ -288,7 +289,7 @@ void print_error_impl(
 }
 
 void print_error_impl(
-	compiler::error::lower_bound_redefinition error,
+	errors::lower_bound_redefinition error,
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
@@ -305,7 +306,7 @@ void print_error_impl(
 }
 
 void print_error_impl(
-	compiler::error::upper_bound_redefinition error,
+	errors::upper_bound_redefinition error,
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
@@ -322,7 +323,7 @@ void print_error_impl(
 }
 
 void print_error_impl(
-	compiler::error::internal_compiler_error_during_action_evaluation error,
+	errors::internal_compiler_error_during_action_evaluation error,
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
@@ -335,7 +336,7 @@ void print_error_impl(
 }
 
 void print_error_impl(
-	compiler::error::internal_compiler_error_during_range_evaluation error,
+	errors::internal_compiler_error_during_range_evaluation error,
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
@@ -348,7 +349,7 @@ void print_error_impl(
 }
 
 void print_error_impl(
-	compiler::error::internal_compiler_error_during_comparison_condition_evaluation error,
+	errors::internal_compiler_error_during_comparison_condition_evaluation error,
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
@@ -361,7 +362,7 @@ void print_error_impl(
 }
 
 void print_error_impl(
-	compiler::error::internal_compiler_error_during_string_condition_evaluation error,
+	errors::internal_compiler_error_during_string_condition_evaluation error,
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
@@ -374,7 +375,7 @@ void print_error_impl(
 }
 
 void print_error_impl(
-	compiler::error::internal_compiler_error_during_boolean_condition_evaluation error,
+	errors::internal_compiler_error_during_boolean_condition_evaluation error,
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
@@ -387,7 +388,7 @@ void print_error_impl(
 }
 
 void print_error_variant(
-	const compiler::error::error_variant& error,
+	const compile_error& error,
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
@@ -402,7 +403,7 @@ namespace fs::compiler
 {
 
 void print_error(
-	const error::error_variant& error,
+	const compile_error& error,
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {

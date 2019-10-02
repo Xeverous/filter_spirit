@@ -52,21 +52,21 @@ std::optional<std::string> generate_filter_without_preamble(
 
 	logger.info() << "compiling filter template";
 
-	std::variant<lang::constants_map, compiler::error::error_variant> map_or_error =
+	std::variant<lang::constants_map, compiler::compile_error> map_or_error =
 		compiler::resolve_constants(parse_data.ast.constant_definitions, item_price_data);
-	if (std::holds_alternative<compiler::error::error_variant>(map_or_error))
+	if (std::holds_alternative<compiler::compile_error>(map_or_error))
 	{
-		compiler::print_error(std::get<compiler::error::error_variant>(map_or_error), parse_data.lookup_data, logger);
+		compiler::print_error(std::get<compiler::compile_error>(map_or_error), parse_data.lookup_data, logger);
 		return std::nullopt;
 	}
 
 	const auto& map = std::get<lang::constants_map>(map_or_error);
-	const std::variant<std::vector<lang::filter_block>, compiler::error::error_variant> filter_or_error =
+	const std::variant<std::vector<lang::filter_block>, compiler::compile_error> filter_or_error =
 		compiler::compile_statements(parse_data.ast.statements, map, item_price_data);
 
-	if (std::holds_alternative<compiler::error::error_variant>(filter_or_error))
+	if (std::holds_alternative<compiler::compile_error>(filter_or_error))
 	{
-		compiler::print_error(std::get<compiler::error::error_variant>(filter_or_error), parse_data.lookup_data, logger);
+		compiler::print_error(std::get<compiler::compile_error>(filter_or_error), parse_data.lookup_data, logger);
 		return std::nullopt;
 	}
 
