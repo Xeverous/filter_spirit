@@ -38,21 +38,26 @@ BETTER_ENUM(frame_type, int,
 namespace categories // avoids name conflicts with types in lang namespace
 {
 
-	BETTER_ENUM(accessory_type, int, amulet, belt, ring, unknown)
+	BETTER_ENUM(accessory_type, int, amulet, belt, ring, unknown = -1)
 	struct accessory { accessory_type type; };
 
-	BETTER_ENUM(armour_type, int, boots, chest, gloves, helmet, quiver, shield, unknown)
+	BETTER_ENUM(armour_type, int, boots, chest, gloves, helmet, quiver, shield, unknown = -1)
 	struct armour { armour_type type; };
 
 	struct divination_card {};
 
-	BETTER_ENUM(currency_type, int, currency, essence, piece, fossil, resonator, vial, net, unknown)
+	BETTER_ENUM(currency_type, int, currency, essence, piece, fossil, resonator, vial, net, incubator, splinter, oil, unknown = -1)
 	struct currency { currency_type type; };
 
-	struct enchantment {}; // we do not care about lab enchants, Path of Exile filters don't support filtering them
+	BETTER_ENUM(enchantment_type, int, boots, gloves, helmet, unknown = -1)
+	struct enchantment
+	{
+		enchantment_type type;
+	};
+
 	struct flask {};
 
-	BETTER_ENUM(gem_type, int, skill, support, vaal, unknown)
+	BETTER_ENUM(gem_type, int, skill, support, vaal, unknown = -1)
 	struct gem
 	{
 		gem_type type;
@@ -63,7 +68,7 @@ namespace categories // avoids name conflicts with types in lang namespace
 
 	struct jewel {};
 
-	BETTER_ENUM(map_type, int, map, fragment, unique, scarab, leaguestone, unknown)
+	BETTER_ENUM(map_type, int, map, fragment, unique, scarab, unknown = -1)
 	struct map
 	{
 		map_type type;
@@ -73,10 +78,10 @@ namespace categories // avoids name conflicts with types in lang namespace
 
 	struct prophecy {};
 
-	BETTER_ENUM(weapon_type, int, bow, claw, dagger, oneaxe, onemace, onesword, rod, sceptre, staff, twoaxe, twomace, twosword, wand, unknown)
+	BETTER_ENUM(weapon_type, int, bow, claw, dagger, oneaxe, onemace, onesword, rod, sceptre, staff, twoaxe, twomace, twosword, wand, runedagger, warstaff, unknown = -1)
 	struct weapon { weapon_type type; };
 
-	BETTER_ENUM(base_type, int, ring, belt, amulet, helmet, chest, gloves, boots, onemace, sceptre, bow, wand, onesword, claw, shield, dagger, twosword, staff, oneaxe, quiver, twoaxe, twomace, jewel, unknown)
+	BETTER_ENUM(base_type, int, amulet, belt, ring, boots, chest, gloves, helmet, quiver, shield, jewel, bow, claw, dagger, oneaxe, onemace, onesword, rod, sceptre, staff, twoaxe, twomace, twosword, wand, unknown = -1)
 	struct base
 	{
 		enum class influence_type { none, shaper, elder };
@@ -85,6 +90,8 @@ namespace categories // avoids name conflicts with types in lang namespace
 		influence_type influence;
 		int ilvl;
 	};
+
+	struct beast {};
 } // namespace categories
 
 using item_category_variant = std::variant<
@@ -99,7 +106,8 @@ using item_category_variant = std::variant<
 	categories::map,
 	categories::prophecy,
 	categories::weapon,
-	categories::base>;
+	categories::base,
+	categories::beast>;
 
 struct item
 {
@@ -173,7 +181,8 @@ void item::log_info(log::logger& logger) const
 					base.influence == categories::base::influence_type::shaper ? "shaper" :
 					base.influence == categories::base::influence_type::elder  ? "elder"  : "none") <<
 				"\titem level: " << base.ilvl << "\n";
-		}
+		},
+		[&](categories::beast)           { logger << "beast\n"; }
 	}, category);
 
 	logger.end_message();
@@ -314,7 +323,7 @@ item_category_variant parse_item_category(const nlohmann::json& entry)
 	}
 	if (category_str == "enchantment")
 	{
-		return categories::enchantment{};
+		return categories::enchantment{json_to_enum<categories::enchantment_type>(group)};
 	}
 	if (category_str == "flask")
 	{
@@ -364,6 +373,10 @@ item_category_variant parse_item_category(const nlohmann::json& entry)
 
 		const auto ilvl = entry.at("baseItemLevel").get<int>();
 		return categories::base{json_to_enum<categories::base_type>(group), influence, ilvl};
+	}
+	if (category_str == "beast")
+	{
+		return categories::beast{};
 	}
 
 	throw network::poe_watch::json_parse_error("item has unrecognized category: " + category_str);
@@ -516,11 +529,7 @@ lang::item_price_data parse_item_prices(std::string_view itemdata_json, std::str
 		else if (std::holds_alternative<categories::map>(i.category))
 		{
 			const auto& map = std::get<categories::map>(i.category);
-			if (map.type == +categories::map_type::leaguestone)
-			{
-				result.leaguestones.push_back(elementary_item{std::move(i.name), price_data});
-			}
-			else if (map.type == +categories::map_type::scarab)
+			if (map.type == +categories::map_type::scarab)
 			{
 				result.scarabs.push_back(elementary_item{std::move(i.name), price_data});
 			}
@@ -547,6 +556,11 @@ lang::item_price_data parse_item_prices(std::string_view itemdata_json, std::str
 				i.log_info(logger);
 				continue;
 			}
+		}
+		else if (std::holds_alternative<categories::beast>(i.category))
+		{
+			// ignore beasts for now
+			continue;
 		}
 		else if (i.frame == +frame_type::unique || i.frame == +frame_type::relic)
 		{
