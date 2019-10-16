@@ -10,6 +10,8 @@ Different font sizes that have very close values may look exactly the same. This
 
 `Hide` on some items is ignored (usually items of new category introduced by newest game content) (in the past: shaper and elder bases). It is intentional from GGG side - the motivation is to force new game content to be visible in case an outdated filter accidentally hides something important. The drawback is that advanced users can not hide some truly unwanted items.
 
+Here is the GGG's statement on this: https://www.pathofexile.com/forum/view-thread/2500872 (ctrl+F "filter").
+
 **How about auto-refresh feature?**
 
 Could be added very easily. The problem is that the game client is not aware that the filter file has been updated so you have to manually open UI options => item filter => reload.

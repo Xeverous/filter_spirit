@@ -1,5 +1,8 @@
 # filter writing guidelines
 
+TODO some code samples are outdated
+___
+
 The following article aims to establish a set of good practices and conventions for writing a spirit filter (and in general, any filter).
 
 If you have no clue how Filter Spirit works, read "filter writing" article first
@@ -577,6 +580,11 @@ Class "Jewel" {
 ```
 
 ## talismans
+
+Notes:
+
+- Talismans do not have separate item class. They are amulets.
+- There is no direct way to detect talisman's tier. You can query specific base types as a workaround.
 
 ```
 Class "Amulet"
