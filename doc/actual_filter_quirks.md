@@ -6,25 +6,30 @@ The following document aims to outline hidden rules of the actual filter languag
 
 GGG does not maintain any dedicated documentation. All information is gathered from official forum posts, annoucements, reddit and my experiments.
 
+Multiple things have been fixed with the 3.8 update (Blight league). See [this reddit reply and its parents](https://www.reddit.com/r/pathofexile/comments/d0isb7/lootfilter_neversinks_itemfilter_version_730/ezeood1/).
+
 ## trailing comments
 
 Generally it's adviced not to rely on implementation details. There are multiple filter tools that add trailing comments to various actions in filters to allow easy find-replace edits instead of redownloading/regenerating the filter.
 
 Given that:
 
-- not all comments are properly parsed, some cause syntax errors other are read as eg base type names
-- there are many cases in which invalid filters are accepted and you end up with something that does not work
+- ~~not all comments are properly parsed, some cause syntax errors other are read as eg base type names~~ **fixed in 3.8**
+- there are ~~many~~ few cases in which invalid filters are accepted and you end up with something that does not work
 
-...I'm not really going to support traling comments in generated filters, at most make it optional.
+...~~I'm not really going to support traling comments in generated filters, at most make it optional~~ I might add similar feature to Filter Spirit at some point.
 
 ## bugs
 
-- Game can issue "Your Item Filter is out of date" instead of "Failed to load Item Filter" in numerous cases of syntax errors.
-- Fossils are classified as `Stackable Currency`. They do not actually stack in game.
-- Resonators can have 1-4 sockets and Item Filter detects that correctly. Jeweller's orb errors on resonators reporting that they have no sockets. Everyone knows why it is that but ... new players gonna be mad with such contradictory descriptions.
-- `#` starts a comment untill end of line. `#` is not accepted in some contexts:
+- ~~Game can issue "Your Item Filter is out of date" instead of "Failed to load Item Filter" in numerous cases of syntax errors.~~ **fixed in 3.8**
+- ~~Fossils are classified as `Stackable Currency`. They do not actually stack in game.~~ **fixed in 3.7.4**: fossils now stack
+- Resonators fall into `"Delve Stackable Socketable Currency"`, `"Stackable Socketable Currency"`, `"Socketable Currency"` and `"Currency"` classes but not into `"Stackable Currency"`. This is inconsistent with how other supersets of item classes are handled - other supersets either do work (`"Axes"` vs `"Two Hand Axes"`) or error when loading (`"Two Axes"`). The behaviour inconsistency border is the fact whether given superset-class-name is a direct substring of subset-class-name.
+- ~~Resonators can have 1-4 sockets and Item Filter detects that correctly. Jeweller's orb errors on resonators reporting that they have no sockets. Everyone knows why it is that but ... new players gonna be mad with such contradictory descriptions.~~ **Fixed in 3.8**: the error upon using Jeweller's Orb on a resonator is now: "Item has fixed Sockets".
+- ~~`#` starts a comment untill end of line. `#` is not accepted in some contexts:~~ **fixed in 3.8**
 
 ```
+# as of 3.8, nothing from this example code occurs
+
 Show
 	# similar thing happens for any condition
 	# "#" is basically tried to be parsed as some number/keyword/string
@@ -48,41 +53,36 @@ Show
 	PlayAlertSoundPositional 1 300 # this comment works
 	CustomAlertSound "airhorn.wav" # this comment works
 ```
-- generally, in many places text that should cause syntax errors is accepted because characters are skipped in some contexts. Optional `+` or `-` character is accepted for numbers (btw, negative quality would buff Blood of the Karui). Almost sure GGG uses string-to-int functions like `strtol()` with base = 10 which stop on first non-digit character. Null terminated strings were a huge mistake, but that's a completely different topic.
-- custom alert sounds have a really buggy implementation (looks like very naive approach of searching for `"`):
-
+- ~~generally, in many places text that should cause syntax errors is accepted because characters are skipped in some contexts. Optional `+` or `-` character is accepted for numbers (btw, negative quality would buff Blood of the Karui). Almost sure GGG uses string-to-int functions like `strtol()` with base = 10 which stop on first non-digit character. Null terminated strings were a huge mistake, but that's a completely different topic.~~ **fixed in 3.8**
+- ~~custom alert sounds have a really buggy implementation (looks like very naive approach of searching for `"`):~~ **fixed in 3.8**:
 ```
-# as expected: error: Incorrect format: CustomAlertSound [filepath]
-	CustomAlertSound
-
-# loads correctly, but does not play anything upon item drop
-	CustomAlertSound ""
-
 # this is accepted and you may have an illusion that the volume works
 # but everything after second " is completely ignored
 # custom sounds have no volume support
+# since 3.8: error: Incorrect format: CustomAlertSound [filepath]
 	CustomAlertSound "pop.wav" 300
 
 # as above, everything after closing " is skipped until end of line
+# since 3.8: error: Incorrect format: CustomAlertSound [filepath]
 	CustomAlertSound "pop.wav"GGG Fix filters PLZ
-
-# this works too
-	CustomAlertSound WHERE IS MY HH???"pop.wav"
 
 # expected: syntax error: missing path
 # actual: plays pop on item drop like it was not a comment
+# since 3.8: error: Incorrect format: CustomAlertSound [filepath]
 	CustomAlertSound # "pop.wav"
-
-# expected: syntax error: missing path
-# actual: error: Invalid sound filepath "pop.wava"
-	CustomAlertSound # "pop.wava"
 ```
 
-- you can specify `CustomAlertSound` and (`PlayAlertSound` and/or `PlayAlertSoundPositional`) at the same time
-  - if custom alert is last, custom sound is played
-  - if custom alert is not last, nothing is played
-- you can repeat the same action, the last one wins
-- negative numbers are accepted but `Quality > -3` does not catch anything (do they parse signed numbers to unsigned integer type?)
+- these are still present:
+
+```
+# loads correctly, but does not play anything upon item drop
+	CustomAlertSound ""
+
+# works fine
+	CustomAlertSound WHERE IS MY HH???"pop.wav"
+```
+
+- ~~negative numbers are accepted but `Quality > -3` does not catch anything (do they parse signed numbers to unsigned integer type?)~~ **fixed in 3.8**
 
 ## undocumented features
 
@@ -96,7 +96,8 @@ Show
 	Quality < 5 10 15
 	# syntax error (> is not an integer)
 	Quality < 7 > 11
-	# accepted, but doesn't actually work
+	# <3.8: accepted, but doesn't actually work
+	#  3.8: error: Integer "-3" may not be negative
 	Quality > -3
 ```
 
@@ -110,12 +111,15 @@ Quality < 8 4          | + | + | + | + | + | + | + | + |   |   |    |
 Quality 0 2 4 6 8      | + |   | + |   | + |   | + |   | + |   |    |
 Quality +011           |   |   |   |   |   |   |   |   |   |   |    | +
 Quality <= 0xB3X 4#pop | + | + | + | + | + |   |   |   |   |   |    |
-Quality > -3           |   |   |   |   |   |   |   |   |   |   |    |
 
 ## other observations
 
-- `SocketGroup` accepts only RGBW letters, however, when you ctrl+C an item in game abyss sockets are denoted with A and fossil sockets (on resonators) are denoted with D
+- `SocketGroup` accepts only RGBW letters, however, when you ctrl+C an item in game abyss sockets are denoted with A and fossil sockets (on resonators) are denoted with D.
 - Filters were/are never meant to be backwards-compatible. Any future game patch can break existing filters. This has already happened in the past.
-- `""` is a valid string. It is consistent with other (non-empty) strings: rules that have empty strings will match all items because any item name also contains an empty string.
+- You can specify `CustomAlertSound` and (`PlayAlertSound` and/or `PlayAlertSoundPositional`) at the same time
+  - if custom alert is last, custom sound is played
+  - ~~if custom alert is not last, nothing is played~~ **3.8**: now last alert sound is played
+- You can repeat the same action, the last one wins except the situation in the point above.
+- `""` is a valid string. It is consistent with other (non-empty) strings: rules that have empty `BaseType` strings will match all items because any item name also contains an empty string.
 - It is possible to specify font size that is outside allowed range (\[18, 42\]). If so happens, the value is clamped in this range. No such thing happens for volume (must be in range \[0, 300\]).
 - Game client assumes that the filter file is in unicode. [BOM](https://en.wikipedia.org/wiki/Byte_order_mark) is accepted but not required. ASNI encoding breaks where it differs from UTF-8 such as `ö` in `Maelström Staff`. If you get an error that some gibberish string could not be parsed convert file's encoding to UTF-8.
