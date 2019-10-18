@@ -107,25 +107,25 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 			* ut::description("test that all types can be used as constant"))
 		{
 			const std::string input_str = minimal_input() + R"(
-const boolean        = false
-const floating_point = 3.5
-const integer        = 123
-const level          = Level(10)
-const font_size      = FontSize(30)
-const sound_id       = SoundId(7)
-const volume         = Volume(300)
-const group          = Group("RGB")
-const rarity         = rare
-const shape          = hexagon
-const suit           = brown
-const color          = RGB(101, 102, 103)
-const icon           = MinimapIcon(0, green, square)
-const beam           = Beam(yellow)
-const string         = "Leather Belt"
-const path           = Path("pop.wav")
-const alert          = AlertSound(1, 300, false)
-const array          = [1, 2, 3]
-# const dict           = { "a": 1, "b": 2 }
+boolean        = false
+floating_point = 3.5
+integer        = 123
+level          = Level(10)
+font_size      = FontSize(30)
+sound_id       = SoundId(7)
+volume         = Volume(300)
+group          = Group("RGB")
+rarity         = rare
+shape          = hexagon
+suit           = brown
+color          = RGB(101, 102, 103)
+icon           = MinimapIcon(0, green, square)
+beam           = Beam(yellow)
+string         = "Leather Belt"
+path           = Path("pop.wav")
+alert          = AlertSound(1, 300, false)
+array          = [1, 2, 3]
+# dict           = { "a": 1, "b": 2 }
 )";
 			const std::string_view input = input_str;
 			const parser::parse_success_data parse_data = parse(input);
@@ -171,10 +171,10 @@ const array          = [1, 2, 3]
 		BOOST_AUTO_TEST_CASE(array_definitions, * ut::description("test that arrays of various sizes are correctly interpreted"))
 		{
 			const std::string input_str = minimal_input() + R"(
-const a0 = []
-const a1 = [1]
-const a2 = [1, 2]
-const a3 = [1, 2, 3]
+a0 = []
+a1 = [1]
+a2 = [1, 2]
+a3 = [1, 2, 3]
 )";
 			const std::string_view input = input_str;
 			const parser::parse_success_data parse_data = parse(input);
@@ -207,13 +207,13 @@ const a3 = [1, 2, 3]
 		BOOST_AUTO_TEST_CASE(array_subscript, * ut::description("test that array subscript returns correct objects"))
 		{
 			const std::string input_str = minimal_input() + R"(
-const arr = [100, 101, 102, 103]
-const first   = arr[ 0]
-const second  = arr[ 1]
-const prelast = arr[-2]
-const last    = arr[-1]
+arr = [100, 101, 102, 103]
+first   = arr[ 0]
+second  = arr[ 1]
+prelast = arr[-2]
+last    = arr[-1]
 
-const elem = [1, 2, 3][1]
+elem = [1, 2, 3][1]
 )";
 			const std::string_view input = input_str;
 			const parser::parse_success_data parse_data = parse(input);

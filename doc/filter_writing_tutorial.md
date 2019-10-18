@@ -501,22 +501,22 @@ SetMinimapIcon MinimapIcon(0, blue, square)
 
 ## constants
 
-FS adds the feature of being able to name constants.
+FS adds the feature of being able to specify constants (named values).
 
 ```
-const <identifier> = <expression>
+<identifier> = <expression>
 ```
 
-Where identifier is an alpha character (one of `a-zA-Z_`) optionally followed by a sequence of alphanumeric characters (`a-zA-Z_0-9`) (identifiers can not start with a digit). Identifiers that start with `_` are reserved (you should not use them) for future additions like predefined color names.
+Where identifier is an alpha character (one of `a-zA-Z_`) optionally followed by a sequence of alphanumeric characters (`a-zA-Z_0-9`) (identifiers can not start with a digit). Identifiers that start with `_` are reserved (you should not use them) for future additions like predefined color names. You should also avoid identifiers which are keywords in common programming languages - don't name anything like `const`, `if`, `else`, `for`, `while`, `do`, `try`, `catch`, `clas`, `int` - otherwise you risk syntax errors in case FS gets some of these keywords implemented.
 
 Examples:
 
 ```
-const currency_t0 = ["Exalted Orb", "Mirror of Kalandra", "Eternal Orb", "Albino Rhoa Feather", "Mirror Shard"]
-const white = RGB(255, 255, 255)
-const red = RGB(255, 0, 0)
-const color_error = red
-const icon_currency = MinimapIcon(0, yellow, star)
+currency_t0 = ["Exalted Orb", "Mirror of Kalandra", "Eternal Orb", "Albino Rhoa Feather", "Mirror Shard"]
+white = RGB(255, 255, 255)
+red = RGB(255, 0, 0)
+color_error = red
+icon_currency = MinimapIcon(0, yellow, star)
 
 # ...
 
@@ -549,7 +549,7 @@ $<identifier>(<FloatingPoint>, <FloatingPoint>)
 You can use queries directly or assign their results to constants.
 
 ```
-const top_cards = $divination(100, 999999)
+top_cards = $divination(100, 999999)
 
 Class "Divination Card" {
 	BaseType top_cards {

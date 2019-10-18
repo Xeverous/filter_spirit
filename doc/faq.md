@@ -79,7 +79,7 @@ There are more parser libraries available, namely: YACC (used by GDB), Bison and
 
 Again, parsing problems, this time even more complex.
 
-`const <identifier> = <expr>` is much easier to implement because the parser does not have to check if there are multiple expressions. If there is an array it is delimited by `[]` and is treated as one expression with multiple subexpressions separated by `,`.
+`<identifier> = <expr>` is much easier to implement because the parser does not have to check if there are multiple expressions. If there is an array it is delimited by `[]` and is treated as one expression with multiple subexpressions separated by `,`.
 
 ```
 101 102 103 # a color or an array of integers?

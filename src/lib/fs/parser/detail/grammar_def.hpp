@@ -146,7 +146,7 @@ BOOST_SPIRIT_DEFINE(value_expression)
 // ---- definitions ----
 
 const constant_definition_type constant_definition = "constant definiton";
-const auto constant_definition_def = lang::keywords::const_ > identifier > '=' > value_expression;
+const auto constant_definition_def = identifier > '=' > value_expression;
 BOOST_SPIRIT_DEFINE(constant_definition)
 
 // ---- rules ----

@@ -76,7 +76,7 @@ constexpr auto yellow      = "yellow";
 
 // ---- definitions ----
 
-constexpr const char* const const_ = "const"; // const
+// (nothing)
 
 // ---- rules ----
 

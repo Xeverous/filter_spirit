@@ -34,27 +34,27 @@ BOOST_AUTO_TEST_SUITE(parser_suite)
 
 		BOOST_AUTO_TEST_CASE(string_missing_close_quote)
 		{
-			expect_parse_failure("const str = \"abc");
+			expect_parse_failure("str = \"abc");
 		}
 
 		BOOST_AUTO_TEST_CASE(array_missing_close_bracket)
 		{
-			expect_parse_failure("const arr = [1, 2, 3, 4");
+			expect_parse_failure("arr = [1, 2, 3, 4");
 		}
 
 		BOOST_AUTO_TEST_CASE(array_missing_open_bracket)
 		{
-			expect_parse_failure("const arr = 1, 2, 3, 4]");
+			expect_parse_failure("arr = 1, 2, 3, 4]");
 		}
 
 		BOOST_AUTO_TEST_CASE(array_missing_delimeter)
 		{
-			expect_parse_failure("const arr = [1, 2, 3 4]");
+			expect_parse_failure("arr = [1, 2, 3 4]");
 		}
 
 		BOOST_AUTO_TEST_CASE(array_missing_element)
 		{
-			expect_parse_failure("const arr = [1, 2, , 4]");
+			expect_parse_failure("arr = [1, 2, , 4]");
 		}
 
 	BOOST_AUTO_TEST_SUITE_END()

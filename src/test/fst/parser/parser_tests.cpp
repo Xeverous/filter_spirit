@@ -91,8 +91,8 @@ BOOST_AUTO_TEST_SUITE(parser_success_suite)
 # test that parser correctly handles all comments, including this one
 ##
 # #
-const n1 = 1 #
-const n2 = 2 ## #text
+n1 = 1 #
+n2 = 2 ## #text
 )";
 
 		namespace pa = fs::parser::ast;
@@ -109,12 +109,12 @@ const n2 = 2 ## #text
 	{
 		const std::string input = minimal_input() + R"(
 # test that parser can correctly parse various identifiers
-const n1 = 1
-const n_2 = 2
-const n__3__ = 3
-const bUt_RaIdEr_Is_fAsTeR = 4
-const gOtTa_BuIlD_sOmE_dEfEnSe = 5
-const GGG = 666
+n1 = 1
+n_2 = 2
+n__3__ = 3
+bUt_RaIdEr_Is_fAsTeR = 4
+gOtTa_BuIlD_sOmE_dEfEnSe = 5
+GGG = 666
 )";
 
 		namespace pa = fs::parser::ast;
@@ -134,7 +134,7 @@ const GGG = 666
 	BOOST_AUTO_TEST_CASE(empty_string)
 	{
 		const std::string input = minimal_input() + "\n"
-			"const empty_string = \"\"";
+			"empty_string = \"\"";
 
 		namespace pa = fs::parser::ast;
 		const pa::ast_type ast = parse(input).ast;
@@ -148,9 +148,9 @@ const GGG = 666
 	BOOST_AUTO_TEST_CASE(color_definitions)
 	{
 		const std::string input = minimal_input() + "\n"
-			"const color_first = RGB( 11,  22,  33)\n"
-			"const color_black = RGB(  0,   1,   2, 255)\n"
-			"const color_other = color_black";
+			"color_first = RGB( 11,  22,  33)\n"
+			"color_black = RGB(  0,   1,   2, 255)\n"
+			"color_other = color_black";
 
 		namespace pa = fs::parser::ast;
 		const pa::ast_type ast = parse(input).ast;
@@ -192,7 +192,7 @@ const GGG = 666
 	BOOST_AUTO_TEST_CASE(array_definition)
 	{
 		const std::string input = minimal_input() + "\n"
-			"const currency_t1 = [\"Exalted Orb\", \"Mirror of Kalandra\", \"Eternal Orb\", \"Mirror Shard\"]";
+			"currency_t1 = [\"Exalted Orb\", \"Mirror of Kalandra\", \"Eternal Orb\", \"Mirror Shard\"]";
 
 		namespace pa = fs::parser::ast;
 		const pa::ast_type ast = parse(input).ast;

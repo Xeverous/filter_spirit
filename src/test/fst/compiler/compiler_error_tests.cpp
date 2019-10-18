@@ -110,10 +110,10 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 		BOOST_AUTO_TEST_CASE(name_already_exists)
 		{
 			const std::string input_str = minimal_input() + R"(
-const some_var = 0
-const xyz = 1
-const some_other_var = 2
-const xyz = 3
+some_var = 0
+xyz = 1
+some_other_var = 2
+xyz = 3
 )";
 			const std::string_view input = input_str;
 			const fs::parser::parse_success_data parse_data = parse(input);
@@ -135,8 +135,8 @@ const xyz = 3
 		BOOST_AUTO_TEST_CASE(no_such_name)
 		{
 			const std::string input_str = minimal_input() + R"(
-const abc = 0
-const xyz = non_existent_obj
+abc = 0
+xyz = non_existent_obj
 )";
 			const std::string_view input = input_str;
 			const fs::parser::parse_success_data parse_data = parse(input);
@@ -151,7 +151,7 @@ const xyz = non_existent_obj
 		BOOST_AUTO_TEST_CASE(no_such_function)
 		{
 			const std::string input_str = minimal_input() + R"(
-const abc = non_existent_func(0)
+abc = non_existent_func(0)
 )";
 			const std::string_view input = input_str;
 			const fs::parser::parse_success_data parse_data = parse(input);
@@ -166,9 +166,9 @@ const abc = non_existent_func(0)
 		BOOST_AUTO_TEST_CASE(index_out_of_range)
 		{
 			const std::string input_str = minimal_input() + R"(
-const x = 5
-const arr = [1, 2, 3]
-const elem = arr[x]
+x = 5
+arr = [1, 2, 3]
+elem = arr[x]
 )";
 			const std::string_view input = input_str;
 			const fs::parser::parse_success_data parse_data = parse(input);
@@ -186,7 +186,7 @@ const elem = arr[x]
 		BOOST_AUTO_TEST_CASE(invalid_amount_of_arguments)
 		{
 			const std::string input_str = minimal_input() + R"(
-const path = Path(11, 22)
+path = Path(11, 22)
 )";
 			const std::string_view input = input_str;
 			const fs::parser::parse_success_data parse_data = parse(input);
@@ -214,7 +214,7 @@ const path = Path(11, 22)
 		BOOST_AUTO_TEST_CASE(type_mismatch)
 		{
 			const std::string input_str = minimal_input() + R"(
-const path = Path(123)
+path = Path(123)
 )";
 			const std::string_view input = input_str;
 			const fs::parser::parse_success_data parse_data = parse(input);
@@ -242,7 +242,7 @@ const path = Path(123)
 		BOOST_AUTO_TEST_CASE(empty_socket_group)
 		{
 			const std::string input_str = minimal_input() + R"(
-const group = Group("")
+group = Group("")
 )";
 			const std::string_view input = input_str;
 			const fs::parser::parse_success_data parse_data = parse(input);
@@ -268,7 +268,7 @@ const group = Group("")
 		BOOST_AUTO_TEST_CASE(illegal_characters_in_socket_group)
 		{
 			const std::string input_str = minimal_input() + R"(
-const group = Group("GBAC")
+group = Group("GBAC")
 )";
 			const std::string_view input = input_str;
 			const fs::parser::parse_success_data parse_data = parse(input);
@@ -294,7 +294,7 @@ const group = Group("GBAC")
 		BOOST_AUTO_TEST_CASE(invalid_socket_group)
 		{
 			const std::string input_str = minimal_input() + R"(
-const group = Group("RRRRRRR") # 7 characters
+group = Group("RRRRRRR") # 7 characters
 )";
 			const std::string_view input = input_str;
 			const fs::parser::parse_success_data parse_data = parse(input);
@@ -320,7 +320,7 @@ const group = Group("RRRRRRR") # 7 characters
 		BOOST_AUTO_TEST_CASE(invalid_minimap_icon_size)
 		{
 			const std::string input_str = minimal_input() + R"(
-const icon = MinimapIcon(1234, green, circle) # size must be in range [0, 2]
+icon = MinimapIcon(1234, green, circle) # size must be in range [0, 2]
 )";
 			const std::string_view input = input_str;
 			const fs::parser::parse_success_data parse_data = parse(input);

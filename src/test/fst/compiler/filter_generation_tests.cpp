@@ -127,8 +127,8 @@ R"(Show
 		BOOST_AUTO_TEST_CASE(constants)
 		{
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
-const x = 36
-const c1 = RGB(1, 2, x)
+x = 36
+c1 = RGB(1, 2, x)
 
 SetTextColor c1
 SetBackgroundColor c1
@@ -149,10 +149,10 @@ R"(Show
 		BOOST_AUTO_TEST_CASE(nested_actions)
 		{
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
-const x = 36
-const y = 38
-const c1 = RGB(1, 2, x)
-const c2 = RGB(11, 22, y)
+x = 36
+y = 38
+c1 = RGB(1, 2, x)
+c2 = RGB(11, 22, y)
 
 BaseType "Vaal"
 Width > 1 {
@@ -246,7 +246,7 @@ Show
 			ipd.divination_cards.push_back(fs::lang::elementary_item{"Abandoned Wealth", fs::lang::price_data{100, 0, 0, 0, 0, 0, 0, 0, 0, 0}});
 			ipd.divination_cards.push_back(fs::lang::elementary_item{"The Doctor", fs::lang::price_data{1000, 0, 0, 0, 0, 0, 0, 0, 0, 0}});
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
-const low = $divination(0, 5)
+low = $divination(0, 5)
 
 BaseType $divination(100, 999999) { Show }
 BaseType $divination(10, 100) { Show }
