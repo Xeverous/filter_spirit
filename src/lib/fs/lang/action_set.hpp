@@ -35,14 +35,9 @@ struct action_set
 		alert_sound = std::move(new_alert_sound);
 	}
 
-	void disable_drop_sound()
+	void override_play_default_drop_sound(bool enable)
 	{
-		disabled_drop_sound = true;
-	}
-
-	void enable_drop_sound()
-	{
-		disabled_drop_sound = false;
+		disabled_drop_sound = !enable;
 	}
 
 	void override_minimap_icon(minimap_icon new_minimap_icon)

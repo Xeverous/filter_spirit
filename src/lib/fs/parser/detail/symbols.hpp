@@ -176,18 +176,6 @@ struct boolean_condition_properties_ : x3::symbols<lang::boolean_condition_prope
 };
 const boolean_condition_properties_ boolean_condition_properties;
 
-struct nullary_action_types_ : x3::symbols<lang::nullary_action_type>
-{
-	nullary_action_types_()
-	{
-		add
-			(lang::keywords::enable_drop_sound,  lang::nullary_action_type::enable_drop_sound)
-			(lang::keywords::disable_drop_sound, lang::nullary_action_type::disable_drop_sound)
-		;
-	}
-};
-const nullary_action_types_ nullary_action_types;
-
 struct unary_action_types_ : x3::symbols<lang::unary_action_type>
 {
 	unary_action_types_()
@@ -198,6 +186,7 @@ struct unary_action_types_ : x3::symbols<lang::unary_action_type>
 			(lang::keywords::set_background_color,       lang::unary_action_type::set_background_color)
 			(lang::keywords::set_font_size,              lang::unary_action_type::set_font_size)
 			(lang::keywords::set_alert_sound,            lang::unary_action_type::set_alert_sound)
+			(lang::keywords::play_default_drop_sound,    lang::unary_action_type::play_default_drop_sound)
 			(lang::keywords::set_minimap_icon,           lang::unary_action_type::set_minimap_icon)
 			(lang::keywords::set_beam,                   lang::unary_action_type::set_beam)
 		;

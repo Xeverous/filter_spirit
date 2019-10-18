@@ -47,9 +47,11 @@ target_compile_features(filter_spirit
 		cxx_std_17
 )
 
+# we add -Wno-deprecated-copy for GCC due to a false positive
+# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=92145
 target_compile_options(filter_spirit
 	PRIVATE
-		$<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -Wpedantic -ffast-math>
+		$<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -Wpedantic -Wno-deprecated-copy -ffast-math>
 		$<$<CXX_COMPILER_ID:Clang>:-Wall -Wpedantic -ffast-math>
 		$<$<CXX_COMPILER_ID:MSVC>:/W4>
 )

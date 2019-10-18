@@ -126,7 +126,6 @@ struct string_condition_class                : error_on_error, annotate_on_succe
 struct boolean_condition_class               : error_on_error, annotate_on_success {};
 struct socket_group_condition_class          : error_on_error, annotate_on_success {};
 struct condition_class                       : error_on_error, annotate_on_success {};
-struct nullary_action_class                  : error_on_error, annotate_on_success {};
 struct unary_action_class                    : error_on_error, annotate_on_success {};
 struct action_class                          : error_on_error, annotate_on_success {};
 
@@ -264,9 +263,6 @@ BOOST_SPIRIT_DECLARE(socket_group_condition_type)
 
 using condition_type = x3::rule<condition_class, ast::condition>;
 BOOST_SPIRIT_DECLARE(condition_type)
-
-using nullary_action_type = x3::rule<nullary_action_class, ast::nullary_action>;
-BOOST_SPIRIT_DECLARE(nullary_action_type)
 
 using unary_action_type = x3::rule<unary_action_class, ast::unary_action>;
 BOOST_SPIRIT_DECLARE(unary_action_type)

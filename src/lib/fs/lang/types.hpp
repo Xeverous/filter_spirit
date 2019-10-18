@@ -73,6 +73,7 @@ enum class unary_action_type
 	set_background_color,
 	set_font_size,
 	set_alert_sound,
+	play_default_drop_sound,
 	set_minimap_icon,
 	set_beam
 };

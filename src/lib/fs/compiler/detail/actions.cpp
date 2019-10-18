@@ -68,6 +68,16 @@ add_unary_action(
 			action_set.override_alert_sound(std::get<lang::alert_sound>(std::move(alert_or_error)));
 			return std::nullopt;
 		}
+		case lang::unary_action_type::play_default_drop_sound:
+		{
+			std::variant<lang::boolean, compile_error> bool_or_error = detail::evaluate_as<lang::boolean>(action.value, map, item_price_data);
+			if (std::holds_alternative<compile_error>(bool_or_error))
+				return std::get<compile_error>(std::move(bool_or_error));
+
+			const bool enable = std::get<lang::boolean>(bool_or_error).value;
+			action_set.override_play_default_drop_sound(enable);
+			return std::nullopt;
+		}
 		case lang::unary_action_type::set_minimap_icon:
 		{
 			std::variant<lang::minimap_icon, compile_error> icon_or_error = detail::evaluate_as<lang::minimap_icon>(action.value, map, item_price_data);
@@ -93,30 +103,6 @@ add_unary_action(
 	}
 }
 
-[[nodiscard]] std::optional<compile_error>
-add_nullary_action(
-	const ast::nullary_action& action,
-	lang::action_set& action_set)
-{
-	switch (action.action_type)
-	{
-		case lang::nullary_action_type::enable_drop_sound:
-		{
-			action_set.enable_drop_sound();
-			return std::nullopt;
-		}
-		case lang::nullary_action_type::disable_drop_sound:
-		{
-			action_set.disable_drop_sound();
-			return std::nullopt;
-		}
-		default:
-		{
-			return errors::internal_compiler_error_during_action_evaluation{parser::get_position_info(action)};
-		}
-	}
-}
-
 } // namespace
 
 namespace fs::compiler::detail
@@ -129,15 +115,7 @@ add_action(
 	const lang::item_price_data& item_price_data,
 	lang::action_set& action_set)
 {
-	return action.apply_visitor(x3::make_lambda_visitor<std::optional<compile_error>>(
-		[&](const ast::nullary_action& nullary_action)
-		{
-			return add_nullary_action(nullary_action, action_set);
-		},
-		[&](const ast::unary_action& unary_action)
-		{
-			return add_unary_action(unary_action, map, item_price_data, action_set);
-		}));
+	return add_unary_action(action.action, map, item_price_data, action_set);
 }
 
 }

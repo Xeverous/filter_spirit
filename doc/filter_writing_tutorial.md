@@ -464,7 +464,7 @@ MapTier == 16
 
 For consistency with itself, **some actions have been renamed and built-in alert sound has been merged with custom alert sounds** (which one it is is determined from the type of the argument).
 
-All actions begin with `Set` except `DisableDropSound`.
+All actions begin with `Set` except `PlayDefaultDropSound`.
 
 The only types you have to create values of using functions are `Color` and `MinimapIcon` (they require multiple arguments).
 
@@ -477,15 +477,14 @@ SetFontSize <Integer>
 
 SetAlertSound <Sound | Integer | Path | String>
 
-EnableDropSound
-DisableDropSound
+PlayDefaultDropSound <Boolean>
 
 SetMinimapIcon <MinimapIcon>
 
 SetBeam <Beam | Suit>
 ```
 
-`EnableDropSound` is an FS extension (actual filters don't have such thing). It exists so you can overwrite parent action (blocks with enabled drop sound simply do not generate `DisableDropSound` in actual filter).
+Some items always play specific built-in sounds, even if you don't specify anything. `DisableDropSound` in actual filters disables this behaviour. In FS, use `PlayDefaultDropSound` with a boolean value, eg `PlayDefaultDropSound false`.
 
 Examples:
 
