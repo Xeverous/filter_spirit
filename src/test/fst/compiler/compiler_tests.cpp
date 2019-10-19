@@ -125,7 +125,6 @@ string         = "Leather Belt"
 path           = Path("pop.wav")
 alert          = AlertSound(1, 300, false)
 array          = [1, 2, 3]
-# dict           = { "a": 1, "b": 2 }
 )";
 			const std::string_view input = input_str;
 			const parser::parse_success_data parse_data = parse(input);
@@ -161,11 +160,6 @@ array          = [1, 2, 3]
 					lang::object{lang::integer{2}, lang::position_tag()},
 					lang::object{lang::integer{3}, lang::position_tag()}},
 				search(input, "array"), search(input, "[1, 2, 3]"));
-			/* expect_object_in_map(map, lookup_data, "dict",
-				lang::dict_object{
-					{"a", lang::object{lang::integer{1}, lang::position_tag()}},
-					{"b", lang::object{lang::integer{2}, lang::position_tag()}}},
-				search(input, "dict"), search(input, R"({ "a": 1, "b": 2 })")); */
 		}
 
 		BOOST_AUTO_TEST_CASE(array_definitions, * ut::description("test that arrays of various sizes are correctly interpreted"))

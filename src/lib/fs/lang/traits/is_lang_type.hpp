@@ -70,9 +70,6 @@ namespace fs::lang::traits
     template <>
     struct is_lang_type<array_object> : std::true_type {};
 
-    template <>
-    struct is_lang_type<dict_object> : std::true_type {};
-
     template <typename T>
     constexpr bool is_lang_type_v = is_lang_type<T>::value;
 

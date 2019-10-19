@@ -12,7 +12,6 @@
 #include <utility>
 #include <variant>
 #include <vector>
-#include <map>
 
 namespace fs::lang
 {
@@ -340,7 +339,6 @@ inline bool operator!=(const alert_sound& lhs, const alert_sound& rhs) { return 
 class object;
 
 using array_object = std::vector<object>;
-using dict_object = std::map<std::string, object>;
 
 using object_variant = std::variant<
 	// primitive types
@@ -364,9 +362,7 @@ using object_variant = std::variant<
 	custom_alert_sound,
 	alert_sound,
 	// array
-	array_object,
-	// dictionary
-	dict_object
+	array_object
 >;
 
 BETTER_ENUM(object_type, int,
@@ -391,9 +387,7 @@ BETTER_ENUM(object_type, int,
 	custom_alert_sound,
 	alert_sound,
 	// array
-	array,
-	// dictionary
-	dictionary)
+	array)
 
 using position_tag = boost::spirit::x3::position_tagged;
 
@@ -404,19 +398,9 @@ struct object
 		return std::holds_alternative<array_object>(value);
 	}
 
-	bool is_dict() const noexcept
-	{
-		return std::holds_alternative<dict_object>(value);
-	}
-
-	bool is_structured() const noexcept
-	{
-		return is_array() || is_dict();
-	}
-
 	bool is_primitive() const noexcept
 	{
-		return !is_structured();
+		return !is_array();
 	}
 
 	[[nodiscard]]
@@ -449,7 +433,7 @@ template <typename T> [[nodiscard]] constexpr
 object_type type_to_enum_impl()
 {
 	static_assert(sizeof(T) == 0, "missing implementation for this type");
-	return object_type::dictionary;
+	return object_type::array; // return statement only to silence compiler/editors
 }
 
 template <> constexpr
@@ -492,8 +476,6 @@ template <> constexpr
 object_type type_to_enum_impl<alert_sound>() { return object_type::alert_sound; }
 template <> constexpr
 object_type type_to_enum_impl<array_object>() { return object_type::array; }
-template <> constexpr
-object_type type_to_enum_impl<dict_object>() { return object_type::dictionary; }
 
 template <typename T> [[nodiscard]] constexpr
 object_type type_to_enum()
