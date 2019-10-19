@@ -116,7 +116,7 @@ struct comparison_operators_ : x3::symbols<lang::comparison_type>
 		add
 			("<",  lang::comparison_type::less)
 			("<=", lang::comparison_type::less_equal)
-			("==", lang::comparison_type::equal)
+			("=",  lang::comparison_type::equal)
 			(">",  lang::comparison_type::greater)
 			(">=", lang::comparison_type::greater_equal)
 		;
@@ -153,6 +153,7 @@ struct string_condition_properties_ : x3::symbols<lang::string_condition_propert
 			(lang::keywords::class_,           lang::string_condition_property::class_)
 			(lang::keywords::base_type,        lang::string_condition_property::base_type)
 			(lang::keywords::has_explicit_mod, lang::string_condition_property::has_explicit_mod)
+			(lang::keywords::has_enchantment,  lang::string_condition_property::has_enchantment)
 		;
 	}
 };

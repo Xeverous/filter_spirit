@@ -109,6 +109,10 @@ void output_strings_condition(
 		return;
 
 	output_stream << '\t' << name;
+
+	if (cond.exact_match_required)
+		output_stream << " ==";
+
 	for (const std::string& str : *cond.strings)
 		output_stream << " \"" << str << '"';
 
@@ -168,6 +172,7 @@ void condition_set::generate(std::ostream& output_stream) const
 	output_strings_condition(class_,           lg::class_,           output_stream);
 	output_strings_condition(base_type,        lg::base_type,        output_stream);
 	output_strings_condition(has_explicit_mod, lg::has_explicit_mod, output_stream);
+	output_strings_condition(has_enchantment,  lg::has_enchantment,  output_stream);
 }
 
 bool condition_set::is_valid() const
@@ -188,7 +193,8 @@ bool condition_set::is_valid() const
 
 	return is_valid_strings_condition(class_)
 		&& is_valid_strings_condition(base_type)
-		&& is_valid_strings_condition(has_explicit_mod);
+		&& is_valid_strings_condition(has_explicit_mod)
+		&& is_valid_strings_condition(has_enchantment);
 }
 
 }

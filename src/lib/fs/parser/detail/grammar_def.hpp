@@ -166,8 +166,15 @@ const auto comparison_condition_def =
 	> value_expression;
 BOOST_SPIRIT_DEFINE(comparison_condition)
 
+const exact_matching_policy_operator_type exact_matching_policy_operator = "exact matching operator";
+const auto exact_matching_policy_operator_def = "==" >> x3::attr(true) | x3::attr(false);
+BOOST_SPIRIT_DEFINE(exact_matching_policy_operator)
+
 const string_condition_type string_condition = "string condition";
-const auto string_condition_def = x3::lexeme[symbols::string_condition_properties >> not_alnum_or_underscore] > value_expression;
+const auto string_condition_def =
+	x3::lexeme[symbols::string_condition_properties >> not_alnum_or_underscore]
+	> exact_matching_policy_operator
+	> value_expression;
 BOOST_SPIRIT_DEFINE(string_condition)
 
 const boolean_condition_type boolean_condition = "boolean condition";

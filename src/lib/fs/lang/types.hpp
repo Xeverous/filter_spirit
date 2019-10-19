@@ -45,7 +45,8 @@ enum class string_condition_property
 {
 	class_,
 	base_type,
-	has_explicit_mod
+	has_explicit_mod,
+	has_enchantment
 };
 
 enum class boolean_condition_property

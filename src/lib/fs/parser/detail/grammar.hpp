@@ -121,6 +121,7 @@ struct constant_definition_class             : error_on_error, annotate_on_succe
 
 struct comparison_operator_expression_class  : error_on_error, annotate_on_success {};
 struct comparison_condition_class            : error_on_error, annotate_on_success {};
+struct exact_matching_policy_operator_class  : error_on_error, annotate_on_success {};
 struct string_condition_class                : error_on_error, annotate_on_success {};
 struct boolean_condition_class               : error_on_error, annotate_on_success {};
 struct socket_group_condition_class          : error_on_error, annotate_on_success {};
@@ -252,6 +253,9 @@ BOOST_SPIRIT_DECLARE(comparison_operator_expression_type)
 
 using comparison_condition_type = x3::rule<comparison_condition_class, ast::comparison_condition>;
 BOOST_SPIRIT_DECLARE(comparison_condition_type)
+
+using exact_matching_policy_operator_type = x3::rule<exact_matching_policy_operator_class, ast::exact_matching_policy>;
+BOOST_SPIRIT_DECLARE(exact_matching_policy_operator_type)
 
 using string_condition_type = x3::rule<string_condition_class, ast::string_condition>;
 BOOST_SPIRIT_DECLARE(string_condition_type)

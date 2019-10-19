@@ -106,6 +106,7 @@ struct socket_group_condition
 struct strings_condition
 {
 	std::shared_ptr<std::vector<std::string>> strings;
+	bool exact_match_required;
 	position_tag origin;
 };
 
@@ -136,6 +137,7 @@ struct condition_set
 	numeric_range_condition height;
 	numeric_range_condition width;
 	strings_condition has_explicit_mod;
+	strings_condition has_enchantment;
 	numeric_range_condition stack_size;
 	numeric_range_condition gem_level;
 	numeric_range_condition map_tier;

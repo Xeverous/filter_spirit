@@ -87,7 +87,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::string_condition,
-	property, value)
+	property, exact_match, value)
 
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::boolean_condition,

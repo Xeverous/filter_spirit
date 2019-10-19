@@ -214,6 +214,7 @@ array_to_strings(
 [[nodiscard]] std::optional<compile_error>
 add_string_condition_impl(
 	std::vector<std::string> strings,
+	bool is_exact_match,
 	lang::position_tag condition_origin,
 	lang::strings_condition& target)
 {
@@ -221,6 +222,7 @@ add_string_condition_impl(
 		return errors::condition_redefinition{condition_origin, target.origin};
 
 	target.strings = std::make_shared<std::vector<std::string>>(std::move(strings));
+	target.exact_match_required = is_exact_match;
 	target.origin = condition_origin;
 	return std::nullopt;
 }
@@ -242,21 +244,26 @@ add_string_condition(
 		return std::get<compile_error>(std::move(strings_or_error));
 
 	auto& strings = std::get<std::vector<std::string>>(strings_or_error);
-	lang::position_tag condition_origin = parser::get_position_info(condition);
+	const bool is_exact_match = condition.exact_match.required;
+	const lang::position_tag condition_origin = parser::get_position_info(condition);
 
 	switch (condition.property)
 	{
 		case lang::string_condition_property::class_:
 		{
-			return add_string_condition_impl(std::move(strings), condition_origin, condition_set.class_);
+			return add_string_condition_impl(std::move(strings), is_exact_match, condition_origin, condition_set.class_);
 		}
 		case lang::string_condition_property::base_type:
 		{
-			return add_string_condition_impl(std::move(strings), condition_origin, condition_set.base_type);
+			return add_string_condition_impl(std::move(strings), is_exact_match, condition_origin, condition_set.base_type);
 		}
 		case lang::string_condition_property::has_explicit_mod:
 		{
-			return add_string_condition_impl(std::move(strings), condition_origin, condition_set.has_explicit_mod);
+			return add_string_condition_impl(std::move(strings), is_exact_match, condition_origin, condition_set.has_explicit_mod);
+		}
+		case lang::string_condition_property::has_enchantment:
+		{
+			return add_string_condition_impl(std::move(strings), is_exact_match, condition_origin, condition_set.has_enchantment);
 		}
 		default:
 		{

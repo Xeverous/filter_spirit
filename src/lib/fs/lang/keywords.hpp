@@ -92,6 +92,7 @@ constexpr auto socket_group     = generation::socket_group;
 constexpr auto height           = generation::height;
 constexpr auto width            = generation::width;
 constexpr auto has_explicit_mod = generation::has_explicit_mod;
+constexpr auto has_enchantment  = generation::has_enchantment;
 constexpr auto stack_size       = generation::stack_size;
 constexpr auto gem_level        = generation::gem_level;
 constexpr auto identified       = generation::identified;

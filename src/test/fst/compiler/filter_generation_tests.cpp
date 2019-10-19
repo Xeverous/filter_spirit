@@ -124,6 +124,29 @@ R"(Show
 			BOOST_TEST(compare_strings(expected_filter, actual_filter));
 		}
 
+		BOOST_AUTO_TEST_CASE(exact_match_condition)
+		{
+			const std::string actual_filter = generate_filter(minimal_input() + R"(
+Class "Divination Card"
+{
+	BaseType == ["The Wolf", "The Demon"] { Show }
+	BaseType    ["The Wolf", "The Demon"] { Show }
+}
+)");
+			const std::string_view expected_filter =
+R"(Show
+	Class "Divination Card"
+	BaseType == "The Wolf" "The Demon"
+
+Show
+	Class "Divination Card"
+	BaseType "The Wolf" "The Demon"
+
+)";
+
+			BOOST_TEST(compare_strings(expected_filter, actual_filter));
+		}
+
 		BOOST_AUTO_TEST_CASE(constants)
 		{
 			const std::string actual_filter = generate_filter(minimal_input() + R"(

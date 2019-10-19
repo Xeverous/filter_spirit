@@ -311,9 +311,23 @@ struct comparison_condition : x3::position_tagged
 	value_expression value;
 };
 
+struct exact_matching_policy : x3::position_tagged
+{
+	exact_matching_policy& operator=(bool v)
+	{
+		required = v;
+		return *this;
+	}
+
+	bool get_value() const { return required; }
+
+	bool required;
+};
+
 struct string_condition : x3::position_tagged
 {
 	lang::string_condition_property property;
+	exact_matching_policy exact_match;
 	value_expression value;
 };
 

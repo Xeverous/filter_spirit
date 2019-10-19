@@ -417,30 +417,31 @@ function | result type | notes
 
 ## conditions
 
-FS supports all conditions that the actual filters support. Some conditions allow values of multiple types. Conditions will automatically promote the value if possible so writing `SocketGroup Group("RGB")` or `SetAlertSound AlertSound("pop.wav")` is not necessary, `SocketGroup "RGB"` and `SetAlertSound "pop.wav"` is enough.
+FS supports all conditions that the actual filters support. Some conditions allow values of multiple types.
 
-Operator is one of `<`, `>`, `<=`, `>=`, `==`. (there is no `!=` in actual filters). Operator is optional (defaults to `==`).
+- Conditions and Actions will automatically promote the value if possible so writing `SocketGroup Group("RGB")` or `SetAlertSound AlertSound("pop.wav")` is not necessary, `SocketGroup "RGB"` and `SetAlertSound "pop.wav"` is enough. Explicit functions are only necessary when the condition/action consists of multiple values (eg color).
+- Numeric and `Rarity` conditions accept comparison operator - one of `<`, `>`, `<=`, `>=`, `=`. Operator is optional (defaults to `=`).
+- String-based conditions accept optional `==` token which enables exact maching. `BaseType == "The Wolf"` will match only *The Wolf* card, `BaseType "The Wolf"` will match all *The Wolf*, *The Wolf's Legacy* and *The Wolf's Shadow*.
 
 ```
-Rarity        [operator] <Rarity>
-ItemLevel     [operator] <Level | Integer>
-DropLevel     [operator] <Level | Integer>
-Quality       [operator] <Integer>
-Sockets       [operator] <Integer>
-LinkedSockets [operator] <Integer>
-Height        [operator] <Integer>
-Width         [operator] <Integer>
-StackSize     [operator] <Integer>
-GemLevel      [operator] <Integer>
-MapTier       [operator] <Integer>
+Rarity        [< | > | <= | >= | =] <Rarity>
+ItemLevel     [< | > | <= | >= | =] <Level | Integer>
+DropLevel     [< | > | <= | >= | =] <Level | Integer>
+Quality       [< | > | <= | >= | =] <Integer>
+Sockets       [< | > | <= | >= | =] <Integer>
+LinkedSockets [< | > | <= | >= | =] <Integer>
+Height        [< | > | <= | >= | =] <Integer>
+Width         [< | > | <= | >= | =] <Integer>
+StackSize     [< | > | <= | >= | =] <Integer>
+GemLevel      [< | > | <= | >= | =] <Integer>
+MapTier       [< | > | <= | >= | =] <Integer>
 
-Class    [operator] <String | Array>
-BaseType [operator] <String | Array>
+Class          [==] <String | Array>
+BaseType       [==] <String | Array>
+HasExplicitMod [==] <String | Array>
+HasEnchantment [==] <String | Array>
 
 SocketGroup <Group | String>
-
-HasExplicitMod <String>
-HasEnchantment <String>
 
 AnyEnchantment  <Boolean>
 Identified      <Boolean>
@@ -457,7 +458,8 @@ Examples:
 ```
 Class "Currency"
 BaseType ["Shard", "Splinter"]
-MapTier == 16
+BaseType == "The Wolf"
+MapTier = 16
 ```
 
 ## actions

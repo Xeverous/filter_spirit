@@ -71,10 +71,6 @@ There are more parser libraries available, namely: YACC (used by GDB), Bison and
 - They are not really libraries. They have some library parts but mostly they are separate programs that given grammar spec, they generate code. This complicates the build process, complicates your own code and breaks working with any IDE.
 - They all generate C. So forget about automatic memory management (in the form of garbage collection or RAII), you will have to code it yourself. And forget about type safety - everything is `void*`, any wrong cast will likely result in a segfault.
 
-**Why `==` and not `=` like in the original filter?**
-
-`=` from filter language has been replaced by `==` for consistency (this change should be obvious for anyone who ever programmed in any language). `=` is used for defining constants, `==` for comparisons. This makes filter easier to parse. You can still skip `==`, just like with original filter language: `Quality 20` will have exactly the same meaning as `Quality == 20`.
-
 **Why arrays have `[elem, ...]` syntax? In actual filters you just place more strings in the same line.**
 
 Again, parsing problems, this time even more complex.
