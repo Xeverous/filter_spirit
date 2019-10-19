@@ -37,6 +37,10 @@ const identifier_type identifier = identifier_impl.name;
 const auto identifier_def = identifier_impl;
 BOOST_SPIRIT_DEFINE(identifier)
 
+const not_alnum_or_underscore_type not_alnum_or_underscore = "not alphanumeric character or underscore";
+const auto not_alnum_or_underscore_def = !&(x3::alnum | '_');
+BOOST_SPIRIT_DEFINE(not_alnum_or_underscore)
+
 // ---- version requirement ----
 
 const version_literal_type version_literal = "version literal";
@@ -72,19 +76,19 @@ const auto string_literal_def = x3::lexeme['"' > *(x3::char_ - (x3::lit('"') | '
 BOOST_SPIRIT_DEFINE(string_literal)
 
 const boolean_literal_type boolean_literal = "boolean literal";
-const auto boolean_literal_def = symbols::booleans;
+const auto boolean_literal_def = x3::lexeme[symbols::booleans >> not_alnum_or_underscore];
 BOOST_SPIRIT_DEFINE(boolean_literal)
 
 const rarity_literal_type rarity_literal = "rarity literal";
-const auto rarity_literal_def = symbols::rarities;
+const auto rarity_literal_def = x3::lexeme[symbols::rarities >> not_alnum_or_underscore];
 BOOST_SPIRIT_DEFINE(rarity_literal)
 
 const shape_literal_type shape_literal = "shape literal";
-const auto shape_literal_def = symbols::shapes;
+const auto shape_literal_def = x3::lexeme[symbols::shapes >> not_alnum_or_underscore];
 BOOST_SPIRIT_DEFINE(shape_literal)
 
 const suit_literal_type suit_literal = "suit literal";
-const auto suit_literal_def = symbols::suits;
+const auto suit_literal_def = x3::lexeme[symbols::suits >> not_alnum_or_underscore];
 BOOST_SPIRIT_DEFINE(suit_literal)
 
 // ---- expressions ----
@@ -156,19 +160,22 @@ const auto comparison_operator_expression_def = symbols::comparison_operators | 
 BOOST_SPIRIT_DEFINE(comparison_operator_expression)
 
 const comparison_condition_type comparison_condition = "comparison condition";
-const auto comparison_condition_def = symbols::comparison_condition_properties > comparison_operator_expression > value_expression;
+const auto comparison_condition_def =
+	x3::lexeme[symbols::comparison_condition_properties >> not_alnum_or_underscore]
+	> comparison_operator_expression
+	> value_expression;
 BOOST_SPIRIT_DEFINE(comparison_condition)
 
 const string_condition_type string_condition = "string condition";
-const auto string_condition_def = symbols::string_condition_properties > value_expression;
+const auto string_condition_def = x3::lexeme[symbols::string_condition_properties >> not_alnum_or_underscore] > value_expression;
 BOOST_SPIRIT_DEFINE(string_condition)
 
 const boolean_condition_type boolean_condition = "boolean condition";
-const auto boolean_condition_def = symbols::boolean_condition_properties > value_expression;
+const auto boolean_condition_def = x3::lexeme[symbols::boolean_condition_properties >> not_alnum_or_underscore] > value_expression;
 BOOST_SPIRIT_DEFINE(boolean_condition)
 
 const socket_group_condition_type socket_group_condition = "socket group condition";
-const auto socket_group_condition_def = lang::keywords::socket_group > value_expression;
+const auto socket_group_condition_def = x3::lexeme[lang::keywords::socket_group >> not_alnum_or_underscore] > value_expression;
 BOOST_SPIRIT_DEFINE(socket_group_condition)
 
 const condition_type condition = "condition";
@@ -180,7 +187,7 @@ const auto condition_def =
 BOOST_SPIRIT_DEFINE(condition)
 
 const unary_action_type unary_action = "unary action";
-const auto unary_action_def = symbols::unary_action_types > value_expression;
+const auto unary_action_def = x3::lexeme[symbols::unary_action_types >> not_alnum_or_underscore] > value_expression;
 BOOST_SPIRIT_DEFINE(unary_action)
 
 const action_type action = "action";
@@ -190,7 +197,7 @@ BOOST_SPIRIT_DEFINE(action)
 // ---- filter structure ----
 
 const visibility_statement_type visibility_statement = "visibility statement";
-const auto visibility_statement_def = symbols::visibility_literals;
+const auto visibility_statement_def = x3::lexeme[symbols::visibility_literals >> not_alnum_or_underscore];
 BOOST_SPIRIT_DEFINE(visibility_statement)
 
 // moved here due to circular dependency

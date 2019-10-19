@@ -79,7 +79,6 @@ struct error_on_error
 
 // ---- fundamental tokens ----
 
-struct identifier_impl_class;
 struct identifier_class                      : error_on_error, annotate_on_success {};
 
 // ---- version requirement ----
@@ -166,10 +165,12 @@ BOOST_SPIRIT_DECLARE(comment_type)
 // can not match identifier grammar with a struct that contains only std::string (compiles only with std::string directly)
 // to workaround, we just add 1 more step with the same grammar
 // https://stackoverflow.com/questions/18166958
-using identifier_impl_type = x3::rule<identifier_impl_class, std::string>;
+using identifier_impl_type = x3::rule<struct identifier_impl_class, std::string>;
 BOOST_SPIRIT_DECLARE(identifier_impl_type)
 using identifier_type = x3::rule<identifier_class, ast::identifier>;
 BOOST_SPIRIT_DECLARE(identifier_type)
+using not_alnum_or_underscore_type = x3::rule<struct not_alnum_or_underscore_class /*, intentionally nothing */>;
+BOOST_SPIRIT_DECLARE(not_alnum_or_underscore_type)
 
 // ---- version requirement ----
 

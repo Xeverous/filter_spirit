@@ -64,6 +64,21 @@ bool test_literal_definition(const fs::parser::ast::constant_definition& def, co
 	return test_literal_expression<T>(def.value, value);
 }
 
+void test_identifier_definition(const fs::parser::ast::constant_definition& def, const char* name, const char* identifier)
+{
+	BOOST_TEST(def.name.value == name);
+	const fs::parser::ast::primary_expression& prim_expr = def.value.primary_expr;
+
+	if (!holds_alternative<fs::parser::ast::identifier>(prim_expr.var))
+	{
+		BOOST_ERROR("primary expression does not hold identifier");
+		return;
+	}
+
+	const auto& id = boost::get<fs::parser::ast::identifier>(prim_expr.var);
+	BOOST_TEST(id.value == identifier);
+}
+
 namespace fst
 {
 
@@ -115,13 +130,16 @@ n__3__ = 3
 bUt_RaIdEr_Is_fAsTeR = 4
 gOtTa_BuIlD_sOmE_dEfEnSe = 5
 GGG = 666
+not_a_keyword1 = ttrue
+not_a_keyword2 = falsee
+Idendified = Corrrupted
 )";
 
 		namespace pa = fs::parser::ast;
 		const pa::ast_type ast = parse(input).ast;
 
 		const std::vector<pa::constant_definition>& defs = ast.constant_definitions;
-		BOOST_TEST_REQUIRE(static_cast<int>(defs.size()) == 6);
+		BOOST_TEST_REQUIRE(static_cast<int>(defs.size()) == 9);
 
 		test_literal_definition<pa::integer_literal>(defs[0], "n1", 1);
 		test_literal_definition<pa::integer_literal>(defs[1], "n_2", 2);
@@ -129,6 +147,9 @@ GGG = 666
 		test_literal_definition<pa::integer_literal>(defs[3], "bUt_RaIdEr_Is_fAsTeR", 4);
 		test_literal_definition<pa::integer_literal>(defs[4], "gOtTa_BuIlD_sOmE_dEfEnSe", 5);
 		test_literal_definition<pa::integer_literal>(defs[5], "GGG", 666);
+		test_identifier_definition(defs[6], "not_a_keyword1", "ttrue");
+		test_identifier_definition(defs[7], "not_a_keyword2", "falsee");
+		test_identifier_definition(defs[8], "Idendified", "Corrrupted");
 	}
 
 	BOOST_AUTO_TEST_CASE(empty_string)
