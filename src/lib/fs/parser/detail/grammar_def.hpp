@@ -5,8 +5,8 @@
  * Use BOOST_SPIRIT_DEFINE here.
  */
 #pragma once
-#include "fs/parser/detail/symbols.hpp"
-#include "fs/parser/detail/grammar.hpp"
+#include <fs/parser/detail/symbols.hpp>
+#include <fs/parser/detail/grammar.hpp>
 
 namespace fs::parser::detail
 {

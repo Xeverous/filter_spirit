@@ -1,5 +1,5 @@
-#include "fs/compiler/detail/queries.hpp"
-#include "fs/compiler/detail/evaluate_as.hpp"
+#include <fs/compiler/detail/queries.hpp>
+#include <fs/compiler/detail/evaluate_as.hpp>
 
 #include <utility>
 
@@ -9,18 +9,18 @@ namespace fs::compiler::detail
 std::variant<lang::price_range, compile_error>
 construct_price_range(
 	const parser::ast::value_expression_list& arguments,
-	const lang::constants_map& map,
+	const lang::symbol_table& symbols,
 	const lang::item_price_data& item_price_data)
 {
 	const int arguments_amount = arguments.size();
 	if (arguments_amount != 2)
 		return errors::invalid_amount_of_arguments{2, arguments_amount, parser::get_position_info(arguments)};
 
-	std::variant<lang::floating_point, compile_error> fp_min_or_error = evaluate_as<lang::floating_point>(arguments[0], map, item_price_data);
+	std::variant<lang::floating_point, compile_error> fp_min_or_error = evaluate_as<lang::floating_point>(arguments[0], symbols, item_price_data);
 	if (std::holds_alternative<compile_error>(fp_min_or_error))
 		return std::get<compile_error>(std::move(fp_min_or_error));
 
-	std::variant<lang::floating_point, compile_error> fp_max_or_error = evaluate_as<lang::floating_point>(arguments[1], map, item_price_data);
+	std::variant<lang::floating_point, compile_error> fp_max_or_error = evaluate_as<lang::floating_point>(arguments[1], symbols, item_price_data);
 	if (std::holds_alternative<compile_error>(fp_max_or_error))
 		return std::get<compile_error>(std::move(fp_max_or_error));
 

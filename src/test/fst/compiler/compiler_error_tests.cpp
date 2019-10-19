@@ -1,11 +1,11 @@
-#include "fst/common/print_type.hpp"
-#include "fst/common/test_fixtures.hpp"
-#include "fst/common/string_operations.hpp"
+#include <fst/common/print_type.hpp>
+#include <fst/common/test_fixtures.hpp>
+#include <fst/common/string_operations.hpp>
 
-#include "fs/compiler/compiler.hpp"
-#include "fs/compiler/print_error.hpp"
-#include "fs/log/buffered_logger.hpp"
-#include "fs/log/utility.hpp"
+#include <fs/compiler/compiler.hpp>
+#include <fs/compiler/print_error.hpp>
+#include <fs/log/buffered_logger.hpp>
+#include <fs/log/utility.hpp>
 
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
@@ -26,11 +26,11 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 	BOOST_AUTO_TEST_CASE(minimal_input_resolve_constants)
 	{
 		const fs::parser::parse_success_data parse_data = parse(minimal_input());
-		const std::variant<fs::lang::constants_map, fs::compiler::compile_error> map_or_error =
-			resolve_constants(parse_data.ast.constant_definitions);
-		BOOST_TEST_REQUIRE(std::holds_alternative<fs::lang::constants_map>(map_or_error));
-		const auto& map = std::get<fs::lang::constants_map>(map_or_error);
-		BOOST_TEST(map.empty());
+		const std::variant<fs::lang::symbol_table, fs::compiler::compile_error> symbols_or_error =
+			resolve_symbols(parse_data.ast.constant_definitions);
+		BOOST_TEST_REQUIRE(std::holds_alternative<fs::lang::symbol_table>(symbols_or_error));
+		const auto& symbols = std::get<fs::lang::symbol_table>(symbols_or_error);
+		BOOST_TEST(symbols.empty());
 	}
 
 	/*
@@ -60,13 +60,13 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 			return std::get<T>(error);
 		}
 
-		fs::compiler::compile_error expect_error_when_resolving_constants(
+		fs::compiler::compile_error expect_error_when_resolving_symbols(
 			const std::vector<fs::parser::ast::constant_definition>& defs)
 		{
-			std::variant<fs::lang::constants_map, fs::compiler::compile_error> map_or_error =
-				resolve_constants(defs);
-			BOOST_TEST_REQUIRE(std::holds_alternative<fs::compiler::compile_error>(map_or_error));
-			return std::get<fs::compiler::compile_error>(std::move(map_or_error));
+			std::variant<fs::lang::symbol_table, fs::compiler::compile_error> symbols_or_error =
+				resolve_symbols(defs);
+			BOOST_TEST_REQUIRE(std::holds_alternative<fs::compiler::compile_error>(symbols_or_error));
+			return std::get<fs::compiler::compile_error>(std::move(symbols_or_error));
 		}
 
 		// checks all fields except nested errors
@@ -117,7 +117,7 @@ xyz = 3
 )";
 			const std::string_view input = input_str;
 			const fs::parser::parse_success_data parse_data = parse(input);
-			const fs::compiler::compile_error error = expect_error_when_resolving_constants(parse_data.ast.constant_definitions);
+			const fs::compiler::compile_error error = expect_error_when_resolving_symbols(parse_data.ast.constant_definitions);
 			const auto& error_desc = expect_error_of_type<errors::name_already_exists>(error, parse_data.lookup_data);
 
 			const std::string_view pattern = "xyz";
@@ -140,7 +140,7 @@ xyz = non_existent_obj
 )";
 			const std::string_view input = input_str;
 			const fs::parser::parse_success_data parse_data = parse(input);
-			const fs::compiler::compile_error error = expect_error_when_resolving_constants(parse_data.ast.constant_definitions);
+			const fs::compiler::compile_error error = expect_error_when_resolving_symbols(parse_data.ast.constant_definitions);
 			const auto& error_desc = expect_error_of_type<errors::no_such_name>(error, parse_data.lookup_data);
 
 			const std::string_view expected_place_of_name = search(input, "non_existent_obj");
@@ -155,7 +155,7 @@ abc = non_existent_func(0)
 )";
 			const std::string_view input = input_str;
 			const fs::parser::parse_success_data parse_data = parse(input);
-			const fs::compiler::compile_error error = expect_error_when_resolving_constants(parse_data.ast.constant_definitions);
+			const fs::compiler::compile_error error = expect_error_when_resolving_symbols(parse_data.ast.constant_definitions);
 			const auto& error_desc = expect_error_of_type<errors::no_such_function>(error, parse_data.lookup_data);
 
 			const std::string_view expected_place_of_name = search(input, "non_existent_func");
@@ -172,7 +172,7 @@ elem = arr[x]
 )";
 			const std::string_view input = input_str;
 			const fs::parser::parse_success_data parse_data = parse(input);
-			const fs::compiler::compile_error error = expect_error_when_resolving_constants(parse_data.ast.constant_definitions);
+			const fs::compiler::compile_error error = expect_error_when_resolving_symbols(parse_data.ast.constant_definitions);
 			const auto& error_desc = expect_error_of_type<errors::index_out_of_range>(error, parse_data.lookup_data);
 
 			BOOST_TEST(error_desc.array_size == 3);
@@ -190,7 +190,7 @@ path = Path(11, 22)
 )";
 			const std::string_view input = input_str;
 			const fs::parser::parse_success_data parse_data = parse(input);
-			const fs::compiler::compile_error error = expect_error_when_resolving_constants(parse_data.ast.constant_definitions);
+			const fs::compiler::compile_error error = expect_error_when_resolving_symbols(parse_data.ast.constant_definitions);
 			const auto& error_desc = expect_error_of_type<errors::failed_constructor_call>(error, parse_data.lookup_data);
 
 			const std::string_view expected_place_of_function_call = search(input, "Path(11, 22)");
@@ -218,7 +218,7 @@ path = Path(123)
 )";
 			const std::string_view input = input_str;
 			const fs::parser::parse_success_data parse_data = parse(input);
-			const fs::compiler::compile_error error = expect_error_when_resolving_constants(parse_data.ast.constant_definitions);
+			const fs::compiler::compile_error error = expect_error_when_resolving_symbols(parse_data.ast.constant_definitions);
 			const auto& error_desc = expect_error_of_type<errors::failed_constructor_call>(error, parse_data.lookup_data);
 
 			const std::string_view expected_place_of_function_call = search(input, "Path(123)");
@@ -246,7 +246,7 @@ group = Group("")
 )";
 			const std::string_view input = input_str;
 			const fs::parser::parse_success_data parse_data = parse(input);
-			const fs::compiler::compile_error error = expect_error_when_resolving_constants(parse_data.ast.constant_definitions);
+			const fs::compiler::compile_error error = expect_error_when_resolving_symbols(parse_data.ast.constant_definitions);
 			const auto& error_desc = expect_error_of_type<errors::failed_constructor_call>(error, parse_data.lookup_data);
 
 			const std::string_view expected_place_of_function_call = search(input, "Group(\"\")");
@@ -272,7 +272,7 @@ group = Group("GBAC")
 )";
 			const std::string_view input = input_str;
 			const fs::parser::parse_success_data parse_data = parse(input);
-			const fs::compiler::compile_error error = expect_error_when_resolving_constants(parse_data.ast.constant_definitions);
+			const fs::compiler::compile_error error = expect_error_when_resolving_symbols(parse_data.ast.constant_definitions);
 			const auto& error_desc = expect_error_of_type<errors::failed_constructor_call>(error, parse_data.lookup_data);
 
 			const std::string_view expected_place_of_function_call = search(input, "Group(\"GBAC\")");
@@ -298,7 +298,7 @@ group = Group("RRRRRRR") # 7 characters
 )";
 			const std::string_view input = input_str;
 			const fs::parser::parse_success_data parse_data = parse(input);
-			const fs::compiler::compile_error error = expect_error_when_resolving_constants(parse_data.ast.constant_definitions);
+			const fs::compiler::compile_error error = expect_error_when_resolving_symbols(parse_data.ast.constant_definitions);
 			const auto& error_desc = expect_error_of_type<errors::failed_constructor_call>(error, parse_data.lookup_data);
 
 			const std::string_view expected_place_of_function_call = search(input, "Group(\"RRRRRRR\")");
@@ -324,7 +324,7 @@ icon = MinimapIcon(1234, green, circle) # size must be in range [0, 2]
 )";
 			const std::string_view input = input_str;
 			const fs::parser::parse_success_data parse_data = parse(input);
-			const fs::compiler::compile_error error = expect_error_when_resolving_constants(parse_data.ast.constant_definitions);
+			const fs::compiler::compile_error error = expect_error_when_resolving_symbols(parse_data.ast.constant_definitions);
 			const auto& error_desc = expect_error_of_type<errors::failed_constructor_call>(error, parse_data.lookup_data);
 
 			const std::string_view expected_place_of_function_call = search(input, "MinimapIcon(1234, green, circle)");

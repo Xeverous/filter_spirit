@@ -12,7 +12,7 @@
  */
 #pragma once
 
-#include "fs/parser/ast.hpp"
+#include <fs/parser/ast.hpp>
 
 #include <boost/fusion/include/adapt_struct.hpp>
 

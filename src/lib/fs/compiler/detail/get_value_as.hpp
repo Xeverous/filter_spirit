@@ -1,11 +1,11 @@
 #pragma once
 
-#include "fs/lang/types.hpp"
-#include "fs/lang/traits/promotions.hpp"
-#include "fs/lang/traits/is_lang_type.hpp"
-#include "fs/utility/type_list.hpp"
-#include "fs/compiler/error.hpp"
-#include "fs/compiler/detail/type_constructors.hpp"
+#include <fs/lang/types.hpp>
+#include <fs/lang/traits/promotions.hpp>
+#include <fs/lang/traits/is_lang_type.hpp>
+#include <fs/utility/type_list.hpp>
+#include <fs/compiler/error.hpp>
+#include <fs/compiler/detail/type_constructors.hpp>
 
 #include <array>
 #include <variant>

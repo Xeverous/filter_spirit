@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "fs/lang/item_price_data.hpp"
+#include <fs/lang/item_price_data.hpp>
 
 #include <string>
 #include <optional>

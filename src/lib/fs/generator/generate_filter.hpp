@@ -1,8 +1,8 @@
 #pragma once
 
-#include "fs/lang/item_price_data.hpp"
-#include "fs/generator/options.hpp"
-#include "fs/generator/metadata.hpp"
+#include <fs/lang/item_price_data.hpp>
+#include <fs/generator/options.hpp>
+#include <fs/generator/metadata.hpp>
 
 #include <string_view>
 #include <optional>

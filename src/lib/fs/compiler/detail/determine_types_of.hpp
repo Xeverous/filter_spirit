@@ -1,8 +1,8 @@
 #pragma once
 
-#include "fs/parser/ast.hpp"
-#include "fs/lang/constants_map.hpp"
-#include "fs/lang/item_price_data.hpp"
+#include <fs/parser/ast.hpp>
+#include <fs/lang/symbol_table.hpp>
+#include <fs/lang/item_price_data.hpp>
 
 #include <vector>
 #include <optional>
@@ -18,7 +18,7 @@ namespace fs::compiler::detail
 [[nodiscard]] std::vector<std::optional<lang::object_type>>
 determine_types_of(
 	const parser::ast::value_expression_list& expressions,
-	const lang::constants_map& map,
+	const lang::symbol_table& symbols,
 	const lang::item_price_data& item_price_data);
 
 }

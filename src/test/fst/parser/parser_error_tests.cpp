@@ -1,6 +1,6 @@
-#include "fst/common/test_fixtures.hpp"
+#include <fst/common/test_fixtures.hpp>
 
-#include "fs/parser/parser.hpp"
+#include <fs/parser/parser.hpp>
 
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>

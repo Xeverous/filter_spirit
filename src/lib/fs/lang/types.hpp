@@ -1,7 +1,7 @@
 #pragma once
 
-#include "fs/utility/type_traits.hpp"
-#include "fs/utility/better_enum.hpp"
+#include <fs/utility/type_traits.hpp>
+#include <fs/utility/better_enum.hpp>
 
 #include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
 

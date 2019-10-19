@@ -1,11 +1,11 @@
-#include "fs/compiler/detail/evaluate.hpp"
-#include "fs/compiler/detail/evaluate_as.hpp"
-#include "fs/compiler/detail/get_value_as.hpp"
-#include "fs/compiler/detail/queries.hpp"
-#include "fs/compiler/detail/construct.hpp"
-#include "fs/lang/functions.hpp"
-#include "fs/lang/queries.hpp"
-#include "fs/lang/types.hpp"
+#include <fs/compiler/detail/evaluate.hpp>
+#include <fs/compiler/detail/evaluate_as.hpp>
+#include <fs/compiler/detail/get_value_as.hpp>
+#include <fs/compiler/detail/queries.hpp>
+#include <fs/compiler/detail/construct.hpp>
+#include <fs/lang/functions.hpp>
+#include <fs/lang/queries.hpp>
+#include <fs/lang/types.hpp>
 
 #include <cassert>
 #include <utility>
@@ -82,7 +82,7 @@ verify_array_homogeneity(
 [[nodiscard]] std::variant<lang::object, compile_error>
 evaluate_array(
 	const ast::array_expression& expression,
-	const lang::constants_map& map,
+	const lang::symbol_table& symbols,
 	const lang::item_price_data& item_price_data)
 {
 	// note: the entire function should work also in case of empty array
@@ -90,7 +90,7 @@ evaluate_array(
 	for (const ast::value_expression& value_expression : expression.elements)
 	{
 		std::variant<lang::object, compile_error> object_or_error =
-			compiler::detail::evaluate_value_expression(value_expression, map, item_price_data);
+			compiler::detail::evaluate_value_expression(value_expression, symbols, item_price_data);
 		if (std::holds_alternative<compile_error>(object_or_error))
 			return std::get<compile_error>(std::move(object_or_error));
 
@@ -150,14 +150,16 @@ subscript_index_to_array_index(int n, int array_size)
 evaluate_subscript(
 	const lang::object& obj,
 	const ast::subscript& subscript,
-	const lang::constants_map& map,
+	const lang::symbol_table& symbols,
 	const lang::item_price_data& item_price_data)
 {
-	std::variant<lang::array_object, compile_error> array_or_error = fs::compiler::detail::get_value_as<lang::array_object, false>(obj);
+	std::variant<lang::array_object, compile_error> array_or_error =
+		fs::compiler::detail::get_value_as<lang::array_object, false>(obj);
 	if (std::holds_alternative<compile_error>(array_or_error))
 		return std::get<compile_error>(std::move(array_or_error));
 
-	std::variant<lang::integer, compile_error> subscript_or_error = fs::compiler::detail::evaluate_as<lang::integer, false>(subscript.expr, map, item_price_data);
+	std::variant<lang::integer, compile_error> subscript_or_error =
+		fs::compiler::detail::evaluate_as<lang::integer, false>(subscript.expr, symbols, item_price_data);
 	if (std::holds_alternative<compile_error>(subscript_or_error))
 		return std::get<compile_error>(std::move(subscript_or_error));
 
@@ -177,7 +179,7 @@ evaluate_subscript(
 [[nodiscard]] std::variant<lang::object, compile_error>
 evaluate_function_call(
 	const ast::function_call& function_call,
-	const lang::constants_map& map,
+	const lang::symbol_table& symbols,
 	const lang::item_price_data& item_price_data)
 {
 	/*
@@ -185,7 +187,7 @@ evaluate_function_call(
 	 * so just compare function name against built-in functions
 	 *
 	 * if there is a need to support user-defined functions,
-	 * they can be stored in the map
+	 * they can be stored in the symbol_table
 	 */
 	const ast::identifier& function_name = function_call.name;
 	/*
@@ -197,7 +199,7 @@ evaluate_function_call(
 	using compiler::detail::construct;
 	if (function_name.value == lang::functions::rgb)
 	{
-		std::variant<lang::color, compile_error> color_or_error = construct<lang::color>(function_call, map, item_price_data);
+		std::variant<lang::color, compile_error> color_or_error = construct<lang::color>(function_call, symbols, item_price_data);
 		if (std::holds_alternative<compile_error>(color_or_error))
 			return std::get<compile_error>(std::move(color_or_error));
 
@@ -207,7 +209,7 @@ evaluate_function_call(
 	}
 	else if (function_name.value == lang::functions::level)
 	{
-		std::variant<lang::level, compile_error> level_or_error = construct<lang::level>(function_call, map, item_price_data);
+		std::variant<lang::level, compile_error> level_or_error = construct<lang::level>(function_call, symbols, item_price_data);
 		if (std::holds_alternative<compile_error>(level_or_error))
 			return std::get<compile_error>(std::move(level_or_error));
 
@@ -217,7 +219,7 @@ evaluate_function_call(
 	}
 	else if (function_name.value == lang::functions::font_size)
 	{
-		std::variant<lang::font_size, compile_error> font_size_or_error = construct<lang::font_size>(function_call, map, item_price_data);
+		std::variant<lang::font_size, compile_error> font_size_or_error = construct<lang::font_size>(function_call, symbols, item_price_data);
 		if (std::holds_alternative<compile_error>(font_size_or_error))
 			return std::get<compile_error>(std::move(font_size_or_error));
 
@@ -227,7 +229,7 @@ evaluate_function_call(
 	}
 	else if (function_name.value == lang::functions::sound_id)
 	{
-		std::variant<lang::sound_id, compile_error> sound_id_or_error = construct<lang::sound_id>(function_call, map, item_price_data);
+		std::variant<lang::sound_id, compile_error> sound_id_or_error = construct<lang::sound_id>(function_call, symbols, item_price_data);
 		if (std::holds_alternative<compile_error>(sound_id_or_error))
 			return std::get<compile_error>(std::move(sound_id_or_error));
 
@@ -237,7 +239,7 @@ evaluate_function_call(
 	}
 	else if (function_name.value == lang::functions::volume)
 	{
-		std::variant<lang::volume, compile_error> volume_or_error = construct<lang::volume>(function_call, map, item_price_data);
+		std::variant<lang::volume, compile_error> volume_or_error = construct<lang::volume>(function_call, symbols, item_price_data);
 		if (std::holds_alternative<compile_error>(volume_or_error))
 			return std::get<compile_error>(std::move(volume_or_error));
 
@@ -247,7 +249,7 @@ evaluate_function_call(
 	}
 	else if (function_name.value == lang::functions::group)
 	{
-		std::variant<lang::socket_group, compile_error> socket_group_or_error = construct<lang::socket_group>(function_call, map, item_price_data);
+		std::variant<lang::socket_group, compile_error> socket_group_or_error = construct<lang::socket_group>(function_call, symbols, item_price_data);
 		if (std::holds_alternative<compile_error>(socket_group_or_error))
 			return std::get<compile_error>(std::move(socket_group_or_error));
 
@@ -257,7 +259,7 @@ evaluate_function_call(
 	}
 	else if (function_name.value == lang::functions::minimap_icon)
 	{
-		std::variant<lang::minimap_icon, compile_error> icon_or_error = construct<lang::minimap_icon>(function_call, map, item_price_data);
+		std::variant<lang::minimap_icon, compile_error> icon_or_error = construct<lang::minimap_icon>(function_call, symbols, item_price_data);
 		if (std::holds_alternative<compile_error>(icon_or_error))
 			return std::get<compile_error>(std::move(icon_or_error));
 
@@ -267,7 +269,7 @@ evaluate_function_call(
 	}
 	else if (function_name.value == lang::functions::beam_effect)
 	{
-		std::variant<lang::beam_effect, compile_error> beam_effect_or_error = construct<lang::beam_effect>(function_call, map, item_price_data);
+		std::variant<lang::beam_effect, compile_error> beam_effect_or_error = construct<lang::beam_effect>(function_call, symbols, item_price_data);
 		if (std::holds_alternative<compile_error>(beam_effect_or_error))
 			return std::get<compile_error>(std::move(beam_effect_or_error));
 
@@ -277,7 +279,7 @@ evaluate_function_call(
 	}
 	else if (function_name.value == lang::functions::path)
 	{
-		std::variant<lang::path, compile_error> path_or_error = construct<lang::path>(function_call, map, item_price_data);
+		std::variant<lang::path, compile_error> path_or_error = construct<lang::path>(function_call, symbols, item_price_data);
 		if (std::holds_alternative<compile_error>(path_or_error))
 			return std::get<compile_error>(std::move(path_or_error));
 
@@ -287,7 +289,7 @@ evaluate_function_call(
 	}
 	else if (function_name.value == lang::functions::alert_sound)
 	{
-		std::variant<lang::alert_sound, compile_error> alert_sound_or_error = construct<lang::alert_sound>(function_call, map, item_price_data);
+		std::variant<lang::alert_sound, compile_error> alert_sound_or_error = construct<lang::alert_sound>(function_call, symbols, item_price_data);
 		if (std::holds_alternative<compile_error>(alert_sound_or_error))
 			return std::get<compile_error>(std::move(alert_sound_or_error));
 
@@ -302,11 +304,11 @@ evaluate_function_call(
 [[nodiscard]] std::variant<lang::object, compile_error>
 evaluate_price_range_query(
 	const ast::price_range_query& price_range_query,
-	const lang::constants_map& map,
+	const lang::symbol_table& symbols,
 	const lang::item_price_data& item_price_data)
 {
 	std::variant<lang::price_range, compile_error> range_or_error =
-		compiler::detail::construct_price_range(price_range_query.arguments, map, item_price_data);
+		compiler::detail::construct_price_range(price_range_query.arguments, symbols, item_price_data);
 	if (std::holds_alternative<compile_error>(range_or_error))
 		return std::get<compile_error>(std::move(range_or_error));
 
@@ -424,12 +426,12 @@ evaluate_price_range_query(
 [[nodiscard]] std::variant<lang::object, compile_error>
 evaluate_identifier(
 	const ast::identifier& identifier,
-	const lang::constants_map& map)
+	const lang::symbol_table& symbols)
 {
 	const lang::position_tag place_of_name = parser::get_position_info(identifier);
 
-	const auto it = map.find(identifier.value); // C++17: use if (expr; cond)
-	if (it == map.end())
+	const auto it = symbols.find(identifier.value);
+	if (it == symbols.end())
 		return errors::no_such_name{place_of_name};
 
 	return lang::object{it->second.object_instance.value, place_of_name};
@@ -438,7 +440,7 @@ evaluate_identifier(
 [[nodiscard]] std::variant<lang::object, compile_error>
 evaluate_primary_expression(
 	const ast::primary_expression& primary_expression,
-	const lang::constants_map& map,
+	const lang::symbol_table& symbols,
 	const lang::item_price_data& item_price_data)
 {
 	using result_type = std::variant<lang::object, compile_error>;
@@ -448,16 +450,16 @@ evaluate_primary_expression(
 			return evaluate_literal(literal);
 		},
 		[&](const ast::array_expression& array) {
-			return evaluate_array(array, map, item_price_data);
+			return evaluate_array(array, symbols, item_price_data);
 		},
 		[&](const ast::function_call& function_call) {
-			return evaluate_function_call(function_call, map, item_price_data);
+			return evaluate_function_call(function_call, symbols, item_price_data);
 		},
 		[&](const ast::price_range_query& price_range_query) {
-			return evaluate_price_range_query(price_range_query, map, item_price_data);
+			return evaluate_price_range_query(price_range_query, symbols, item_price_data);
 		},
 		[&](const ast::identifier& identifier) {
-			return evaluate_identifier(identifier, map);
+			return evaluate_identifier(identifier, symbols);
 		}
 	));
 }
@@ -470,19 +472,19 @@ namespace fs::compiler::detail
 std::variant<lang::object, compile_error>
 evaluate_value_expression(
 	const ast::value_expression& value_expression,
-	const lang::constants_map& map,
+	const lang::symbol_table& symbols,
 	const lang::item_price_data& item_price_data)
 {
 	using result_type = std::variant<lang::object, compile_error>;
 
-	result_type result = evaluate_primary_expression(value_expression.primary_expr, map, item_price_data);
+	result_type result = evaluate_primary_expression(value_expression.primary_expr, symbols, item_price_data);
 	if (std::holds_alternative<compile_error>(result))
 		return std::get<compile_error>(std::move(result));
 
 	auto& obj = std::get<lang::object>(result);
 	for (auto& expr : value_expression.postfix_exprs)
 	{
-		result_type res = evaluate_subscript(obj, expr.expr, map, item_price_data);
+		result_type res = evaluate_subscript(obj, expr.expr, symbols, item_price_data);
 		if (std::holds_alternative<compile_error>(res))
 			return std::get<compile_error>(std::move(res));
 		else

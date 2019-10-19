@@ -1,10 +1,9 @@
-#include "fs/compiler/compiler.hpp"
-#include "fs/compiler/error.hpp"
-#include "fs/compiler/detail/evaluate.hpp"
-#include "fs/compiler/detail/filter_builder.hpp"
-#include "fs/parser/ast.hpp"
-#include "fs/lang/constants_map.hpp"
-
+#include <fs/lang/symbol_table.hpp>
+#include <fs/compiler/compiler.hpp>
+#include <fs/compiler/error.hpp>
+#include <fs/compiler/detail/evaluate.hpp>
+#include <fs/compiler/detail/filter_builder.hpp>
+#include <fs/parser/ast.hpp>
 #include <cassert>
 #include <string_view>
 #include <utility>
@@ -33,14 +32,13 @@ namespace ast = fs::parser::ast;
 [[nodiscard]] std::optional<compile_error>
 add_constant_from_definition(
 	const ast::constant_definition& def,
-	lang::constants_map& map,
+	lang::symbol_table& symbols,
 	const lang::item_price_data& item_price_data)
 {
 	const ast::identifier& wanted_name = def.name;
 	const ast::value_expression& value_expression = def.value;
 
-	const auto it = map.find(wanted_name.value); // C++17: use if (expr; cond)
-	if (it != map.end())
+	if (const auto it = symbols.find(wanted_name.value); it != symbols.end())
 	{
 		const lang::position_tag place_of_original_name = parser::get_position_info(it->second.name_origin);
 		const lang::position_tag place_of_duplicated_name = parser::get_position_info(wanted_name);
@@ -48,12 +46,12 @@ add_constant_from_definition(
 	}
 
 	std::variant<lang::object, compile_error> expr_result =
-		compiler::detail::evaluate_value_expression(value_expression, map, item_price_data);
+		compiler::detail::evaluate_value_expression(value_expression, symbols, item_price_data);
 
 	if (std::holds_alternative<compile_error>(expr_result))
 		return std::get<compile_error>(std::move(expr_result));
 
-	const auto pair = map.emplace(
+	const auto pair = symbols.emplace(
 		wanted_name.value,
 		lang::named_object{
 			std::get<lang::object>(std::move(expr_result)),
@@ -68,31 +66,31 @@ add_constant_from_definition(
 namespace fs::compiler
 {
 
-std::variant<lang::constants_map, compile_error>
-resolve_constants(
+std::variant<lang::symbol_table, compile_error>
+resolve_symbols(
 	const std::vector<parser::ast::constant_definition>& constant_definitions,
 	const lang::item_price_data& item_price_data)
 {
-	lang::constants_map map;
+	lang::symbol_table symbols;
 
 	for (const ast::constant_definition& def : constant_definitions)
 	{
-		std::optional<compile_error> error = add_constant_from_definition(def, map, item_price_data);
+		std::optional<compile_error> error = add_constant_from_definition(def, symbols, item_price_data);
 
 		if (error)
 			return *std::move(error);
 	}
 
-	return map;
+	return symbols;
 }
 
 std::variant<std::vector<lang::filter_block>, compile_error>
 compile_statements(
 	const std::vector<parser::ast::statement>& statements,
-	const lang::constants_map& map,
+	const lang::symbol_table& symbols,
 	const lang::item_price_data& item_price_data)
 {
-	return detail::filter_builder::build_filter(statements, map, item_price_data);
+	return detail::filter_builder::build_filter(statements, symbols, item_price_data);
 }
 
 } // namespace fs::compiler

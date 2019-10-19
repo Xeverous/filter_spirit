@@ -1,7 +1,7 @@
 #pragma once
 
-#include "fs/parser/parser.hpp"
-#include "fs/compiler/error.hpp"
+#include <fs/parser/parser.hpp>
+#include <fs/compiler/error.hpp>
 
 namespace fs::log { class logger; }
 

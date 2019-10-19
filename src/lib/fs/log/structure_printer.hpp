@@ -1,7 +1,7 @@
 #pragma once
 
-#include "fs/utility/type_traits.hpp"
-#include "fs/utility/type_name.hpp"
+#include <fs/utility/type_traits.hpp>
+#include <fs/utility/type_name.hpp>
 
 #include <boost/fusion/include/for_each.hpp>
 

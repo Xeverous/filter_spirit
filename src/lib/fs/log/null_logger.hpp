@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fs/log/logger.hpp"
+#include <fs/log/logger.hpp>
 
 namespace fs::log
 {

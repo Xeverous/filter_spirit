@@ -1,7 +1,7 @@
 #pragma once
 
-#include "fs/lang/types.hpp"
-#include "fs/lang/keywords.hpp"
+#include <fs/lang/types.hpp>
+#include <fs/lang/keywords.hpp>
 
 #include <boost/spirit/home/x3/string/symbols.hpp>
 

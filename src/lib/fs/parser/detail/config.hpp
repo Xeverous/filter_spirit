@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fs/parser/error.hpp"
+#include <fs/parser/error.hpp>
 
 #include <boost/spirit/home/x3.hpp>
 #include <boost/spirit/home/x3/support/ast/position_tagged.hpp>

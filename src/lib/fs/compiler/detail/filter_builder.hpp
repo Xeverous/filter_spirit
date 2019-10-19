@@ -1,12 +1,12 @@
 #pragma once
-#include "fs/compiler/error.hpp"
-#include "fs/lang/constants_map.hpp"
-#include "fs/lang/action_set.hpp"
-#include "fs/lang/condition_set.hpp"
-#include "fs/lang/filter_block.hpp"
-#include "fs/lang/item_price_data.hpp"
-#include "fs/parser/parser.hpp"
-#include "fs/parser/ast.hpp"
+#include <fs/lang/symbol_table.hpp>
+#include <fs/compiler/error.hpp>
+#include <fs/lang/action_set.hpp>
+#include <fs/lang/condition_set.hpp>
+#include <fs/lang/filter_block.hpp>
+#include <fs/lang/item_price_data.hpp>
+#include <fs/parser/parser.hpp>
+#include <fs/parser/ast.hpp>
 
 #include <utility>
 #include <vector>
@@ -23,14 +23,14 @@ public:
 	std::variant<std::vector<lang::filter_block>, compile_error>
 	build_filter(
 		const std::vector<parser::ast::statement>& top_level_statements,
-		const lang::constants_map& map,
+		const lang::symbol_table& symbols,
 		const lang::item_price_data& item_price_data);
 
 private:
 	filter_builder(
-		const lang::constants_map& map,
+		const lang::symbol_table& symbols,
 		const lang::item_price_data& item_price_data)
-	: map(map), item_price_data(item_price_data)
+	: symbols(symbols), item_price_data(item_price_data)
 	{}
 
 	[[nodiscard]] std::variant<std::vector<lang::filter_block>, compile_error>
@@ -61,7 +61,7 @@ private:
 		const lang::condition_set& parent_conditions,
 		const lang::action_set& parent_actions);
 
-	const lang::constants_map& map;
+	const lang::symbol_table& symbols;
 	const lang::item_price_data& item_price_data;
 
 	std::vector<lang::filter_block> blocks;

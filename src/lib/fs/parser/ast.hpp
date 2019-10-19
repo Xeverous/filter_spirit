@@ -5,7 +5,7 @@
  */
 #pragma once
 
-#include "fs/lang/types.hpp"
+#include <fs/lang/types.hpp>
 
 #include <boost/optional.hpp>
 #include <boost/spirit/home/x3/support/ast/variant.hpp>

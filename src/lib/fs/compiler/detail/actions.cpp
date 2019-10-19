@@ -1,5 +1,5 @@
-#include "fs/compiler/detail/actions.hpp"
-#include "fs/compiler/detail/evaluate_as.hpp"
+#include <fs/compiler/detail/actions.hpp>
+#include <fs/compiler/detail/evaluate_as.hpp>
 
 #include <boost/spirit/home/x3/support/utility/lambda_visitor.hpp>
 
@@ -17,7 +17,7 @@ using namespace fs::compiler;
 [[nodiscard]] std::optional<compile_error>
 add_unary_action(
 	const ast::unary_action& action,
-	const lang::constants_map& map,
+	const lang::symbol_table& symbols,
 	const lang::item_price_data& item_price_data,
 	lang::action_set& action_set)
 {
@@ -25,7 +25,7 @@ add_unary_action(
 	{
 		case lang::unary_action_type::set_border_color:
 		{
-			std::variant<lang::color, compile_error> color_or_error = detail::evaluate_as<lang::color>(action.value, map, item_price_data);
+			std::variant<lang::color, compile_error> color_or_error = detail::evaluate_as<lang::color>(action.value, symbols, item_price_data);
 			if (std::holds_alternative<compile_error>(color_or_error))
 				return std::get<compile_error>(std::move(color_or_error));
 
@@ -34,7 +34,7 @@ add_unary_action(
 		}
 		case lang::unary_action_type::set_text_color:
 		{
-			std::variant<lang::color, compile_error> color_or_error = detail::evaluate_as<lang::color>(action.value, map, item_price_data);
+			std::variant<lang::color, compile_error> color_or_error = detail::evaluate_as<lang::color>(action.value, symbols, item_price_data);
 			if (std::holds_alternative<compile_error>(color_or_error))
 				return std::get<compile_error>(std::move(color_or_error));
 
@@ -43,7 +43,7 @@ add_unary_action(
 		}
 		case lang::unary_action_type::set_background_color:
 		{
-			std::variant<lang::color, compile_error> color_or_error = detail::evaluate_as<lang::color>(action.value, map, item_price_data);
+			std::variant<lang::color, compile_error> color_or_error = detail::evaluate_as<lang::color>(action.value, symbols, item_price_data);
 			if (std::holds_alternative<compile_error>(color_or_error))
 				return std::get<compile_error>(std::move(color_or_error));
 
@@ -52,7 +52,7 @@ add_unary_action(
 		}
 		case lang::unary_action_type::set_font_size:
 		{
-			std::variant<lang::font_size, compile_error> font_size_or_error = detail::evaluate_as<lang::font_size>(action.value, map, item_price_data);
+			std::variant<lang::font_size, compile_error> font_size_or_error = detail::evaluate_as<lang::font_size>(action.value, symbols, item_price_data);
 			if (std::holds_alternative<compile_error>(font_size_or_error))
 				return std::get<compile_error>(std::move(font_size_or_error));
 
@@ -61,7 +61,7 @@ add_unary_action(
 		}
 		case lang::unary_action_type::set_alert_sound:
 		{
-			std::variant<lang::alert_sound, compile_error> alert_or_error = detail::evaluate_as<lang::alert_sound>(action.value, map, item_price_data);
+			std::variant<lang::alert_sound, compile_error> alert_or_error = detail::evaluate_as<lang::alert_sound>(action.value, symbols, item_price_data);
 			if (std::holds_alternative<compile_error>(alert_or_error))
 				return std::get<compile_error>(std::move(alert_or_error));
 
@@ -70,7 +70,7 @@ add_unary_action(
 		}
 		case lang::unary_action_type::play_default_drop_sound:
 		{
-			std::variant<lang::boolean, compile_error> bool_or_error = detail::evaluate_as<lang::boolean>(action.value, map, item_price_data);
+			std::variant<lang::boolean, compile_error> bool_or_error = detail::evaluate_as<lang::boolean>(action.value, symbols, item_price_data);
 			if (std::holds_alternative<compile_error>(bool_or_error))
 				return std::get<compile_error>(std::move(bool_or_error));
 
@@ -80,7 +80,7 @@ add_unary_action(
 		}
 		case lang::unary_action_type::set_minimap_icon:
 		{
-			std::variant<lang::minimap_icon, compile_error> icon_or_error = detail::evaluate_as<lang::minimap_icon>(action.value, map, item_price_data);
+			std::variant<lang::minimap_icon, compile_error> icon_or_error = detail::evaluate_as<lang::minimap_icon>(action.value, symbols, item_price_data);
 			if (std::holds_alternative<compile_error>(icon_or_error))
 				return std::get<compile_error>(std::move(icon_or_error));
 
@@ -89,7 +89,7 @@ add_unary_action(
 		}
 		case lang::unary_action_type::set_beam:
 		{
-			std::variant<lang::beam_effect, compile_error> beam_or_error = detail::evaluate_as<lang::beam_effect>(action.value, map, item_price_data);
+			std::variant<lang::beam_effect, compile_error> beam_or_error = detail::evaluate_as<lang::beam_effect>(action.value, symbols, item_price_data);
 			if (std::holds_alternative<compile_error>(beam_or_error))
 				return std::get<compile_error>(std::move(beam_or_error));
 
@@ -111,11 +111,11 @@ namespace fs::compiler::detail
 std::optional<compile_error>
 add_action(
 	const ast::action& action,
-	const lang::constants_map& map,
+	const lang::symbol_table& symbols,
 	const lang::item_price_data& item_price_data,
 	lang::action_set& action_set)
 {
-	return add_unary_action(action.action, map, item_price_data, action_set);
+	return add_unary_action(action.action, symbols, item_price_data, action_set);
 }
 
 }

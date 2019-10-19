@@ -1,5 +1,5 @@
-#include "fs/lang/item_price_data.hpp"
-#include "fs/log/logger.hpp"
+#include <fs/lang/item_price_data.hpp>
+#include <fs/log/logger.hpp>
 
 namespace fs::lang
 {

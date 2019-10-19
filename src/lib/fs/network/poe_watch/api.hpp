@@ -1,7 +1,7 @@
 #pragma once
 
-#include "fs/lang/item_price_data.hpp"
-#include "fs/lang/league.hpp"
+#include <fs/lang/item_price_data.hpp>
+#include <fs/lang/league.hpp>
 
 #include <vector>
 #include <future>

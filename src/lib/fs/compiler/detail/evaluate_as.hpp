@@ -1,7 +1,7 @@
 #pragma once
 
-#include "fs/compiler/detail/evaluate.hpp"
-#include "fs/compiler/detail/get_value_as.hpp"
+#include <fs/compiler/detail/evaluate.hpp>
+#include <fs/compiler/detail/get_value_as.hpp>
 
 #include <utility>
 
@@ -12,10 +12,10 @@ template <typename T, bool AllowPromotions = true>
 [[nodiscard]] std::variant<T, compile_error>
 evaluate_as(
 	const parser::ast::value_expression& expression,
-	const lang::constants_map& map,
+	const lang::symbol_table& symbols,
 	const lang::item_price_data& item_price_data)
 {
-	std::variant<lang::object, compile_error> object_or_error = evaluate_value_expression(expression, map, item_price_data);
+	std::variant<lang::object, compile_error> object_or_error = evaluate_value_expression(expression, symbols, item_price_data);
 
 	if (std::holds_alternative<compile_error>(object_or_error))
 		return std::get<compile_error>(std::move(object_or_error));

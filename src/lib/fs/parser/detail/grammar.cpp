@@ -4,8 +4,8 @@
  * @details This file is intended for compilation of grammar objects.
  * Use BOOST_SPIRIT_INSTANTIATE here.
  */
-#include "fs/parser/ast_adapted.hpp"
-#include "fs/parser/detail/grammar_def.hpp"
+#include <fs/parser/ast_adapted.hpp>
+#include <fs/parser/detail/grammar_def.hpp>
 
 namespace fs::parser::detail
 {

@@ -1,10 +1,10 @@
-#include "fst/common/test_fixtures.hpp"
+#include <fst/common/test_fixtures.hpp>
 
-#include "fs/lang/item_price_data.hpp"
-#include "fs/parser/parser.hpp"
-#include "fs/compiler/compiler.hpp"
-#include "fs/core/version.hpp"
-#include "fs/log/buffered_logger.hpp"
+#include <fs/lang/item_price_data.hpp>
+#include <fs/parser/parser.hpp>
+#include <fs/compiler/compiler.hpp>
+#include <fs/core/version.hpp>
+#include <fs/log/buffered_logger.hpp>
 
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
@@ -41,11 +41,11 @@ pr::parse_success_data parser_fixture::parse(std::string_view input)
 	return std::get<pr::parse_success_data>(std::move(parse_result));
 }
 
-std::variant<fs::lang::constants_map, fs::compiler::compile_error>
-compiler_fixture::resolve_constants(
+std::variant<fs::lang::symbol_table, fs::compiler::compile_error>
+compiler_fixture::resolve_symbols(
 	const std::vector<pr::ast::constant_definition>& defs)
 {
-	return fs::compiler::resolve_constants(defs, fs::lang::item_price_data{});
+	return fs::compiler::resolve_symbols(defs, fs::lang::item_price_data{});
 }
 
 }

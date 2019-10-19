@@ -1,14 +1,14 @@
 #pragma once
 
-#include "fs/parser/ast.hpp"
-#include "fs/lang/types.hpp"
-#include "fs/lang/constants_map.hpp"
-#include "fs/lang/item_price_data.hpp"
-#include "fs/lang/traits/promotions.hpp"
-#include "fs/compiler/error.hpp"
-#include "fs/compiler/detail/evaluate_as.hpp"
-#include "fs/compiler/detail/type_constructors.hpp"
-#include "fs/compiler/detail/determine_types_of.hpp"
+#include <fs/parser/ast.hpp>
+#include <fs/lang/types.hpp>
+#include <fs/lang/symbol_table.hpp>
+#include <fs/lang/item_price_data.hpp>
+#include <fs/lang/traits/promotions.hpp>
+#include <fs/compiler/error.hpp>
+#include <fs/compiler/detail/evaluate_as.hpp>
+#include <fs/compiler/detail/type_constructors.hpp>
+#include <fs/compiler/detail/determine_types_of.hpp>
 
 #include <array>
 #include <cassert>
@@ -44,7 +44,7 @@ namespace impl
 	template <typename T, typename... Args> [[nodiscard]]
 	std::variant<T, compile_error> unpack_args_and_call_constructor(
 		const parser::ast::value_expression_list& arguments,
-		const lang::constants_map& /* map */,
+		const lang::symbol_table& /* symbols */,
 		const lang::item_price_data& /* item_price_data */,
 		lang::traits::constructor_argument_list<>,
 		Args&&... args)
@@ -66,21 +66,21 @@ namespace impl
 	> [[nodiscard]]
 	std::variant<T, compile_error> unpack_args_and_call_constructor(
 		const parser::ast::value_expression_list& arguments,
-		const lang::constants_map& map,
+		const lang::symbol_table& symbols,
 		const lang::item_price_data& item_price_data,
 		lang::traits::constructor_argument_list<ConstructorArgType, OtherConstructorArgTypes...>,
 		Args&&... args)
 	{
 		constexpr auto index = sizeof...(Args);
 		std::variant<ConstructorArgType, compile_error> arg_or_error =
-			evaluate_as<ConstructorArgType>(arguments[index], map, item_price_data);
+			evaluate_as<ConstructorArgType>(arguments[index], symbols, item_price_data);
 
 		if (std::holds_alternative<compile_error>(arg_or_error))
 			return std::get<compile_error>(std::move(arg_or_error));
 
 		return unpack_args_and_call_constructor<T>(
 			arguments,
-			map,
+			symbols,
 			item_price_data,
 			lang::traits::constructor_argument_list<OtherConstructorArgTypes...>{},
 			std::forward<Args>(args)...,
@@ -93,7 +93,7 @@ namespace impl
 	template <typename T, typename... ConstructorArgTypes> [[nodiscard]]
 	std::variant<T, compile_error> construct_check_arguments_amount(
 		const parser::ast::value_expression_list& arguments,
-		const lang::constants_map& map,
+		const lang::symbol_table& symbols,
 		const lang::item_price_data& item_price_data,
 		lang::traits::constructor_argument_list<ConstructorArgTypes...>)
 	{
@@ -109,7 +109,7 @@ namespace impl
 
 		return unpack_args_and_call_constructor<T>(
 			arguments,
-			map,
+			symbols,
 			item_price_data,
 			lang::traits::constructor_argument_list<ConstructorArgTypes...>{});
 	}
@@ -162,7 +162,7 @@ namespace impl
 	template <typename T, typename... FailedConstructors, typename... Errors> [[nodiscard]]
 	std::variant<T, compile_error> construct_attempt(
 		const parser::ast::function_call& function_call,
-		const lang::constants_map& map,
+		const lang::symbol_table& symbols,
 		const lang::item_price_data& item_price_data,
 		lang::traits::constructor_list<> /* ctors_to_attempt */,
 		lang::traits::constructor_list<FailedConstructors...> /* failed_constructors */,
@@ -197,7 +197,7 @@ namespace impl
 
 			return errors::no_matching_constructor_found{
 				lang::type_to_enum<T>(),
-				determine_types_of(function_call.arguments, map, item_price_data),
+				determine_types_of(function_call.arguments, symbols, item_price_data),
 				parser::get_position_info(function_call),
 				std::move(errors)};
 		}
@@ -214,20 +214,20 @@ namespace impl
 	> [[nodiscard]]
 	std::variant<T, compile_error> construct_attempt(
 		const parser::ast::function_call& function_call,
-		const lang::constants_map& map,
+		const lang::symbol_table& symbols,
 		const lang::item_price_data& item_price_data,
 		lang::traits::constructor_list<ConstructorArgumentList, OtherConstructorArgumentLists...> /* ctors_to_attempt */,
 		lang::traits::constructor_list<FailedConstructors...> /* failed_constructors */,
 		Errors&&... errors_so_far)
 	{
 		std::variant<T, compile_error> result = construct_check_arguments_amount<T>(
-			function_call.arguments, map, item_price_data, ConstructorArgumentList{});
+			function_call.arguments, symbols, item_price_data, ConstructorArgumentList{});
 
 		if (std::holds_alternative<compile_error>(result))
 		{
 			return construct_attempt<T>(
 				function_call,
-				map,
+				symbols,
 				item_price_data,
 				lang::traits::constructor_list<OtherConstructorArgumentLists...>{},
 				lang::traits::constructor_list<FailedConstructors..., ConstructorArgumentList>{},
@@ -243,11 +243,11 @@ namespace impl
 template <typename T> [[nodiscard]]
 std::variant<T, compile_error> construct(
 	const parser::ast::function_call& function_call,
-	const lang::constants_map& map,
+	const lang::symbol_table& symbols,
 	const lang::item_price_data& item_price_data)
 {
 	using constructors = typename lang::traits::type_traits<T>::allowed_constructors;
-	return impl::construct_attempt<T>(function_call, map, item_price_data, constructors{}, lang::traits::constructor_list<>{});
+	return impl::construct_attempt<T>(function_call, symbols, item_price_data, constructors{}, lang::traits::constructor_list<>{});
 }
 
 }

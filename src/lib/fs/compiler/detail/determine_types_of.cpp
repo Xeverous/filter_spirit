@@ -1,14 +1,14 @@
-#include "fs/compiler/detail/determine_types_of.hpp"
-#include "fs/compiler/detail/evaluate.hpp"
-#include "fs/compiler/error.hpp"
-#include "fs/lang/types.hpp"
+#include <fs/compiler/detail/determine_types_of.hpp>
+#include <fs/compiler/detail/evaluate.hpp>
+#include <fs/compiler/error.hpp>
+#include <fs/lang/types.hpp>
 
 namespace fs::compiler::detail
 {
 
 std::vector<std::optional<lang::object_type>> determine_types_of(
 	const parser::ast::value_expression_list& expressions,
-	const lang::constants_map& map,
+	const lang::symbol_table& symbols,
 	const lang::item_price_data& item_price_data)
 {
 	std::vector<std::optional<lang::object_type>> result;
@@ -17,7 +17,7 @@ std::vector<std::optional<lang::object_type>> determine_types_of(
 	for (const parser::ast::value_expression& expression : expressions)
 	{
 		std::variant<lang::object, compile_error> object_or_error =
-			evaluate_value_expression(expression, map, item_price_data);
+			evaluate_value_expression(expression, symbols, item_price_data);
 
 		if (std::holds_alternative<lang::object>(object_or_error))
 		{

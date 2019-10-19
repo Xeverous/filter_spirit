@@ -1,5 +1,5 @@
-#include "fs/compiler/detail/conditions.hpp"
-#include "fs/compiler/detail/evaluate_as.hpp"
+#include <fs/compiler/detail/conditions.hpp>
+#include <fs/compiler/detail/evaluate_as.hpp>
 
 #include <boost/spirit/home/x3/support/utility/lambda_visitor.hpp>
 
@@ -75,7 +75,7 @@ add_range_condition(
 [[nodiscard]] std::optional<compile_error>
 add_comparison_condition(
 	const ast::comparison_condition& condition,
-	const lang::constants_map& map,
+	const lang::symbol_table& symbols,
 	const lang::item_price_data& item_price_data,
 	lang::condition_set& condition_set)
 {
@@ -87,7 +87,7 @@ add_comparison_condition(
 
 		case lang::comparison_condition_property::item_level:
 		{
-			std::variant<lang::level, compile_error> level_or_error = evaluate_as<lang::level>(condition.value, map, item_price_data);
+			std::variant<lang::level, compile_error> level_or_error = evaluate_as<lang::level>(condition.value, symbols, item_price_data);
 			if (std::holds_alternative<compile_error>(level_or_error))
 				return std::get<compile_error>(std::move(level_or_error));
 
@@ -96,7 +96,7 @@ add_comparison_condition(
 		}
 		case lang::comparison_condition_property::drop_level:
 		{
-			std::variant<lang::level, compile_error> level_or_error = evaluate_as<lang::level>(condition.value, map, item_price_data);
+			std::variant<lang::level, compile_error> level_or_error = evaluate_as<lang::level>(condition.value, symbols, item_price_data);
 			if (std::holds_alternative<compile_error>(level_or_error))
 				return std::get<compile_error>(std::move(level_or_error));
 
@@ -105,7 +105,7 @@ add_comparison_condition(
 		}
 		case lang::comparison_condition_property::quality:
 		{
-			std::variant<lang::integer, compile_error> integer_or_error = evaluate_as<lang::integer>(condition.value, map, item_price_data);
+			std::variant<lang::integer, compile_error> integer_or_error = evaluate_as<lang::integer>(condition.value, symbols, item_price_data);
 			if (std::holds_alternative<compile_error>(integer_or_error))
 				return std::get<compile_error>(std::move(integer_or_error));
 
@@ -114,7 +114,7 @@ add_comparison_condition(
 		}
 		case lang::comparison_condition_property::rarity:
 		{
-			std::variant<lang::rarity, compile_error> rarity_or_error = evaluate_as<lang::rarity>(condition.value, map, item_price_data);
+			std::variant<lang::rarity, compile_error> rarity_or_error = evaluate_as<lang::rarity>(condition.value, symbols, item_price_data);
 			if (std::holds_alternative<compile_error>(rarity_or_error))
 				return std::get<compile_error>(std::move(rarity_or_error));
 
@@ -123,7 +123,7 @@ add_comparison_condition(
 		}
 		case lang::comparison_condition_property::sockets:
 		{
-			std::variant<lang::integer, compile_error> integer_or_error = evaluate_as<lang::integer>(condition.value, map, item_price_data);
+			std::variant<lang::integer, compile_error> integer_or_error = evaluate_as<lang::integer>(condition.value, symbols, item_price_data);
 			if (std::holds_alternative<compile_error>(integer_or_error))
 				return std::get<compile_error>(std::move(integer_or_error));
 
@@ -132,7 +132,7 @@ add_comparison_condition(
 		}
 		case lang::comparison_condition_property::links:
 		{
-			std::variant<lang::integer, compile_error> integer_or_error = evaluate_as<lang::integer>(condition.value, map, item_price_data);
+			std::variant<lang::integer, compile_error> integer_or_error = evaluate_as<lang::integer>(condition.value, symbols, item_price_data);
 			if (std::holds_alternative<compile_error>(integer_or_error))
 				return std::get<compile_error>(std::move(integer_or_error));
 
@@ -141,7 +141,7 @@ add_comparison_condition(
 		}
 		case lang::comparison_condition_property::height:
 		{
-			std::variant<lang::integer, compile_error> integer_or_error = evaluate_as<lang::integer>(condition.value, map, item_price_data);
+			std::variant<lang::integer, compile_error> integer_or_error = evaluate_as<lang::integer>(condition.value, symbols, item_price_data);
 			if (std::holds_alternative<compile_error>(integer_or_error))
 				return std::get<compile_error>(std::move(integer_or_error));
 
@@ -150,7 +150,7 @@ add_comparison_condition(
 		}
 		case lang::comparison_condition_property::width:
 		{
-			std::variant<lang::integer, compile_error> integer_or_error = evaluate_as<lang::integer>(condition.value, map, item_price_data);
+			std::variant<lang::integer, compile_error> integer_or_error = evaluate_as<lang::integer>(condition.value, symbols, item_price_data);
 			if (std::holds_alternative<compile_error>(integer_or_error))
 				return std::get<compile_error>(std::move(integer_or_error));
 
@@ -159,7 +159,7 @@ add_comparison_condition(
 		}
 		case lang::comparison_condition_property::stack_size:
 		{
-			std::variant<lang::integer, compile_error> integer_or_error = evaluate_as<lang::integer>(condition.value, map, item_price_data);
+			std::variant<lang::integer, compile_error> integer_or_error = evaluate_as<lang::integer>(condition.value, symbols, item_price_data);
 			if (std::holds_alternative<compile_error>(integer_or_error))
 				return std::get<compile_error>(std::move(integer_or_error));
 
@@ -168,7 +168,7 @@ add_comparison_condition(
 		}
 		case lang::comparison_condition_property::gem_level:
 		{
-			std::variant<lang::integer, compile_error> integer_or_error = evaluate_as<lang::integer>(condition.value, map, item_price_data);
+			std::variant<lang::integer, compile_error> integer_or_error = evaluate_as<lang::integer>(condition.value, symbols, item_price_data);
 			if (std::holds_alternative<compile_error>(integer_or_error))
 				return std::get<compile_error>(std::move(integer_or_error));
 
@@ -177,7 +177,7 @@ add_comparison_condition(
 		}
 		case lang::comparison_condition_property::map_tier:
 		{
-			std::variant<lang::integer, compile_error> integer_or_error = evaluate_as<lang::integer>(condition.value, map, item_price_data);
+			std::variant<lang::integer, compile_error> integer_or_error = evaluate_as<lang::integer>(condition.value, symbols, item_price_data);
 			if (std::holds_alternative<compile_error>(integer_or_error))
 				return std::get<compile_error>(std::move(integer_or_error));
 
@@ -230,11 +230,11 @@ add_string_condition_impl(
 [[nodiscard]] std::optional<compile_error>
 add_string_condition(
 	const parser::ast::string_condition& condition,
-	const lang::constants_map& map,
+	const lang::symbol_table& symbols,
 	const lang::item_price_data& item_price_data,
 	lang::condition_set& condition_set)
 {
-	std::variant<lang::array_object, compile_error> array_or_error = detail::evaluate_as<lang::array_object>(condition.value, map, item_price_data);
+	std::variant<lang::array_object, compile_error> array_or_error = detail::evaluate_as<lang::array_object>(condition.value, symbols, item_price_data);
 	if (std::holds_alternative<compile_error>(array_or_error))
 		return std::get<compile_error>(std::move(array_or_error));
 
@@ -289,11 +289,11 @@ add_boolean_condition_impl(
 [[nodiscard]] std::optional<compile_error>
 add_boolean_condition(
 	const parser::ast::boolean_condition& condition,
-	const lang::constants_map& map,
+	const lang::symbol_table& symbols,
 	const lang::item_price_data& item_price_data,
 	lang::condition_set& condition_set)
 {
-	std::variant<lang::boolean, compile_error> boolean_or_error = detail::evaluate_as<lang::boolean>(condition.value, map, item_price_data);
+	std::variant<lang::boolean, compile_error> boolean_or_error = detail::evaluate_as<lang::boolean>(condition.value, symbols, item_price_data);
 	if (std::holds_alternative<compile_error>(boolean_or_error))
 		return std::get<compile_error>(std::move(boolean_or_error));
 
@@ -357,11 +357,11 @@ add_socket_group_condition_impl(
 [[nodiscard]] std::optional<compile_error>
 add_socket_group_condition(
 	const parser::ast::socket_group_condition& condition,
-	const lang::constants_map& map,
+	const lang::symbol_table& symbols,
 	const lang::item_price_data& item_price_data,
 	lang::condition_set& condition_set)
 {
-	std::variant<lang::socket_group, compile_error> socket_group_or_error = detail::evaluate_as<lang::socket_group>(condition.value, map, item_price_data);
+	std::variant<lang::socket_group, compile_error> socket_group_or_error = detail::evaluate_as<lang::socket_group>(condition.value, symbols, item_price_data);
 	if (std::holds_alternative<compile_error>(socket_group_or_error))
 		return std::get<compile_error>(std::move(socket_group_or_error));
 
@@ -380,7 +380,7 @@ namespace x3 = boost::spirit::x3;
 
 std::optional<compile_error> add_conditions(
 	const std::vector<ast::condition>& conditions,
-	const lang::constants_map& map,
+	const lang::symbol_table& symbols,
 	const lang::item_price_data& item_price_data,
 	lang::condition_set& condition_set)
 {
@@ -389,19 +389,19 @@ std::optional<compile_error> add_conditions(
 		auto error = condition.apply_visitor(x3::make_lambda_visitor<std::optional<compile_error>>(
 			[&](const ast::comparison_condition& comparison_condition)
 			{
-				return add_comparison_condition(comparison_condition, map, item_price_data, condition_set);
+				return add_comparison_condition(comparison_condition, symbols, item_price_data, condition_set);
 			},
 			[&](const ast::string_condition& string_condition)
 			{
-				return add_string_condition(string_condition, map, item_price_data, condition_set);
+				return add_string_condition(string_condition, symbols, item_price_data, condition_set);
 			},
 			[&](const ast::boolean_condition& boolean_condition)
 			{
-				return add_boolean_condition(boolean_condition, map, item_price_data, condition_set);
+				return add_boolean_condition(boolean_condition, symbols, item_price_data, condition_set);
 			},
 			[&](const ast::socket_group_condition& socket_group_condition)
 			{
-				return add_socket_group_condition(socket_group_condition, map, item_price_data, condition_set);
+				return add_socket_group_condition(socket_group_condition, symbols, item_price_data, condition_set);
 			}));
 
 		if (error)

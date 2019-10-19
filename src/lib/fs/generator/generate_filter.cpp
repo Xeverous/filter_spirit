@@ -1,12 +1,12 @@
-#include "fs/generator/generate_filter.hpp"
-#include "fs/generator/generator.hpp"
-#include "fs/parser/parser.hpp"
-#include "fs/parser/ast_adapted.hpp" // required adaptation info for fs::log::structure_printer
-#include "fs/compiler/compiler.hpp"
-#include "fs/compiler/print_error.hpp"
-#include "fs/lang/constants_map.hpp"
-#include "fs/log/logger.hpp"
-#include "fs/log/structure_printer.hpp"
+#include <fs/generator/generate_filter.hpp>
+#include <fs/generator/generator.hpp>
+#include <fs/lang/symbol_table.hpp>
+#include <fs/parser/parser.hpp>
+#include <fs/parser/ast_adapted.hpp> // required adaptation info for fs::log::structure_printer
+#include <fs/compiler/compiler.hpp>
+#include <fs/compiler/print_error.hpp>
+#include <fs/log/logger.hpp>
+#include <fs/log/structure_printer.hpp>
 
 namespace fs::generator
 {
@@ -52,15 +52,15 @@ std::optional<std::string> generate_filter_without_preamble(
 
 	logger.info() << "compiling filter template";
 
-	std::variant<lang::constants_map, compiler::compile_error> map_or_error =
-		compiler::resolve_constants(parse_data.ast.constant_definitions, item_price_data);
-	if (std::holds_alternative<compiler::compile_error>(map_or_error))
+	std::variant<lang::symbol_table, compiler::compile_error> symbols_or_error =
+		compiler::resolve_symbols(parse_data.ast.constant_definitions, item_price_data);
+	if (std::holds_alternative<compiler::compile_error>(symbols_or_error))
 	{
-		compiler::print_error(std::get<compiler::compile_error>(map_or_error), parse_data.lookup_data, logger);
+		compiler::print_error(std::get<compiler::compile_error>(symbols_or_error), parse_data.lookup_data, logger);
 		return std::nullopt;
 	}
 
-	const auto& map = std::get<lang::constants_map>(map_or_error);
+	const auto& map = std::get<lang::symbol_table>(symbols_or_error);
 	const std::variant<std::vector<lang::filter_block>, compiler::compile_error> filter_or_error =
 		compiler::compile_statements(parse_data.ast.statements, map, item_price_data);
 

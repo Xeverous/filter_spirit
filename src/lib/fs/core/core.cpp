@@ -1,9 +1,9 @@
-#include "fs/core/core.hpp"
-#include "fs/utility/file.hpp"
-#include "fs/generator/generate_filter.hpp"
-#include "fs/network/poe_watch/api.hpp"
-#include "fs/network/poe_watch/parse_json.hpp" // TODO avoid including this
-#include "fs/log/logger.hpp"
+#include <fs/core/core.hpp>
+#include <fs/utility/file.hpp>
+#include <fs/generator/generate_filter.hpp>
+#include <fs/network/poe_watch/api.hpp>
+#include <fs/network/poe_watch/parse_json.hpp> // TODO avoid including this
+#include <fs/log/logger.hpp>
 
 #include <fstream>
 

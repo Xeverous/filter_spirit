@@ -1,7 +1,7 @@
-#include "fs/compiler/detail/filter_builder.hpp"
-#include "fs/compiler/detail/actions.hpp"
-#include "fs/compiler/detail/conditions.hpp"
-#include "fs/lang/queries.hpp"
+#include <fs/compiler/detail/filter_builder.hpp>
+#include <fs/compiler/detail/actions.hpp>
+#include <fs/compiler/detail/conditions.hpp>
+#include <fs/lang/queries.hpp>
 
 #include <boost/spirit/home/x3/support/utility/lambda_visitor.hpp>
 #include <utility>
@@ -14,10 +14,10 @@ namespace x3 = boost::spirit::x3;
 
 std::variant<std::vector<lang::filter_block>, compile_error> filter_builder::build_filter(
 	const std::vector<parser::ast::statement>& top_level_statements,
-	const lang::constants_map& map,
+	const lang::symbol_table& symbols,
 	const lang::item_price_data& item_price_data)
 {
-	return filter_builder(map, item_price_data).build_filter(top_level_statements);
+	return filter_builder(symbols, item_price_data).build_filter(top_level_statements);
 }
 
 std::variant<std::vector<lang::filter_block>, compile_error> filter_builder::build_filter(
@@ -42,7 +42,7 @@ std::optional<compile_error> filter_builder::build_nested(
 		auto error = statement.apply_visitor(x3::make_lambda_visitor<std::optional<compile_error>>(
 			[&, this](const ast::action& action)
 			{
-				return add_action(action, map, item_price_data, parent_actions);
+				return add_action(action, symbols, item_price_data, parent_actions);
 			},
 			[&, this](const ast::visibility_statement& vs)
 			{
@@ -53,7 +53,7 @@ std::optional<compile_error> filter_builder::build_nested(
 				// explicitly make a copy of parent conditions - the call stack will preserve
 				// old instance while nested blocks can add additional conditions that have limited lifetime
 				lang::condition_set nested_conditions(parent_conditions);
-				std::optional<compile_error> error = add_conditions(nested_block.conditions, map, item_price_data, nested_conditions);
+				std::optional<compile_error> error = add_conditions(nested_block.conditions, symbols, item_price_data, nested_conditions);
 				if (error)
 					return error;
 

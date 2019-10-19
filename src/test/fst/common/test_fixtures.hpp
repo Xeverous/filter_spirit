@@ -1,9 +1,9 @@
 #pragma once
 
-#include "fs/log/buffered_logger.hpp"
-#include "fs/lang/constants_map.hpp"
-#include "fs/parser/parser.hpp"
-#include "fs/compiler/error.hpp"
+#include <fs/log/buffered_logger.hpp>
+#include <fs/lang/symbol_table.hpp>
+#include <fs/parser/parser.hpp>
+#include <fs/compiler/error.hpp>
 
 #include <string>
 #include <string_view>
@@ -25,8 +25,8 @@ class compiler_fixture : public parser_fixture
 {
 protected:
 	static
-	std::variant<fs::lang::constants_map, fs::compiler::compile_error>
-	resolve_constants(const std::vector<fs::parser::ast::constant_definition>& defs);
+	std::variant<fs::lang::symbol_table, fs::compiler::compile_error>
+	resolve_symbols(const std::vector<fs::parser::ast::constant_definition>& defs);
 };
 
 }

@@ -1,5 +1,5 @@
 #pragma once
-#include "fs/lang/types.hpp"
+#include <fs/lang/types.hpp>
 #include <unordered_map>
 #include <string>
 
@@ -12,6 +12,6 @@ struct named_object
 	position_tag name_origin;
 };
 
-using constants_map = std::unordered_map<std::string, named_object>;
+using symbol_table = std::unordered_map<std::string, named_object>;
 
 }
