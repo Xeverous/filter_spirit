@@ -1,9 +1,9 @@
-#include <fs/lang/symbol_table.hpp>
-#include <fs/compiler/compiler.hpp>
+#include <fs/compiler/resolve_symbols.hpp>
 #include <fs/compiler/error.hpp>
 #include <fs/compiler/detail/evaluate.hpp>
-#include <fs/compiler/detail/filter_builder.hpp>
+#include <fs/lang/symbol_table.hpp>
 #include <fs/parser/ast.hpp>
+
 #include <cassert>
 #include <string_view>
 #include <utility>
@@ -82,15 +82,6 @@ resolve_symbols(
 	}
 
 	return symbols;
-}
-
-std::variant<std::vector<lang::filter_block>, compile_error>
-compile_statements(
-	const std::vector<parser::ast::statement>& statements,
-	const lang::symbol_table& symbols,
-	const lang::item_price_data& item_price_data)
-{
-	return detail::filter_builder::build_filter(statements, symbols, item_price_data);
 }
 
 } // namespace fs::compiler

@@ -2,7 +2,7 @@
 
 #include <fs/lang/item_price_data.hpp>
 #include <fs/parser/parser.hpp>
-#include <fs/compiler/compiler.hpp>
+#include <fs/compiler/resolve_symbols.hpp>
 #include <fs/core/version.hpp>
 #include <fs/log/buffered_logger.hpp>
 

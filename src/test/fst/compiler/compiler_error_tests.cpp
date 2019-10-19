@@ -2,8 +2,8 @@
 #include <fst/common/test_fixtures.hpp>
 #include <fst/common/string_operations.hpp>
 
-#include <fs/compiler/compiler.hpp>
 #include <fs/compiler/print_error.hpp>
+#include <fs/compiler/resolve_symbols.hpp>
 #include <fs/log/buffered_logger.hpp>
 #include <fs/log/utility.hpp>
 

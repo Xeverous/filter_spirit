@@ -3,8 +3,10 @@
 #include <fs/lang/symbol_table.hpp>
 #include <fs/parser/parser.hpp>
 #include <fs/parser/ast_adapted.hpp> // required adaptation info for fs::log::structure_printer
-#include <fs/compiler/compiler.hpp>
+#include <fs/compiler/error.hpp>
 #include <fs/compiler/print_error.hpp>
+#include <fs/compiler/resolve_symbols.hpp>
+#include <fs/compiler/build_filter_blocks.hpp>
 #include <fs/log/logger.hpp>
 #include <fs/log/structure_printer.hpp>
 
@@ -62,7 +64,7 @@ std::optional<std::string> generate_filter_without_preamble(
 
 	const auto& map = std::get<lang::symbol_table>(symbols_or_error);
 	const std::variant<std::vector<lang::filter_block>, compiler::compile_error> filter_or_error =
-		compiler::compile_statements(parse_data.ast.statements, map, item_price_data);
+		compiler::build_filter_blocks(parse_data.ast.statements, map, item_price_data);
 
 	if (std::holds_alternative<compiler::compile_error>(filter_or_error))
 	{

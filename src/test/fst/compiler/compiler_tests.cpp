@@ -2,9 +2,9 @@
 #include <fst/common/test_fixtures.hpp>
 #include <fst/common/string_operations.hpp>
 
-#include <fs/compiler/compiler.hpp>
+#include <fs/compiler/build_filter_blocks.hpp>
+#include <fs/compiler/resolve_symbols.hpp>
 #include <fs/compiler/print_error.hpp>
-#include <fs/compiler/detail/filter_builder.hpp>
 #include <fs/log/buffered_logger.hpp>
 #include <fs/utility/visitor.hpp>
 
@@ -84,8 +84,7 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 			const lang::symbol_table& symbols)
 		{
 			std::variant<std::vector<lang::filter_block>, compiler::compile_error> result =
-				compiler::detail::filter_builder::build_filter(
-					top_level_statements, symbols, lang::item_price_data{});
+				compiler::build_filter_blocks(top_level_statements, symbols, lang::item_price_data{});
 
 			if (std::holds_alternative<compiler::compile_error>(result))
 			{

@@ -9,12 +9,12 @@ add_library(filter_spirit SHARED
 	fs/parser/parser.cpp
 	fs/parser/print_error.cpp
 	fs/parser/detail/grammar.cpp
-	fs/compiler/compiler.cpp
+	fs/compiler/build_filter_blocks.cpp
+	fs/compiler/resolve_symbols.cpp
 	fs/compiler/print_error.cpp
-	fs/compiler/detail/actions.cpp
-	fs/compiler/detail/conditions.cpp
+	fs/compiler/detail/add_action.cpp
+	fs/compiler/detail/add_conditions.cpp
 	fs/compiler/detail/evaluate.cpp
-	fs/compiler/detail/filter_builder.cpp
 	fs/compiler/detail/queries.cpp
 	fs/compiler/detail/determine_types_of.cpp
 	fs/generator/generate_filter.cpp
