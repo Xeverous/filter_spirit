@@ -5,7 +5,9 @@
  */
 #pragma once
 
-#include <fs/lang/types.hpp>
+#include <fs/lang/primitive_types.hpp>
+#include <fs/lang/action_properties.hpp>
+#include <fs/lang/condition_properties.hpp>
 
 #include <boost/optional.hpp>
 #include <boost/spirit/home/x3/support/ast/variant.hpp>
@@ -113,9 +115,7 @@ struct integer_literal : x3::position_tagged
 	int value;
 };
 
-struct string_literal : std::string, x3::position_tagged
-{
-};
+struct string_literal : std::string, x3::position_tagged {};
 
 struct boolean_literal : x3::position_tagged
 {
@@ -185,9 +185,9 @@ struct literal_expression : x3::variant<
 	using base_type::operator=;
 };
 
-struct value_expression_list : std::vector<struct value_expression>, x3::position_tagged
-{
-};
+struct value_expression;
+
+struct value_expression_list : std::vector<value_expression>, x3::position_tagged {};
 
 struct function_call : x3::position_tagged
 {
@@ -214,7 +214,12 @@ struct array_expression : x3::position_tagged
 	value_expression_list elements;
 };
 
+struct action;
+
+struct compound_action_expression : std::vector<action>, x3::position_tagged {};
+
 struct primary_expression : x3::variant<
+		compound_action_expression,
 		literal_expression,
 		array_expression,
 		function_call,
@@ -287,6 +292,19 @@ struct constant_definition : x3::position_tagged
 {
 	identifier name;
 	value_expression value;
+};
+
+struct definition : x3::position_tagged
+{
+	definition& operator=(constant_definition def)
+	{
+		definition = std::move(def);
+		return *this;
+	}
+
+	const constant_definition& get_value() const { return definition; }
+
+	constant_definition definition;
 };
 
 // ---- rules ----
@@ -367,17 +385,26 @@ struct unary_action : x3::position_tagged
 	value_expression value;
 };
 
-struct action : x3::position_tagged
+struct compound_action : x3::position_tagged
 {
-	action& operator=(unary_action ua)
+	compound_action& operator=(value_expression ve)
 	{
-		action = std::move(ua);
+		value = std::move(ve);
 		return *this;
 	}
 
-	const unary_action& get_value() const { return action; }
+	const value_expression& get_value() const { return value; }
 
-	unary_action action;
+	value_expression value;
+};
+
+struct action : x3::variant<
+		compound_action,
+		unary_action
+	>, x3::position_tagged
+{
+	using base_type::base_type;
+	using base_type::operator=;
 };
 
 // ---- filter structure ----
@@ -417,7 +444,7 @@ struct filter_structure : x3::position_tagged
 {
 	version_requirement_statement version_data;
 	config config;
-	std::vector<constant_definition> constant_definitions;
+	std::vector<definition> definitions;
 	std::vector<statement> statements;
 };
 

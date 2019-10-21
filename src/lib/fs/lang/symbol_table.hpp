@@ -1,5 +1,8 @@
 #pragma once
-#include <fs/lang/types.hpp>
+
+#include <fs/lang/object.hpp>
+#include <fs/lang/position_tag.hpp>
+
 #include <unordered_map>
 #include <string>
 

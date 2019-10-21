@@ -1,4 +1,4 @@
-#include <fs/lang/types.hpp>
+#include <fs/lang/object.hpp>
 #include <fs/utility/visitor.hpp>
 #include <fs/utility/type_traits.hpp>
 
@@ -14,13 +14,11 @@ std::string_view to_string_view(object_type type)
 
 object_type type_of_object(const object_variant& object)
 {
-	return std::visit(utility::visitor{
-		[](auto&& value)
-		{
+	return std::visit(
+		[](auto&& value) {
 			using T = std::decay_t<decltype(value)>;
 			return type_to_enum<T>();
-		}
-	}, object);
+		}, object);
 }
 
 // this could be in the header but there is no need for it to be parsed multiple times

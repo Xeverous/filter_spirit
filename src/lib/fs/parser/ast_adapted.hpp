@@ -105,4 +105,4 @@ BOOST_FUSION_ADAPT_STRUCT(
 
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::filter_structure,
-	version_data, config, constant_definitions, statements)
+	version_data, config, definitions, statements)

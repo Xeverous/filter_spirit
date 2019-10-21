@@ -5,6 +5,7 @@
 #include <fs/compiler/build_filter_blocks.hpp>
 #include <fs/compiler/resolve_symbols.hpp>
 #include <fs/compiler/print_error.hpp>
+#include <fs/lang/position_tag.hpp>
 #include <fs/log/buffered_logger.hpp>
 #include <fs/utility/visitor.hpp>
 
@@ -59,7 +60,7 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 	protected:
 		static
 		lang::symbol_table expect_success_when_resolving_symbols(
-			const std::vector<parser::ast::constant_definition>& defs,
+			const std::vector<parser::ast::definition>& defs,
 			const parser::lookup_data& lookup_data)
 		{
 			const std::variant<lang::symbol_table, compiler::compile_error> symbols_or_error =
@@ -128,7 +129,7 @@ array          = [1, 2, 3]
 			const std::string_view input = input_str;
 			const parser::parse_success_data parse_data = parse(input);
 			const parser::lookup_data& lookup_data = parse_data.lookup_data;
-			const lang::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.constant_definitions, lookup_data);
+			const lang::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.definitions, lookup_data);
 
 			expect_object_in_symbols(symbols, lookup_data, "boolean",        lang::boolean{false},            search(input, "boolean"),        search(input, "false"));
 			expect_object_in_symbols(symbols, lookup_data, "floating_point", lang::floating_point{3.5},       search(input, "floating_point"), search(input, "3.5"));
@@ -172,7 +173,7 @@ a3 = [1, 2, 3]
 			const std::string_view input = input_str;
 			const parser::parse_success_data parse_data = parse(input);
 			const parser::lookup_data& lookup_data = parse_data.lookup_data;
-			const lang::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.constant_definitions, lookup_data);
+			const lang::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.definitions, lookup_data);
 
 			expect_object_in_symbols(symbols, lookup_data, "a0",
 				lang::array_object{},
@@ -211,7 +212,7 @@ elem = [1, 2, 3][1]
 			const std::string_view input = input_str;
 			const parser::parse_success_data parse_data = parse(input);
 			const parser::lookup_data& lookup_data = parse_data.lookup_data;
-			const lang::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.constant_definitions, lookup_data);
+			const lang::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.definitions, lookup_data);
 
 			expect_object_in_symbols(symbols, lookup_data, "first",
 				lang::integer{100}, search(input, "first"), search(input, "[ 0]"));
@@ -246,7 +247,7 @@ Show
 			const std::string_view input = input_str;
 			const parser::parse_success_data parse_data = parse(input);
 			const parser::lookup_data& lookup_data = parse_data.lookup_data;
-			const lang::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.constant_definitions, lookup_data);
+			const lang::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.definitions, lookup_data);
 			const std::vector<lang::filter_block> blocks =
 				expect_success_when_building_filter(parse_data.ast.statements, parse_data.lookup_data, symbols);
 			BOOST_TEST_REQUIRE(static_cast<int>(blocks.size()) == 2);
@@ -343,7 +344,7 @@ Show
 				const std::string_view input = input_str;
 				const parser::parse_success_data parse_data = parse(input);
 				const parser::lookup_data& lookup_data = parse_data.lookup_data;
-				const lang::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.constant_definitions, lookup_data);
+				const lang::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.definitions, lookup_data);
 				const std::vector<lang::filter_block> blocks =
 					expect_success_when_building_filter(parse_data.ast.statements, parse_data.lookup_data, symbols);
 				BOOST_TEST_REQUIRE(static_cast<int>(blocks.size()) == 1);

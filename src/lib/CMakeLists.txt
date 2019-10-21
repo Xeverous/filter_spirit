@@ -22,7 +22,7 @@ add_library(filter_spirit SHARED
 	fs/lang/action_set.cpp
 	fs/lang/condition_set.cpp
 	fs/lang/filter_block.cpp
-	fs/lang/types.cpp
+	fs/lang/object.cpp
 	fs/lang/item_price_data.cpp
 	fs/log/buffered_logger.cpp
 	fs/log/console_logger.cpp

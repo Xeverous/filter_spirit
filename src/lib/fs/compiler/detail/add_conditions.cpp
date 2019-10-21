@@ -1,5 +1,6 @@
 #include <fs/compiler/detail/add_conditions.hpp>
 #include <fs/compiler/detail/evaluate_as.hpp>
+#include <fs/lang/position_tag.hpp>
 
 #include <boost/spirit/home/x3/support/utility/lambda_visitor.hpp>
 

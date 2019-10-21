@@ -1,6 +1,6 @@
 #pragma once
 
-#include <fs/lang/types.hpp>
+#include <fs/lang/primitive_types.hpp>
 
 #include <utility>
 #include <iosfwd>
@@ -50,6 +50,8 @@ struct action_set
 		beam_effect = new_beam_effect;
 	}
 
+	void override_with(action_set&& other);
+
 	void generate(std::ostream& output_stream) const;
 
 	std::optional<color> border_color;
@@ -61,5 +63,8 @@ struct action_set
 	std::optional<minimap_icon> minimap_icon;
 	std::optional<beam_effect> beam_effect;
 };
+
+bool operator==(const action_set& lhs, const action_set& rhs);
+bool operator!=(const action_set& lhs, const action_set& rhs);
 
 }

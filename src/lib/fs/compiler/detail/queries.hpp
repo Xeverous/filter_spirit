@@ -2,7 +2,10 @@
 
 #include <fs/parser/ast.hpp>
 #include <fs/compiler/error.hpp>
+#include <fs/lang/object.hpp>
+#include <fs/lang/position_tag.hpp>
 #include <fs/lang/symbol_table.hpp>
+#include <fs/lang/price_range.hpp>
 #include <fs/lang/item_price_data.hpp>
 
 #include <algorithm>
