@@ -26,7 +26,7 @@ class compiler_fixture : public parser_fixture
 protected:
 	static
 	std::variant<fs::lang::symbol_table, fs::compiler::compile_error>
-	resolve_symbols(const std::vector<fs::parser::ast::constant_definition>& defs);
+	resolve_symbols(const std::vector<fs::parser::ast::definition>& defs);
 };
 
 }

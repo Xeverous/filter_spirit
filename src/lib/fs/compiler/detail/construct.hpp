@@ -1,7 +1,7 @@
 #pragma once
 
 #include <fs/parser/ast.hpp>
-#include <fs/lang/types.hpp>
+#include <fs/lang/object.hpp>
 #include <fs/lang/symbol_table.hpp>
 #include <fs/lang/item_price_data.hpp>
 #include <fs/lang/traits/promotions.hpp>

@@ -169,6 +169,131 @@ R"(Show
 			BOOST_TEST(compare_strings(expected_filter, actual_filter));
 		}
 
+		BOOST_AUTO_TEST_CASE(compound_action)
+		{
+			const std::string actual_filter = generate_filter(minimal_input() + R"(
+x = RGB(1, 2, 3)
+comp = {
+	SetBorderColor x
+	SetTextColor x
+}
+
+SetFontSize 36
+Set comp
+Rarity rare {
+	Show
+}
+)");
+			const std::string_view expected_filter =
+R"(Show
+	Rarity = Rare
+	SetBorderColor 1 2 3
+	SetTextColor 1 2 3
+	SetFontSize 36
+
+)";
+			BOOST_TEST(compare_strings(expected_filter, actual_filter));
+		}
+
+		BOOST_AUTO_TEST_CASE(compound_action_in_compound_action)
+		{
+			const std::string actual_filter = generate_filter(minimal_input() + R"(
+x = RGB(1, 2, 3)
+y = RGB(11, 22, 33)
+
+comp2 = {
+	SetBorderColor y
+	SetTextColor y
+}
+
+comp1 = {
+	SetBorderColor x
+	Set comp2
+	SetTextColor x
+}
+
+SetFontSize 36
+Set comp1
+Rarity rare {
+	Show
+}
+
+Show
+)");
+			const std::string_view expected_filter =
+R"(Show
+	Rarity = Rare
+	SetBorderColor 11 22 33
+	SetTextColor 1 2 3
+	SetFontSize 36
+
+Show
+	SetBorderColor 11 22 33
+	SetTextColor 1 2 3
+	SetFontSize 36
+
+)";
+			BOOST_TEST(compare_strings(expected_filter, actual_filter));
+		}
+
+		BOOST_AUTO_TEST_CASE(compound_action_override)
+		{
+			const std::string actual_filter = generate_filter(minimal_input() + R"(
+x = RGB(1, 2, 3)
+y = RGB(11, 22, 33)
+
+comp2 = {
+	SetBorderColor y
+	SetTextColor y
+	SetFontSize 42
+}
+
+comp1 = {
+	SetBorderColor x
+	SetTextColor x
+}
+
+SetFontSize 36
+Set comp1
+Rarity rare {
+	Set comp2
+
+	Quality 20 {
+		SetBackgroundColor RGB(50, 50, 50)
+		Set comp1
+		SetTextColor RGB(100, 100, 100)
+		Show
+	}
+
+	Show
+}
+
+Show
+)");
+			const std::string_view expected_filter =
+R"(Show
+	Quality = 20
+	Rarity = Rare
+	SetBorderColor 1 2 3
+	SetTextColor 100 100 100
+	SetBackgroundColor 50 50 50
+	SetFontSize 42
+
+Show
+	Rarity = Rare
+	SetBorderColor 11 22 33
+	SetTextColor 11 22 33
+	SetFontSize 42
+
+Show
+	SetBorderColor 1 2 3
+	SetTextColor 1 2 3
+	SetFontSize 36
+
+)";
+			BOOST_TEST(compare_strings(expected_filter, actual_filter));
+		}
+
 		BOOST_AUTO_TEST_CASE(nested_actions)
 		{
 			const std::string actual_filter = generate_filter(minimal_input() + R"(

@@ -55,7 +55,7 @@ std::optional<std::string> generate_filter_without_preamble(
 	logger.info() << "compiling filter template";
 
 	std::variant<lang::symbol_table, compiler::compile_error> symbols_or_error =
-		compiler::resolve_symbols(parse_data.ast.constant_definitions, item_price_data);
+		compiler::resolve_symbols(parse_data.ast.definitions, item_price_data);
 	if (std::holds_alternative<compiler::compile_error>(symbols_or_error))
 	{
 		compiler::print_error(std::get<compiler::compile_error>(symbols_or_error), parse_data.lookup_data, logger);

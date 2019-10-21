@@ -13,7 +13,7 @@ namespace fs::compiler
 
 [[nodiscard]] std::variant<lang::symbol_table, compile_error>
 resolve_symbols(
-	const std::vector<parser::ast::constant_definition>& constant_definitions,
+	const std::vector<parser::ast::definition>& definitions,
 	const lang::item_price_data& item_price_data);
 
 }

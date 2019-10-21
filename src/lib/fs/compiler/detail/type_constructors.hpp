@@ -2,7 +2,7 @@
 
 #include <fs/compiler/error.hpp>
 #include <fs/parser/ast.hpp>
-#include <fs/lang/types.hpp>
+#include <fs/lang/object.hpp>
 
 #include <array>
 #include <type_traits>

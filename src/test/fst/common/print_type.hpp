@@ -1,6 +1,8 @@
 #pragma once
 
-#include <fs/lang/types.hpp>
+#include <fs/lang/object.hpp>
+#include <fs/lang/action_properties.hpp>
+#include <fs/lang/condition_properties.hpp>
 
 #include <ostream>
 #include <optional>

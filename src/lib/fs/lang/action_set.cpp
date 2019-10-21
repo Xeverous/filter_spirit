@@ -197,4 +197,47 @@ void action_set::generate(std::ostream& output_stream) const
 	output_beam_effect(beam_effect, output_stream);
 }
 
+void action_set::override_with(action_set&& other)
+{
+	if (other.border_color)
+		override_border_color(*other.border_color);
+
+	if (other.text_color)
+		override_text_color(*other.text_color);
+
+	if (other.background_color)
+		override_background_color(*other.background_color);
+
+	if (other.font_size)
+		override_font_size(*other.font_size);
+
+	if (other.alert_sound)
+		override_alert_sound(*std::move(other.alert_sound));
+
+	disabled_drop_sound = other.disabled_drop_sound;
+
+	if (other.minimap_icon)
+		override_minimap_icon(*other.minimap_icon);
+
+	if (other.beam_effect)
+		override_beam_effect(*other.beam_effect);
+}
+
+bool operator==(const action_set& lhs, const action_set& rhs)
+{
+	return lhs.border_color == rhs.border_color
+		&& lhs.text_color == rhs.text_color
+		&& lhs.background_color == rhs.background_color
+		&& lhs.font_size == rhs.font_size
+		&& lhs.alert_sound == rhs.alert_sound
+		&& lhs.disabled_drop_sound == rhs.disabled_drop_sound
+		&& lhs.minimap_icon == rhs.minimap_icon
+		&& lhs.beam_effect == rhs.beam_effect;
+}
+
+bool operator!=(const action_set& lhs, const action_set& rhs)
+{
+	return !(lhs == rhs);
+}
+
 }

@@ -103,6 +103,24 @@ add_unary_action(
 	}
 }
 
+[[nodiscard]] std::optional<compile_error>
+add_compound_action(
+	const ast::compound_action& ca,
+	const lang::symbol_table& symbols,
+	const lang::item_price_data& item_price_data,
+	lang::action_set& action_set)
+{
+	std::variant<lang::action_set, compile_error> actions_or_error =
+		detail::evaluate_as<lang::action_set>(ca.value, symbols, item_price_data);
+
+	if (std::holds_alternative<compile_error>(actions_or_error)) {
+		return std::get<compile_error>(std::move(actions_or_error));
+	}
+
+	action_set.override_with(std::get<lang::action_set>(std::move(actions_or_error)));
+	return std::nullopt;
+}
+
 } // namespace
 
 namespace fs::compiler::detail
@@ -115,7 +133,14 @@ add_action(
 	const lang::item_price_data& item_price_data,
 	lang::action_set& action_set)
 {
-	return add_unary_action(action.action, symbols, item_price_data, action_set);
+	return action.apply_visitor(x3::make_lambda_visitor<std::optional<compile_error>>(
+		[&](const ast::unary_action& ua) {
+			return add_unary_action(ua, symbols, item_price_data, action_set);
+		},
+		[&](const ast::compound_action& ca) {
+			return add_compound_action(ca, symbols, item_price_data, action_set);
+		}
+	));
 }
 
 }

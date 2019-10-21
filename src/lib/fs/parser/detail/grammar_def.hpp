@@ -93,6 +93,13 @@ BOOST_SPIRIT_DEFINE(suit_literal)
 
 // ---- expressions ----
 
+// moved here due to circular dependency
+const action_type action = "action";
+
+const compound_action_expression_type compound_action_expression = "compound action expression";
+const auto compound_action_expression_def = '{' >> *action > '}';
+BOOST_SPIRIT_DEFINE(compound_action_expression)
+
 const literal_expression_type literal_expression = "literal";
 const auto literal_expression_def =
 // order here is crucial in context-sensitive grammars
@@ -129,7 +136,8 @@ BOOST_SPIRIT_DEFINE(array_expression)
 
 const primary_expression_type primary_expression = "primary expression";
 const auto primary_expression_def =
-	  literal_expression
+	  compound_action_expression
+	| literal_expression
 	| array_expression
 	| function_call
 	| identifier
@@ -150,8 +158,13 @@ BOOST_SPIRIT_DEFINE(value_expression)
 // ---- definitions ----
 
 const constant_definition_type constant_definition = "constant definiton";
-const auto constant_definition_def = identifier > '=' > value_expression;
+const auto constant_definition_def = identifier >> '=' > value_expression;
 BOOST_SPIRIT_DEFINE(constant_definition)
+
+// future space for metedata definitions
+const definition_type definition = "definition";
+const auto definition_def = constant_definition;
+BOOST_SPIRIT_DEFINE(definition)
 
 // ---- rules ----
 
@@ -197,8 +210,11 @@ const unary_action_type unary_action = "unary action";
 const auto unary_action_def = x3::lexeme[symbols::unary_action_types >> not_alnum_or_underscore] > value_expression;
 BOOST_SPIRIT_DEFINE(unary_action)
 
-const action_type action = "action";
-const auto action_def = unary_action;
+const compound_action_type compound_action = "compound action";
+const auto compound_action_def = x3::lexeme["Set" >> not_alnum_or_underscore] > value_expression;
+BOOST_SPIRIT_DEFINE(compound_action)
+
+const auto action_def = compound_action | unary_action;
 BOOST_SPIRIT_DEFINE(action)
 
 // ---- filter structure ----
@@ -218,7 +234,7 @@ const auto rule_block_def = *condition >> x3::lit('{') > *statement > x3::lit('}
 BOOST_SPIRIT_DEFINE(rule_block)
 
 const filter_structure_type filter_structure = "filter structure";
-const auto filter_structure_def = version_requirement_statement > config > *constant_definition > *statement;
+const auto filter_structure_def = version_requirement_statement > config > *definition > *statement;
 BOOST_SPIRIT_DEFINE(filter_structure)
 
 const grammar_type grammar = "code";

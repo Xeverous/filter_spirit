@@ -43,7 +43,7 @@ pr::parse_success_data parser_fixture::parse(std::string_view input)
 
 std::variant<fs::lang::symbol_table, fs::compiler::compile_error>
 compiler_fixture::resolve_symbols(
-	const std::vector<pr::ast::constant_definition>& defs)
+	const std::vector<pr::ast::definition>& defs)
 {
 	return fs::compiler::resolve_symbols(defs, fs::lang::item_price_data{});
 }

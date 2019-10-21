@@ -3,9 +3,10 @@
 #include <fs/compiler/detail/get_value_as.hpp>
 #include <fs/compiler/detail/queries.hpp>
 #include <fs/compiler/detail/construct.hpp>
+#include <fs/compiler/detail/add_action.hpp>
 #include <fs/lang/functions.hpp>
 #include <fs/lang/queries.hpp>
-#include <fs/lang/types.hpp>
+#include <fs/lang/price_range.hpp>
 
 #include <cassert>
 #include <utility>
@@ -27,7 +28,7 @@ evaluate_literal(
 {
 	using result_type = lang::object_variant;
 
-	result_type object = expression.apply_visitor(x3::make_lambda_visitor<result_type>(
+	auto object = expression.apply_visitor(x3::make_lambda_visitor<result_type>(
 		[](ast::boolean_literal literal) -> result_type {
 			return lang::boolean{literal.value};
 		},
@@ -438,6 +439,24 @@ evaluate_identifier(
 }
 
 [[nodiscard]] std::variant<lang::object, compile_error>
+evaluate_compound_action(
+	const ast::compound_action_expression& expr,
+	const lang::symbol_table& symbols,
+	const lang::item_price_data& item_price_data)
+{
+	lang::action_set actions;
+
+	for (const ast::action& act : expr) {
+		std::optional<compile_error> error = detail::add_action(act, symbols, item_price_data, actions);
+
+		if (error)
+			return *std::move(error);
+	}
+
+	return lang::object{std::move(actions), parser::get_position_info(expr)};
+}
+
+[[nodiscard]] std::variant<lang::object, compile_error>
 evaluate_primary_expression(
 	const ast::primary_expression& primary_expression,
 	const lang::symbol_table& symbols,
@@ -460,6 +479,9 @@ evaluate_primary_expression(
 		},
 		[&](const ast::identifier& identifier) {
 			return evaluate_identifier(identifier, symbols);
+		},
+		[&](const ast::compound_action_expression& expr) {
+			return evaluate_compound_action(expr, symbols, item_price_data);
 		}
 	));
 }

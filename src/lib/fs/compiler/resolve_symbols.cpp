@@ -4,17 +4,21 @@
 #include <fs/lang/symbol_table.hpp>
 #include <fs/parser/ast.hpp>
 
+#include <boost/spirit/home/x3/support/utility/lambda_visitor.hpp>
+
 #include <cassert>
 #include <string_view>
 #include <utility>
 #include <sstream>
+
+namespace ast = fs::parser::ast;
+namespace x3 = boost::spirit::x3;
 
 namespace
 {
 
 using namespace fs;
 using namespace fs::compiler;
-namespace ast = fs::parser::ast;
 
 /*
  * core entry point into adding constants
@@ -32,8 +36,8 @@ namespace ast = fs::parser::ast;
 [[nodiscard]] std::optional<compile_error>
 add_constant_from_definition(
 	const ast::constant_definition& def,
-	lang::symbol_table& symbols,
-	const lang::item_price_data& item_price_data)
+	const lang::item_price_data& item_price_data,
+	lang::symbol_table& symbols)
 {
 	const ast::identifier& wanted_name = def.name;
 	const ast::value_expression& value_expression = def.value;
@@ -68,14 +72,13 @@ namespace fs::compiler
 
 std::variant<lang::symbol_table, compile_error>
 resolve_symbols(
-	const std::vector<parser::ast::constant_definition>& constant_definitions,
+	const std::vector<parser::ast::definition>& definitions,
 	const lang::item_price_data& item_price_data)
 {
 	lang::symbol_table symbols;
 
-	for (const ast::constant_definition& def : constant_definitions)
-	{
-		std::optional<compile_error> error = add_constant_from_definition(def, symbols, item_price_data);
+	for (const ast::definition& def : definitions) {
+		std::optional<compile_error> error = add_constant_from_definition(def.definition, item_price_data, symbols);
 
 		if (error)
 			return *std::move(error);
