@@ -9,6 +9,11 @@
 namespace fs::lang
 {
 
+struct none {};
+
+inline bool operator==(none, none) { return true; }
+inline bool operator!=(none, none) { return false; }
+
 struct boolean
 {
 	bool value;

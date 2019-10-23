@@ -46,6 +46,14 @@ struct structure_printer
 	}
 
 	template <typename T>
+	std::enable_if_t<std::is_empty_v<T> || traits::has_void_get_value_v<T>>
+	operator()(const T&) const
+	{
+		tab(indent);
+		std::cout << fs::utility::type_name<T>().get() << "\n";
+	}
+
+	template <typename T>
 	std::enable_if_t<fs::traits::has_pointer_semantics_v<T>>
 	operator()(const T& obj) const
 	{
@@ -79,7 +87,7 @@ struct structure_printer
 	}
 
 	template <typename T>
-	std::enable_if_t<traits::has_get_value_v<T>>
+	std::enable_if_t<traits::has_non_void_get_value_v<T>>
 	operator()(const T& obj) const
 	{
 		tab(indent);

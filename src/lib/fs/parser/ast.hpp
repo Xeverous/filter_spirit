@@ -169,6 +169,11 @@ struct suit_literal : x3::position_tagged
 	lang::suit value;
 };
 
+struct none_literal : x3::position_tagged
+{
+	void get_value() {}
+};
+
 // ---- expressions ----
 
 struct literal_expression : x3::variant<
@@ -178,7 +183,8 @@ struct literal_expression : x3::variant<
 		boolean_literal,
 		rarity_literal,
 		shape_literal,
-		suit_literal
+		suit_literal,
+		none_literal
 	>, x3::position_tagged
 {
 	using base_type::base_type;

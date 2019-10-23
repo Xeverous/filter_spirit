@@ -94,12 +94,26 @@ namespace detail
 
 
 	template <typename, typename = void>
-	struct has_get_value_impl : std::false_type {};
+	struct has_non_void_get_value_impl : std::false_type {};
 
 	template <typename T>
-	struct has_get_value_impl<T, std::void_t<
+	struct has_non_void_get_value_impl<T, std::void_t<
 		decltype(std::declval<T>().get_value())
-	>> : std::true_type {};
+	>>
+	{
+		static constexpr bool value = !std::is_same_v<void, decltype(std::declval<T>().get_value())>;
+	};
+
+	template <typename, typename = void>
+	struct has_void_get_value_impl : std::false_type {};
+
+	template <typename T>
+	struct has_void_get_value_impl<T, std::void_t<
+		decltype(std::declval<T>().get_value())
+	>>
+	{
+		static constexpr bool value = std::is_same_v<void, decltype(std::declval<T>().get_value())>;
+	};
 }
 
 template <typename T, typename = void>
@@ -160,9 +174,15 @@ constexpr bool is_variant_alternative_v = is_variant_alternative<T, Variant>::va
 
 
 template <typename T, typename = void>
-struct has_get_value : detail::has_get_value_impl<T> {};
+struct has_non_void_get_value : detail::has_non_void_get_value_impl<T> {};
 
 template <typename T>
-constexpr bool has_get_value_v = has_get_value<T>::value;
+constexpr bool has_non_void_get_value_v = has_non_void_get_value<T>::value;
+
+template <typename T, typename = void>
+struct has_void_get_value : detail::has_void_get_value_impl<T> {};
+
+template <typename T>
+constexpr bool has_void_get_value_v = has_void_get_value<T>::value;
 
 }

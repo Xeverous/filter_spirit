@@ -100,6 +100,7 @@ struct boolean_literal_class                 : error_on_error, annotate_on_succe
 struct rarity_literal_class                  : error_on_error, annotate_on_success {};
 struct shape_literal_class                   : error_on_error, annotate_on_success {};
 struct suit_literal_class                    : error_on_error, annotate_on_success {};
+struct none_literal_class                    : error_on_error, annotate_on_success {};
 
 // ---- expressions ----
 
@@ -214,6 +215,9 @@ BOOST_SPIRIT_DECLARE(shape_literal_type)
 
 using suit_literal_type = x3::rule<suit_literal_class, ast::suit_literal>;
 BOOST_SPIRIT_DECLARE(suit_literal_type)
+
+using none_literal_type = x3::rule<none_literal_class, ast::none_literal>;
+BOOST_SPIRIT_DECLARE(none_literal_type)
 
 // ---- expressions ----
 

@@ -18,6 +18,7 @@ using array_object = std::vector<object>;
 
 using object_variant = std::variant<
 	// primitive types
+	none,
 	boolean,
 	floating_point,
 	integer,
@@ -45,6 +46,7 @@ using object_variant = std::variant<
 
 BETTER_ENUM(object_type, int,
 	// primitive types
+	none,
 	boolean,
 	floating_point,
 	integer,
@@ -119,6 +121,8 @@ object_type type_to_enum_impl()
 	return object_type::array; // return statement only to silence compiler/editors
 }
 
+template <> constexpr
+object_type type_to_enum_impl<none>() { return object_type::none; }
 template <> constexpr
 object_type type_to_enum_impl<boolean>() { return object_type::boolean; }
 template <> constexpr

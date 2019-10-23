@@ -30,6 +30,9 @@ evaluate_literal(
 	using result_type = lang::object_variant;
 
 	auto object = expression.apply_visitor(x3::make_lambda_visitor<result_type>(
+		[](ast::none_literal) {
+			return lang::none{};
+		},
 		[](ast::boolean_literal literal) -> result_type {
 			return lang::boolean{literal.value};
 		},
