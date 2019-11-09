@@ -7,12 +7,12 @@
 namespace fs::lang
 {
 
-std::string_view to_string_view(object_type type)
+std::string_view to_string_view(object_type type) noexcept
 {
 	return type._to_string();
 }
 
-object_type type_of_object(const object_variant& object)
+object_type type_of_object(const object_variant& object) noexcept
 {
 	return std::visit(
 		[](auto&& value) {

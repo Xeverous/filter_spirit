@@ -202,7 +202,7 @@ array_to_strings(
 		if (!std::holds_alternative<lang::string>(obj.value))
 			return errors::type_mismatch{
 				lang::object_type::string,
-				lang::type_of_object(obj.value),
+				obj.type(),
 				obj.value_origin};
 
 		auto& string = std::get<lang::string>(obj.value);

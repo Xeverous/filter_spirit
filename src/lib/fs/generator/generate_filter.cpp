@@ -16,8 +16,8 @@ namespace fs::generator
 std::optional<std::string> generate_filter(
 	std::string_view input,
 	const lang::item_price_data& item_price_data,
+	const lang::item_price_metadata& item_price_metadata,
 	options options,
-	metadata metadata,
 	log::logger& logger)
 {
 	std::optional<std::string> maybe_filter = generate_filter_without_preamble(input, item_price_data, options, logger);
@@ -26,7 +26,7 @@ std::optional<std::string> generate_filter(
 		return std::nullopt;
 
 	std::string& filter = *maybe_filter;
-	prepend_metadata(metadata, filter);
+	prepend_metadata(item_price_metadata, filter);
 	return filter;
 }
 
@@ -36,7 +36,7 @@ std::optional<std::string> generate_filter_without_preamble(
 	options options,
 	log::logger& logger)
 {
-	item_price_data.log_info(logger);
+	logger.info() << "" << item_price_data; // TODO fix .info() etc so that it does not return rvalue
 	logger.info() << "parsing filter template";
 	std::variant<parser::parse_success_data, parser::parse_failure_data> parse_result = parser::parse(input);
 

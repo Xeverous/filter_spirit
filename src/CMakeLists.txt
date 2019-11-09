@@ -6,6 +6,6 @@ endif()
 
 include(CTest) # adds option BUILD_TESTING (default ON)
 if(BUILD_TESTING AND FILTER_SPIRIT_BUILD_TESTS)
-    enable_testing()
-    add_subdirectory(test)
+	enable_testing()
+	add_subdirectory(test)
 endif()

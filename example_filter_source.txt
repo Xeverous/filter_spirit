@@ -485,12 +485,10 @@ Rarity unique {
 
 	{
 		SetAlertSound alert_unique_maybe_valueable
-		BaseType $uniques_ambiguous_armour   (0,999999) { Show }
-		BaseType $uniques_ambiguous_weapon   (0,999999) { Show }
-		BaseType $uniques_ambiguous_accessory(0,999999) { Show }
-		BaseType $uniques_ambiguous_jewel    (0,999999) { Show }
-		BaseType $uniques_ambiguous_flask    (0,999999) { Show }
-		BaseType $uniques_ambiguous_map      (0,999999) { Show }
+		BaseType $uniques_eq_ambiguous   (0, _) { Show }
+		BaseType $uniques_flask_ambiguous(0, _) { Show }
+		BaseType $uniques_jewel_ambiguous(0, _) { Show }
+		BaseType $uniques_map_ambiguous  (0, _) { Show }
 	}
 
 	{
@@ -498,12 +496,10 @@ Rarity unique {
 		SetAlertSound alert_unique_best
 		SetBeam beam_top_unique
 		SetMinimapIcon minimap_top_unique
-		BaseType $uniques_unambiguous_armour   (100,999999) { Show }
-		BaseType $uniques_unambiguous_weapon   (100,999999) { Show }
-		BaseType $uniques_unambiguous_accessory(100,999999) { Show }
-		BaseType $uniques_unambiguous_jewel    (100,999999) { Show }
-		BaseType $uniques_unambiguous_flask    (100,999999) { Show }
-		BaseType $uniques_unambiguous_map      (100,999999) { Show }
+		BaseType $uniques_eq_unambiguous   (100, _) { Show }
+		BaseType $uniques_flask_unambiguous(100, _) { Show }
+		BaseType $uniques_jewel_unambiguous(100, _) { Show }
+		BaseType $uniques_map_unambiguous  (100, _) { Show }
 	}
 
 	{
@@ -511,12 +507,10 @@ Rarity unique {
 		SetAlertSound alert_unique_good
 		SetBeam beam_top_unique
 		SetMinimapIcon minimap_mid_unique
-		BaseType $uniques_unambiguous_armour   (5,100) { Show }
-		BaseType $uniques_unambiguous_weapon   (5,100) { Show }
-		BaseType $uniques_unambiguous_accessory(5,100) { Show }
-		BaseType $uniques_unambiguous_jewel    (5,100) { Show }
-		BaseType $uniques_unambiguous_flask    (5,100) { Show }
-		BaseType $uniques_unambiguous_map      (5,100) { Show }
+		BaseType $uniques_eq_unambiguous   (5, 100) { Show }
+		BaseType $uniques_flask_unambiguous(5, 100) { Show }
+		BaseType $uniques_jewel_unambiguous(5, 100) { Show }
+		BaseType $uniques_map_unambiguous  (5, 100) { Show }
 	}
 
 	# note that APIs may not list all possible uniques

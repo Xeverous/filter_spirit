@@ -20,7 +20,7 @@ std::vector<std::optional<lang::object_type>> determine_types_of(
 
 		if (std::holds_alternative<lang::object>(object_or_error)) {
 			const auto& object = std::get<lang::object>(object_or_error);
-			result.push_back(lang::type_of_object(object.value));
+			result.push_back(object.type());
 		}
 		else {
 			result.push_back(std::nullopt);

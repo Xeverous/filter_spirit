@@ -1,26 +1,61 @@
 #include <fs/utility/file.hpp>
-#include <fstream>
-#include <iterator>
-#include <sys/types.h>
-#include <sys/stat.h>
+
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/fstream.hpp>
+#include <boost/system/system_error.hpp>
+#include <boost/system/error_code.hpp>
 
 namespace fs::utility
 {
 
-bool file_exists(const char* path)
+namespace bfs = boost::filesystem;
+
+std::string load_file(const boost::filesystem::path& path, std::error_code& ec)
 {
-	struct stat buffer;
-	return stat(path, &buffer) == 0;
+	boost::system::error_code bec;
+	bfs::file_status status = bfs::status(path, bec);
+
+	if (bec) {
+		ec = static_cast<std::error_code>(bec);
+		return {};
+	}
+
+	if (bfs::is_directory(status)) {
+		//ec = boost::system::errc::make_error_code(boost::system::errc::is_a_directory);
+		ec = std::make_error_code(std::errc::is_a_directory);
+		return {};
+	}
+
+	const auto file_size = bfs::file_size(path, bec);
+	if (ec) {
+		ec = static_cast<std::error_code>(bec);
+		return {};
+	}
+
+	bfs::ifstream file(path, std::ios::binary);
+
+	if (!file.good()) {
+		ec = std::make_error_code(std::io_errc::stream);
+		return {};
+	}
+
+	std::string file_contents(file_size, '\0');
+	file.read(file_contents.data(), file_size);
+	return file_contents;
 }
 
-std::optional<std::string> load_file(const char* file_path)
+std::error_code save_file(const boost::filesystem::path& path, std::string_view file_contents)
 {
-	std::ifstream file(file_path);
+	if (bfs::is_directory(path))
+		return std::make_error_code(std::errc::is_a_directory);
+
+	bfs::ofstream file(path, std::ios::binary | std::ios::trunc);
 
 	if (!file.good())
-		return {};
+		return std::make_error_code(std::io_errc::stream);
 
-	return std::string(std::istreambuf_iterator<char>{file}, {});
+	file.write(file_contents.data(), file_contents.size());
+	return {};
 }
 
 }

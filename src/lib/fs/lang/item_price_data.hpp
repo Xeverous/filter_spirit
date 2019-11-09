@@ -1,94 +1,105 @@
 #pragma once
 
+#include <fs/log/logger_fwd.hpp>
+
 #include <vector>
 #include <string>
-
-namespace fs::log { class logger; }
+#include <unordered_map>
+#include <utility>
 
 namespace fs::lang
 {
 
-// note: this needs to be API-agnostic (currently very centered around poe.watch)
-// refactor this (eg remove unused fields) once poe.ninja support is present
 struct price_data
 {
-	double mean = 0;     // arithmetic mean
-	double median = 0;   // when sorted, value in the middle
-	double mode = 0;     // most repeated value
-	double min = 0;      // lower bound of price calculation
-	double max = 0;      // upper bound of price calculation
-	double exalted = 0;  // same as mean, just in exalted
-	double total = 0;    // amount of currently listed items
-	double daily = 0;    // amount of new listed items in last 24h
-	double current = 0;  // amount of currently listed items that have a price
-	double accepted = 0; // amount of accepted offers for price calculation (troll offers are ignored)
+	double chaos_value;
+	bool is_low_confidence;
 };
 
 struct elementary_item
 {
-	std::string base_type_name;
-	price_data price_data;
-};
-
-struct base_type_item
-{
-	int ilvl;
-	std::string base_type_name;
-	price_data price_data;
-};
-
-struct unique_item
-{
+	price_data price;
 	std::string name;
-	std::string base_type_name;
-	price_data price_data;
 };
+
+struct divination_card : elementary_item
+{
+	divination_card(elementary_item ei, int stack_size)
+	: elementary_item(std::move(ei)), stack_size(stack_size) {}
+
+	divination_card(price_data price, std::string name, int stack_size)
+	: elementary_item{price, std::move(name)}, stack_size(stack_size) {}
+
+	int stack_size;
+};
+
+struct gem : elementary_item
+{
+	gem(elementary_item ei, int level, int quality, bool is_corrupted)
+	: elementary_item(std::move(ei)), level(level), quality(quality), is_corrupted(is_corrupted) {}
+
+	int level;
+	int quality;
+	bool is_corrupted;
+};
+
+enum class influence_type { none, shaper, elder };
+
+struct base : elementary_item
+{
+	base(elementary_item ei, int item_level, influence_type influence)
+	: elementary_item(std::move(ei)), item_level(item_level), influence(influence) {}
+
+	int item_level;
+	influence_type influence;
+};
+
+bool is_undroppable_unique(std::string_view name) noexcept;
+
+// unlinked uniques
+struct unique_item_price_data
+{
+	void add_item(std::string base_type, elementary_item item_info);
+
+	// maps base type name to unique item name
+	// (only 1 unique on the given base)
+	std::unordered_map<std::string, elementary_item> unambiguous;
+	// maps base type name to unique item names
+	// (contains multiple entries per base type)
+	std::unordered_multimap<std::string, elementary_item> ambiguous;
+};
+
+struct item_price_metadata;
 
 struct item_price_data
 {
-	void log_info(log::logger& logger) const;
-	/*
-	 * Some items (eg very rare uniques and cards, Harbinger pieces)
-	 * may not have associated entry in price data.
-	 *
-	 * This is not a bug, some items may simply have undetermined value.
-	 * We can at most just log them, it's the filter writer's responsibility
-	 * to be prepared that not all items have reliable prices.
-	 */
-	int count_of_items_without_price_data = 0;
+	[[nodiscard]] bool
+	load_and_parse(
+		const item_price_metadata& metadata,
+		const std::string& directory_path,
+		log::logger& logger);
 
-	// sorted by price
-	std::vector<elementary_item> divination_cards;
-	std::vector<elementary_item> prophecies;
+	std::vector<divination_card> divination_cards;
+
+	std::vector<elementary_item> oils;
+	std::vector<elementary_item> incubators;
 	std::vector<elementary_item> essences;
-	std::vector<elementary_item> leaguestones;
-	std::vector<elementary_item> pieces;
-	std::vector<elementary_item> nets;
-	std::vector<elementary_item> vials;
 	std::vector<elementary_item> fossils;
+	std::vector<elementary_item> prophecies;
 	std::vector<elementary_item> resonators;
 	std::vector<elementary_item> scarabs;
+	std::vector<elementary_item> helmet_enchants;
 
-	// sorted by ilvl
-	std::vector<base_type_item> bases_without_influence;
-	std::vector<base_type_item> bases_shaper;
-	std::vector<base_type_item> bases_elder;
+	std::vector<gem> gems;
 
-	// sorted by price
-	std::vector<unique_item> unambiguous_unique_armours;
-	std::vector<unique_item> unambiguous_unique_weapons;
-	std::vector<unique_item> unambiguous_unique_accessories;
-	std::vector<unique_item> unambiguous_unique_jewels;
-	std::vector<unique_item> unambiguous_unique_flasks;
-	std::vector<unique_item> unambiguous_unique_maps;
+	std::vector<base> bases;
 
-	// sorted by base type
-	std::vector<unique_item> ambiguous_unique_armours;
-	std::vector<unique_item> ambiguous_unique_weapons;
-	std::vector<unique_item> ambiguous_unique_accessories;
-	std::vector<unique_item> ambiguous_unique_jewels;
-	std::vector<unique_item> ambiguous_unique_flasks;
-	std::vector<unique_item> ambiguous_unique_maps;
+	unique_item_price_data unique_eq; // jewellery, body parts, weapons
+	unique_item_price_data unique_flasks;
+	unique_item_price_data unique_jewels;
+	unique_item_price_data unique_maps;
 };
+
+log::logger_wrapper& operator<<(log::logger_wrapper& logger, const item_price_data& ipd);
 
 }

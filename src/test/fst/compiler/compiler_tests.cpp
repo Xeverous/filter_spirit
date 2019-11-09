@@ -41,7 +41,7 @@ void expect_object_in_symbols(
 	if (object.value != value)
 	{
 		const std::string_view all_code = lookup_data.get_view_of_whole_content();
-		BOOST_ERROR("expected " << lang::type_of_object(value) << " but got " << lang::type_of_object(object.value) << "\n"
+		BOOST_ERROR("expected " << lang::type_of_object(value) << " but got " << object.type() << "\n"
 			<< range_info_to_string(all_code, lookup_data.position_of(named_object.name_origin))
 			<< range_info_to_string(all_code, lookup_data.position_of(object.value_origin)));
 	}

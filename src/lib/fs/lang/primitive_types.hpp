@@ -11,24 +11,24 @@ namespace fs::lang
 
 struct none {};
 
-inline bool operator==(none, none) { return true; }
-inline bool operator!=(none, none) { return false; }
+inline bool operator==(none, none) noexcept { return true; }
+inline bool operator!=(none, none) noexcept { return false; }
 
 struct boolean
 {
 	bool value;
 };
 
-inline bool operator==(boolean lhs, boolean rhs) { return lhs.value == rhs.value; }
-inline bool operator!=(boolean lhs, boolean rhs) { return !(lhs == rhs); }
+inline bool operator==(boolean lhs, boolean rhs) noexcept { return lhs.value == rhs.value; }
+inline bool operator!=(boolean lhs, boolean rhs) noexcept { return !(lhs == rhs); }
 
 struct integer
 {
 	int value;
 };
 
-inline bool operator==(integer lhs, integer rhs) { return lhs.value == rhs.value; }
-inline bool operator!=(integer lhs, integer rhs) { return !(lhs == rhs); }
+inline bool operator==(integer lhs, integer rhs) noexcept { return lhs.value == rhs.value; }
+inline bool operator!=(integer lhs, integer rhs) noexcept { return !(lhs == rhs); }
 
 struct floating_point
 {
@@ -38,8 +38,8 @@ struct floating_point
 	double value;
 };
 
-inline bool operator==(floating_point lhs, floating_point rhs) { return lhs.value == rhs.value; }
-inline bool operator!=(floating_point lhs, floating_point rhs) { return !(lhs == rhs); }
+inline bool operator==(floating_point lhs, floating_point rhs) noexcept { return lhs.value == rhs.value; }
+inline bool operator!=(floating_point lhs, floating_point rhs) noexcept { return !(lhs == rhs); }
 
 struct level
 {
@@ -49,8 +49,8 @@ struct level
 	int value;
 };
 
-inline bool operator==(level lhs, level rhs) { return lhs.value == rhs.value; }
-inline bool operator!=(level lhs, level rhs) { return !(lhs == rhs); }
+inline bool operator==(level lhs, level rhs) noexcept { return lhs.value == rhs.value; }
+inline bool operator!=(level lhs, level rhs) noexcept { return !(lhs == rhs); }
 
 struct font_size
 {
@@ -60,8 +60,8 @@ struct font_size
 	int value;
 };
 
-inline bool operator==(font_size lhs, font_size rhs) { return lhs.value == rhs.value; }
-inline bool operator!=(font_size lhs, font_size rhs) { return !(lhs == rhs); }
+inline bool operator==(font_size lhs, font_size rhs) noexcept { return lhs.value == rhs.value; }
+inline bool operator!=(font_size lhs, font_size rhs) noexcept { return !(lhs == rhs); }
 
 struct sound_id
 {
@@ -71,8 +71,8 @@ struct sound_id
 	int value;
 };
 
-inline bool operator==(sound_id lhs, sound_id rhs) { return lhs.value == rhs.value; }
-inline bool operator!=(sound_id lhs, sound_id rhs) { return !(lhs == rhs); }
+inline bool operator==(sound_id lhs, sound_id rhs) noexcept { return lhs.value == rhs.value; }
+inline bool operator!=(sound_id lhs, sound_id rhs) noexcept { return !(lhs == rhs); }
 
 struct volume
 {
@@ -82,8 +82,8 @@ struct volume
 	int value;
 };
 
-inline bool operator==(volume lhs, volume rhs) { return lhs.value == rhs.value; }
-inline bool operator!=(volume lhs, volume rhs) { return !(lhs == rhs); }
+inline bool operator==(volume lhs, volume rhs) noexcept { return lhs.value == rhs.value; }
+inline bool operator!=(volume lhs, volume rhs) noexcept { return !(lhs == rhs); }
 
 struct socket_group
 {
@@ -99,11 +99,11 @@ struct socket_group
 	int w = 0;
 };
 
-inline bool operator==(socket_group lhs, socket_group rhs)
+inline bool operator==(socket_group lhs, socket_group rhs) noexcept
 {
 	return std::tie(lhs.r, lhs.g, lhs.b, lhs.w) == std::tie(rhs.r, rhs.g, rhs.b, rhs.w);
 }
-inline bool operator!=(socket_group lhs, socket_group rhs) { return !(lhs == rhs); }
+inline bool operator!=(socket_group lhs, socket_group rhs) noexcept { return !(lhs == rhs); }
 
 enum class rarity { normal, magic, rare, unique };
 enum class shape { circle, diamond, hexagon, square, star, triangle };
@@ -129,11 +129,11 @@ struct color
 	std::optional<int> a;
 };
 
-inline bool operator==(color lhs, color rhs)
+inline bool operator==(color lhs, color rhs) noexcept
 {
 	return std::tie(lhs.r, lhs.g, lhs.b, lhs.a) == std::tie(rhs.r, rhs.g, rhs.b, rhs.a);
 }
-inline bool operator!=(color lhs, color rhs) { return !(lhs == rhs); }
+inline bool operator!=(color lhs, color rhs) noexcept { return !(lhs == rhs); }
 
 struct minimap_icon
 {
@@ -148,11 +148,11 @@ struct minimap_icon
 	shape shape;
 };
 
-inline bool operator==(minimap_icon lhs, minimap_icon rhs)
+inline bool operator==(minimap_icon lhs, minimap_icon rhs) noexcept
 {
 	return std::tie(lhs.size, lhs.color, lhs.shape) == std::tie(rhs.size, rhs.color, rhs.shape);
 }
-inline bool operator!=(minimap_icon lhs, minimap_icon rhs) { return !(lhs == rhs); }
+inline bool operator!=(minimap_icon lhs, minimap_icon rhs) noexcept { return !(lhs == rhs); }
 
 struct beam_effect
 {
@@ -166,19 +166,19 @@ struct beam_effect
 	bool is_temporary;
 };
 
-inline bool operator==(beam_effect lhs, beam_effect rhs)
+inline bool operator==(beam_effect lhs, beam_effect rhs) noexcept
 {
 	return std::tie(lhs.color, lhs.is_temporary) == std::tie(rhs.color, rhs.is_temporary);
 }
-inline bool operator!=(beam_effect lhs, beam_effect rhs) { return !(lhs == rhs); }
+inline bool operator!=(beam_effect lhs, beam_effect rhs) noexcept { return !(lhs == rhs); }
 
 struct string
 {
 	std::string value;
 };
 
-inline bool operator==(const string& lhs, const string& rhs) { return lhs.value == rhs.value; }
-inline bool operator!=(const string& lhs, const string& rhs) { return !(lhs == rhs); }
+inline bool operator==(const string& lhs, const string& rhs) noexcept { return lhs.value == rhs.value; }
+inline bool operator!=(const string& lhs, const string& rhs) noexcept { return !(lhs == rhs); }
 
 struct path
 {
@@ -191,8 +191,8 @@ struct path
 	std::string value;
 };
 
-inline bool operator==(const path& lhs, const path& rhs) { return lhs.value == rhs.value; }
-inline bool operator!=(const path& lhs, const path& rhs) { return !(lhs == rhs); }
+inline bool operator==(const path& lhs, const path& rhs) noexcept { return lhs.value == rhs.value; }
+inline bool operator!=(const path& lhs, const path& rhs) noexcept { return !(lhs == rhs); }
 
 struct built_in_alert_sound
 {
@@ -216,11 +216,11 @@ struct built_in_alert_sound
 	boolean is_positional = boolean{false};
 };
 
-inline bool operator==(built_in_alert_sound lhs, built_in_alert_sound rhs)
+inline bool operator==(built_in_alert_sound lhs, built_in_alert_sound rhs) noexcept
 {
 	return std::tie(lhs.id, lhs.volume, lhs.is_positional) == std::tie(rhs.id, rhs.volume, rhs.is_positional);
 }
-inline bool operator!=(built_in_alert_sound lhs, built_in_alert_sound rhs) { return !(lhs == rhs); }
+inline bool operator!=(built_in_alert_sound lhs, built_in_alert_sound rhs) noexcept { return !(lhs == rhs); }
 
 struct custom_alert_sound
 {
@@ -233,8 +233,8 @@ struct custom_alert_sound
 	path path;
 };
 
-inline bool operator==(const custom_alert_sound& lhs, const custom_alert_sound& rhs) { return lhs.path == rhs.path; }
-inline bool operator!=(const custom_alert_sound& lhs, const custom_alert_sound& rhs) { return !(lhs == rhs); }
+inline bool operator==(const custom_alert_sound& lhs, const custom_alert_sound& rhs) noexcept { return lhs.path == rhs.path; }
+inline bool operator!=(const custom_alert_sound& lhs, const custom_alert_sound& rhs) noexcept { return !(lhs == rhs); }
 
 struct alert_sound
 {
@@ -268,7 +268,7 @@ struct alert_sound
 	std::variant<built_in_alert_sound, custom_alert_sound> sound;
 };
 
-inline bool operator==(const alert_sound& lhs, const alert_sound& rhs) { return lhs.sound == rhs.sound; }
-inline bool operator!=(const alert_sound& lhs, const alert_sound& rhs) { return !(lhs == rhs); }
+inline bool operator==(const alert_sound& lhs, const alert_sound& rhs) noexcept { return lhs.sound == rhs.sound; }
+inline bool operator!=(const alert_sound& lhs, const alert_sound& rhs) noexcept { return !(lhs == rhs); }
 
 } // namespace fs::lang

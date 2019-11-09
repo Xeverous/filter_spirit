@@ -23,7 +23,7 @@ namespace impl
 	{
 		return errors::type_mismatch{
 			lang::type_to_enum<T>(),
-			lang::type_of_object(object.value),
+			object.type(),
 			object.value_origin};
 	}
 
@@ -55,28 +55,24 @@ std::variant<T, compile_error> get_value_as(const lang::object& object)
 {
 	static_assert(lang::traits::is_lang_type_v<T>, "T should be one of FS language types");
 
-	if constexpr (AllowPromotions)
-	{
-		if constexpr (std::is_same_v<T, lang::array_object>)
-		{
+	if constexpr (AllowPromotions) {
+		if constexpr (std::is_same_v<T, lang::array_object>) {
 			if (!object.is_array())
 				return object.promote_to_array();
 
 			return std::get<lang::array_object>(object.value);
 		}
-		else
-		{
+		else {
 			return impl::get_non_array_value_as<T>(object);
 		}
 	}
-	else
-	{
+	else {
 		if (std::holds_alternative<T>(object.value))
 			return std::get<T>(object.value);
 		else
 			return errors::type_mismatch{
 				lang::type_to_enum<T>(),
-				lang::type_of_object(object.value),
+				object.type(),
 				object.value_origin};
 	}
 }

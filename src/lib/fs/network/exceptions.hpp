@@ -1,8 +1,9 @@
 #pragma once
 
 #include <stdexcept>
+#include <string>
 
-namespace fs::network::poe_watch
+namespace fs::network
 {
 
 // use this type to indicate logic errors (eg item has missing / invalid field type)

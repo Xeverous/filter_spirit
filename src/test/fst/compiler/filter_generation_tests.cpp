@@ -388,11 +388,11 @@ Show
 		BOOST_AUTO_TEST_CASE(simple_price_queries)
 		{
 			fs::lang::item_price_data ipd;
-			ipd.divination_cards.push_back(fs::lang::elementary_item{"Rain of Chaos", fs::lang::price_data{0.125, 0, 0, 0, 0, 0, 0, 0, 0, 0}});
-			ipd.divination_cards.push_back(fs::lang::elementary_item{"Humility", fs::lang::price_data{5, 0, 0, 0, 0, 0, 0, 0, 0, 0}});
-			ipd.divination_cards.push_back(fs::lang::elementary_item{"A Dab of Ink", fs::lang::price_data{10, 0, 0, 0, 0, 0, 0, 0, 0, 0}});
-			ipd.divination_cards.push_back(fs::lang::elementary_item{"Abandoned Wealth", fs::lang::price_data{100, 0, 0, 0, 0, 0, 0, 0, 0, 0}});
-			ipd.divination_cards.push_back(fs::lang::elementary_item{"The Doctor", fs::lang::price_data{1000, 0, 0, 0, 0, 0, 0, 0, 0, 0}});
+			ipd.divination_cards.push_back(fs::lang::divination_card{fs::lang::price_data{0.125, false}, "Rain of Chaos", 8});
+			ipd.divination_cards.push_back(fs::lang::divination_card{fs::lang::price_data{5, false}, "Humility", 9});
+			ipd.divination_cards.push_back(fs::lang::divination_card{fs::lang::price_data{10, false}, "A Dab of Ink", 9});
+			ipd.divination_cards.push_back(fs::lang::divination_card{fs::lang::price_data{100, false}, "Abandoned Wealth", 5});
+			ipd.divination_cards.push_back(fs::lang::divination_card{fs::lang::price_data{1000, false}, "The Doctor", 8});
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
 low = $divination(0, 5)
 

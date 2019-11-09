@@ -3,8 +3,8 @@
 
 #include <fs/parser/parser.hpp>
 #include <fs/log/buffered_logger.hpp>
-#include <fs/core/version.hpp>
 #include <fs/utility/holds_alternative.hpp>
+#include <fs/version.hpp>
 
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
@@ -94,9 +94,9 @@ BOOST_AUTO_TEST_SUITE(parser_success_suite)
 		BOOST_TEST(config.params.empty());
 
 		const auto version = ast.version_data.get_value();
-		BOOST_TEST(version.major == core::version::major);
-		BOOST_TEST(version.minor == core::version::minor);
-		BOOST_TEST(version.patch == core::version::patch);
+		BOOST_TEST(version.major == version::major);
+		BOOST_TEST(version.minor == version::minor);
+		BOOST_TEST(version.patch == version::patch);
 	}
 
 	BOOST_AUTO_TEST_CASE(comments)

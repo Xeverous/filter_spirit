@@ -3,8 +3,8 @@
 #include <fs/lang/item_price_data.hpp>
 #include <fs/parser/parser.hpp>
 #include <fs/compiler/resolve_symbols.hpp>
-#include <fs/core/version.hpp>
 #include <fs/log/buffered_logger.hpp>
+#include <fs/version.hpp>
 
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
@@ -16,7 +16,7 @@ namespace fst
 
 const std::string& minimal_input()
 {
-	namespace v = fs::core::version;
+	namespace v = fs::version;
 	static const std::string str =
 		"version: " + std::to_string(v::major) + "." + std::to_string(v::minor) + "." + std::to_string(v::patch) + "\n"
 		"config: {}";

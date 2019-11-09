@@ -1,6 +1,6 @@
 #pragma once
 
-namespace fs::core::version
+namespace fs::version
 {
 
 constexpr int major = 0;

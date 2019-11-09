@@ -3,13 +3,12 @@
 #include <fs/parser/ast.hpp>
 #include <fs/parser/detail/config.hpp>
 #include <fs/log/utility.hpp>
+#include <fs/log/logger_fwd.hpp>
 
 #include <string_view>
 #include <variant>
 #include <utility>
 #include <cassert>
-
-namespace fs::log { class logger; }
 
 namespace fs::parser
 {

@@ -67,12 +67,10 @@ verify_array_homogeneity(
 		return std::nullopt;
 
 	const lang::object& first_object = array.front();
-	const lang::object_type first_type = lang::type_of_object(first_object.value);
-	for (const lang::object& element : array)
-	{
-		const lang::object_type tested_type = lang::type_of_object(element.value);
-		if (tested_type != first_type) // C++20: [[unlikely]]
-		{
+	const lang::object_type first_type = first_object.type();
+	for (const lang::object& element : array) {
+		const lang::object_type tested_type = element.type();
+		if (tested_type != first_type) { // C++20: [[unlikely]]
 			return errors::non_homogeneous_array{
 				first_object.value_origin,
 				element.value_origin,
@@ -320,14 +318,20 @@ evaluate_price_range_query(
 	const auto& price_range = std::get<lang::price_range>(range_or_error);
 	const lang::position_tag position_of_query = parser::get_position_info(price_range_query);
 
-	const auto eval_query = [&](const auto& items)
-	{
-		lang::array_object array = compiler::detail::evaluate_price_range_query_on_sorted_range(
-			price_range,
-			position_of_query,
-			items.begin(),
-			items.end());
+	const auto eval_query = [&](const auto& items, auto price_func, auto name_func) {
+		lang::array_object array;
+		for (auto it = items.begin(); it != items.end(); ++it) {
+			if (price_range.contains(price_func(it))) {
+				array.push_back(lang::object{lang::string{name_func(it)}, position_of_query});
+			}
+		}
 		return lang::object{std::move(array), position_of_query};
+	};
+	const auto eval_query_elementary_items = [&](const auto& items) {
+		return eval_query(items, [](auto it) { return it->price.chaos_value; }, [](auto it) { return it->name; });
+	};
+	const auto eval_query_unique_items = [&](const auto& items) {
+		return eval_query(items, [](auto it) { return it->second.price.chaos_value; }, [](auto it) { return it->second.name; });
 	};
 	/*
 	 * note: this is O(n) but relying on small string optimization
@@ -336,93 +340,56 @@ evaluate_price_range_query(
 	 * comparisons.
 	 */
 	const ast::identifier& query_name = price_range_query.name;
-	if (query_name.value == lang::queries::divination)
-	{
-		return eval_query(item_price_data.divination_cards);
+	if (query_name.value == lang::queries::divination) {
+		return eval_query_elementary_items(item_price_data.divination_cards); // TODO use complex query later
 	}
-	else if (query_name.value == lang::queries::prophecies)
-	{
-		return eval_query(item_price_data.prophecies);
+	else if (query_name.value == lang::queries::oils) {
+		return eval_query_elementary_items(item_price_data.prophecies);
 	}
-	else if (query_name.value == lang::queries::essences)
-	{
-		return eval_query(item_price_data.essences);
+	else if (query_name.value == lang::queries::incubators) {
+		return eval_query_elementary_items(item_price_data.prophecies);
 	}
-	else if (query_name.value == lang::queries::leaguestones)
-	{
-		return eval_query(item_price_data.leaguestones);
+	else if (query_name.value == lang::queries::essences) {
+		return eval_query_elementary_items(item_price_data.essences);
 	}
-	else if (query_name.value == lang::queries::pieces)
-	{
-		return eval_query(item_price_data.pieces);
+	else if (query_name.value == lang::queries::fossils) {
+		return eval_query_elementary_items(item_price_data.fossils);
 	}
-	else if (query_name.value == lang::queries::nets)
-	{
-		return eval_query(item_price_data.nets);
+	else if (query_name.value == lang::queries::prophecies) {
+		return eval_query_elementary_items(item_price_data.prophecies);
 	}
-	else if (query_name.value == lang::queries::vials)
-	{
-		return eval_query(item_price_data.vials);
+	else if (query_name.value == lang::queries::resonators) {
+		return eval_query_elementary_items(item_price_data.resonators);
 	}
-	else if (query_name.value == lang::queries::fossils)
-	{
-		return eval_query(item_price_data.fossils);
+	else if (query_name.value == lang::queries::scarabs) {
+		return eval_query_elementary_items(item_price_data.scarabs);
 	}
-	else if (query_name.value == lang::queries::resonators)
-	{
-		return eval_query(item_price_data.resonators);
+	else if (query_name.value == lang::queries::helmet_enchants) {
+		return eval_query_elementary_items(item_price_data.helmet_enchants);
 	}
-	else if (query_name.value == lang::queries::scarabs)
-	{
-		return eval_query(item_price_data.scarabs);
+	else if (query_name.value == lang::queries::uniques_eq_ambiguous) {
+		return eval_query_unique_items(item_price_data.unique_eq.ambiguous);
 	}
-	else if (query_name.value == lang::queries::uniques_ambiguous_armour)
-	{
-		return eval_query(item_price_data.ambiguous_unique_armours);
+	else if (query_name.value == lang::queries::uniques_eq_unambiguous) {
+		return eval_query_unique_items(item_price_data.unique_eq.unambiguous);
 	}
-	else if (query_name.value == lang::queries::uniques_ambiguous_weapon)
-	{
-		return eval_query(item_price_data.ambiguous_unique_weapons);
+	else if (query_name.value == lang::queries::uniques_flask_ambiguous) {
+		return eval_query_unique_items(item_price_data.unique_flasks.ambiguous);
 	}
-	else if (query_name.value == lang::queries::uniques_ambiguous_accessory)
-	{
-		return eval_query(item_price_data.ambiguous_unique_accessories);
+	else if (query_name.value == lang::queries::uniques_flask_unambiguous) {
+		return eval_query_unique_items(item_price_data.unique_flasks.unambiguous);
 	}
-	else if (query_name.value == lang::queries::uniques_ambiguous_jewel)
-	{
-		return eval_query(item_price_data.ambiguous_unique_jewels);
+	else if (query_name.value == lang::queries::uniques_jewel_ambiguous) {
+		return eval_query_unique_items(item_price_data.unique_jewels.ambiguous);
 	}
-	else if (query_name.value == lang::queries::uniques_ambiguous_flask)
-	{
-		return eval_query(item_price_data.ambiguous_unique_flasks);
+	else if (query_name.value == lang::queries::uniques_jewel_unambiguous) {
+		return eval_query_unique_items(item_price_data.unique_jewels.unambiguous);
 	}
-	else if (query_name.value == lang::queries::uniques_ambiguous_map)
-	{
-		return eval_query(item_price_data.ambiguous_unique_maps);
+	else if (query_name.value == lang::queries::uniques_map_ambiguous) {
+		return eval_query_unique_items(item_price_data.unique_maps.ambiguous);
 	}
-	else if (query_name.value == lang::queries::uniques_unambiguous_armour)
-	{
-		return eval_query(item_price_data.unambiguous_unique_armours);
-	}
-	else if (query_name.value == lang::queries::uniques_unambiguous_weapon)
-	{
-		return eval_query(item_price_data.unambiguous_unique_weapons);
-	}
-	else if (query_name.value == lang::queries::uniques_unambiguous_accessory)
-	{
-		return eval_query(item_price_data.unambiguous_unique_accessories);
-	}
-	else if (query_name.value == lang::queries::uniques_unambiguous_jewel)
-	{
-		return eval_query(item_price_data.unambiguous_unique_jewels);
-	}
-	else if (query_name.value == lang::queries::uniques_unambiguous_flask)
-	{
-		return eval_query(item_price_data.unambiguous_unique_flasks);
-	}
-	else if (query_name.value == lang::queries::uniques_unambiguous_map)
-	{
-		return eval_query(item_price_data.unambiguous_unique_maps);
+	else if (query_name.value == lang::queries::uniques_map_unambiguous) {
+		return eval_query_unique_items(item_price_data.unique_maps.unambiguous);
 	}
 
 	return errors::no_such_query{parser::get_position_info(query_name)};

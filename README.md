@@ -116,9 +116,10 @@ Class "Divination Card" {
   - beast
   - asio
   - system
+  - **filesystem**
   - **unit_test_framework** (only if you build tests)
 - nlohmann/json
-- **OpenSSL** (preferably 1.1)
+- **OpenSSL** (preferably 1.1+)
 
 bolded dependencies require linking, all dependencies are exposed as targets in CMake script
 

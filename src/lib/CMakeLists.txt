@@ -1,6 +1,6 @@
 find_package(nlohmann_json 3.0.0 REQUIRED)
 find_package(OpenSSL REQUIRED)
-find_package(Boost 1.68 REQUIRED)
+find_package(Boost 1.68 REQUIRED COMPONENTS filesystem)
 
 # some source files are shared with tests and GUI/CLI executables
 # compile these as shared library so that it can be reused by both
@@ -24,16 +24,23 @@ add_library(filter_spirit SHARED
 	fs/lang/filter_block.cpp
 	fs/lang/object.cpp
 	fs/lang/item_price_data.cpp
+	fs/lang/item_price_metadata.cpp
+	fs/lang/data_source_type.cpp
+	fs/lang/item_price_metadata.cpp
 	fs/log/buffered_logger.cpp
 	fs/log/console_logger.cpp
 	fs/log/logger.cpp
 	fs/log/utility.cpp
 	fs/utility/file.cpp
-	fs/network/network.cpp
-	fs/network/session.cpp
-	fs/network/poe_watch/api.cpp
-	fs/network/poe_watch/parse_json.cpp
-	fs/core/core.cpp
+	fs/utility/dump_json.cpp
+	fs/network/http.cpp
+	fs/network/url_encode.cpp
+	fs/network/poe_watch/download_data.cpp
+	fs/network/poe_watch/parse_data.cpp
+	fs/network/poe_watch/api_data.cpp
+	fs/network/poe_ninja/download_data.cpp
+	fs/network/poe_ninja/parse_data.cpp
+	fs/network/poe_ninja/api_data.cpp
 )
 
 target_include_directories(filter_spirit
@@ -60,6 +67,7 @@ target_link_libraries(filter_spirit
 	PRIVATE
 		nlohmann_json::nlohmann_json
 		OpenSSL::SSL
+		Boost::filesystem
 )
 
 # Windows requires additional networking libraries for Boost ASIO
