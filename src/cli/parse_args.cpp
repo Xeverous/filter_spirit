@@ -62,10 +62,10 @@ int run(int argc, char* argv[])
 			("read,r", po::value(&data_read_dir), "read item price data (JSON files) from specified directory")
 		;
 
-		boost::optional<std::string> data_write_dir;
+		boost::optional<std::string> data_save_dir;
 		po::options_description data_storing_options("data storing options (use if you would like to save item price data for future use)");
 		data_storing_options.add_options()
-			("save,s", po::value(&data_write_dir), "save item price data (JSON files) to specified directory")
+			("save,s", po::value(&data_save_dir), "save item price data (JSON files) to specified directory (requires download option)")
 		;
 
 		bool opt_generate = false;
@@ -131,60 +131,12 @@ int run(int argc, char* argv[])
 			return EXIT_SUCCESS;
 		}
 
-		if ((download_league_name_watch && data_read_dir)
-			|| (download_league_name_ninja && data_read_dir)
-			|| (download_league_name_ninja && download_league_name_watch))
-		{
-			logger.error() << "more than 1 data obtaining option specified";
-			return EXIT_FAILURE;
-		}
-
-		std::optional<fs::lang::item_price_data> item_price_data;
-		fs::lang::item_price_metadata item_price_metadata;
-		if (download_league_name_ninja) {
-			item_price_data = download_item_price_data(*download_league_name_ninja, fs::lang::data_source_type::poe_ninja, logger);
-			item_price_metadata.league_name = *download_league_name_ninja;
-			item_price_metadata.data_source = fs::lang::data_source_type::poe_ninja;
-			item_price_metadata.download_date = boost::posix_time::microsec_clock::universal_time();
-		}
-		else if (download_league_name_watch) {
-			item_price_data = download_item_price_data(*download_league_name_watch, fs::lang::data_source_type::poe_watch, logger);
-			item_price_metadata.league_name = *download_league_name_watch;
-			item_price_metadata.data_source = fs::lang::data_source_type::poe_watch;
-			item_price_metadata.download_date = boost::posix_time::microsec_clock::universal_time();
-		}
-		else if (data_read_dir) {
-			if (!item_price_metadata.load(*data_read_dir, logger)) {
-				logger.error() << "failed to load item price metadata";
-				return EXIT_FAILURE;
-			}
-
-			fs::lang::item_price_data data;
-			if (!data.load_and_parse(item_price_metadata, *data_read_dir, logger)) {
-				logger.error() << "failed to load item price data";
-				return EXIT_FAILURE;
-			}
-			item_price_data = std::move(data);
-		}
+		std::optional<item_data> data = obtain_item_data(
+			download_league_name_ninja, download_league_name_watch, data_read_dir, data_save_dir, logger);
 
 		if (opt_generate) {
-			if (!item_price_data) {
-				logger.error() << "no item price data, giving up on filter generation";
-				return EXIT_FAILURE;
-			}
-
-			if (!input_path) {
-				logger.error() << "no input path given";
-				return EXIT_FAILURE;
-			}
-
-			if (!output_path) {
-				logger.error() << "no output path given";
-				return EXIT_FAILURE;
-			}
-
-			if (!generate_item_filter(*item_price_data, item_price_metadata, *input_path, *output_path, opt_print_ast, logger)) {
-				logger.info() << "errors occured during filter generation";
+			if (!generate_item_filter(data, input_path, output_path, opt_print_ast, logger)) {
+				logger.info() << "filter generation failed";
 				return EXIT_FAILURE;
 			}
 		}

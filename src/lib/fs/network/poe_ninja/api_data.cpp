@@ -1,6 +1,8 @@
 #include <fs/network/poe_ninja/api_data.hpp>
-
+#include <fs/log/logger.hpp>
 #include <fs/utility/file.hpp>
+
+#include <utility>
 
 namespace
 {
@@ -33,56 +35,57 @@ namespace fs::network::poe_ninja
 {
 
 #define FOR_ALL_MEMBERS(MACRO) \
-	MACRO(currency, filename_currency); \
-	MACRO(fragment, filename_fragment); \
-	MACRO(oil, filename_oil); \
-	MACRO(incubator, filename_incubator); \
-	MACRO(scarab, filename_scarab); \
-	MACRO(fossil, filename_fossil); \
-	MACRO(resonator, filename_resonator); \
-	MACRO(essence, filename_essence); \
-	MACRO(divination_card, filename_divination_card); \
-	MACRO(prophecy, filename_prophecy); \
-	MACRO(skill_gem, filename_skill_gem); \
-	MACRO(base_type, filename_base_type); \
-	MACRO(helmet_enchant, filename_helmet_enchant); \
-	MACRO(unique_map, filename_unique_map); \
-	MACRO(map, filename_map); \
-	MACRO(unique_jewel, filename_unique_jewel); \
-	MACRO(unique_flask, filename_unique_flask); \
-	MACRO(unique_weapon, filename_unique_weapon); \
-	MACRO(unique_armour, filename_unique_armour); \
-	MACRO(unique_accessory, filename_unique_accessory); \
+	MACRO(currency, filename_currency) \
+	MACRO(fragment, filename_fragment) \
+	MACRO(oil, filename_oil) \
+	MACRO(incubator, filename_incubator) \
+	MACRO(scarab, filename_scarab) \
+	MACRO(fossil, filename_fossil) \
+	MACRO(resonator, filename_resonator) \
+	MACRO(essence, filename_essence) \
+	MACRO(divination_card, filename_divination_card) \
+	MACRO(prophecy, filename_prophecy) \
+	MACRO(skill_gem, filename_skill_gem) \
+	MACRO(base_type, filename_base_type) \
+	MACRO(helmet_enchant, filename_helmet_enchant) \
+	MACRO(unique_map, filename_unique_map) \
+	MACRO(map, filename_map) \
+	MACRO(unique_jewel, filename_unique_jewel) \
+	MACRO(unique_flask, filename_unique_flask) \
+	MACRO(unique_weapon, filename_unique_weapon) \
+	MACRO(unique_armour, filename_unique_armour) \
+	MACRO(unique_accessory, filename_unique_accessory) \
 	MACRO(beast, filename_beast)
 
-std::error_code api_item_price_data::save(const boost::filesystem::path& directory) const
+bool api_item_price_data::save(const boost::filesystem::path& directory, log::logger& logger) const
 {
-	std::error_code ec;
-
 #define SAVE(member_var, file_name) \
-	ec = utility::save_file(directory / file_name, member_var); \
-	if (ec) \
-		return ec
+	if (!utility::save_file(directory / file_name, member_var, logger)) {\
+		return false; \
+	}
 
-	FOR_ALL_MEMBERS(SAVE);
+	FOR_ALL_MEMBERS(SAVE)
 #undef SAVE
 
-	return ec;
+	return true;
 }
 
-std::error_code api_item_price_data::load(const boost::filesystem::path& directory)
+bool api_item_price_data::load(const boost::filesystem::path& directory, log::logger& logger)
 {
-	std::error_code ec;
-
+	std::optional<std::string> file_contents;
 #define LOAD(member_var, file_name) \
-	member_var = utility::load_file(directory / file_name, ec); \
-	if (ec) \
-		return ec
+	file_contents = utility::load_file(directory / file_name, logger); \
+	if (file_contents) {\
+		member_var = std::move(*file_contents); \
+	} \
+	else { \
+		return false; \
+	}
 
-	FOR_ALL_MEMBERS(LOAD);
+	FOR_ALL_MEMBERS(LOAD)
 #undef LOAD
 
-	return ec;
+	return true;
 }
 
 #undef FOR_ALL_MEMBERS

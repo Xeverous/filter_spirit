@@ -1,5 +1,6 @@
 #include <fs/lang/item_price_data.hpp>
 #include <fs/lang/item_price_metadata.hpp>
+// TODO network includes are a bit risky here (circular dependency)
 #include <fs/network/poe_ninja/api_data.hpp>
 #include <fs/network/poe_watch/api_data.hpp>
 #include <fs/network/poe_ninja/parse_data.hpp>
@@ -189,10 +190,9 @@ bool item_price_data::load_and_parse(
 	try {
 		if (metadata.data_source == lang::data_source_type::poe_ninja) {
 			network::poe_ninja::api_item_price_data api_data;
-			const std::error_code ec = api_data.load(directory_path);
 
-			if (ec) {
-				logger.error() << "failed to load item price data: " << ec.message();
+			if (!api_data.load(directory_path, logger)) {
+				logger.error() << "failed to load item price data";
 				return false;
 			}
 
@@ -201,10 +201,9 @@ bool item_price_data::load_and_parse(
 		}
 		else if (metadata.data_source == lang::data_source_type::poe_watch) {
 			network::poe_watch::api_item_price_data api_data;
-			const std::error_code ec = api_data.load(directory_path);
 
-			if (ec) {
-				logger.error() << "failed to load item price data: " << ec.message();
+			if (!api_data.load(directory_path, logger)) {
+				logger.error() << "failed to load item price data";
 				return false;
 			}
 

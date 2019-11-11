@@ -1,5 +1,7 @@
 #pragma once
 
+#include <fs/log/logger_fwd.hpp>
+
 #include <boost/filesystem/path.hpp>
 
 #include <string>
@@ -11,8 +13,8 @@ namespace fs::network::poe_ninja
 // https://poe.ninja/swagger
 struct api_item_price_data
 {
-	[[nodiscard]] std::error_code save(const boost::filesystem::path& directory) const;
-	[[nodiscard]] std::error_code load(const boost::filesystem::path& directory);
+	[[nodiscard]] bool save(const boost::filesystem::path& directory, log::logger& logger) const;
+	[[nodiscard]] bool load(const boost::filesystem::path& directory, log::logger& logger);
 
 	// poe.ninja/api/data/currencyoverview
 	std::string currency;

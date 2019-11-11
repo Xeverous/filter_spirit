@@ -1,4 +1,5 @@
 #include <fs/utility/file.hpp>
+#include <fs/log/logger.hpp>
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/fstream.hpp>
@@ -44,6 +45,19 @@ std::string load_file(const boost::filesystem::path& path, std::error_code& ec)
 	return file_contents;
 }
 
+std::optional<std::string> load_file(const boost::filesystem::path& path, log::logger& logger)
+{
+	std::error_code ec;
+	std::string file_contents = load_file(path, ec);
+
+	if (ec) {
+		logger.error() << "failed to load file " << path.generic_string() << ": " << ec.message();
+		return std::nullopt;
+	}
+
+	return file_contents;
+}
+
 std::error_code save_file(const boost::filesystem::path& path, std::string_view file_contents)
 {
 	if (bfs::is_directory(path))
@@ -56,6 +70,16 @@ std::error_code save_file(const boost::filesystem::path& path, std::string_view 
 
 	file.write(file_contents.data(), file_contents.size());
 	return {};
+}
+
+bool save_file(const boost::filesystem::path& path, std::string_view file_contents, log::logger& logger)
+{
+	if (auto ec = save_file(path, file_contents); ec) {
+		logger.error() << "failed to save file " << path.generic_string() << ": " << ec.message();
+		return false;
+	}
+
+	return true;
 }
 
 }

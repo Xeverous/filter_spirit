@@ -1,5 +1,8 @@
 #include <fs/network/poe_watch/api_data.hpp>
 #include <fs/utility/file.hpp>
+#include <fs/log/logger.hpp>
+
+#include <utility>
 
 namespace
 {
@@ -12,26 +15,33 @@ constexpr auto filename_itemdata = "itemdata.json";
 namespace fs::network::poe_watch
 {
 
-std::error_code api_item_price_data::save(const boost::filesystem::path& directory) const
+bool api_item_price_data::save(const boost::filesystem::path& directory, log::logger& logger) const
 {
-	std::error_code ec = utility::save_file(directory / filename_compact, compact_json);
-
-	if (ec)
-		return ec;
-
-	return utility::save_file(directory / filename_itemdata, itemdata_json);
+	return utility::save_file(directory / filename_compact, compact_json, logger)
+		&& utility::save_file(directory / filename_itemdata, itemdata_json, logger);
 }
 
-std::error_code api_item_price_data::load(const boost::filesystem::path& directory)
+bool api_item_price_data::load(const boost::filesystem::path& directory, log::logger& logger)
 {
-	std::error_code ec;
-	compact_json = utility::load_file(directory / filename_compact, ec);
+	std::optional<std::string> file_contents = utility::load_file(directory / filename_compact, logger);
 
-	if (ec)
-		return ec;
+	if (file_contents) {
+		compact_json = std::move(*file_contents);
+	}
+	else {
+		return false;
+	}
 
-	itemdata_json = utility::load_file(directory / filename_itemdata, ec);
-	return ec;
+	file_contents = utility::load_file(directory / filename_itemdata, logger);
+
+	if (file_contents) {
+		itemdata_json = std::move(*file_contents);
+	}
+	else {
+		return false;
+	}
+
+	return true;
 }
 
 }
