@@ -226,24 +226,25 @@ bool item_price_data::load_and_parse(
 	return false;
 }
 
-void unique_item_price_data::add_item(std::string base_type, elementary_item item_info)
+void unique_item_price_data::add_item(std::string base_type, elementary_item item)
 {
 	if (auto it = ambiguous.find(base_type); it != ambiguous.end()) {
 		// there is already a unique item with such base type name - add another
-		ambiguous.insert(it, decltype(ambiguous)::value_type(std::move(base_type), std::move(item_info)));
+		it->second.push_back(std::move(item));
 		return;
 	}
 
 	if (auto it = unambiguous.find(base_type); it != unambiguous.end()) {
 		// we have found a new item with the same base type name
 		// move the old one to ambiguous items and add current one there too
-		ambiguous.insert(unambiguous.extract(it));
-		ambiguous.emplace(std::move(base_type), std::move(item_info));
+		auto& vec = ambiguous[std::move(base_type)];
+		vec.push_back(std::move(unambiguous.extract(it).mapped()));
+		vec.push_back(std::move(item));
 		return;
 	}
 
 	// no conflicts found - add the item to unambiguous uniques
-	unambiguous.emplace(std::move(base_type), std::move(item_info));
+	unambiguous.emplace(std::move(base_type), std::move(item));
 }
 
 log::logger_wrapper& operator<<(log::logger_wrapper& logger, const item_price_data& ipd)

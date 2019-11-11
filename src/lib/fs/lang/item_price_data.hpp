@@ -66,7 +66,7 @@ struct unique_item_price_data
 	std::unordered_map<std::string, elementary_item> unambiguous;
 	// maps base type name to unique item names
 	// (contains multiple entries per base type)
-	std::unordered_multimap<std::string, elementary_item> ambiguous;
+	std::unordered_map<std::string, std::vector<elementary_item>> ambiguous;
 };
 
 struct item_price_metadata;

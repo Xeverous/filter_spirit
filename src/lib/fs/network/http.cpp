@@ -90,6 +90,7 @@ std::future<std::vector<http::response<http::string_body>>> session::async_http_
 	request.method(http::verb::get);
 	request.set(http::field::host, host);
 	request.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
+	// request.keep_alive(true); // redundant in HTTP 1.1
 
 	// Look up the domain name
 	resolver.async_resolve(
@@ -153,6 +154,7 @@ void session::next_request()
 			[self = shared_from_this()](boost::system::error_code ec) {
 				self->on_shutdown(ec);
 			});
+		return;
 	}
 
 	const auto& current_target = targets[responses.size()];
@@ -200,11 +202,16 @@ void session::on_read(
 
 void session::on_shutdown(boost::system::error_code ec)
 {
-	if (ec == boost::asio::error::eof) {
+	if (
 		// Rationale:
 		// http://stackoverflow.com/questions/25587403/boost-asio-ssl-async-shutdown-always-finishes-with-an-error
+		ec == boost::asio::error::eof
+		// rationale: https://github.com/boostorg/beast/issues/38
+		|| ec == boost::asio::ssl::error::stream_truncated)
+	{
 		ec.assign(0, ec.category());
 	}
+
 	if (ec) {
 		throw boost::system::system_error(ec, "could not shutdown the connection");
 	}

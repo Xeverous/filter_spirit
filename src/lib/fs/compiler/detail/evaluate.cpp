@@ -318,6 +318,9 @@ evaluate_price_range_query(
 	const auto& price_range = std::get<lang::price_range>(range_or_error);
 	const lang::position_tag position_of_query = parser::get_position_info(price_range_query);
 
+	// TODO this is too complex - move the code to item_price_data when the interface of it
+	// is decided upon (think what to do with is_low_confidence). Right now there are no
+	// invariants in item_price_data so we do a lot of find/for-each algorithms.
 	const auto eval_query = [&](const auto& items, auto price_func, auto name_func) {
 		lang::array_object array;
 		for (auto it = items.begin(); it != items.end(); ++it) {
@@ -330,8 +333,22 @@ evaluate_price_range_query(
 	const auto eval_query_elementary_items = [&](const auto& items) {
 		return eval_query(items, [](auto it) { return it->price.chaos_value; }, [](auto it) { return it->name; });
 	};
-	const auto eval_query_unique_items = [&](const auto& items) {
-		return eval_query(items, [](auto it) { return it->second.price.chaos_value; }, [](auto it) { return it->second.name; });
+	const auto eval_query_unamb_unique_items = [&](const auto& items) {
+		return eval_query(items, [](auto it) { return it->second.price.chaos_value; }, [](auto it) { return it->first; });
+	};
+	const auto eval_query_amb_unique_items = [&](const auto& items) {
+		return eval_query(
+			items,
+			[](auto it) {
+				auto& items = it->second;
+				return std::max_element(
+					items.begin(),
+					items.end(),
+					[](const auto& lhs, const auto& rhs) {
+						return lhs.price.chaos_value < rhs.price.chaos_value;
+					})->price.chaos_value;
+			},
+			[](auto it) { return it->first; });
 	};
 	/*
 	 * note: this is O(n) but relying on small string optimization
@@ -368,28 +385,28 @@ evaluate_price_range_query(
 		return eval_query_elementary_items(item_price_data.helmet_enchants);
 	}
 	else if (query_name.value == lang::queries::uniques_eq_ambiguous) {
-		return eval_query_unique_items(item_price_data.unique_eq.ambiguous);
+		return eval_query_amb_unique_items(item_price_data.unique_eq.ambiguous);
 	}
 	else if (query_name.value == lang::queries::uniques_eq_unambiguous) {
-		return eval_query_unique_items(item_price_data.unique_eq.unambiguous);
+		return eval_query_unamb_unique_items(item_price_data.unique_eq.unambiguous);
 	}
 	else if (query_name.value == lang::queries::uniques_flask_ambiguous) {
-		return eval_query_unique_items(item_price_data.unique_flasks.ambiguous);
+		return eval_query_amb_unique_items(item_price_data.unique_flasks.ambiguous);
 	}
 	else if (query_name.value == lang::queries::uniques_flask_unambiguous) {
-		return eval_query_unique_items(item_price_data.unique_flasks.unambiguous);
+		return eval_query_unamb_unique_items(item_price_data.unique_flasks.unambiguous);
 	}
 	else if (query_name.value == lang::queries::uniques_jewel_ambiguous) {
-		return eval_query_unique_items(item_price_data.unique_jewels.ambiguous);
+		return eval_query_amb_unique_items(item_price_data.unique_jewels.ambiguous);
 	}
 	else if (query_name.value == lang::queries::uniques_jewel_unambiguous) {
-		return eval_query_unique_items(item_price_data.unique_jewels.unambiguous);
+		return eval_query_unamb_unique_items(item_price_data.unique_jewels.unambiguous);
 	}
 	else if (query_name.value == lang::queries::uniques_map_ambiguous) {
-		return eval_query_unique_items(item_price_data.unique_maps.ambiguous);
+		return eval_query_amb_unique_items(item_price_data.unique_maps.ambiguous);
 	}
 	else if (query_name.value == lang::queries::uniques_map_unambiguous) {
-		return eval_query_unique_items(item_price_data.unique_maps.unambiguous);
+		return eval_query_unamb_unique_items(item_price_data.unique_maps.unambiguous);
 	}
 
 	return errors::no_such_query{parser::get_position_info(query_name)};
