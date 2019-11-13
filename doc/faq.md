@@ -1,6 +1,6 @@
 # FAQ
 
-## usage
+## generated filters
 
 **I have changed font size but it looks the same.**
 
@@ -12,15 +12,15 @@ Different font sizes that have very close values may look exactly the same. This
 
 Here is the GGG's statement on this: https://www.pathofexile.com/forum/view-thread/2500872 (ctrl+F "filter").
 
+**How does partying interact with filters?**
+
+Filters know nothing about allocation of items in a party. All drops are treated just like you were playing solo - they will have their styles, fire sound effects and create map icons etc but items you can not pick up will be greyed out. There is no control over this behavior.
+
+## usage
+
 **How about auto-refresh feature?**
 
 Could be added very easily. The problem is that the game client is not aware that the filter file has been updated so you have to manually open UI options => item filter => reload.
-
-**How do I filter cards from X price up, with no limit?**
-
-`$divination(X, 9999999)` should be enough. Just don't go past `2147483648`.
-
-There is an idea to support `(X, _)` but since the current workaround is very easy it's a low priority feature.
 
 **When loading the filter, I'm getting an error with some gibberish string. What's wrong?**
 

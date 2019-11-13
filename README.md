@@ -14,30 +14,27 @@ Note that the tool is in its early development so things may chage. Suggestions 
 
 Core features:
 
-- static typing safety
-- generation-time error checking
-- language elements dedicated to elimination of code duplication:
-  - ability to define constants: `const red = RGB(255, 0, 0)`
-  - statements work top-down like in regular filters but they can be nested to inherit conditions and override actions
-- dynamic rules: `BaseType $divination(10, 100)` pulls data from API to list div cards worth 10-100c at generation time, refresh whenever you want - your filter is always up-to-date with market prices
-- support for filter variants (eg color-blind, strict, uber-strict, Animate Weapon support etc) - generate multiple filters with different flavours from a single source file
+- **Generation-time error checking**. FS has own parser and compiler that performs semantic analysis - it is not a blind text-copy-paste script.
+- **Language features dedicated to elimination of filter code duplication**:
+  - **named constants**: `const red = RGB(255, 0, 0)`
+  - **named style groups**: `x = { SetFontSize 42 SetTextColor black }`
+  - **nesting of filter blocks** to inherit conditions and override actions
+- **querying item prices**: `BaseType $divination(10, 100)` pulls data from API to list div cards worth 10-100c at generation time. Refresh whenever you want - your filter is always up-to-date with market prices.
 
-There are 2 intended usage scenarios:
+Planned features:
 
-- Someone writes a filter using Filer Spirit templates and publishes generated variants that are ready to be immediately loaded by the game client.
-- Someone writes a filter template and shares it to other people who have downloaded Filter Spirit - they can:
-  - (re)generate actual filter any time, making it always up to date with market prices
-  - edit the config to tweak generated variants
-  - edit the source to change styles (eg colors, sounds)
-  - edit the source to change filter structure
+- Support for filter variants (eg color-blind, strict, uber-strict, Animate Weapon support etc) - generate multiple filters with different flavours from a single source file.
+- Filter debugger & loot preview: something similar to https://bschug.github.io/poedit/poedit.html allowing to find matching blocks and preview randomly generated loot from specific game encounters.
+- User-defined highlight for Notepad++ for FS syntax.
+- Live edit mode - see generared code as you write.
 
 ## example code
 
 There is a full example filter template source in the repository although the syntax is a subject to change.
 
 ```
-const color_white  = RGB(255, 255, 255, 255)
-const color_hammer = RGB(162,  85,   0) # (default opacity)
+color_white  = RGB(255, 255, 255, 255)
+color_hammer = RGB(162,  85,   0) # (default opacity)
 
 BaseType ["Gavel", "Stone Hammer", "Rock Breaker"] {
 	SetTextColor color_white
@@ -59,8 +56,8 @@ BaseType ["Gavel", "Stone Hammer", "Rock Breaker"] {
 		Show # show rare hammers with 16+ quality
 	}
 
-	# hide any other hammers
-	# actually discouraged as you might lose RGB recipe material for later blocks
+	# hide any other hammers (actually discouraged as you might lose
+	# RGB recipe material for later blocks - better don't write this Hide)
 	Hide
 }
 
@@ -100,14 +97,21 @@ Class "Divination Card" {
 	BaseType ["Rain of Chaos", "Carrion Crow"] {
 		Hide
 	}
+
+	# any other cards
+	Show
 }
 ```
+
+## program interface
+
+Currently only a command line executable (see `--help`). Graphic interface in development.
 
 ## build dependencies
 
 - C++17 compiler (`<filesystem>` not required)
 - Boost 1.70 OR older with Spirit headers updated to 1.70; this project uses:
-  - spirit (using bleeding-edge X3 parser)
+  - spirit (newest X3 library)
   - fusion
   - optional
   - variant
@@ -121,7 +125,7 @@ Class "Divination Card" {
 - nlohmann/json
 - **OpenSSL** (preferably 1.1+)
 
-bolded dependencies require linking, all dependencies are exposed as targets in CMake script
+Bolded dependencies require linking, all dependencies are exposed as targets in CMake script.
 
 ## building
 
@@ -139,4 +143,4 @@ If you are using `make` don't forget to add `-j` (parallel jobs) to add *100% in
 
 LICENSE file in the main directory of the repository applies to any file, unless otherwise specified.
 
-Contact me if you are interested in work on or using this project but need or require a more permissive license.
+Contact me if you are interested in work on or using this project but got any concerns in regards to usage or licensing.

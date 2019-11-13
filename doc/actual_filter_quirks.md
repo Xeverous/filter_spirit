@@ -4,6 +4,8 @@ The following document aims to outline hidden rules of the actual filter languag
 
 [The article on wiki](https://pathofexile.gamepedia.com/Item_filter) is generally correct but there are some hidden, undocumented implementation details in game's client parser that have visible consequences but are nowhere mentioned.
 
+Additionally, wiki (which uses game metadata) is not a good source of item class information: Offering is classified as "Labyrinth Map Item" in game files while the actual one that works in filters is "Map Fragments" (or any superset). Likely, filters use a different item class system than the game data itself.
+
 GGG does not maintain any dedicated documentation. All information is gathered from official forum posts, annoucements, reddit and my experiments.
 
 Multiple things have been fixed with the 3.8 update (Blight league). See [this reddit reply and its parents](https://www.reddit.com/r/pathofexile/comments/d0isb7/lootfilter_neversinks_itemfilter_version_730/ezeood1/).
