@@ -560,6 +560,80 @@ SetBeam Beam(yellow, true) # temporary beam (the only possible syntax)
 SetMinimapIcon MinimapIcon(0, blue, square)
 ```
 
+### compound actions
+
+FS also supports compound actions. You can assign multiple actions to 1 identifier and use the `Set` keyword to apply all.
+
+Like with every other actions, later (and deeper nested) actions override previous ones on their depth.
+
+<table>
+<tr>
+<th>FS template</th>
+<th>generated filter</th>
+</tr>
+<tr>
+
+<td>
+<pre>
+x = RGB(1, 2, 3)
+y = RGB(11, 22, 33)
+<div></div>
+comp1 = {
+	SetBorderColor x
+	SetTextColor x
+}
+<div></div>
+comp2 = {
+	SetBorderColor y
+	SetTextColor y
+	SetFontSize 42
+}
+<div></div>
+SetFontSize 36
+Set comp1
+Rarity rare {
+	Set comp2
+<div></div>
+	Quality 20 {
+		SetBackgroundColor RGB(50, 50, 50)
+		Set comp1
+		SetTextColor RGB(100, 100, 100)
+		Show
+	}
+<div></div>
+	Show
+}
+<div></div>
+Show
+</pre>
+</td>
+
+<td>
+<pre>
+Show
+	Quality = 20
+	Rarity = Rare
+	SetBorderColor 1 2 3
+	SetTextColor 100 100 100
+	SetBackgroundColor 50 50 50
+	SetFontSize 42
+<div></div>
+Show
+	Rarity = Rare
+	SetBorderColor 11 22 33
+	SetTextColor 11 22 33
+	SetFontSize 42
+<div></div>
+Show
+	SetBorderColor 1 2 3
+	SetTextColor 1 2 3
+	SetFontSize 36
+</pre>
+</td>
+
+</tr>
+</table>
+
 ## price queries
 
 One of the core fancy features of FS.
