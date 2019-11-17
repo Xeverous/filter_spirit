@@ -39,22 +39,6 @@
 
 // (nothing to adapt)
 
-// ---- version requirement ----
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::version_literal,
-	major, minor, patch)
-
-// ---- config ----
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::config_param,
-	name, enabled, child_params)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::config,
-	params)
-
 // ---- literal types ----
 
 // (nothing to adapt)
@@ -105,4 +89,4 @@ BOOST_FUSION_ADAPT_STRUCT(
 
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::filter_structure,
-	version_data, config, definitions, statements)
+	definitions, statements)

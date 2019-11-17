@@ -81,16 +81,6 @@ struct error_on_error
 
 struct identifier_class                      : error_on_error, annotate_on_success {};
 
-// ---- version requirement ----
-
-struct version_literal_class                 : error_on_error, annotate_on_success {};
-struct version_requirement_statement_class   : error_on_error, annotate_on_success {};
-
-// ---- config ----
-
-struct config_param_class                    : error_on_error, annotate_on_success {};
-struct config_class                          : error_on_error, annotate_on_success {};
-
 // ---- literal types ----
 
 struct floating_point_literal_class          : error_on_error, annotate_on_success {};
@@ -176,22 +166,6 @@ using identifier_type = x3::rule<identifier_class, ast::identifier>;
 BOOST_SPIRIT_DECLARE(identifier_type)
 using not_alnum_or_underscore_type = x3::rule<struct not_alnum_or_underscore_class /*, intentionally nothing */>;
 BOOST_SPIRIT_DECLARE(not_alnum_or_underscore_type)
-
-// ---- version requirement ----
-
-using version_literal_type = x3::rule<version_literal_class, ast::version_literal>;
-BOOST_SPIRIT_DECLARE(version_literal_type)
-
-using version_requirement_statement_type = x3::rule<version_requirement_statement_class, ast::version_literal>;
-BOOST_SPIRIT_DECLARE(version_requirement_statement_type)
-
-// ---- config ----
-
-using config_param_type = x3::rule<config_param_class, ast::config_param>;
-BOOST_SPIRIT_DECLARE(config_param_type)
-
-using config_type = x3::rule<config_class, ast::config>;
-BOOST_SPIRIT_DECLARE(config_type)
 
 // ---- literal types ----
 

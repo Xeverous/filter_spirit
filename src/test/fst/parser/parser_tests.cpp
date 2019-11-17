@@ -85,20 +85,6 @@ namespace fst
 BOOST_FIXTURE_TEST_SUITE(parser_suite, parser_fixture)
 BOOST_AUTO_TEST_SUITE(parser_success_suite)
 
-	BOOST_AUTO_TEST_CASE(version_requirement)
-	{
-		using namespace fs;
-		const parser::ast::ast_type ast = parse(minimal_input()).ast;
-
-		const parser::ast::config& config = ast.config;
-		BOOST_TEST(config.params.empty());
-
-		const auto version = ast.version_data.get_value();
-		BOOST_TEST(version.major == version::major);
-		BOOST_TEST(version.minor == version::minor);
-		BOOST_TEST(version.patch == version::patch);
-	}
-
 	BOOST_AUTO_TEST_CASE(comments)
 	{
 		const std::string input = minimal_input() + R"(

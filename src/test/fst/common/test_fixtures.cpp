@@ -4,7 +4,6 @@
 #include <fs/parser/parser.hpp>
 #include <fs/compiler/resolve_symbols.hpp>
 #include <fs/log/buffered_logger.hpp>
-#include <fs/version.hpp>
 
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
@@ -16,10 +15,9 @@ namespace fst
 
 const std::string& minimal_input()
 {
-	namespace v = fs::version;
-	static const std::string str =
-		"version: " + std::to_string(v::major) + "." + std::to_string(v::minor) + "." + std::to_string(v::patch) + "\n"
-		"config: {}";
+	// anything that is always required in the filter
+	// currently nothing
+	static const std::string str;
 	return str;
 }
 

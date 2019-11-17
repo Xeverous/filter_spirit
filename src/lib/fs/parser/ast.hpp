@@ -51,42 +51,6 @@ struct identifier : x3::position_tagged
 	std::string value;
 };
 
-// ---- version requirement ----
-
-struct version_literal : x3::position_tagged
-{
-	int major = 0;
-	int minor = 0;
-	int patch = 0;
-};
-
-struct version_requirement_statement : x3::position_tagged
-{
-	version_requirement_statement& operator=(version_literal vl)
-	{
-		min_required_version = vl;
-		return *this;
-	}
-
-	const version_literal& get_value() const { return min_required_version; }
-
-	version_literal min_required_version;
-};
-
-// ---- config ----
-
-struct config_param : x3::position_tagged
-{
-	identifier name;
-	bool enabled;
-	std::vector<config_param> child_params; // yo dawg, I heard you like recursion...
-};
-
-struct config : x3::position_tagged
-{
-	std::vector<config_param> params;
-};
-
 // ---- literal types ----
 
 struct floating_point_literal : x3::position_tagged
@@ -448,8 +412,6 @@ struct statement : x3::variant<
 
 struct filter_structure : x3::position_tagged
 {
-	version_requirement_statement version_data;
-	config config;
 	std::vector<definition> definitions;
 	std::vector<statement> statements;
 };

@@ -41,26 +41,6 @@ const not_alnum_or_underscore_type not_alnum_or_underscore = "not alphanumeric c
 const auto not_alnum_or_underscore_def = !&(x3::alnum | '_');
 BOOST_SPIRIT_DEFINE(not_alnum_or_underscore)
 
-// ---- version requirement ----
-
-const version_literal_type version_literal = "version literal";
-const auto version_literal_def = x3::int_ >> '.' >> x3::int_ >> '.' >> x3::int_;
-BOOST_SPIRIT_DEFINE(version_literal)
-
-const version_requirement_statement_type version_requirement_statement = "version requirement statement";
-const auto version_requirement_statement_def = x3::lit(lang::keywords::version) > ':' > version_literal;
-BOOST_SPIRIT_DEFINE(version_requirement_statement)
-
-// ---- config ----
-
-const config_param_type config_param = "config param";
-const auto config_param_def = identifier > ':' > symbols::yes_no > (('{' > *config_param > '}') | x3::attr(std::vector<ast::config_param>()));
-BOOST_SPIRIT_DEFINE(config_param)
-
-const config_type config = "config";
-const auto config_def = x3::lit(lang::keywords::config) > ':' > '{' > *config_param > '}';
-BOOST_SPIRIT_DEFINE(config)
-
 // ---- literal types ----
 
 const floating_point_literal_type floating_point_literal = "number (fractional)";
@@ -239,7 +219,7 @@ const auto rule_block_def = *condition >> x3::lit('{') > *statement > x3::lit('}
 BOOST_SPIRIT_DEFINE(rule_block)
 
 const filter_structure_type filter_structure = "filter structure";
-const auto filter_structure_def = version_requirement_statement > config > *definition > *statement;
+const auto filter_structure_def = *definition > *statement;
 BOOST_SPIRIT_DEFINE(filter_structure)
 
 const grammar_type grammar = "code";

@@ -2,23 +2,6 @@
 # This file is public domain. You can freely modify and reuse it in any way.
 # more about Filter Spirit tool on https://github.com/Xeverous/filter_spirit
 
-# test supported version, if source file requirement is too high
-# the user will be prompted to update
-version: 0.0.0
-
-# section config
-# use this to tweak filter variants
-# note: all options can be overriden in the application
-# yes/no provided here are only defaults
-config: {
-	chance_bases: yes
-	animate_weapon: no {
-		ranged_weapons: no
-		magic_items: no
-	}
-	hide_rare_garbage: yes
-}
-
 # TODO predefined constants
 color_white            = RGB(255, 255, 255)
 color_black            = RGB(  0,   0,   0, 255)
