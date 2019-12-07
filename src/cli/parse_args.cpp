@@ -23,16 +23,16 @@ void print_help(const boost::program_options::options_description& options)
 	std::cout <<
 		"Filter Spirit - advanced item filter generator for Path of Exile game client\n\n"
 		"Usage:\n"
-		"./filter_spirit <data_obtaining_option> [data_storing_option] [-g input_path output_path [generation_option]...]\n"
-		"./filter_spirit <generic_option>\n"
+		"./filter_spirit_cli <data_obtaining_option> [data_storing_option] [-g input_path output_path [generation_option]...]\n"
+		"./filter_spirit_cli <generic_option>\n"
 		"\n"
 		"Examples:\n"
 		"generate/refresh an item filter (using newest available online data):\n"
-		"./filter_spirit -n \"Standard\" -g filter_template.txt output.filter\n"
+		"./filter_spirit_cli -n \"Standard\" -g filter_template.txt output.filter\n"
 		"download API data for future reuse:\n"
-		"./filter_spirit -n \"Standard\" -s .\n"
+		"./filter_spirit_cli -n \"Standard\" -s .\n"
 		"generate/refresh an item filter (using previously saved data):\n"
-		"./filter_spirit -r . -g filter_template.txt output.filter\n";
+		"./filter_spirit_cli -r . -g filter_template.txt output.filter\n";
 
 	options.print(std::cout);
 
