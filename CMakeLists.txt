@@ -8,7 +8,7 @@ if(${CMAKE_VERSION} VERSION_LESS 3.12)
 endif()
 
 project(filter_spirit
-	VERSION 0.1.0
+	VERSION 0.2.0
 	DESCRIPTION "advanced item filter generator for the game Path of Exile using own DSL and online APIs"
 	LANGUAGES CXX)
 
