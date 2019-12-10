@@ -69,7 +69,7 @@ constexpr auto brown  = "Brown";
 constexpr auto yellow = "Yellow";
 
 constexpr auto circle   = "Circle";
-constexpr auto diamond  = "Diamon";
+constexpr auto diamond  = "Diamond";
 constexpr auto hexagon  = "Hexagon";
 constexpr auto square   = "Square";
 constexpr auto star     = "Star";
