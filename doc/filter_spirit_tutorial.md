@@ -510,6 +510,8 @@ ShaperItem      <Boolean>
 FracturedItem   <Boolean>
 SynthesisedItem <Boolean>
 ShapedMap       <Boolean>
+ElderMap        <Boolean>
+BlightedMap     <Boolean>
 ```
 
 Examples:

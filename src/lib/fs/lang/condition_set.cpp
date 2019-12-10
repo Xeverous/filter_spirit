@@ -168,6 +168,8 @@ void condition_set::generate(std::ostream& output_stream) const
 	output_boolean_condition(is_synthesised_item, lg::synthesised_item, output_stream);
 	output_boolean_condition(is_enchanted,        lg::any_enchantment,  output_stream);
 	output_boolean_condition(is_shaped_map,       lg::shaped_map,       output_stream);
+	output_boolean_condition(is_elder_map,        lg::elder_map,        output_stream);
+	output_boolean_condition(is_blighted_map,     lg::blighted_map,     output_stream);
 
 	output_strings_condition(class_,           lg::class_,           output_stream);
 	output_strings_condition(base_type,        lg::base_type,        output_stream);

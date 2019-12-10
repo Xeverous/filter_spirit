@@ -32,6 +32,8 @@ constexpr auto fractured_item   = "FracturedItem";
 constexpr auto synthesised_item = "SynthesisedItem";
 constexpr auto any_enchantment  = "AnyEnchantment";
 constexpr auto shaped_map       = "ShapedMap";
+constexpr auto elder_map        = "ElderMap";
+constexpr auto blighted_map     = "BlightedMap";
 constexpr auto map_tier         = "MapTier";
 
 constexpr auto r = 'R';

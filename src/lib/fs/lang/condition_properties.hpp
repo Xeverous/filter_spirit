@@ -44,7 +44,9 @@ enum class boolean_condition_property
 	fractured_item,
 	synthesised_item,
 	any_enchantment,
-	shaped_map
+	shaped_map,
+	elder_map,
+	blighted_map
 };
 
 } // namespace fs::lang

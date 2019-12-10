@@ -150,6 +150,8 @@ struct condition_set
 	std::optional<boolean_condition> is_synthesised_item;
 	std::optional<boolean_condition> is_enchanted;
 	std::optional<boolean_condition> is_shaped_map;
+	std::optional<boolean_condition> is_elder_map;
+	std::optional<boolean_condition> is_blighted_map;
 };
 
 }

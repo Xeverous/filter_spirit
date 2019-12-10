@@ -103,6 +103,8 @@ constexpr auto fractured_item   = generation::fractured_item;
 constexpr auto synthesised_item = generation::synthesised_item;
 constexpr auto any_enchantment  = generation::any_enchantment;
 constexpr auto shaped_map       = generation::shaped_map;
+constexpr auto elder_map        = generation::elder_map;
+constexpr auto blighted_map     = generation::blighted_map;
 constexpr auto map_tier         = generation::map_tier;
 
 constexpr auto set_border_color           = generation::set_border_color;

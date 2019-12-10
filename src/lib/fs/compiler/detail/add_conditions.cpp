@@ -301,42 +301,38 @@ add_boolean_condition(
 	auto& boolean = std::get<lang::boolean>(boolean_or_error);
 	lang::position_tag condition_origin = parser::get_position_info(condition);
 
-	switch (condition.property)
-	{
-		case lang::boolean_condition_property::identified:
-		{
+	switch (condition.property) {
+		case lang::boolean_condition_property::identified: {
 			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_identified);
 		}
-		case lang::boolean_condition_property::corrupted:
-		{
+		case lang::boolean_condition_property::corrupted: {
 			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_corrupted);
 		}
-		case lang::boolean_condition_property::elder_item:
-		{
+		case lang::boolean_condition_property::elder_item: {
 			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_elder_item);
 		}
-		case lang::boolean_condition_property::shaper_item:
-		{
+		case lang::boolean_condition_property::shaper_item: {
 			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_shaper_item);
 		}
-		case lang::boolean_condition_property::fractured_item:
-		{
+		case lang::boolean_condition_property::fractured_item: {
 			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_fractured_item);
 		}
-		case lang::boolean_condition_property::synthesised_item:
-		{
+		case lang::boolean_condition_property::synthesised_item: {
 			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_synthesised_item);
 		}
-		case lang::boolean_condition_property::any_enchantment:
-		{
+		case lang::boolean_condition_property::any_enchantment: {
 			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_enchanted);
 		}
-		case lang::boolean_condition_property::shaped_map:
-		{
+		case lang::boolean_condition_property::shaped_map: {
 			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_shaped_map);
 		}
-		default:
-		{
+		case lang::boolean_condition_property::elder_map: {
+			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_elder_map);
+		}
+		case lang::boolean_condition_property::blighted_map: {
+			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_blighted_map);
+		}
+		default: {
 			return errors::internal_compiler_error_during_boolean_condition_evaluation{condition_origin};
 		}
 	}

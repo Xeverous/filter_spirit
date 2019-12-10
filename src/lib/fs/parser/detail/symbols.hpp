@@ -173,6 +173,8 @@ struct boolean_condition_properties_ : x3::symbols<lang::boolean_condition_prope
 			(lang::keywords::synthesised_item,  lang::boolean_condition_property::synthesised_item)
 			(lang::keywords::any_enchantment,   lang::boolean_condition_property::any_enchantment)
 			(lang::keywords::shaped_map,        lang::boolean_condition_property::shaped_map)
+			(lang::keywords::elder_map,         lang::boolean_condition_property::elder_map)
+			(lang::keywords::blighted_map,      lang::boolean_condition_property::blighted_map)
 		;
 	}
 };
