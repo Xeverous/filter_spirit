@@ -22,6 +22,7 @@ constexpr auto height           = "Height";
 constexpr auto width            = "Width";
 constexpr auto has_explicit_mod = "HasExplicitMod";
 constexpr auto has_enchantment  = "HasEnchantment";
+constexpr auto prophecy         = "Prophecy";
 constexpr auto stack_size       = "StackSize";
 constexpr auto gem_level        = "GemLevel";
 constexpr auto identified       = "Identified";

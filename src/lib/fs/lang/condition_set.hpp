@@ -139,6 +139,7 @@ struct condition_set
 	numeric_range_condition width;
 	strings_condition has_explicit_mod;
 	strings_condition has_enchantment;
+	strings_condition prophecy;
 	numeric_range_condition stack_size;
 	numeric_range_condition gem_level;
 	numeric_range_condition map_tier;

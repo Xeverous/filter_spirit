@@ -499,6 +499,7 @@ Class          [==] <String | Array>
 BaseType       [==] <String | Array>
 HasExplicitMod [==] <String | Array>
 HasEnchantment [==] <String | Array>
+Prophecy       [==] <String | Array>
 
 SocketGroup <Group | String>
 

@@ -175,6 +175,7 @@ void condition_set::generate(std::ostream& output_stream) const
 	output_strings_condition(base_type,        lg::base_type,        output_stream);
 	output_strings_condition(has_explicit_mod, lg::has_explicit_mod, output_stream);
 	output_strings_condition(has_enchantment,  lg::has_enchantment,  output_stream);
+	output_strings_condition(prophecy,         lg::prophecy,         output_stream);
 }
 
 bool condition_set::is_valid() const
@@ -196,7 +197,8 @@ bool condition_set::is_valid() const
 	return is_valid_strings_condition(class_)
 		&& is_valid_strings_condition(base_type)
 		&& is_valid_strings_condition(has_explicit_mod)
-		&& is_valid_strings_condition(has_enchantment);
+		&& is_valid_strings_condition(has_enchantment)
+		&& is_valid_strings_condition(prophecy);
 }
 
 }

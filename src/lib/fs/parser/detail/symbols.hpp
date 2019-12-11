@@ -155,6 +155,7 @@ struct string_condition_properties_ : x3::symbols<lang::string_condition_propert
 			(lang::keywords::base_type,        lang::string_condition_property::base_type)
 			(lang::keywords::has_explicit_mod, lang::string_condition_property::has_explicit_mod)
 			(lang::keywords::has_enchantment,  lang::string_condition_property::has_enchantment)
+			(lang::keywords::prophecy,         lang::string_condition_property::prophecy)
 		;
 	}
 };

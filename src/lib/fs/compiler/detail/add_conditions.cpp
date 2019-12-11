@@ -248,26 +248,23 @@ add_string_condition(
 	const bool is_exact_match = condition.exact_match.required;
 	const lang::position_tag condition_origin = parser::get_position_info(condition);
 
-	switch (condition.property)
-	{
-		case lang::string_condition_property::class_:
-		{
+	switch (condition.property) {
+		case lang::string_condition_property::class_: {
 			return add_string_condition_impl(std::move(strings), is_exact_match, condition_origin, condition_set.class_);
 		}
-		case lang::string_condition_property::base_type:
-		{
+		case lang::string_condition_property::base_type: {
 			return add_string_condition_impl(std::move(strings), is_exact_match, condition_origin, condition_set.base_type);
 		}
-		case lang::string_condition_property::has_explicit_mod:
-		{
+		case lang::string_condition_property::has_explicit_mod: {
 			return add_string_condition_impl(std::move(strings), is_exact_match, condition_origin, condition_set.has_explicit_mod);
 		}
-		case lang::string_condition_property::has_enchantment:
-		{
+		case lang::string_condition_property::has_enchantment: {
 			return add_string_condition_impl(std::move(strings), is_exact_match, condition_origin, condition_set.has_enchantment);
 		}
-		default:
-		{
+		case lang::string_condition_property::prophecy: {
+			return add_string_condition_impl(std::move(strings), is_exact_match, condition_origin, condition_set.prophecy);
+		}
+		default: {
 			return errors::internal_compiler_error_during_string_condition_evaluation{condition_origin};
 		}
 	}
