@@ -151,30 +151,30 @@ alert_veiled_item        = alert_wow
 
 alert_error              = "triggered.mp3"
 
-beam_top_gem         = green
-beam_top_unique      = brown
-beam_6L              = red
-beam_fishing_rod     = white
-beam_currency        = yellow
+beam_top_gem         = Green
+beam_top_unique      = Brown
+beam_6L              = Red
+beam_fishing_rod     = White
+beam_currency        = Yellow
 beam_reliquary       = beam_currency
 beam_delve_fossil    = beam_currency
 beam_delve_resonator = beam_currency
-beam_divination      = blue
+beam_divination      = Blue
 
-minimap_top_gem         = MinimapIcon(0, green, circle)
-minimap_mid_gem         = MinimapIcon(1, green, circle)
-minimap_low_gem         = MinimapIcon(2, green, circle)
-minimap_top_unique      = MinimapIcon(0, brown, triangle)
-minimap_mid_unique      = MinimapIcon(1, brown, triangle)
-minimap_6L              = MinimapIcon(0, red, hexagon)
-minimap_fishing_rod     = MinimapIcon(0, white, star)
-minimap_currency_t1     = MinimapIcon(0, yellow, star)
-minimap_currency_t2     = MinimapIcon(1, yellow, star)
-minimap_currency_t3     = MinimapIcon(2, yellow, star)
+minimap_top_gem         = MinimapIcon(0, Green, Circle)
+minimap_mid_gem         = MinimapIcon(1, Green, Circle)
+minimap_low_gem         = MinimapIcon(2, Green, Circle)
+minimap_top_unique      = MinimapIcon(0, Brown, Triangle)
+minimap_mid_unique      = MinimapIcon(1, Brown, Triangle)
+minimap_6L              = MinimapIcon(0, Red, Hexagon)
+minimap_fishing_rod     = MinimapIcon(0, White, Star)
+minimap_currency_t1     = MinimapIcon(0, Yellow, Star)
+minimap_currency_t2     = MinimapIcon(1, Yellow, Star)
+minimap_currency_t3     = MinimapIcon(2, Yellow, Star)
 minimap_delve_fossil    = minimap_currency_t2
 minimap_delve_resonator = minimap_currency_t2
 minimap_reliquary       = minimap_currency_t1
-minimap_error           = MinimapIcon(0, red, square)
+minimap_error           = MinimapIcon(0, Red, Square)
 
 bases_t1 = ["Eternal Burgonet", "Lion Pelt", "Hubris Circlet", "Nightmare Bascinet", "Titan Gauntlets", "Slink Gloves", "Sorcerer Gloves", "Dragonscale Gauntlets", "Titan Greaves", "Slink Boots", "Sorcerer Boots", "Dragonscale Boots", "Assassin's Boots", "Glorious Plate", "Assassin's Garb", "Vaal Regalia", "Titanium Spirit Shield", "Harbinger Bow", "Ambusher", "Ezomyte Dagger", "Platinum Kris", "Imperial Skean", "Demon Dagger", "Void Sceptre", "Sambar Sceptre", "Profane Wand", "Prophecy Wand", "Tornado Wand", "Opal Wand", "Imbued Wand", "Demon's Horn", "Steel Ring", "Opal Ring", "Blue Pearl Amulet", "Marble Amulet", "Crystal Belt", "Bone Helmet", "Two-Toned Boots", "Spiked Gloves", "Gripped Gloves", "Fingerless Silk Gloves"]
 
@@ -423,16 +423,16 @@ BaseType ["Gavel", "Stone Hammer", "Rock Breaker"] {
 	SetTextColor color_white
 	SetBackgroundColor color_hammer
 
-	Rarity normal {
+	Rarity Normal {
 		Show
 	}
 
-	Rarity magic
+	Rarity Magic
 	Quality > 12 {
 		Show
 	}
 
-	Rarity rare
+	Rarity Rare
 	Quality > 16 {
 		Show
 	}
@@ -449,7 +449,7 @@ Class "Piece" {
 
 # Tabula Rasa and Skin of the Loyal
 # ...and any unique that drops 6L'd (Synthesis seems to drop them)
-Rarity unique
+Rarity Unique
 LinkedSockets 6 {
 	SetTextColor color_unique
 	SetBorderColor color_unique
@@ -461,7 +461,7 @@ LinkedSockets 6 {
 	Show
 }
 
-Rarity unique {
+Rarity Unique {
 	SetTextColor color_unique
 	SetBorderColor color_unique
 	SetFontSize font_unique
@@ -700,7 +700,7 @@ Class "Divination Card" {
 	# place here low-value cards that you always want to pickup
 	BaseType ["The Gambler", "Jack in the Box", "Emperor's Luck", "Her Mask", "Humility", "Loyalty", "Lucky Connections", "Lucky Deck", "No Traces", "The Calling", "The Catalyst", "The Encroaching Darkness", "The Gambler", "The Gemcutter", "The Innocent", "The Inventor", "The Master Artisan", "The Obscured", "The Puzzle", "The Risk", "The Survivalist", "The Throne", "The Wrath", "The Wretched", "Three Faces in the Dark", "Three Voices", "Vinia's Token"] {
 		SetAlertSound alert_divination_always_pickup
-		SetBeam blue # temp # (not yet supported)
+		SetBeam Beam(Blue, True)
 		Show
 	}
 
@@ -710,14 +710,14 @@ Class "Divination Card" {
 		Show
 	}
 
-	BaseType $divination(100,999999) {
+	BaseType $divination(100, _) {
 		SetTextColor color_black
 		SetBorderColor color_divination
 		SetBackgroundColor color_divination
 		SetFontSize font_max
 		SetAlertSound alert_divination_best
 		SetBeam beam_divination
-		SetMinimapIcon MinimapIcon(0, blue, square)
+		SetMinimapIcon MinimapIcon(0, Blue, Square)
 		Show
 	}
 
@@ -726,7 +726,7 @@ Class "Divination Card" {
 		SetFontSize font_mid_divinaton
 		SetAlertSound alert_divination_mid
 		SetBeam beam_divination
-		SetMinimapIcon MinimapIcon(1, blue, square)
+		SetMinimapIcon MinimapIcon(1, Blue, Square)
 		Show
 	}
 
@@ -735,7 +735,7 @@ Class "Divination Card" {
 		SetFontSize font_mid_divinaton
 		SetAlertSound alert_divination_low
 		SetBeam beam_divination # temp
-		SetMinimapIcon MinimapIcon(2, blue, square)
+		SetMinimapIcon MinimapIcon(2, Blue, Square)
 		Show
 	}
 
@@ -786,13 +786,13 @@ Class "Maps" {
 Class "Abyss Jewel" {
 	SetFontSize font_abyss_jewel
 
-	Rarity magic {
+	Rarity Magic {
 		SetTextColor color_magic
 		SetBorderColor color_magic
 		Show
 	}
 
-	Rarity rare {
+	Rarity Rare {
 		SetTextColor color_rare
 		SetBorderColor color_rare
 		Show
@@ -804,13 +804,13 @@ Class "Abyss Jewel" {
 Class "Jewel" {
 	SetFontSize font_jewel
 
-	Rarity magic {
+	Rarity Magic {
 		SetTextColor color_magic
 		SetBorderColor color_magic
 		Show
 	}
 
-	Rarity rare {
+	Rarity Rare {
 		SetTextColor color_rare
 		SetBorderColor color_rare
 		Show
@@ -824,7 +824,7 @@ BaseType "Talisman" {
 	SetBackgroundColor color_talisman
 	SetFontSize font_talisman
 
-	Rarity rare {
+	Rarity Rare {
 		SetTextColor color_rare
 		SetAlertSound alert_talisman_rare
 		Show
@@ -836,8 +836,8 @@ BaseType "Talisman" {
 }
 
 # bases you want to pickup for crafting
-Rarity <= rare
-Corrupted false {
+Rarity <= Rare
+Corrupted False {
 	SetTextColor color_black
 	SetBackgroundColor color_crafting
 	SetFontSize font_crafting
@@ -852,15 +852,15 @@ Corrupted false {
 # corrupted items
 # note: 6L and 6s will be catched earlier
 # note: you might want a separate block for breach rings
-Rarity <= rare
-Corrupted true {
+Rarity <= Rare
+Corrupted True {
 	SetBackgroundColor color_corrupted
 	Show
 }
 
 # (shaper/elder) bases
-Rarity <= rare {
-	ShaperItem true {
+Rarity <= Rare {
+	ShaperItem True {
 		SetBackgroundColor color_shaper_item
 		SetAlertSound alert_shaper_item
 
@@ -884,7 +884,7 @@ Rarity <= rare {
 		Show
 	}
 
-	ElderItem true {
+	ElderItem True {
 		SetBackgroundColor color_elder_item
 		SetAlertSound alert_elder_item
 
@@ -917,13 +917,13 @@ Rarity <= rare {
 #		Show
 #	}
 
-	FracturedItem true {
+	FracturedItem True {
 		SetBackgroundColor color_fractured_item
 		SetAlertSound alert_fractured_item
 		Show
 	}
 
-	SynthesisedItem true {
+	SynthesisedItem True {
 		SetBackgroundColor color_synthesised_item
 		SetAlertSound alert_synthesised_item
 		Show
@@ -958,7 +958,7 @@ Rarity <= rare {
 #		}
 #	}
 
-	Rarity normal {
+	Rarity Normal {
 		SocketGroup Group("RGB") {
 			Width 2
 			Height <= 2 {
@@ -977,7 +977,7 @@ Rarity <= rare {
 		}
 	}
 
-	Rarity magic {
+	Rarity Magic {
 		SetTextColor color_magic
 
 		SocketGroup Group("RGB") {
@@ -1000,7 +1000,7 @@ Rarity <= rare {
 		Hide
 	}
 
-	Rarity rare {
+	Rarity Rare {
 		ItemLevel >= 75 {
 			SetTextColor color_rare_regal
 
@@ -1140,7 +1140,7 @@ Rarity <= rare {
 }
 
 # base types you want to pickup for chancing
-Rarity normal
+Rarity Normal
 BaseType ["Leather Belt"] {
 	SetTextColor color_black
 	SetBackgroundColor color_chance_base
@@ -1151,23 +1151,23 @@ BaseType ["Leather Belt"] {
 # TODO animate weapon support
 # idea: compile-time switches based on config
 #enable_if (config.animate_weapon) {
-#	Rarity normal && Class "TODO" {
+#	Rarity Normal && Class "TODO" {
 #		# TODO
 #	}
 #
 #	enable_if (config.animate_weapon.ranged_weapons) {
-#		Rarity normal && Class "TODO" {
+#		Rarity Normal && Class "TODO" {
 #			# TODO
 #		}
 #	}
 #
 #	enable_if (config.animate_weapon.magic_items) {
-#		Rarity magic && Class "TODO" {
+#		Rarity Magic && Class "TODO" {
 #			# TODO
 #		}
 #
 #		enable_if (config.animate_weapon.ranged_weapons) {
-#			Rarity magic && Class "TODO" {
+#			Rarity Magic && Class "TODO" {
 #				# TODO
 #			}
 #		}
@@ -1217,20 +1217,20 @@ ItemLevel <= 15 {
 
 # show IDed blue items (Atzoatzl and Warband drops)
 # TODO could be done better with HasExplicitMod
-Rarity magic
-Identified true {
+Rarity Magic
+Identified True {
 	SetBorderColor color_magic
 	Show
 }
 
 # at this point all worthwhile items should be sorted out
 # hide all remaining normal/magic/(rare) garbage
-Rarity <= magic {
+Rarity <= Magic {
 	Hide
 }
 
 #enable_if (config.hide_rare_garbage) {
-	Rarity rare {
+	Rarity Rare {
 		Hide
 	}
 #}
@@ -1242,6 +1242,6 @@ SetTextColor color_error
 SetBorderColor color_error
 SetFontSize font_max
 SetAlertSound alert_error
-SetBeam red
+SetBeam Red
 SetMinimapIcon minimap_error
 Show

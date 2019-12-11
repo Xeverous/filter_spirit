@@ -180,7 +180,7 @@ comp = {
 
 SetFontSize 36
 Set comp
-Rarity rare {
+Rarity Rare {
 	Show
 }
 )");
@@ -214,7 +214,7 @@ comp1 = {
 
 SetFontSize 36
 Set comp1
-Rarity rare {
+Rarity Rare {
 	Show
 }
 
@@ -255,7 +255,7 @@ comp1 = {
 
 SetFontSize 36
 Set comp1
-Rarity rare {
+Rarity Rare {
 	Set comp2
 
 	Quality 20 {
@@ -396,7 +396,7 @@ Show
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
 low = $divination(0, 5)
 
-BaseType $divination(100, 999999) { Show }
+BaseType $divination(100, _) { Show }
 BaseType $divination(10, 100) { Show }
 BaseType $divination(5, 10) { Show }
 BaseType low { Hide }
