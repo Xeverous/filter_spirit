@@ -197,8 +197,7 @@ array_to_strings(
 	lang::array_object array)
 {
 	std::vector<std::string> result;
-	for (lang::object& obj : array)
-	{
+	for (lang::object& obj : array) {
 		if (!std::holds_alternative<lang::string>(obj.value))
 			return errors::type_mismatch{
 				lang::object_type::string,
@@ -207,6 +206,24 @@ array_to_strings(
 
 		auto& string = std::get<lang::string>(obj.value);
 		result.push_back(std::move(string.value));
+	}
+
+	return result;
+}
+
+[[nodiscard]] std::variant<std::vector<lang::influence>, compile_error>
+array_to_influences(
+	lang::array_object array)
+{
+	std::vector<lang::influence> result;
+	for (lang::object& obj : array) {
+		if (!std::holds_alternative<lang::influence>(obj.value))
+			return errors::type_mismatch{
+				lang::object_type::influence,
+				obj.type(),
+				obj.value_origin};
+
+		result.push_back(std::get<lang::influence>(obj.value));
 	}
 
 	return result;
@@ -229,8 +246,24 @@ add_string_condition_impl(
 }
 
 [[nodiscard]] std::optional<compile_error>
-add_string_condition(
-	const parser::ast::string_condition& condition,
+add_influence_condition_impl(
+	std::vector<lang::influence> influences,
+	bool is_exact_match,
+	lang::position_tag condition_origin,
+	lang::influences_condition& target)
+{
+	if (target.influences != nullptr)
+		return errors::condition_redefinition{condition_origin, target.origin};
+
+	target.influences = std::make_shared<std::vector<lang::influence>>(std::move(influences));
+	target.exact_match_required = is_exact_match;
+	target.origin = condition_origin;
+	return std::nullopt;
+}
+
+[[nodiscard]] std::optional<compile_error>
+add_array_condition(
+	const parser::ast::array_condition& condition,
 	const lang::symbol_table& symbols,
 	const lang::item_price_data& item_price_data,
 	lang::condition_set& condition_set)
@@ -239,29 +272,40 @@ add_string_condition(
 	if (std::holds_alternative<compile_error>(array_or_error))
 		return std::get<compile_error>(std::move(array_or_error));
 
-	auto& array = std::get<lang::array_object>(array_or_error);
-	std::variant<std::vector<std::string>, compile_error> strings_or_error = array_to_strings(std::move(array));
+	const bool is_exact_match = condition.exact_match.required;
+	const lang::position_tag condition_origin = parser::get_position_info(condition);
+
+	// all conditions except "HasInfluence" expect an array of strings, which expects an array of influences
+	// handle influence first and then just expect an array of string for every other condition
+	if (condition.property == lang::array_condition_property::has_influence) {
+		auto influences_or_error = array_to_influences(std::move(std::get<lang::array_object>(array_or_error)));
+		if (std::holds_alternative<compile_error>(influences_or_error))
+			return std::get<compile_error>(std::move(influences_or_error));
+
+		auto& influences = std::get<std::vector<lang::influence>>(influences_or_error);
+		return add_influence_condition_impl(std::move(influences), is_exact_match, condition_origin, condition_set.has_influence);
+	}
+
+	auto strings_or_error = array_to_strings(std::move(std::get<lang::array_object>(array_or_error)));
 	if (std::holds_alternative<compile_error>(strings_or_error))
 		return std::get<compile_error>(std::move(strings_or_error));
 
 	auto& strings = std::get<std::vector<std::string>>(strings_or_error);
-	const bool is_exact_match = condition.exact_match.required;
-	const lang::position_tag condition_origin = parser::get_position_info(condition);
 
 	switch (condition.property) {
-		case lang::string_condition_property::class_: {
+		case lang::array_condition_property::class_: {
 			return add_string_condition_impl(std::move(strings), is_exact_match, condition_origin, condition_set.class_);
 		}
-		case lang::string_condition_property::base_type: {
+		case lang::array_condition_property::base_type: {
 			return add_string_condition_impl(std::move(strings), is_exact_match, condition_origin, condition_set.base_type);
 		}
-		case lang::string_condition_property::has_explicit_mod: {
+		case lang::array_condition_property::has_explicit_mod: {
 			return add_string_condition_impl(std::move(strings), is_exact_match, condition_origin, condition_set.has_explicit_mod);
 		}
-		case lang::string_condition_property::has_enchantment: {
+		case lang::array_condition_property::has_enchantment: {
 			return add_string_condition_impl(std::move(strings), is_exact_match, condition_origin, condition_set.has_enchantment);
 		}
-		case lang::string_condition_property::prophecy: {
+		case lang::array_condition_property::prophecy: {
 			return add_string_condition_impl(std::move(strings), is_exact_match, condition_origin, condition_set.prophecy);
 		}
 		default: {
@@ -378,23 +422,18 @@ std::optional<compile_error> add_conditions(
 	const lang::item_price_data& item_price_data,
 	lang::condition_set& condition_set)
 {
-	for (const ast::condition& condition : conditions)
-	{
+	for (const ast::condition& condition : conditions) {
 		auto error = condition.apply_visitor(x3::make_lambda_visitor<std::optional<compile_error>>(
-			[&](const ast::comparison_condition& comparison_condition)
-			{
+			[&](const ast::comparison_condition& comparison_condition) {
 				return add_comparison_condition(comparison_condition, symbols, item_price_data, condition_set);
 			},
-			[&](const ast::string_condition& string_condition)
-			{
-				return add_string_condition(string_condition, symbols, item_price_data, condition_set);
+			[&](const ast::array_condition& string_condition) {
+				return add_array_condition(string_condition, symbols, item_price_data, condition_set);
 			},
-			[&](const ast::boolean_condition& boolean_condition)
-			{
+			[&](const ast::boolean_condition& boolean_condition) {
 				return add_boolean_condition(boolean_condition, symbols, item_price_data, condition_set);
 			},
-			[&](const ast::socket_group_condition& socket_group_condition)
-			{
+			[&](const ast::socket_group_condition& socket_group_condition) {
 				return add_socket_group_condition(socket_group_condition, symbols, item_price_data, condition_set);
 			}));
 

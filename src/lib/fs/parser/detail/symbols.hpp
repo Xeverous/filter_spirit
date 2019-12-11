@@ -82,6 +82,22 @@ struct suits_ : x3::symbols<lang::suit>
 };
 const suits_ suits;
 
+struct influences_ : x3::symbols<lang::influence>
+{
+	influences_()
+	{
+		add
+			(lang::keywords::shaper,   lang::influence::shaper)
+			(lang::keywords::elder,    lang::influence::elder)
+			(lang::keywords::crusader, lang::influence::crusader)
+			(lang::keywords::redeemer, lang::influence::redeemer)
+			(lang::keywords::hunter,   lang::influence::hunter)
+			(lang::keywords::warlord,  lang::influence::warlord)
+		;
+	}
+};
+const influences_ influences;
+
 // ---- expressions ----
 
 // (nothing to symbolize)
@@ -128,20 +144,21 @@ struct comparison_condition_properties_ : x3::symbols<lang::comparison_condition
 };
 const comparison_condition_properties_ comparison_condition_properties;
 
-struct string_condition_properties_ : x3::symbols<lang::string_condition_property>
+struct array_condition_properties_ : x3::symbols<lang::array_condition_property>
 {
-	string_condition_properties_()
+	array_condition_properties_()
 	{
 		add
-			(lang::keywords::class_,           lang::string_condition_property::class_)
-			(lang::keywords::base_type,        lang::string_condition_property::base_type)
-			(lang::keywords::has_explicit_mod, lang::string_condition_property::has_explicit_mod)
-			(lang::keywords::has_enchantment,  lang::string_condition_property::has_enchantment)
-			(lang::keywords::prophecy,         lang::string_condition_property::prophecy)
+			(lang::keywords::class_,           lang::array_condition_property::class_)
+			(lang::keywords::base_type,        lang::array_condition_property::base_type)
+			(lang::keywords::has_explicit_mod, lang::array_condition_property::has_explicit_mod)
+			(lang::keywords::has_enchantment,  lang::array_condition_property::has_enchantment)
+			(lang::keywords::prophecy,         lang::array_condition_property::prophecy)
+			(lang::keywords::has_influence,    lang::array_condition_property::has_influence)
 		;
 	}
 };
-const string_condition_properties_ string_condition_properties;
+const array_condition_properties_ array_condition_properties;
 
 struct boolean_condition_properties_ : x3::symbols<lang::boolean_condition_property>
 {

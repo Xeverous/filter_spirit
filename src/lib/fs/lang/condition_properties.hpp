@@ -27,13 +27,14 @@ enum class comparison_condition_property
 	map_tier
 };
 
-enum class string_condition_property
+enum class array_condition_property
 {
 	class_,
 	base_type,
 	has_explicit_mod,
 	has_enchantment,
-	prophecy
+	prophecy,
+	has_influence
 };
 
 enum class boolean_condition_property

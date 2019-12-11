@@ -117,8 +117,9 @@ expression(s) | type | notes
 `Normal`, `Magic`, `Rare`, `Unique` | Rarity |
 `Circle`, `Diamond`, `Hexagon`, `Square`, `Star`, `Triangle` | Shape |
 `Red`, `Green`, `Blue`, `White`, `Brown`, `Yellow` | Suit |
+`Shaper`, `Elder`, `Crusader`, `Redeemer`, `Hunter`, `Warlord` | Influence |
 `"abc"` | String | UTF-8 encoding, line breaking characters not allowed (LF and CR)
-`["Leather Belt", "Sorcerer Boots"]`, `[10, 20, 30]` | Array | empty arrays are allowed
+`["Leather Belt", "Sorcerer Boots"]`, `[Shaper, Elder]` | Array | empty arrays are allowed
 
 Some actions in actual filters use multiple tokens which require more complex types. These need to be created using built-in functions.
 
@@ -481,6 +482,9 @@ FS supports all conditions that the actual filters support. Some conditions allo
 - Conditions and Actions will automatically promote the value if possible so writing `SocketGroup Group("RGB")` or `SetAlertSound AlertSound("pop.wav")` is not necessary, `SocketGroup "RGB"` and `SetAlertSound "pop.wav"` is enough. **Explicit functions are only necessary when the condition/action consists of multiple values (eg color).**
 - Numeric and `Rarity` conditions accept comparison operator - one of `<`, `>`, `<=`, `>=`, `=`. Operator is optional (defaults to `=`).
 - String-based conditions accept optional `==` token which enables exact maching. `BaseType == "The Wolf"` will match only *The Wolf* card, `BaseType "The Wolf"` will match all *The Wolf*, *The Wolf's Legacy* and *The Wolf's Shadow*.
+- `HasInfluence` condition behaves differently with `==`:
+  - If `==` is not present, it will match an item **with at least one of specified influences**.
+  - If `==` is present, it will only match items **with all specified influences**.
 
 ```
 Rarity        [< | > | <= | >= | =] <Rarity>
@@ -500,6 +504,7 @@ BaseType       [==] <String | Array>
 HasExplicitMod [==] <String | Array>
 HasEnchantment [==] <String | Array>
 Prophecy       [==] <String | Array>
+HasInfluence   [==] <Influence | Array>
 
 SocketGroup <Group | String>
 

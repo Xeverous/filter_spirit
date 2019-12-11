@@ -27,6 +27,7 @@ using object_variant = std::variant<
 	sound_id,
 	volume,
 	socket_group,
+	influence,
 	rarity,
 	shape,
 	suit,
@@ -55,6 +56,7 @@ BETTER_ENUM(object_type, int,
 	sound_id,
 	volume,
 	socket_group,
+	influence,
 	rarity,
 	shape,
 	suit,
@@ -144,6 +146,8 @@ template <> constexpr
 object_type type_to_enum_impl<volume>() noexcept { return object_type::volume; }
 template <> constexpr
 object_type type_to_enum_impl<socket_group>() noexcept { return object_type::socket_group; }
+template <> constexpr
+object_type type_to_enum_impl<influence>() noexcept { return object_type::influence; }
 template <> constexpr
 object_type type_to_enum_impl<rarity>() noexcept { return object_type::rarity; }
 template <> constexpr

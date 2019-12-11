@@ -105,6 +105,7 @@ inline bool operator==(socket_group lhs, socket_group rhs) noexcept
 }
 inline bool operator!=(socket_group lhs, socket_group rhs) noexcept { return !(lhs == rhs); }
 
+enum class influence { shaper, elder, crusader, redeemer, hunter, warlord };
 enum class rarity { normal, magic, rare, unique };
 enum class shape { circle, diamond, hexagon, square, star, triangle };
 enum class suit { red, green, blue, white, brown, yellow };

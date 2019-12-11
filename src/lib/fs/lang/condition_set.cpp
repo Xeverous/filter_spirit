@@ -119,6 +119,51 @@ void output_strings_condition(
 	output_stream << '\n';
 }
 
+void output_influences_condition(
+	const lang::influences_condition& cond,
+	const char* name,
+	std::ostream& output_stream)
+{
+	if (cond.influences == nullptr)
+		return;
+
+	output_stream << '\t' << name;
+
+	if (cond.exact_match_required)
+		output_stream << " ==";
+
+	for (lang::influence infl : *cond.influences) {
+		output_stream << ' ';
+
+		namespace lg = lang::generation;
+
+		switch (infl) {
+			case lang::influence::shaper:
+				output_stream << lg::shaper;
+				break;
+			case lang::influence::elder:
+				output_stream << lg::elder;
+				break;
+			case lang::influence::crusader:
+				output_stream << lg::crusader;
+				break;
+			case lang::influence::redeemer:
+				output_stream << lg::redeemer;
+				break;
+			case lang::influence::hunter:
+				output_stream << lg::hunter;
+				break;
+			case lang::influence::warlord:
+				output_stream << lg::warlord;
+				break;
+			default:
+				break;
+		}
+	}
+
+	output_stream << '\n';
+}
+
 void output_boolean_condition(
 	std::optional<lang::boolean_condition> cond,
 	const char* name,
@@ -176,29 +221,32 @@ void condition_set::generate(std::ostream& output_stream) const
 	output_strings_condition(has_explicit_mod, lg::has_explicit_mod, output_stream);
 	output_strings_condition(has_enchantment,  lg::has_enchantment,  output_stream);
 	output_strings_condition(prophecy,         lg::prophecy,         output_stream);
+
+	output_influences_condition(has_influence, lg::has_influence, output_stream);
 }
 
 bool condition_set::is_valid() const
 {
-	const auto is_valid_strings_condition = [](const strings_condition& cond)
+	const auto is_valid_array_condition = [](const auto& shared_ptr_array)
 	{
 		// no condition: ok, we just don't require item to have this property
-		if (cond.strings == nullptr)
+		if (shared_ptr_array == nullptr)
 			return true;
 
 		// empty list of allowed values: there are no items that can match this block
 		// game client will not accept an empty list so return that the block is invalid
-		if ((*cond.strings).empty())
+		if ((*shared_ptr_array).empty())
 			return false;
 
 		return true;
 	};
 
-	return is_valid_strings_condition(class_)
-		&& is_valid_strings_condition(base_type)
-		&& is_valid_strings_condition(has_explicit_mod)
-		&& is_valid_strings_condition(has_enchantment)
-		&& is_valid_strings_condition(prophecy);
+	return is_valid_array_condition(class_.strings)
+		&& is_valid_array_condition(base_type.strings)
+		&& is_valid_array_condition(has_explicit_mod.strings)
+		&& is_valid_array_condition(has_enchantment.strings)
+		&& is_valid_array_condition(prophecy.strings)
+		&& is_valid_array_condition(has_influence.influences);
 }
 
 }

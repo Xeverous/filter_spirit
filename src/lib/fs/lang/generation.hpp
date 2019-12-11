@@ -23,6 +23,7 @@ constexpr auto width            = "Width";
 constexpr auto has_explicit_mod = "HasExplicitMod";
 constexpr auto has_enchantment  = "HasEnchantment";
 constexpr auto prophecy         = "Prophecy";
+constexpr auto has_influence    = "HasInfluence";
 constexpr auto stack_size       = "StackSize";
 constexpr auto gem_level        = "GemLevel";
 constexpr auto identified       = "Identified";
@@ -75,6 +76,13 @@ constexpr auto hexagon  = "Hexagon";
 constexpr auto square   = "Square";
 constexpr auto star     = "Star";
 constexpr auto triangle = "Triangle";
+
+constexpr auto shaper      = "Shaper";
+constexpr auto elder       = "Elder";
+constexpr auto crusader    = "Crusader";
+constexpr auto redeemer    = "Redeemer";
+constexpr auto hunter      = "Hunter";
+constexpr auto warlord     = "Warlord";
 
 constexpr auto temp = "Temp";
 

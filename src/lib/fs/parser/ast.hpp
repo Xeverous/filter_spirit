@@ -133,6 +133,19 @@ struct suit_literal : x3::position_tagged
 	lang::suit value;
 };
 
+struct influence_literal : x3::position_tagged
+{
+	influence_literal& operator=(lang::influence i)
+	{
+		value = i;
+		return *this;
+	}
+
+	lang::influence get_value() const { return value; }
+
+	lang::influence value;
+};
+
 struct none_literal : x3::position_tagged
 {
 	void get_value() {}
@@ -148,6 +161,7 @@ struct literal_expression : x3::variant<
 		rarity_literal,
 		shape_literal,
 		suit_literal,
+		influence_literal,
 		none_literal
 	>, x3::position_tagged
 {
@@ -312,9 +326,9 @@ struct exact_matching_policy : x3::position_tagged
 	bool required;
 };
 
-struct string_condition : x3::position_tagged
+struct array_condition : x3::position_tagged
 {
-	lang::string_condition_property property;
+	lang::array_condition_property property;
 	exact_matching_policy exact_match;
 	value_expression value;
 };
@@ -340,7 +354,7 @@ struct socket_group_condition : x3::position_tagged
 
 struct condition : x3::variant<
 		comparison_condition,
-		string_condition,
+		array_condition,
 		boolean_condition,
 		socket_group_condition
 	>, x3::position_tagged

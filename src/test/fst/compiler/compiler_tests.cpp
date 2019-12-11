@@ -116,6 +116,7 @@ font_size      = FontSize(30)
 sound_id       = SoundId(7)
 volume         = Volume(300)
 group          = Group("RGB")
+influence      = Elder
 rarity         = Rare
 shape          = Hexagon
 suit           = Brown
@@ -141,6 +142,7 @@ array          = [1, 2, 3]
 			expect_object_in_symbols(symbols, lookup_data, "sound_id",       lang::sound_id{7},               search(input, "sound_id"),       search(input, "SoundId(7)"));
 			expect_object_in_symbols(symbols, lookup_data, "volume",         lang::volume{300},               search(input, "volume"),         search(input, "Volume(300)"));
 			expect_object_in_symbols(symbols, lookup_data, "group",          lang::socket_group{1, 1 , 1, 0}, search(input, "group"),          search(input, "Group(\"RGB\")"));
+			expect_object_in_symbols(symbols, lookup_data, "influence",      lang::influence::elder,          search(input, "influence"),      search(input, "Elder"));
 			expect_object_in_symbols(symbols, lookup_data, "rarity",         lang::rarity::rare,              search(input, "rarity"),         search(input, "Rare"));
 			expect_object_in_symbols(symbols, lookup_data, "shape",          lang::shape::hexagon,            search(input, "shape"),          search(input, "Hexagon"));
 			expect_object_in_symbols(symbols, lookup_data, "suit",           lang::suit::brown,               search(input, "suit"),           search(input, "Brown"));

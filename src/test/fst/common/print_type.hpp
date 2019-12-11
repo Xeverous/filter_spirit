@@ -34,7 +34,7 @@ std::ostream& boost_test_print_type(std::ostream& os, unary_action_type at)
 }
 
 inline
-std::ostream& boost_test_print_type(std::ostream& os, string_condition_property scp)
+std::ostream& boost_test_print_type(std::ostream& os, array_condition_property scp)
 {
 	return os << "(string_condition_property: " << static_cast<int>(scp) << ")";
 }

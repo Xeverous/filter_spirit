@@ -124,7 +124,7 @@ R"(Show
 			BOOST_TEST(compare_strings(expected_filter, actual_filter));
 		}
 
-		BOOST_AUTO_TEST_CASE(exact_match_condition)
+		BOOST_AUTO_TEST_CASE(strings_condition)
 		{
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
 Class "Divination Card"
@@ -141,6 +141,29 @@ R"(Show
 Show
 	Class "Divination Card"
 	BaseType "The Wolf" "The Demon"
+
+)";
+
+			BOOST_TEST(compare_strings(expected_filter, actual_filter));
+		}
+
+		BOOST_AUTO_TEST_CASE(influences_condition)
+		{
+			const std::string actual_filter = generate_filter(minimal_input() + R"(
+BaseType "Leather Belt"
+{
+	HasInfluence == [Shaper, Crusader, Hunter] { Show }
+	HasInfluence    [Elder, Redeemer, Warlord] { Show }
+}
+)");
+			const std::string_view expected_filter =
+R"(Show
+	BaseType "Leather Belt"
+	HasInfluence == Shaper Crusader Hunter
+
+Show
+	BaseType "Leather Belt"
+	HasInfluence Elder Redeemer Warlord
 
 )";
 

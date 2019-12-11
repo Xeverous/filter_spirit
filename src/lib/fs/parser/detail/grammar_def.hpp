@@ -71,6 +71,10 @@ const suit_literal_type suit_literal = "suit literal";
 const auto suit_literal_def = x3::lexeme[symbols::suits >> not_alnum_or_underscore];
 BOOST_SPIRIT_DEFINE(suit_literal)
 
+const influence_literal_type influence_literal = "influence literal";
+const auto influence_literal_def = x3::lexeme[symbols::influences >> not_alnum_or_underscore];
+BOOST_SPIRIT_DEFINE(influence_literal)
+
 const none_literal_type none_literal = "none literal";
 const auto none_literal_def = x3::lexeme['_' >> not_alnum_or_underscore] > x3::attr(ast::none_literal());
 BOOST_SPIRIT_DEFINE(none_literal)
@@ -97,6 +101,7 @@ const auto literal_expression_def =
 	| rarity_literal
 	| shape_literal
 	| suit_literal
+	| influence_literal
 	| none_literal;
 BOOST_SPIRIT_DEFINE(literal_expression)
 
@@ -168,12 +173,12 @@ const exact_matching_policy_operator_type exact_matching_policy_operator = "exac
 const auto exact_matching_policy_operator_def = ("==" > x3::attr(true)) | x3::attr(false);
 BOOST_SPIRIT_DEFINE(exact_matching_policy_operator)
 
-const string_condition_type string_condition = "string condition";
-const auto string_condition_def =
-	x3::lexeme[symbols::string_condition_properties >> not_alnum_or_underscore]
+const array_condition_type array_condition = "array condition";
+const auto array_condition_def =
+	x3::lexeme[symbols::array_condition_properties >> not_alnum_or_underscore]
 	> exact_matching_policy_operator
 	> value_expression;
-BOOST_SPIRIT_DEFINE(string_condition)
+BOOST_SPIRIT_DEFINE(array_condition)
 
 const boolean_condition_type boolean_condition = "boolean condition";
 const auto boolean_condition_def = x3::lexeme[symbols::boolean_condition_properties >> not_alnum_or_underscore] > value_expression;
@@ -186,7 +191,7 @@ BOOST_SPIRIT_DEFINE(socket_group_condition)
 const condition_type condition = "condition";
 const auto condition_def =
 	  comparison_condition
-	| string_condition
+	| array_condition
 	| boolean_condition
 	| socket_group_condition;
 BOOST_SPIRIT_DEFINE(condition)

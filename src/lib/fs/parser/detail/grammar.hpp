@@ -90,6 +90,7 @@ struct boolean_literal_class                 : error_on_error, annotate_on_succe
 struct rarity_literal_class                  : error_on_error, annotate_on_success {};
 struct shape_literal_class                   : error_on_error, annotate_on_success {};
 struct suit_literal_class                    : error_on_error, annotate_on_success {};
+struct influence_literal_class               : error_on_error, annotate_on_success {};
 struct none_literal_class                    : error_on_error, annotate_on_success {};
 
 // ---- expressions ----
@@ -115,7 +116,7 @@ struct definition_class                      : error_on_error, annotate_on_succe
 struct comparison_operator_expression_class  : error_on_error, annotate_on_success {};
 struct comparison_condition_class            : error_on_error, annotate_on_success {};
 struct exact_matching_policy_operator_class  : error_on_error, annotate_on_success {};
-struct string_condition_class                : error_on_error, annotate_on_success {};
+struct array_condition_class                 : error_on_error, annotate_on_success {};
 struct boolean_condition_class               : error_on_error, annotate_on_success {};
 struct socket_group_condition_class          : error_on_error, annotate_on_success {};
 struct condition_class                       : error_on_error, annotate_on_success {};
@@ -190,6 +191,9 @@ BOOST_SPIRIT_DECLARE(shape_literal_type)
 using suit_literal_type = x3::rule<suit_literal_class, ast::suit_literal>;
 BOOST_SPIRIT_DECLARE(suit_literal_type)
 
+using influence_literal_type = x3::rule<influence_literal_class, ast::influence_literal>;
+BOOST_SPIRIT_DECLARE(influence_literal_type)
+
 using none_literal_type = x3::rule<none_literal_class, ast::none_literal>;
 BOOST_SPIRIT_DECLARE(none_literal_type)
 
@@ -244,8 +248,8 @@ BOOST_SPIRIT_DECLARE(comparison_condition_type)
 using exact_matching_policy_operator_type = x3::rule<exact_matching_policy_operator_class, ast::exact_matching_policy>;
 BOOST_SPIRIT_DECLARE(exact_matching_policy_operator_type)
 
-using string_condition_type = x3::rule<string_condition_class, ast::string_condition>;
-BOOST_SPIRIT_DECLARE(string_condition_type)
+using array_condition_type = x3::rule<array_condition_class, ast::array_condition>;
+BOOST_SPIRIT_DECLARE(array_condition_type)
 
 using boolean_condition_type = x3::rule<boolean_condition_class, ast::boolean_condition>;
 BOOST_SPIRIT_DECLARE(boolean_condition_type)

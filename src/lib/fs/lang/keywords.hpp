@@ -60,6 +60,13 @@ constexpr auto white       = generation::white;
 constexpr auto brown       = generation::brown;
 constexpr auto yellow      = generation::yellow;
 
+constexpr auto shaper      = generation::shaper;
+constexpr auto elder       = generation::elder;
+constexpr auto crusader    = generation::crusader;
+constexpr auto redeemer    = generation::redeemer;
+constexpr auto hunter      = generation::hunter;
+constexpr auto warlord     = generation::warlord;
+
 // ---- expressions ----
 
 // (nothing)
@@ -84,6 +91,7 @@ constexpr auto width            = generation::width;
 constexpr auto has_explicit_mod = generation::has_explicit_mod;
 constexpr auto has_enchantment  = generation::has_enchantment;
 constexpr auto prophecy         = generation::prophecy;
+constexpr auto has_influence    = generation::has_influence;
 constexpr auto stack_size       = generation::stack_size;
 constexpr auto gem_level        = generation::gem_level;
 constexpr auto identified       = generation::identified;

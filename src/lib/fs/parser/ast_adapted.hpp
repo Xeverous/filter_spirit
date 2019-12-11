@@ -70,7 +70,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 	property, comparison_type, value)
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::string_condition,
+	fs::parser::ast::array_condition,
 	property, exact_match, value)
 
 BOOST_FUSION_ADAPT_STRUCT(

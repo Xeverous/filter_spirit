@@ -51,6 +51,9 @@ evaluate_literal(
 		[](ast::suit_literal literal) -> result_type {
 			return lang::suit{literal.value};
 		},
+		[](ast::influence_literal literal) -> result_type {
+			return lang::influence{literal.value};
+		},
 		[](const ast::string_literal& literal) -> result_type {
 			return lang::string{literal};
 		}

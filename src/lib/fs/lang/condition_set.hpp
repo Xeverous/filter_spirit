@@ -111,6 +111,13 @@ struct strings_condition
 	position_tag origin;
 };
 
+struct influences_condition
+{
+	std::shared_ptr<std::vector<influence>> influences;
+	bool exact_match_required;
+	position_tag origin;
+};
+
 struct condition_set
 {
 	void generate(std::ostream& output_stream) const;
@@ -140,6 +147,7 @@ struct condition_set
 	strings_condition has_explicit_mod;
 	strings_condition has_enchantment;
 	strings_condition prophecy;
+	influences_condition has_influence;
 	numeric_range_condition stack_size;
 	numeric_range_condition gem_level;
 	numeric_range_condition map_tier;

@@ -6,6 +6,11 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 
 *newest at the top*
 
+### 3.9 (Metamorph) - [Item Filter information](https://www.pathofexile.com/forum/view-thread/2687401)
+
+- [patch notes](https://www.pathofexile.com/forum/view-thread/2687400) - new gems, base types, uniques and cards
+- [reddit post clarification](https://www.reddit.com/r/pathofexile/comments/e910dq/forum_announcements_conquerors_of_the_atlas_patch/fafxgvj/) - regarding new influence types
+
 ### 3.8.1d
 
 From the [patch notes](https://www.pathofexile.com/forum/view-thread/2655286):
