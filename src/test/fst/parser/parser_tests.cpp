@@ -218,7 +218,7 @@ Identifiedd = Corruptedd
 
 		for (int i = 0; i < static_cast<int>(array_expr.elements.size()); ++i) {
 			if (!test_literal_expression<pa::string_literal>(array_expr.elements[i], names[i])) {
-				BOOST_ERROR("failed literal expressino for i = " << i);
+				BOOST_ERROR("failed literal expression for i = " << i);
 			}
 		}
 	}

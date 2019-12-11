@@ -38,27 +38,27 @@ constexpr auto hide = generation::hide;
 
 // ---- literal types ----
 
-constexpr auto true_       = "true";
-constexpr auto false_      = "false";
+constexpr auto true_       = generation::true_;
+constexpr auto false_      = generation::false_;
 
-constexpr auto normal      = "normal";
-constexpr auto magic       = "magic";
-constexpr auto rare        = "rare";
-constexpr auto unique      = "unique";
+constexpr auto normal      = generation::normal;
+constexpr auto magic       = generation::magic;
+constexpr auto rare        = generation::rare;
+constexpr auto unique      = generation::unique;
 
-constexpr auto circle      = "circle";
-constexpr auto diamond     = "diamond";
-constexpr auto hexagon     = "hexagon";
-constexpr auto square      = "square";
-constexpr auto star        = "star";
-constexpr auto triangle    = "triangle";
+constexpr auto circle      = generation::circle;
+constexpr auto diamond     = generation::diamond;
+constexpr auto hexagon     = generation::hexagon;
+constexpr auto square      = generation::square;
+constexpr auto star        = generation::star;
+constexpr auto triangle    = generation::triangle;
 
-constexpr auto red         = "red";
-constexpr auto green       = "green";
-constexpr auto blue        = "blue";
-constexpr auto white       = "white";
-constexpr auto brown       = "brown";
-constexpr auto yellow      = "yellow";
+constexpr auto red         = generation::red;
+constexpr auto green       = generation::green;
+constexpr auto blue        = generation::blue;
+constexpr auto white       = generation::white;
+constexpr auto brown       = generation::brown;
+constexpr auto yellow      = generation::yellow;
 
 // ---- expressions ----
 

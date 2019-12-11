@@ -320,14 +320,14 @@ group = Group("RRRRRRR") # 7 characters
 		BOOST_AUTO_TEST_CASE(invalid_minimap_icon_size)
 		{
 			const std::string input_str = minimal_input() + R"(
-icon = MinimapIcon(1234, green, circle) # size must be in range [0, 2]
+icon = MinimapIcon(1234, Green, Circle) # size must be in range [0, 2]
 )";
 			const std::string_view input = input_str;
 			const fs::parser::parse_success_data parse_data = parse(input);
 			const fs::compiler::compile_error error = expect_error_when_resolving_symbols(parse_data.ast.definitions);
 			const auto& error_desc = expect_error_of_type<errors::failed_constructor_call>(error, parse_data.lookup_data);
 
-			const std::string_view expected_place_of_function_call = search(input, "MinimapIcon(1234, green, circle)");
+			const std::string_view expected_place_of_function_call = search(input, "MinimapIcon(1234, Green, Circle)");
 			test_error(
 				error_desc,
 				parse_data.lookup_data,

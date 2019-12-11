@@ -50,7 +50,7 @@ Filter Spirit is a tool that lets you write a filter using enchanced syntax and 
 Core features of FS syntax are:
 
 - Being able to name constants. No more copy-pasting the same color values - just write `color_money = RGB(213, 159, 15)` and reuse `color_money` whenever you want
-- Being able to name sets of styles. Write `x = { SetFontSize 42 SetTextColor black }` and reuse in any block.
+- Being able to name sets of styles. Write `x = { SetFontSize 42 SetTextColor Black }` and reuse in any block.
 - Nesting of blocks. This is a very powerful feature allowing to significantly remove duplicate code and override styles for specific items.
 - Querying item prices at generation time. `BaseType $divination(10, 100)` will query poe.ninja or poe.watch for divination cards in [10, 100) chaos range.
 - Semantic analysis of filter code. FS implements a parser and compiler that checks for grammar and type errors. You can not end up with filters like `BaseType 42`.
@@ -65,8 +65,8 @@ Just like in actual filters, comments start with `#` and span until end of line.
 
 FS filter template consists of constant definitions which are then followed by blocks which may contain **actions**, **conditions** and nested blocks.
 
-- **condition** - a requirement for the item to be matched. `ItemLevel > 3`, `Rarity unique` and such.
-- **action** - the style applied to matched items. `SetFontSize 18`, `SetBeam blue` and such.
+- **condition** - a requirement for the item to be matched. `ItemLevel > 3`, `Rarity Unique` and such.
+- **action** - the style applied to matched items. `SetFontSize 18`, `SetBeam Blue` and such.
 - Conditions and actions are mutually exclusive. There is no thing that is both at the same time.
 
 ### constants
@@ -87,7 +87,7 @@ Examples:
 ```
 top_currency = ["Exalted Orb", "Mirror of Kalandra", "Eternal Orb", "Albino Rhoa Feather", "Mirror Shard"]
 font_max = 42
-div_beam = blue
+div_beam = Blue
 ```
 
 You can not redefine a constant:
@@ -110,13 +110,13 @@ Don't worry if you can not grasp all of the following tables - this is more for 
 
 expression(s) | type | notes
 --------------|------|------
-`false`, `true` | Boolean |
+`False`, `True` | Boolean |
 `123` | Integer | leading zeros accepted
 `3.14` | FloatingPoint | `.` required
 `-1.2e-3` | FloatingPoint | syntax as defined by C99 or C++11 standard
-`normal`, `magic`, `rare`, `unique` | Rarity |
-`circle`, `diamond`, `hexagon`, `square`, `star`, `triangle` | Shape |
-`red`, `green`, `blue`, `white`, `brown`, `yellow` | Suit |
+`Normal`, `Magic`, `Rare`, `Unique` | Rarity |
+`Circle`, `Diamond`, `Hexagon`, `Square`, `Star`, `Triangle` | Shape |
+`Red`, `Green`, `Blue`, `White`, `Brown`, `Yellow` | Suit |
 `"abc"` | String | UTF-8 encoding, line breaking characters not allowed (LF and CR)
 `["Leather Belt", "Sorcerer Boots"]`, `[10, 20, 30]` | Array | empty arrays are allowed
 
@@ -277,16 +277,16 @@ Each `Show`/`Hide` directly corresponds to a generation of a block. It collects 
 BaseType ["Gavel", "Stone Hammer", "Rock Breaker"] {
 	SetBackgroundColor RGB(162, 85, 0)
 <div></div>
-	Rarity normal {
+	Rarity Normal {
 		Show
 	}
 <div></div>
-	Rarity magic
+	Rarity Magic
 	Quality > 12 {
 		Show
 	}
 <div></div>
-	Rarity rare
+	Rarity Rare
 	Quality > 16 {
 		Show
 	}
@@ -557,10 +557,10 @@ SetTextColor RGB(240, 200, 150)
 SetBackgroundColor RGB(0, 0, 0, 255)
 SetAlertSound "pop.wav"
 SetAlertSound AlertSound(1, 300)
-SetBeam green              # permanent beam
-SetBeam Beam(green, false) # permanent beam, just verbose
-SetBeam Beam(yellow, true) # temporary beam (the only possible syntax)
-SetMinimapIcon MinimapIcon(0, blue, square)
+SetBeam Green              # permanent beam
+SetBeam Beam(Green, False) # permanent beam, just verbose
+SetBeam Beam(Yellow, True) # temporary beam (the only possible syntax)
+SetMinimapIcon MinimapIcon(0, Blue, Square)
 ```
 
 ### compound actions
@@ -643,10 +643,11 @@ One of the core fancy features of FS.
 
 All queries start with `$` (obviously, there is no better operator for price queries) followed by 2 function arguments: min and max price.
 
-- Queries return an array of strings to put into `BaseType` condition.
+- Queries return an array of strings to put into `BaseType` condition (in case of `$prophecies` they can also be used in `Prophecy`).
 - Minimum price is inclusive but maximum price is exclusive to facilitate range/iterator idioms. This way two ranges where one's upper bound is the same as other's lower bound do not overlap.
 - A special value of `_` can be used to indicate no bound.
 - You can use queries directly or assign their results to constants.
+- All queries only return high-confidence items. Low-confidence items are treated as if they did not exist in the price data.
 
 Available queries:
 
@@ -706,8 +707,8 @@ Class "Divination Card" {
 ```
 
 ```
-Rarity unique {
-	SetTextColor brown
+Rarity Unique {
+	SetTextColor Brown
 
 	# surely good drops
 	BaseType $uniques_eq_unambiguous(100, _) {

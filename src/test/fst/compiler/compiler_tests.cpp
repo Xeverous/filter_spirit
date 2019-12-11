@@ -108,7 +108,7 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 		{
 			const std::string input_str = minimal_input() + R"(
 nothing        = _
-boolean        = false
+boolean        = False
 floating_point = 3.5
 integer        = 123
 level          = Level(10)
@@ -116,15 +116,15 @@ font_size      = FontSize(30)
 sound_id       = SoundId(7)
 volume         = Volume(300)
 group          = Group("RGB")
-rarity         = rare
-shape          = hexagon
-suit           = brown
+rarity         = Rare
+shape          = Hexagon
+suit           = Brown
 color          = RGB(101, 102, 103)
-icon           = MinimapIcon(0, green, square)
-beam           = Beam(yellow)
+icon           = MinimapIcon(0, Green, Square)
+beam           = Beam(Yellow)
 string         = "Leather Belt"
 path           = Path("pop.wav")
-alert          = AlertSound(1, 300, false)
+alert          = AlertSound(1, 300, False)
 array          = [1, 2, 3]
 )";
 			const std::string_view input = input_str;
@@ -133,7 +133,7 @@ array          = [1, 2, 3]
 			const lang::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.definitions, lookup_data);
 
 			expect_object_in_symbols(symbols, lookup_data, "nothing",        lang::none{},                    search(input, "nothing"),        search(input, "_"));
-			expect_object_in_symbols(symbols, lookup_data, "boolean",        lang::boolean{false},            search(input, "boolean"),        search(input, "false"));
+			expect_object_in_symbols(symbols, lookup_data, "boolean",        lang::boolean{false},            search(input, "boolean"),        search(input, "False"));
 			expect_object_in_symbols(symbols, lookup_data, "floating_point", lang::floating_point{3.5},       search(input, "floating_point"), search(input, "3.5"));
 			expect_object_in_symbols(symbols, lookup_data, "integer",        lang::integer{123},              search(input, "integer"),        search(input, "123"));
 			expect_object_in_symbols(symbols, lookup_data, "level",          lang::level{10},                 search(input, "level"),          search(input, "Level(10)"));
@@ -141,21 +141,21 @@ array          = [1, 2, 3]
 			expect_object_in_symbols(symbols, lookup_data, "sound_id",       lang::sound_id{7},               search(input, "sound_id"),       search(input, "SoundId(7)"));
 			expect_object_in_symbols(symbols, lookup_data, "volume",         lang::volume{300},               search(input, "volume"),         search(input, "Volume(300)"));
 			expect_object_in_symbols(symbols, lookup_data, "group",          lang::socket_group{1, 1 , 1, 0}, search(input, "group"),          search(input, "Group(\"RGB\")"));
-			expect_object_in_symbols(symbols, lookup_data, "rarity",         lang::rarity::rare,              search(input, "rarity"),         search(input, "rare"));
-			expect_object_in_symbols(symbols, lookup_data, "shape",          lang::shape::hexagon,            search(input, "shape"),          search(input, "hexagon"));
-			expect_object_in_symbols(symbols, lookup_data, "suit",           lang::suit::brown,               search(input, "suit"),           search(input, "brown"));
+			expect_object_in_symbols(symbols, lookup_data, "rarity",         lang::rarity::rare,              search(input, "rarity"),         search(input, "Rare"));
+			expect_object_in_symbols(symbols, lookup_data, "shape",          lang::shape::hexagon,            search(input, "shape"),          search(input, "Hexagon"));
+			expect_object_in_symbols(symbols, lookup_data, "suit",           lang::suit::brown,               search(input, "suit"),           search(input, "Brown"));
 			expect_object_in_symbols(symbols, lookup_data, "color",          lang::color{101, 102, 103},      search(input, "color"),          search(input, "RGB(101, 102, 103)"));
 			expect_object_in_symbols(symbols, lookup_data, "icon",
 				lang::minimap_icon{lang::integer{0}, lang::suit::green, lang::shape::square},
-				search(input, "icon"), search(input, "MinimapIcon(0, green, square)"));
+				search(input, "icon"), search(input, "MinimapIcon(0, Green, Square)"));
 			expect_object_in_symbols(symbols, lookup_data, "beam",
 				lang::beam_effect{lang::suit::yellow},
-				search(input, "beam"), search(input, "Beam(yellow)"));
+				search(input, "beam"), search(input, "Beam(Yellow)"));
 			expect_object_in_symbols(symbols, lookup_data, "string",         lang::string{"Leather Belt"},    search(input, "string"),         search(input, "\"Leather Belt\""));
 			expect_object_in_symbols(symbols, lookup_data, "path",           lang::path{"pop.wav"},           search(input, "path"),           search(input, "Path(\"pop.wav\")"));
 			expect_object_in_symbols(symbols, lookup_data, "alert",
 				lang::alert_sound{lang::built_in_alert_sound{lang::sound_id{1}, lang::volume{300}, lang::boolean{false}}},
-				search(input, "alert"), search(input, "AlertSound(1, 300, false)"));
+				search(input, "alert"), search(input, "AlertSound(1, 300, False)"));
 			expect_object_in_symbols(symbols, lookup_data, "array",
 				lang::array_object{
 					lang::object{lang::integer{1}, lang::position_tag()},
@@ -239,7 +239,7 @@ ItemLevel 10
 SocketGroup "RGBW"
 {
 	SetAlertSound 7
-	SetBeam green
+	SetBeam Green
 	Hide
 }
 
@@ -391,12 +391,12 @@ Show
 
 			BOOST_AUTO_TEST_CASE(integer_and_boolean)
 			{
-				expect_alert_sound("AlertSound(1, true)", alert_sound(built_in_alert_sound(sound_id{integer{1}}, boolean{true})));
+				expect_alert_sound("AlertSound(1, True)", alert_sound(built_in_alert_sound(sound_id{integer{1}}, boolean{true})));
 			}
 
 			BOOST_AUTO_TEST_CASE(integer_and_integer_and_boolean)
 			{
-				expect_alert_sound("AlertSound(1, 200, true)", alert_sound(built_in_alert_sound(sound_id{integer{1}}, volume{200}, boolean{true})));
+				expect_alert_sound("AlertSound(1, 200, True)", alert_sound(built_in_alert_sound(sound_id{integer{1}}, volume{200}, boolean{true})));
 			}
 
 			BOOST_AUTO_TEST_CASE(promoted_string)

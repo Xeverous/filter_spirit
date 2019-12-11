@@ -5,7 +5,7 @@ ___
 
 The following article aims to establish a set of good practices and conventions for writing a spirit filter (and in general, any filter).
 
-If you have no clue how Filter Spirit works, read "filter writing" article first
+If you have no clue how Filter Spirit works, read "filter spirit tutorial" article first
 
 Items can be filtered by different **properties** (no formal use of this word from GGG side but I picked this one to avoid any name conflict). Properties are independent of each other (although some combinations do not exist, like quest items with sockets). Filters support many different properties but because *every item that goes through the filter gets the style of first matched block* **the order of blocks is crucial to ensure correct filtering**.
 
@@ -31,7 +31,7 @@ Class "Maps" {
 		Show
 	}
 
-	ShapedMap true {
+	ShapedMap True {
 		MapTier >= 11 {
 			# red, shaped maps
 			Set...
