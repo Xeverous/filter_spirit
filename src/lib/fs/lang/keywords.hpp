@@ -60,6 +60,13 @@ constexpr auto white       = generation::white;
 constexpr auto brown       = generation::brown;
 constexpr auto yellow      = generation::yellow;
 
+constexpr auto shaper      = generation::shaper;
+constexpr auto elder       = generation::elder;
+constexpr auto crusader    = generation::crusader;
+constexpr auto redeemer    = generation::redeemer;
+constexpr auto hunter      = generation::hunter;
+constexpr auto warlord     = generation::warlord;
+
 // ---- expressions ----
 
 // (nothing)

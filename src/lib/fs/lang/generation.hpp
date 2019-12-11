@@ -76,6 +76,13 @@ constexpr auto square   = "Square";
 constexpr auto star     = "Star";
 constexpr auto triangle = "Triangle";
 
+constexpr auto shaper      = "Shaper";
+constexpr auto elder       = "Elder";
+constexpr auto crusader    = "Crusader";
+constexpr auto redeemer    = "Redeemer";
+constexpr auto hunter      = "Hunter";
+constexpr auto warlord     = "Warlord";
+
 constexpr auto temp = "Temp";
 
 }
