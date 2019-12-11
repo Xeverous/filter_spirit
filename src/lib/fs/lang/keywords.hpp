@@ -36,16 +36,6 @@ constexpr auto hide = generation::hide;
 
 // (tokens only, no keywords here)
 
-// ---- version requirement ----
-
-constexpr auto version = "version";
-
-// ---- config ----
-
-constexpr auto config = "config";
-constexpr auto yes = "yes";
-constexpr auto no = "no";
-
 // ---- literal types ----
 
 constexpr auto true_       = "true";

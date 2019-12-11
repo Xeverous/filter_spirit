@@ -20,24 +20,6 @@ namespace x3 = boost::spirit::x3;
 
 // (nothing to symbolize)
 
-// ---- version requirement ----
-
-// (nothing to symbolize)
-
-// ---- config ----
-
-struct yes_no_ : x3::symbols<bool>
-{
-	yes_no_()
-	{
-		add
-			(lang::keywords::yes, true)
-			(lang::keywords::no, false)
-		;
-	}
-};
-const yes_no_ yes_no;
-
 // ---- literal types ----
 
 struct booleans_ : x3::symbols<bool>
