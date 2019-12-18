@@ -30,12 +30,14 @@ color_5L               = RGB(192, 128,   0)
 color_sacrifice        = RGB(150, 100,   0)
 color_mortal           = RGB( 60, 150,   0)
 color_labirynth        = RGB(  0, 150,   0)
+color_incursion        = color_labirynth
 color_quest            = RGB( 74, 230,  58)
 color_divination       = RGB(100, 210, 255)
 color_map_red          = color_red
 color_map_yellow       = color_rare
 color_map_white        = color_normal
 color_talisman         = RGB( 50, 130,  50)
+color_metamorph        = RGB( 25, 181,  25)
 color_rare_t1          = RGB(  0,  96,   0)
 color_rare_t2          = RGB(  0,  64,   0)
 color_chance_base      = RGB( 51, 204, 204)
@@ -52,7 +54,7 @@ color_synthesised_item = RGB(150, 100, 200)
 color_veiled_item      = RGB(150, 100, 158)
 
 currency_t1 = ["Exalted Orb", "Mirror of Kalandra", "Eternal Orb", "Albino Rhoa Feather", "Mirror Shard" ]
-currency_t2 = ["Divine Orb", "Chaos Orb", "Gemcutter's Prism", "Orb of Regret", "Regal Orb", "Stacked Deck", "Vaal Orb", "Apprentice Cartographer's Seal", "Apprentice Cartographer's Sextant", "Journeyman Cartographer's Seal", "Journeyman Cartographer's Sextant", "Master Cartographer's Seal", "Master Cartographer's Sextant", "Unshaping Orb", "Remnant of Corruption", "Exalted Shard", "Orb of Annulment", "Orb of Binding", "Orb of Horizons", "Harbinger's Orb", "Engineer's Orb", "Ancient Orb", "Stacked Deck", "Vial of" ]
+currency_t2 = ["Divine Orb", "Chaos Orb", "Gemcutter's Prism", "Orb of Regret", "Regal Orb", "Stacked Deck", "Vaal Orb", "Simple Sextant", "Prime Sextant", "Awakened Sextant", "Remnant of Corruption", "Exalted Shard", "Orb of Annulment", "Orb of Binding", "Orb of Horizons", "Harbinger's Orb", "Engineer's Orb", "Ancient Orb", "Stacked Deck", "Vial of" ]
 currency_t3 = ["Cartographer's Chisel", "Jeweller's Orb", "Orb of Alchemy", "Orb of Chance", "Orb of Fusing", "Orb of Scouring", "Silver Coin", "Blessed Orb" ]
 currency_t4 = ["Annulment Shard", "Binding Shard", "Horizon Shard", "Harbinger's Shard", "Engineer's Shard", "Ancient Shard", "Chaos Shard", "Regal Shard", "Alchemy Shard" ]
 
@@ -148,6 +150,7 @@ alert_elder_item         = alert_wow
 alert_fractured_item     = alert_wow
 alert_synthesised_item   = alert_wow
 alert_veiled_item        = alert_wow
+alert_metamorph          = alert_hitmarker
 
 alert_error              = "triggered.mp3"
 
@@ -195,7 +198,28 @@ Class "Currency" {
 		Show
 	}
 
+	BaseType ["Crusader's Exalted Orb", "Redeemer's Exalted Orb", "Hunter's Exalted Orb", "Warlord's Exalted Orb", "Awakener's Orb"] {
+		SetTextColor color_golden
+		SetBorderColor color_golden
+		SetBackgroundColor color_red
+		SetFontSize font_max
+		SetAlertSound alert_currency_t1
+		SetBeam beam_currency
+		SetMinimapIcon minimap_currency_t1
+		Show
+	}
+
 	BaseType currency_t2 {
+		SetTextColor color_black
+		SetBackgroundColor color_currency
+		SetFontSize font_currency_t2
+		SetAlertSound alert_currency_t2
+		SetBeam beam_currency
+		SetMinimapIcon minimap_currency_t2
+		Show
+	}
+
+	BaseType ["Catalyst", "Oil"] {
 		SetTextColor color_black
 		SetBackgroundColor color_currency
 		SetFontSize font_currency_t2
@@ -216,7 +240,7 @@ Class "Currency" {
 	}
 
 	BaseType currency_t4 {
-		SetTextColor color_golden
+		SetTextColor color_white
 		SetBorderColor color_golden
 		SetBackgroundColor color_currency
 		SetFontSize font_currency_t4
@@ -352,6 +376,16 @@ Class "Currency" {
 	SetBackgroundColor color_currency
 	SetFontSize font_max
 	SetAlertSound alert_error
+	Show
+}
+
+Class "Incubator" {
+	SetTextColor color_black
+	SetBackgroundColor color_currency
+	SetFontSize font_currency_t2
+	SetAlertSound alert_currency_t2
+	SetBeam beam_currency
+	SetMinimapIcon minimap_currency_t2
 	Show
 }
 
@@ -537,9 +571,19 @@ Sockets 6 {
 Class "Incursion Item"
 BaseType ["Stone of Passage", "Flashpowder Keg"] {
 	SetTextColor color_black
+	SetBackgroundColor color_incursion
+	SetFontSize font_max
+	SetAlertSound alert_incursion_item
+	SetMinimapIcon MinimapIcon(0, Green, Hexagon)
+	Show
+}
+
+Class "Atlas Region Upgrade Item" {
+	SetTextColor color_black
 	SetBackgroundColor color_labirynth
 	SetFontSize font_max
 	SetAlertSound alert_incursion_item
+	SetMinimapIcon minimap_reliquary
 	Show
 }
 
@@ -574,14 +618,21 @@ Class "Map Fragments" {
 		Show
 	}
 
-	# Shaper guardians
-	BaseType ["Fragment of the Phoenix", "Fragment of the Minotaur", "Fragment of the Chimera", "Fragment of the Hydra"] {
+	{
 		SetBorderColor color_white
 		SetTextColor color_white
 		SetBackgroundColor color_red
 		SetFontSize font_max
 		SetAlertSound alert_fragment_atlas
-		Show
+
+		# Shaper guardians
+		BaseType ["Fragment of the Phoenix", "Fragment of the Minotaur", "Fragment of the Chimera", "Fragment of the Hydra"] { Show }
+
+		# Elder guardians
+		BaseType ["Fragment of Enslavement", "Fragment of Eradication", "Fragment of Constriction", "Fragment of Purification"] { Show }
+
+		# Uber Elder guardians
+		BaseType ["Fragment of Shape", "Fragment of Knowledge", "Fragment of Terror", "Fragment of Emptiness"] { Show }
 	}
 
 	BaseType "Breachstone" {
@@ -590,6 +641,16 @@ Class "Map Fragments" {
 		SetBackgroundColor color_white
 		SetFontSize font_max
 		SetAlertSound alert_misc_breachstone
+		Show
+	}
+
+	# Pale Court (final missions of prophecy chains)
+	BaseType ["Eber's Key", "Yriel's Key", "Inya's Key", "Volkuur's Key"] {
+		SetTextColor color_white
+		SetBorderColor color_white
+		SetBackgroundColor RGB(255, 0, 255)
+		SetFontSize font_max
+		SetAlertSound alert_misc_pale_court
 		Show
 	}
 }
@@ -615,16 +676,6 @@ Class "Misc Map Item" {
 		SetAlertSound alert_misc_reliquary
 		SetBeam beam_reliquary
 		SetMinimapIcon minimap_reliquary
-		Show
-	}
-
-	# Pale Court (final missions of prophecy chains)
-	BaseType ["Eber's Key", "Yriel's Key", "Inya's Key", "Volkuur's Key"] {
-		SetTextColor color_white
-		SetBorderColor color_white
-		SetBackgroundColor RGB(255, 0, 255)
-		SetFontSize font_max
-		SetAlertSound alert_misc_pale_court
 		Show
 	}
 }
@@ -665,6 +716,15 @@ Class "Fishing Rods" {
 	SetAlertSound alert_fishing_rod
 	SetBeam beam_fishing_rod
 	SetMinimapIcon minimap_fishing_rod
+	Show
+}
+
+Class "Metamorph Sample" {
+	SetTextColor color_metamorph
+	SetBorderColor color_metamorph
+	SetBackgroundColor color_black
+	SetFontSize font_max
+	SetAlertSound alert_metamorph
 	Show
 }
 
@@ -740,7 +800,7 @@ Class "Divination Card" {
 	}
 
 	# < 1c shits (eg Carrion Crow)
-	Hide
+	Show
 }
 
 Class "Maps" {
