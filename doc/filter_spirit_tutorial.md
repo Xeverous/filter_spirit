@@ -137,11 +137,11 @@ function | result type | notes
 `Group(<String>)` | Group | string may consist of only `R`, `G`, `B`, `W` characters
 `Beam(<Suit>, <Boolean> = false)` | Beam (permanent by default) | second argument is optional
 `MinimapIcon(<Integer>, <Suit>, <Shape>)` | MinimapIcon
-`AlertSound(<SoundId | Integer>)` | AlertSound | built-in sound
-`AlertSound(<SoundId | Integer>, <Volume | Integer>)` | AlertSound | built-in sound (wih specified volume)
-`AlertSound(<SoundId | Integer>, <Boolean>)` | AlertSound | built-in sound (being positional or not)
-`AlertSound(<SoundId | Integer>, <Volume | Integer>, <Boolean>)` | AlertSound | built-in sound (wih specified volume and being positional or not)
-`AlertSound(<Path | String>)` | AlertSound | custom sound (note that filters do not support volume and positionality for custom sounds)
+`AlertSound(<SoundId \| Integer>)` | AlertSound | built-in sound
+`AlertSound(<SoundId \| Integer>, <Volume \| Integer>)` | AlertSound | built-in sound (wih specified volume)
+`AlertSound(<SoundId \| Integer>, <Boolean>)` | AlertSound | built-in sound (being positional or not)
+`AlertSound(<SoundId \| Integer>, <Volume \| Integer>, <Boolean>)` | AlertSound | built-in sound (wih specified volume and being positional or not)
+`AlertSound(<Path \| String>)` | AlertSound | custom sound (note that filters do not support volume and positionality for custom sounds)
 
 ### blocks
 
