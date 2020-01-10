@@ -8,16 +8,22 @@ find_package(Boost 1.68 REQUIRED
 ##############################################################################
 # create target and set its properties
 
-add_executable(filter_spirit_test
-	fst/main.cpp
-	fst/parser/parser_tests.cpp
-	fst/parser/parser_error_tests.cpp
-	fst/compiler/compiler_error_tests.cpp
-	fst/compiler/filter_generation_tests.cpp
-	fst/compiler/compiler_tests.cpp
-	fst/common/test_fixtures.cpp
-	fst/common/string_operations.cpp
-	fst/utility/algorithm_tests.cpp
+add_executable(filter_spirit_test)
+
+target_sources(filter_spirit_test
+	PRIVATE
+		fst/main.cpp
+		fst/parser/parser_tests.cpp
+		fst/parser/parser_error_tests.cpp
+		fst/compiler/compiler_error_tests.cpp
+		fst/compiler/filter_generation_tests.cpp
+		fst/compiler/compiler_tests.cpp
+		fst/common/test_fixtures.cpp
+		fst/common/string_operations.cpp
+		fst/utility/algorithm_tests.cpp
+		fst/common/print_type.hpp
+		fst/common/string_operations.hpp
+		fst/common/test_fixtures.hpp
 )
 
 target_include_directories(filter_spirit_test

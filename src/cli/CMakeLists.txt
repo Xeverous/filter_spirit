@@ -4,10 +4,15 @@ find_package(Boost 1.68 REQUIRED
 		filesystem
 )
 
-add_executable(filter_spirit_cli
-	parse_args.cpp
-	main.cpp
-	core.cpp
+add_executable(filter_spirit_cli)
+
+target_sources(filter_spirit_cli
+	PRIVATE
+		parse_args.cpp
+		core.cpp
+		main.cpp
+		parse_args.hpp
+		core.hpp
 )
 
 target_include_directories(filter_spirit_cli
