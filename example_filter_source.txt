@@ -901,10 +901,10 @@ Corrupted False {
 	SetTextColor color_black
 	SetBackgroundColor color_crafting
 	SetFontSize font_crafting
-	SetAlertSound alert_base_crafting
+	SetAlertSound alert_mlg_airhorn
 
-	ItemLevel >= 85
-	BaseType ["Hubris Circlet"] {
+	ItemLevel >= 86
+	BaseType ["Bone Helmet", "Two-Toned Boots", "Fingerless Silk Gloves", "Crystal Belt", "Spiked Gloves"] {
 		Show
 	}
 }
