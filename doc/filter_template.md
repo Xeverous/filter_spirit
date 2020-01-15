@@ -125,6 +125,7 @@ Filter Spirit allows to use market item prices when generating the filter. This 
 - Uniques should be filtered before RGB and linked items.
 - Filter 6L uniques before uniques.
 - Filter white socket items after RGB items and uniques.
+- Filter mod-specific rares (Incursion, Syndicate, Warband, Synthesis etc mods) before all other rares. Note that items with all these mods always drop identified.
 - Chance/crafting bases: don't forget `Corrupted false`.
 - Filter as many items by class as possible before you use other conditions.
 - Don't forget to disable leveling gear once a certain character level was reached - for example, you can display any item with `LinkedSockets 4` but only if they have `ItemLevel < 50`. If you reach higher-lvl zones they will simply have too high ilvl to appear.
