@@ -14,6 +14,9 @@ namespace
 
 std::string ptime_to_pretty_string(boost::posix_time::ptime time)
 {
+	if (time.is_special())
+		return "(none)";
+
 	std::string result = to_iso_extended_string(time.date()); // YYYY-MM-DD
 	result += ' ';
 

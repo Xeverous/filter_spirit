@@ -54,11 +54,13 @@ int run(int argc, char* argv[])
 
 		boost::optional<std::string> download_league_name_watch;
 		boost::optional<std::string> download_league_name_ninja;
+		bool opt_empty_data = false;
 		boost::optional<std::string> data_read_dir;
 		po::options_description data_obtaining_options("data obtaining options (use 1)");
 		data_obtaining_options.add_options()
 			("download-watch,w", po::value(&download_league_name_watch), "download newest item price data from api.poe.watch for specified league")
 			("download-ninja,n", po::value(&download_league_name_ninja), "download newest item price data from poe.ninja/api for specified league")
+			("empty-data,e",     po::bool_switch(&opt_empty_data),       "run with no item price data (all price queries will have no results)")
 			("read,r", po::value(&data_read_dir), "read item price data (JSON files) from specified directory")
 		;
 
@@ -131,8 +133,19 @@ int run(int argc, char* argv[])
 			return EXIT_SUCCESS;
 		}
 
-		std::optional<item_data> data = obtain_item_data(
-			download_league_name_ninja, download_league_name_watch, data_read_dir, data_save_dir, logger);
+		std::optional<item_data> data;
+
+		if (opt_empty_data) {
+			// user explicitly stated to use empty data, some find it useful to write SSF filters where price queries are not used
+			data = item_data();
+			item_data& d = *data;
+			d.item_price_metadata.data_source = fs::lang::data_source_type::none;
+			d.item_price_metadata.league_name = "(none)";
+			d.item_price_metadata.download_date = boost::posix_time::ptime(boost::posix_time::not_a_date_time);
+		}
+		else {
+			data = obtain_item_data(download_league_name_ninja, download_league_name_watch, data_read_dir, data_save_dir, logger);
+		}
 
 		if (opt_generate) {
 			if (!generate_item_filter(data, input_path, output_path, opt_print_ast, logger)) {
