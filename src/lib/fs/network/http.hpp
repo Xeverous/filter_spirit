@@ -2,7 +2,6 @@
 
 #include <fs/log/logger.hpp>
 
-#include <boost/beast/http.hpp>
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/ssl/context.hpp>
 
@@ -14,12 +13,14 @@
 namespace fs::network
 {
 
+using result_type = std::vector<std::string>;
+
 std::string url_encode(std::string_view str);
 
 // result passed as output parameter to reuse memory
 void url_encode(std::string_view str, std::string& buffer);
 
-[[nodiscard]] std::future<std::vector<boost::beast::http::response<boost::beast::http::string_body>>>
+[[nodiscard]] std::future<result_type>
 async_http_get(
 	boost::asio::io_context& ioc,
 	boost::asio::ssl::context& ctx,

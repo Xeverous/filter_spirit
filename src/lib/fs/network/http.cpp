@@ -11,8 +11,10 @@
 #include <boost/asio/ssl/stream.hpp>
 #include <boost/system/system_error.hpp>
 
+#include <limits>
 #include <memory>
 #include <future>
+#include <optional>
 #include <utility>
 #include <stdexcept>
 #include <string_view>
@@ -36,6 +38,8 @@ using tcp = boost::asio::ip::tcp; // from <boost/asio/ip/tcp.hpp>
 namespace ssl = boost::asio::ssl; // from <boost/asio/ssl.hpp>
 namespace http = boost::beast::http; // from <boost/beast/http.hpp>
 
+using response_type = http::response_parser<http::string_body>;
+
 class session: public std::enable_shared_from_this<session>
 {
 public:
@@ -45,7 +49,7 @@ public:
 	{
 	}
 
-	[[nodiscard]] std::future<std::vector<http::response<http::string_body>>>
+	[[nodiscard]] std::future<fs::network::result_type>
 	async_http_get(
 		const char* host,
 		std::vector<std::string> targets);
@@ -74,19 +78,20 @@ private:
 	tcp::resolver resolver;
 	ssl::stream<tcp::socket> stream;
 	boost::beast::flat_buffer buffer; // (Must persist between reads)
-	http::request<http::empty_body> request;
-	std::vector<std::string> targets;
-	std::vector<http::response<http::string_body>> responses;
-	std::promise<std::vector<http::response<http::string_body>>> promise;
+	http::request<http::empty_body> request; // HTTP GET request
+	std::optional<response_type> response;   // returned HTTP content
+	std::vector<std::string> targets;        // array of links
+	fs::network::result_type results;        // array of downloaded data
+	std::promise<fs::network::result_type> promise;
 };
 
 
-std::future<std::vector<http::response<http::string_body>>> session::async_http_get(
+std::future<fs::network::result_type> session::async_http_get(
 	const char* host,
 	std::vector<std::string> targets)
 {
 	// save targets that will be used in each request+response pair
-	responses.reserve(targets.size());
+	results.reserve(targets.size());
 	this->targets = std::move(targets);
 
 	// Set SNI Hostname (many hosts need this to handshake successfully)
@@ -155,9 +160,10 @@ void session::on_handshake(boost::system::error_code ec)
 
 void session::next_request()
 {
-	if (responses.size() == targets.size()) {
-		promise.set_value(std::move(responses));
-		responses.clear();
+	if (results.size() == targets.size()) {
+		// we are done, we downloaded from all targets
+		promise.set_value(std::move(results));
+		results.clear();
 
 		// Gracefully close the stream
 		stream.async_shutdown(
@@ -167,7 +173,7 @@ void session::next_request()
 		return;
 	}
 
-	const auto& current_target = targets[responses.size()];
+	const auto& current_target = targets[results.size()];
 	request.target(boost::beast::string_view(current_target.data(), current_target.size()));
 
 	// Send the HTTP request to the remote host
@@ -187,13 +193,22 @@ void session::on_write(
 	if (ec)
 		throw boost::system::system_error(ec, "could not write the request");
 
-	responses.resize(responses.size() + 1);
+	// Response is non-copyable, non-moveable and unusable afer receiving data.
+	// Explicit destruction + placement-new workarounds the issue (optional does the same).
+	// https://github.com/boostorg/beast/issues/1820#issuecomment-579942743
+	response = std::nullopt;
+	response.emplace();
+
+	// We want unlimited body size
+	// Some of the data we get is too large for default buffer size (8 MB)
+	// See https://stackoverflow.com/questions/50348516/boost-beast-message-with-body-limit
+	(*response).body_limit(std::numeric_limits<std::uint64_t>::max());
 
 	// Receive the HTTP response
 	http::async_read(
 		stream,
 		buffer,
-		responses.back(),
+		*response,
 		[self = shared_from_this()]
 		(boost::system::error_code ec, std::size_t bytes_transferred) {
 			self->on_read(ec, bytes_transferred);
@@ -207,6 +222,10 @@ void session::on_read(
 	if (ec)
 		throw boost::system::system_error(ec, "could not read the request");
 
+	// move the data from the response to our results
+	results.resize(results.size() + 1);
+	results.back() = std::move((*response).get().body());
+
 	next_request();
 }
 
@@ -216,7 +235,13 @@ void session::on_shutdown(boost::system::error_code ec)
 		// Rationale:
 		// http://stackoverflow.com/questions/25587403/boost-asio-ssl-async-shutdown-always-finishes-with-an-error
 		ec == boost::asio::error::eof
-		// rationale: https://github.com/boostorg/beast/issues/38
+		// Technically, we should not ignore this error but unfortunately some services (including poe.ninja's
+		// Cloudflare backend) shutdowns abruptly as a way to save bandwidth. This very shady optimization is
+		// seen from the client side as an SSL short read which could be a symptom of a man-in-the-middle attack
+		// trying to hijack the TCP connection. In HTTP 1.0, this could be used to exploit some implicit assumptions
+		// when the connection closes. As of HTTP 1.1, there are no known exploits because 1.1 has no on-close assumptions.
+		// See https://github.com/boostorg/beast/issues/38 for more details on the problem.
+		// If you use a different networking library and do not get this error, report this as a security issue anyway.
 		|| ec == boost::asio::ssl::error::stream_truncated)
 	{
 		ec.assign(0, ec.category());
@@ -266,7 +291,7 @@ std::string url_encode(std::string_view str)
 	return result;
 }
 
-std::future<std::vector<boost::beast::http::response<boost::beast::http::string_body>>>
+std::future<fs::network::result_type>
 async_http_get(
 	boost::asio::io_context& ioc,
 	boost::asio::ssl::context& ctx,
