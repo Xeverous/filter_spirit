@@ -4,12 +4,6 @@ Advanced item filter generator for Path of Exile that uses it's own [DSL](https:
 
 The project is under construction, message [/u/Xeverous](https://old.reddit.com/user/Xeverous/) on reddit or Xeverous#2151 on Discord if you are interested in it's early development or have any questions/suggestions/whatever. You can also open an issue.
 
-## documentation and tutorial
-
-Browse `doc` directory. Files are in Markdown so you can read them online on GitHub.
-
-Note that the tool is in its early development so things may chage. Suggestions welcome.
-
 ## overview
 
 Core features:
@@ -42,16 +36,16 @@ BaseType ["Gavel", "Stone Hammer", "Rock Breaker"] {
 	# above BaseType conditon will be inherited by all nested blocks
 	# above actions will be inherited and can be overriden by nested blocks
 
-	Rarity normal {
+	Rarity Normal {
 		Show # show normal hammers
 	}
 
-	Rarity magic
+	Rarity Magic
 	Quality >= 12 {
 		Show # show magic hammers with 12+ quality
 	}
 
-	Rarity rare
+	Rarity Rare
 	Quality >= 16 {
 		Show # show rare hammers with 16+ quality
 	}
@@ -72,14 +66,14 @@ Class "Divination Card" {
 	}
 
 	# 100c+
-	BaseType $divination(100, 999999) {
+	BaseType $divination(100, _) {
 		SetTextColor color_black
 		SetBorderColor color_divination
 		SetBackgroundColor color_divination
 		SetFontSize font_max
 		SetAlertSound alert_divination_best
 		SetBeam beam_divination
-		SetMinimapIcon MinimapIcon(0, blue, square)
+		SetMinimapIcon MinimapIcon(0, Blue, Square)
 		Show
 	}
 
@@ -89,7 +83,7 @@ Class "Divination Card" {
 		SetFontSize font_mid_divinaton
 		SetAlertSound alert_divination_mid
 		SetBeam beam_divination
-		SetMinimapIcon MinimapIcon(1, blue, square)
+		SetMinimapIcon MinimapIcon(1, Blue, Square)
 		Show
 	}
 
@@ -103,9 +97,21 @@ Class "Divination Card" {
 }
 ```
 
+## documentation and tutorial
+
+Browse `doc` directory. Files are in Markdown so you can read them online on GitHub.
+
+Note that the tool is in its early development so things may chage. Suggestions welcome.
+
 ## program interface
 
-Currently only a command line executable (see `--help`). Graphic interface in development.
+Currently only a command line executable. Graphic interface in development - see pinned issue.
+
+In Windows, you can quickly open command line in desired directory by typing "cmd" in the file explorer's path - see https://stackoverflow.com/a/10135218/4818802. Do this in FS directory (where `filter_spirit_cli.exe` is) and you can instantly use the program, eg `filter_spirit_cli --help`.
+
+## runtime dependencies
+
+FS does not need to install anything. You can download latest release and immediately use the program.
 
 ## build dependencies
 
@@ -113,6 +119,7 @@ Currently only a command line executable (see `--help`). Graphic interface in de
 - Boost 1.70 OR older with Spirit headers updated to 1.70; this project uses:
   - spirit (newest X3 library)
   - fusion
+  - preprocessor
   - optional
   - variant
   - **program_options**
@@ -129,12 +136,13 @@ Bolded dependencies require linking, all dependencies are exposed as targets in 
 
 ## building
 
-standard CMake based build
+modern CMake build script
 
 ```
 mkdir build
 cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release [your_options...]
+make -j
 ```
 
 If you are using `make` don't forget to add `-j` (parallel jobs) to add *100% increased build speed per additional core*.

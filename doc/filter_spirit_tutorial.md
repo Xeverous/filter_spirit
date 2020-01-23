@@ -38,9 +38,9 @@ Filter Spirit requires files in UTF-8 encoding. This is the same as for real fil
 
 ## actual filter vs Filter Spirit
 
-Filter Spirit is a tool that lets you write a filter using enchanced syntax and market information. It is important to note few key things:
+Filter Spirit is a tool that lets you write a filter using enhanced syntax and market information. It is important to note few key things:
 
-- The enchanced-syntax-text-file is read by FS program. It is not modified and only used to generate an actual filter. This brings the possibility to refresh (redo the generation) which updates the base types of worthy items while maintaining the same filter structure.
+- The enhanced-syntax-filter-template-file is read by FS program. It is not modified and only used to generate an actual filter. This brings the possibility to refresh (redo the generation) which updates the base types of worthy items while maintaining the same filter structure.
 - FS filters syntax is similar to the real filters only to make it easier to learn and understand how it works. It could use a completely different grammar but there would not be much point in it. New ideas welcome though.
 - FS filters syntax IS NOT a superset of real filters. Copy-pasting a real filter to FS will almost always cause syntax errors. However, the convertion is pretty easy (read further).
 - Because FS only generates real filters based on extra information, it can not do more than actual filters. FS exists mostly to save you time and error-prone manual work by reducing duplicated code and automating incorporation of market information.
@@ -135,7 +135,7 @@ function | result type | notes
 `SoundId(<Integer>)` | SoundId |
 `Volume(<Integer>)` | Volume |
 `Group(<String>)` | Group | string may consist of only `R`, `G`, `B`, `W` characters
-`Beam(<Suit>, <Boolean> = false)` | Beam (permanent by default) | second argument is optional
+`Beam(<Suit>, <Boolean> = False)` | Beam (permanent by default) | second argument is optional
 `MinimapIcon(<Integer>, <Suit>, <Shape>)` | MinimapIcon
 `AlertSound(<SoundId \| Integer>)` | AlertSound | built-in sound
 `AlertSound(<SoundId \| Integer>, <Volume \| Integer>)` | AlertSound | built-in sound (wih specified volume)
@@ -553,7 +553,7 @@ SetMinimapIcon <MinimapIcon>
 SetBeam <Beam | Suit>
 ```
 
-Some items always play specific built-in sounds, even if you don't specify anything. `DisableDropSound` in actual filters disables this behaviour. In FS, use `PlayDefaultDropSound` with a boolean value, eg `PlayDefaultDropSound false`.
+Some items always play specific built-in sounds, even if you don't specify anything. `DisableDropSound` in actual filters disables this behaviour. In FS, use `PlayDefaultDropSound` with a boolean value, eg `PlayDefaultDropSound False`.
 
 Examples:
 
@@ -599,6 +599,7 @@ comp2 = {
 <div></div>
 SetFontSize 36
 Set comp1
+<div></div>
 Rarity rare {
 	Set comp2
 <div></div>
@@ -677,10 +678,11 @@ Available queries:
 
 Unique items are separated into 4 categories where each has ambiguous and unambiguous results:
 
+- `eq` are all equippable items (weapons, shields, all armour parts, belts, amulets and rings)
 - Unambiguous outputs base types for which there is only 1 unique item.
 - Ambiguous outputs base types for which there is more than 1 unique item, using the highest price of possible unique drops on each base.
 - These 2 never overlap in output.
-- FS removes undroppable uniques (eg Harbinger and corruption-only uniques) from market information before outputting base types. This results in less ambiguities and removes items which you would not care for anyway when writing the filter.
+- FS removes undroppable uniques (eg Harbinger and vendor-only uniques) from market information before outputting base types. This results in less ambiguities and removes items which you would not care for anyway when writing the filter. Corruption-only uniques are not removed because 1) poe.watch and poe.ninja differ in their reports or searches 2) maps with Corrupting Tempest and some sextant mods can drop corrupted items
 
 Examples:
 
@@ -713,7 +715,7 @@ Class "Divination Card" {
 
 ```
 Rarity Unique {
-	SetTextColor Brown
+	SetTextColor brown
 
 	# surely good drops
 	BaseType $uniques_eq_unambiguous(100, _) {
