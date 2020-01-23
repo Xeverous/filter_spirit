@@ -2,7 +2,6 @@
 
 #include <fs/log/logger_fwd.hpp>
 
-#include <boost/beast/http.hpp>
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/ssl/context.hpp>
 
@@ -12,8 +11,9 @@
 
 namespace fs::network
 {
+using result_type = std::vector<std::string>;
 
-[[nodiscard]] std::future<std::vector<boost::beast::http::response<boost::beast::http::string_body>>>
+[[nodiscard]] std::future<result_type>
 async_http_get(
 	boost::asio::io_context& ioc,
 	boost::asio::ssl::context& ctx,

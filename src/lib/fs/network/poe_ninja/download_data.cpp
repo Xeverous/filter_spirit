@@ -52,17 +52,18 @@ std::future<api_item_price_data> async_download_item_price_data(std::string leag
 	#undef CURRENCY_OVERVIEW_LINK
 	#undef ITEM_OVERVIEW_LINK
 
-	auto response_handler = [league = std::move(league_name)](std::vector<boost::beast::http::response<boost::beast::http::string_body>> responses) {
+	auto response_handler = [league = std::move(league_name)](result_type responses) {
 		if (responses.size() != 21u) {
 			throw std::logic_error("logic error: downloaded a different "
 				"number of files from poe.ninja: expected 21 but got " + std::to_string(responses.size()));
 		}
 
-		// z = n + 1, ignore it
-		// data is ignored
-		#define MOVE_BODY_N(z, n, data) std::move(responses[n]).body(),
+		// use preprocessor library to auto-repeat some boilerplate
+		// z = n + 1 (n is 0-based, z is 1-based), we ignore z
+		// data is not needed, we ignore it
+		#define MOVE_RESPONSE_N(z, n, data) std::move(responses[n]),
 		return api_item_price_data {
-			BOOST_PP_REPEAT(21, MOVE_BODY_N,)
+			BOOST_PP_REPEAT(21, MOVE_RESPONSE_N,)
 		};
 		#undef MOVE_BODY_N
 	};
