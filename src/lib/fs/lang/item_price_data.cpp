@@ -139,24 +139,25 @@ auto make_undroppable_uniques()
 		"The Unshattered Will",
 
 		// corruption only
-		"Blood of Corruption",
-		"Ancient Waystones"
-		"Atziri's Reign",
-		"Blood Sacrifice",
-		"Brittle Barrier",
-		"Chill of Corruption",
-		"Combustibles",
-		"Corrupted Energy",
-		"Fevered Mind",
-		"Fragility",
-		"Hungry Abyss",
-		"Mutated Growth",
-		"Pacifism",
-		"Powerlessness",
-		"Sacrificial Harvest",
-		"Self-Flagellation",
-		"Vaal Sentencing",
-		"Weight of Sin",
+		// these can actually drop in a map with Corrupting Tempest or some sextant mods
+		// "Blood of Corruption",
+		// "Ancient Waystones"
+		// "Atziri's Reign",
+		// "Blood Sacrifice",
+		// "Brittle Barrier",
+		// "Chill of Corruption",
+		// "Combustibles",
+		// "Corrupted Energy",
+		// "Fevered Mind",
+		// "Fragility",
+		// "Hungry Abyss",
+		// "Mutated Growth",
+		// "Pacifism",
+		// "Powerlessness",
+		// "Sacrificial Harvest",
+		// "Self-Flagellation",
+		// "Vaal Sentencing",
+		// "Weight of Sin",
 	};
 
 	std::sort(
