@@ -106,33 +106,39 @@ parse_gems(std::string_view json_str, log::logger& logger)
 	return result;
 }
 
-lang::influence_type variant_to_influence(const nlohmann::json& variant)
-{
-	if (variant.is_null())
-		return lang::influence_type::none;
-
-	const auto& str = variant.get_ref<const nlohmann::json::string_t&>();
-	if (str == "Shaper") {
-		return lang::influence_type::shaper;
-	}
-	if (str == "Elder") {
-		return lang::influence_type::elder;
-	}
-
-	throw network::json_parse_error("base item has invalid influence");
-}
-
 [[nodiscard]] std::vector<lang::base>
 parse_bases(std::string_view json_str, log::logger& logger)
 {
 	std::vector<lang::base> result;
 
 	for_each_item(json_str, logger, [&](const nlohmann::json& item) {
-		result.emplace_back(
-			get_elementary_item_data(item),
-			item.at("levelRequired").get<int>(),
-			variant_to_influence(item.at("variant"))
-		);
+		const auto& item_influence = item.at("variant");
+		// yes, not really a proper name but poe.ninja reuses some fields for other purposes
+		const auto item_level = item.at("levelRequired").get<int>();
+
+		if (item_influence.is_null()) {
+			result.emplace_back(
+				get_elementary_item_data(item),
+				item_level,
+				false, false, false, false, false, false
+			);
+		}
+		else {
+			const auto& infl = item_influence.get_ref<const nlohmann::json::string_t&>();
+
+			// as of now, poe.ninja only reports singly-influenced items
+			// we can just compare the influence string
+			result.emplace_back(
+				get_elementary_item_data(item),
+				item_level,
+				infl == "Shaper",
+				infl == "Elder",
+				infl == "Crusader",
+				infl == "Redeemer",
+				infl == "Hunter",
+				infl == "Warlord"
+			);
+		}
 	});
 
 	return result;

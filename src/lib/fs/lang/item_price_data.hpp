@@ -43,15 +43,34 @@ struct gem : elementary_item
 	bool is_corrupted;
 };
 
-enum class influence_type { none, shaper, elder };
-
 struct base : elementary_item
 {
-	base(elementary_item ei, int item_level, influence_type influence)
-	: elementary_item(std::move(ei)), item_level(item_level), influence(influence) {}
+	base(
+		elementary_item ei,
+		int item_level,
+		bool is_shaper,
+		bool is_elder,
+		bool is_crusader,
+		bool is_redeemer,
+		bool is_hunter,
+		bool is_warlord)
+	: elementary_item(std::move(ei))
+	, item_level(item_level)
+	, is_shaper(is_shaper)
+	, is_elder(is_elder)
+	, is_crusader(is_crusader)
+	, is_redeemer(is_redeemer)
+	, is_hunter(is_hunter)
+	, is_warlord(is_warlord)
+	{}
 
 	int item_level;
-	influence_type influence;
+	bool is_shaper;
+	bool is_elder;
+	bool is_crusader;
+	bool is_redeemer;
+	bool is_hunter;
+	bool is_warlord;
 };
 
 bool is_undroppable_unique(std::string_view name) noexcept;

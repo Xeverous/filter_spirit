@@ -38,17 +38,27 @@ BETTER_ENUM(frame_type, int,
 
 namespace categories // avoids name conflicts with types in lang namespace
 {
+	// note: names of these are expected to match poe.watch's JSON strings
 
 	BETTER_ENUM(accessory_type, int, amulet, belt, ring, unknown = -1)
-	struct accessory { accessory_type type; };
+	struct accessory
+	{
+		accessory_type type;
+	};
 
 	BETTER_ENUM(armour_type, int, boots, chest, gloves, helmet, quiver, shield, unknown = -1)
-	struct armour { armour_type type; };
+	struct armour
+	{
+		armour_type type;
+	};
 
 	struct divination_card {};
 
 	BETTER_ENUM(currency_type, int, currency, essence, piece, fossil, resonator, vial, net, incubator, splinter, oil, unknown = -1)
-	struct currency { currency_type type; };
+	struct currency
+	{
+		currency_type type;
+	};
 
 	BETTER_ENUM(enchantment_type, int, boots, gloves, helmet, unknown = -1)
 	struct enchantment
@@ -64,7 +74,7 @@ namespace categories // avoids name conflicts with types in lang namespace
 		gem_type type;
 		int level;
 		int quality;
-		bool corrupted;
+		bool is_corrupted;
 	};
 
 	struct jewel {};
@@ -80,14 +90,22 @@ namespace categories // avoids name conflicts with types in lang namespace
 	struct prophecy {};
 
 	BETTER_ENUM(weapon_type, int, bow, claw, dagger, oneaxe, onemace, onesword, rod, sceptre, staff, twoaxe, twomace, twosword, wand, runedagger, warstaff, unknown = -1)
-	struct weapon { weapon_type type; };
+	struct weapon
+	{
+		weapon_type type;
+	};
 
 	BETTER_ENUM(base_type, int, amulet, belt, ring, boots, chest, gloves, helmet, quiver, shield, jewel, bow, claw, dagger, oneaxe, onemace, onesword, rod, sceptre, staff, twoaxe, twomace, twosword, wand, unknown = -1)
 	struct base
 	{
 		base_type type;
-		lang::influence_type influence;
 		int ilvl;
+		bool is_shaper;
+		bool is_elder;
+		bool is_crusader;
+		bool is_redeemer;
+		bool is_hunter;
+		bool is_warlord;
 	};
 
 	struct beast {};
@@ -157,7 +175,7 @@ log::logger_wrapper& operator<<(log::logger_wrapper& logger, const item& item)
 			logger << "gem:\n"
 				"\tlevel    : " << gem.level << "\n"
 				"\tquality  : " << gem.quality << "\n"
-				"\tcorrupted: " << (gem.corrupted ? "true" : "false") << "\n";
+				"\tcorrupted: " << (gem.is_corrupted ? "true" : "false") << "\n";
 		},
 		[&](categories::jewel)           { logger << "jewel\n"; },
 		[&](categories::map map) {
@@ -170,10 +188,14 @@ log::logger_wrapper& operator<<(log::logger_wrapper& logger, const item& item)
 		[&](categories::base base) {
 			logger << "base:\n"
 				"\ttype      : " << base.type._name() << "\n"
-				"\tinfluence : " << (
-					base.influence == lang::influence_type::shaper ? "shaper" :
-					base.influence == lang::influence_type::elder  ? "elder"  : "none") << "\n"
-				"\titem level: " << base.ilvl << "\n";
+				"\titem level: " << base.ilvl << "\n"
+				"\tinfluence : " <<
+					(base.is_shaper   ? "Shaper "   : "" ) <<
+					(base.is_elder    ? "Elder "    : "" ) <<
+					(base.is_crusader ? "Crusader " : "" ) <<
+					(base.is_redeemer ? "Redeemer " : "" ) <<
+					(base.is_hunter   ? "Hunter "   : "" ) <<
+					(base.is_warlord  ? "Warlord "  : "" ) << "\n";
 		},
 		[&](categories::beast)           { logger << "beast\n"; }
 	}, item.category);
@@ -322,19 +344,29 @@ item_category_variant parse_item_category(const nlohmann::json& entry)
 		return categories::weapon{json_to_enum<categories::weapon_type>(group)};
 	}
 	if (category_str == "base") {
-		const auto is_shaper = entry.at("baseIsShaper").get<bool>();
-		const auto is_elder  = entry.at("baseIsElder") .get<bool>();
+		const auto& influences = entry.at("influences");
+		if (!influences.is_array())
+			throw network::json_parse_error("item influences should be an array but it is not");
 
-		if (is_shaper && is_elder)
-			throw network::json_parse_error("item can not be shaper and elder at the same time");
-
-		const auto influence =
-			is_shaper ? lang::influence_type::shaper :
-			is_elder  ? lang::influence_type::elder  :
-			            lang::influence_type::none;
+		const bool is_shaper   = influences.find("shaper")   != influences.end();
+		const bool is_elder    = influences.find("elder")    != influences.end();
+		const bool is_crusader = influences.find("crusader") != influences.end();
+		const bool is_redeemer = influences.find("redeemer") != influences.end();
+		const bool is_hunter   = influences.find("hunter")   != influences.end();
+		const bool is_warlord  = influences.find("warlord")  != influences.end();
 
 		const auto ilvl = entry.at("baseItemLevel").get<int>();
-		return categories::base{json_to_enum<categories::base_type>(group), influence, ilvl};
+
+		return categories::base{
+			json_to_enum<categories::base_type>(group),
+			ilvl,
+			is_shaper,
+			is_elder,
+			is_crusader,
+			is_redeemer,
+			is_hunter,
+			is_warlord
+		};
 	}
 	if (category_str == "beast") {
 		return categories::beast{};
@@ -585,7 +617,7 @@ parse_item_price_data(
 				elementary_item{price_data, std::move(itm.name)},
 				gem.level,
 				gem.quality,
-				gem.corrupted});
+				gem.is_corrupted});
 			continue;
 		}
 		else if (std::holds_alternative<categories::enchantment>(itm.category)) {
