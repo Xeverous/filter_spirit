@@ -1,6 +1,5 @@
 #pragma once
 
-#include <fs/log/buffered_logger.hpp>
 #include <fs/lang/symbol_table.hpp>
 #include <fs/parser/parser.hpp>
 #include <fs/compiler/error.hpp>

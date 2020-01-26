@@ -2,7 +2,7 @@
 
 #include <fs/lang/item_price_data.hpp>
 #include <fs/generator/options.hpp>
-#include <fs/log/logger_fwd.hpp>
+#include <fs/log/logger.hpp>
 
 #include <string_view>
 #include <optional>

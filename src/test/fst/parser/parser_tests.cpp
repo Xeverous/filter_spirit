@@ -2,7 +2,6 @@
 #include <fst/common/test_fixtures.hpp>
 
 #include <fs/parser/parser.hpp>
-#include <fs/log/buffered_logger.hpp>
 #include <fs/utility/holds_alternative.hpp>
 #include <fs/version.hpp>
 

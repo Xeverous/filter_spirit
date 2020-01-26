@@ -185,7 +185,7 @@ using namespace fs::lang;
 void compare_item_price_data(
 	const item_price_data& lhs,
 	const item_price_data& rhs,
-	log::logger& log)
+	log::message_stream& stream)
 {
 	// divination cards
 	{
@@ -200,13 +200,13 @@ void compare_item_price_data(
 			};
 
 		boost::format lhs_fmter("%-47s %2s |\n");
-		const auto report_lhs = [&](const divination_card& c) { log << (lhs_fmter % c.name % c.stack_size).str(); };
+		const auto report_lhs = [&](const divination_card& c) { stream << (lhs_fmter % c.name % c.stack_size).str(); };
 
 		boost::format rhs_fmter("                                                   | %-47s %2s\n");
-		const auto report_rhs = [&](const divination_card& c) { log << (rhs_fmter % c.name % c.stack_size).str(); };
+		const auto report_rhs = [&](const divination_card& c) { stream << (rhs_fmter % c.name % c.stack_size).str(); };
 
-		log << "divination cards (with stack size): " << static_cast<int>(lhs.divination_cards.size())
-			<< " vs " << static_cast<int>(rhs.divination_cards.size()) << "\n";
+		stream << "divination cards (name + stack size): " << lhs.divination_cards.size()
+			<< " vs " << rhs.divination_cards.size() << '\n';
 		utility::diff_report(
 			lhs.divination_cards.begin(), lhs.divination_cards.end(),
 			rhs.divination_cards.begin(), rhs.divination_cards.end(),
@@ -225,14 +225,14 @@ void compare_item_price_data(
 		};
 
 	boost::format lhs_fmter("%-50s |\n");
-	const auto report_lhs = [&](const elementary_item& e) { log << (lhs_fmter % e.name).str(); };
+	const auto report_lhs = [&](const elementary_item& e) { stream << (lhs_fmter % e.name).str(); };
 
 	boost::format rhs_fmter("                                                   | %s\n");
-	const auto report_rhs = [&](const elementary_item& e) { log << (rhs_fmter % e.name).str(); };
+	const auto report_rhs = [&](const elementary_item& e) { stream << (rhs_fmter % e.name).str(); };
 
 	const auto run_compare_elementary =
 		[&](const std::vector<elementary_item>& lhs, const std::vector<elementary_item>& rhs, const char* desc) {
-			log << desc << ": " << static_cast<int>(lhs.size()) << " vs " << static_cast<int>(rhs.size()) << "\n";
+			stream << desc << ": " << lhs.size() << " vs " << rhs.size() << '\n';
 			utility::diff_report(
 				lhs.begin(), lhs.end(), rhs.begin(), rhs.end(),
 				compare_elementary_items_eq, compare_elementary_items_lt,
@@ -275,7 +275,7 @@ bool item_price_data::load_and_parse(
 			network::poe_ninja::api_item_price_data api_data;
 
 			if (!api_data.load(directory_path, logger)) {
-				logger.error() << "failed to load item price data";
+				logger.error() << "failed to load item price data\n";
 				return false;
 			}
 
@@ -286,7 +286,7 @@ bool item_price_data::load_and_parse(
 			network::poe_watch::api_item_price_data api_data;
 
 			if (!api_data.load(directory_path, logger)) {
-				logger.error() << "failed to load item price data";
+				logger.error() << "failed to load item price data\n";
 				return false;
 			}
 
@@ -294,15 +294,15 @@ bool item_price_data::load_and_parse(
 			return true;
 		}
 		else {
-			logger.error() << "unknown data source";
+			logger.error() << "unknown data source\n";
 			return false;
 		}
 	}
 	catch (const network::json_parse_error& e) {
-		logger.warning() << "failed to parse JSON file: " << e.what();
+		logger.warning() << "failed to parse JSON file: " << e.what() << '\n';
 	}
 	catch (const nlohmann::json::exception& e) {
-		logger.warning() << e.what(); // no need to add more text, nlohmann exceptions are verbose
+		logger.warning() << e.what() << '\n'; // no need to add more text, nlohmann exceptions are verbose
 	}
 
 	return false;
@@ -329,31 +329,31 @@ void unique_item_price_data::add_item(std::string base_type, elementary_item ite
 	unambiguous.emplace(std::move(base_type), std::move(item));
 }
 
-log::logger_wrapper& operator<<(log::logger_wrapper& logger, const item_price_data& ipd)
+log::message_stream& operator<<(log::message_stream& logger, const item_price_data& ipd)
 {
 	return logger << "item price data:\n"
-		"\tdivination cards: " << static_cast<int>(ipd.divination_cards.size()) << "\n"
-		"\toils            : " << static_cast<int>(ipd.oils.size()) << "\n"
-		"\tincubators      : " << static_cast<int>(ipd.incubators.size()) << "\n"
-		"\tessences        : " << static_cast<int>(ipd.essences.size()) << "\n"
-		"\tfossils         : " << static_cast<int>(ipd.fossils.size()) << "\n"
-		"\tprophecies      : " << static_cast<int>(ipd.prophecies.size()) << "\n"
-		"\tresonators      : " << static_cast<int>(ipd.resonators.size()) << "\n"
-		"\tscarabs         : " << static_cast<int>(ipd.scarabs.size()) << "\n"
-		"\thelmet enchants : " << static_cast<int>(ipd.helmet_enchants.size()) << "\n"
-		"\tgems            : " << static_cast<int>(ipd.gems.size()) << "\n"
-		"\tbases           : " << static_cast<int>(ipd.bases.size()) << "\n"
-		"\tunique equipment (unambiguous): " << static_cast<int>(ipd.unique_eq.unambiguous.size()) << "\n"
-		"\tunique equipment (ambiguous)  : " << static_cast<int>(ipd.unique_eq.ambiguous.size()) << "\n"
-		"\tunique flasks (unambiguous)   : " << static_cast<int>(ipd.unique_flasks.unambiguous.size()) << "\n"
-		"\tunique flasks (ambiguous)     : " << static_cast<int>(ipd.unique_flasks.ambiguous.size()) << "\n"
-		"\tunique jewels (unambiguous)   : " << static_cast<int>(ipd.unique_jewels.unambiguous.size()) << "\n"
-		"\tunique jewels (ambiguous)     : " << static_cast<int>(ipd.unique_jewels.ambiguous.size()) << "\n"
-		"\tunique map (unambiguous)      : " << static_cast<int>(ipd.unique_maps.unambiguous.size()) << "\n"
-		"\tunique map (ambiguous)        : " << static_cast<int>(ipd.unique_maps.ambiguous.size()) << "\n";
+		"\tdivination cards: " << ipd.divination_cards.size() << "\n"
+		"\toils            : " << ipd.oils.size() << "\n"
+		"\tincubators      : " << ipd.incubators.size() << "\n"
+		"\tessences        : " << ipd.essences.size() << "\n"
+		"\tfossils         : " << ipd.fossils.size() << "\n"
+		"\tprophecies      : " << ipd.prophecies.size() << "\n"
+		"\tresonators      : " << ipd.resonators.size() << "\n"
+		"\tscarabs         : " << ipd.scarabs.size() << "\n"
+		"\thelmet enchants : " << ipd.helmet_enchants.size() << "\n"
+		"\tgems            : " << ipd.gems.size() << "\n"
+		"\tbases           : " << ipd.bases.size() << "\n"
+		"\tunique equipment (unambiguous): " << ipd.unique_eq.unambiguous.size() << "\n"
+		"\tunique equipment (ambiguous)  : " << ipd.unique_eq.ambiguous.size() << "\n"
+		"\tunique flasks (unambiguous)   : " << ipd.unique_flasks.unambiguous.size() << "\n"
+		"\tunique flasks (ambiguous)     : " << ipd.unique_flasks.ambiguous.size() << "\n"
+		"\tunique jewels (unambiguous)   : " << ipd.unique_jewels.unambiguous.size() << "\n"
+		"\tunique jewels (ambiguous)     : " << ipd.unique_jewels.ambiguous.size() << "\n"
+		"\tunique map (unambiguous)      : " << ipd.unique_maps.unambiguous.size() << "\n"
+		"\tunique map (ambiguous)        : " << ipd.unique_maps.ambiguous.size() << "\n";
 }
 
-log::logger_wrapper& operator<<(log::logger_wrapper& logger, const item_price_metadata& ipm)
+log::message_stream& operator<<(log::message_stream& logger, const item_price_metadata& ipm)
 {
 	return logger <<
 		"item price data downloaded: " << utility::ptime_to_pretty_string(ipm.download_date) << "\n"
@@ -386,11 +386,9 @@ void compare_item_price_info(
 	const item_price_info& rhs,
 	log::logger& log)
 {
-	log.info() << "left price data:\n" << lhs.metadata << "right price data:\n" << rhs.metadata;
-
-	log.begin_info_message();
-	compare_item_price_data(lhs.data, rhs.data, log);
-	log.end_message();
+	auto stream = log.info();
+	stream << "left price data:\n" << lhs.metadata << "right price data:\n" << rhs.metadata;
+	compare_item_price_data(lhs.data, rhs.data, stream);
 }
 
 constexpr auto filename_metadata = "metadata.json";
@@ -407,51 +405,61 @@ bool item_price_metadata::save(const boost::filesystem::path& directory, fs::log
 		{field_download_date, boost::posix_time::to_iso_string(download_date)}
 	};
 
-	std::error_code ec = utility::save_file(directory / filename_metadata, utility::dump_json(json));
+	const auto path = directory / filename_metadata;
+	std::error_code ec = utility::save_file(path, utility::dump_json(json));
 
-	if (ec)
-		logger.error() << "failed to save item price metadata: " << ec.message();
+	if (ec) {
+		logger.error() << "failed to save " << path.generic_string() << ": " << ec.message() << '\n';
+		return false;
+	}
 
-	return !static_cast<bool>(ec);
+	return true;
 }
 
 bool item_price_metadata::load(const boost::filesystem::path& directory, fs::log::logger& logger)
 {
 	std::error_code ec;
-	std::string file_content = utility::load_file(directory / filename_metadata, ec);
+	const auto path = directory / filename_metadata;
+	std::string file_content = utility::load_file(path, ec);
 
 	if (ec) {
-		logger.error() << "failed to load metadata file: " << ec.message();
+		logger.error() << "failed to load " << path.generic_string() << ": " << ec.message() << '\n';
 		return false;
 	}
 
-	auto json = nlohmann::json::parse(file_content);
+	try {
+		auto json = nlohmann::json::parse(file_content);
 
-	// create a separate data instance to implement strong exception guuarantee
-	item_price_metadata data;
-	data.league_name = json.at(field_league_name).get<std::string>();
+		// create a separate data instance to implement strong exception guuarantee
+		item_price_metadata data;
+		data.league_name = json.at(field_league_name).get<std::string>();
 
-	if (
-		std::optional<data_source_type> data_source = lang::from_string(
-			json.at(field_data_source).get_ref<const std::string&>());
-		data_source)
-	{
-		data.data_source = *data_source;
+		if (
+			std::optional<data_source_type> data_source = lang::from_string(
+				json.at(field_data_source).get_ref<const std::string&>());
+			data_source)
+		{
+			data.data_source = *data_source;
+		}
+		else {
+			logger.error() << "failed to parse data source from metadata file\n";
+			return false;
+		}
+
+		data.download_date = boost::posix_time::from_iso_string(
+			json.at(field_download_date).get_ref<const std::string&>());
+		if (data.download_date.is_special()) {
+			logger.error() << "invalid date in metadata file\n";
+			return false;
+		}
+
+		*this = std::move(data);
+		return true;
 	}
-	else {
-		logger.error() << "failed to parse data source from metadata file";
+	catch (const std::exception& e) {
+		logger.error() << "when reading " << path.generic_string() << ": " << e.what() << '\n';
 		return false;
 	}
-
-	data.download_date = boost::posix_time::from_iso_string(
-		json.at(field_download_date).get_ref<const std::string&>());
-	if (data.download_date.is_special()) {
-		logger.error() << "invalid date in metadata file";
-		return false;
-	}
-
-	*this = std::move(data);
-	return true;
 }
 
 }

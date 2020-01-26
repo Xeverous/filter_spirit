@@ -1,6 +1,6 @@
 #pragma once
 
-#include <fs/log/logger_fwd.hpp>
+#include <fs/log/logger.hpp>
 #include <fs/lang/data_source_type.hpp>
 
 #include <boost/filesystem/path.hpp>
@@ -133,7 +133,7 @@ struct item_price_data
 };
 
 
-log::logger_wrapper& operator<<(log::logger_wrapper& logger, const item_price_data& ipd);
+log::message_stream& operator<<(log::message_stream& logger, const item_price_data& ipd);
 
 struct item_price_metadata
 {
@@ -145,7 +145,7 @@ struct item_price_metadata
 	boost::posix_time::ptime download_date;
 };
 
-log::logger_wrapper& operator<<(log::logger_wrapper& logger, const item_price_metadata& ipm);
+log::message_stream& operator<<(log::message_stream& logger, const item_price_metadata& ipm);
 
 struct item_price_info
 {

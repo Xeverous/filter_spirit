@@ -1,9 +1,10 @@
 #include <fst/common/string_operations.hpp>
 
-#include <fs/log/utility.hpp>
-#include <fs/log/buffered_logger.hpp>
+#include <fs/utility/string_helpers.hpp>
+#include <fs/log/string_logger.hpp>
 
 #include <string_view>
+#include <utility>
 
 namespace
 {
@@ -67,16 +68,7 @@ std::string_view search(std::string_view input, std::string_view pattern)
 	BOOST_TEST_REQUIRE((pair.first != input_last),
 		"test is written incorrectly, search within tested input code failed\n"
 		"input:\n" << input << "\npattern:\n" << pattern);
-	return fs::log::make_string_view(pair.first, pair.second);
-}
-
-std::string range_info_to_string(
-	std::string_view all_code,
-	std::string_view code_to_underline)
-{
-	fs::log::buffered_logger logger;
-	logger.print_underlined_code(all_code, code_to_underline);
-	return logger.flush_out();
+	return fs::utility::make_string_view(pair.first, pair.second);
 }
 
 boost::test_tools::predicate_result compare_ranges(
@@ -92,8 +84,8 @@ boost::test_tools::predicate_result compare_ranges(
 
 	boost::test_tools::predicate_result result(false);
 	result.message()
-		<< "EXPECTED:\n" << range_info_to_string(whole_input, expected)
-		<< "ACTUAL:\n" << range_info_to_string(whole_input, actual);
+		<< "EXPECTED:\n" << fs::utility::range_underline_to_string(whole_input, expected)
+		<< "ACTUAL:\n" << fs::utility::range_underline_to_string(whole_input, actual);
 	return result;
 }
 

@@ -30,10 +30,10 @@ void for_each_item(std::string_view json_str, log::logger& logger, F f)
 		}
 		catch (const network::json_parse_error& e) {
 			logger.warning() << "failed to parse item entry: " << e.what()
-				<< ", skipping this item: " << utility::dump_json(item);
+				<< ", skipping this item: " << utility::dump_json(item) << '\n';
 		}
 		catch (const nlohmann::json::exception& e) {
-			logger.warning() << e.what() << ", caused by this item: " << utility::dump_json(item);
+			logger.warning() << e.what() << ", caused by this item: " << utility::dump_json(item) << '\n';
 		}
 	}
 }

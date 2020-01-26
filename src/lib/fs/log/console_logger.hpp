@@ -2,6 +2,8 @@
 
 #include <fs/log/logger.hpp>
 
+#include <iostream>
+
 namespace fs::log
 {
 
@@ -11,14 +13,39 @@ namespace fs::log
 class console_logger : public logger
 {
 public:
-	void begin_info_message   () override;
-	void begin_warning_message() override;
-	void begin_error_message  () override;
-	void end_message() override;
+	void begin_message(severity s) override
+	{
+		if (s == severity::info)
+			std::cout << "INFO: ";
+		else if (s == severity::warning)
+			std::cout << "WARN: ";
+		else if (s == severity::error)
+			std::cout << "ERROR: ";
+	}
 
-	void add(std::string_view text) override;
-	void add(char character) override;
-	void add(int number) override;
+	void end_message() override
+	{
+	}
+
+	void add(std::string_view text) override
+	{
+		std::cout << text;
+	}
+
+	void add(char character) override
+	{
+		std::cout << character;
+	}
+
+	void add(std::int64_t number) override
+	{
+		std::cout << number;
+	}
+
+	void add(std::uint64_t number) override
+	{
+		std::cout << number;
+	}
 };
 
 }

@@ -1,8 +1,8 @@
 #include <fs/compiler/print_error.hpp>
 #include <fs/parser/parser.hpp>
 #include <fs/log/logger.hpp>
-#include <fs/log/strings.hpp>
 #include <fs/utility/algorithm.hpp>
+#include <fs/utility/string_helpers.hpp>
 
 #include <cassert>
 
@@ -16,19 +16,19 @@ using namespace fs::compiler;
 void print_error_variant(
 	const compile_error& error,
 	const parser::lookup_data& lookup_data,
-	log::logger& logger);
+	log::message_stream& stream);
 
 void print_error_impl(
 	errors::name_already_exists error,
 	const parser::lookup_data& lookup_data,
-	log::logger& logger)
+	log::message_stream& stream)
 {
-	logger.print_line_number_with_description_and_underlined_code(
+	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_duplicated_name),
 		log::strings::error,
 		"name already exists");
-	logger.print_line_number_with_description_and_underlined_code(
+	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_original_name),
 		log::strings::note,
@@ -38,9 +38,9 @@ void print_error_impl(
 void print_error_impl(
 	errors::no_such_name error,
 	const parser::lookup_data& lookup_data,
-	log::logger& logger)
+	log::message_stream& stream)
 {
-	logger.print_line_number_with_description_and_underlined_code(
+	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_name),
 		log::strings::error,
@@ -50,9 +50,9 @@ void print_error_impl(
 void print_error_impl(
 	errors::no_such_function error,
 	const parser::lookup_data& lookup_data,
-	log::logger& logger)
+	log::message_stream& stream)
 {
-	logger.print_line_number_with_description_and_underlined_code(
+	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_name),
 		log::strings::error,
@@ -62,9 +62,9 @@ void print_error_impl(
 void print_error_impl(
 	errors::no_such_query error,
 	const parser::lookup_data& lookup_data,
-	log::logger& logger)
+	log::message_stream& stream)
 {
-	logger.print_line_number_with_description_and_underlined_code(
+	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_name),
 		log::strings::error,
@@ -74,9 +74,9 @@ void print_error_impl(
 void print_error_impl(
 	errors::invalid_amount_of_arguments error,
 	const parser::lookup_data& lookup_data,
-	log::logger& logger)
+	log::message_stream& stream)
 {
-	logger.print_line_number_with_description_and_underlined_code(
+	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_arguments),
 		log::strings::error,
@@ -89,9 +89,9 @@ void print_error_impl(
 void print_error_impl(
 	errors::type_mismatch error,
 	const parser::lookup_data& lookup_data,
-	log::logger& logger)
+	log::message_stream& stream)
 {
-	logger.print_line_number_with_description_and_underlined_code(
+	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_expression),
 		log::strings::error,
@@ -106,80 +106,79 @@ void print_unmatched_function_call(
 	std::string_view function_name,
 	const errors::unmatched_function_call& error,
 	const parser::lookup_data& lookup_data,
-	log::logger& logger)
+	log::message_stream& stream)
 {
-	logger << "candidate " << function_name << "(";
+	stream << "candidate " << function_name << "(";
 	utility::for_each_and_between(
 		error.expected_argument_types.begin(),
 		error.expected_argument_types.end(),
-		[&logger](fs::lang::object_type type) { logger << fs::lang::to_string_view(type); },
-		[&logger]() { logger << ", "; });
-	logger << "):\n";
+		[&stream](fs::lang::object_type type) { stream << fs::lang::to_string_view(type); },
+		[&stream]() { stream << ", "; });
+	stream << "):\n";
 
-	print_error_variant(error.error, lookup_data, logger);
+	print_error_variant(error.error, lookup_data, stream);
 }
 
 void print_error_impl(
 	const errors::failed_constructor_call& error,
 	const parser::lookup_data& lookup_data,
-	log::logger& logger)
+	log::message_stream& stream)
 {
 	const std::string_view attempted_type_name = fs::lang::to_string_view(error.attempted_type_to_construct);
 
 	const std::string_view all_code = lookup_data.get_view_of_whole_content();
 	const std::string_view code_to_underline = lookup_data.position_of(error.place_of_function_call);
 
-	logger.print_line_number(log::count_lines(all_code.data(), code_to_underline.data()));
-	logger << log::strings::error << "failed constructor call " << attempted_type_name << "(";
+	stream.print_line_number(utility::count_lines(all_code.data(), code_to_underline.data()));
+	stream << log::strings::error << "failed constructor call " << attempted_type_name << "(";
 	utility::for_each_and_between(
 		error.ctor_argument_types.begin(),
 		error.ctor_argument_types.end(),
-		[&logger](fs::lang::object_type type) { logger << fs::lang::to_string_view(type); },
-		[&logger]() { logger << ", "; });
-	logger << "):\n";
-	logger.print_underlined_code(all_code, code_to_underline);
+		[&stream](fs::lang::object_type type) { stream << fs::lang::to_string_view(type); },
+		[&stream]() { stream << ", "; });
+	stream << "):\n";
+	stream.print_underlined_code(all_code, code_to_underline);
 
 	assert(error.error != nullptr);
-	print_error_variant(*error.error, lookup_data, logger);
+	print_error_variant(*error.error, lookup_data, stream);
 }
 
 void print_error_impl(
 	const errors::no_matching_constructor_found& error,
 	const parser::lookup_data& lookup_data,
-	log::logger& logger)
+	log::message_stream& stream)
 {
 	const std::string_view attempted_type_name = fs::lang::to_string_view(error.attempted_type_to_construct);
 
 	const std::string_view all_code = lookup_data.get_view_of_whole_content();
 	const std::string_view code_to_underline = lookup_data.position_of(error.place_of_function_call);
 
-	logger.print_line_number(log::count_lines(all_code.data(), code_to_underline.data()));
-	logger << log::strings::error << "no matching constructor for call to " << attempted_type_name << "(";
+	stream.print_line_number(utility::count_lines(all_code.data(), code_to_underline.data()));
+	stream << log::strings::error << "no matching constructor for call to " << attempted_type_name << "(";
 	utility::for_each_and_between(
 		error.supplied_types.begin(),
 		error.supplied_types.end(),
-		[&logger](std::optional<fs::lang::object_type> type)
-		{
+		[&stream](std::optional<fs::lang::object_type> type) {
 			if (type.has_value())
-				logger << fs::lang::to_string_view(*type);
+				stream << fs::lang::to_string_view(*type);
 			else
-				logger << "?";
+				stream << "?";
 		},
-		[&logger]() { logger << ", "; });
-	logger << "):\n";
+		[&stream]() { stream << ", "; });
+	stream << "):\n";
 
-	logger.print_underlined_code(all_code, code_to_underline);
+	stream.print_underlined_code(all_code, code_to_underline);
 
 	for (const errors::unmatched_function_call& inner_error : error.errors)
-		print_unmatched_function_call(attempted_type_name, inner_error, lookup_data, logger);
+		print_unmatched_function_call(attempted_type_name, inner_error, lookup_data, stream);
 }
 
 void print_error_impl(
 	errors::nested_arrays_not_allowed error,
 	const parser::lookup_data& lookup_data,
-	log::logger& logger)
+	log::message_stream& stream)
 {
-	logger.print_line_number_with_description_and_underlined_code(
+	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_nested_array_expression),
 		log::strings::error,
@@ -189,16 +188,16 @@ void print_error_impl(
 void print_error_impl(
 	errors::non_homogeneous_array error,
 	const parser::lookup_data& lookup_data,
-	log::logger& logger)
+	log::message_stream& stream)
 {
-	logger.print_line_number_with_description_and_underlined_code(
+	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_first_element),
 		log::strings::error,
 		"non homogeneous array, one element of type '",
 		fs::lang::to_string_view(error.first_element_type),
 		"'");
-	logger.print_line_number_with_description_and_underlined_code(
+	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_second_element),
 		log::strings::note,
@@ -210,9 +209,9 @@ void print_error_impl(
 void print_error_impl(
 	errors::index_out_of_range error,
 	const parser::lookup_data& lookup_data,
-	log::logger& logger)
+	log::message_stream& stream)
 {
-	logger.print_line_number_with_description_and_underlined_code(
+	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_subscript),
 		log::strings::error,
@@ -225,9 +224,9 @@ void print_error_impl(
 void print_error_impl(
 	errors::empty_socket_group error,
 	const parser::lookup_data& lookup_data,
-	log::logger& logger)
+	log::message_stream& stream)
 {
-	logger.print_line_number_with_description_and_underlined_code(
+	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_socket_group_string),
 		log::strings::error,
@@ -237,9 +236,9 @@ void print_error_impl(
 void print_error_impl(
 	errors::illegal_characters_in_socket_group error,
 	const parser::lookup_data& lookup_data,
-	log::logger& logger)
+	log::message_stream& stream)
 {
-	logger.print_line_number_with_description_and_underlined_code(
+	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_socket_group_string),
 		log::strings::error,
@@ -249,9 +248,9 @@ void print_error_impl(
 void print_error_impl(
 	errors::invalid_socket_group error,
 	const parser::lookup_data& lookup_data,
-	log::logger& logger)
+	log::message_stream& stream)
 {
-	logger.print_line_number_with_description_and_underlined_code(
+	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_socket_group_string),
 		log::strings::error,
@@ -261,9 +260,9 @@ void print_error_impl(
 void print_error_impl(
 	errors::invalid_minimap_icon_size error,
 	const parser::lookup_data& lookup_data,
-	log::logger& logger)
+	log::message_stream& stream)
 {
-	logger.print_line_number_with_description_and_underlined_code(
+	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_size_argument),
 		log::strings::error,
@@ -274,14 +273,14 @@ void print_error_impl(
 void print_error_impl(
 	errors::condition_redefinition error,
 	const parser::lookup_data& lookup_data,
-	log::logger& logger)
+	log::message_stream& stream)
 {
-	logger.print_line_number_with_description_and_underlined_code(
+	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_redefinition),
 		log::strings::error,
 		"condition redefinition (the same condition can not be specified again in the same block or nested blocks)");
-	logger.print_line_number_with_description_and_underlined_code(
+	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_original_definition),
 		log::strings::note,
@@ -291,14 +290,14 @@ void print_error_impl(
 void print_error_impl(
 	errors::lower_bound_redefinition error,
 	const parser::lookup_data& lookup_data,
-	log::logger& logger)
+	log::message_stream& stream)
 {
-	logger.print_line_number_with_description_and_underlined_code(
+	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_redefinition),
 		log::strings::error,
 		"lower bound redefinition (the same bound for comparison can not be specified again in the same block or nested blocks)");
-	logger.print_line_number_with_description_and_underlined_code(
+	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_original_definition),
 		log::strings::note,
@@ -308,14 +307,14 @@ void print_error_impl(
 void print_error_impl(
 	errors::upper_bound_redefinition error,
 	const parser::lookup_data& lookup_data,
-	log::logger& logger)
+	log::message_stream& stream)
 {
-	logger.print_line_number_with_description_and_underlined_code(
+	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_redefinition),
 		log::strings::error,
 		"upper bound redefinition (the same bound for comparison can not be specified again in the same block or nested blocks)");
-	logger.print_line_number_with_description_and_underlined_code(
+	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_original_definition),
 		log::strings::note,
@@ -325,9 +324,9 @@ void print_error_impl(
 void print_error_impl(
 	errors::internal_compiler_error_during_action_evaluation error,
 	const parser::lookup_data& lookup_data,
-	log::logger& logger)
+	log::message_stream& stream)
 {
-	logger.print_line_number_with_description_and_underlined_code(
+	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_action),
 		log::strings::internal_compiler_error,
@@ -338,9 +337,9 @@ void print_error_impl(
 void print_error_impl(
 	errors::internal_compiler_error_during_range_evaluation error,
 	const parser::lookup_data& lookup_data,
-	log::logger& logger)
+	log::message_stream& stream)
 {
-	logger.print_line_number_with_description_and_underlined_code(
+	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_comparison_condition),
 		log::strings::internal_compiler_error,
@@ -351,9 +350,9 @@ void print_error_impl(
 void print_error_impl(
 	errors::internal_compiler_error_during_comparison_condition_evaluation error,
 	const parser::lookup_data& lookup_data,
-	log::logger& logger)
+	log::message_stream& stream)
 {
-	logger.print_line_number_with_description_and_underlined_code(
+	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_comparison_condition),
 		log::strings::internal_compiler_error,
@@ -364,9 +363,9 @@ void print_error_impl(
 void print_error_impl(
 	errors::internal_compiler_error_during_string_condition_evaluation error,
 	const parser::lookup_data& lookup_data,
-	log::logger& logger)
+	log::message_stream& stream)
 {
-	logger.print_line_number_with_description_and_underlined_code(
+	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_string_condition),
 		log::strings::internal_compiler_error,
@@ -377,9 +376,9 @@ void print_error_impl(
 void print_error_impl(
 	errors::internal_compiler_error_during_boolean_condition_evaluation error,
 	const parser::lookup_data& lookup_data,
-	log::logger& logger)
+	log::message_stream& stream)
 {
-	logger.print_line_number_with_description_and_underlined_code(
+	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.place_of_boolean_condition),
 		log::strings::internal_compiler_error,
@@ -390,10 +389,10 @@ void print_error_impl(
 void print_error_variant(
 	const compile_error& error,
 	const parser::lookup_data& lookup_data,
-	log::logger& logger)
+	log::message_stream& stream)
 {
 	std::visit(
-		[&](const auto& error) { print_error_impl(error, lookup_data, logger); },
+		[&](const auto& error) { print_error_impl(error, lookup_data, stream); },
 		error);
 }
 
@@ -407,13 +406,12 @@ void print_error(
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
-	logger.begin_error_message();
-	logger << "compile error\n";
+	auto stream = logger.error();
+	stream << "compile error\n";
 	// some errors are recursive (contain other errors)
 	// print_error_variant() is a helper for recursion
 	// if we recursed print_error() we would get multiple log messages
-	print_error_variant(error, lookup_data, logger);
-	logger.end_message();
+	print_error_variant(error, lookup_data, stream);
 }
 
 }

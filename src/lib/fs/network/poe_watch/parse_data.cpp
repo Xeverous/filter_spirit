@@ -128,7 +128,7 @@ using item_category_variant = std::variant<
 
 struct item
 {
-	int id = 0;
+	std::size_t id = 0;
 	std::string name;                     // item main name, eg "Tabula Rasa"
 	std::optional<std::string> base_type; // item base type, eg "Simple Robe", null for non-wearable items
 	frame_type frame;                  // frame displayed in game UI
@@ -138,55 +138,54 @@ struct item
 	item_category_variant category; // combined category and group
 };
 
-log::logger_wrapper& operator<<(log::logger_wrapper& logger, const item& item)
+log::message_stream& operator<<(log::message_stream& stream, const item& item)
 {
-	logger << "item:\n"
+	stream << "item:\n"
 		"ID              : " << item.id << "\n"
 		"name            : " << item.name << "\n"
 		"base type       : " << item.base_type.value_or("(none)") << "\n"
 		"frame           : " << (item.frame == +frame_type::unknown ? "(unknown)" : item.frame._to_string()) << "\n";
 
-	const auto log_optional = [&logger](const char* name, std::optional<int> opt)
-	{
-		logger << name;
+	const auto log_optional = [&stream](const char* name, std::optional<int> opt) {
+		stream << name;
 		if (opt)
-			logger << *opt;
+			stream << *opt;
 		else
-			logger << "(none)";
-		logger << "\n";
+			stream << "(none)";
+		stream << "\n";
 	};
 
 	log_optional("max stack size  : ", item.max_stack_size);
 
 	log_optional("links           : ", item.links);
 
-	logger << "has variations  : " << (item.has_unique_variations ? "true" : "false") << "\n";
+	stream << "has variations  : " << (item.has_unique_variations ? "true" : "false") << "\n";
 
-	logger << "category        : ";
+	stream << "category        : ";
 
 	std::visit(utility::visitor{
-		[&](categories::accessory)       { logger << "accessory\n"; },
-		[&](categories::armour)          { logger << "armour\n"; },
-		[&](categories::divination_card) { logger << "divination card\n"; },
-		[&](categories::currency)        { logger << "currency\n"; },
-		[&](categories::enchantment)     { logger << "enchantment\n"; },
-		[&](categories::flask)           { logger << "flask\n"; },
+		[&](categories::accessory)       { stream << "accessory\n"; },
+		[&](categories::armour)          { stream << "armour\n"; },
+		[&](categories::divination_card) { stream << "divination card\n"; },
+		[&](categories::currency)        { stream << "currency\n"; },
+		[&](categories::enchantment)     { stream << "enchantment\n"; },
+		[&](categories::flask)           { stream << "flask\n"; },
 		[&](categories::gem gem) {
-			logger << "gem:\n"
+			stream << "gem:\n"
 				"\tlevel    : " << gem.level << "\n"
 				"\tquality  : " << gem.quality << "\n"
 				"\tcorrupted: " << (gem.is_corrupted ? "true" : "false") << "\n";
 		},
-		[&](categories::jewel)           { logger << "jewel\n"; },
+		[&](categories::jewel)           { stream << "jewel\n"; },
 		[&](categories::map map) {
-			logger << "map\n\ttype  : " << map.type._name() << "\n";
+			stream << "map\n\ttype  : " << map.type._name() << "\n";
 			log_optional("\ttier  : ", map.tier);
 			log_optional("\tseries: ", map.series);
 		},
-		[&](categories::prophecy)        { logger << "prophecy\n"; },
-		[&](categories::weapon)          { logger << "weapon\n"; },
+		[&](categories::prophecy)        { stream << "prophecy\n"; },
+		[&](categories::weapon)          { stream << "weapon\n"; },
 		[&](categories::base base) {
-			logger << "base:\n"
+			stream << "base:\n"
 				"\ttype      : " << base.type._name() << "\n"
 				"\titem level: " << base.ilvl << "\n"
 				"\tinfluence : " <<
@@ -197,10 +196,10 @@ log::logger_wrapper& operator<<(log::logger_wrapper& logger, const item& item)
 					(base.is_hunter   ? "Hunter "   : "" ) <<
 					(base.is_warlord  ? "Warlord "  : "" ) << "\n";
 		},
-		[&](categories::beast)           { logger << "beast\n"; }
+		[&](categories::beast)           { stream << "beast\n"; }
 	}, item.category);
 
-	return logger;
+	return stream;
 }
 
 // same behaviour as JavaScript code on poe.watch
@@ -220,19 +219,19 @@ parse_compact(std::string_view compact_json, log::logger& logger)
 
 	std::vector<std::optional<lang::price_data>> item_prices;
 	item_prices.resize(32768); // expect about 30 000 items
-	int max_id = 0;
+	std::size_t max_id = 0;
 	for (const auto& item : json) {
-		const auto id = item.at("id").get<int>();
+		const auto id = item.at("id").get<std::size_t>();
 
-		if (id >= static_cast<int>(item_prices.size())) // C++20: [[unlikely]]
-			item_prices.resize(item_prices.size() * 2);
+		if (id >= item_prices.size()) // C++20: [[unlikely]]
+			item_prices.resize(id * 2);
 
 		if (id > max_id)
 			max_id = id;
 
 		if (item_prices[id].has_value()) { // C++20: [[unlikely]]
 			logger.warning() << "A price data entry with duplicated ID has been found, ID = "
-				<< id << ", skipping this item";
+				<< id << ", skipping this entry\n";
 			continue;
 		}
 
@@ -381,7 +380,7 @@ item parse_item(const nlohmann::json& item_json)
 	assert(item_json.is_object());
 
 	return item{
-		item_json.at("id").get<int>(),
+		item_json.at("id").get<std::size_t>(),
 		item_json.at("name").get<std::string>(),
 		get_optional_subelement<std::string>(item_json, "type"),
 		parse_item_frame(item_json.at("frame")),
@@ -404,7 +403,7 @@ parse_itemdata(std::string_view itemdata_json, log::logger& logger)
 	for (const auto& item_entry : json) {
 		const auto log_exception = [&](const auto& e) {
 			logger.warning() << "failed to parse item entry in itemdata JSON: " << e.what()
-				<< ", skipping the following item: " << utility::dump_json(item_entry);
+				<< ", skipping the following item: " << utility::dump_json(item_entry) << '\n';
 		};
 
 		try {
@@ -457,23 +456,31 @@ parse_item_price_data(
 	const api_item_price_data& ipd,
 	log::logger& logger)
 {
-	logger.info() << "parsing item prices";
+	logger.info() << "parsing item prices\n";
 	std::vector<std::optional<lang::price_data>> item_prices = parse_compact(ipd.compact_json, logger);
 	if (item_prices.empty())
 		throw network::json_parse_error("parsed empty list of item prices");
 
-	logger.info() << "parsing item data";
+	logger.info() << "parsing item data\n";
 	std::vector<item> itemdata = parse_itemdata(ipd.itemdata_json, logger);
 	if (itemdata.empty())
 		throw network::json_parse_error("parsed empty list of item data");
 
-	logger.info() << "item entries: " << static_cast<int>(itemdata.size());
+	logger.info() << "item entries: " << itemdata.size() << '\n';
 
 	lang::item_price_data result;
 	for (item& itm : itemdata) {
-		// ignore items which do not have price information
-		if (itm.id >= static_cast<int>(item_prices.size()) || !item_prices[itm.id].has_value())
+		/*
+		 * Ignore items which do not have price information.
+		 *
+		 * poe.watch has a global database for all items which is shared across leagues.
+		 * Some items are not obtainable in all leagues so this is normal. Additionally,
+		 * the owner confirmed that the lack of price infromation can be a result of
+		 * no confidence about given item offers.
+		 */
+		if (itm.id >= item_prices.size() || !item_prices[itm.id].has_value()) {
 			continue;
+		}
 
 		const lang::price_data& price_data = *item_prices[itm.id];
 

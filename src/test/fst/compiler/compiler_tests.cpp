@@ -6,7 +6,7 @@
 #include <fs/compiler/resolve_symbols.hpp>
 #include <fs/compiler/print_error.hpp>
 #include <fs/lang/position_tag.hpp>
-#include <fs/log/buffered_logger.hpp>
+#include <fs/log/string_logger.hpp>
 #include <fs/utility/visitor.hpp>
 
 #define BOOST_TEST_DYN_LINK
@@ -30,20 +30,18 @@ void expect_object_in_symbols(
 	std::string_view value_origin)
 {
 	const auto it = symbols.find(name);
-	if (it == symbols.end())
-	{
+	if (it == symbols.end()) {
 		BOOST_ERROR("expected " << name << " in symbol table");
 		return;
 	}
 
 	const lang::named_object& named_object = it->second;
 	const lang::object& object = named_object.object_instance;
-	if (object.value != value)
-	{
+	if (object.value != value) {
 		const std::string_view all_code = lookup_data.get_view_of_whole_content();
 		BOOST_ERROR("expected " << lang::type_of_object(value) << " but got " << object.type() << "\n"
-			<< range_info_to_string(all_code, lookup_data.position_of(named_object.name_origin))
-			<< range_info_to_string(all_code, lookup_data.position_of(object.value_origin)));
+			<< utility::range_underline_to_string(all_code, lookup_data.position_of(named_object.name_origin))
+			<< utility::range_underline_to_string(all_code, lookup_data.position_of(object.value_origin)));
 	}
 
 	const std::string_view input_range = lookup_data.get_view_of_whole_content();
@@ -66,13 +64,11 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 			const std::variant<lang::symbol_table, compiler::compile_error> symbols_or_error =
 				resolve_symbols(defs);
 
-			if (std::holds_alternative<compiler::compile_error>(symbols_or_error))
-			{
+			if (std::holds_alternative<compiler::compile_error>(symbols_or_error)) {
 				const auto& error = std::get<compiler::compile_error>(symbols_or_error);
-				log::buffered_logger logger;
+				log::string_logger logger;
 				compiler::print_error(error, lookup_data, logger);
-				const auto log = logger.flush_out();
-				BOOST_FAIL("resolve_symbols failed but should not:\n" << log);
+				BOOST_FAIL("resolve_symbols failed but should not:\n" << logger.str());
 			}
 
 			return std::get<lang::symbol_table>(std::move(symbols_or_error));
@@ -87,13 +83,11 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 			std::variant<std::vector<lang::filter_block>, compiler::compile_error> result =
 				compiler::build_filter_blocks(top_level_statements, symbols, lang::item_price_data{});
 
-			if (std::holds_alternative<compiler::compile_error>(result))
-			{
+			if (std::holds_alternative<compiler::compile_error>(result)) {
 				const auto& error = std::get<compiler::compile_error>(result);
-				log::buffered_logger logger;
+				log::string_logger logger;
 				compiler::print_error(error, lookup_data, logger);
-				const auto log = logger.flush_out();
-				BOOST_FAIL("building filter blocks failed but should not:\n" << log);
+				BOOST_FAIL("building filter blocks failed but should not:\n" << logger.str());
 			}
 
 			return std::get<std::vector<lang::filter_block>>(std::move(result));

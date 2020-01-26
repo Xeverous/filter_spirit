@@ -1,7 +1,7 @@
 #pragma once
 
 #include <fs/network/http.hpp>
-#include <fs/log/logger_fwd.hpp>
+#include <fs/log/logger.hpp>
 
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/ssl/context.hpp>

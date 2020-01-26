@@ -2,7 +2,6 @@
 #include <fs/parser/print_error.hpp>
 #include <fs/parser/detail/grammar.hpp>
 #include <fs/log/logger.hpp>
-#include <fs/log/utility.hpp>
 
 namespace fs::parser
 {
@@ -36,16 +35,15 @@ std::variant<parse_success_data, parse_failure_data> parse(std::string_view inpu
 
 void print_parse_errors(const parse_failure_data& parse_data, log::logger& logger)
 {
-	if (parse_data.errors.empty())
-	{
-		logger.internal_error("parse failed but no error information has been reported");
+	if (parse_data.errors.empty()) {
+		logger.error() << "Parse failed but no error information has been generated.\n" << log::strings::request_bug_report;
 		return;
 	}
 
 	for (const parse_error& error : parse_data.errors)
 		print_error(error, parse_data.lookup_data, logger);
 
-	logger.print_line_number_with_description_and_pointed_code(
+	logger.info().print_line_number_with_description_and_pointed_code(
 		parse_data.lookup_data.get_view_of_whole_content(),
 		parse_data.parser_stop_position,
 		"parser stopped here");

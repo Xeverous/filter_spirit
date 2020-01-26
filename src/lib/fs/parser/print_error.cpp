@@ -10,19 +10,18 @@ void print_error(
 	const parser::lookup_data& lookup_data,
 	log::logger&logger)
 {
-	logger.begin_error_message();
-	logger << "parse failure\n";
-	logger.print_line_number_with_description_and_pointed_code(
+	auto stream = logger.error();
+	stream << "parse failure\n";
+	stream.print_line_number_with_description_and_pointed_code(
 		lookup_data.get_view_of_whole_content(),
 		error.error_place,
 		"expected ",
 		error.what_was_expected,
 		" here");
-	logger.print_line_number_with_description_and_pointed_code(
+	stream.print_line_number_with_description_and_pointed_code(
 		lookup_data.get_view_of_whole_content(),
 		error.backtracking_place,
 		"backtracking parser here");
-	logger.end_message();
 }
 
 }

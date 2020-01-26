@@ -1,6 +1,6 @@
 #pragma once
 
-#include <fs/log/logger_fwd.hpp>
+#include <fs/log/logger.hpp>
 
 #include <boost/beast/http.hpp>
 #include <boost/asio/io_context.hpp>
@@ -9,9 +9,15 @@
 #include <future>
 #include <vector>
 #include <string>
+#include <string_view>
 
 namespace fs::network
 {
+
+std::string url_encode(std::string_view str);
+
+// result passed as output parameter to reuse memory
+void url_encode(std::string_view str, std::string& buffer);
 
 [[nodiscard]] std::future<std::vector<boost::beast::http::response<boost::beast::http::string_body>>>
 async_http_get(

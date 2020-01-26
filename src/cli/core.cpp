@@ -18,12 +18,12 @@ load_item_price_info(const std::string& path, log::logger& logger)
 {
 	lang::item_price_info info;
 	if (!info.metadata.load(path, logger)) {
-		logger.error() << "failed to load item price metadata";
+		logger.error() << "failed to load item price metadata\n";
 		return std::nullopt;
 	}
 
 	if (!info.data.load_and_parse(info.metadata, path, logger)) {
-		logger.error() << "failed to load item price data";
+		logger.error() << "failed to load item price data\n";
 		return std::nullopt;
 	}
 
@@ -38,15 +38,15 @@ void save_api_data(
 	log::logger& logger)
 {
 	if (!metadata.save(data_save_dir, logger)) {
-		logger.error() << "failed to save item price metadata";
+		logger.error() << "failed to save item price metadata\n";
 		return;
 	}
 
 	if (!api_data.save(data_save_dir, logger)) {
-		logger.error() << "failed to save item price data";
+		logger.error() << "failed to save item price data\n";
 	}
 
-	logger.info() << "item price data successfully saved";
+	logger.info() << "item price data successfully saved\n";
 }
 
 bool generate_item_filter_impl(
@@ -81,16 +81,14 @@ void list_leagues(log::logger& logger)
 	const auto league_data = leagues_future.get();
 	const std::vector<lang::league> leagues = network::poe_watch::parse_league_info(league_data.leagues);
 
-	logger.begin_info_message();
-	logger.add("available leagues:\n");
+	auto stream = logger.info();
+	stream << "available leagues:\n";
 
 	// print leaue.name because that's the name that the API expects
 	// printing different name style would confuse users - these names are quered
 	// to be later to the API as league name
 	for (const lang::league& league : leagues)
-		logger << league.name << "\n";
-
-	logger.end_message();
+		stream << league.name << '\n';
 }
 
 std::optional<lang::item_price_info>
@@ -105,12 +103,12 @@ obtain_item_price_info(
 		|| (download_league_name_ninja && data_read_dir)
 		|| (download_league_name_ninja && download_league_name_watch))
 	{
-		logger.error() << "more than 1 data obtaining option specified";
+		logger.error() << "more than 1 data obtaining option specified\n";
 		return std::nullopt;
 	}
 
 	if (data_read_dir && data_save_dir) {
-		logger.error() << "reading and saving can not be specified at the same time";
+		logger.error() << "reading and saving can not be specified at the same time\n";
 		return std::nullopt;
 	}
 
@@ -155,17 +153,17 @@ bool generate_item_filter(
 	fs::log::logger& logger)
 {
 	if (!item_price_info) {
-		logger.error() << "no item price data, giving up on filter generation";
+		logger.error() << "no item price data, giving up on filter generation\n";
 		return false;
 	}
 
 	if (!input_path) {
-		logger.error() << "no input path given";
+		logger.error() << "no input path given\n";
 		return false;
 	}
 
 	if (!output_path) {
-		logger.error() << "no output path given";
+		logger.error() << "no output path given\n";
 		return false;
 	}
 
@@ -177,7 +175,7 @@ int compare_data_saves(
 	fs::log::logger& logger)
 {
 	if (paths.size() != 2u) {
-		logger.error() << "for comparing data saves exactly 2 paths should be given";
+		logger.error() << "for comparing data saves exactly 2 paths should be given\n";
 		return EXIT_FAILURE;
 	}
 

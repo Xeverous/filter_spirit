@@ -1,5 +1,4 @@
 #include <fs/network/poe_ninja/download_data.hpp>
-#include <fs/network/url_encode.hpp>
 #include <fs/network/async_download.hpp>
 #include <fs/log/logger.hpp>
 

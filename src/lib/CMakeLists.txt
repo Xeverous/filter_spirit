@@ -36,15 +36,11 @@ target_sources(filter_spirit
 		fs/lang/object.cpp
 		fs/lang/item_price_data.cpp
 		fs/lang/data_source_type.cpp
-		fs/log/buffered_logger.cpp
-		fs/log/console_logger.cpp
 		fs/log/logger.cpp
-		fs/log/utility.cpp
 		fs/utility/file.cpp
 		fs/utility/dump_json.cpp
 		fs/utility/string_helpers.cpp
 		fs/network/http.cpp
-		fs/network/url_encode.cpp
 		fs/network/poe_watch/download_data.cpp
 		fs/network/poe_watch/parse_data.cpp
 		fs/network/poe_watch/api_data.cpp
@@ -87,14 +83,11 @@ target_sources(filter_spirit
 		fs/lang/symbol_table.hpp
 		fs/lang/traits/is_lang_type.hpp
 		fs/lang/traits/promotions.hpp
-		fs/log/buffered_logger.hpp
+		fs/log/string_logger.hpp
 		fs/log/console_logger.hpp
 		fs/log/logger.hpp
-		fs/log/logger_fwd.hpp
 		fs/log/null_logger.hpp
-		fs/log/strings.hpp
 		fs/log/structure_printer.hpp
-		fs/log/utility.hpp
 		fs/network/async_download.hpp
 		fs/network/exceptions.hpp
 		fs/network/http.hpp
@@ -104,7 +97,6 @@ target_sources(filter_spirit
 		fs/network/poe_watch/api_data.hpp
 		fs/network/poe_watch/download_data.hpp
 		fs/network/poe_watch/parse_data.hpp
-		fs/network/url_encode.hpp
 		fs/parser/ast.hpp
 		fs/parser/ast_adapted.hpp
 		fs/parser/detail/config.hpp

@@ -169,17 +169,17 @@ int run(int argc, char* argv[])
 
 		if (opt_generate) {
 			if (!generate_item_filter(item_price_info, input_path, output_path, opt_print_ast, logger)) {
-				logger.info() << "filter generation failed";
+				logger.info() << "filter generation failed\n";
 				return EXIT_FAILURE;
 			}
 		}
 	}
 	catch (const std::exception& e) {
-		logger.error() << e.what();
+		logger.error() << e.what() << '\n';
 		return EXIT_FAILURE;
 	}
 	catch (...) {
-		logger.error() << "unknown error";
+		logger.error() << "unknown error\n" << fs::log::strings::request_bug_report;
 		return EXIT_FAILURE;
 	}
 

@@ -4,8 +4,8 @@
 
 #include <fs/compiler/print_error.hpp>
 #include <fs/compiler/resolve_symbols.hpp>
-#include <fs/log/buffered_logger.hpp>
-#include <fs/log/utility.hpp>
+#include <fs/log/string_logger.hpp>
+#include <fs/utility/string_helpers.hpp>
 
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
@@ -51,10 +51,9 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 		{
 			if (!std::holds_alternative<T>(error))
 			{
-				fs::log::buffered_logger logger;
+				fs::log::string_logger logger;
 				fs::compiler::print_error(error, lookup_data, logger);
-				const auto log_data = logger.flush_out();
-				BOOST_FAIL("got error of a different type than expected:\n" << log_data);
+				BOOST_FAIL("got error of a different type than expected:\n" << logger.str());
 			}
 
 			return std::get<T>(error);
@@ -127,7 +126,7 @@ xyz = 3
 
 			const char *const search_first = expected_place_of_original_name.data() + expected_place_of_original_name.size();
 			const char *const search_last  = input.data() + input.size();
-			const std::string_view expected_place_of_duplicated_name = search(fs::log::make_string_view(search_first, search_last), pattern);
+			const std::string_view expected_place_of_duplicated_name = search(fs::utility::make_string_view(search_first, search_last), pattern);
 			const std::string_view reported_place_of_duplicated_name = parse_data.lookup_data.position_of(error_desc.place_of_duplicated_name);
 			BOOST_TEST(compare_ranges(expected_place_of_duplicated_name, reported_place_of_duplicated_name, input));
 		}

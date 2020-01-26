@@ -35,28 +35,26 @@ std::optional<std::string> generate_filter_without_preamble(
 	options options,
 	log::logger& logger)
 {
-	logger.info() << "" << item_price_data; // TODO fix .info() etc so that it does not return rvalue
-	logger.info() << "parsing filter template";
+	logger.info() << "" << item_price_data; // add << "" to workaround calling <<(rvalue, item_price_data)
+	logger.info() << "parsing filter template\n";
 	std::variant<parser::parse_success_data, parser::parse_failure_data> parse_result = parser::parse(input);
 
-	if (std::holds_alternative<parser::parse_failure_data>(parse_result))
-	{
+	if (std::holds_alternative<parser::parse_failure_data>(parse_result)) {
 		parser::print_parse_errors(std::get<parser::parse_failure_data>(parse_result), logger);
 		return std::nullopt;
 	}
 
-	logger.info() << "parse successful";
+	logger.info() << "parse successful\n";
 	const auto& parse_data = std::get<parser::parse_success_data>(parse_result);
 
 	if (options.print_ast)
 		fs::log::structure_printer()(parse_data.ast);
 
-	logger.info() << "compiling filter template";
+	logger.info() << "compiling filter template\n";
 
 	std::variant<lang::symbol_table, compiler::compile_error> symbols_or_error =
 		compiler::resolve_symbols(parse_data.ast.definitions, item_price_data);
-	if (std::holds_alternative<compiler::compile_error>(symbols_or_error))
-	{
+	if (std::holds_alternative<compiler::compile_error>(symbols_or_error)) {
 		compiler::print_error(std::get<compiler::compile_error>(symbols_or_error), parse_data.lookup_data, logger);
 		return std::nullopt;
 	}
@@ -65,13 +63,12 @@ std::optional<std::string> generate_filter_without_preamble(
 	const std::variant<std::vector<lang::filter_block>, compiler::compile_error> filter_or_error =
 		compiler::build_filter_blocks(parse_data.ast.statements, map, item_price_data);
 
-	if (std::holds_alternative<compiler::compile_error>(filter_or_error))
-	{
+	if (std::holds_alternative<compiler::compile_error>(filter_or_error)) {
 		compiler::print_error(std::get<compiler::compile_error>(filter_or_error), parse_data.lookup_data, logger);
 		return std::nullopt;
 	}
 
-	logger.info() << "compilation successful";
+	logger.info() << "compilation successful\n";
 
 	const auto& blocks = std::get<std::vector<lang::filter_block>>(filter_or_error);
 	return assemble_blocks_to_raw_filter(blocks);

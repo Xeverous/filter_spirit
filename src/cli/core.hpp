@@ -1,6 +1,6 @@
 #pragma once
 
-#include <fs/log/logger_fwd.hpp>
+#include <fs/log/logger.hpp>
 #include <fs/lang/item_price_data.hpp>
 
 #include <boost/optional.hpp>

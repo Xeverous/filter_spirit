@@ -51,7 +51,7 @@ std::optional<std::string> load_file(const boost::filesystem::path& path, log::l
 	std::string file_contents = load_file(path, ec);
 
 	if (ec) {
-		logger.error() << "failed to load file " << path.generic_string() << ": " << ec.message();
+		logger.error() << "failed to load file " << path.generic_string() << ": " << ec.message() << '\n';
 		return std::nullopt;
 	}
 
@@ -75,7 +75,7 @@ std::error_code save_file(const boost::filesystem::path& path, std::string_view 
 bool save_file(const boost::filesystem::path& path, std::string_view file_contents, log::logger& logger)
 {
 	if (auto ec = save_file(path, file_contents); ec) {
-		logger.error() << "failed to save file " << path.generic_string() << ": " << ec.message();
+		logger.error() << "failed to save file " << path.generic_string() << ": " << ec.message() << '\n';
 		return false;
 	}
 

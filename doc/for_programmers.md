@@ -33,6 +33,7 @@ Because the core program logic is mostly a parser+compiler, a lot of code is ded
 - `boost::filesystem` - file I/O.
 - `boost::system` - error handling, used in filesystem and networking.
 - `boost::unit_test` - obvious. Boost Test library might be a huge overkill when Google Test is much simpler, but since FS already uses a ton of boost there is not much point in dragging more dependencies.
+- `boost::format` - string formatting.
 - `nlohmann::json` - JSON parser library. Might switch to `boost::json` once it gets official approval and is integrated into official boost repository.
 - OpenSSL - implementation of network cryptography. Dependency of ASIO.
 - Better Enum library - copied into utility directory. Offers a macro to define and automate some boilerplate to avoid shortcomings with C++ enums.

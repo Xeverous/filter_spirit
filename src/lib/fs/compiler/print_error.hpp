@@ -2,7 +2,7 @@
 
 #include <fs/parser/parser.hpp>
 #include <fs/compiler/error.hpp>
-#include <fs/log/logger_fwd.hpp>
+#include <fs/log/logger.hpp>
 
 namespace fs::compiler
 {
