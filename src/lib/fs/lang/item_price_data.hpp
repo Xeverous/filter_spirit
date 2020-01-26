@@ -1,6 +1,10 @@
 #pragma once
 
 #include <fs/log/logger_fwd.hpp>
+#include <fs/lang/data_source_type.hpp>
+
+#include <boost/filesystem/path.hpp>
+#include <boost/date_time/posix_time/posix_time_types.hpp>
 
 #include <vector>
 #include <string>
@@ -98,6 +102,15 @@ struct item_price_data
 		const std::string& directory_path,
 		log::logger& logger);
 
+	/**
+	 * @brief sort all non-unique item categories by name
+	 *
+	 * Purposes:
+	 * - faster searching of the given item (binary search)
+	 * - efficient comparison of 2 item_price_data instances
+	 */
+	void sort();
+
 	std::vector<divination_card> divination_cards;
 
 	std::vector<elementary_item> oils;
@@ -119,6 +132,34 @@ struct item_price_data
 	unique_item_price_data unique_maps;
 };
 
+
 log::logger_wrapper& operator<<(log::logger_wrapper& logger, const item_price_data& ipd);
 
+struct item_price_metadata
+{
+	[[nodiscard]] bool save(const boost::filesystem::path& directory, fs::log::logger& logger) const;
+	[[nodiscard]] bool load(const boost::filesystem::path& directory, fs::log::logger& logger);
+
+	std::string league_name;
+	data_source_type data_source;
+	boost::posix_time::ptime download_date;
+};
+
+log::logger_wrapper& operator<<(log::logger_wrapper& logger, const item_price_metadata& ipm);
+
+struct item_price_info
+{
+	item_price_data data;
+	item_price_metadata metadata;
+};
+
+/**
+ * Produce logs about differences in 2 item data sets
+ *
+ * both item data inputs must be sorted
+ */
+void compare_item_price_info(
+	const item_price_info& lhs,
+	const item_price_info& rhs,
+	log::logger& log);
 }

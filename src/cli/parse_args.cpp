@@ -4,7 +4,6 @@
 #include <fs/version.hpp>
 #include <fs/log/console_logger.hpp>
 #include <fs/lang/item_price_data.hpp>
-#include <fs/lang/item_price_metadata.hpp>
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/program_options.hpp>
@@ -58,16 +57,21 @@ int run(int argc, char* argv[])
 		boost::optional<std::string> data_read_dir;
 		po::options_description data_obtaining_options("data obtaining options (use 1)");
 		data_obtaining_options.add_options()
-			("download-watch,w", po::value(&download_league_name_watch), "download newest item price data from api.poe.watch for specified league")
-			("download-ninja,n", po::value(&download_league_name_ninja), "download newest item price data from poe.ninja/api for specified league")
-			("empty-data,e",     po::bool_switch(&opt_empty_data),       "run with no item price data (all price queries will have no results)")
-			("read,r", po::value(&data_read_dir), "read item price data (JSON files) from specified directory")
+			("download-watch,w", po::value(&download_league_name_watch)->value_name("LEAGUE"),
+				"download newest item price data from api.poe.watch for specified LEAGUE")
+			("download-ninja,n", po::value(&download_league_name_ninja)->value_name("LEAGUE"),
+				"download newest item price data from poe.ninja/api for specified LEAGUE")
+			("empty-data,e",     po::bool_switch(&opt_empty_data),
+				"run with no item price data (all price queries will have no results)")
+			("read,r", po::value(&data_read_dir)->value_name("DIRPATH"),
+				"read item price data (JSON files) from specified directory")
 		;
 
 		boost::optional<std::string> data_save_dir;
 		po::options_description data_storing_options("data storing options (use if you would like to save item price data for future use)");
 		data_storing_options.add_options()
-			("save,s", po::value(&data_save_dir), "save item price data (JSON files) to specified directory (requires download option)")
+			("save,s", po::value(&data_save_dir)->value_name("DIRPATH"),
+				"save item price data (JSON files) to specified directory (requires download option)")
 		;
 
 		bool opt_generate = false;
@@ -84,25 +88,34 @@ int run(int argc, char* argv[])
 		constexpr auto output_path_str = "output-path";
 		po::options_description positional_options("positional arguments required by -g (argument names not required)");
 		positional_options.add_options()
-			(input_path_str,  po::value(&input_path),  "file path to filter template source")
-			(output_path_str, po::value(&output_path), "file path where to generate the filter")
+			(input_path_str,  po::value(&input_path)->value_name("FILEPATH"),  "FILEPATH to filter template file")
+			(output_path_str, po::value(&output_path)->value_name("FILEPATH"), "FILEPATH where to generate the filter")
 		;
 
 		bool opt_list_leagues = false;
 		bool opt_help = false;
 		bool opt_version = false;
+		std::vector<std::string> compare_paths;
 		po::options_description generic_options("generic options (use 1)");
 		generic_options.add_options()
 			("list-leagues,l", po::bool_switch(&opt_list_leagues), "download and list leagues")
 			("help,h",         po::bool_switch(&opt_help),    "print this message")
 			("version,v",      po::bool_switch(&opt_version), "print version number")
+			("compare,c",      po::value(&compare_paths)->composing()->value_name("DIRPATH"),
+				"compare single-property items (cards, oils, scarabs, fossils, ...)"
+				"in 2 price data saves (this option needs to be used twice)")
 		;
 
 		po::positional_options_description positional_options_description;
 		positional_options_description.add(input_path_str, 1).add(output_path_str, 1);
 
 		po::options_description all_options;
-		all_options.add(data_obtaining_options).add(data_storing_options).add(generation_options).add(positional_options).add(generic_options);
+		all_options
+			.add(data_obtaining_options)
+			.add(data_storing_options)
+			.add(generation_options)
+			.add(positional_options)
+			.add(generic_options);
 
 		po::variables_map vm;
 		po::store(po::command_line_parser(argc, argv).options(all_options).positional(positional_options_description).run(), vm);
@@ -133,22 +146,29 @@ int run(int argc, char* argv[])
 			return EXIT_SUCCESS;
 		}
 
-		std::optional<item_data> data;
+		if (!compare_paths.empty()) {
+			return compare_data_saves(compare_paths, logger);
+		}
 
-		if (opt_empty_data) {
-			// user explicitly stated to use empty data, some find it useful to write SSF filters where price queries are not used
-			data = item_data();
-			item_data& d = *data;
-			d.item_price_metadata.data_source = fs::lang::data_source_type::none;
-			d.item_price_metadata.league_name = "(none)";
-			d.item_price_metadata.download_date = boost::posix_time::ptime(boost::posix_time::not_a_date_time);
-		}
-		else {
-			data = obtain_item_data(download_league_name_ninja, download_league_name_watch, data_read_dir, data_save_dir, logger);
-		}
+		const auto item_price_info = [&]() -> std::optional<fs::lang::item_price_info> {
+			if (opt_empty_data) {
+				// user explicitly stated to use empty data, some find it useful to write SSF filters where price queries are not used
+				fs::lang::item_price_info info;
+				info.metadata.data_source = fs::lang::data_source_type::none;
+				info.metadata.league_name = "(none)";
+				info.metadata.download_date = boost::posix_time::ptime(boost::posix_time::not_a_date_time);
+				return info;
+			}
+			else {
+				return obtain_item_price_info(
+					download_league_name_ninja,
+					download_league_name_watch,
+					data_read_dir, data_save_dir, logger);
+			}
+		}();
 
 		if (opt_generate) {
-			if (!generate_item_filter(data, input_path, output_path, opt_print_ast, logger)) {
+			if (!generate_item_filter(item_price_info, input_path, output_path, opt_print_ast, logger)) {
 				logger.info() << "filter generation failed";
 				return EXIT_FAILURE;
 			}

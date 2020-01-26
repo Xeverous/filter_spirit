@@ -35,15 +35,14 @@ target_sources(filter_spirit
 		fs/lang/filter_block.cpp
 		fs/lang/object.cpp
 		fs/lang/item_price_data.cpp
-		fs/lang/item_price_metadata.cpp
 		fs/lang/data_source_type.cpp
-		fs/lang/item_price_metadata.cpp
 		fs/log/buffered_logger.cpp
 		fs/log/console_logger.cpp
 		fs/log/logger.cpp
 		fs/log/utility.cpp
 		fs/utility/file.cpp
 		fs/utility/dump_json.cpp
+		fs/utility/string_helpers.cpp
 		fs/network/http.cpp
 		fs/network/url_encode.cpp
 		fs/network/poe_watch/download_data.cpp
@@ -78,7 +77,6 @@ target_sources(filter_spirit
 		fs/lang/functions.hpp
 		fs/lang/generation.hpp
 		fs/lang/item_price_data.hpp
-		fs/lang/item_price_metadata.hpp
 		fs/lang/keywords.hpp
 		fs/lang/league.hpp
 		fs/lang/object.hpp
@@ -125,6 +123,7 @@ target_sources(filter_spirit
 		fs/utility/type_name.hpp
 		fs/utility/type_traits.hpp
 		fs/utility/visitor.hpp
+		fs/utility/string_helpers.hpp
 		fs/version.hpp
 )
 

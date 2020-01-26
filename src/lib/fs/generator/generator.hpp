@@ -1,7 +1,7 @@
 #pragma once
 
 #include <fs/lang/filter_block.hpp>
-#include <fs/lang/item_price_metadata.hpp>
+#include <fs/lang/item_price_data.hpp>
 
 #include <string>
 #include <vector>

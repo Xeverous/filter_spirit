@@ -1,5 +1,7 @@
 #include <utility>
 #include <iterator>
+#include <algorithm>
+#include <tuple>
 
 namespace fs::utility
 {
@@ -121,6 +123,84 @@ std::pair<UnaryFunction, NullaryFunction> for_each_and_between(
 
 	unary_func(*first);
 	return std::make_pair(unary_func, nullary_func);
+}
+
+/**
+ * @brief report differences between 2 sorted ranges
+ *
+ * lhs_first, lhs_last - range 1 (must be sorted)
+ * rhs_first, rhs_last - range 2 (must be sorted)
+ *
+ * comp_eq - accepts (*lhs_it, *rhs_it), implements operator==
+ * comp_lt - accepts (*lhs_it, *rhs_it), implements operator<
+ *
+ * lhs_only_f - called with (*lhs) when it exists only in range 1
+ * rhs_only_f - called with (*rhs) when it exists only in range 2
+ *
+ * Example - for these ranges with default operators:
+ * {'a', 'b',           'd', 'e',      'g', 'h',      'j'}
+ * {'a', 'b', 'c', 'c', 'd',      'f', 'g',      'i'     }
+ * these will be called:
+ * rhs_only_f: c
+ * rhs_only_f: c
+ * lhs_only_f: e
+ * rhs_only_f: f
+ * lhs_only_f: h
+ * rhs_only_f: i
+ * lhs_only_f: j
+ */
+template <
+	typename InputIt1,
+	typename InputIt2,
+	typename BinaryPredicate1,
+	typename BinaryPredicate2,
+	typename UnaryFunction1,
+	typename UnaryFunction2
+>
+void diff_report(
+	InputIt1 lhs_first,
+	InputIt1 lhs_last,
+	InputIt2 rhs_first,
+	InputIt2 rhs_last,
+	BinaryPredicate1 comp_eq,
+	BinaryPredicate2 comp_lt,
+	UnaryFunction1 lhs_only_f,
+	UnaryFunction2 rhs_only_f)
+{
+	auto lhs_it = lhs_first;
+	auto rhs_it = rhs_first;
+
+	while (lhs_it != lhs_last || rhs_it != rhs_last) {
+		std::tie(lhs_it, rhs_it) = std::mismatch(lhs_it, lhs_last, rhs_it, rhs_last, comp_eq);
+
+		if (lhs_it == lhs_last) {
+			// no more items in lhs, all remaining items in rhs are unique
+			for (; rhs_it != rhs_last; ++rhs_it) {
+				rhs_only_f(*rhs_it);
+			}
+		}
+		else if (rhs_it == rhs_last) {
+			// no more items in rhs, all remaining items in lhs are unique
+			for (; lhs_it != lhs_last; ++lhs_it) {
+				lhs_only_f(*lhs_it);
+			}
+		}
+		// if control flow reaches here we are in the middle of both sequences
+		else if (comp_lt(*lhs_it, *rhs_it)) {
+			// lhs < rhs
+			while (lhs_it != lhs_last && comp_lt(*lhs_it, *rhs_it)) {
+				lhs_only_f(*lhs_it);
+				++lhs_it;
+			}
+		}
+		else {
+			// lhs > rhs
+			while (rhs_it != rhs_last && !comp_lt(*lhs_it, *rhs_it) && !comp_eq(*lhs_it, *rhs_it)) {
+				rhs_only_f(*rhs_it);
+				++rhs_it;
+			}
+		}
+	}
 }
 
 }

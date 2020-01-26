@@ -1,7 +1,6 @@
 #pragma once
 
 #include <fs/lang/item_price_data.hpp>
-#include <fs/lang/item_price_metadata.hpp>
 #include <fs/generator/options.hpp>
 #include <fs/log/logger_fwd.hpp>
 
@@ -15,7 +14,7 @@ namespace fs::generator
  * @brief end-to-end filter generation function
  *
  * @param input filter template source code
- * @param item_price_data item price data
+ * @param item_price_info item price data and metadata
  * @param options filter generation options
  * @param logger logger instance
  * @return filter file content or nothing if error occured
@@ -23,8 +22,7 @@ namespace fs::generator
 [[nodiscard]]
 std::optional<std::string> generate_filter(
 	std::string_view input,
-	const lang::item_price_data& item_price_data,
-	const lang::item_price_metadata& item_price_metadata,
+	const lang::item_price_info& item_price_info,
 	options options,
 	log::logger& logger);
 
