@@ -101,9 +101,8 @@ int run(int argc, char* argv[])
 			("list-leagues,l", po::bool_switch(&opt_list_leagues), "download and list leagues")
 			("help,h",         po::bool_switch(&opt_help),    "print this message")
 			("version,v",      po::bool_switch(&opt_version), "print version number")
-			("compare,c",      po::value(&compare_paths)->composing()->value_name("DIRPATH"),
-				"compare single-property items (cards, oils, scarabs, fossils, ...)"
-				"in 2 price data saves (this option needs to be used twice)")
+			("compare,c",      po::value(&compare_paths)->multitoken()->value_name("DIRPATH DIRPATH"),
+				"compare single-property items (cards, oils, scarabs, fossils, ...) in 2 price data saves")
 		;
 
 		po::positional_options_description positional_options_description;
