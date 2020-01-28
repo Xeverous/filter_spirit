@@ -1,5 +1,15 @@
 # Filter Spirit changelog
 
+## upcoming version
+
+- New small features:
+  - Option `-e` allows to run FS with no item price information. Useful for those who write filters without price quesries (eg. filters for SSF). If the filter contains price queries, with this option enabled no items will be returned by them.
+  - Option `-i` allows to display meta-information about given item price data save.
+  - Option `-c` allows to compare 2 item price data saves in regards to single-property items (that is, items for which only name matters).
+  - For option `-s`, FS will now create the deepest directory in the path if it does not exist.
+- FS no longer removes corrupted uniques from price data. They can now appear in results of price queries (and cause some ambiguities) but that's intended because in some rare circumstances they can actually drop (eg. a sextant mod or Corrupting Tempest).
+- Updated handling of multi-influenced items. They are still not queryable (see issues) but this change removes some unwanted logs. As of now, poe.ninja does not support dual-influenced bases.
+
 ## version 0.3.0 (11.12.2019)
 
 - Implemented new influence types for the Conquerors of the Atlas update. See documentation for examples.
