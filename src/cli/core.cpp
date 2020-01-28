@@ -70,7 +70,13 @@ bool generate_item_filter_impl(
 	if (!filter_content)
 		return false;
 
-	return utility::save_file(output_filepath, *filter_content, logger);
+	if (utility::save_file(output_filepath, *filter_content, logger)) {
+		logger.info() << "item filter successfully saved as " << output_filepath.generic_string() << '\n';
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 } // namespace

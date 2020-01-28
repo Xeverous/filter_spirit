@@ -404,6 +404,9 @@ constexpr auto field_download_date = "download_date";
 
 bool item_price_metadata::save(const boost::filesystem::path& directory, fs::log::logger& logger) const
 {
+	if (!utility::create_directory_if_not_exists(directory, logger))
+		return false;
+
 	nlohmann::json json = {
 		{field_league_name, league_name},
 		{field_data_source, to_string(data_source)},

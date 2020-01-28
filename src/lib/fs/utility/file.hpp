@@ -23,4 +23,7 @@ save_file(const boost::filesystem::path& path, std::string_view file_contents);
 [[nodiscard]] bool
 save_file(const boost::filesystem::path& path, std::string_view file_contents, log::logger& logger);
 
+[[nodiscard]] bool
+create_directory_if_not_exists(const boost::filesystem::path& dirpath, log::logger& logger);
+
 }
