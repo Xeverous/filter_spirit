@@ -27,6 +27,11 @@ generate_item_filter(
 	fs::log::logger& logger);
 
 [[nodiscard]] int // <= exit status
+print_data_save_info(
+	const std::string& path,
+	fs::log::logger& logger);
+
+[[nodiscard]] int // <= exit status
 compare_data_saves(
 	const std::vector<std::string>& paths,
 	fs::log::logger& logger);

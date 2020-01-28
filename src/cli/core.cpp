@@ -170,6 +170,20 @@ bool generate_item_filter(
 	return generate_item_filter_impl(*item_price_info, *input_path, *output_path, print_ast, logger);
 }
 
+int print_data_save_info(
+	const std::string& path,
+	fs::log::logger& logger)
+{
+	std::optional<lang::item_price_info> data = load_item_price_info(path, logger);
+	if (!data) {
+		return EXIT_FAILURE;
+	}
+
+	logger.info() << "" << *data;
+
+	return EXIT_SUCCESS;
+}
+
 int compare_data_saves(
 	const std::vector<std::string>& paths,
 	fs::log::logger& logger)

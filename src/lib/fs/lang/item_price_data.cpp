@@ -329,9 +329,9 @@ void unique_item_price_data::add_item(std::string base_type, elementary_item ite
 	unambiguous.emplace(std::move(base_type), std::move(item));
 }
 
-log::message_stream& operator<<(log::message_stream& logger, const item_price_data& ipd)
+log::message_stream& operator<<(log::message_stream& stream, const item_price_data& ipd)
 {
-	return logger << "item price data:\n"
+	return stream << "item price data:\n"
 		"\tdivination cards: " << ipd.divination_cards.size() << "\n"
 		"\toils            : " << ipd.oils.size() << "\n"
 		"\tincubators      : " << ipd.incubators.size() << "\n"
@@ -353,12 +353,17 @@ log::message_stream& operator<<(log::message_stream& logger, const item_price_da
 		"\tunique map (ambiguous)        : " << ipd.unique_maps.ambiguous.size() << "\n";
 }
 
-log::message_stream& operator<<(log::message_stream& logger, const item_price_metadata& ipm)
+log::message_stream& operator<<(log::message_stream& stream, const item_price_metadata& ipm)
 {
-	return logger <<
-		"item price data downloaded: " << utility::ptime_to_pretty_string(ipm.download_date) << "\n"
-		"item price data from      : " << std::string(lang::to_string(ipm.data_source)) << "\n"
-		"item price data for league: " << ipm.league_name << "\n";
+	return stream << "item price metadata:\n"
+		"\titem price data downloaded: " << utility::ptime_to_pretty_string(ipm.download_date) << "\n"
+		"\titem price data from      : " << std::string(lang::to_string(ipm.data_source)) << "\n"
+		"\titem price data for league: " << ipm.league_name << "\n";
+}
+
+log::message_stream& operator<<(log::message_stream& stream, const item_price_info& ipi)
+{
+	return stream << ipi.metadata << ipi.data;
 }
 
 void item_price_data::sort()

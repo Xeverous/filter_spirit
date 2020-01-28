@@ -133,7 +133,7 @@ struct item_price_data
 };
 
 
-log::message_stream& operator<<(log::message_stream& logger, const item_price_data& ipd);
+log::message_stream& operator<<(log::message_stream& stream, const item_price_data& ipd);
 
 struct item_price_metadata
 {
@@ -145,13 +145,15 @@ struct item_price_metadata
 	boost::posix_time::ptime download_date;
 };
 
-log::message_stream& operator<<(log::message_stream& logger, const item_price_metadata& ipm);
+log::message_stream& operator<<(log::message_stream& stream, const item_price_metadata& ipm);
 
 struct item_price_info
 {
 	item_price_data data;
 	item_price_metadata metadata;
 };
+
+log::message_stream& operator<<(log::message_stream& stream, const item_price_info& ipi);
 
 /**
  * Produce logs about differences in 2 item data sets

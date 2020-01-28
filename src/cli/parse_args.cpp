@@ -95,12 +95,14 @@ int run(int argc, char* argv[])
 		bool opt_list_leagues = false;
 		bool opt_help = false;
 		bool opt_version = false;
+		boost::optional<std::string> info_path;
 		std::vector<std::string> compare_paths;
 		po::options_description generic_options("generic options (use 1)");
 		generic_options.add_options()
 			("list-leagues,l", po::bool_switch(&opt_list_leagues), "download and list leagues")
 			("help,h",         po::bool_switch(&opt_help),    "print this message")
 			("version,v",      po::bool_switch(&opt_version), "print version number")
+			("info,i",         po::value(&info_path)->value_name("DIRPATH"), "show information about given item price data save")
 			("compare,c",      po::value(&compare_paths)->multitoken()->value_name("DIRPATH DIRPATH"),
 				"compare single-property items (cards, oils, scarabs, fossils, ...) in 2 price data saves")
 		;
@@ -143,6 +145,10 @@ int run(int argc, char* argv[])
 		if (opt_list_leagues) {
 			list_leagues(logger);
 			return EXIT_SUCCESS;
+		}
+
+		if (info_path) {
+			return print_data_save_info(*info_path, logger);
 		}
 
 		if (!compare_paths.empty()) {
