@@ -1,6 +1,6 @@
 # Filter Spirit changelog
 
-## upcoming version
+## version 0.4.0 (29.01.2020)
 
 - New small features:
   - Option `-e` allows to run FS with no item price information. Useful for those who write filters without price quesries (eg. filters for SSF). If the filter contains price queries, with this option enabled no items will be returned by them.
