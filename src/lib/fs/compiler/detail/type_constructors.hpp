@@ -34,14 +34,13 @@ struct type_constructor<lang::socket_group>
 	std::variant<lang::socket_group, compile_error> call(
 		lang::position_tag origin,
 		std::array<lang::position_tag, 1> argument_origins,
-		const lang::string& string)
+		const std::string& string)
 	{
-		if (string.value.empty())
+		if (string.empty())
 			return errors::empty_socket_group{argument_origins[0]};
 
 		lang::socket_group sg;
-		for (char c : string.value)
-		{
+		for (char c : string) {
 			if (c == 'R')
 				++sg.r;
 			else if (c == 'G')
@@ -59,6 +58,15 @@ struct type_constructor<lang::socket_group>
 			return errors::invalid_socket_group{origin};
 
 		return sg;
+	}
+
+	[[nodiscard]] static
+	std::variant<lang::socket_group, compile_error> call(
+		lang::position_tag origin,
+		std::array<lang::position_tag, 1> argument_origins,
+		const lang::string& string)
+	{
+		return call(origin, argument_origins, string.value);
 	}
 };
 

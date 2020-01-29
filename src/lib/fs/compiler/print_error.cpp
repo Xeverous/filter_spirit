@@ -288,6 +288,23 @@ void print_error_impl(
 }
 
 void print_error_impl(
+	errors::action_redefinition error,
+	const parser::lookup_data& lookup_data,
+	log::message_stream& stream)
+{
+	stream.print_line_number_with_description_and_underlined_code(
+		lookup_data.get_view_of_whole_content(),
+		lookup_data.position_of(error.place_of_redefinition),
+		log::strings::error,
+		"action redefinition (the same action can not be specified again in the same block)");
+	stream.print_line_number_with_description_and_underlined_code(
+		lookup_data.get_view_of_whole_content(),
+		lookup_data.position_of(error.place_of_original_definition),
+		log::strings::note,
+		"first defined here");
+}
+
+void print_error_impl(
 	errors::lower_bound_redefinition error,
 	const parser::lookup_data& lookup_data,
 	log::message_stream& stream)
@@ -322,67 +339,41 @@ void print_error_impl(
 }
 
 void print_error_impl(
-	errors::internal_compiler_error_during_action_evaluation error,
+	errors::internal_compiler_error error,
 	const parser::lookup_data& lookup_data,
 	log::message_stream& stream)
 {
-	stream.print_line_number_with_description_and_underlined_code(
-		lookup_data.get_view_of_whole_content(),
-		lookup_data.position_of(error.place_of_action),
-		log::strings::internal_compiler_error,
-		"unhandled case in action evaluation\n",
-		log::strings::request_bug_report);
-}
+	const auto error_str = [&]() {
+		switch (error.cause) {
+			using error_cause = errors::internal_compiler_error_cause;
 
-void print_error_impl(
-	errors::internal_compiler_error_during_range_evaluation error,
-	const parser::lookup_data& lookup_data,
-	log::message_stream& stream)
-{
-	stream.print_line_number_with_description_and_underlined_code(
-		lookup_data.get_view_of_whole_content(),
-		lookup_data.position_of(error.place_of_comparison_condition),
-		log::strings::internal_compiler_error,
-		"unhandled case in range evaluation\n",
-		log::strings::request_bug_report);
-}
+			case error_cause::add_boolean_condition:
+				return "add_boolean_condition";
+			case error_cause::add_range_condition:
+				return "add_range_condition";
+			case error_cause::real_filter_add_numeric_condition:
+				return "real_filter_add_numeric_condition";
+			case error_cause::real_filter_add_string_array_condition:
+				return "real_filter_add_string_array_condition";
+			case error_cause::real_filter_add_color_action:
+				return "real_filter_add_color_action";
+			case error_cause::spirit_filter_add_array_condition:
+				return "spirit_filter_add_array_condition";
+			case error_cause::spirit_filter_add_comparison_condition:
+				return "spirit_filter_add_comparison_condition";
+			case error_cause::spirit_filter_add_unary_action:
+				return "spirit_filter_add_unary_action";
+			default:
+				return "(unknown)";
+		}
+	}();
 
-void print_error_impl(
-	errors::internal_compiler_error_during_comparison_condition_evaluation error,
-	const parser::lookup_data& lookup_data,
-	log::message_stream& stream)
-{
 	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
-		lookup_data.position_of(error.place_of_comparison_condition),
+		lookup_data.position_of(error.origin),
 		log::strings::internal_compiler_error,
-		"unhandled case in comparison condition evaluation\n",
-		log::strings::request_bug_report);
-}
-
-void print_error_impl(
-	errors::internal_compiler_error_during_string_condition_evaluation error,
-	const parser::lookup_data& lookup_data,
-	log::message_stream& stream)
-{
-	stream.print_line_number_with_description_and_underlined_code(
-		lookup_data.get_view_of_whole_content(),
-		lookup_data.position_of(error.place_of_string_condition),
-		log::strings::internal_compiler_error,
-		"unhandled case in string condition evaluation\n",
-		log::strings::request_bug_report);
-}
-
-void print_error_impl(
-	errors::internal_compiler_error_during_boolean_condition_evaluation error,
-	const parser::lookup_data& lookup_data,
-	log::message_stream& stream)
-{
-	stream.print_line_number_with_description_and_underlined_code(
-		lookup_data.get_view_of_whole_content(),
-		lookup_data.position_of(error.place_of_boolean_condition),
-		log::strings::internal_compiler_error,
-		"unhandled case in boolean condition evaluation\n",
+		error_str,
+		"\n",
 		log::strings::request_bug_report);
 }
 

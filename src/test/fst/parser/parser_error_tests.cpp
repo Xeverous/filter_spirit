@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_SUITE(parser_suite)
 		{
 			const std::string input_str = minimal_input() + str;
 			const std::string_view input = input_str;
-			std::variant<parser::parse_success_data, parser::parse_failure_data> parse_result = parser::parse(input);
+			std::variant<parser::sf::parse_success_data, parser::parse_failure_data> parse_result = parser::sf::parse(input);
 			BOOST_TEST_REQUIRE(std::holds_alternative<parser::parse_failure_data>(parse_result));
 			const auto& parse_data = std::get<parser::parse_failure_data>(parse_result);
 			BOOST_TEST(!parse_data.errors.empty());

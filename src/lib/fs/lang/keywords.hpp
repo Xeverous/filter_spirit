@@ -1,5 +1,4 @@
 #pragma once
-#include <fs/lang/generation.hpp>
 
 /*
  * some of these constants would seem to be very trivial but:
@@ -15,104 +14,109 @@
 namespace fs::lang::keywords
 {
 
-constexpr auto level        = "Level";
-constexpr auto font_size    = "FontSize";
-constexpr auto sound_id     = "SoundId";
-constexpr auto volume       = "Volume";
-constexpr auto group        = "Group";
-constexpr auto minimap_icon = "MinimapIcon";
-constexpr auto beam_effect  = "Beam";
-constexpr auto path         = "Path";
-constexpr auto alert_sound  = "AlertSound";
+// keywords used in real filters and potentially used in spirit filter templates
+namespace rf
+{
+	// visibility
+	constexpr auto show = "Show";
+	constexpr auto hide = "Hide";
 
-constexpr auto show = generation::show;
-constexpr auto hide = generation::hide;
+	// conditions
+	constexpr auto item_level       = "ItemLevel";
+	constexpr auto drop_level       = "DropLevel";
+	constexpr auto quality          = "Quality";
+	constexpr auto rarity           = "Rarity";
+	constexpr auto class_           = "Class";
+	constexpr auto base_type        = "BaseType";
+	constexpr auto sockets          = "Sockets";
+	constexpr auto linked_sockets   = "LinkedSockets";
+	constexpr auto socket_group     = "SocketGroup";
+	constexpr auto height           = "Height";
+	constexpr auto width            = "Width";
+	constexpr auto has_explicit_mod = "HasExplicitMod";
+	constexpr auto has_enchantment  = "HasEnchantment";
+	constexpr auto prophecy         = "Prophecy";
+	constexpr auto has_influence    = "HasInfluence";
+	constexpr auto stack_size       = "StackSize";
+	constexpr auto gem_level        = "GemLevel";
+	constexpr auto identified       = "Identified";
+	constexpr auto corrupted        = "Corrupted";
+	constexpr auto elder_item       = "ElderItem";
+	constexpr auto shaper_item      = "ShaperItem";
+	constexpr auto fractured_item   = "FracturedItem";
+	constexpr auto synthesised_item = "SynthesisedItem";
+	constexpr auto any_enchantment  = "AnyEnchantment";
+	constexpr auto shaped_map       = "ShapedMap";
+	constexpr auto elder_map        = "ElderMap";
+	constexpr auto blighted_map     = "BlightedMap";
+	constexpr auto map_tier         = "MapTier";
 
-// ---- whitespace ----
+	constexpr auto r = 'R';
+	constexpr auto g = 'G';
+	constexpr auto b = 'B';
+	constexpr auto w = 'W';
 
-// (obviously no keywords for whitespace)
+	constexpr auto normal = "Normal";
+	constexpr auto magic  = "Magic";
+	constexpr auto rare   = "Rare";
+	constexpr auto unique = "Unique";
 
-// ---- fundamental tokens ----
+	constexpr auto true_   = "True";
+	constexpr auto false_  = "False";
 
-// (tokens only, no keywords here)
+	// actions
+	constexpr auto set_border_color            = "SetBorderColor";
+	constexpr auto set_text_color              = "SetTextColor";
+	constexpr auto set_background_color        = "SetBackgroundColor";
+	constexpr auto set_font_size               = "SetFontSize";
+	constexpr auto play_alert_sound            = "PlayAlertSound";
+	constexpr auto play_alert_sound_positional = "PlayAlertSoundPositional";
+	constexpr auto disable_drop_sound          = "DisableDropSound";
+	constexpr auto custom_alert_sound          = "CustomAlertSound";
+	constexpr auto minimap_icon                = "MinimapIcon";
+	constexpr auto play_effect                 = "PlayEffect";
 
-// ---- literal types ----
+	constexpr auto red    = "Red";
+	constexpr auto green  = "Green";
+	constexpr auto blue   = "Blue";
+	constexpr auto white  = "White";
+	constexpr auto brown  = "Brown";
+	constexpr auto yellow = "Yellow";
 
-constexpr auto true_       = generation::true_;
-constexpr auto false_      = generation::false_;
+	constexpr auto circle   = "Circle";
+	constexpr auto diamond  = "Diamond";
+	constexpr auto hexagon  = "Hexagon";
+	constexpr auto square   = "Square";
+	constexpr auto star     = "Star";
+	constexpr auto triangle = "Triangle";
 
-constexpr auto normal      = generation::normal;
-constexpr auto magic       = generation::magic;
-constexpr auto rare        = generation::rare;
-constexpr auto unique      = generation::unique;
+	constexpr auto shaper      = "Shaper";
+	constexpr auto elder       = "Elder";
+	constexpr auto crusader    = "Crusader";
+	constexpr auto redeemer    = "Redeemer";
+	constexpr auto hunter      = "Hunter";
+	constexpr auto warlord     = "Warlord";
 
-constexpr auto circle      = generation::circle;
-constexpr auto diamond     = generation::diamond;
-constexpr auto hexagon     = generation::hexagon;
-constexpr auto square      = generation::square;
-constexpr auto star        = generation::star;
-constexpr auto triangle    = generation::triangle;
+	constexpr auto temp = "Temp";
+} // namespace rf
 
-constexpr auto red         = generation::red;
-constexpr auto green       = generation::green;
-constexpr auto blue        = generation::blue;
-constexpr auto white       = generation::white;
-constexpr auto brown       = generation::brown;
-constexpr auto yellow      = generation::yellow;
+// keywords used in spirit filters
+namespace sf
+{
+	constexpr auto level        = "Level";
+	constexpr auto font_size    = "FontSize";
+	constexpr auto sound_id     = "SoundId";
+	constexpr auto volume       = "Volume";
+	constexpr auto group        = "Group";
+	constexpr auto minimap_icon = "MinimapIcon";
+	constexpr auto beam_effect  = "Beam";
+	constexpr auto path         = "Path";
+	constexpr auto alert_sound  = "AlertSound";
 
-constexpr auto shaper      = generation::shaper;
-constexpr auto elder       = generation::elder;
-constexpr auto crusader    = generation::crusader;
-constexpr auto redeemer    = generation::redeemer;
-constexpr auto hunter      = generation::hunter;
-constexpr auto warlord     = generation::warlord;
-
-// ---- expressions ----
-
-// (nothing)
-
-// ---- definitions ----
-
-// (nothing)
-
-// ---- rules ----
-
-constexpr auto item_level       = generation::item_level;
-constexpr auto drop_level       = generation::drop_level;
-constexpr auto quality          = generation::quality;
-constexpr auto rarity           = generation::rarity;
-constexpr auto class_           = generation::class_;
-constexpr auto base_type        = generation::base_type;
-constexpr auto sockets          = generation::sockets;
-constexpr auto linked_sockets   = generation::linked_sockets;
-constexpr auto socket_group     = generation::socket_group;
-constexpr auto height           = generation::height;
-constexpr auto width            = generation::width;
-constexpr auto has_explicit_mod = generation::has_explicit_mod;
-constexpr auto has_enchantment  = generation::has_enchantment;
-constexpr auto prophecy         = generation::prophecy;
-constexpr auto has_influence    = generation::has_influence;
-constexpr auto stack_size       = generation::stack_size;
-constexpr auto gem_level        = generation::gem_level;
-constexpr auto identified       = generation::identified;
-constexpr auto corrupted        = generation::corrupted;
-constexpr auto elder_item       = generation::elder_item;
-constexpr auto shaper_item      = generation::shaper_item;
-constexpr auto fractured_item   = generation::fractured_item;
-constexpr auto synthesised_item = generation::synthesised_item;
-constexpr auto any_enchantment  = generation::any_enchantment;
-constexpr auto shaped_map       = generation::shaped_map;
-constexpr auto elder_map        = generation::elder_map;
-constexpr auto blighted_map     = generation::blighted_map;
-constexpr auto map_tier         = generation::map_tier;
-
-constexpr auto set_border_color           = generation::set_border_color;
-constexpr auto set_text_color             = generation::set_text_color;
-constexpr auto set_background_color       = generation::set_background_color;
-constexpr auto set_font_size              = generation::set_font_size;
-constexpr auto set_alert_sound            = "SetAlertSound";
-constexpr auto play_default_drop_sound    = "PlayDefaultDropSound";
-constexpr auto set_minimap_icon           = "SetMinimapIcon";
-constexpr auto set_beam                   = "SetBeam";
+	constexpr auto set_alert_sound            = "SetAlertSound";
+	constexpr auto play_default_drop_sound    = "PlayDefaultDropSound";
+	constexpr auto set_minimap_icon           = "SetMinimapIcon";
+	constexpr auto set_beam                   = "SetBeam";
+} // namespace sf
 
 }

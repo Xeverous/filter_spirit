@@ -3,7 +3,7 @@
 #include <fst/common/string_operations.hpp>
 
 #include <fs/compiler/print_error.hpp>
-#include <fs/compiler/resolve_symbols.hpp>
+#include <fs/compiler/compiler.hpp>
 #include <fs/log/string_logger.hpp>
 #include <fs/utility/string_helpers.hpp>
 
@@ -25,7 +25,7 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 
 	BOOST_AUTO_TEST_CASE(minimal_input_resolve_constants)
 	{
-		const fs::parser::parse_success_data parse_data = parse(minimal_input());
+		const fs::parser::sf::parse_success_data parse_data = parse(minimal_input());
 		const std::variant<fs::lang::symbol_table, fs::compiler::compile_error> symbols_or_error =
 			resolve_symbols(parse_data.ast.definitions);
 		BOOST_TEST_REQUIRE(std::holds_alternative<fs::lang::symbol_table>(symbols_or_error));
@@ -60,7 +60,7 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 		}
 
 		fs::compiler::compile_error expect_error_when_resolving_symbols(
-			const std::vector<fs::parser::ast::definition>& defs)
+			const std::vector<fs::parser::ast::sf::definition>& defs)
 		{
 			std::variant<fs::lang::symbol_table, fs::compiler::compile_error> symbols_or_error =
 				resolve_symbols(defs);
@@ -115,7 +115,7 @@ some_other_var = 2
 xyz = 3
 )";
 			const std::string_view input = input_str;
-			const fs::parser::parse_success_data parse_data = parse(input);
+			const fs::parser::sf::parse_success_data parse_data = parse(input);
 			const fs::compiler::compile_error error = expect_error_when_resolving_symbols(parse_data.ast.definitions);
 			const auto& error_desc = expect_error_of_type<errors::name_already_exists>(error, parse_data.lookup_data);
 
@@ -138,7 +138,7 @@ abc = 0
 xyz = non_existent_obj
 )";
 			const std::string_view input = input_str;
-			const fs::parser::parse_success_data parse_data = parse(input);
+			const fs::parser::sf::parse_success_data parse_data = parse(input);
 			const fs::compiler::compile_error error = expect_error_when_resolving_symbols(parse_data.ast.definitions);
 			const auto& error_desc = expect_error_of_type<errors::no_such_name>(error, parse_data.lookup_data);
 
@@ -153,7 +153,7 @@ xyz = non_existent_obj
 abc = non_existent_func(0)
 )";
 			const std::string_view input = input_str;
-			const fs::parser::parse_success_data parse_data = parse(input);
+			const fs::parser::sf::parse_success_data parse_data = parse(input);
 			const fs::compiler::compile_error error = expect_error_when_resolving_symbols(parse_data.ast.definitions);
 			const auto& error_desc = expect_error_of_type<errors::no_such_function>(error, parse_data.lookup_data);
 
@@ -170,7 +170,7 @@ arr = [1, 2, 3]
 elem = arr[x]
 )";
 			const std::string_view input = input_str;
-			const fs::parser::parse_success_data parse_data = parse(input);
+			const fs::parser::sf::parse_success_data parse_data = parse(input);
 			const fs::compiler::compile_error error = expect_error_when_resolving_symbols(parse_data.ast.definitions);
 			const auto& error_desc = expect_error_of_type<errors::index_out_of_range>(error, parse_data.lookup_data);
 
@@ -188,7 +188,7 @@ elem = arr[x]
 path = Path(11, 22)
 )";
 			const std::string_view input = input_str;
-			const fs::parser::parse_success_data parse_data = parse(input);
+			const fs::parser::sf::parse_success_data parse_data = parse(input);
 			const fs::compiler::compile_error error = expect_error_when_resolving_symbols(parse_data.ast.definitions);
 			const auto& error_desc = expect_error_of_type<errors::failed_constructor_call>(error, parse_data.lookup_data);
 
@@ -216,7 +216,7 @@ path = Path(11, 22)
 path = Path(123)
 )";
 			const std::string_view input = input_str;
-			const fs::parser::parse_success_data parse_data = parse(input);
+			const fs::parser::sf::parse_success_data parse_data = parse(input);
 			const fs::compiler::compile_error error = expect_error_when_resolving_symbols(parse_data.ast.definitions);
 			const auto& error_desc = expect_error_of_type<errors::failed_constructor_call>(error, parse_data.lookup_data);
 
@@ -244,7 +244,7 @@ path = Path(123)
 group = Group("")
 )";
 			const std::string_view input = input_str;
-			const fs::parser::parse_success_data parse_data = parse(input);
+			const fs::parser::sf::parse_success_data parse_data = parse(input);
 			const fs::compiler::compile_error error = expect_error_when_resolving_symbols(parse_data.ast.definitions);
 			const auto& error_desc = expect_error_of_type<errors::failed_constructor_call>(error, parse_data.lookup_data);
 
@@ -270,7 +270,7 @@ group = Group("")
 group = Group("GBAC")
 )";
 			const std::string_view input = input_str;
-			const fs::parser::parse_success_data parse_data = parse(input);
+			const fs::parser::sf::parse_success_data parse_data = parse(input);
 			const fs::compiler::compile_error error = expect_error_when_resolving_symbols(parse_data.ast.definitions);
 			const auto& error_desc = expect_error_of_type<errors::failed_constructor_call>(error, parse_data.lookup_data);
 
@@ -296,7 +296,7 @@ group = Group("GBAC")
 group = Group("RRRRRRR") # 7 characters
 )";
 			const std::string_view input = input_str;
-			const fs::parser::parse_success_data parse_data = parse(input);
+			const fs::parser::sf::parse_success_data parse_data = parse(input);
 			const fs::compiler::compile_error error = expect_error_when_resolving_symbols(parse_data.ast.definitions);
 			const auto& error_desc = expect_error_of_type<errors::failed_constructor_call>(error, parse_data.lookup_data);
 
@@ -322,7 +322,7 @@ group = Group("RRRRRRR") # 7 characters
 icon = MinimapIcon(1234, Green, Circle) # size must be in range [0, 2]
 )";
 			const std::string_view input = input_str;
-			const fs::parser::parse_success_data parse_data = parse(input);
+			const fs::parser::sf::parse_success_data parse_data = parse(input);
 			const fs::compiler::compile_error error = expect_error_when_resolving_symbols(parse_data.ast.definitions);
 			const auto& error_desc = expect_error_of_type<errors::failed_constructor_call>(error, parse_data.lookup_data);
 

@@ -3,7 +3,6 @@
 #include <fs/lang/object.hpp>
 #include <fs/lang/position_tag.hpp>
 
-#include <memory>
 #include <optional>
 #include <vector>
 
@@ -106,14 +105,19 @@ struct socket_group_condition
 
 struct strings_condition
 {
-	std::shared_ptr<std::vector<std::string>> strings;
+	std::vector<std::string> strings;
 	bool exact_match_required;
 	position_tag origin;
 };
 
 struct influences_condition
 {
-	std::shared_ptr<std::vector<influence>> influences;
+	bool shaper;
+	bool elder;
+	bool crusader;
+	bool redeemer;
+	bool hunter;
+	bool warlord;
 	bool exact_match_required;
 	position_tag origin;
 };
@@ -137,17 +141,17 @@ struct condition_set
 	numeric_range_condition drop_level;
 	numeric_range_condition quality;
 	rarity_range_condition rarity;
-	strings_condition class_;
-	strings_condition base_type;
+	std::optional<strings_condition> class_;
+	std::optional<strings_condition> base_type;
 	numeric_range_condition sockets;
 	numeric_range_condition links;
 	std::optional<socket_group_condition> socket_group;
 	numeric_range_condition height;
 	numeric_range_condition width;
-	strings_condition has_explicit_mod;
-	strings_condition has_enchantment;
-	strings_condition prophecy;
-	influences_condition has_influence;
+	std::optional<strings_condition> has_explicit_mod;
+	std::optional<strings_condition> has_enchantment;
+	std::optional<strings_condition> prophecy;
+	std::optional<influences_condition> has_influence;
 	numeric_range_condition stack_size;
 	numeric_range_condition gem_level;
 	numeric_range_condition map_tier;

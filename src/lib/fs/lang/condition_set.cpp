@@ -1,5 +1,5 @@
 #include <fs/lang/condition_set.hpp>
-#include <fs/lang/generation.hpp>
+#include <fs/lang/keywords.hpp>
 
 #include <cassert>
 
@@ -7,24 +7,22 @@ namespace
 {
 
 using namespace fs;
+namespace kw = lang::keywords::rf;
 
 std::ostream& operator<<(std::ostream& os, lang::rarity r)
 {
-	namespace lg = lang::generation;
-
-	switch (r)
-	{
+	switch (r) {
 		case lang::rarity::normal:
-			os << lg::normal;
+			os << kw::normal;
 			break;
 		case lang::rarity::magic:
-			os << lg::magic;
+			os << kw::magic;
 			break;
 		case lang::rarity::rare:
-			os << lg::rare;
+			os << kw::rare;
 			break;
 		case lang::rarity::unique:
-			os << lg::unique;
+			os << kw::unique;
 			break;
 		default:
 			break;
@@ -88,78 +86,68 @@ void output_socket_group_condition(
 			output_stream << letter;
 	};
 
-	namespace lg = lang::generation;
 	const lang::socket_group& sg = (*cond).group;
 	assert(sg.is_valid());
 
-	output_stream << '\t' << lg::socket_group << ' ';
-	output_letter(lg::r, sg.r);
-	output_letter(lg::g, sg.g);
-	output_letter(lg::b, sg.b);
-	output_letter(lg::w, sg.w);
+	output_stream << '\t' << kw::socket_group << ' ';
+	output_letter(kw::r, sg.r);
+	output_letter(kw::g, sg.g);
+	output_letter(kw::b, sg.b);
+	output_letter(kw::w, sg.w);
 	output_stream << '\n';
 }
 
 void output_strings_condition(
-	const lang::strings_condition& cond,
+	const std::optional<lang::strings_condition>& condition,
 	const char* name,
 	std::ostream& output_stream)
 {
-	if (cond.strings == nullptr)
+	if (!condition.has_value())
 		return;
 
 	output_stream << '\t' << name;
 
+	auto& cond = *condition;
 	if (cond.exact_match_required)
 		output_stream << " ==";
 
-	for (const std::string& str : *cond.strings)
+	for (const std::string& str : cond.strings)
 		output_stream << " \"" << str << '"';
 
 	output_stream << '\n';
 }
 
 void output_influences_condition(
-	const lang::influences_condition& cond,
+	const std::optional<lang::influences_condition>& condition,
 	const char* name,
 	std::ostream& output_stream)
 {
-	if (cond.influences == nullptr)
+	if (!condition.has_value())
 		return;
 
 	output_stream << '\t' << name;
 
+	auto& cond = *condition;
 	if (cond.exact_match_required)
 		output_stream << " ==";
 
-	for (lang::influence infl : *cond.influences) {
-		output_stream << ' ';
+	if (cond.shaper)
+		output_stream << ' ' << kw::shaper;
 
-		namespace lg = lang::generation;
+	if (cond.elder)
+		output_stream << ' ' << kw::elder;
 
-		switch (infl) {
-			case lang::influence::shaper:
-				output_stream << lg::shaper;
-				break;
-			case lang::influence::elder:
-				output_stream << lg::elder;
-				break;
-			case lang::influence::crusader:
-				output_stream << lg::crusader;
-				break;
-			case lang::influence::redeemer:
-				output_stream << lg::redeemer;
-				break;
-			case lang::influence::hunter:
-				output_stream << lg::hunter;
-				break;
-			case lang::influence::warlord:
-				output_stream << lg::warlord;
-				break;
-			default:
-				break;
-		}
-	}
+	if (cond.crusader)
+		output_stream << ' ' << kw::crusader;
+
+	if (cond.redeemer)
+		output_stream << ' ' << kw::redeemer;
+
+	if (cond.hunter)
+		output_stream << ' ' << kw::hunter;
+
+	if (cond.warlord)
+		output_stream << ' ' << kw::warlord;
 
 	output_stream << '\n';
 }
@@ -176,9 +164,9 @@ void output_boolean_condition(
 
 	const lang::boolean_condition& bc = *cond;
 	if (bc.value.value)
-		output_stream << lang::generation::true_;
+		output_stream << kw::true_;
 	else
-		output_stream << lang::generation::false_;
+		output_stream << kw::false_;
 
 	output_stream << '\n';
 }
@@ -190,63 +178,70 @@ namespace fs::lang
 
 void condition_set::generate(std::ostream& output_stream) const
 {
-	namespace lg = lang::generation;
-	output_range_condition(item_level, lg::item_level,     output_stream);
-	output_range_condition(drop_level, lg::drop_level,     output_stream);
-	output_range_condition(quality,    lg::quality,        output_stream);
-	output_range_condition(rarity,     lg::rarity,         output_stream);
-	output_range_condition(sockets,    lg::sockets,        output_stream);
-	output_range_condition(links,      lg::linked_sockets, output_stream);
-	output_range_condition(height,     lg::height,         output_stream);
-	output_range_condition(width,      lg::width,          output_stream);
-	output_range_condition(stack_size, lg::stack_size,     output_stream);
-	output_range_condition(gem_level,  lg::gem_level,      output_stream);
-	output_range_condition(map_tier,   lg::map_tier,       output_stream);
+	output_range_condition(item_level, kw::item_level,     output_stream);
+	output_range_condition(drop_level, kw::drop_level,     output_stream);
+	output_range_condition(quality,    kw::quality,        output_stream);
+	output_range_condition(rarity,     kw::rarity,         output_stream);
+	output_range_condition(sockets,    kw::sockets,        output_stream);
+	output_range_condition(links,      kw::linked_sockets, output_stream);
+	output_range_condition(height,     kw::height,         output_stream);
+	output_range_condition(width,      kw::width,          output_stream);
+	output_range_condition(stack_size, kw::stack_size,     output_stream);
+	output_range_condition(gem_level,  kw::gem_level,      output_stream);
+	output_range_condition(map_tier,   kw::map_tier,       output_stream);
 
 	output_socket_group_condition(socket_group, output_stream);
 
-	output_boolean_condition(is_identified,       lg::identified,       output_stream);
-	output_boolean_condition(is_corrupted,        lg::corrupted,        output_stream);
-	output_boolean_condition(is_elder_item,       lg::elder_item,       output_stream);
-	output_boolean_condition(is_shaper_item,      lg::shaper_item,      output_stream);
-	output_boolean_condition(is_fractured_item,   lg::fractured_item,   output_stream);
-	output_boolean_condition(is_synthesised_item, lg::synthesised_item, output_stream);
-	output_boolean_condition(is_enchanted,        lg::any_enchantment,  output_stream);
-	output_boolean_condition(is_shaped_map,       lg::shaped_map,       output_stream);
-	output_boolean_condition(is_elder_map,        lg::elder_map,        output_stream);
-	output_boolean_condition(is_blighted_map,     lg::blighted_map,     output_stream);
+	output_boolean_condition(is_identified,       kw::identified,       output_stream);
+	output_boolean_condition(is_corrupted,        kw::corrupted,        output_stream);
+	output_boolean_condition(is_elder_item,       kw::elder_item,       output_stream);
+	output_boolean_condition(is_shaper_item,      kw::shaper_item,      output_stream);
+	output_boolean_condition(is_fractured_item,   kw::fractured_item,   output_stream);
+	output_boolean_condition(is_synthesised_item, kw::synthesised_item, output_stream);
+	output_boolean_condition(is_enchanted,        kw::any_enchantment,  output_stream);
+	output_boolean_condition(is_shaped_map,       kw::shaped_map,       output_stream);
+	output_boolean_condition(is_elder_map,        kw::elder_map,        output_stream);
+	output_boolean_condition(is_blighted_map,     kw::blighted_map,     output_stream);
 
-	output_strings_condition(class_,           lg::class_,           output_stream);
-	output_strings_condition(base_type,        lg::base_type,        output_stream);
-	output_strings_condition(has_explicit_mod, lg::has_explicit_mod, output_stream);
-	output_strings_condition(has_enchantment,  lg::has_enchantment,  output_stream);
-	output_strings_condition(prophecy,         lg::prophecy,         output_stream);
+	output_strings_condition(class_,           kw::class_,           output_stream);
+	output_strings_condition(base_type,        kw::base_type,        output_stream);
+	output_strings_condition(has_explicit_mod, kw::has_explicit_mod, output_stream);
+	output_strings_condition(has_enchantment,  kw::has_enchantment,  output_stream);
+	output_strings_condition(prophecy,         kw::prophecy,         output_stream);
 
-	output_influences_condition(has_influence, lg::has_influence, output_stream);
+	output_influences_condition(has_influence, kw::has_influence, output_stream);
 }
 
 bool condition_set::is_valid() const
 {
-	const auto is_valid_array_condition = [](const auto& shared_ptr_array)
-	{
+	const auto is_valid_strings_condition = [](const std::optional<strings_condition>& condition) {
 		// no condition: ok, we just don't require item to have this property
-		if (shared_ptr_array == nullptr)
+		if (!condition)
 			return true;
 
 		// empty list of allowed values: there are no items that can match this block
 		// game client will not accept an empty list so return that the block is invalid
-		if ((*shared_ptr_array).empty())
+		if ((*condition).strings.empty())
 			return false;
 
 		return true;
 	};
 
-	return is_valid_array_condition(class_.strings)
-		&& is_valid_array_condition(base_type.strings)
-		&& is_valid_array_condition(has_explicit_mod.strings)
-		&& is_valid_array_condition(has_enchantment.strings)
-		&& is_valid_array_condition(prophecy.strings)
-		&& is_valid_array_condition(has_influence.influences);
+	const bool influences_valid = [&]() {
+		if (!has_influence)
+			return true;
+
+		// at least 1 influence must be present
+		auto& inf = *has_influence;
+		return inf.shaper || inf.elder || inf.crusader || inf.redeemer || inf.hunter || inf.warlord;
+	}();
+
+	return influences_valid
+		&& is_valid_strings_condition(class_)
+		&& is_valid_strings_condition(base_type)
+		&& is_valid_strings_condition(has_explicit_mod)
+		&& is_valid_strings_condition(has_enchantment)
+		&& is_valid_strings_condition(prophecy);
 }
 
 }

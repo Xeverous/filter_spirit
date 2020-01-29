@@ -2,8 +2,7 @@
 #include <fst/common/test_fixtures.hpp>
 #include <fst/common/string_operations.hpp>
 
-#include <fs/compiler/build_filter_blocks.hpp>
-#include <fs/compiler/resolve_symbols.hpp>
+#include <fs/compiler/compiler.hpp>
 #include <fs/compiler/print_error.hpp>
 #include <fs/lang/position_tag.hpp>
 #include <fs/log/string_logger.hpp>
@@ -58,7 +57,7 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 	protected:
 		static
 		lang::symbol_table expect_success_when_resolving_symbols(
-			const std::vector<parser::ast::definition>& defs,
+			const std::vector<parser::ast::sf::definition>& defs,
 			const parser::lookup_data& lookup_data)
 		{
 			const std::variant<lang::symbol_table, compiler::compile_error> symbols_or_error =
@@ -75,13 +74,13 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 		}
 
 		static
-		std::vector<lang::filter_block> expect_success_when_building_filter(
-			const std::vector<parser::ast::statement>& top_level_statements,
+		lang::item_filter expect_success_when_building_filter(
+			const std::vector<parser::ast::sf::statement>& top_level_statements,
 			const parser::lookup_data& lookup_data,
 			const lang::symbol_table& symbols)
 		{
-			std::variant<std::vector<lang::filter_block>, compiler::compile_error> result =
-				compiler::build_filter_blocks(top_level_statements, symbols, lang::item_price_data{});
+			std::variant<lang::item_filter, compiler::compile_error> result =
+				compiler::compile_spirit_filter(top_level_statements, symbols, lang::item_price_data{});
 
 			if (std::holds_alternative<compiler::compile_error>(result)) {
 				const auto& error = std::get<compiler::compile_error>(result);
@@ -90,7 +89,7 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 				BOOST_FAIL("building filter blocks failed but should not:\n" << logger.str());
 			}
 
-			return std::get<std::vector<lang::filter_block>>(std::move(result));
+			return std::get<lang::item_filter>(std::move(result));
 		}
 	};
 
@@ -123,7 +122,7 @@ alert          = AlertSound(1, 300, False)
 array          = [1, 2, 3]
 )";
 			const std::string_view input = input_str;
-			const parser::parse_success_data parse_data = parse(input);
+			const parser::sf::parse_success_data parse_data = parse(input);
 			const parser::lookup_data& lookup_data = parse_data.lookup_data;
 			const lang::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.definitions, lookup_data);
 
@@ -169,7 +168,7 @@ a2 = [1, 2]
 a3 = [1, 2, 3]
 )";
 			const std::string_view input = input_str;
-			const parser::parse_success_data parse_data = parse(input);
+			const parser::sf::parse_success_data parse_data = parse(input);
 			const parser::lookup_data& lookup_data = parse_data.lookup_data;
 			const lang::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.definitions, lookup_data);
 
@@ -208,7 +207,7 @@ last    = arr[-1]
 elem = [1, 2, 3][1]
 )";
 			const std::string_view input = input_str;
-			const parser::parse_success_data parse_data = parse(input);
+			const parser::sf::parse_success_data parse_data = parse(input);
 			const parser::lookup_data& lookup_data = parse_data.lookup_data;
 			const lang::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.definitions, lookup_data);
 
@@ -243,15 +242,15 @@ SetAlertSound "error.wav"
 Show
 )";
 			const std::string_view input = input_str;
-			const parser::parse_success_data parse_data = parse(input);
+			const parser::sf::parse_success_data parse_data = parse(input);
 			const parser::lookup_data& lookup_data = parse_data.lookup_data;
 			const lang::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.definitions, lookup_data);
-			const std::vector<lang::filter_block> blocks =
+			const lang::item_filter filter =
 				expect_success_when_building_filter(parse_data.ast.statements, parse_data.lookup_data, symbols);
-			BOOST_TEST_REQUIRE(static_cast<int>(blocks.size()) == 2);
+			BOOST_TEST_REQUIRE(static_cast<int>(filter.blocks.size()) == 2);
 
-			const lang::filter_block& b0 = blocks[0];
-			BOOST_TEST(b0.show == false);
+			const lang::item_filter_block& b0 = filter.blocks[0];
+			BOOST_TEST(b0.visibility.show == false);
 
 			const lang::condition_set& b0_cond = b0.conditions;
 			BOOST_TEST(b0_cond.item_level.is_exact());
@@ -271,25 +270,25 @@ Show
 			}
 
 			const lang::action_set& b0_act = b0.actions;
-			if (b0_act.beam_effect.has_value())
+			if (b0_act.set_beam_effect.has_value())
 			{
-				BOOST_TEST((*b0_act.beam_effect).color == lang::suit::green);
-				BOOST_TEST((*b0_act.beam_effect).is_temporary == false);
+				BOOST_TEST((*b0_act.set_beam_effect).beam.color == lang::suit::green);
+				BOOST_TEST((*b0_act.set_beam_effect).beam.is_temporary.value == false);
 			}
 			else
 			{
 				BOOST_ERROR("block 0 has no beam effect but it should have");
 			}
 
-			const lang::filter_block& b1 = blocks[1];
-			BOOST_TEST(b1.show == true);
+			const lang::item_filter_block& b1 = filter.blocks[1];
+			BOOST_TEST(b1.visibility.show == true);
 
 			const lang::action_set& b1_act = b1.actions;
-			if (b1_act.alert_sound.has_value())
+			if (b1_act.set_alert_sound.has_value())
 			{
-				if (std::holds_alternative<lang::custom_alert_sound>((*b1_act.alert_sound).sound))
+				if (std::holds_alternative<lang::custom_alert_sound>((*b1_act.set_alert_sound).alert.sound))
 				{
-					const auto& sound = std::get<lang::custom_alert_sound>((*b1_act.alert_sound).sound);
+					const auto& sound = std::get<lang::custom_alert_sound>((*b1_act.set_alert_sound).alert.sound);
 					BOOST_TEST(sound.path.value == "error.wav");
 				}
 				else
@@ -299,7 +298,7 @@ Show
 			}
 			else
 			{
-				BOOST_ERROR("block 1 has no alert sound but it should have");
+				BOOST_ERROR("block 1 has no alert sound action but it should have");
 			}
 		}
 
@@ -340,17 +339,17 @@ Show
 			{
 				const std::string input_str = minimal_input() + "SetAlertSound " + expression + "\nShow";
 				const std::string_view input = input_str;
-				const parser::parse_success_data parse_data = parse(input);
+				const parser::sf::parse_success_data parse_data = parse(input);
 				const parser::lookup_data& lookup_data = parse_data.lookup_data;
 				const lang::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.definitions, lookup_data);
-				const std::vector<lang::filter_block> blocks =
+				const lang::item_filter filter =
 					expect_success_when_building_filter(parse_data.ast.statements, parse_data.lookup_data, symbols);
-				BOOST_TEST_REQUIRE(static_cast<int>(blocks.size()) == 1);
-				const lang::filter_block& block = blocks[0];
-				BOOST_TEST(block.show == true);
-				const std::optional<lang::alert_sound>& maybe_alert_sound = block.actions.alert_sound;
-				BOOST_TEST_REQUIRE(maybe_alert_sound.has_value());
-				const lang::alert_sound& alert_sound = *maybe_alert_sound;
+				BOOST_TEST_REQUIRE(static_cast<int>(filter.blocks.size()) == 1);
+				const lang::item_filter_block& block = filter.blocks[0];
+				BOOST_TEST(block.visibility.show == true);
+				const std::optional<lang::alert_sound_action>& maybe_alert_sound_action = block.actions.set_alert_sound;
+				BOOST_TEST_REQUIRE(maybe_alert_sound_action.has_value());
+				const lang::alert_sound& alert_sound = (*maybe_alert_sound_action).alert;
 				test_alert_sound(expected_value, alert_sound);
 			}
 		};

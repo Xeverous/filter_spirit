@@ -7,14 +7,14 @@ namespace fs::compiler::detail
 {
 
 std::vector<std::optional<lang::object_type>> determine_types_of(
-	const parser::ast::value_expression_list& expressions,
+	const parser::ast::sf::value_expression_list& expressions,
 	const lang::symbol_table& symbols,
 	const lang::item_price_data& item_price_data)
 {
 	std::vector<std::optional<lang::object_type>> result;
 	result.reserve(expressions.size());
 
-	for (const parser::ast::value_expression& expression : expressions) {
+	for (const parser::ast::sf::value_expression& expression : expressions) {
 		std::variant<lang::object, compile_error> object_or_error =
 			evaluate_value_expression(expression, symbols, item_price_data);
 

@@ -59,12 +59,6 @@ private:
 	detail::position_cache_type position_cache;
 };
 
-struct parse_success_data
-{
-	ast::ast_type ast;
-	lookup_data lookup_data;
-};
-
 struct parse_failure_data
 {
 	lookup_data lookup_data;
@@ -72,9 +66,30 @@ struct parse_failure_data
 	const char* parser_stop_position;
 };
 
-[[nodiscard]]
-std::variant<parse_success_data, parse_failure_data> parse(std::string_view input);
+namespace sf
+{
+	struct parse_success_data
+	{
+		ast::sf::ast_type ast;
+		lookup_data lookup_data;
+	};
+
+	[[nodiscard]]
+	std::variant<parse_success_data, parse_failure_data> parse(std::string_view input);
+}
+
+namespace rf
+{
+	struct parse_success_data
+	{
+		ast::rf::ast_type ast;
+		lookup_data lookup_data;
+	};
+
+	[[nodiscard]]
+	std::variant<parse_success_data, parse_failure_data> parse(std::string_view input);
+}
 
 void print_parse_errors(const parse_failure_data& parse_data, log::logger& logger);
 
-}
+} // namespace fs::parser

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <fs/lang/primitive_types.hpp>
+#include <fs/lang/position_tag.hpp>
 
 #include <utility>
 #include <iosfwd>
@@ -8,60 +9,128 @@
 namespace fs::lang
 {
 
+// origins should point to the strings which create actions, eg:
+// SetTextColor 0 0 0 255
+// ~~~~~~~~~~~~
+
+struct color_action
+{
+	color c;
+	position_tag origin;
+};
+
+inline bool operator==(color_action lhs, color_action rhs)
+{
+	return lhs.c == rhs.c;
+}
+
+inline bool operator!=(color_action lhs, color_action rhs)
+{
+	return !(lhs == rhs);
+}
+
+struct font_size_action
+{
+	font_size size;
+	position_tag origin;
+};
+
+inline bool operator==(font_size_action lhs, font_size_action rhs)
+{
+	return lhs.size == rhs.size;
+}
+
+inline bool operator!=(font_size_action lhs, font_size_action rhs)
+{
+	return !(lhs == rhs);
+}
+
+struct alert_sound_action
+{
+	alert_sound alert;
+	position_tag origin;
+};
+
+inline bool operator==(alert_sound_action lhs, alert_sound_action rhs)
+{
+	return lhs.alert == rhs.alert;
+}
+
+inline bool operator!=(alert_sound_action lhs, alert_sound_action rhs)
+{
+	return !(lhs == rhs);
+}
+
+// this action has no state - it either exists (we disabled default drop sound)
+// or does not exist (empty optional, no emmiting of this action in the filter)
+struct disable_default_drop_sound_action
+{
+	position_tag origin;
+};
+
+inline bool operator==(disable_default_drop_sound_action /* lhs */, disable_default_drop_sound_action /* rhs */)
+{
+	return true;
+}
+
+inline bool operator!=(disable_default_drop_sound_action lhs, disable_default_drop_sound_action rhs)
+{
+	return !(lhs == rhs);
+}
+
+struct minimap_icon_action
+{
+	minimap_icon icon;
+	position_tag origin;
+};
+
+inline bool operator==(minimap_icon_action lhs, minimap_icon_action rhs)
+{
+	return lhs.icon == rhs.icon;
+}
+
+inline bool operator!=(minimap_icon_action lhs, minimap_icon_action rhs)
+{
+	return !(lhs == rhs);
+}
+
+struct beam_effect_action
+{
+	beam_effect beam;
+	position_tag origin;
+};
+
+inline bool operator==(beam_effect_action lhs, beam_effect_action rhs)
+{
+	return lhs.beam == rhs.beam;
+}
+
+inline bool operator!=(beam_effect_action lhs, beam_effect_action rhs)
+{
+	return !(lhs == rhs);
+}
+
+/**
+ * @class a type describing all of the given filter block actions
+ *
+ * all values are optional which is self-explanatory - no actions are required
+ *
+ * this type assumes all values (color, sizes, strings) are already verified and correct
+ */
 struct action_set
 {
-	void override_border_color(color new_color)
-	{
-		border_color = new_color;
-	}
-
-	void override_text_color(color new_color)
-	{
-		text_color = new_color;
-	}
-
-	void override_background_color(color new_color)
-	{
-		background_color = new_color;
-	}
-
-	void override_font_size(font_size new_font_size)
-	{
-		font_size = new_font_size;
-	}
-
-	void override_alert_sound(alert_sound new_alert_sound)
-	{
-		alert_sound = std::move(new_alert_sound);
-	}
-
-	void override_play_default_drop_sound(bool enable)
-	{
-		disabled_drop_sound = !enable;
-	}
-
-	void override_minimap_icon(minimap_icon new_minimap_icon)
-	{
-		minimap_icon = new_minimap_icon;
-	}
-
-	void override_beam_effect(beam_effect new_beam_effect)
-	{
-		beam_effect = new_beam_effect;
-	}
-
 	void override_with(action_set&& other);
 
 	void generate(std::ostream& output_stream) const;
 
-	std::optional<color> border_color;
-	std::optional<color> text_color;
-	std::optional<color> background_color;
-	std::optional<font_size> font_size;
-	std::optional<alert_sound> alert_sound;
-	bool disabled_drop_sound = false;
-	std::optional<minimap_icon> minimap_icon;
-	std::optional<beam_effect> beam_effect;
+	std::optional<color_action> set_border_color;
+	std::optional<color_action> set_text_color;
+	std::optional<color_action> set_background_color;
+	std::optional<font_size_action> set_font_size;
+	std::optional<alert_sound_action> set_alert_sound;
+	std::optional<disable_default_drop_sound_action> disable_default_drop_sound;
+	std::optional<minimap_icon_action> set_minimap_icon;
+	std::optional<beam_effect_action> set_beam_effect;
 };
 
 bool operator==(const action_set& lhs, const action_set& rhs);

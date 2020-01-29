@@ -7,7 +7,7 @@
 #include <string_view>
 #include <optional>
 
-namespace fs::generator
+namespace fs::generator::sf
 {
 
 /**

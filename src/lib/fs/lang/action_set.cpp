@@ -1,5 +1,5 @@
 #include <fs/lang/action_set.hpp>
-#include <fs/lang/generation.hpp>
+#include <fs/lang/keywords.hpp>
 #include <fs/utility/visitor.hpp>
 
 #include <ostream>
@@ -8,16 +8,17 @@ namespace
 {
 
 using namespace fs;
+namespace kw = lang::keywords::rf;
 
 void output_color_action(
-	std::optional<lang::color> color,
+	std::optional<lang::color_action> color_action,
 	const char* name,
 	std::ostream& output_stream)
 {
-	if (!color.has_value())
+	if (!color_action.has_value())
 		return;
 
-	const lang::color& c = *color;
+	const lang::color& c = (*color_action).c;
 	output_stream << '\t' << name << ' ' << c.r << ' ' << c.g << ' ' << c.b;
 	if (c.a.has_value())
 		output_stream << ' ' << *c.a;
@@ -26,13 +27,13 @@ void output_color_action(
 }
 
 void output_font_size(
-	std::optional<lang::font_size> font_size,
+	std::optional<lang::font_size_action> font_size_action,
 	std::ostream& output_stream)
 {
-	if (!font_size.has_value())
+	if (!font_size_action.has_value())
 		return;
 
-	output_stream << '\t' << lang::generation::set_font_size << ' ' << (*font_size).value << '\n';
+	output_stream << '\t' << kw::set_font_size << ' ' << (*font_size_action).size.value << '\n';
 }
 
 void output_built_in_alert_sound(
@@ -42,9 +43,9 @@ void output_built_in_alert_sound(
 	output_stream << '\t';
 
 	if (alert_sound.is_positional.value)
-		output_stream << lang::generation::play_alert_sound_positional;
+		output_stream << kw::play_alert_sound_positional;
 	else
-		output_stream << lang::generation::play_alert_sound;
+		output_stream << kw::play_alert_sound;
 
 	output_stream << ' ' << alert_sound.id.value;
 
@@ -58,61 +59,58 @@ void output_custom_alert_sound(
 	const lang::custom_alert_sound& alert_sound,
 	std::ostream& output_stream)
 {
-	output_stream << '\t' << lang::generation::custom_alert_sound
+	output_stream << '\t' << kw::custom_alert_sound
 		<< " \"" << alert_sound.path.value << "\"\n";
 }
 
 void output_alert_sound(
-	const std::optional<lang::alert_sound>& alert_sound,
+	const std::optional<lang::alert_sound_action>& alert_sound_action,
 	std::ostream& output_stream)
 {
-	if (!alert_sound.has_value())
+	if (!alert_sound_action.has_value())
 		return;
 
-	const lang::alert_sound& as = *alert_sound;
+	const lang::alert_sound& as = (*alert_sound_action).alert;
 	std::visit(utility::visitor{
-		[&output_stream](lang::built_in_alert_sound sound)
-		{
+		[&output_stream](lang::built_in_alert_sound sound) {
 			output_built_in_alert_sound(sound, output_stream);
 		},
-		[&output_stream](const lang::custom_alert_sound& sound)
-		{
+		[&output_stream](const lang::custom_alert_sound& sound) {
 			output_custom_alert_sound(sound, output_stream);
 		}
 	}, as.sound);
 }
 
 void output_disabled_drop_sound(
-	bool is_disabled,
+	std::optional<lang::disable_default_drop_sound_action> action,
 	std::ostream& output_stream)
 {
-	if (!is_disabled)
+	if (!action)
 		return;
 
-	output_stream << '\t' << lang::generation::disable_drop_sound << '\n';
+	output_stream << '\t' << kw::disable_drop_sound << '\n';
 }
 
 void output_suit(lang::suit s, std::ostream& output_stream)
 {
-	switch (s)
-	{
+	switch (s) {
 		case lang::suit::red:
-			output_stream << lang::generation::red;
+			output_stream << kw::red;
 			break;
 		case lang::suit::green:
-			output_stream << lang::generation::green;
+			output_stream << kw::green;
 			break;
 		case lang::suit::blue:
-			output_stream << lang::generation::blue;
+			output_stream << kw::blue;
 			break;
 		case lang::suit::white:
-			output_stream << lang::generation::white;
+			output_stream << kw::white;
 			break;
 		case lang::suit::brown:
-			output_stream << lang::generation::brown;
+			output_stream << kw::brown;
 			break;
 		case lang::suit::yellow:
-			output_stream << lang::generation::yellow;
+			output_stream << kw::yellow;
 			break;
 		default:
 			break;
@@ -121,25 +119,24 @@ void output_suit(lang::suit s, std::ostream& output_stream)
 
 void output_shape(lang::shape s, std::ostream& output_stream)
 {
-	switch (s)
-	{
+	switch (s) {
 		case lang::shape::circle:
-			output_stream << lang::generation::circle;
+			output_stream << kw::circle;
 			break;
 		case lang::shape::diamond:
-			output_stream << lang::generation::diamond;
+			output_stream << kw::diamond;
 			break;
 		case lang::shape::hexagon:
-			output_stream << lang::generation::hexagon;
+			output_stream << kw::hexagon;
 			break;
 		case lang::shape::square:
-			output_stream << lang::generation::square;
+			output_stream << kw::square;
 			break;
 		case lang::shape::star:
-			output_stream << lang::generation::star;
+			output_stream << kw::star;
 			break;
 		case lang::shape::triangle:
-			output_stream << lang::generation::triangle;
+			output_stream << kw::triangle;
 			break;
 		default:
 			break;
@@ -147,14 +144,14 @@ void output_shape(lang::shape s, std::ostream& output_stream)
 }
 
 void output_minimap_icon(
-	std::optional<lang::minimap_icon> minimap_icon,
+	std::optional<lang::minimap_icon_action> minimap_icon_action,
 	std::ostream& output_stream)
 {
-	if (!minimap_icon.has_value())
+	if (!minimap_icon_action.has_value())
 		return;
 
-	const lang::minimap_icon& mi = *minimap_icon;
-	output_stream << '\t' << lang::generation::minimap_icon << ' ' << mi.size.value << ' ';
+	const lang::minimap_icon& mi = (*minimap_icon_action).icon;
+	output_stream << '\t' << kw::minimap_icon << ' ' << mi.size.value << ' ';
 
 	output_suit(mi.color, output_stream);
 	output_stream << ' ';
@@ -163,17 +160,17 @@ void output_minimap_icon(
 }
 
 void output_beam_effect(
-	std::optional<lang::beam_effect> beam_effect,
+	std::optional<lang::beam_effect_action> beam_effect_action,
 	std::ostream& output_stream)
 {
-	if (!beam_effect.has_value())
+	if (!beam_effect_action.has_value())
 		return;
 
-	const lang::beam_effect& be = *beam_effect;
-	output_stream << '\t' << lang::generation::play_effect << ' ';
+	const lang::beam_effect& be = (*beam_effect_action).beam;
+	output_stream << '\t' << kw::play_effect << ' ';
 	output_suit(be.color, output_stream);
-	if (be.is_temporary)
-		output_stream << ' ' << lang::generation::temp;
+	if (be.is_temporary.value)
+		output_stream << ' ' << kw::temp;
 
 	output_stream << '\n';
 }
@@ -185,54 +182,53 @@ namespace fs::lang
 
 void action_set::generate(std::ostream& output_stream) const
 {
-	namespace lg = lang::generation;
-	output_color_action(border_color,     lg::set_border_color,     output_stream);
-	output_color_action(text_color,       lg::set_text_color,       output_stream);
-	output_color_action(background_color, lg::set_background_color, output_stream);
+	output_color_action(set_border_color,     kw::set_border_color,     output_stream);
+	output_color_action(set_text_color,       kw::set_text_color,       output_stream);
+	output_color_action(set_background_color, kw::set_background_color, output_stream);
 
-	output_font_size(font_size, output_stream);
-	output_alert_sound(alert_sound, output_stream);
-	output_disabled_drop_sound(disabled_drop_sound, output_stream);
-	output_minimap_icon(minimap_icon, output_stream);
-	output_beam_effect(beam_effect, output_stream);
+	output_font_size(set_font_size, output_stream);
+	output_alert_sound(set_alert_sound, output_stream);
+	output_disabled_drop_sound(disable_default_drop_sound, output_stream);
+	output_minimap_icon(set_minimap_icon, output_stream);
+	output_beam_effect(set_beam_effect, output_stream);
 }
 
 void action_set::override_with(action_set&& other)
 {
-	if (other.border_color)
-		override_border_color(*other.border_color);
+	if (other.set_border_color)
+		set_border_color = *other.set_border_color;
 
-	if (other.text_color)
-		override_text_color(*other.text_color);
+	if (other.set_text_color)
+		set_text_color = *other.set_text_color;
 
-	if (other.background_color)
-		override_background_color(*other.background_color);
+	if (other.set_background_color)
+		set_background_color = *other.set_background_color;
 
-	if (other.font_size)
-		override_font_size(*other.font_size);
+	if (other.set_font_size)
+		set_font_size = *other.set_font_size;
 
-	if (other.alert_sound)
-		override_alert_sound(*std::move(other.alert_sound));
+	if (other.set_alert_sound)
+		set_alert_sound = std::move(*other.set_alert_sound);
 
-	disabled_drop_sound = other.disabled_drop_sound;
+	disable_default_drop_sound = other.disable_default_drop_sound;
 
-	if (other.minimap_icon)
-		override_minimap_icon(*other.minimap_icon);
+	if (other.set_minimap_icon)
+		set_minimap_icon = *other.set_minimap_icon;
 
-	if (other.beam_effect)
-		override_beam_effect(*other.beam_effect);
+	if (other.set_beam_effect)
+		set_beam_effect = *other.set_beam_effect;
 }
 
 bool operator==(const action_set& lhs, const action_set& rhs)
 {
-	return lhs.border_color == rhs.border_color
-		&& lhs.text_color == rhs.text_color
-		&& lhs.background_color == rhs.background_color
-		&& lhs.font_size == rhs.font_size
-		&& lhs.alert_sound == rhs.alert_sound
-		&& lhs.disabled_drop_sound == rhs.disabled_drop_sound
-		&& lhs.minimap_icon == rhs.minimap_icon
-		&& lhs.beam_effect == rhs.beam_effect;
+	return lhs.set_border_color == rhs.set_border_color
+		&& lhs.set_text_color == rhs.set_text_color
+		&& lhs.set_background_color == rhs.set_background_color
+		&& lhs.set_font_size == rhs.set_font_size
+		&& lhs.set_alert_sound == rhs.set_alert_sound
+		&& lhs.disable_default_drop_sound == rhs.disable_default_drop_sound
+		&& lhs.set_minimap_icon == rhs.set_minimap_icon
+		&& lhs.set_beam_effect == rhs.set_beam_effect;
 }
 
 bool operator!=(const action_set& lhs, const action_set& rhs)

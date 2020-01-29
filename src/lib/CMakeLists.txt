@@ -18,13 +18,11 @@ add_library(filter_spirit SHARED)
 target_sources(filter_spirit
 	PRIVATE
 		fs/parser/parser.cpp
-		fs/parser/print_error.cpp
 		fs/parser/detail/grammar.cpp
-		fs/compiler/build_filter_blocks.cpp
-		fs/compiler/resolve_symbols.cpp
+		fs/compiler/compiler.cpp
 		fs/compiler/print_error.cpp
-		fs/compiler/detail/add_action.cpp
-		fs/compiler/detail/add_conditions.cpp
+		fs/compiler/detail/actions.cpp
+		fs/compiler/detail/conditions.cpp
 		fs/compiler/detail/evaluate.cpp
 		fs/compiler/detail/queries.cpp
 		fs/compiler/detail/determine_types_of.cpp
@@ -32,7 +30,7 @@ target_sources(filter_spirit
 		fs/generator/generator.cpp
 		fs/lang/action_set.cpp
 		fs/lang/condition_set.cpp
-		fs/lang/filter_block.cpp
+		fs/lang/item_filter.cpp
 		fs/lang/object.cpp
 		fs/lang/item_price_data.cpp
 		fs/lang/data_source_type.cpp
@@ -48,9 +46,8 @@ target_sources(filter_spirit
 		fs/network/poe_ninja/parse_data.cpp
 		fs/network/poe_ninja/api_data.cpp
 	PUBLIC
-		fs/compiler/build_filter_blocks.hpp
-		fs/compiler/detail/add_action.hpp
-		fs/compiler/detail/add_conditions.hpp
+		fs/compiler/detail/actions.hpp
+		fs/compiler/detail/conditions.hpp
 		fs/compiler/detail/construct.hpp
 		fs/compiler/detail/determine_types_of.hpp
 		fs/compiler/detail/evaluate.hpp
@@ -58,9 +55,9 @@ target_sources(filter_spirit
 		fs/compiler/detail/get_value_as.hpp
 		fs/compiler/detail/queries.hpp
 		fs/compiler/detail/type_constructors.hpp
+		fs/compiler/compiler.hpp
 		fs/compiler/error.hpp
 		fs/compiler/print_error.hpp
-		fs/compiler/resolve_symbols.hpp
 		fs/generator/generate_filter.hpp
 		fs/generator/generator.hpp
 		fs/generator/options.hpp
@@ -69,10 +66,10 @@ target_sources(filter_spirit
 		fs/lang/condition_properties.hpp
 		fs/lang/condition_set.hpp
 		fs/lang/data_source_type.hpp
-		fs/lang/filter_block.hpp
 		fs/lang/functions.hpp
-		fs/lang/generation.hpp
+		fs/lang/item.hpp
 		fs/lang/item_price_data.hpp
+		fs/lang/item_filter.hpp
 		fs/lang/keywords.hpp
 		fs/lang/league.hpp
 		fs/lang/object.hpp
@@ -105,7 +102,6 @@ target_sources(filter_spirit
 		fs/parser/detail/symbols.hpp
 		fs/parser/error.hpp
 		fs/parser/parser.hpp
-		fs/parser/print_error.hpp
 		fs/utility/algorithm.hpp
 		fs/utility/better_enum.hpp
 		fs/utility/dump_json.hpp

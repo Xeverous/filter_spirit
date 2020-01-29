@@ -39,7 +39,7 @@ namespace fs::compiler::detail
 
 std::variant<lang::price_range, compile_error>
 construct_price_range(
-	const parser::ast::value_expression_list& arguments,
+	const parser::ast::sf::value_expression_list& arguments,
 	const lang::symbol_table& symbols,
 	const lang::item_price_data& item_price_data)
 {
