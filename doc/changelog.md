@@ -9,6 +9,7 @@
   - For option `-s`, FS will now create the deepest directory in the path if it does not exist.
 - FS no longer removes corrupted uniques from price data. They can now appear in results of price queries (and cause some ambiguities) but that's intended because in some rare circumstances they can actually drop (eg. a sextant mod or Corrupting Tempest).
 - Updated handling of multi-influenced items. They are still not queryable (see issues) but this change removes some unwanted logs. As of now, poe.ninja does not support dual-influenced bases.
+- Fixed a bug caused by the used buffer for network responses which did not have size large enough to contain some of poe.ninja's responses, resulting in "could not read the request: body limit exceeded" error.
 
 ## version 0.3.0 (11.12.2019)
 
