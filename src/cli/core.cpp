@@ -61,7 +61,7 @@ bool generate_item_filter_impl(
 	if (!source_file_content)
 		return false;
 
-	std::optional<std::string> filter_content = generator::generate_filter(
+	std::optional<std::string> filter_content = generator::sf::generate_filter(
 		*source_file_content,
 		item_price_info,
 		generator::options{print_ast},

@@ -3,6 +3,7 @@
 namespace fs::lang
 {
 
+// < <= = > >=
 enum class comparison_type
 {
 	less,
@@ -12,6 +13,7 @@ enum class comparison_type
 	greater_equal
 };
 
+// all conditions which use comparison
 enum class comparison_condition_property
 {
 	item_level,
@@ -27,6 +29,23 @@ enum class comparison_condition_property
 	map_tier
 };
 
+// all conditions which use comparison against integers
+// (currently comparison conditions except rarity)
+enum class numeric_comparison_condition_property
+{
+	item_level,
+	drop_level,
+	quality,
+	sockets,
+	links,
+	height,
+	width,
+	stack_size,
+	gem_level,
+	map_tier
+};
+
+// all conditions which work with array of values
 enum class array_condition_property
 {
 	class_,
@@ -37,6 +56,18 @@ enum class array_condition_property
 	has_influence
 };
 
+// all conditions which work with array of strings
+// (basically all array conditions except influence)
+enum class string_array_condition_property
+{
+	class_,
+	base_type,
+	has_explicit_mod,
+	has_enchantment,
+	prophecy,
+};
+
+// all conditions which are boolean tests
 enum class boolean_condition_property
 {
 	identified,

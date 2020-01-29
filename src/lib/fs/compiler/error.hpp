@@ -105,6 +105,12 @@ struct condition_redefinition
 	lang::position_tag place_of_original_definition;
 };
 
+struct action_redefinition
+{
+	lang::position_tag place_of_redefinition;
+	lang::position_tag place_of_original_definition;
+};
+
 struct lower_bound_redefinition
 {
 	lang::position_tag place_of_redefinition;
@@ -117,29 +123,30 @@ struct upper_bound_redefinition
 	lang::position_tag place_of_original_definition;
 };
 
-struct internal_compiler_error_during_action_evaluation
+struct rule_already_specified
 {
-	lang::position_tag place_of_action;
+	lang::position_tag place;
 };
 
-struct internal_compiler_error_during_range_evaluation
+enum class internal_compiler_error_cause
 {
-	lang::position_tag place_of_comparison_condition;
+	add_boolean_condition,
+	add_range_condition,
+
+	real_filter_add_numeric_condition,
+	real_filter_add_string_array_condition,
+	real_filter_add_color_action,
+
+	spirit_filter_add_array_condition,
+	spirit_filter_add_comparison_condition,
+
+	spirit_filter_add_unary_action
 };
 
-struct internal_compiler_error_during_comparison_condition_evaluation
+struct internal_compiler_error
 {
-	lang::position_tag place_of_comparison_condition;
-};
-
-struct internal_compiler_error_during_string_condition_evaluation
-{
-	lang::position_tag place_of_string_condition;
-};
-
-struct internal_compiler_error_during_boolean_condition_evaluation
-{
-	lang::position_tag place_of_boolean_condition;
+	internal_compiler_error_cause cause;
+	lang::position_tag origin;
 };
 
 }
@@ -164,13 +171,10 @@ using compile_error = std::variant<
 	errors::invalid_socket_group,
 	errors::invalid_minimap_icon_size,
 	errors::condition_redefinition,
+	errors::action_redefinition,
 	errors::lower_bound_redefinition,
 	errors::upper_bound_redefinition,
-	errors::internal_compiler_error_during_action_evaluation,
-	errors::internal_compiler_error_during_range_evaluation,
-	errors::internal_compiler_error_during_comparison_condition_evaluation,
-	errors::internal_compiler_error_during_string_condition_evaluation,
-	errors::internal_compiler_error_during_boolean_condition_evaluation
+	errors::internal_compiler_error
 >;
 
 namespace errors

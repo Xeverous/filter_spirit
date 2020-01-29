@@ -108,6 +108,7 @@ inline bool operator!=(socket_group lhs, socket_group rhs) noexcept { return !(l
 enum class influence { shaper, elder, crusader, redeemer, hunter, warlord };
 enum class rarity { normal, magic, rare, unique };
 enum class shape { circle, diamond, hexagon, square, star, triangle };
+// suit is named "suit" to avoid name conflict with "color"
 enum class suit { red, green, blue, white, brown, yellow };
 
 struct color
@@ -158,13 +159,13 @@ inline bool operator!=(minimap_icon lhs, minimap_icon rhs) noexcept { return !(l
 struct beam_effect
 {
 	explicit beam_effect(suit s)
-	: color(s), is_temporary(false) {}
+	: color(s), is_temporary(boolean{false}) {}
 
 	explicit beam_effect(suit s, boolean b)
-	: color(s), is_temporary(b.value) {}
+	: color(s), is_temporary(b) {}
 
 	suit color;
-	bool is_temporary;
+	boolean is_temporary;
 };
 
 inline bool operator==(beam_effect lhs, beam_effect rhs) noexcept
@@ -245,13 +246,13 @@ struct alert_sound
 	explicit alert_sound(sound_id id)
 	: sound(built_in_alert_sound(id)) {}
 
-	explicit alert_sound(sound_id id, volume volume)
+	alert_sound(sound_id id, volume volume)
 	: sound(built_in_alert_sound(id, volume)) {}
 
-	explicit alert_sound(sound_id id, boolean boolean)
+	alert_sound(sound_id id, boolean boolean)
 	: sound(built_in_alert_sound(id, boolean)) {}
 
-	explicit alert_sound(sound_id id, volume volume, boolean boolean)
+	alert_sound(sound_id id, volume volume, boolean boolean)
 	: sound(built_in_alert_sound(id, volume, boolean)) {}
 
 	explicit alert_sound(built_in_alert_sound sound)

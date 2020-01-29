@@ -16,6 +16,7 @@ class object;
 
 using array_object = std::vector<object>;
 
+// TODO: do we really need wrappign types such as font_size and path?
 using object_variant = std::variant<
 	// primitive types
 	none,

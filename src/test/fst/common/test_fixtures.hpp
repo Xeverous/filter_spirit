@@ -17,7 +17,7 @@ class parser_fixture
 {
 protected:
 	static
-	fs::parser::parse_success_data parse(std::string_view input);
+	fs::parser::sf::parse_success_data parse(std::string_view input);
 };
 
 class compiler_fixture : public parser_fixture
@@ -25,7 +25,7 @@ class compiler_fixture : public parser_fixture
 protected:
 	static
 	std::variant<fs::lang::symbol_table, fs::compiler::compile_error>
-	resolve_symbols(const std::vector<fs::parser::ast::definition>& defs);
+	resolve_symbols(const std::vector<fs::parser::ast::sf::definition>& defs);
 };
 
 }

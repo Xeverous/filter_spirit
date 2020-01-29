@@ -1,5 +1,5 @@
+#include <fs/lang/item_filter.hpp>
 #include <fs/generator/generator.hpp>
-#include <fs/lang/filter_block.hpp>
 #include <fs/utility/string_helpers.hpp>
 #include <fs/version.hpp>
 
@@ -13,11 +13,11 @@
 namespace fs::generator
 {
 
-std::string assemble_blocks_to_raw_filter(const std::vector<lang::filter_block>& blocks)
+std::string to_raw_filter(const lang::item_filter& filter)
 {
 	std::stringstream ss;
 
-	for (const lang::filter_block& block : blocks)
+	for (const lang::item_filter_block& block : filter.blocks)
 		block.generate(ss);
 
 	return ss.str();

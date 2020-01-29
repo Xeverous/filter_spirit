@@ -24,7 +24,7 @@ namespace impl
 	// helper for get_expression_list_positions
 	template <std::size_t... I> [[nodiscard]]
 	auto make_array_from_expressions(
-		const parser::ast::value_expression_list& expressions,
+		const parser::ast::sf::value_expression_list& expressions,
 		std::index_sequence<I...>)
 	{
 		return std::array<lang::position_tag, sizeof...(I)>{
@@ -34,7 +34,7 @@ namespace impl
 	// helper for calling type_constructor
 	template <std::size_t N> [[nodiscard]]
 	std::array<lang::position_tag, N> get_expression_list_positions(
-		const parser::ast::value_expression_list& expressions)
+		const parser::ast::sf::value_expression_list& expressions)
 	{
 		assert(expressions.size() == N);
 		return make_array_from_expressions(expressions, std::make_index_sequence<N>{});
@@ -44,7 +44,7 @@ namespace impl
 	// proceed to call constructor
 	template <typename T, typename... Args> [[nodiscard]]
 	std::variant<T, compile_error> unpack_args_and_call_constructor(
-		const parser::ast::value_expression_list& arguments,
+		const parser::ast::sf::value_expression_list& arguments,
 		const lang::symbol_table& /* symbols */,
 		const lang::item_price_data& /* item_price_data */,
 		lang::traits::constructor_argument_list<>,
@@ -66,7 +66,7 @@ namespace impl
 		typename... Args
 	> [[nodiscard]]
 	std::variant<T, compile_error> unpack_args_and_call_constructor(
-		const parser::ast::value_expression_list& arguments,
+		const parser::ast::sf::value_expression_list& arguments,
 		const lang::symbol_table& symbols,
 		const lang::item_price_data& item_price_data,
 		lang::traits::constructor_argument_list<ConstructorArgType, OtherConstructorArgTypes...>,
@@ -93,15 +93,14 @@ namespace impl
 	// if not, return errors::invalid_amount_of_arguments
 	template <typename T, typename... ConstructorArgTypes> [[nodiscard]]
 	std::variant<T, compile_error> construct_check_arguments_amount(
-		const parser::ast::value_expression_list& arguments,
+		const parser::ast::sf::value_expression_list& arguments,
 		const lang::symbol_table& symbols,
 		const lang::item_price_data& item_price_data,
 		lang::traits::constructor_argument_list<ConstructorArgTypes...>)
 	{
 		const auto expected_arguments_count = sizeof...(ConstructorArgTypes);
 		const auto actual_arguments_count = arguments.size();
-		if (actual_arguments_count != expected_arguments_count)
-		{
+		if (actual_arguments_count != expected_arguments_count) {
 			return errors::invalid_amount_of_arguments{
 				static_cast<int>(expected_arguments_count),
 				static_cast<int>(actual_arguments_count),
@@ -162,7 +161,7 @@ namespace impl
 	// that contains error information about each failed attempt
 	template <typename T, typename... FailedConstructors, typename... Errors> [[nodiscard]]
 	std::variant<T, compile_error> construct_attempt(
-		const parser::ast::function_call& function_call,
+		const parser::ast::sf::function_call& function_call,
 		const lang::symbol_table& symbols,
 		const lang::item_price_data& item_price_data,
 		lang::traits::constructor_list<> /* ctors_to_attempt */,
@@ -214,7 +213,7 @@ namespace impl
 		typename... Errors // = compile_error; we template it only for perfect forwarding and wait for homogenous packs feature
 	> [[nodiscard]]
 	std::variant<T, compile_error> construct_attempt(
-		const parser::ast::function_call& function_call,
+		const parser::ast::sf::function_call& function_call,
 		const lang::symbol_table& symbols,
 		const lang::item_price_data& item_price_data,
 		lang::traits::constructor_list<ConstructorArgumentList, OtherConstructorArgumentLists...> /* ctors_to_attempt */,
@@ -224,8 +223,7 @@ namespace impl
 		std::variant<T, compile_error> result = construct_check_arguments_amount<T>(
 			function_call.arguments, symbols, item_price_data, ConstructorArgumentList{});
 
-		if (std::holds_alternative<compile_error>(result))
-		{
+		if (std::holds_alternative<compile_error>(result)) {
 			return construct_attempt<T>(
 				function_call,
 				symbols,
@@ -243,7 +241,7 @@ namespace impl
 
 template <typename T> [[nodiscard]]
 std::variant<T, compile_error> construct(
-	const parser::ast::function_call& function_call,
+	const parser::ast::sf::function_call& function_call,
 	const lang::symbol_table& symbols,
 	const lang::item_price_data& item_price_data)
 {

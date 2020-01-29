@@ -4,7 +4,6 @@
 
 #include <boost/spirit/home/x3.hpp>
 #include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
-#include <boost/spirit/home/x3/support/utility/error_reporting.hpp>
 
 #include <vector>
 
@@ -20,8 +19,12 @@ using error_holder_type = std::vector<parse_error>;
 namespace fs::parser::detail
 {
 
-using whitespace_type = x3::rule<struct whitespace_class>;
-using skipper_type = whitespace_type;
+namespace common
+{
+    using whitespace_type = x3::rule<struct whitespace_class>;
+}
+
+using skipper_type = common::whitespace_type;
 
 using iterator_type = const char*;
 using range_type = boost::iterator_range<iterator_type>;

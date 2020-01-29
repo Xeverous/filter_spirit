@@ -31,6 +31,8 @@
 // using boost::fusion::operator<<;
 // using boost::fusion::operators::operator<<;
 
+// -------- spirit filter --------
+
 // ---- whitespace ----
 
 // (nothing to adapt)
@@ -46,47 +48,97 @@
 // ---- expressions ----
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::function_call,
+	fs::parser::ast::sf::function_call,
 	name, arguments)
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::price_range_query,
+	fs::parser::ast::sf::price_range_query,
 	name, arguments)
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::value_expression,
+	fs::parser::ast::sf::value_expression,
 	primary_expr, postfix_exprs)
 
 // ---- definitions ----
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::constant_definition,
+	fs::parser::ast::sf::constant_definition,
 	name, value)
 
 // ---- rules ----
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::comparison_condition,
+	fs::parser::ast::sf::comparison_condition,
 	property, comparison_type, value)
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::array_condition,
+	fs::parser::ast::sf::array_condition,
 	property, exact_match, value)
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::boolean_condition,
+	fs::parser::ast::sf::boolean_condition,
 	property, value)
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::unary_action,
+	fs::parser::ast::sf::unary_action,
 	action_type, value)
 
 // ---- filter structure ----
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::rule_block,
+	fs::parser::ast::sf::rule_block,
 	conditions, statements)
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::filter_structure,
+	fs::parser::ast::sf::filter_structure,
 	definitions, statements)
+
+// -------- real filter --------
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::rf::color_literal,
+	r, g, b, a)
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::rf::icon_literal,
+	size, suit, shape)
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::rf::rarity_condition,
+	comparison_type, rarity)
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::rf::numeric_condition,
+	property, comparison_type, integer)
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::rf::string_array_condition,
+	property, exact_match, string_literals)
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::rf::has_influence_condition,
+	exact_match, influence_literals)
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::rf::boolean_condition,
+	property, value)
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::rf::color_action,
+	action, color)
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::rf::play_alert_sound_action,
+	sound_id, volume)
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::rf::play_alert_sound_positional_action,
+	sound_id, volume)
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::rf::play_effect_action,
+	suit, is_temporary)
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::rf::filter_block,
+	visibility, rules)

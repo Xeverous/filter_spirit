@@ -10,9 +10,15 @@
 namespace fs::parser::detail
 {
 
-BOOST_SPIRIT_INSTANTIATE(grammar_type, iterator_type, context_type)
-BOOST_SPIRIT_INSTANTIATE(skipper_type, iterator_type, boost::spirit::x3::unused_type)
-
+namespace common {
+	BOOST_SPIRIT_INSTANTIATE(skipper_type, iterator_type, x3::unused_type)
+}
+namespace sf {
+	BOOST_SPIRIT_INSTANTIATE(grammar_type, iterator_type, context_type)
+}
+namespace rf {
+	BOOST_SPIRIT_INSTANTIATE(rf::grammar_type, iterator_type, context_type)
+}
 /*
  * If you are getting error: 'undefined reference to bool fs::parser::parse_rule[...]'
  * this means that the instantiated parser object does not match x3::phrase_parse().
@@ -29,19 +35,24 @@ BOOST_SPIRIT_INSTANTIATE(skipper_type, iterator_type, boost::spirit::x3::unused_
 // int y = iterator_type{};
 // int z = context_type{};
 
+skipper_type sf_skipper()
+{
+	return common::whitespace;
 }
 
-namespace fs::parser
+skipper_type rf_skipper()
 {
-
-detail::grammar_type grammar()
-{
-	return detail::grammar;
+	return common::whitespace;
 }
 
-detail::skipper_type skipper()
+sf::grammar_type sf_grammar()
 {
-	return detail::whitespace;
+	return sf::grammar;
+}
+
+rf::grammar_type rf_grammar()
+{
+	return rf::grammar;
 }
 
 }

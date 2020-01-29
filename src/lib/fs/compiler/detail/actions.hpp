@@ -11,12 +11,16 @@
 namespace fs::compiler::detail
 {
 
-[[nodiscard]]
-std::optional<compile_error>
-add_action(
-	const parser::ast::action& action,
+[[nodiscard]] std::optional<compile_error>
+spirit_filter_add_action(
+	const parser::ast::sf::action& action,
 	const lang::symbol_table& symbols,
 	const lang::item_price_data& item_price_data,
+	lang::action_set& action_set);
+
+[[nodiscard]] std::optional<compile_error>
+real_filter_add_action(
+	const parser::ast::rf::action& action,
 	lang::action_set& action_set);
 
 }

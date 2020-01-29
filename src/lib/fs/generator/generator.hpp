@@ -1,6 +1,6 @@
 #pragma once
 
-#include <fs/lang/filter_block.hpp>
+#include <fs/lang/item_filter.hpp>
 #include <fs/lang/item_price_data.hpp>
 
 #include <string>
@@ -10,7 +10,7 @@ namespace fs::generator
 {
 
 [[nodiscard]]
-std::string assemble_blocks_to_raw_filter(const std::vector<lang::filter_block>& blocks);
+std::string to_raw_filter(const lang::item_filter& filter);
 
 void prepend_metadata(const lang::item_price_metadata& metadata, std::string& raw_filter);
 
