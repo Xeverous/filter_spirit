@@ -103,7 +103,7 @@ namespace sf
 	// ---- literal types ----
 
 	struct floating_point_literal_class          : error_on_error, annotate_on_success {};
-	struct none_literal_class                    : error_on_error, annotate_on_success {};
+	struct underscore_literal_class              : error_on_error, annotate_on_success {};
 
 	// ---- expressions ----
 
@@ -271,8 +271,8 @@ namespace sf
 	using floating_point_literal_type = x3::rule<floating_point_literal_class, ast::sf::floating_point_literal>;
 	BOOST_SPIRIT_DECLARE(floating_point_literal_type)
 
-	using none_literal_type = x3::rule<none_literal_class, ast::sf::none_literal>;
-	BOOST_SPIRIT_DECLARE(none_literal_type)
+	using underscore_literal_type = x3::rule<underscore_literal_class, ast::sf::underscore_literal>;
+	BOOST_SPIRIT_DECLARE(underscore_literal_type)
 
 	// ---- expressions ----
 

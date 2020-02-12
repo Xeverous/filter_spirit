@@ -34,8 +34,8 @@ evaluate_literal(const ast::sf::literal_expression& expression)
 	using result_type = lang::object_variant;
 
 	auto object = expression.apply_visitor(x3::make_lambda_visitor<result_type>(
-		[](ast::sf::none_literal) {
-			return lang::none{};
+		[](ast::sf::underscore_literal) {
+			return lang::underscore{};
 		},
 		[](ast::sf::boolean_literal literal) -> result_type {
 			return lang::boolean{literal.value};

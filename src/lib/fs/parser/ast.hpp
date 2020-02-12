@@ -204,7 +204,7 @@ namespace sf
 	using suit_literal = common::suit_literal;
 	using influence_literal = common::influence_literal;
 
-	struct none_literal : x3::position_tagged
+	struct underscore_literal : x3::position_tagged
 	{
 		void get_value() {}
 	};
@@ -220,7 +220,7 @@ namespace sf
 			shape_literal,
 			suit_literal,
 			influence_literal,
-			none_literal
+			underscore_literal
 		>, x3::position_tagged
 	{
 		using base_type::base_type;

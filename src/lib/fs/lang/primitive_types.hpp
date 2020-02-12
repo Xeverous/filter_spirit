@@ -14,6 +14,11 @@ struct none {};
 inline bool operator==(none, none) noexcept { return true; }
 inline bool operator!=(none, none) noexcept { return false; }
 
+struct underscore {};
+
+inline bool operator==(underscore, underscore) noexcept { return true; }
+inline bool operator!=(underscore, underscore) noexcept { return false; }
+
 struct boolean
 {
 	bool value;

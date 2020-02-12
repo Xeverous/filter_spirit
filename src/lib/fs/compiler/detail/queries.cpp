@@ -20,7 +20,7 @@ evaluate_range_value(const lang::object& obj)
 		return std::get<lang::integer>(obj.value).value;
 	if (type == +lang::object_type::floating_point)
 		return std::get<lang::floating_point>(obj.value).value;
-	if (type == +lang::object_type::none)
+	if (type == +lang::object_type::underscore)
 		return std::nullopt;
 
 	// TODO this needs better error handling - fix this when price query design for non-elementary items

@@ -100,7 +100,7 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 			* ut::description("test that all types can be used as constant"))
 		{
 			const std::string input_str = minimal_input() + R"(
-nothing        = _
+underscore     = _
 boolean        = False
 floating_point = 3.5
 integer        = 123
@@ -126,7 +126,7 @@ array          = [1, 2, 3]
 			const parser::lookup_data& lookup_data = parse_data.lookup_data;
 			const lang::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.definitions, lookup_data);
 
-			expect_object_in_symbols(symbols, lookup_data, "nothing",        lang::none{},                    search(input, "nothing"),        search(input, "_"));
+			expect_object_in_symbols(symbols, lookup_data, "underscore",     lang::underscore{},              search(input, "underscore"),     search(input, "_"));
 			expect_object_in_symbols(symbols, lookup_data, "boolean",        lang::boolean{false},            search(input, "boolean"),        search(input, "False"));
 			expect_object_in_symbols(symbols, lookup_data, "floating_point", lang::floating_point{3.5},       search(input, "floating_point"), search(input, "3.5"));
 			expect_object_in_symbols(symbols, lookup_data, "integer",        lang::integer{123},              search(input, "integer"),        search(input, "123"));

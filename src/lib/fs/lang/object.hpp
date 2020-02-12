@@ -20,6 +20,7 @@ using array_object = std::vector<object>;
 using object_variant = std::variant<
 	// primitive types
 	none,
+	underscore,
 	boolean,
 	floating_point,
 	integer,
@@ -49,6 +50,7 @@ using object_variant = std::variant<
 BETTER_ENUM(object_type, int,
 	// primitive types
 	none,
+	underscore,
 	boolean,
 	floating_point,
 	integer,
@@ -131,6 +133,8 @@ object_type type_to_enum_impl() noexcept
 
 template <> constexpr
 object_type type_to_enum_impl<none>() noexcept { return object_type::none; }
+template <> constexpr
+object_type type_to_enum_impl<underscore>() noexcept { return object_type::underscore; }
 template <> constexpr
 object_type type_to_enum_impl<boolean>() noexcept { return object_type::boolean; }
 template <> constexpr

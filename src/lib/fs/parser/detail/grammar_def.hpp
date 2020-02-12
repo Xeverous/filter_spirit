@@ -96,9 +96,9 @@ namespace sf
 	const auto floating_point_literal_def = x3::real_parser<double, x3::strict_real_policies<double>>{};
 	BOOST_SPIRIT_DEFINE(floating_point_literal)
 
-	const none_literal_type none_literal = "none literal";
-	const auto none_literal_def = x3::lexeme['_' >> common::not_alnum_or_underscore] > x3::attr(ast::sf::none_literal());
-	BOOST_SPIRIT_DEFINE(none_literal)
+	const underscore_literal_type underscore_literal = "underscore literal";
+	const auto underscore_literal_def = x3::lexeme['_' >> common::not_alnum_or_underscore] > x3::attr(ast::sf::underscore_literal());
+	BOOST_SPIRIT_DEFINE(underscore_literal)
 
 	// ---- expressions ----
 
@@ -123,7 +123,7 @@ namespace sf
 		| common::shape_literal
 		| common::suit_literal
 		| common::influence_literal
-		| none_literal;
+		| underscore_literal;
 	BOOST_SPIRIT_DEFINE(literal_expression)
 
 	// moved here due to circular dependency
