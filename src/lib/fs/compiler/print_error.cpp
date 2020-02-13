@@ -48,18 +48,6 @@ void print_error_impl(
 }
 
 void print_error_impl(
-	errors::no_such_function error,
-	const parser::lookup_data& lookup_data,
-	log::message_stream& stream)
-{
-	stream.print_line_number_with_description_and_underlined_code(
-		lookup_data.get_view_of_whole_content(),
-		lookup_data.position_of(error.place_of_name),
-		log::strings::error,
-		"no such function exists");
-}
-
-void print_error_impl(
 	errors::no_such_query error,
 	const parser::lookup_data& lookup_data,
 	log::message_stream& stream)
@@ -99,110 +87,6 @@ void print_error_impl(
 		fs::lang::to_string_view(error.expected_type),
 		"' but got '",
 		fs::lang::to_string_view(error.actual_type),
-		"'");
-}
-
-void print_unmatched_function_call(
-	std::string_view function_name,
-	const errors::unmatched_function_call& error,
-	const parser::lookup_data& lookup_data,
-	log::message_stream& stream)
-{
-	stream << "candidate " << function_name << "(";
-	utility::for_each_and_between(
-		error.expected_argument_types.begin(),
-		error.expected_argument_types.end(),
-		[&stream](fs::lang::object_type type) { stream << fs::lang::to_string_view(type); },
-		[&stream]() { stream << ", "; });
-	stream << "):\n";
-
-	print_error_variant(error.error, lookup_data, stream);
-}
-
-void print_error_impl(
-	const errors::failed_constructor_call& error,
-	const parser::lookup_data& lookup_data,
-	log::message_stream& stream)
-{
-	const std::string_view attempted_type_name = fs::lang::to_string_view(error.attempted_type_to_construct);
-
-	const std::string_view all_code = lookup_data.get_view_of_whole_content();
-	const std::string_view code_to_underline = lookup_data.position_of(error.place_of_function_call);
-
-	stream.print_line_number(utility::count_lines(all_code.data(), code_to_underline.data()));
-	stream << log::strings::error << "failed constructor call " << attempted_type_name << "(";
-	utility::for_each_and_between(
-		error.ctor_argument_types.begin(),
-		error.ctor_argument_types.end(),
-		[&stream](fs::lang::object_type type) { stream << fs::lang::to_string_view(type); },
-		[&stream]() { stream << ", "; });
-	stream << "):\n";
-	stream.print_underlined_code(all_code, code_to_underline);
-
-	assert(error.error != nullptr);
-	print_error_variant(*error.error, lookup_data, stream);
-}
-
-void print_error_impl(
-	const errors::no_matching_constructor_found& error,
-	const parser::lookup_data& lookup_data,
-	log::message_stream& stream)
-{
-	const std::string_view attempted_type_name = fs::lang::to_string_view(error.attempted_type_to_construct);
-
-	const std::string_view all_code = lookup_data.get_view_of_whole_content();
-	const std::string_view code_to_underline = lookup_data.position_of(error.place_of_function_call);
-
-	stream.print_line_number(utility::count_lines(all_code.data(), code_to_underline.data()));
-	stream << log::strings::error << "no matching constructor for call to " << attempted_type_name << "(";
-	utility::for_each_and_between(
-		error.supplied_types.begin(),
-		error.supplied_types.end(),
-		[&stream](std::optional<fs::lang::object_type> type) {
-			if (type.has_value())
-				stream << fs::lang::to_string_view(*type);
-			else
-				stream << "?";
-		},
-		[&stream]() { stream << ", "; });
-	stream << "):\n";
-
-	stream.print_underlined_code(all_code, code_to_underline);
-
-	for (const errors::unmatched_function_call& inner_error : error.errors)
-		print_unmatched_function_call(attempted_type_name, inner_error, lookup_data, stream);
-}
-
-void print_error_impl(
-	errors::nested_arrays_not_allowed error,
-	const parser::lookup_data& lookup_data,
-	log::message_stream& stream)
-{
-	stream.print_line_number_with_description_and_underlined_code(
-		lookup_data.get_view_of_whole_content(),
-		lookup_data.position_of(error.place_of_nested_array_expression),
-		log::strings::error,
-		"nested arrays are not allowed");
-}
-
-void print_error_impl(
-	errors::non_homogeneous_array error,
-	const parser::lookup_data& lookup_data,
-	log::message_stream& stream)
-{
-	stream.print_line_number_with_description_and_underlined_code(
-		lookup_data.get_view_of_whole_content(),
-		lookup_data.position_of(error.place_of_first_element),
-		log::strings::error,
-		"non homogeneous array, one element of type '",
-		fs::lang::to_string_view(error.first_element_type),
-		"'");
-	stream.print_line_number_with_description_and_underlined_code(
-		lookup_data.get_view_of_whole_content(),
-		lookup_data.position_of(error.place_of_second_element),
-		log::strings::note,
-		"and one element of type '",
-		fs::lang::to_string_view(error.second_element_type),
 		"'");
 }
 

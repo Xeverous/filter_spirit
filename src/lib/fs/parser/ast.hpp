@@ -231,29 +231,10 @@ namespace sf
 
 	struct value_expression_sequence : std::vector<value_expression>, x3::position_tagged {};
 
-	struct function_call : x3::position_tagged
-	{
-		identifier name;
-		value_expression_sequence arguments;
-	};
-
 	struct price_range_query : x3::position_tagged
 	{
 		identifier name;
 		value_expression_sequence arguments;
-	};
-
-	struct array_expression : x3::position_tagged
-	{
-		array_expression& operator=(value_expression_sequence list)
-		{
-			elements = std::move(list);
-			return *this;
-		}
-
-		const value_expression_sequence& get_value() const { return elements; }
-
-		value_expression_sequence elements;
 	};
 
 	struct action;
@@ -263,8 +244,6 @@ namespace sf
 	struct value_expression : x3::variant<
 			compound_action_expression,
 			literal_expression,
-			array_expression,
-			function_call,
 			identifier,
 			price_range_query
 		>, x3::position_tagged

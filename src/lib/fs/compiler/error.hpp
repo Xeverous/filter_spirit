@@ -24,11 +24,6 @@ struct no_such_name
 	lang::position_tag place_of_name;
 };
 
-struct no_such_function
-{
-	lang::position_tag place_of_name;
-};
-
 struct no_such_query
 {
 	lang::position_tag place_of_name;
@@ -46,29 +41,6 @@ struct type_mismatch
 	lang::object_type expected_type;
 	lang::object_type actual_type;
 	lang::position_tag place_of_expression;
-};
-
-struct failed_constructor_call;
-
-struct no_matching_constructor_found
-{
-	lang::object_type attempted_type_to_construct;
-	std::vector<std::optional<lang::object_type>> supplied_types;
-	lang::position_tag place_of_function_call;
-	std::vector<struct unmatched_function_call> errors;
-};
-
-struct nested_arrays_not_allowed
-{
-	lang::position_tag place_of_nested_array_expression;
-};
-
-struct non_homogeneous_array
-{
-	lang::position_tag place_of_first_element;
-	lang::position_tag place_of_second_element;
-	lang::object_type first_element_type;
-	lang::object_type second_element_type;
 };
 
 struct empty_socket_group
@@ -150,14 +122,9 @@ namespace fs::compiler
 using compile_error = std::variant<
 	errors::name_already_exists,
 	errors::no_such_name,
-	errors::no_such_function,
 	errors::no_such_query,
 	errors::invalid_amount_of_arguments,
 	errors::type_mismatch,
-	errors::failed_constructor_call,
-	errors::no_matching_constructor_found,
-	errors::nested_arrays_not_allowed,
-	errors::non_homogeneous_array,
 	errors::empty_socket_group,
 	errors::illegal_characters_in_socket_group,
 	errors::invalid_socket_group,
@@ -168,35 +135,5 @@ using compile_error = std::variant<
 	errors::upper_bound_redefinition,
 	errors::internal_compiler_error
 >;
-
-namespace errors
-{
-
-struct failed_constructor_call
-{
-	lang::object_type attempted_type_to_construct;
-	std::vector<lang::object_type> ctor_argument_types;
-	lang::position_tag place_of_function_call;
-	/*
-	 * we can not hold compile_error directly because this type is already
-	 * one of compile_error variants (infinite memory would be needed)
-	 * so allocate on the heap instead
-	 *
-	 * also, we can not use a simpler version of compile_error that does not contain
-	 * complex error types because it is pretty much impossible to prove all invariants
-	 * of this in the program - there are simply too many intermediate functions which
-	 * thanks to recursion can not really prove they will be always a base case that
-	 * results in simpler error type
-	 */
-	std::unique_ptr<compile_error> error;
-};
-
-struct unmatched_function_call
-{
-	std::vector<lang::object_type> expected_argument_types;
-	compile_error error;
-};
-
-} // namespace errors
 
 } // namespace fs::compiler

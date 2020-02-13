@@ -48,10 +48,6 @@
 // ---- expressions ----
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::sf::function_call,
-	name, arguments)
-
-BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::sf::price_range_query,
 	name, arguments)
 
