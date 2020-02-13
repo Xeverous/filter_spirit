@@ -162,26 +162,6 @@ abc = non_existent_func(0)
 			BOOST_TEST(compare_ranges(expected_place_of_name, reported_place_of_name, input));
 		}
 
-		BOOST_AUTO_TEST_CASE(index_out_of_range)
-		{
-			const std::string input_str = minimal_input() + R"(
-x = 5
-arr = [1, 2, 3]
-elem = arr[x]
-)";
-			const std::string_view input = input_str;
-			const fs::parser::sf::parse_success_data parse_data = parse(input);
-			const fs::compiler::compile_error error = expect_error_when_resolving_symbols(parse_data.ast.definitions);
-			const auto& error_desc = expect_error_of_type<errors::index_out_of_range>(error, parse_data.lookup_data);
-
-			BOOST_TEST(error_desc.array_size == 3);
-			BOOST_TEST(error_desc.requested_index == 5);
-
-			const std::string_view expected_place_of_index_error = search(input, "[x]");
-			const std::string_view reported_place_of_index_error = parse_data.lookup_data.position_of(error_desc.place_of_subscript);
-			BOOST_TEST(compare_ranges(expected_place_of_index_error, reported_place_of_index_error, input));
-		}
-
 		BOOST_AUTO_TEST_CASE(invalid_amount_of_arguments)
 		{
 			const std::string input_str = minimal_input() + R"(

@@ -207,21 +207,6 @@ void print_error_impl(
 }
 
 void print_error_impl(
-	errors::index_out_of_range error,
-	const parser::lookup_data& lookup_data,
-	log::message_stream& stream)
-{
-	stream.print_line_number_with_description_and_underlined_code(
-		lookup_data.get_view_of_whole_content(),
-		lookup_data.position_of(error.place_of_subscript),
-		log::strings::error,
-		"index out of range, requested ",
-		error.requested_index,
-		" but array size is ",
-		error.array_size);
-}
-
-void print_error_impl(
 	errors::empty_socket_group error,
 	const parser::lookup_data& lookup_data,
 	log::message_stream& stream)

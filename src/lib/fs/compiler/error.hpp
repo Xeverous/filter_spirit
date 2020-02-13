@@ -71,13 +71,6 @@ struct non_homogeneous_array
 	lang::object_type second_element_type;
 };
 
-struct index_out_of_range
-{
-	lang::position_tag place_of_subscript;
-	int requested_index;
-	int array_size;
-};
-
 struct empty_socket_group
 {
 	lang::position_tag place_of_socket_group_string;
@@ -165,7 +158,6 @@ using compile_error = std::variant<
 	errors::no_matching_constructor_found,
 	errors::nested_arrays_not_allowed,
 	errors::non_homogeneous_array,
-	errors::index_out_of_range,
 	errors::empty_socket_group,
 	errors::illegal_characters_in_socket_group,
 	errors::invalid_socket_group,

@@ -120,70 +120,6 @@ evaluate_array(
 		parser::get_position_info(expression)};
 }
 
-/*
- * convert language's subscript index to actual (C++) array index
- * negative index is nth element from the end
- *
- * example:
- *
- * array_size = 4
- * array[0] => 0
- * array[3] => 3
- * array[4] => error (empty result)
- * array[-1] => 3
- * array[-4] => 0
- * array[-5] => error (empty result)
- */
-[[nodiscard]] std::optional<int>
-subscript_index_to_array_index(int n, int array_size)
-{
-	assert(array_size >= 0);
-
-	if (n >= 0)
-	{
-		if (n < array_size)
-			return n;
-		else
-			return std::nullopt;
-	}
-	else
-	{
-		if (n + array_size >= 0)
-			return n + array_size;
-		else
-			return std::nullopt;
-	}
-}
-
-[[nodiscard]] std::variant<lang::object, compile_error>
-evaluate_subscript(
-	const lang::object& obj,
-	const ast::sf::subscript& subscript,
-	const lang::symbol_table& symbols,
-	const lang::item_price_data& item_price_data)
-{
-	std::variant<lang::array_object, compile_error> array_or_error =
-		fs::compiler::detail::get_value_as<lang::array_object, false>(obj);
-	if (std::holds_alternative<compile_error>(array_or_error))
-		return std::get<compile_error>(std::move(array_or_error));
-
-	std::variant<lang::integer, compile_error> subscript_or_error =
-		fs::compiler::detail::evaluate_as<lang::integer, false>(subscript.expr, symbols, item_price_data);
-	if (std::holds_alternative<compile_error>(subscript_or_error))
-		return std::get<compile_error>(std::move(subscript_or_error));
-
-	auto& array = std::get<lang::array_object>(array_or_error);
-	auto& subscript_index = std::get<lang::integer>(subscript_or_error);
-
-	const int array_size = array.size();
-	std::optional<int> index = subscript_index_to_array_index(subscript_index.value, array_size);
-	if (!index) {
-		return errors::index_out_of_range{parser::get_position_info(subscript), subscript_index.value, array_size};
-	}
-
-	return lang::object{std::move(array[*index].value), parser::get_position_info(subscript)};
-}
-
 [[nodiscard]] std::variant<lang::object, compile_error>
 evaluate_function_call(
 	const ast::sf::function_call& function_call,
@@ -380,36 +316,6 @@ evaluate_compound_action(
 	return lang::object{std::move(actions), parser::get_position_info(expr)};
 }
 
-[[nodiscard]] std::variant<lang::object, compile_error>
-evaluate_primary_expression(
-	const ast::sf::primary_expression& primary_expression,
-	const lang::symbol_table& symbols,
-	const lang::item_price_data& item_price_data)
-{
-	using result_type = std::variant<lang::object, compile_error>;
-
-	return primary_expression.apply_visitor(x3::make_lambda_visitor<result_type>(
-		[](const ast::sf::literal_expression& literal) -> result_type {
-			return evaluate_literal(literal);
-		},
-		[&](const ast::sf::array_expression& array) {
-			return evaluate_array(array, symbols, item_price_data);
-		},
-		[&](const ast::sf::function_call& function_call) {
-			return evaluate_function_call(function_call, symbols, item_price_data);
-		},
-		[&](const ast::sf::price_range_query& price_range_query) {
-			return evaluate_price_range_query(price_range_query, symbols, item_price_data);
-		},
-		[&](const ast::sf::identifier& identifier) {
-			return evaluate_identifier(identifier, symbols);
-		},
-		[&](const ast::sf::compound_action_expression& expr) {
-			return evaluate_compound_action(expr, symbols, item_price_data);
-		}
-	));
-}
-
 } // namespace
 
 namespace fs::compiler::detail
@@ -446,20 +352,26 @@ evaluate_value_expression(
 {
 	using result_type = std::variant<lang::object, compile_error>;
 
-	result_type result = evaluate_primary_expression(value_expression.primary_expr, symbols, item_price_data);
-	if (std::holds_alternative<compile_error>(result))
-		return std::get<compile_error>(std::move(result));
-
-	auto& obj = std::get<lang::object>(result);
-	for (auto& expr : value_expression.postfix_exprs) {
-		result_type res = evaluate_subscript(obj, expr.expr, symbols, item_price_data);
-		if (std::holds_alternative<compile_error>(res))
-			return std::get<compile_error>(std::move(res));
-		else
-			obj = std::get<lang::object>(std::move(res));
-	}
-
-	return obj;
+	return value_expression.apply_visitor(x3::make_lambda_visitor<result_type>(
+		[](const ast::sf::literal_expression& literal) -> result_type {
+			return evaluate_literal(literal);
+		},
+		[&](const ast::sf::array_expression& array) {
+			return evaluate_array(array, symbols, item_price_data);
+		},
+		[&](const ast::sf::function_call& function_call) {
+			return evaluate_function_call(function_call, symbols, item_price_data);
+		},
+		[&](const ast::sf::price_range_query& price_range_query) {
+			return evaluate_price_range_query(price_range_query, symbols, item_price_data);
+		},
+		[&](const ast::sf::identifier& identifier) {
+			return evaluate_identifier(identifier, symbols);
+		},
+		[&](const ast::sf::compound_action_expression& expr) {
+			return evaluate_compound_action(expr, symbols, item_price_data);
+		}
+	));
 }
 
 }

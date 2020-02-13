@@ -39,15 +39,13 @@ bool test_literal(const T& literal, const Value& value)
 template <typename T, typename Value>
 bool test_literal_expression(const fs::parser::ast::sf::value_expression& expr, const Value& value)
 {
-	BOOST_TEST(expr.postfix_exprs.empty(), "definition should not contain postfix expressions");
-
-	if (!holds_alternative<fs::parser::ast::sf::literal_expression>(expr.primary_expr.var))
+	if (!holds_alternative<fs::parser::ast::sf::literal_expression>(expr.var))
 	{
 		BOOST_ERROR("definition does not hold literal_expression variant");
 		return false;
 	}
 
-	const auto& literal_expression = boost::get<fs::parser::ast::sf::literal_expression>(expr.primary_expr.var);
+	const auto& literal_expression = boost::get<fs::parser::ast::sf::literal_expression>(expr.var);
 	if (!holds_alternative<T>(literal_expression.var))
 	{
 		BOOST_ERROR("definition is literal_expression but does not hold expected literal");
@@ -68,15 +66,14 @@ bool test_literal_definition(const fs::parser::ast::sf::definition& def, const c
 void test_identifier_definition(const fs::parser::ast::sf::definition& def, const char* name, const char* identifier)
 {
 	BOOST_TEST(def.def.name.value == name);
-	const fs::parser::ast::sf::primary_expression& prim_expr = def.def.value.primary_expr;
 
-	if (!holds_alternative<fs::parser::ast::sf::identifier>(prim_expr.var))
+	if (!holds_alternative<fs::parser::ast::sf::identifier>(def.def.value.var))
 	{
-		BOOST_ERROR("primary expression does not hold identifier");
+		BOOST_ERROR("value expression does not hold identifier");
 		return;
 	}
 
-	const auto& id = boost::get<fs::parser::ast::sf::identifier>(prim_expr.var);
+	const auto& id = boost::get<fs::parser::ast::sf::identifier>(def.def.value.var);
 	BOOST_TEST(id.value == identifier);
 }
 
@@ -166,9 +163,8 @@ Identifiedd = Corruptedd
 		BOOST_TEST(defs[1].def.name.value == "color_black");
 		BOOST_TEST(defs[2].def.name.value == "color_other");
 
-		BOOST_TEST(defs[0].def.value.postfix_exprs.empty());
-		BOOST_TEST_REQUIRE(holds_alternative<ast::sf::function_call>(defs[0].def.value.primary_expr.var));
-		const auto& f0 = boost::get<ast::sf::function_call>(defs[0].def.value.primary_expr.var);
+		BOOST_TEST_REQUIRE(holds_alternative<ast::sf::function_call>(defs[0].def.value.var));
+		const auto& f0 = boost::get<ast::sf::function_call>(defs[0].def.value.var);
 		BOOST_TEST(f0.name.value == "RGB");
 		BOOST_TEST_REQUIRE(static_cast<int>(f0.arguments.size()) == 3);
 
@@ -176,9 +172,8 @@ Identifiedd = Corruptedd
 		test_literal_expression<ast::sf::integer_literal>(f0.arguments[1], 22);
 		test_literal_expression<ast::sf::integer_literal>(f0.arguments[2], 33);
 
-		BOOST_TEST(defs[1].def.value.postfix_exprs.empty());
-		BOOST_TEST_REQUIRE(holds_alternative<ast::sf::function_call>(defs[1].def.value.primary_expr.var));
-		const auto& f1 = boost::get<ast::sf::function_call>(defs[1].def.value.primary_expr.var);
+		BOOST_TEST_REQUIRE(holds_alternative<ast::sf::function_call>(defs[1].def.value.var));
+		const auto& f1 = boost::get<ast::sf::function_call>(defs[1].def.value.var);
 		BOOST_TEST(f1.name.value == "RGB");
 		BOOST_TEST_REQUIRE(static_cast<int>(f1.arguments.size()) == 4);
 
@@ -187,9 +182,8 @@ Identifiedd = Corruptedd
 		test_literal_expression<ast::sf::integer_literal>(f1.arguments[2], 2);
 		test_literal_expression<ast::sf::integer_literal>(f1.arguments[3], 255);
 
-		BOOST_TEST(defs[2].def.value.postfix_exprs.empty());
-		BOOST_TEST_REQUIRE(holds_alternative<ast::sf::identifier>(defs[2].def.value.primary_expr.var));
-		const auto& iden = boost::get<ast::sf::identifier>(defs[2].def.value.primary_expr.var);
+		BOOST_TEST_REQUIRE(holds_alternative<ast::sf::identifier>(defs[2].def.value.var));
+		const auto& iden = boost::get<ast::sf::identifier>(defs[2].def.value.var);
 		BOOST_TEST(iden.value == "color_black");
 	}
 
@@ -204,9 +198,8 @@ Identifiedd = Corruptedd
 		BOOST_TEST_REQUIRE(static_cast<int>(defs.size()) == 1);
 
 		BOOST_TEST(defs[0].def.name.value == "currency_t1");
-		BOOST_TEST(defs[0].def.value.postfix_exprs.empty());
-		BOOST_TEST_REQUIRE(holds_alternative<ast::sf::array_expression>(defs[0].def.value.primary_expr.var));
-		const auto& array_expr = boost::get<ast::sf::array_expression>(defs[0].def.value.primary_expr.var);
+		BOOST_TEST_REQUIRE(holds_alternative<ast::sf::array_expression>(defs[0].def.value.var));
+		const auto& array_expr = boost::get<ast::sf::array_expression>(defs[0].def.value.var);
 		BOOST_TEST_REQUIRE(static_cast<int>(array_expr.elements.size()) == 4);
 
 		const std::vector<std::string> names = { "Exalted Orb", "Mirror of Kalandra", "Eternal Orb", "Mirror Shard" };

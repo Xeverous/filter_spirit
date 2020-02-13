@@ -260,7 +260,7 @@ namespace sf
 
 	struct compound_action_expression : std::vector<action>, x3::position_tagged {};
 
-	struct primary_expression : x3::variant<
+	struct value_expression : x3::variant<
 			compound_action_expression,
 			literal_expression,
 			array_expression,
@@ -293,40 +293,6 @@ namespace sf
 	* a false positive on the same type definition. Workaround above does not help.
 	* Simply use -Wno-deprecated-copy.
 	*/
-
-	struct postfix_expression;
-
-	struct value_expression : x3::position_tagged
-	{
-		primary_expression primary_expr;
-		std::vector<postfix_expression> postfix_exprs;
-	};
-
-	struct subscript : x3::position_tagged
-	{
-		subscript& operator=(value_expression ve)
-		{
-			expr = std::move(ve);
-			return *this;
-		}
-
-		const value_expression& get_value() const { return expr; }
-
-		value_expression expr;
-	};
-
-	struct postfix_expression : x3::position_tagged
-	{
-		postfix_expression& operator=(subscript s)
-		{
-			expr = std::move(s);
-			return *this;
-		}
-
-		const subscript& get_value() const { return expr; }
-
-		subscript expr;
-	};
 
 	// ---- definitions ----
 

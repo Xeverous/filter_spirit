@@ -113,9 +113,6 @@ namespace sf
 	struct function_call_class                   : error_on_error, annotate_on_success {};
 	struct price_range_query_class               : error_on_error, annotate_on_success {};
 	struct array_expression_class                : error_on_error, annotate_on_success {};
-	struct primary_expression_class              : error_on_error, annotate_on_success {};
-	struct subscript_class                       : error_on_error, annotate_on_success {};
-	struct postfix_expression_class              : error_on_error, annotate_on_success {};
 	struct value_expression_class                : error_on_error, annotate_on_success {};
 
 	// ---- definitions ----
@@ -293,15 +290,6 @@ namespace sf
 
 	using array_expression_type = x3::rule<array_expression_class, ast::sf::array_expression>;
 	BOOST_SPIRIT_DECLARE(array_expression_type)
-
-	using primary_expression_type = x3::rule<primary_expression_class, ast::sf::primary_expression>;
-	BOOST_SPIRIT_DECLARE(primary_expression_type)
-
-	using subscript_type = x3::rule<subscript_class, ast::sf::subscript>;
-	BOOST_SPIRIT_DECLARE(subscript_type)
-
-	using postfix_expression_type = x3::rule<postfix_expression_class, ast::sf::postfix_expression>;
-	BOOST_SPIRIT_DECLARE(postfix_expression_type)
 
 	using value_expression_type = x3::rule<value_expression_class, ast::sf::value_expression>;
 	BOOST_SPIRIT_DECLARE(value_expression_type)
