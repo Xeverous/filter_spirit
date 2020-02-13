@@ -7,7 +7,7 @@ namespace fs::compiler::detail
 {
 
 std::vector<std::optional<lang::object_type>> determine_types_of(
-	const parser::ast::sf::value_expression_list& expressions,
+	const parser::ast::sf::value_expression_sequence& expressions,
 	const lang::symbol_table& symbols,
 	const lang::item_price_data& item_price_data)
 {

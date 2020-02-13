@@ -109,7 +109,7 @@ namespace sf
 
 	struct compound_action_expression_class      : error_on_error, annotate_on_success {};
 	struct literal_expression_class              : error_on_error, annotate_on_success {};
-	struct value_expression_list_class           : error_on_error, annotate_on_success {};
+	struct value_expression_sequence_class       : error_on_error, annotate_on_success {};
 	struct function_call_class                   : error_on_error, annotate_on_success {};
 	struct price_range_query_class               : error_on_error, annotate_on_success {};
 	struct array_expression_class                : error_on_error, annotate_on_success {};
@@ -279,8 +279,8 @@ namespace sf
 	using literal_expression_type = x3::rule<literal_expression_class, ast::sf::literal_expression>;
 	BOOST_SPIRIT_DECLARE(literal_expression_type)
 
-	using value_expression_list_type = x3::rule<value_expression_list_class, ast::sf::value_expression_list>;
-	BOOST_SPIRIT_DECLARE(value_expression_list_type)
+	using value_expression_sequence_type = x3::rule<value_expression_sequence_class, ast::sf::value_expression_sequence>;
+	BOOST_SPIRIT_DECLARE(value_expression_sequence_type)
 
 	using function_call_type = x3::rule<function_call_class, ast::sf::function_call>;
 	BOOST_SPIRIT_DECLARE(function_call_type)

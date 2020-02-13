@@ -129,20 +129,20 @@ namespace sf
 	// moved here due to circular dependency
 	const value_expression_type value_expression = "expression";
 
-	const value_expression_list_type value_expression_list = "expression list";
-	const auto value_expression_list_def = (value_expression % ',') | x3::attr(ast::sf::value_expression_list());
-	BOOST_SPIRIT_DEFINE(value_expression_list)
+	const value_expression_sequence_type value_expression_sequence = "expression list";
+	const auto value_expression_sequence_def = (value_expression % ',') | x3::attr(ast::sf::value_expression_sequence());
+	BOOST_SPIRIT_DEFINE(value_expression_sequence)
 
 	const function_call_type function_call = "function call";
-	const auto function_call_def = common::identifier >> '(' > value_expression_list > ')';
+	const auto function_call_def = common::identifier >> '(' > value_expression_sequence > ')';
 	BOOST_SPIRIT_DEFINE(function_call)
 
 	const price_range_query_type price_range_query = "price range query";
-	const auto price_range_query_def = '$' > common::identifier > '(' > value_expression_list > ')';
+	const auto price_range_query_def = '$' > common::identifier > '(' > value_expression_sequence > ')';
 	BOOST_SPIRIT_DEFINE(price_range_query)
 
 	const array_expression_type array_expression = "array expression";
-	const auto array_expression_def = '[' > value_expression_list > ']';
+	const auto array_expression_def = '[' > value_expression_sequence > ']';
 	BOOST_SPIRIT_DEFINE(array_expression)
 
 	const auto value_expression_def =
