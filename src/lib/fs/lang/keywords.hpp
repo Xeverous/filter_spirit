@@ -103,20 +103,35 @@ namespace rf
 // keywords used in spirit filters
 namespace sf
 {
-	constexpr auto level        = "Level";
-	constexpr auto font_size    = "FontSize";
-	constexpr auto sound_id     = "SoundId";
-	constexpr auto volume       = "Volume";
-	constexpr auto group        = "Group";
-	constexpr auto minimap_icon = "MinimapIcon";
-	constexpr auto beam_effect  = "Beam";
-	constexpr auto path         = "Path";
-	constexpr auto alert_sound  = "AlertSound";
+	// some item types are commented - there is no point in querying for them
+	// and/or sites like poe.watch and poe.ninja do not report their prices
+	constexpr auto divination      = "divination";      // 2.0 - The Awakening (Warbands + Tempest)
+	constexpr auto enchants_helmet = "enchants_helmet"; // 2.2 - Perandus league (also Ascendancy)
+	constexpr auto prophecies      = "prophecies";      // 2.3 - Prophecy league
+	constexpr auto essences        = "essences";        // 2.4 - Essence league (also Atlas of Worlds)
+	constexpr auto leaguestones    = "leaguestones";    // 2.6 - Legacy league
+	// constexpr auto pieces       = "pieces";          // 3.0 - Harbinger league (also Fall of Oriath)
+	// constexpr auto nets         = "nets";            // 3.2 - Bestiary league
+	// constexpr auto vials        = "vials";           // 3.3 - Incursion league
+	constexpr auto fossils         = "fossils";         // 3.4 - Delve league
+	constexpr auto resonators      = "resonators";      // as above
+	constexpr auto scarabs         = "scarabs";         // 3.5 - Betrayal league
+	constexpr auto incubators      = "incubators";      // 3.7 - Legion league
+	constexpr auto oils            = "oils";            // 3.8 - Blight league
+	constexpr auto catalysts       = "catalysts";       // 3.9 - Metamorph league
 
-	constexpr auto set_alert_sound            = "SetAlertSound";
-	constexpr auto play_default_drop_sound    = "PlayDefaultDropSound";
-	constexpr auto set_minimap_icon           = "SetMinimapIcon";
-	constexpr auto set_beam                   = "SetBeam";
+
+	constexpr auto uniques_eq_unambiguous    = "uniques_eq_unambiguous";
+	constexpr auto uniques_eq_ambiguous      = "uniques_eq_ambiguous";
+
+	constexpr auto uniques_flask_unambiguous = "uniques_flask_unambiguous";
+	constexpr auto uniques_flask_ambiguous   = "uniques_flask_ambiguous";
+
+	constexpr auto uniques_jewel_unambiguous = "uniques_jewel_unambiguous";
+	constexpr auto uniques_jewel_ambiguous   = "uniques_jewel_ambiguous";
+
+	constexpr auto uniques_map_unambiguous   = "uniques_map_unambiguous";
+	constexpr auto uniques_map_ambiguous     = "uniques_map_ambiguous";
 } // namespace sf
 
 }

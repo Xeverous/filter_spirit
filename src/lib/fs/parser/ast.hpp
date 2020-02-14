@@ -8,6 +8,7 @@
 #include <fs/lang/primitive_types.hpp>
 #include <fs/lang/action_properties.hpp>
 #include <fs/lang/condition_properties.hpp>
+#include <fs/lang/queries.hpp>
 
 #include <boost/optional.hpp>
 #include <boost/spirit/home/x3/support/ast/variant.hpp>
@@ -233,8 +234,15 @@ namespace sf
 
 	struct query : x3::position_tagged
 	{
-		identifier name;
-		value_expression_sequence arguments;
+		auto& operator=(lang::query qry)
+		{
+			q = qry;
+			return *this;
+		}
+
+		auto get_value() const { return q; }
+
+		lang::query q;
 	};
 
 	struct action;

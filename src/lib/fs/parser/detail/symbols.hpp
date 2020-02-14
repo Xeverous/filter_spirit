@@ -3,6 +3,7 @@
 #include <fs/lang/condition_properties.hpp>
 #include <fs/lang/primitive_types.hpp>
 #include <fs/lang/keywords.hpp>
+#include <fs/lang/queries.hpp>
 
 #include <boost/spirit/home/x3/string/symbols.hpp>
 
@@ -231,6 +232,36 @@ namespace rf
 // symbols used exclusively in spirit filter template language
 namespace sf
 {
+	struct queries_ : x3::symbols<lang::query>
+	{
+		queries_()
+		{
+			add
+				(lang::keywords::sf::divination,      fs::lang::query::divination)
+				(lang::keywords::sf::enchants_helmet, fs::lang::query::enchants_helmet)
+				(lang::keywords::sf::prophecies,      fs::lang::query::prophecies)
+				(lang::keywords::sf::essences,        fs::lang::query::essences)
+				(lang::keywords::sf::leaguestones,    fs::lang::query::leaguestones)
+				(lang::keywords::sf::fossils,         fs::lang::query::fossils)
+				(lang::keywords::sf::resonators,      fs::lang::query::resonators)
+				(lang::keywords::sf::scarabs,         fs::lang::query::scarabs)
+				(lang::keywords::sf::incubators,      fs::lang::query::incubators)
+				(lang::keywords::sf::oils,            fs::lang::query::oils)
+				(lang::keywords::sf::catalysts,       fs::lang::query::catalysts)
+				(lang::keywords::sf::uniques_eq_unambiguous,    fs::lang::query::uniques_eq_unambiguous)
+				(lang::keywords::sf::uniques_eq_ambiguous,      fs::lang::query::uniques_eq_ambiguous)
+				(lang::keywords::sf::uniques_flask_unambiguous, fs::lang::query::uniques_flask_unambiguous)
+				(lang::keywords::sf::uniques_flask_ambiguous,   fs::lang::query::uniques_flask_ambiguous)
+				(lang::keywords::sf::uniques_jewel_unambiguous, fs::lang::query::uniques_jewel_unambiguous)
+				(lang::keywords::sf::uniques_jewel_ambiguous,   fs::lang::query::uniques_jewel_ambiguous)
+				(lang::keywords::sf::uniques_map_unambiguous,   fs::lang::query::uniques_map_unambiguous)
+				(lang::keywords::sf::uniques_map_ambiguous,     fs::lang::query::uniques_map_ambiguous)
+			;
+		}
+	};
+	const queries_ queries;
+
+
 	struct comparison_condition_properties_ : x3::symbols<lang::comparison_condition_property>
 	{
 		comparison_condition_properties_()

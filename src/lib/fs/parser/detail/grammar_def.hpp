@@ -134,7 +134,7 @@ namespace sf
 	BOOST_SPIRIT_DEFINE(value_expression_sequence)
 
 	const query_type query = "price range query";
-	const auto query_def = '$' > common::identifier > '(' > value_expression_sequence > ')';
+	const auto query_def = '$' > x3::lexeme[symbols::sf::queries >> common::not_alnum_or_underscore];
 	BOOST_SPIRIT_DEFINE(query)
 
 	const auto value_expression_def =

@@ -47,9 +47,7 @@
 
 // ---- expressions ----
 
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::sf::query,
-	name, arguments)
+// (nothing to adapt)
 
 // ---- definitions ----
 
