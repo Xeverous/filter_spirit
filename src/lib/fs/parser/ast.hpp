@@ -231,7 +231,7 @@ namespace sf
 
 	struct value_expression_sequence : std::vector<value_expression>, x3::position_tagged {};
 
-	struct price_range_query : x3::position_tagged
+	struct query : x3::position_tagged
 	{
 		identifier name;
 		value_expression_sequence arguments;
@@ -245,7 +245,7 @@ namespace sf
 			compound_action_expression,
 			literal_expression,
 			identifier,
-			price_range_query
+			query
 		>, x3::position_tagged
 	{
 		using base_type::base_type;

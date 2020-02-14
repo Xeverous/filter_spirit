@@ -133,15 +133,15 @@ namespace sf
 	const auto value_expression_sequence_def = (value_expression % ',') | x3::attr(ast::sf::value_expression_sequence());
 	BOOST_SPIRIT_DEFINE(value_expression_sequence)
 
-	const price_range_query_type price_range_query = "price range query";
-	const auto price_range_query_def = '$' > common::identifier > '(' > value_expression_sequence > ')';
-	BOOST_SPIRIT_DEFINE(price_range_query)
+	const query_type query = "price range query";
+	const auto query_def = '$' > common::identifier > '(' > value_expression_sequence > ')';
+	BOOST_SPIRIT_DEFINE(query)
 
 	const auto value_expression_def =
 		  compound_action_expression
 		| literal_expression
 		| common::identifier
-		| price_range_query;
+		| query;
 	BOOST_SPIRIT_DEFINE(value_expression)
 
 	// ---- definitions ----

@@ -66,18 +66,18 @@ evaluate_literal(const ast::sf::literal_expression& expression)
 }
 
 [[nodiscard]] std::variant<lang::object, compile_error>
-evaluate_price_range_query(
-	const ast::sf::price_range_query& price_range_query,
+evaluate_query(
+	const ast::sf::query& query,
 	const lang::symbol_table& symbols,
 	const lang::item_price_data& item_price_data)
 {
 	std::variant<lang::price_range, compile_error> range_or_error =
-		compiler::detail::construct_price_range(price_range_query.arguments, symbols, item_price_data);
+		compiler::detail::construct_price_range(query.arguments, symbols, item_price_data);
 	if (std::holds_alternative<compile_error>(range_or_error))
 		return std::get<compile_error>(std::move(range_or_error));
 
 	const auto& price_range = std::get<lang::price_range>(range_or_error);
-	const lang::position_tag position_of_query = parser::get_position_info(price_range_query);
+	const lang::position_tag position_of_query = parser::get_position_info(query);
 
 	// TODO this is too complex - move the code to item_price_data when the interface of it
 	// is decided upon (think what to do with is_low_confidence). Right now there are no
@@ -117,7 +117,7 @@ evaluate_price_range_query(
 	 * tree-based or hash-based map. We can also optimize order of
 	 * comparisons.
 	 */
-	const ast::sf::identifier& query_name = price_range_query.name;
+	const ast::sf::identifier& query_name = query.name;
 	if (query_name.value == lang::queries::divination) {
 		return eval_query_elementary_items(item_price_data.divination_cards); // TODO use complex query later
 	}
@@ -245,8 +245,8 @@ evaluate_value_expression(
 		[](const ast::sf::literal_expression& literal) -> result_type {
 			return evaluate_literal(literal);
 		},
-		[&](const ast::sf::price_range_query& price_range_query) {
-			return evaluate_price_range_query(price_range_query, symbols, item_price_data);
+		[&](const ast::sf::query& query) {
+			return evaluate_query(query, symbols, item_price_data);
 		},
 		[&](const ast::sf::identifier& identifier) {
 			return evaluate_identifier(identifier, symbols);
