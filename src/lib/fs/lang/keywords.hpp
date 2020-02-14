@@ -105,7 +105,7 @@ namespace sf
 {
 	// some item types are commented - there is no point in querying for them
 	// and/or sites like poe.watch and poe.ninja do not report their prices
-	constexpr auto divination      = "divination";      // 2.0 - The Awakening (Warbands + Tempest)
+	constexpr auto cards           = "cards";           // 2.0 - The Awakening (Warbands + Tempest)
 	constexpr auto enchants_helmet = "enchants_helmet"; // 2.2 - Perandus league (also Ascendancy)
 	constexpr auto prophecies      = "prophecies";      // 2.3 - Prophecy league
 	constexpr auto essences        = "essences";        // 2.4 - Essence league (also Atlas of Worlds)

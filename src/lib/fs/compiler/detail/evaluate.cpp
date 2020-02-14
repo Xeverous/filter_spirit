@@ -4,7 +4,6 @@
 #include <fs/compiler/detail/queries.hpp>
 #include <fs/compiler/detail/type_constructors.hpp>
 #include <fs/compiler/detail/actions.hpp>
-#include <fs/lang/functions.hpp>
 #include <fs/lang/queries.hpp>
 #include <fs/lang/price_range.hpp>
 #include <fs/lang/position_tag.hpp>
@@ -63,114 +62,6 @@ evaluate_literal(const ast::sf::literal_expression& expression)
 	));
 
 	return lang::object{std::move(object), parser::get_position_info(expression)};
-}
-
-[[nodiscard]] std::variant<lang::object, compile_error>
-evaluate_query(
-	const ast::sf::query& query,
-	const lang::symbol_table& symbols,
-	const lang::item_price_data& item_price_data)
-{
-	std::variant<lang::price_range, compile_error> range_or_error =
-		compiler::detail::construct_price_range(query.arguments, symbols, item_price_data);
-	if (std::holds_alternative<compile_error>(range_or_error))
-		return std::get<compile_error>(std::move(range_or_error));
-
-	const auto& price_range = std::get<lang::price_range>(range_or_error);
-	const lang::position_tag position_of_query = parser::get_position_info(query);
-
-	// TODO this is too complex - move the code to item_price_data when the interface of it
-	// is decided upon (think what to do with is_low_confidence). Right now there are no
-	// invariants in item_price_data so we do a lot of find/for-each algorithms.
-	const auto eval_query = [&](const auto& items, auto price_func, auto name_func) {
-		lang::array_object array;
-		for (auto it = items.begin(); it != items.end(); ++it) {
-			if (price_range.contains(price_func(it))) {
-				array.push_back(lang::object{lang::string{name_func(it)}, position_of_query});
-			}
-		}
-		return lang::object{std::move(array), position_of_query};
-	};
-	const auto eval_query_elementary_items = [&](const auto& items) {
-		return eval_query(items, [](auto it) { return it->price.chaos_value; }, [](auto it) { return it->name; });
-	};
-	const auto eval_query_unamb_unique_items = [&](const auto& items) {
-		return eval_query(items, [](auto it) { return it->second.price.chaos_value; }, [](auto it) { return it->first; });
-	};
-	const auto eval_query_amb_unique_items = [&](const auto& items) {
-		return eval_query(
-			items,
-			[](auto it) {
-				auto& items = it->second;
-				return std::max_element(
-					items.begin(),
-					items.end(),
-					[](const auto& lhs, const auto& rhs) {
-						return lhs.price.chaos_value < rhs.price.chaos_value;
-					})->price.chaos_value;
-			},
-			[](auto it) { return it->first; });
-	};
-	/*
-	 * note: this is O(n) but relying on small string optimization
-	 * and much better memory layout makes it to run faster than a
-	 * tree-based or hash-based map. We can also optimize order of
-	 * comparisons.
-	 */
-	const ast::sf::identifier& query_name = query.name;
-	if (query_name.value == lang::queries::divination) {
-		return eval_query_elementary_items(item_price_data.divination_cards); // TODO use complex query later
-	}
-	else if (query_name.value == lang::queries::oils) {
-		return eval_query_elementary_items(item_price_data.prophecies);
-	}
-	else if (query_name.value == lang::queries::incubators) {
-		return eval_query_elementary_items(item_price_data.prophecies);
-	}
-	else if (query_name.value == lang::queries::essences) {
-		return eval_query_elementary_items(item_price_data.essences);
-	}
-	else if (query_name.value == lang::queries::fossils) {
-		return eval_query_elementary_items(item_price_data.fossils);
-	}
-	else if (query_name.value == lang::queries::prophecies) {
-		return eval_query_elementary_items(item_price_data.prophecies);
-	}
-	else if (query_name.value == lang::queries::resonators) {
-		return eval_query_elementary_items(item_price_data.resonators);
-	}
-	else if (query_name.value == lang::queries::scarabs) {
-		return eval_query_elementary_items(item_price_data.scarabs);
-	}
-	else if (query_name.value == lang::queries::helmet_enchants) {
-		return eval_query_elementary_items(item_price_data.helmet_enchants);
-	}
-	else if (query_name.value == lang::queries::uniques_eq_ambiguous) {
-		return eval_query_amb_unique_items(item_price_data.unique_eq.ambiguous);
-	}
-	else if (query_name.value == lang::queries::uniques_eq_unambiguous) {
-		return eval_query_unamb_unique_items(item_price_data.unique_eq.unambiguous);
-	}
-	else if (query_name.value == lang::queries::uniques_flask_ambiguous) {
-		return eval_query_amb_unique_items(item_price_data.unique_flasks.ambiguous);
-	}
-	else if (query_name.value == lang::queries::uniques_flask_unambiguous) {
-		return eval_query_unamb_unique_items(item_price_data.unique_flasks.unambiguous);
-	}
-	else if (query_name.value == lang::queries::uniques_jewel_ambiguous) {
-		return eval_query_amb_unique_items(item_price_data.unique_jewels.ambiguous);
-	}
-	else if (query_name.value == lang::queries::uniques_jewel_unambiguous) {
-		return eval_query_unamb_unique_items(item_price_data.unique_jewels.unambiguous);
-	}
-	else if (query_name.value == lang::queries::uniques_map_ambiguous) {
-		return eval_query_amb_unique_items(item_price_data.unique_maps.ambiguous);
-	}
-	else if (query_name.value == lang::queries::uniques_map_unambiguous) {
-		return eval_query_unamb_unique_items(item_price_data.unique_maps.unambiguous);
-	}
-
-	return errors::no_such_query{parser::get_position_info(query_name)};
 }
 
 [[nodiscard]] std::variant<lang::object, compile_error>
@@ -245,8 +136,8 @@ evaluate_value_expression(
 		[](const ast::sf::literal_expression& literal) -> result_type {
 			return evaluate_literal(literal);
 		},
-		[&](const ast::sf::query& query) {
-			return evaluate_query(query, symbols, item_price_data);
+		[](const ast::sf::query& query) -> result_type {
+			return lang::object{query.q, parser::get_position_info(query)};
 		},
 		[&](const ast::sf::identifier& identifier) {
 			return evaluate_identifier(identifier, symbols);

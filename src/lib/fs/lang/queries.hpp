@@ -4,7 +4,7 @@ namespace fs::lang
 {
 	enum class query
 	{
-		divination,
+		cards,
 		enchants_helmet,
 		prophecies,
 		essences,

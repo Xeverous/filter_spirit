@@ -237,7 +237,7 @@ namespace sf
 		queries_()
 		{
 			add
-				(lang::keywords::sf::divination,      fs::lang::query::divination)
+				(lang::keywords::sf::cards,           fs::lang::query::cards)
 				(lang::keywords::sf::enchants_helmet, fs::lang::query::enchants_helmet)
 				(lang::keywords::sf::prophecies,      fs::lang::query::prophecies)
 				(lang::keywords::sf::essences,        fs::lang::query::essences)
@@ -260,7 +260,6 @@ namespace sf
 		}
 	};
 	const queries_ queries;
-
 
 	struct comparison_condition_properties_ : x3::symbols<lang::comparison_condition_property>
 	{
@@ -303,15 +302,15 @@ namespace sf
 	{
 		unary_action_types_()
 		{
-			add
+			add // TODO refactor mappings (split them eg depending on expected arguments, correct naming)
 				(lang::keywords::rf::set_border_color,           lang::unary_action_type::set_border_color)
 				(lang::keywords::rf::set_text_color,             lang::unary_action_type::set_text_color)
 				(lang::keywords::rf::set_background_color,       lang::unary_action_type::set_background_color)
 				(lang::keywords::rf::set_font_size,              lang::unary_action_type::set_font_size)
-				(lang::keywords::sf::set_alert_sound,            lang::unary_action_type::set_alert_sound)
-				(lang::keywords::sf::play_default_drop_sound,    lang::unary_action_type::play_default_drop_sound)
-				(lang::keywords::sf::set_minimap_icon,           lang::unary_action_type::set_minimap_icon)
-				(lang::keywords::sf::set_beam,                   lang::unary_action_type::set_beam)
+				(lang::keywords::rf::play_alert_sound,           lang::unary_action_type::set_alert_sound)
+				(lang::keywords::rf::disable_drop_sound,         lang::unary_action_type::play_default_drop_sound)
+				(lang::keywords::rf::minimap_icon,               lang::unary_action_type::set_minimap_icon)
+				(lang::keywords::rf::play_effect,                lang::unary_action_type::set_beam)
 			;
 		}
 	};

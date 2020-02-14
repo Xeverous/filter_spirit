@@ -5,6 +5,7 @@
 #include <fs/lang/position_tag.hpp>
 #include <fs/lang/primitive_types.hpp>
 #include <fs/lang/action_set.hpp>
+#include <fs/lang/queries.hpp>
 
 #include <vector>
 #include <variant>
@@ -41,6 +42,7 @@ using object_variant = std::variant<
 	built_in_alert_sound,
 	custom_alert_sound,
 	alert_sound,
+	query,
 	// array
 	array_object,
 	// compound action
@@ -71,6 +73,7 @@ BETTER_ENUM(object_type, int,
 	built_in_alert_sound,
 	custom_alert_sound,
 	alert_sound,
+	query,
 	// array
 	array,
 	// compound action
@@ -175,6 +178,8 @@ template <> constexpr
 object_type type_to_enum_impl<custom_alert_sound>() noexcept { return object_type::custom_alert_sound; }
 template <> constexpr
 object_type type_to_enum_impl<alert_sound>() noexcept { return object_type::alert_sound; }
+template <> constexpr
+object_type type_to_enum_impl<query>() noexcept { return object_type::query; }
 template <> constexpr
 object_type type_to_enum_impl<array_object>() noexcept { return object_type::array; }
 template <> constexpr

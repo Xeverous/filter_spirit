@@ -66,7 +66,6 @@ target_sources(filter_spirit
 		fs/lang/condition_properties.hpp
 		fs/lang/condition_set.hpp
 		fs/lang/data_source_type.hpp
-		fs/lang/functions.hpp
 		fs/lang/item.hpp
 		fs/lang/item_price_data.hpp
 		fs/lang/item_filter.hpp
