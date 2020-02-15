@@ -126,22 +126,20 @@ namespace sf
 		| underscore_literal;
 	BOOST_SPIRIT_DEFINE(literal_expression)
 
-	// moved here due to circular dependency
-	const value_expression_type value_expression = "expression";
+	const primitive_value_type primitive_value = "primitive";
+	const auto primitive_value_def = literal_expression | common::identifier;
+	BOOST_SPIRIT_DEFINE(primitive_value)
 
-	const value_expression_sequence_type value_expression_sequence = "expression list";
-	const auto value_expression_sequence_def = (value_expression % ',') | x3::attr(ast::sf::value_expression_sequence());
-	BOOST_SPIRIT_DEFINE(value_expression_sequence)
+	const sequence_type sequence = "sequence";
+	const auto sequence_def = +primitive_value;
+	BOOST_SPIRIT_DEFINE(sequence)
 
-	const query_type query = "price range query";
+	const query_type query = "query";
 	const auto query_def = '$' > x3::lexeme[symbols::sf::queries >> common::not_alnum_or_underscore];
 	BOOST_SPIRIT_DEFINE(query)
 
-	const auto value_expression_def =
-		  compound_action_expression
-		| literal_expression
-		| common::identifier
-		| query;
+	const value_expression_type value_expression = "expression";
+	const auto value_expression_def = sequence | query | compound_action_expression;
 	BOOST_SPIRIT_DEFINE(value_expression)
 
 	// ---- definitions ----

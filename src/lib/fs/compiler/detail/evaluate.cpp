@@ -1,12 +1,10 @@
 #include <fs/compiler/detail/evaluate.hpp>
-#include <fs/compiler/detail/evaluate_as.hpp>
-#include <fs/compiler/detail/get_value_as.hpp>
-#include <fs/compiler/detail/queries.hpp>
 #include <fs/compiler/detail/type_constructors.hpp>
 #include <fs/compiler/detail/actions.hpp>
 #include <fs/lang/queries.hpp>
 #include <fs/lang/price_range.hpp>
 #include <fs/lang/position_tag.hpp>
+#include <fs/utility/holds_alternative.hpp>
 
 #include <cassert>
 #include <utility>
@@ -26,12 +24,12 @@ namespace
 
 // ---- spirit filter ----
 
-[[nodiscard]] lang::object
+[[nodiscard]] lang::primitive_object
 evaluate_literal(const ast::sf::literal_expression& expression)
 {
-	using result_type = lang::object_variant;
+	using result_type = lang::primitive_object_variant;
 
-	auto object = expression.apply_visitor(x3::make_lambda_visitor<result_type>(
+	auto value = expression.apply_visitor(x3::make_lambda_visitor<result_type>(
 		[](ast::sf::underscore_literal) {
 			return lang::underscore{};
 		},
@@ -61,7 +59,7 @@ evaluate_literal(const ast::sf::literal_expression& expression)
 		}
 	));
 
-	return lang::object{std::move(object), parser::get_position_info(expression)};
+	return lang::primitive_object{std::move(value), parser::get_position_info(expression)};
 }
 
 [[nodiscard]] std::variant<lang::object, compile_error>
@@ -94,6 +92,81 @@ evaluate_compound_action(
 	}
 
 	return lang::object{std::move(actions), parser::get_position_info(expr)};
+}
+
+[[nodiscard]] std::variant<lang::object, compile_error>
+evaluate_sequence(
+	const ast::sf::sequence& sequence,
+	const lang::symbol_table& symbols)
+{
+	assert(!sequence.empty());
+
+	const auto sequence_origin = parser::get_position_info(sequence);
+
+	/*
+	 * If sequence has just 1 element and it is an identifier it can be a compound action.
+	 * If there are more elements the identifier must refer to a primitive type - compound
+	 * actions can not be mixed with primitive elements.
+	 */
+	if (sequence.size() == 1u) {
+		using result_type = std::variant<lang::object, compile_error>;
+
+		return sequence[0].apply_visitor(x3::make_lambda_visitor<result_type>(
+			[&](const ast::sf::literal_expression& literal) -> result_type {
+				return lang::object{
+					lang::sequence_object{
+						{ evaluate_literal(literal) },
+						sequence_origin
+					},
+					sequence_origin
+				};
+			},
+			[&](const ast::sf::identifier& identifier) {
+				return evaluate_identifier(identifier, symbols);
+			}
+		));
+	}
+
+	/*
+	 * There is more than 1 element - all must be primitive.
+	 */
+	lang::sequence_object::container_type seq_values;
+	for (const ast::sf::primitive_value& primitive : sequence) {
+		if (holds_alternative<ast::sf::literal_expression>(primitive.var)) {
+			seq_values.push_back(evaluate_literal(boost::get<ast::sf::literal_expression>(primitive.var)));
+		}
+
+		assert(holds_alternative<ast::sf::identifier>(primitive.var));
+		const auto& iden = boost::get<ast::sf::identifier>(primitive.var);
+
+		std::variant<lang::object, compile_error> obj_or_err = evaluate_identifier(iden, symbols);
+		if (holds_alternative<compile_error>(obj_or_err)) {
+			return std::get<compile_error>(std::move(obj_or_err));
+		}
+
+		auto& obj = std::get<lang::object>(obj_or_err);
+		if (!obj.is_sequence()) {
+			return errors::type_mismatch{
+				lang::object_type::sequence,
+				obj.type(),
+				obj.origin
+			};
+		}
+
+		/*
+		 * Identifier refers to a sequence - flatten it to the parent sequence
+		 * append elements from this sequence in the same order.
+		 * During flatteting, intentionally lose the seq origin - the parent one
+		 * will be more appropriate for any diagnostic messages.
+		 */
+		auto& seq = std::get<lang::sequence_object>(obj.value).values;
+		std::move(seq.begin(), seq.end(), std::back_inserter(seq_values));
+	}
+
+	return lang::object{
+		lang::sequence_object{std::move(seq_values), sequence_origin},
+		sequence_origin
+	};
 }
 
 } // namespace
@@ -133,14 +206,11 @@ evaluate_value_expression(
 	using result_type = std::variant<lang::object, compile_error>;
 
 	return value_expression.apply_visitor(x3::make_lambda_visitor<result_type>(
-		[](const ast::sf::literal_expression& literal) -> result_type {
-			return evaluate_literal(literal);
+		[&](const ast::sf::sequence& seq) {
+			return evaluate_sequence(seq, symbols);
 		},
 		[](const ast::sf::query& query) -> result_type {
 			return lang::object{query.q, parser::get_position_info(query)};
-		},
-		[&](const ast::sf::identifier& identifier) {
-			return evaluate_identifier(identifier, symbols);
 		},
 		[&](const ast::sf::compound_action_expression& expr) {
 			return evaluate_compound_action(expr, symbols, item_price_data);

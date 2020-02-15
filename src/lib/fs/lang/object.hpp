@@ -7,89 +7,104 @@
 #include <fs/lang/action_set.hpp>
 #include <fs/lang/queries.hpp>
 
-#include <vector>
+#include <boost/container/small_vector.hpp>
+
 #include <variant>
 
 namespace fs::lang
 {
 
-class object;
-
-using array_object = std::vector<object>;
-
-// TODO: do we really need wrappign types such as font_size and path?
-using object_variant = std::variant<
-	// primitive types
+using primitive_object_variant = std::variant<
 	none,
 	underscore,
 	boolean,
 	floating_point,
 	integer,
-	level,
-	font_size,
-	sound_id,
-	volume,
 	socket_group,
 	influence,
 	rarity,
 	shape,
 	suit,
-	color,
-	minimap_icon,
-	beam_effect,
-	string,
-	path,
-	built_in_alert_sound,
-	custom_alert_sound,
-	alert_sound,
-	query,
-	// array
-	array_object,
-	// compound action
-	action_set
+	string
 >;
 
-BETTER_ENUM(object_type, int,
-	// primitive types
+struct primitive_object
+{
+	primitive_object_variant value;
+	position_tag origin;
+};
+
+inline bool operator==(const primitive_object& lhs, const primitive_object& rhs)
+{
+	return lhs.value == rhs.value;
+}
+
+inline bool operator!=(const primitive_object& lhs, const primitive_object& rhs)
+{
+	return !(lhs == rhs);
+}
+
+struct sequence_object
+{
+	// Use small_vector because most lang sequences will have very lmited number of elements -
+	// the longest sequences are color (R, G, B, + optonal A) and arrays of strings for string-based
+	// conditions like BaseType.
+	// This container optimizes storage so that only long arrays of strings will allocate.
+	using container_type = boost::container::small_vector<primitive_object, 4>;
+
+	container_type values;
+	position_tag  origin;
+};
+
+inline bool operator==(const sequence_object& lhs, const sequence_object& rhs)
+{
+	return lhs.values == rhs.values;
+}
+
+inline bool operator!=(const sequence_object& lhs, const sequence_object& rhs)
+{
+	return !(lhs == rhs);
+}
+
+using object_variant = std::variant<sequence_object, action_set, query>;
+
+BETTER_ENUM(primitive_object_type, int,
 	none,
 	underscore,
 	boolean,
 	floating_point,
 	integer,
-	level,
-	font_size,
-	sound_id,
-	volume,
 	socket_group,
 	influence,
 	rarity,
 	shape,
 	suit,
-	color,
-	minimap_icon,
-	beam_effect,
-	string,
-	path,
-	built_in_alert_sound,
-	custom_alert_sound,
-	alert_sound,
-	query,
-	// array
-	array,
-	// compound action
-	action_set)
+	string)
+
+BETTER_ENUM(object_type, int, sequence, compound_action, query)
+
+[[nodiscard]] inline
+std::string_view to_string_view(primitive_object_type type) noexcept
+{
+	return type._to_string();
+}
+
+[[nodiscard]] inline
+std::string_view to_string_view(object_type type) noexcept
+{
+	return type._to_string();
+}
 
 [[nodiscard]]
-std::string_view to_string_view(object_type type) noexcept;
-
+object_type type_of_object(const object_variant& obj) noexcept;
 [[nodiscard]]
-object_type type_of_object(const object_variant& object) noexcept;
+primitive_object_type type_of_primitive(const primitive_object_variant& obj) noexcept;
 
 struct object
 {
-	bool is_array() const noexcept
+	bool is_sequence() const noexcept
 	{
-		return std::holds_alternative<array_object>(value);
+		return std::holds_alternative<sequence_object>(value);
 	}
 
 	bool is_compound_action() const noexcept
@@ -97,9 +112,9 @@ struct object
 		return std::holds_alternative<action_set>(value);
 	}
 
-	bool is_primitive() const noexcept
+	bool is_query() const noexcept
 	{
-		return !is_array() && !is_compound_action();
+		return std::holds_alternative<query>(value);
 	}
 
 	object_type type() const noexcept
@@ -107,92 +122,55 @@ struct object
 		return type_of_object(value);
 	}
 
-	[[nodiscard]]
-	array_object promote_to_array() const
-	{
-		assert(!is_array());
-		return array_object(1, *this);
-	}
-
 	object_variant value;
-	position_tag value_origin;
+	position_tag origin;
 };
 
-inline bool operator==(const object& lhs, const object& rhs) noexcept
-{
-	// we intentionally do not compare origins
-	// this operator is used by tests and potentially in the language
-	return lhs.value == rhs.value;
-}
-inline bool operator!=(const object& lhs, const object& rhs) noexcept { return !(lhs == rhs); }
+bool operator==(const object& lhs, const object& rhs) noexcept;
 
+inline
+bool operator!=(const object& lhs, const object& rhs) noexcept { return !(lhs == rhs); }
+
+namespace detail {
+	template <typename T> [[nodiscard]] constexpr
+	primitive_object_type type_to_enum_impl() noexcept
+	{
+		static_assert(sizeof(T) == 0, "missing implementation for this type");
+		return primitive_object_type::none; // return statement only to silence compiler/editors
+	}
+
+	template <> constexpr
+	primitive_object_type type_to_enum_impl<none>() noexcept { return primitive_object_type::none; }
+	template <> constexpr
+	primitive_object_type type_to_enum_impl<underscore>() noexcept { return primitive_object_type::underscore; }
+	template <> constexpr
+	primitive_object_type type_to_enum_impl<boolean>() noexcept { return primitive_object_type::boolean; }
+	template <> constexpr
+	primitive_object_type type_to_enum_impl<floating_point>() noexcept { return primitive_object_type::floating_point; }
+	template <> constexpr
+	primitive_object_type type_to_enum_impl<integer>() noexcept { return primitive_object_type::integer; }
+	template <> constexpr
+	primitive_object_type type_to_enum_impl<socket_group>() noexcept { return primitive_object_type::socket_group; }
+	template <> constexpr
+	primitive_object_type type_to_enum_impl<influence>() noexcept { return primitive_object_type::influence; }
+	template <> constexpr
+	primitive_object_type type_to_enum_impl<rarity>() noexcept { return primitive_object_type::rarity; }
+	template <> constexpr
+	primitive_object_type type_to_enum_impl<shape>() noexcept { return primitive_object_type::shape; }
+	template <> constexpr
+	primitive_object_type type_to_enum_impl<suit>() noexcept { return primitive_object_type::suit; }
+	template <> constexpr
+	primitive_object_type type_to_enum_impl<string>() noexcept { return primitive_object_type::string; }
+}
 
 template <typename T> [[nodiscard]] constexpr
-object_type type_to_enum_impl() noexcept
-{
-	static_assert(sizeof(T) == 0, "missing implementation for this type");
-	return object_type::array; // return statement only to silence compiler/editors
-}
-
-template <> constexpr
-object_type type_to_enum_impl<none>() noexcept { return object_type::none; }
-template <> constexpr
-object_type type_to_enum_impl<underscore>() noexcept { return object_type::underscore; }
-template <> constexpr
-object_type type_to_enum_impl<boolean>() noexcept { return object_type::boolean; }
-template <> constexpr
-object_type type_to_enum_impl<floating_point>() noexcept { return object_type::floating_point; }
-template <> constexpr
-object_type type_to_enum_impl<integer>() noexcept { return object_type::integer; }
-template <> constexpr
-object_type type_to_enum_impl<level>() noexcept { return object_type::level; }
-template <> constexpr
-object_type type_to_enum_impl<font_size>() noexcept { return object_type::font_size; }
-template <> constexpr
-object_type type_to_enum_impl<sound_id>() noexcept { return object_type::sound_id; }
-template <> constexpr
-object_type type_to_enum_impl<volume>() noexcept { return object_type::volume; }
-template <> constexpr
-object_type type_to_enum_impl<socket_group>() noexcept { return object_type::socket_group; }
-template <> constexpr
-object_type type_to_enum_impl<influence>() noexcept { return object_type::influence; }
-template <> constexpr
-object_type type_to_enum_impl<rarity>() noexcept { return object_type::rarity; }
-template <> constexpr
-object_type type_to_enum_impl<shape>() noexcept { return object_type::shape; }
-template <> constexpr
-object_type type_to_enum_impl<suit>() noexcept { return object_type::suit; }
-template <> constexpr
-object_type type_to_enum_impl<color>() noexcept { return object_type::color; }
-template <> constexpr
-object_type type_to_enum_impl<minimap_icon>() noexcept { return object_type::minimap_icon; }
-template <> constexpr
-object_type type_to_enum_impl<beam_effect>() noexcept { return object_type::beam_effect; }
-template <> constexpr
-object_type type_to_enum_impl<string>() noexcept { return object_type::string; }
-template <> constexpr
-object_type type_to_enum_impl<path>() noexcept { return object_type::path; }
-template <> constexpr
-object_type type_to_enum_impl<built_in_alert_sound>() noexcept { return object_type::built_in_alert_sound; }
-template <> constexpr
-object_type type_to_enum_impl<custom_alert_sound>() noexcept { return object_type::custom_alert_sound; }
-template <> constexpr
-object_type type_to_enum_impl<alert_sound>() noexcept { return object_type::alert_sound; }
-template <> constexpr
-object_type type_to_enum_impl<query>() noexcept { return object_type::query; }
-template <> constexpr
-object_type type_to_enum_impl<array_object>() noexcept { return object_type::array; }
-template <> constexpr
-object_type type_to_enum_impl<action_set>() noexcept { return object_type::action_set; }
-
-template <typename T> [[nodiscard]] constexpr
-object_type type_to_enum() noexcept
+primitive_object_type type_to_enum() noexcept
 {
 	static_assert(
-		traits::is_variant_alternative_v<T, object_variant>,
+		traits::is_variant_alternative_v<T, primitive_object_variant>,
 		"T must be one of object type alternatives");
 
-	return type_to_enum_impl<T>();
+	return detail::type_to_enum_impl<T>();
 }
 
 }

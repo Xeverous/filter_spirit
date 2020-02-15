@@ -1,8 +1,9 @@
-#include <fs/compiler/detail/evaluate_as.hpp>
+#include <fs/compiler/detail/conditions.hpp>
+#include <fs/compiler/detail/evaluate.hpp>
 #include <fs/lang/position_tag.hpp>
+#include <fs/lang/condition_set.hpp>
 
 #include <boost/spirit/home/x3/support/utility/lambda_visitor.hpp>
-#include <fs/compiler/detail/conditions.hpp>
 
 #include <utility>
 
@@ -137,142 +138,14 @@ spirit_filter_add_comparison_condition(
 	const lang::item_price_data& item_price_data,
 	lang::condition_set& condition_set)
 {
+	// TODO implement
+
 	const lang::position_tag condition_origin = parser::get_position_info(condition);
-
-	switch (condition.property) {
-		using detail::evaluate_as;
-
-		case lang::comparison_condition_property::item_level: {
-			std::variant<lang::level, compile_error> level_or_error = evaluate_as<lang::level>(condition.value, symbols, item_price_data);
-			if (std::holds_alternative<compile_error>(level_or_error))
-				return std::get<compile_error>(std::move(level_or_error));
-
-			const auto& level = std::get<lang::level>(level_or_error);
-			return add_range_condition(condition.comparison_type.value, level.value, condition_origin, condition_set.item_level);
-		}
-		case lang::comparison_condition_property::drop_level: {
-			std::variant<lang::level, compile_error> level_or_error = evaluate_as<lang::level>(condition.value, symbols, item_price_data);
-			if (std::holds_alternative<compile_error>(level_or_error))
-				return std::get<compile_error>(std::move(level_or_error));
-
-			const auto& level = std::get<lang::level>(level_or_error);
-			return add_range_condition(condition.comparison_type.value, level.value, condition_origin, condition_set.drop_level);
-		}
-		case lang::comparison_condition_property::quality: {
-			std::variant<lang::integer, compile_error> integer_or_error = evaluate_as<lang::integer>(condition.value, symbols, item_price_data);
-			if (std::holds_alternative<compile_error>(integer_or_error))
-				return std::get<compile_error>(std::move(integer_or_error));
-
-			const auto& integer = std::get<lang::integer>(integer_or_error);
-			return add_range_condition(condition.comparison_type.value, integer.value, condition_origin, condition_set.quality);
-		}
-		case lang::comparison_condition_property::rarity: {
-			std::variant<lang::rarity, compile_error> rarity_or_error = evaluate_as<lang::rarity>(condition.value, symbols, item_price_data);
-			if (std::holds_alternative<compile_error>(rarity_or_error))
-				return std::get<compile_error>(std::move(rarity_or_error));
-
-			const auto& rarity = std::get<lang::rarity>(rarity_or_error);
-			return add_range_condition(condition.comparison_type.value, rarity, condition_origin, condition_set.rarity);
-		}
-		case lang::comparison_condition_property::sockets: {
-			std::variant<lang::integer, compile_error> integer_or_error = evaluate_as<lang::integer>(condition.value, symbols, item_price_data);
-			if (std::holds_alternative<compile_error>(integer_or_error))
-				return std::get<compile_error>(std::move(integer_or_error));
-
-			const auto& integer = std::get<lang::integer>(integer_or_error);
-			return add_range_condition(condition.comparison_type.value, integer.value, condition_origin, condition_set.sockets);
-		}
-		case lang::comparison_condition_property::links: {
-			std::variant<lang::integer, compile_error> integer_or_error = evaluate_as<lang::integer>(condition.value, symbols, item_price_data);
-			if (std::holds_alternative<compile_error>(integer_or_error))
-				return std::get<compile_error>(std::move(integer_or_error));
-
-			const auto& integer = std::get<lang::integer>(integer_or_error);
-			return add_range_condition(condition.comparison_type.value, integer.value, condition_origin, condition_set.links);
-		}
-		case lang::comparison_condition_property::height: {
-			std::variant<lang::integer, compile_error> integer_or_error = evaluate_as<lang::integer>(condition.value, symbols, item_price_data);
-			if (std::holds_alternative<compile_error>(integer_or_error))
-				return std::get<compile_error>(std::move(integer_or_error));
-
-			const auto& integer = std::get<lang::integer>(integer_or_error);
-			return add_range_condition(condition.comparison_type.value, integer.value, condition_origin, condition_set.height);
-		}
-		case lang::comparison_condition_property::width: {
-			std::variant<lang::integer, compile_error> integer_or_error = evaluate_as<lang::integer>(condition.value, symbols, item_price_data);
-			if (std::holds_alternative<compile_error>(integer_or_error))
-				return std::get<compile_error>(std::move(integer_or_error));
-
-			const auto& integer = std::get<lang::integer>(integer_or_error);
-			return add_range_condition(condition.comparison_type.value, integer.value, condition_origin, condition_set.width);
-		}
-		case lang::comparison_condition_property::stack_size: {
-			std::variant<lang::integer, compile_error> integer_or_error = evaluate_as<lang::integer>(condition.value, symbols, item_price_data);
-			if (std::holds_alternative<compile_error>(integer_or_error))
-				return std::get<compile_error>(std::move(integer_or_error));
-
-			const auto& integer = std::get<lang::integer>(integer_or_error);
-			return add_range_condition(condition.comparison_type.value, integer.value, condition_origin, condition_set.stack_size);
-		}
-		case lang::comparison_condition_property::gem_level: {
-			std::variant<lang::integer, compile_error> integer_or_error = evaluate_as<lang::integer>(condition.value, symbols, item_price_data);
-			if (std::holds_alternative<compile_error>(integer_or_error))
-				return std::get<compile_error>(std::move(integer_or_error));
-
-			const auto& integer = std::get<lang::integer>(integer_or_error);
-			return add_range_condition(condition.comparison_type.value, integer.value, condition_origin, condition_set.gem_level);
-		}
-		case lang::comparison_condition_property::map_tier: {
-			std::variant<lang::integer, compile_error> integer_or_error = evaluate_as<lang::integer>(condition.value, symbols, item_price_data);
-			if (std::holds_alternative<compile_error>(integer_or_error))
-				return std::get<compile_error>(std::move(integer_or_error));
-
-			const auto& integer = std::get<lang::integer>(integer_or_error);
-			return add_range_condition(condition.comparison_type.value, integer.value, condition_origin, condition_set.map_tier);
-		}
-	}
 
 	return errors::internal_compiler_error{
 		errors::internal_compiler_error_cause::spirit_filter_add_comparison_condition,
 		condition_origin
 	};
-}
-
-[[nodiscard]] std::variant<std::vector<std::string>, compile_error>
-array_to_strings(
-	lang::array_object array)
-{
-	std::vector<std::string> result;
-	for (lang::object& obj : array) {
-		if (!std::holds_alternative<lang::string>(obj.value))
-			return errors::type_mismatch{
-				lang::object_type::string,
-				obj.type(),
-				obj.value_origin};
-
-		auto& string = std::get<lang::string>(obj.value);
-		result.push_back(std::move(string.value));
-	}
-
-	return result;
-}
-
-[[nodiscard]] std::variant<std::vector<lang::influence>, compile_error>
-array_to_influences(
-	lang::array_object array)
-{
-	std::vector<lang::influence> result;
-	for (lang::object& obj : array) {
-		if (!std::holds_alternative<lang::influence>(obj.value))
-			return errors::type_mismatch{
-				lang::object_type::influence,
-				obj.type(),
-				obj.value_origin};
-
-		result.push_back(std::get<lang::influence>(obj.value));
-	}
-
-	return result;
 }
 
 [[nodiscard]] std::optional<compile_error>
@@ -331,55 +204,10 @@ spirit_filter_add_array_condition(
 	const lang::item_price_data& item_price_data,
 	lang::condition_set& condition_set)
 {
-	std::variant<lang::array_object, compile_error> array_or_error =
-		detail::evaluate_as<lang::array_object>(condition.value, symbols, item_price_data);
-
-	if (std::holds_alternative<compile_error>(array_or_error))
-		return std::get<compile_error>(std::move(array_or_error));
-
 	const bool is_exact_match = condition.exact_match.required;
 	const lang::position_tag condition_origin = parser::get_position_info(condition);
 
-	// all conditions except "HasInfluence" expect an array of strings, which expects an array of influences
-	// handle influence first and then just expect an array of string for every other condition
-	if (condition.property == lang::array_condition_property::has_influence) {
-		auto influences_or_error = array_to_influences(std::move(std::get<lang::array_object>(array_or_error)));
-
-		if (std::holds_alternative<compile_error>(influences_or_error))
-			return std::get<compile_error>(std::move(influences_or_error));
-
-		auto& influences = std::get<std::vector<lang::influence>>(influences_or_error);
-		return spirit_filter_add_influence_condition_impl(
-			std::move(influences), is_exact_match, condition_origin, condition_set.has_influence);
-	}
-
-	auto strings_or_error = array_to_strings(std::move(std::get<lang::array_object>(array_or_error)));
-	if (std::holds_alternative<compile_error>(strings_or_error))
-		return std::get<compile_error>(std::move(strings_or_error));
-
-	auto& strings = std::get<std::vector<std::string>>(strings_or_error);
-
-	switch (condition.property) {
-		case lang::array_condition_property::class_: {
-			return add_string_condition_impl(std::move(strings), is_exact_match, condition_origin, condition_set.class_);
-		}
-		case lang::array_condition_property::base_type: {
-			return add_string_condition_impl(std::move(strings), is_exact_match, condition_origin, condition_set.base_type);
-		}
-		case lang::array_condition_property::has_explicit_mod: {
-			return add_string_condition_impl(std::move(strings), is_exact_match, condition_origin, condition_set.has_explicit_mod);
-		}
-		case lang::array_condition_property::has_enchantment: {
-			return add_string_condition_impl(std::move(strings), is_exact_match, condition_origin, condition_set.has_enchantment);
-		}
-		case lang::array_condition_property::prophecy: {
-			return add_string_condition_impl(std::move(strings), is_exact_match, condition_origin, condition_set.prophecy);
-		}
-		case lang::array_condition_property::has_influence: { // to shut the warning about unhandled case
-			break; // already handled earlier in the function
-		}
-	}
-
+	// TODO implement
 	return errors::internal_compiler_error{
 		errors::internal_compiler_error_cause::spirit_filter_add_array_condition,
 		condition_origin
@@ -406,15 +234,9 @@ spirit_filter_add_socket_group_condition(
 	const lang::item_price_data& item_price_data,
 	lang::condition_set& condition_set)
 {
-	std::variant<lang::socket_group, compile_error> socket_group_or_error =
-		detail::evaluate_as<lang::socket_group>(condition.value, symbols, item_price_data);
-
-	if (std::holds_alternative<compile_error>(socket_group_or_error))
-		return std::get<compile_error>(std::move(socket_group_or_error));
-
-	const auto& socket_group = std::get<lang::socket_group>(socket_group_or_error);
-	lang::position_tag condition_origin = parser::get_position_info(condition);
-	return add_socket_group_condition(socket_group, condition_origin, condition_set.socket_group);
+	// TODO implement
+	throw 0;
+	// return add_socket_group_condition(socket_group, condition_origin, condition_set.socket_group);
 }
 
 [[nodiscard]] std::optional<compile_error>
@@ -424,15 +246,9 @@ spirit_filter_add_boolean_condition(
 	const lang::item_price_data& item_price_data,
 	lang::condition_set& condition_set)
 {
-	std::variant<lang::boolean, compile_error> boolean_or_error =
-		detail::evaluate_as<lang::boolean>(condition.value, symbols, item_price_data);
-
-	if (std::holds_alternative<compile_error>(boolean_or_error))
-		return std::get<compile_error>(std::move(boolean_or_error));
-
-	auto& boolean = std::get<lang::boolean>(boolean_or_error);
-	const lang::position_tag condition_origin = parser::get_position_info(condition);
-	return add_boolean_condition(boolean, condition_origin, condition.property, condition_set);
+	// TODO implement
+	throw 0;
+	// return add_boolean_condition(boolean, condition_origin, condition.property, condition_set);
 }
 
 [[nodiscard]] std::optional<compile_error>

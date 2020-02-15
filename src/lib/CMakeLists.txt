@@ -24,8 +24,6 @@ target_sources(filter_spirit
 		fs/compiler/detail/actions.cpp
 		fs/compiler/detail/conditions.cpp
 		fs/compiler/detail/evaluate.cpp
-		fs/compiler/detail/queries.cpp
-		fs/compiler/detail/determine_types_of.cpp
 		fs/generator/generate_filter.cpp
 		fs/generator/generator.cpp
 		fs/lang/action_set.cpp
@@ -49,11 +47,7 @@ target_sources(filter_spirit
 		fs/compiler/detail/actions.hpp
 		fs/compiler/detail/conditions.hpp
 		fs/compiler/detail/construct.hpp
-		fs/compiler/detail/determine_types_of.hpp
 		fs/compiler/detail/evaluate.hpp
-		fs/compiler/detail/evaluate_as.hpp
-		fs/compiler/detail/get_value_as.hpp
-		fs/compiler/detail/queries.hpp
 		fs/compiler/detail/type_constructors.hpp
 		fs/compiler/compiler.hpp
 		fs/compiler/error.hpp

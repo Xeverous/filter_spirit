@@ -228,9 +228,13 @@ namespace sf
 		using base_type::operator=;
 	};
 
-	struct value_expression;
+	struct primitive_value : x3::variant<literal_expression, identifier>, x3::position_tagged
+	{
+		using base_type::base_type;
+		using base_type::operator=;
+	};
 
-	struct value_expression_sequence : std::vector<value_expression>, x3::position_tagged {};
+	struct sequence : std::vector<primitive_value>, x3::position_tagged {};
 
 	struct query : x3::position_tagged
 	{
@@ -250,10 +254,9 @@ namespace sf
 	struct compound_action_expression : std::vector<action>, x3::position_tagged {};
 
 	struct value_expression : x3::variant<
-			compound_action_expression,
-			literal_expression,
-			identifier,
-			query
+			sequence,
+			query,
+			compound_action_expression
 		>, x3::position_tagged
 	{
 		using base_type::base_type;
