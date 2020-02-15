@@ -147,22 +147,6 @@ namespace rf
 	};
 	const numeric_comparison_condition_properties_ numeric_comparison_condition_properties;
 
-	struct array_condition_properties_ : x3::symbols<lang::array_condition_property>
-	{
-		array_condition_properties_()
-		{
-			add
-				(lang::keywords::rf::class_,           lang::array_condition_property::class_)
-				(lang::keywords::rf::base_type,        lang::array_condition_property::base_type)
-				(lang::keywords::rf::has_explicit_mod, lang::array_condition_property::has_explicit_mod)
-				(lang::keywords::rf::has_enchantment,  lang::array_condition_property::has_enchantment)
-				(lang::keywords::rf::prophecy,         lang::array_condition_property::prophecy)
-				(lang::keywords::rf::has_influence,    lang::array_condition_property::has_influence)
-			;
-		}
-	};
-	const array_condition_properties_ array_condition_properties;
-
 	struct string_array_condition_properties_ : x3::symbols<lang::string_array_condition_property>
 	{
 		string_array_condition_properties_()
@@ -177,6 +161,18 @@ namespace rf
 		}
 	};
 	const string_array_condition_properties_ string_array_condition_properties;
+
+	struct socket_spec_condition_properties_ : x3::symbols<lang::socket_spec_condition_property>
+	{
+		socket_spec_condition_properties_()
+		{
+			add
+				(lang::keywords::rf::sockets,      lang::socket_spec_condition_property::sockets)
+				(lang::keywords::rf::socket_group, lang::socket_spec_condition_property::socket_group)
+			;
+		}
+	};
+	socket_spec_condition_properties_ socket_spec_condition_properties;
 
 	struct boolean_condition_properties_ : x3::symbols<lang::boolean_condition_property>
 	{
@@ -260,43 +256,6 @@ namespace sf
 		}
 	};
 	const queries_ queries;
-
-	struct comparison_condition_properties_ : x3::symbols<lang::comparison_condition_property>
-	{
-		comparison_condition_properties_()
-		{
-			add
-				(lang::keywords::rf::item_level,     lang::comparison_condition_property::item_level)
-				(lang::keywords::rf::drop_level,     lang::comparison_condition_property::drop_level)
-				(lang::keywords::rf::quality,        lang::comparison_condition_property::quality)
-				(lang::keywords::rf::rarity,         lang::comparison_condition_property::rarity)
-				(lang::keywords::rf::sockets,        lang::comparison_condition_property::sockets)
-				(lang::keywords::rf::linked_sockets, lang::comparison_condition_property::links)
-				(lang::keywords::rf::height,         lang::comparison_condition_property::height)
-				(lang::keywords::rf::width,          lang::comparison_condition_property::width)
-				(lang::keywords::rf::stack_size,     lang::comparison_condition_property::stack_size)
-				(lang::keywords::rf::gem_level,      lang::comparison_condition_property::gem_level)
-				(lang::keywords::rf::map_tier,       lang::comparison_condition_property::map_tier)
-			;
-		}
-	};
-	const comparison_condition_properties_ comparison_condition_properties;
-
-	struct array_condition_properties_ : x3::symbols<lang::array_condition_property>
-	{
-		array_condition_properties_()
-		{
-			add
-				(lang::keywords::rf::class_,           lang::array_condition_property::class_)
-				(lang::keywords::rf::base_type,        lang::array_condition_property::base_type)
-				(lang::keywords::rf::has_explicit_mod, lang::array_condition_property::has_explicit_mod)
-				(lang::keywords::rf::has_enchantment,  lang::array_condition_property::has_enchantment)
-				(lang::keywords::rf::prophecy,         lang::array_condition_property::prophecy)
-				(lang::keywords::rf::has_influence,    lang::array_condition_property::has_influence)
-			;
-		}
-	};
-	const array_condition_properties_ array_condition_properties;
 
 	struct unary_action_types_ : x3::symbols<lang::unary_action_type>
 	{

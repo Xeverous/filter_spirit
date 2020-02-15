@@ -13,22 +13,6 @@ enum class comparison_type
 	greater_equal
 };
 
-// all conditions which use comparison
-enum class comparison_condition_property
-{
-	item_level,
-	drop_level,
-	quality,
-	rarity,
-	sockets,
-	links,
-	height,
-	width,
-	stack_size,
-	gem_level,
-	map_tier
-};
-
 // all conditions which use comparison against integers
 // (currently comparison conditions except rarity)
 enum class numeric_comparison_condition_property
@@ -43,17 +27,6 @@ enum class numeric_comparison_condition_property
 	stack_size,
 	gem_level,
 	map_tier
-};
-
-// all conditions which work with array of values
-enum class array_condition_property
-{
-	class_,
-	base_type,
-	has_explicit_mod,
-	has_enchantment,
-	prophecy,
-	has_influence
 };
 
 // all conditions which work with array of strings
@@ -80,6 +53,12 @@ enum class boolean_condition_property
 	shaped_map,
 	elder_map,
 	blighted_map
+};
+
+enum class socket_spec_condition_property
+{
+	sockets,
+	socket_group
 };
 
 } // namespace fs::lang

@@ -102,8 +102,7 @@ enum class internal_compiler_error_cause
 	real_filter_add_string_array_condition,
 	real_filter_add_color_action,
 
-	spirit_filter_add_array_condition,
-	spirit_filter_add_comparison_condition,
+	spirit_filter_add_numeric_comparison_condition,
 
 	spirit_filter_add_unary_action
 };

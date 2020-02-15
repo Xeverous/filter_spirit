@@ -132,8 +132,8 @@ add_boolean_condition(
 }
 
 [[nodiscard]] std::optional<compile_error>
-spirit_filter_add_comparison_condition(
-	const ast::sf::comparison_condition& condition,
+spirit_filter_add_numeric_comparison_condition(
+	const ast::sf::numeric_comparison_condition& condition,
 	const lang::symbol_table& symbols,
 	const lang::item_price_data& item_price_data,
 	lang::condition_set& condition_set)
@@ -143,7 +143,7 @@ spirit_filter_add_comparison_condition(
 	const lang::position_tag condition_origin = parser::get_position_info(condition);
 
 	return errors::internal_compiler_error{
-		errors::internal_compiler_error_cause::spirit_filter_add_comparison_condition,
+		errors::internal_compiler_error_cause::spirit_filter_add_numeric_comparison_condition,
 		condition_origin
 	};
 }
@@ -198,23 +198,6 @@ spirit_filter_add_influence_condition_impl(
 }
 
 [[nodiscard]] std::optional<compile_error>
-spirit_filter_add_array_condition(
-	const ast::sf::array_condition& condition,
-	const lang::symbol_table& symbols,
-	const lang::item_price_data& item_price_data,
-	lang::condition_set& condition_set)
-{
-	const bool is_exact_match = condition.exact_match.required;
-	const lang::position_tag condition_origin = parser::get_position_info(condition);
-
-	// TODO implement
-	return errors::internal_compiler_error{
-		errors::internal_compiler_error_cause::spirit_filter_add_array_condition,
-		condition_origin
-	};
-}
-
-[[nodiscard]] std::optional<compile_error>
 add_socket_group_condition(
 	lang::socket_group socket_group,
 	lang::position_tag condition_origin,
@@ -228,8 +211,8 @@ add_socket_group_condition(
 }
 
 [[nodiscard]] std::optional<compile_error>
-spirit_filter_add_socket_group_condition(
-	const ast::sf::socket_group_condition& condition,
+spirit_filter_add_socket_spec_condition(
+	const ast::sf::socket_spec_condition& condition,
 	const lang::symbol_table& symbols,
 	const lang::item_price_data& item_price_data,
 	lang::condition_set& condition_set)
@@ -392,18 +375,26 @@ spirit_filter_add_conditions(
 	lang::condition_set& condition_set)
 {
 	for (const ast::sf::condition& condition : conditions) {
-		auto error = condition.apply_visitor(x3::make_lambda_visitor<std::optional<compile_error>>(
-			[&](const ast::sf::comparison_condition& comparison_condition) {
-				return spirit_filter_add_comparison_condition(comparison_condition, symbols, item_price_data, condition_set);
+		using result_type = std::optional<compile_error>;
+
+		auto error = condition.apply_visitor(x3::make_lambda_visitor<result_type>(
+			[&](const ast::sf::rarity_comparison_condition& comparison_condition) -> result_type {
+				throw 0; // TODO implement
 			},
-			[&](const ast::sf::array_condition& string_condition) {
-				return spirit_filter_add_array_condition(string_condition, symbols, item_price_data, condition_set);
+			[&](const ast::sf::numeric_comparison_condition& comparison_condition) {
+				return spirit_filter_add_numeric_comparison_condition(comparison_condition, symbols, item_price_data, condition_set);
+			},
+			[&](const ast::sf::string_sequence_condition& string_condition) -> result_type {
+				throw 0; // TODO implement
+			},
+			[&](const ast::sf::has_influence_condition& string_condition) -> result_type {
+				throw 0; // TODO implement
+			},
+			[&](const ast::sf::socket_spec_condition& socket_group_condition) {
+				return spirit_filter_add_socket_spec_condition(socket_group_condition, symbols, item_price_data, condition_set);
 			},
 			[&](const ast::sf::boolean_condition& boolean_condition) {
 				return spirit_filter_add_boolean_condition(boolean_condition, symbols, item_price_data, condition_set);
-			},
-			[&](const ast::sf::socket_group_condition& socket_group_condition) {
-				return spirit_filter_add_socket_group_condition(socket_group_condition, symbols, item_price_data, condition_set);
 			}
 		));
 

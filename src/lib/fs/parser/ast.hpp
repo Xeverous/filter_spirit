@@ -308,47 +308,53 @@ namespace sf
 	// ---- rules ----
 
 	using comparison_operator_expression = common::comparison_operator_expression;
-
-	struct comparison_condition : x3::position_tagged
-	{
-		lang::comparison_condition_property property;
-		comparison_operator_expression comparison_type;
-		value_expression value;
-	};
-
 	using exact_matching_policy = common::exact_matching_policy;
 
-	struct array_condition : x3::position_tagged
+	struct rarity_comparison_condition : x3::position_tagged
 	{
-		lang::array_condition_property property;
+		comparison_operator_expression comparison_type;
+		sequence values;
+	};
+
+	struct numeric_comparison_condition : x3::position_tagged
+	{
+		lang::numeric_comparison_condition_property property;
+		comparison_operator_expression comparison_type;
+		sequence values;
+	};
+
+	struct string_sequence_condition : x3::position_tagged
+	{
+		lang::string_array_condition_property property;
 		exact_matching_policy exact_match;
-		value_expression value;
+		sequence values;
+	};
+
+	struct has_influence_condition : x3::position_tagged
+	{
+		exact_matching_policy exact_match;
+		sequence values;
+	};
+
+	struct socket_spec_condition : x3::position_tagged
+	{
+		lang::socket_spec_condition_property property;
+		sequence values;
 	};
 
 	struct boolean_condition : x3::position_tagged
 	{
 		lang::boolean_condition_property property;
-		value_expression value;
-	};
-
-	struct socket_group_condition : x3::position_tagged
-	{
-		socket_group_condition& operator=(value_expression ve)
-		{
-			value = std::move(ve);
-			return *this;
-		}
-
-		const value_expression& get_value() const { return value; }
-
-		value_expression value;
+		sequence values;
 	};
 
 	struct condition : x3::variant<
-			comparison_condition,
-			array_condition,
-			boolean_condition,
-			socket_group_condition
+			rarity_comparison_condition,
+			numeric_comparison_condition,
+			string_sequence_condition,
+			has_influence_condition,
+			socket_spec_condition,
+			boolean_condition
 		>, x3::position_tagged
 	{
 		using base_type::base_type;

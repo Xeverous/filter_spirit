@@ -226,10 +226,8 @@ void print_error_impl(
 				return "real_filter_add_string_array_condition";
 			case error_cause::real_filter_add_color_action:
 				return "real_filter_add_color_action";
-			case error_cause::spirit_filter_add_array_condition:
-				return "spirit_filter_add_array_condition";
-			case error_cause::spirit_filter_add_comparison_condition:
-				return "spirit_filter_add_comparison_condition";
+			case error_cause::spirit_filter_add_numeric_comparison_condition:
+				return "spirit_filter_add_numeric_comparison_condition";
 			case error_cause::spirit_filter_add_unary_action:
 				return "spirit_filter_add_unary_action";
 			default:

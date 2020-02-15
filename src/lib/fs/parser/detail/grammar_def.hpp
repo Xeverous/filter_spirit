@@ -153,41 +153,59 @@ namespace sf
 	const auto definition_def = constant_definition;
 	BOOST_SPIRIT_DEFINE(definition)
 
-	// ---- rules ----
+	// ---- conditions ----
 
-	const comparison_condition_type comparison_condition = "comparison condition";
-	const auto comparison_condition_def =
-		x3::lexeme[symbols::sf::comparison_condition_properties >> common::not_alnum_or_underscore]
+	const rarity_comparison_condition_type rarity_comparison_condition = "rarity comparison condition";
+	const auto rarity_comparison_condition_def =
+		x3::lexeme[lang::keywords::rf::rarity >> common::not_alnum_or_underscore]
 		> common::comparison_operator_expression
-		> value_expression;
-	BOOST_SPIRIT_DEFINE(comparison_condition)
+		> sequence;
+	BOOST_SPIRIT_DEFINE(rarity_comparison_condition)
 
-	const array_condition_type array_condition = "array condition";
-	const auto array_condition_def =
-		x3::lexeme[symbols::sf::array_condition_properties >> common::not_alnum_or_underscore]
+	const numeric_comparison_condition_type numeric_comparison_condition = "numeric comparison condition";
+	const auto numeric_comparison_condition_def =
+		x3::lexeme[symbols::rf::numeric_comparison_condition_properties >> common::not_alnum_or_underscore]
+		> common::comparison_operator_expression
+		> sequence;
+	BOOST_SPIRIT_DEFINE(numeric_comparison_condition)
+
+	const string_sequence_condition_type string_sequence_condition = "string sequence condition";
+	const auto string_sequence_condition_def =
+		x3::lexeme[symbols::rf::string_array_condition_properties >> common::not_alnum_or_underscore]
 		> common::exact_matching_policy_expression
-		> value_expression;
-	BOOST_SPIRIT_DEFINE(array_condition)
+		> sequence;
+	BOOST_SPIRIT_DEFINE(string_sequence_condition)
+
+	const has_influence_condition_type has_influence_condition = "has influence condition";
+	const auto has_influence_condition_def =
+		x3::lexeme[lang::keywords::rf::has_influence >> common::not_alnum_or_underscore]
+		> common::exact_matching_policy_expression
+		> sequence;
+	BOOST_SPIRIT_DEFINE(has_influence_condition)
+
+	const socket_spec_condition_type socket_spec_condition = "socket spec condition";
+	const auto socket_spec_condition_def =
+		x3::lexeme[symbols::rf::socket_spec_condition_properties >> common::not_alnum_or_underscore]
+		> sequence;
+	BOOST_SPIRIT_DEFINE(socket_spec_condition)
 
 	const boolean_condition_type boolean_condition = "boolean condition";
 	const auto boolean_condition_def =
 		x3::lexeme[symbols::rf::boolean_condition_properties >> common::not_alnum_or_underscore]
-		> value_expression;
+		> sequence;
 	BOOST_SPIRIT_DEFINE(boolean_condition)
-
-	const socket_group_condition_type socket_group_condition = "socket group condition";
-	const auto socket_group_condition_def =
-		x3::lexeme[lang::keywords::rf::socket_group >> common::not_alnum_or_underscore]
-		> value_expression;
-	BOOST_SPIRIT_DEFINE(socket_group_condition)
 
 	const condition_type condition = "condition";
 	const auto condition_def =
-		  comparison_condition
-		| array_condition
-		| boolean_condition
-		| socket_group_condition;
+		  rarity_comparison_condition
+		| numeric_comparison_condition
+		| string_sequence_condition
+		| has_influence_condition
+		| socket_spec_condition
+		| boolean_condition;
 	BOOST_SPIRIT_DEFINE(condition)
+
+	// ---- actions ----
 
 	const unary_action_type unary_action = "unary action";
 	const auto unary_action_def =

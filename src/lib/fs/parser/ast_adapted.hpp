@@ -55,19 +55,33 @@ BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::sf::constant_definition,
 	name, value)
 
-// ---- rules ----
+// ---- conditions ----
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::sf::comparison_condition,
-	property, comparison_type, value)
+	fs::parser::ast::sf::rarity_comparison_condition,
+	comparison_type, values)
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::sf::array_condition,
-	property, exact_match, value)
+	fs::parser::ast::sf::numeric_comparison_condition,
+	property, comparison_type, values)
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::sf::string_sequence_condition,
+	property, exact_match, values)
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::sf::has_influence_condition,
+	exact_match, values)
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::sf::socket_spec_condition,
+	property, values)
 
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::sf::boolean_condition,
-	property, value)
+	property, values)
+
+// ---- actions ----
 
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::sf::unary_action,

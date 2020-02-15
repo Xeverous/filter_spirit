@@ -119,13 +119,18 @@ namespace sf
 	struct constant_definition_class             : error_on_error, annotate_on_success {};
 	struct definition_class                      : error_on_error, annotate_on_success {};
 
-	// ---- rules ----
+	// ---- conditions ----
 
-	struct comparison_condition_class            : error_on_error, annotate_on_success {};
-	struct array_condition_class                 : error_on_error, annotate_on_success {};
+	struct rarity_comparison_condition_class     : error_on_error, annotate_on_success {};
+	struct numeric_comparison_condition_class    : error_on_error, annotate_on_success {};
+	struct string_sequence_condition_class       : error_on_error, annotate_on_success {};
+	struct has_influence_condition_class         : error_on_error, annotate_on_success {};
+	struct socket_spec_condition_class           : error_on_error, annotate_on_success {};
 	struct boolean_condition_class               : error_on_error, annotate_on_success {};
-	struct socket_group_condition_class          : error_on_error, annotate_on_success {};
 	struct condition_class                       : error_on_error, annotate_on_success {};
+
+	// ---- actions ----
+
 	struct compound_action_class                 : error_on_error, annotate_on_success {};
 	struct unary_action_class                    : error_on_error, annotate_on_success {};
 	struct action_class                          : error_on_error, annotate_on_success {};
@@ -298,22 +303,30 @@ namespace sf
 	using definition_type = x3::rule<definition_class, ast::sf::definition>;
 	BOOST_SPIRIT_DECLARE(definition_type)
 
-	// ---- rules ----
+	// ---- conditions ----
 
-	using comparison_condition_type = x3::rule<comparison_condition_class, ast::sf::comparison_condition>;
-	BOOST_SPIRIT_DECLARE(comparison_condition_type)
+	using rarity_comparison_condition_type = x3::rule<rarity_comparison_condition_class, ast::sf::rarity_comparison_condition>;
+	BOOST_SPIRIT_DECLARE(rarity_comparison_condition_type)
 
-	using array_condition_type = x3::rule<array_condition_class, ast::sf::array_condition>;
-	BOOST_SPIRIT_DECLARE(array_condition_type)
+	using numeric_comparison_condition_type = x3::rule<numeric_comparison_condition_class, ast::sf::numeric_comparison_condition>;
+	BOOST_SPIRIT_DECLARE(numeric_comparison_condition_type)
+
+	using string_sequence_condition_type = x3::rule<string_sequence_condition_class, ast::sf::string_sequence_condition>;
+	BOOST_SPIRIT_DECLARE(string_sequence_condition_type)
+
+	using has_influence_condition_type = x3::rule<has_influence_condition_class, ast::sf::has_influence_condition>;
+	BOOST_SPIRIT_DECLARE(has_influence_condition_type)
+
+	using socket_spec_condition_type = x3::rule<socket_spec_condition_class, ast::sf::socket_spec_condition>;
+	BOOST_SPIRIT_DECLARE(socket_spec_condition_type)
 
 	using boolean_condition_type = x3::rule<boolean_condition_class, ast::sf::boolean_condition>;
 	BOOST_SPIRIT_DECLARE(boolean_condition_type)
 
-	using socket_group_condition_type = x3::rule<socket_group_condition_class, ast::sf::socket_group_condition>;
-	BOOST_SPIRIT_DECLARE(socket_group_condition_type)
-
 	using condition_type = x3::rule<condition_class, ast::sf::condition>;
 	BOOST_SPIRIT_DECLARE(condition_type)
+
+	// ---- actions ----
 
 	using compound_action_type = x3::rule<compound_action_class, ast::sf::compound_action>;
 	BOOST_SPIRIT_DECLARE(compound_action_type)
