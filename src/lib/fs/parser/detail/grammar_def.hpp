@@ -126,20 +126,20 @@ namespace sf
 		| underscore_literal;
 	BOOST_SPIRIT_DEFINE(literal_expression)
 
+	const query_type query = "query";
+	const auto query_def = '$' > x3::lexeme[symbols::sf::queries >> common::not_alnum_or_underscore];
+	BOOST_SPIRIT_DEFINE(query)
+
 	const primitive_value_type primitive_value = "primitive";
-	const auto primitive_value_def = literal_expression | common::identifier;
+	const auto primitive_value_def = literal_expression | query | common::identifier;
 	BOOST_SPIRIT_DEFINE(primitive_value)
 
 	const sequence_type sequence = "sequence";
 	const auto sequence_def = +primitive_value;
 	BOOST_SPIRIT_DEFINE(sequence)
 
-	const query_type query = "query";
-	const auto query_def = '$' > x3::lexeme[symbols::sf::queries >> common::not_alnum_or_underscore];
-	BOOST_SPIRIT_DEFINE(query)
-
 	const value_expression_type value_expression = "expression";
-	const auto value_expression_def = sequence | query | compound_action_expression;
+	const auto value_expression_def = sequence | compound_action_expression;
 	BOOST_SPIRIT_DEFINE(value_expression)
 
 	// ---- definitions ----

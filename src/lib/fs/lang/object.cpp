@@ -23,9 +23,6 @@ object_type type_of_object(const object_variant& obj) noexcept
 		},
 		[](const action_set&) {
 			return object_type::compound_action;
-		},
-		[](query) {
-			return object_type::query;
 		}
 	}, obj);
 }

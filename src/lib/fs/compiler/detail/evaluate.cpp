@@ -62,6 +62,12 @@ evaluate_literal(const ast::sf::literal_expression& expression)
 	return lang::primitive_object{std::move(value), parser::get_position_info(expression)};
 }
 
+[[nodiscard]] lang::primitive_object
+evaluate_query(const ast::sf::query& expression)
+{
+	return lang::primitive_object{expression.q, parser::get_position_info(expression)};
+}
+
 [[nodiscard]] std::variant<lang::object, compile_error>
 evaluate_identifier(
 	const ast::sf::identifier& identifier,
@@ -121,6 +127,15 @@ evaluate_sequence(
 					sequence_origin
 				};
 			},
+			[&](const ast::sf::query& query) -> result_type {
+				return lang::object{
+					lang::sequence_object{
+						{ evaluate_query(query) },
+						sequence_origin
+					},
+					sequence_origin
+				};
+			},
 			[&](const ast::sf::identifier& identifier) {
 				return evaluate_identifier(identifier, symbols);
 			}
@@ -134,6 +149,10 @@ evaluate_sequence(
 	for (const ast::sf::primitive_value& primitive : sequence) {
 		if (holds_alternative<ast::sf::literal_expression>(primitive.var)) {
 			seq_values.push_back(evaluate_literal(boost::get<ast::sf::literal_expression>(primitive.var)));
+		}
+
+		if (holds_alternative<ast::sf::query>(primitive.var)) {
+			seq_values.push_back(evaluate_query(boost::get<ast::sf::query>(primitive.var)));
 		}
 
 		assert(holds_alternative<ast::sf::identifier>(primitive.var));
@@ -208,9 +227,6 @@ evaluate_value_expression(
 	return value_expression.apply_visitor(x3::make_lambda_visitor<result_type>(
 		[&](const ast::sf::sequence& seq) {
 			return evaluate_sequence(seq, symbols);
-		},
-		[](const ast::sf::query& query) -> result_type {
-			return lang::object{query.q, parser::get_position_info(query)};
 		},
 		[&](const ast::sf::compound_action_expression& expr) {
 			return evaluate_compound_action(expr, symbols, item_price_data);

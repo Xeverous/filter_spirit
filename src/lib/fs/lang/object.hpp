@@ -25,7 +25,8 @@ using primitive_object_variant = std::variant<
 	rarity,
 	shape,
 	suit,
-	string
+	string,
+	query
 >;
 
 struct primitive_object
@@ -66,7 +67,7 @@ inline bool operator!=(const sequence_object& lhs, const sequence_object& rhs)
 	return !(lhs == rhs);
 }
 
-using object_variant = std::variant<sequence_object, action_set, query>;
+using object_variant = std::variant<sequence_object, action_set>;
 
 BETTER_ENUM(primitive_object_type, int,
 	none,
@@ -79,9 +80,10 @@ BETTER_ENUM(primitive_object_type, int,
 	rarity,
 	shape,
 	suit,
-	string)
+	string,
+	query)
 
-BETTER_ENUM(object_type, int, sequence, compound_action, query)
+BETTER_ENUM(object_type, int, sequence, compound_action)
 
 [[nodiscard]] inline
 std::string_view to_string_view(primitive_object_type type) noexcept
@@ -110,11 +112,6 @@ struct object
 	bool is_compound_action() const noexcept
 	{
 		return std::holds_alternative<action_set>(value);
-	}
-
-	bool is_query() const noexcept
-	{
-		return std::holds_alternative<query>(value);
 	}
 
 	object_type type() const noexcept
@@ -161,6 +158,8 @@ namespace detail {
 	primitive_object_type type_to_enum_impl<suit>() noexcept { return primitive_object_type::suit; }
 	template <> constexpr
 	primitive_object_type type_to_enum_impl<string>() noexcept { return primitive_object_type::string; }
+	template <> constexpr
+	primitive_object_type type_to_enum_impl<query>() noexcept { return primitive_object_type::query; }
 }
 
 template <typename T> [[nodiscard]] constexpr

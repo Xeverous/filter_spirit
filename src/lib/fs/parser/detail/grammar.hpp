@@ -109,9 +109,9 @@ namespace sf
 
 	struct compound_action_expression_class      : error_on_error, annotate_on_success {};
 	struct literal_expression_class              : error_on_error, annotate_on_success {};
+	struct query_class                           : error_on_error, annotate_on_success {};
 	struct primitive_value_class                 : error_on_error, annotate_on_success {};
 	struct sequence_class                        : error_on_error, annotate_on_success {};
-	struct query_class                           : error_on_error, annotate_on_success {};
 	struct value_expression_class                : error_on_error, annotate_on_success {};
 
 	// ---- definitions ----
@@ -283,14 +283,14 @@ namespace sf
 	using literal_expression_type = x3::rule<literal_expression_class, ast::sf::literal_expression>;
 	BOOST_SPIRIT_DECLARE(literal_expression_type)
 
+	using query_type = x3::rule<query_class, ast::sf::query>;
+	BOOST_SPIRIT_DECLARE(query_type)
+
 	using primitive_value_type = x3::rule<primitive_value_class, ast::sf::primitive_value>;
 	BOOST_SPIRIT_DECLARE(primitive_value_type)
 
 	using sequence_type = x3::rule<sequence_class, ast::sf::sequence>;
 	BOOST_SPIRIT_DECLARE(sequence_type)
-
-	using query_type = x3::rule<query_class, ast::sf::query>;
-	BOOST_SPIRIT_DECLARE(query_type)
 
 	using value_expression_type = x3::rule<value_expression_class, ast::sf::value_expression>;
 	BOOST_SPIRIT_DECLARE(value_expression_type)

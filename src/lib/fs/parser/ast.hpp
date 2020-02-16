@@ -228,14 +228,6 @@ namespace sf
 		using base_type::operator=;
 	};
 
-	struct primitive_value : x3::variant<literal_expression, identifier>, x3::position_tagged
-	{
-		using base_type::base_type;
-		using base_type::operator=;
-	};
-
-	struct sequence : std::vector<primitive_value>, x3::position_tagged {};
-
 	struct query : x3::position_tagged
 	{
 		auto& operator=(lang::query qry)
@@ -249,13 +241,20 @@ namespace sf
 		lang::query q;
 	};
 
+	struct primitive_value : x3::variant<literal_expression, query, identifier>, x3::position_tagged
+	{
+		using base_type::base_type;
+		using base_type::operator=;
+	};
+
+	struct sequence : std::vector<primitive_value>, x3::position_tagged {};
+
 	struct action;
 
 	struct compound_action_expression : std::vector<action>, x3::position_tagged {};
 
 	struct value_expression : x3::variant<
 			sequence,
-			query,
 			compound_action_expression
 		>, x3::position_tagged
 	{
