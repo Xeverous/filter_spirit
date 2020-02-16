@@ -46,9 +46,7 @@ target_sources(filter_spirit
 	PUBLIC
 		fs/compiler/detail/actions.hpp
 		fs/compiler/detail/conditions.hpp
-		fs/compiler/detail/construct.hpp
 		fs/compiler/detail/evaluate.hpp
-		fs/compiler/detail/type_constructors.hpp
 		fs/compiler/compiler.hpp
 		fs/compiler/error.hpp
 		fs/compiler/print_error.hpp
@@ -65,14 +63,13 @@ target_sources(filter_spirit
 		fs/lang/item_filter.hpp
 		fs/lang/keywords.hpp
 		fs/lang/league.hpp
+		fs/lang/limits.hpp
 		fs/lang/object.hpp
 		fs/lang/position_tag.hpp
 		fs/lang/price_range.hpp
 		fs/lang/primitive_types.hpp
 		fs/lang/queries.hpp
 		fs/lang/symbol_table.hpp
-		fs/lang/traits/is_lang_type.hpp
-		fs/lang/traits/promotions.hpp
 		fs/log/string_logger.hpp
 		fs/log/console_logger.hpp
 		fs/log/logger.hpp

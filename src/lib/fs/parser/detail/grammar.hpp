@@ -83,6 +83,7 @@ namespace common
 	struct shape_literal_class                   : error_on_error, annotate_on_success {};
 	struct suit_literal_class                    : error_on_error, annotate_on_success {};
 	struct influence_literal_class               : error_on_error, annotate_on_success {};
+	struct none_literal_class                    : error_on_error, annotate_on_success {};
 
 	struct comparison_operator_expression_class  : error_on_error, annotate_on_success {};
 	struct exact_matching_policy_expression_class: error_on_error, annotate_on_success {};
@@ -103,7 +104,7 @@ namespace sf
 	// ---- literal types ----
 
 	struct floating_point_literal_class          : error_on_error, annotate_on_success {};
-	struct underscore_literal_class              : error_on_error, annotate_on_success {};
+	struct socket_spec_literal_class             : error_on_error, annotate_on_success {};
 
 	// ---- expressions ----
 
@@ -131,8 +132,14 @@ namespace sf
 
 	// ---- actions ----
 
+	struct set_color_action_class                : error_on_error, annotate_on_success {};
+	struct set_font_size_action_class            : error_on_error, annotate_on_success {};
+	struct minimap_icon_action_class             : error_on_error, annotate_on_success {};
+	struct play_effect_action_class              : error_on_error, annotate_on_success {};
+	struct play_alert_sound_action_class         : error_on_error, annotate_on_success {};
+	struct custom_alert_sound_action_class       : error_on_error, annotate_on_success {};
+	struct disable_drop_sound_action_class       : error_on_error, annotate_on_success {};
 	struct compound_action_class                 : error_on_error, annotate_on_success {};
-	struct unary_action_class                    : error_on_error, annotate_on_success {};
 	struct action_class                          : error_on_error, annotate_on_success {};
 
 	// ---- filter structure ----
@@ -164,6 +171,7 @@ namespace rf
 	struct icon_literal_class                    : error_on_error, annotate_on_success {};
 	struct string_literal_array_class            : error_on_error, annotate_on_success {};
 	struct influence_literal_array_class         : error_on_error, annotate_on_success {};
+	struct socket_spec_literal_class             : error_on_error, annotate_on_success {};
 
 	// ---- conditions ----
 
@@ -171,7 +179,7 @@ namespace rf
 	struct numeric_condition_class               : error_on_error, annotate_on_success {};
 	struct string_array_condition_class          : error_on_error, annotate_on_success {};
 	struct has_influence_condition_class         : error_on_error, annotate_on_success {};
-	struct socket_group_condition_class          : error_on_error, annotate_on_success {};
+	struct socket_spec_condition_class           : error_on_error, annotate_on_success {};
 	struct boolean_condition_class               : error_on_error, annotate_on_success {};
 
 	// ---- actions ----
@@ -243,6 +251,9 @@ namespace common
 	using influence_literal_type = x3::rule<influence_literal_class, ast::common::influence_literal>;
 	BOOST_SPIRIT_DECLARE(influence_literal_type)
 
+	using none_literal_type = x3::rule<none_literal_class, ast::common::none_literal>;
+	BOOST_SPIRIT_DECLARE(none_literal_type)
+
 	// ---- rules ----
 
 	using comparison_operator_expression_type = x3::rule<comparison_operator_expression_class, ast::common::comparison_operator_expression>;
@@ -272,8 +283,8 @@ namespace sf
 	using floating_point_literal_type = x3::rule<floating_point_literal_class, ast::sf::floating_point_literal>;
 	BOOST_SPIRIT_DECLARE(floating_point_literal_type)
 
-	using underscore_literal_type = x3::rule<underscore_literal_class, ast::sf::underscore_literal>;
-	BOOST_SPIRIT_DECLARE(underscore_literal_type)
+	using socket_spec_literal_type = x3::rule<socket_spec_literal_class, ast::sf::socket_spec_literal>;
+	BOOST_SPIRIT_DECLARE(socket_spec_literal_type)
 
 	// ---- expressions ----
 
@@ -328,14 +339,32 @@ namespace sf
 
 	// ---- actions ----
 
-	using compound_action_type = x3::rule<compound_action_class, ast::sf::compound_action>;
-	BOOST_SPIRIT_DECLARE(compound_action_type)
+	using set_color_action_type = x3::rule<set_color_action_class, ast::sf::set_color_action>;
+	BOOST_SPIRIT_DECLARE(set_color_action_type)
 
-	using unary_action_type = x3::rule<unary_action_class, ast::sf::unary_action>;
-	BOOST_SPIRIT_DECLARE(unary_action_type)
+	using set_font_size_action_type = x3::rule<set_font_size_action_class, ast::sf::set_font_size_action>;
+	BOOST_SPIRIT_DECLARE(set_font_size_action_type)
+
+	using minimap_icon_action_type = x3::rule<minimap_icon_action_class, ast::sf::minimap_icon_action>;
+	BOOST_SPIRIT_DECLARE(minimap_icon_action_type)
+
+	using play_effect_action_type = x3::rule<play_effect_action_class, ast::sf::play_effect_action>;
+	BOOST_SPIRIT_DECLARE(play_effect_action_type)
+
+	using play_alert_sound_action_type = x3::rule<play_alert_sound_action_class, ast::sf::play_alert_sound_action>;
+	BOOST_SPIRIT_DECLARE(play_alert_sound_action_type)
+
+	using custom_alert_sound_action_type = x3::rule<custom_alert_sound_action_class, ast::sf::custom_alert_sound_action>;
+	BOOST_SPIRIT_DECLARE(custom_alert_sound_action_type)
+
+	using disable_drop_sound_action_type = x3::rule<disable_drop_sound_action_class, ast::sf::disable_drop_sound_action>;
+	BOOST_SPIRIT_DECLARE(disable_drop_sound_action_type)
 
 	using action_type = x3::rule<action_class, ast::sf::action>;
 	BOOST_SPIRIT_DECLARE(action_type)
+
+	using compound_action_type = x3::rule<compound_action_class, ast::sf::compound_action>;
+	BOOST_SPIRIT_DECLARE(compound_action_type)
 
 	// ---- filter structure ----
 
@@ -369,20 +398,23 @@ namespace rf
 	using influence_literal_array_type = x3::rule<influence_literal_array_class, ast::rf::influence_literal_array>;
 	BOOST_SPIRIT_DECLARE(influence_literal_array_type)
 
+	using socket_spec_literal_type = x3::rule<socket_spec_literal_class, ast::rf::socket_spec_literal>;
+	BOOST_SPIRIT_DECLARE(socket_spec_literal_type)
+
 	// ---- conditions ----
 
 	using rarity_condition_type               = x3::rule<rarity_condition_class,            ast::rf::rarity_condition>;
 	using numeric_condition_type              = x3::rule<numeric_condition_class,           ast::rf::numeric_condition>;
 	using string_array_condition_type         = x3::rule<string_array_condition_class,      ast::rf::string_array_condition>;
 	using has_influence_condition_type        = x3::rule<has_influence_condition_class,     ast::rf::has_influence_condition>;
-	using socket_group_condition_type         = x3::rule<socket_group_condition_class,      ast::rf::socket_group_condition>;
+	using socket_spec_condition_type          = x3::rule<socket_spec_condition_class,       ast::rf::socket_spec_condition>;
 	using boolean_condition_type              = x3::rule<boolean_condition_class,           ast::rf::boolean_condition>;
 	BOOST_SPIRIT_DECLARE(
 		rarity_condition_type,
 		numeric_condition_type,
 		string_array_condition_type,
 		has_influence_condition_type,
-		socket_group_condition_type,
+		socket_spec_condition_type,
 		boolean_condition_type
 	)
 

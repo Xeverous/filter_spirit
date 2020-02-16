@@ -55,6 +55,8 @@ namespace rf
 	constexpr auto g = 'G';
 	constexpr auto b = 'B';
 	constexpr auto w = 'W';
+	constexpr auto a = 'A';
+	constexpr auto d = 'D';
 
 	constexpr auto normal = "Normal";
 	constexpr auto magic  = "Magic";
@@ -98,6 +100,7 @@ namespace rf
 	constexpr auto warlord     = "Warlord";
 
 	constexpr auto temp = "Temp";
+	constexpr auto none = "None";
 } // namespace rf
 
 // keywords used in spirit filters

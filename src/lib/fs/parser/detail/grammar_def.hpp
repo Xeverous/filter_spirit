@@ -73,6 +73,10 @@ namespace common
 	const auto influence_literal_def = x3::lexeme[symbols::rf::influences >> not_alnum_or_underscore];
 	BOOST_SPIRIT_DEFINE(influence_literal)
 
+	const none_literal_type none_literal = "none literal";
+	const auto none_literal_def = x3::lexeme[lang::keywords::rf::none >> not_alnum_or_underscore] > x3::attr(ast::common::none_literal{});
+	BOOST_SPIRIT_DEFINE(none_literal)
+
 	// ---- rules ----
 
 	const comparison_operator_expression_type comparison_operator_expression = "comparison operator";
@@ -96,9 +100,9 @@ namespace sf
 	const auto floating_point_literal_def = x3::real_parser<double, x3::strict_real_policies<double>>{};
 	BOOST_SPIRIT_DEFINE(floating_point_literal)
 
-	const underscore_literal_type underscore_literal = "underscore literal";
-	const auto underscore_literal_def = x3::lexeme['_' >> common::not_alnum_or_underscore] > x3::attr(ast::sf::underscore_literal());
-	BOOST_SPIRIT_DEFINE(underscore_literal)
+	const socket_spec_literal_type socket_spec_literal = "socket spec literal";
+	const auto socket_spec_literal_def = x3::lexeme[common::integer_literal >> common::identifier];
+	BOOST_SPIRIT_DEFINE(socket_spec_literal)
 
 	// ---- expressions ----
 
@@ -116,6 +120,9 @@ namespace sf
 	// we can clearly assume that integers and strings will be the most popular
 	// note: order should match types in literal_expression_type::attribute_type
 		  floating_point_literal
+		// must be attempted before integer literal, otherwise integer literal for eg "5GGG" would
+		// leave letters which immediately follow (no whitespace) that would trigger parse error
+		| socket_spec_literal
 		| common::integer_literal
 		| common::string_literal
 		| common::boolean_literal
@@ -123,7 +130,7 @@ namespace sf
 		| common::shape_literal
 		| common::suit_literal
 		| common::influence_literal
-		| underscore_literal;
+		| common::none_literal;
 	BOOST_SPIRIT_DEFINE(literal_expression)
 
 	const query_type query = "query";
@@ -131,7 +138,7 @@ namespace sf
 	BOOST_SPIRIT_DEFINE(query)
 
 	const primitive_value_type primitive_value = "primitive";
-	const auto primitive_value_def = literal_expression | query | common::identifier;
+	const auto primitive_value_def = literal_expression | common::identifier;
 	BOOST_SPIRIT_DEFINE(primitive_value)
 
 	const sequence_type sequence = "sequence";
@@ -186,6 +193,7 @@ namespace sf
 	const socket_spec_condition_type socket_spec_condition = "socket spec condition";
 	const auto socket_spec_condition_def =
 		x3::lexeme[symbols::rf::socket_spec_condition_properties >> common::not_alnum_or_underscore]
+		> (symbols::rf::socket_spec_comparison_operators | x3::attr(lang::socket_spec_comparison_type::equal))
 		> sequence;
 	BOOST_SPIRIT_DEFINE(socket_spec_condition)
 
@@ -207,19 +215,63 @@ namespace sf
 
 	// ---- actions ----
 
-	const unary_action_type unary_action = "unary action";
-	const auto unary_action_def =
-		x3::lexeme[symbols::sf::unary_action_types >> common::not_alnum_or_underscore]
-		> value_expression;
-	BOOST_SPIRIT_DEFINE(unary_action)
+	const set_color_action_type set_color_action = "set color action";
+	const auto set_color_action_def =
+		x3::lexeme[symbols::rf::color_actions >> common::not_alnum_or_underscore]
+		> sequence;
+	BOOST_SPIRIT_DEFINE(set_color_action)
+
+	const set_font_size_action_type set_font_size_action = "set font size action";
+	const auto set_font_size_action_def =
+		x3::lexeme[lang::keywords::rf::set_font_size >> common::not_alnum_or_underscore]
+		> sequence;
+	BOOST_SPIRIT_DEFINE(set_font_size_action)
+
+	const minimap_icon_action_type minimap_icon_action = "minimap icon action";
+	const auto minimap_icon_action_def =
+		x3::lexeme[lang::keywords::rf::minimap_icon >> common::not_alnum_or_underscore]
+		> sequence;
+	BOOST_SPIRIT_DEFINE(minimap_icon_action)
+
+	const play_effect_action_type play_effect_action = "play effect action";
+	const auto play_effect_action_def =
+		x3::lexeme[lang::keywords::rf::play_effect >> common::not_alnum_or_underscore]
+		> sequence;
+	BOOST_SPIRIT_DEFINE(play_effect_action)
+
+	const play_alert_sound_action_type play_alert_sound_action = "play alert sound action";
+	const auto play_alert_sound_action_def =
+		x3::lexeme[symbols::rf::play_alert_sound_actions >> common::not_alnum_or_underscore]
+		> sequence;
+	BOOST_SPIRIT_DEFINE(play_alert_sound_action)
+
+	const custom_alert_sound_action_type custom_alert_sound_action = "custom alert sound action";
+	const auto custom_alert_sound_action_def =
+		x3::lexeme[lang::keywords::rf::custom_alert_sound >> common::not_alnum_or_underscore]
+		> sequence;
+	BOOST_SPIRIT_DEFINE(custom_alert_sound_action)
+
+	const disable_drop_sound_action_type disable_drop_sound_action = "disable drop sound action";
+	const auto disable_drop_sound_action_def =
+		x3::lexeme[lang::keywords::rf::disable_drop_sound >> common::not_alnum_or_underscore]
+		> x3::attr(ast::sf::disable_drop_sound_action{});
+	BOOST_SPIRIT_DEFINE(disable_drop_sound_action)
 
 	const compound_action_type compound_action = "compound action";
 	const auto compound_action_def =
 		x3::lexeme["Set" >> common::not_alnum_or_underscore]
-		> value_expression;
+		> sequence;
 	BOOST_SPIRIT_DEFINE(compound_action)
 
-	const auto action_def = compound_action | unary_action;
+	const auto action_def =
+		  set_color_action
+		| set_font_size_action
+		| minimap_icon_action
+		| play_effect_action
+		| play_alert_sound_action
+		| custom_alert_sound_action
+		| disable_drop_sound_action
+		| compound_action;
 	BOOST_SPIRIT_DEFINE(action)
 
 	// ---- filter structure ----
@@ -271,6 +323,15 @@ namespace rf
 	const auto influence_literal_array_def = +x3::lexeme[common::influence_literal >> common::not_alnum_or_underscore];
 	BOOST_SPIRIT_DEFINE(influence_literal_array)
 
+	const socket_spec_literal_type socket_spec_literal = "socket spec literal";
+	const auto socket_spec_literal_def =
+		x3::lexeme[
+			// TODO what is the position_tag value when x3::attr() is used?
+			(common::integer_literal >> (common::identifier | x3::attr(ast::rf::identifier{})))
+			| (x3::attr(ast::rf::integer_literal{}) >> common::identifier)
+		];
+	BOOST_SPIRIT_DEFINE(socket_spec_literal)
+
 	// ---- conditions ----
 
 	const rarity_condition_type rarity_condition = "rarity condition";
@@ -301,11 +362,12 @@ namespace rf
 		> influence_literal_array;
 	BOOST_SPIRIT_DEFINE(has_influence_condition)
 
-	const socket_group_condition_type socket_group_condition = "socket group condition";
-	const auto socket_group_condition_def =
-		x3::lexeme[lang::keywords::rf::socket_group >> common::not_alnum_or_underscore]
-		> common::identifier;
-	BOOST_SPIRIT_DEFINE(socket_group_condition)
+	const socket_spec_condition_type socket_spec_condition = "socket spec condition";
+	const auto socket_spec_condition_def =
+		x3::lexeme[symbols::rf::socket_spec_condition_properties >> common::not_alnum_or_underscore]
+		> (symbols::rf::socket_spec_comparison_operators | x3::attr(lang::socket_spec_comparison_type::equal))
+		> +socket_spec_literal;
+	BOOST_SPIRIT_DEFINE(socket_spec_condition)
 
 	const boolean_condition_type boolean_condition = "boolean condition";
 	const auto boolean_condition_def =
@@ -319,7 +381,7 @@ namespace rf
 		| numeric_condition
 		| string_array_condition
 		| has_influence_condition
-		| socket_group_condition
+		| socket_spec_condition
 		| boolean_condition;
 	BOOST_SPIRIT_DEFINE(condition)
 

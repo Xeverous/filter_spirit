@@ -14,26 +14,15 @@ namespace fs::lang
 // SetTextColor 0 0 0 255
 // ~~~~~~~~~~~~
 
-// TODO remove unneded ctors and types
-
 struct color
 {
-	color(int r, int g, int b)
-	: r(r), g(g), b(b) {}
-
-	color(int r, int g, int b, int a)
+	color(integer r, integer g, integer b, std::optional<integer> a = std::nullopt)
 	: r(r), g(g), b(b), a(a) {}
 
-	color(integer r, integer g, integer b)
-	: r(r.value), g(g.value), b(b.value) {}
-
-	color(integer r, integer g, integer b, integer a)
-	: r(r.value), g(g.value), b(b.value), a(a.value) {}
-
-	int r;
-	int g;
-	int b;
-	std::optional<int> a;
+	integer r;
+	integer g;
+	integer b;
+	std::optional<integer> a;
 };
 
 inline bool operator==(color lhs, color rhs) noexcept
@@ -75,79 +64,29 @@ inline bool operator!=(font_size_action lhs, font_size_action rhs)
 	return !(lhs == rhs);
 }
 
-struct path
+struct builtin_alert_sound
 {
-	explicit path(std::string str)
-	: value(std::move(str)) {}
+	explicit builtin_alert_sound(bool is_positional, integer sound_id, std::optional<integer> volume = std::nullopt)
+	:  is_positional(is_positional), sound_id(sound_id), volume(volume) {}
 
-	explicit path(string s)
-	: value(std::move(s.value)) {}
-
-	std::string value;
+	bool is_positional;
+	integer sound_id;
+	std::optional<integer> volume;
 };
 
-inline bool operator==(const path& lhs, const path& rhs) noexcept { return lhs.value == rhs.value; }
-inline bool operator!=(const path& lhs, const path& rhs) noexcept { return !(lhs == rhs); }
-
-struct sound_id
+inline bool operator==(builtin_alert_sound lhs, builtin_alert_sound rhs) noexcept
 {
-	explicit sound_id(int value) : value(value) {}
-	explicit sound_id(integer n) : value(n.value) {}
-
-	int value;
-};
-
-inline bool operator==(sound_id lhs, sound_id rhs) noexcept { return lhs.value == rhs.value; }
-inline bool operator!=(sound_id lhs, sound_id rhs) noexcept { return !(lhs == rhs); }
-
-struct volume
-{
-	explicit volume(int value) : value(value) {}
-	explicit volume(integer n) : value(n.value) {}
-
-	int value;
-};
-
-inline bool operator==(volume lhs, volume rhs) noexcept { return lhs.value == rhs.value; }
-inline bool operator!=(volume lhs, volume rhs) noexcept { return !(lhs == rhs); }
-
-struct built_in_alert_sound
-{
-	explicit built_in_alert_sound(integer n)
-	: id(n) {}
-
-	explicit built_in_alert_sound(sound_id id)
-	: id(id) {}
-
-	explicit built_in_alert_sound(sound_id id, volume volume)
-	: id(id), volume(volume) {}
-
-	explicit built_in_alert_sound(sound_id id, boolean is_positional)
-	: id(id), is_positional(is_positional) {}
-
-	explicit built_in_alert_sound(sound_id id, volume volume, boolean is_positional)
-	: id(id), volume(volume), is_positional(is_positional) {}
-
-	sound_id id;
-	std::optional<volume> volume;
-	boolean is_positional = boolean{false};
-};
-
-inline bool operator==(built_in_alert_sound lhs, built_in_alert_sound rhs) noexcept
-{
-	return std::tie(lhs.id, lhs.volume, lhs.is_positional) == std::tie(rhs.id, rhs.volume, rhs.is_positional);
+	return std::tie(lhs.is_positional, lhs.sound_id, lhs.volume)
+		== std::tie(rhs.is_positional, rhs.sound_id, rhs.volume);
 }
-inline bool operator!=(built_in_alert_sound lhs, built_in_alert_sound rhs) noexcept { return !(lhs == rhs); }
+inline bool operator!=(builtin_alert_sound lhs, builtin_alert_sound rhs) noexcept { return !(lhs == rhs); }
 
 struct custom_alert_sound
 {
-	explicit custom_alert_sound(string str)
-	: path(std::move(str)) {}
-
-	explicit custom_alert_sound(path path)
+	explicit custom_alert_sound(string path)
 	: path(std::move(path)) {}
 
-	path path;
+	string path;
 };
 
 inline bool operator==(const custom_alert_sound& lhs, const custom_alert_sound& rhs) noexcept { return lhs.path == rhs.path; }
@@ -155,34 +94,13 @@ inline bool operator!=(const custom_alert_sound& lhs, const custom_alert_sound& 
 
 struct alert_sound
 {
-	explicit alert_sound(integer n)
-	: sound(built_in_alert_sound(sound_id(n))) {}
-
-	explicit alert_sound(sound_id id)
-	: sound(built_in_alert_sound(id)) {}
-
-	alert_sound(sound_id id, volume volume)
-	: sound(built_in_alert_sound(id, volume)) {}
-
-	alert_sound(sound_id id, boolean boolean)
-	: sound(built_in_alert_sound(id, boolean)) {}
-
-	alert_sound(sound_id id, volume volume, boolean boolean)
-	: sound(built_in_alert_sound(id, volume, boolean)) {}
-
-	explicit alert_sound(built_in_alert_sound sound)
+	explicit alert_sound(builtin_alert_sound sound)
 	: sound(sound) {}
-
-	explicit alert_sound(string s)
-	: sound(custom_alert_sound(path(std::move(s)))) {}
-
-	explicit alert_sound(path p)
-	: sound(custom_alert_sound(std::move(p))) {}
 
 	explicit alert_sound(custom_alert_sound sound)
 	: sound(std::move(sound)) {}
 
-	std::variant<built_in_alert_sound, custom_alert_sound> sound;
+	std::variant<builtin_alert_sound, custom_alert_sound> sound;
 };
 
 inline bool operator==(const alert_sound& lhs, const alert_sound& rhs) noexcept { return lhs.sound == rhs.sound; }
@@ -206,27 +124,24 @@ inline bool operator!=(alert_sound_action lhs, alert_sound_action rhs)
 
 // this action has no state - it either exists (we disabled default drop sound)
 // or does not exist (empty optional, no emmiting of this action in the filter)
-struct disable_default_drop_sound_action
+struct disable_drop_sound_action
 {
 	position_tag origin;
 };
 
-inline bool operator==(disable_default_drop_sound_action /* lhs */, disable_default_drop_sound_action /* rhs */)
+inline bool operator==(disable_drop_sound_action /* lhs */, disable_drop_sound_action /* rhs */)
 {
 	return true;
 }
 
-inline bool operator!=(disable_default_drop_sound_action lhs, disable_default_drop_sound_action rhs)
+inline bool operator!=(disable_drop_sound_action lhs, disable_drop_sound_action rhs)
 {
 	return !(lhs == rhs);
 }
 
 struct minimap_icon
 {
-	explicit minimap_icon(int size, suit color, shape shape)
-	: size(integer{size}), color(color), shape(shape) {}
-
-	explicit minimap_icon(integer size, suit color, shape shape)
+	minimap_icon(integer size, suit color, shape shape)
 	: size(size), color(color), shape(shape) {}
 
 	integer size;
@@ -256,36 +171,33 @@ inline bool operator!=(minimap_icon_action lhs, minimap_icon_action rhs)
 	return !(lhs == rhs);
 }
 
-struct beam_effect
+struct play_effect
 {
-	explicit beam_effect(suit s)
-	: color(s), is_temporary(boolean{false}) {}
-
-	explicit beam_effect(suit s, boolean b)
-	: color(s), is_temporary(b) {}
+	play_effect(suit s, bool is_temporary)
+	: color(s), is_temporary(is_temporary) {}
 
 	suit color;
-	boolean is_temporary;
+	bool is_temporary;
 };
 
-inline bool operator==(beam_effect lhs, beam_effect rhs) noexcept
+inline bool operator==(play_effect lhs, play_effect rhs) noexcept
 {
 	return std::tie(lhs.color, lhs.is_temporary) == std::tie(rhs.color, rhs.is_temporary);
 }
-inline bool operator!=(beam_effect lhs, beam_effect rhs) noexcept { return !(lhs == rhs); }
+inline bool operator!=(play_effect lhs, play_effect rhs) noexcept { return !(lhs == rhs); }
 
-struct beam_effect_action
+struct play_effect_action
 {
-	beam_effect beam;
+	play_effect beam;
 	position_tag origin;
 };
 
-inline bool operator==(beam_effect_action lhs, beam_effect_action rhs)
+inline bool operator==(play_effect_action lhs, play_effect_action rhs)
 {
 	return lhs.beam == rhs.beam;
 }
 
-inline bool operator!=(beam_effect_action lhs, beam_effect_action rhs)
+inline bool operator!=(play_effect_action lhs, play_effect_action rhs)
 {
 	return !(lhs == rhs);
 }
@@ -307,10 +219,10 @@ struct action_set
 	std::optional<color_action> set_text_color;
 	std::optional<color_action> set_background_color;
 	std::optional<font_size_action> set_font_size;
-	std::optional<alert_sound_action> set_alert_sound;
-	std::optional<disable_default_drop_sound_action> disable_default_drop_sound;
-	std::optional<minimap_icon_action> set_minimap_icon;
-	std::optional<beam_effect_action> set_beam_effect;
+	std::optional<alert_sound_action> play_alert_sound;
+	std::optional<disable_drop_sound_action> disable_drop_sound;
+	std::optional<minimap_icon_action> minimap_icon;
+	std::optional<play_effect_action> play_effect;
 };
 
 bool operator==(const action_set& lhs, const action_set& rhs);

@@ -13,6 +13,16 @@ enum class comparison_type
 	greater_equal
 };
 
+enum class socket_spec_comparison_type
+{
+	less,
+	less_equal,
+	equal,
+	greater,
+	greater_equal,
+	exact
+};
+
 // all conditions which use comparison against integers
 // (currently comparison conditions except rarity)
 enum class numeric_comparison_condition_property
@@ -20,7 +30,6 @@ enum class numeric_comparison_condition_property
 	item_level,
 	drop_level,
 	quality,
-	sockets,
 	links,
 	height,
 	width,
@@ -53,12 +62,6 @@ enum class boolean_condition_property
 	shaped_map,
 	elder_map,
 	blighted_map
-};
-
-enum class socket_spec_condition_property
-{
-	sockets,
-	socket_group
 };
 
 } // namespace fs::lang

@@ -1,7 +1,10 @@
 #pragma once
 
-#include <fs/lang/object.hpp>
+#include <fs/lang/primitive_types.hpp>
 #include <fs/lang/position_tag.hpp>
+#include <fs/lang/condition_properties.hpp>
+
+#include <boost/container/small_vector.hpp>
 
 #include <optional>
 #include <vector>
@@ -17,6 +20,7 @@ struct range_bound
 	position_tag origin;
 };
 
+// TODO more noexcept
 template <typename T>
 bool operator==(range_bound<T> left, range_bound<T> right)
 {
@@ -88,8 +92,9 @@ struct range_condition
 	std::optional<range_bound<T>> upper_bound;
 };
 
-using numeric_range_condition = range_condition<int>;
 using rarity_range_condition = range_condition<rarity>;
+using numeric_range_condition = range_condition<int>;
+using fractional_range_condition = range_condition<double>;
 
 struct boolean_condition
 {
@@ -97,9 +102,12 @@ struct boolean_condition
 	position_tag origin;
 };
 
-struct socket_group_condition
+struct socket_spec_condition
 {
-	socket_group group;
+	using container_type = boost::container::small_vector<socket_group, 6>;
+
+	socket_spec_comparison_type comparison_type;
+	container_type values;
 	position_tag origin;
 };
 
@@ -143,9 +151,9 @@ struct condition_set
 	rarity_range_condition rarity;
 	std::optional<strings_condition> class_;
 	std::optional<strings_condition> base_type;
-	numeric_range_condition sockets;
 	numeric_range_condition links;
-	std::optional<socket_group_condition> socket_group;
+	std::optional<socket_spec_condition> sockets;
+	std::optional<socket_spec_condition> socket_group;
 	numeric_range_condition height;
 	numeric_range_condition width;
 	std::optional<strings_condition> has_explicit_mod;
@@ -165,6 +173,12 @@ struct condition_set
 	std::optional<boolean_condition> is_shaped_map;
 	std::optional<boolean_condition> is_elder_map;
 	std::optional<boolean_condition> is_blighted_map;
+};
+
+// spirit filter extensions
+struct spirit_condition_set : condition_set
+{
+	fractional_range_condition price;
 };
 
 }

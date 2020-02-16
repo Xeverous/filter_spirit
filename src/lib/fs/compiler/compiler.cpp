@@ -35,7 +35,6 @@ namespace x3 = boost::spirit::x3;
 [[nodiscard]] std::optional<compile_error>
 add_constant_from_definition(
 	const ast::sf::constant_definition& def,
-	const lang::item_price_data& item_price_data,
 	lang::symbol_table& symbols)
 {
 	const ast::sf::identifier& wanted_name = def.name;
@@ -48,7 +47,7 @@ add_constant_from_definition(
 	}
 
 	std::variant<lang::object, compile_error> expr_result =
-		detail::evaluate_value_expression(value_expression, symbols, item_price_data);
+		detail::evaluate_value_expression(value_expression, symbols);
 
 	if (std::holds_alternative<compile_error>(expr_result))
 		return std::get<compile_error>(std::move(expr_result));
@@ -70,13 +69,12 @@ std::optional<compile_error> apply_statements_recursively(
 	lang::action_set parent_actions,
 	const std::vector<ast::sf::statement>& statements,
 	const lang::symbol_table& symbols,
-	const lang::item_price_data& item_price_data,
 	std::vector<lang::item_filter_block>& blocks)
 {
 	for (const ast::sf::statement& statement : statements) {
 		auto error = statement.apply_visitor(x3::make_lambda_visitor<std::optional<compile_error>>(
 			[&](const ast::sf::action& action) {
-				return detail::spirit_filter_add_action(action, symbols, item_price_data, parent_actions);
+				return detail::spirit_filter_add_action(action, symbols, parent_actions);
 			},
 			[&](const ast::sf::visibility_statement& vs) {
 				blocks.push_back(lang::item_filter_block{
@@ -90,7 +88,7 @@ std::optional<compile_error> apply_statements_recursively(
 				// old instance while nested blocks can add additional conditions that have limited lifetime
 				lang::condition_set nested_conditions(parent_conditions);
 				std::optional<compile_error> error = detail::spirit_filter_add_conditions(
-					nested_block.conditions, symbols, item_price_data, nested_conditions);
+					nested_block.conditions, symbols, nested_conditions);
 				if (error)
 					return error;
 
@@ -99,7 +97,6 @@ std::optional<compile_error> apply_statements_recursively(
 					parent_actions,
 					nested_block.statements,
 					symbols,
-					item_price_data,
 					blocks);
 			}));
 
@@ -116,14 +113,12 @@ namespace fs::compiler
 {
 
 std::variant<lang::symbol_table, compile_error>
-resolve_spirit_filter_symbols(
-	const std::vector<parser::ast::sf::definition>& definitions,
-	const lang::item_price_data& item_price_data)
+resolve_spirit_filter_symbols(const std::vector<parser::ast::sf::definition>& definitions)
 {
 	lang::symbol_table symbols;
 
 	for (const auto& def : definitions) {
-		std::optional<compile_error> error = add_constant_from_definition(def.def, item_price_data, symbols);
+		std::optional<compile_error> error = add_constant_from_definition(def.def, symbols);
 
 		if (error)
 			return *std::move(error);
@@ -135,16 +130,15 @@ resolve_spirit_filter_symbols(
 std::variant<lang::item_filter, compile_error>
 compile_spirit_filter(
 	const std::vector<parser::ast::sf::statement>& statements,
-	const lang::symbol_table& symbols,
-	const lang::item_price_data& ipd)
+	const lang::symbol_table& symbols)
 {
 	std::vector<lang::item_filter_block> blocks;
 	std::optional<compile_error> error = apply_statements_recursively(
-		{}, {}, statements, symbols, ipd, blocks);
+		{}, {}, statements, symbols, blocks);
 	if (error)
 		return *std::move(error);
 
-	return lang::item_filter{ blocks };
+	return lang::item_filter{std::move(blocks)};
 }
 
 std::variant<lang::item_filter, compile_error>

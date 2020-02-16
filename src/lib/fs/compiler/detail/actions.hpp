@@ -4,7 +4,6 @@
 #include <fs/compiler/error.hpp>
 #include <fs/lang/symbol_table.hpp>
 #include <fs/lang/action_set.hpp>
-#include <fs/lang/item_price_data.hpp>
 
 #include <optional>
 
@@ -15,7 +14,6 @@ namespace fs::compiler::detail
 spirit_filter_add_action(
 	const parser::ast::sf::action& action,
 	const lang::symbol_table& symbols,
-	const lang::item_price_data& item_price_data,
 	lang::action_set& action_set);
 
 [[nodiscard]] std::optional<compile_error>

@@ -48,30 +48,61 @@ void print_error_impl(
 }
 
 void print_error_impl(
-	errors::no_such_query error,
-	const parser::lookup_data& lookup_data,
-	log::message_stream& stream)
-{
-	stream.print_line_number_with_description_and_underlined_code(
-		lookup_data.get_view_of_whole_content(),
-		lookup_data.position_of(error.place_of_name),
-		log::strings::error,
-		"no such query exists");
-}
-
-void print_error_impl(
 	errors::invalid_amount_of_arguments error,
 	const parser::lookup_data& lookup_data,
 	log::message_stream& stream)
 {
-	stream.print_line_number_with_description_and_underlined_code(
-		lookup_data.get_view_of_whole_content(),
-		lookup_data.position_of(error.place_of_arguments),
-		log::strings::error,
-		"invalid amount of arguments, expected ",
-		error.expected,
-		" but got ",
-		error.actual);
+	if (error.max_allowed) {
+		stream.print_line_number_with_description_and_underlined_code(
+			lookup_data.get_view_of_whole_content(),
+			lookup_data.position_of(error.place_of_arguments),
+			log::strings::error,
+			"invalid amount of arguments, expected from ",
+			error.min_allowed,
+			" to ",
+			*error.max_allowed,
+			" but got ",
+			error.actual);
+	}
+	else {
+		stream.print_line_number_with_description_and_underlined_code(
+			lookup_data.get_view_of_whole_content(),
+			lookup_data.position_of(error.place_of_arguments),
+			log::strings::error,
+			"invalid amount of arguments, expected ",
+			error.min_allowed,
+			" but got ",
+			error.actual);
+	}
+}
+
+void print_error_impl(
+	errors::invalid_integer_value error,
+	const parser::lookup_data& lookup_data,
+	log::message_stream& stream)
+{
+	if (error.max_allowed_value) {
+		stream.print_line_number_with_description_and_underlined_code(
+			lookup_data.get_view_of_whole_content(),
+			lookup_data.position_of(error.origin),
+			log::strings::error,
+			"invalid integer value, expected value in range ",
+			error.min_allowed_value,
+			" - ",
+			*error.max_allowed_value,
+			" but got ",
+			error.actual_value);
+	}
+	else {
+		stream.print_line_number_with_description_and_underlined_code(
+			lookup_data.get_view_of_whole_content(),
+			lookup_data.position_of(error.origin),
+			log::strings::error,
+			"invalid inetger value, expected at least ",
+			error.min_allowed_value,
+			" but got ",
+			error.actual_value);
+	}
 }
 
 void print_error_impl(
@@ -91,52 +122,56 @@ void print_error_impl(
 }
 
 void print_error_impl(
-	errors::empty_socket_group error,
+	errors::empty_socket_spec error,
 	const parser::lookup_data& lookup_data,
 	log::message_stream& stream)
 {
 	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
-		lookup_data.position_of(error.place_of_socket_group_string),
+		lookup_data.position_of(error.origin),
 		log::strings::error,
 		"socket group can not be empty");
 }
 
 void print_error_impl(
-	errors::illegal_characters_in_socket_group error,
+	errors::illegal_characters_in_socket_spec error,
 	const parser::lookup_data& lookup_data,
 	log::message_stream& stream)
 {
 	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
-		lookup_data.position_of(error.place_of_socket_group_string),
+		lookup_data.position_of(error.origin),
 		log::strings::error,
-		"invalid socket group (use only R/G/B/W characters)");
+		"invalid socket group (use only R/G/B/W/A/D characters)");
 }
 
 void print_error_impl(
-	errors::invalid_socket_group error,
+	errors::invalid_socket_spec error,
 	const parser::lookup_data& lookup_data,
 	log::message_stream& stream)
 {
 	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
-		lookup_data.position_of(error.place_of_socket_group_string),
+		lookup_data.position_of(error.origin),
 		log::strings::error,
 		"invalid socket group");
 }
 
 void print_error_impl(
-	errors::invalid_minimap_icon_size error,
+	errors::duplicate_influence error,
 	const parser::lookup_data& lookup_data,
 	log::message_stream& stream)
 {
 	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
-		lookup_data.position_of(error.place_of_size_argument),
+		lookup_data.position_of(error.second_influence),
 		log::strings::error,
-		"invalid minimap icon size, valid values are 0 - 2, requested is ",
-		error.requested_size);
+		"duplicate influence");
+	stream.print_line_number_with_description_and_underlined_code(
+		lookup_data.get_view_of_whole_content(),
+		lookup_data.position_of(error.first_influence),
+		log::strings::note,
+		"first defined here");
 }
 
 void print_error_impl(
@@ -220,16 +255,14 @@ void print_error_impl(
 				return "add_boolean_condition";
 			case error_cause::add_range_condition:
 				return "add_range_condition";
-			case error_cause::real_filter_add_numeric_condition:
-				return "real_filter_add_numeric_condition";
-			case error_cause::real_filter_add_string_array_condition:
-				return "real_filter_add_string_array_condition";
+			case error_cause::add_numeric_comparison_condition:
+				return "add_numeric_comparison_condition";
+			case error_cause::add_string_array_condition:
+				return "add_string_array_condition";
 			case error_cause::real_filter_add_color_action:
 				return "real_filter_add_color_action";
-			case error_cause::spirit_filter_add_numeric_comparison_condition:
-				return "spirit_filter_add_numeric_comparison_condition";
-			case error_cause::spirit_filter_add_unary_action:
-				return "spirit_filter_add_unary_action";
+			case error_cause::spirit_filter_add_set_color_action_impl:
+				return "spirit_filter_add_set_color_action_impl";
 			default:
 				return "(unknown)";
 		}
@@ -266,9 +299,8 @@ void print_error(
 {
 	auto stream = logger.error();
 	stream << "compile error\n";
-	// some errors are recursive (contain other errors)
-	// print_error_variant() is a helper for recursion
-	// if we recursed print_error() we would get multiple log messages
+	// For case when there are/will be multiple errors:
+	// we call a separate function to hold 1 stream message
 	print_error_variant(error, lookup_data, stream);
 }
 

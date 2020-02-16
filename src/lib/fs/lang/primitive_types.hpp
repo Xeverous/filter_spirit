@@ -1,7 +1,10 @@
 #pragma once
 
+#include <fs/lang/limits.hpp>
+
 #include <tuple>
 #include <string>
+#include <optional>
 #include <variant>
 
 namespace fs::lang
@@ -12,10 +15,10 @@ struct none {};
 inline bool operator==(none, none) noexcept { return true; }
 inline bool operator!=(none, none) noexcept { return false; }
 
-struct underscore {};
+struct temp {};
 
-inline bool operator==(underscore, underscore) noexcept { return true; }
-inline bool operator!=(underscore, underscore) noexcept { return false; }
+inline bool operator==(temp, temp) noexcept { return true; }
+inline bool operator!=(temp, temp) noexcept { return false; }
 
 struct boolean
 {
@@ -44,18 +47,29 @@ struct floating_point
 inline bool operator==(floating_point lhs, floating_point rhs) noexcept { return lhs.value == rhs.value; }
 inline bool operator!=(floating_point lhs, floating_point rhs) noexcept { return !(lhs == rhs); }
 
-struct socket_group
+struct socket_group // TODO rename to socket_spec
 {
-	bool is_valid() const noexcept
+	bool is_num_valid() const noexcept
 	{
-		int sum = r + g + b + w;
-		return 0 < sum && sum <= 6;
+		if (!num)
+			return true;
+
+		return limits::min_item_sockets <= *num && *num <= limits::max_item_sockets;
 	}
 
+	bool is_valid() const noexcept
+	{
+		auto sum = r + g + b + w + a + d;
+		return limits::min_item_sockets <= sum && sum <= limits::max_item_sockets && is_num_valid();
+	}
+
+	std::optional<int> num = std::nullopt;
 	int r = 0;
 	int g = 0;
 	int b = 0;
-	int w = 0;
+	int w = 0; // white sockets
+	int a = 0; // abyss sockets
+	int d = 0; // delve sockets (on resonators)
 };
 
 inline bool operator==(socket_group lhs, socket_group rhs) noexcept

@@ -52,7 +52,7 @@ std::optional<std::string> generate_filter_without_preamble(
 	logger.info() << "compiling filter template\n";
 
 	std::variant<lang::symbol_table, compiler::compile_error> symbols_or_error =
-		compiler::resolve_spirit_filter_symbols(parse_data.ast.definitions, item_price_data);
+		compiler::resolve_spirit_filter_symbols(parse_data.ast.definitions);
 	if (std::holds_alternative<compiler::compile_error>(symbols_or_error)) {
 		compiler::print_error(std::get<compiler::compile_error>(symbols_or_error), parse_data.lookup_data, logger);
 		return std::nullopt;
@@ -60,7 +60,7 @@ std::optional<std::string> generate_filter_without_preamble(
 
 	const auto& map = std::get<lang::symbol_table>(symbols_or_error);
 	const std::variant<lang::item_filter, compiler::compile_error> filter_or_error =
-		compiler::compile_spirit_filter(parse_data.ast.statements, map, item_price_data);
+		compiler::compile_spirit_filter(parse_data.ast.statements, map);
 
 	if (std::holds_alternative<compiler::compile_error>(filter_or_error)) {
 		compiler::print_error(std::get<compiler::compile_error>(filter_or_error), parse_data.lookup_data, logger);

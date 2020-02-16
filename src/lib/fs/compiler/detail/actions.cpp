@@ -4,6 +4,7 @@
 #include <boost/spirit/home/x3/support/utility/lambda_visitor.hpp>
 
 #include <utility>
+#include <type_traits>
 
 namespace ast = fs::parser::ast;
 namespace x3 = boost::spirit::x3;
@@ -14,73 +15,342 @@ namespace
 using namespace fs;
 using namespace fs::compiler;
 
-// ---- spirit_filter_add_action helper ----
+// ---- spirit filter helpers ----
 
 [[nodiscard]] std::optional<compile_error>
-spirit_filter_add_unary_action(
-	const ast::sf::unary_action& action,
-	const lang::symbol_table& symbols,
-	const lang::item_price_data& item_price_data,
-	lang::action_set& action_set)
+spirit_filter_add_set_color_action_impl(
+	lang::color_action_type action_type,
+	lang::color_action action,
+	lang::action_set& set)
 {
-	// TODO implement
-	return errors::internal_compiler_error{
-		errors::internal_compiler_error_cause::spirit_filter_add_unary_action,
-		parser::get_position_info(action)
-	};
-}
-
-[[nodiscard]] std::optional<compile_error>
-spirit_filter_add_compound_action(
-	const ast::sf::compound_action& ca,
-	const lang::symbol_table& symbols,
-	const lang::item_price_data& item_price_data,
-	lang::action_set& action_set)
-{
-	// TODO implement
-	return std::nullopt;
-}
-
-// ---- real_filter_add_action helper ----
-
-[[nodiscard]] std::optional<compile_error>
-real_filter_add_color_action(
-	const ast::rf::color_action& action,
-	lang::action_set& action_set)
-{
-	const auto origin = parser::get_position_info(action);
-	const lang::color_action act{detail::evaluate(action.color), origin};
-
-	switch (action.action) {
+	// override previous action
+	switch (action_type) {
 		case lang::color_action_type::set_border_color: {
-			if (action_set.set_border_color) {
-				return errors::action_redefinition{origin, (*action_set.set_border_color).origin};
-			}
-
-			action_set.set_border_color = act;
+			set.set_border_color = action;
 			return std::nullopt;
 		}
 		case lang::color_action_type::set_text_color: {
-			if (action_set.set_text_color) {
-				return errors::action_redefinition{origin, (*action_set.set_text_color).origin};
-			}
-
-			action_set.set_text_color = act;
+			set.set_text_color = action;
 			return std::nullopt;
 		}
 		case lang::color_action_type::set_background_color: {
-			if (action_set.set_background_color) {
-				return errors::action_redefinition{origin, (*action_set.set_background_color).origin};
-			}
-
-			action_set.set_background_color = act;
+			set.set_background_color = action;
 			return std::nullopt;
 		}
 	}
 
 	return errors::internal_compiler_error{
+		errors::internal_compiler_error_cause::spirit_filter_add_set_color_action_impl,
+		action.origin};
+}
+
+[[nodiscard]] std::optional<compile_error>
+spirit_filter_add_set_color_action(
+	const ast::sf::set_color_action& action,
+	const lang::symbol_table& symbols,
+	lang::action_set& set)
+{
+	std::variant<lang::object, compile_error> obj_or_err = detail::evaluate_sequence(action.seq, symbols, 3, 4);
+	if (std::holds_alternative<compile_error>(obj_or_err)) {
+		return std::get<compile_error>(std::move(obj_or_err));
+	}
+
+	auto& obj = std::get<lang::object>(obj_or_err);
+
+	const auto args_num = static_cast<int>(obj.values.size());
+	assert(args_num == 3 || args_num == 4);
+
+	std::variant<lang::integer, compile_error> int0_or_err = detail::get_as<lang::integer>(obj.values[0]);
+	if (std::holds_alternative<compile_error>(int0_or_err))
+		return std::get<compile_error>(std::move(int0_or_err));
+
+	std::variant<lang::integer, compile_error> int1_or_err = detail::get_as<lang::integer>(obj.values[1]);
+	if (std::holds_alternative<compile_error>(int1_or_err))
+		return std::get<compile_error>(std::move(int1_or_err));
+
+	std::variant<lang::integer, compile_error> int2_or_err = detail::get_as<lang::integer>(obj.values[2]);
+	if (std::holds_alternative<compile_error>(int2_or_err))
+		return std::get<compile_error>(std::move(int2_or_err));
+
+	const auto r = std::make_pair(std::get<lang::integer>(int0_or_err), obj.values[0].origin);
+	const auto g = std::make_pair(std::get<lang::integer>(int1_or_err), obj.values[1].origin);
+	const auto b = std::make_pair(std::get<lang::integer>(int2_or_err), obj.values[2].origin);
+	std::optional<std::pair<lang::integer, lang::position_tag>> a;
+
+	if (args_num == 4) {
+		std::variant<lang::integer, compile_error> int3_or_err = detail::get_as<lang::integer>(obj.values[3]);
+		if (std::holds_alternative<compile_error>(int3_or_err))
+			return std::get<compile_error>(std::move(int3_or_err));
+
+		a = std::make_pair(std::get<lang::integer>(int3_or_err), obj.values[3].origin);
+	}
+
+	std::variant<lang::color, compile_error> col_or_err = detail::make_color(r, g, b, a);
+	if (std::holds_alternative<compile_error>(col_or_err)) {
+		return std::get<compile_error>(col_or_err);
+	}
+
+	auto act = lang::color_action{std::get<lang::color>(col_or_err), parser::get_position_info(action)};
+	return spirit_filter_add_set_color_action_impl(action.action_type, act, set);
+}
+
+[[nodiscard]] std::optional<compile_error>
+spirit_filter_add_set_font_size_action(
+	const ast::sf::set_font_size_action& action,
+	const lang::symbol_table& symbols,
+	lang::action_set& set)
+{
+	std::variant<lang::object, compile_error> obj_or_err = detail::evaluate_sequence(action.seq, symbols, 1, 1);
+	if (std::holds_alternative<compile_error>(obj_or_err)) {
+		return std::get<compile_error>(std::move(obj_or_err));
+	}
+
+	auto& obj = std::get<lang::object>(obj_or_err);
+
+	assert(obj.values.size() == 1u);
+
+	// TODO add erorr handling for font size
+	std::variant<lang::integer, compile_error> int_or_err = detail::get_as<lang::integer>(obj.values[0]);
+	if (std::holds_alternative<compile_error>(int_or_err))
+		return std::get<compile_error>(std::move(int_or_err));
+
+	auto int_obj = std::get<lang::integer>(int_or_err);
+
+	// override previous action
+	set.set_font_size = lang::font_size_action{int_obj, parser::get_position_info(action)};
+	return std::nullopt;
+}
+
+[[nodiscard]] std::optional<compile_error>
+spirit_filter_add_minimap_icon_action(
+	const ast::sf::minimap_icon_action& action,
+	const lang::symbol_table& symbols,
+	lang::action_set& set)
+{
+	std::variant<lang::object, compile_error> obj_or_err = detail::evaluate_sequence(action.seq, symbols, 3, 3);
+	if (std::holds_alternative<compile_error>(obj_or_err)) {
+		return std::get<compile_error>(std::move(obj_or_err));
+	}
+
+	auto& obj = std::get<lang::object>(obj_or_err);
+
+	assert(obj.values.size() == 3u);
+
+	std::variant<lang::integer, compile_error> int_or_err = detail::get_as<lang::integer>(obj.values[0]);
+	if (std::holds_alternative<compile_error>(int_or_err))
+		return std::get<compile_error>(std::move(int_or_err));
+
+	std::variant<lang::suit, compile_error> suit_or_err = detail::get_as<lang::suit>(obj.values[1]);
+	if (std::holds_alternative<compile_error>(suit_or_err))
+		return std::get<compile_error>(std::move(suit_or_err));
+
+	std::variant<lang::shape, compile_error> shape_or_err = detail::get_as<lang::shape>(obj.values[2]);
+	if (std::holds_alternative<compile_error>(shape_or_err))
+		return std::get<compile_error>(std::move(shape_or_err));
+
+	auto size  = std::get<lang::integer>(int_or_err);
+	auto suit  = std::get<lang::suit>(suit_or_err);
+	auto shape = std::get<lang::shape>(shape_or_err);
+
+	std::variant<lang::minimap_icon, compile_error> icon_or_err =
+		detail::make_minimap_icon(size, obj.values[0].origin, suit, shape);
+
+	if (std::holds_alternative<compile_error>(icon_or_err)) {
+		return std::get<compile_error>(std::move(icon_or_err));
+	}
+
+	// override previous action
+	set.minimap_icon = lang::minimap_icon_action{
+		std::get<lang::minimap_icon>(icon_or_err),
+		parser::get_position_info(action)
+	};
+	return std::nullopt;
+}
+
+[[nodiscard]] std::optional<compile_error>
+spirit_filter_add_play_effect_action(
+	const ast::sf::play_effect_action& action,
+	const lang::symbol_table& symbols,
+	lang::action_set& set)
+{
+	std::variant<lang::object, compile_error> obj_or_err = detail::evaluate_sequence(action.seq, symbols, 1, 2);
+	if (std::holds_alternative<compile_error>(obj_or_err)) {
+		return std::get<compile_error>(std::move(obj_or_err));
+	}
+
+	auto& obj = std::get<lang::object>(obj_or_err);
+
+	const auto args_num = static_cast<int>(obj.values.size());
+	assert(args_num == 1 || args_num == 2);
+
+	std::variant<lang::suit, compile_error> suit_or_err = detail::get_as<lang::suit>(obj.values[0]);
+	if (std::holds_alternative<compile_error>(suit_or_err))
+		return std::get<compile_error>(std::move(suit_or_err));
+
+	auto& suit = std::get<lang::suit>(suit_or_err);
+
+	if (args_num == 2) {
+		std::variant<lang::temp, compile_error> temp_or_err = detail::get_as<lang::temp>(obj.values[0]);
+		if (std::holds_alternative<compile_error>(temp_or_err))
+			return std::get<compile_error>(std::move(temp_or_err));
+
+		// override previous action
+		set.play_effect = lang::play_effect_action{
+			lang::play_effect{suit, true},
+			parser::get_position_info(action)
+		};
+		return std::nullopt;
+	}
+
+	// override previous action
+	set.play_effect = lang::play_effect_action{
+		lang::play_effect{suit, true},
+		parser::get_position_info(action)
+	};
+	return std::nullopt;
+}
+
+[[nodiscard]] std::optional<compile_error>
+spirit_filter_add_play_alert_sound_action(
+	const ast::sf::play_alert_sound_action& action,
+	const lang::symbol_table& symbols,
+	lang::action_set& set)
+{
+	std::variant<lang::object, compile_error> obj_or_err = detail::evaluate_sequence(action.seq, symbols, 1, 2);
+	if (std::holds_alternative<compile_error>(obj_or_err)) {
+		return std::get<compile_error>(std::move(obj_or_err));
+	}
+
+	auto& obj = std::get<lang::object>(obj_or_err);
+
+	const auto args_num = static_cast<int>(obj.values.size());
+	assert(args_num == 1 || args_num == 2);
+
+	std::variant<lang::integer, compile_error> sid_or_err = detail::get_as<lang::integer>(obj.values[0]);
+	if (std::holds_alternative<compile_error>(sid_or_err))
+		return std::get<compile_error>(std::move(sid_or_err));
+
+	auto sound_id = std::make_pair(std::get<lang::integer>(sid_or_err), obj.values[0].origin);
+	std::optional<std::pair<lang::integer, lang::position_tag>> volume;
+
+	if (args_num == 2) {
+		std::variant<lang::integer, compile_error> vol_or_err = detail::get_as<lang::integer>(obj.values[1]);
+		if (std::holds_alternative<compile_error>(vol_or_err))
+			return std::get<compile_error>(std::move(vol_or_err));
+
+		volume = std::make_pair(std::get<lang::integer>(vol_or_err), obj.values[1].origin);
+	}
+
+	std::variant<lang::builtin_alert_sound, compile_error> bas_or_err =
+		detail::make_builtin_alert_sound(action.positional, sound_id, volume);
+
+	if (std::holds_alternative<compile_error>(bas_or_err)) {
+		return std::get<compile_error>(std::move(bas_or_err));
+	}
+
+	// override previous action
+	set.play_alert_sound = lang::alert_sound_action{
+		lang::alert_sound{std::get<lang::builtin_alert_sound>(bas_or_err)},
+		parser::get_position_info(action)
+	};
+	return std::nullopt;
+}
+
+[[nodiscard]] std::optional<compile_error>
+spirit_filter_add_custom_alert_sound_action(
+	const ast::sf::custom_alert_sound_action& action,
+	const lang::symbol_table& symbols,
+	lang::action_set& set)
+{
+	std::variant<lang::object, compile_error> obj_or_err = detail::evaluate_sequence(action.seq, symbols, 1, 1);
+	if (std::holds_alternative<compile_error>(obj_or_err)) {
+		return std::get<compile_error>(std::move(obj_or_err));
+	}
+
+	auto& obj = std::get<lang::object>(obj_or_err);
+
+	assert(obj.values.size() == 1u);
+
+	std::variant<lang::string, compile_error> str_or_err = detail::get_as<lang::string>(obj.values[0]);
+	if (std::holds_alternative<compile_error>(str_or_err))
+		return std::get<compile_error>(std::move(str_or_err));
+
+	auto& str = std::get<lang::string>(str_or_err);
+
+	set.play_alert_sound = lang::alert_sound_action{
+		lang::alert_sound{lang::custom_alert_sound{std::move(str)}},
+		parser::get_position_info(action)
+	};
+	return std::nullopt;
+}
+
+[[nodiscard]] std::optional<compile_error>
+spirit_filter_add_compound_action(
+	const ast::sf::compound_action& action,
+	const lang::symbol_table& symbols,
+	lang::action_set& set)
+{
+	std::variant<lang::object, compile_error> obj_or_err = detail::evaluate_sequence(action.seq, symbols, 1, 1);
+	if (std::holds_alternative<compile_error>(obj_or_err)) {
+		return std::get<compile_error>(std::move(obj_or_err));
+	}
+
+	auto& obj = std::get<lang::object>(obj_or_err);
+
+	assert(obj.values.size() == 1u);
+
+	std::variant<lang::action_set, compile_error> as_or_err = detail::get_as<lang::action_set>(obj.values[0]);
+	if (std::holds_alternative<compile_error>(as_or_err))
+		return std::get<compile_error>(std::move(as_or_err));
+
+	auto& as = std::get<lang::action_set>(as_or_err);
+	set.override_with(std::move(as));
+	return std::nullopt;
+}
+
+// ---- real filter helpers ----
+
+template <typename T>
+[[nodiscard]] std::optional<compile_error>
+real_filter_add_action_impl(
+	T&& action,
+	std::optional<T>& target)
+{
+	if (target) {
+		return errors::action_redefinition{action.origin, (*target).origin};
+	}
+
+	target = std::move(action);
+	return std::nullopt;
+}
+
+[[nodiscard]] std::optional<compile_error>
+real_filter_add_color_action(
+	const ast::rf::color_action& action,
+	lang::action_set& set)
+{
+	std::variant<lang::color, compile_error> col_or_err = detail::evaluate(action.color);
+	if (std::holds_alternative<compile_error>(col_or_err)) {
+		return std::get<compile_error>(std::move(col_or_err));
+	}
+
+	auto act = lang::color_action{std::get<lang::color>(col_or_err), parser::get_position_info(action)};
+
+	switch (action.action) {
+		case lang::color_action_type::set_border_color: {
+			return real_filter_add_action_impl(std::move(act), set.set_border_color);
+		}
+		case lang::color_action_type::set_text_color: {
+			return real_filter_add_action_impl(std::move(act), set.set_text_color);
+		}
+		case lang::color_action_type::set_background_color: {
+			return real_filter_add_action_impl(std::move(act), set.set_background_color);
+		}
+	}
+
+	return errors::internal_compiler_error{
 		errors::internal_compiler_error_cause::real_filter_add_color_action,
-		origin};
+		act.origin};
 }
 
 [[nodiscard]] lang::alert_sound
@@ -90,16 +360,16 @@ real_filter_make_alert_sound(
 	bool positional)
 {
 	if (volume) {
-		return lang::alert_sound{lang::built_in_alert_sound{
-			lang::sound_id{detail::evaluate(sound_id)},
-			lang::volume{lang::integer{detail::evaluate(*volume)}},
-			lang::boolean{positional},
+		return lang::alert_sound{lang::builtin_alert_sound{
+			positional,
+			detail::evaluate(sound_id),
+			detail::evaluate(*volume)
 		}};
 	}
 	else {
-		return lang::alert_sound{lang::built_in_alert_sound{
-			lang::sound_id{detail::evaluate(sound_id)},
-			lang::boolean{positional}
+		return lang::alert_sound{lang::builtin_alert_sound{
+			positional,
+			detail::evaluate(sound_id)
 		}};
 	}
 }
@@ -113,15 +383,33 @@ std::optional<compile_error>
 spirit_filter_add_action(
 	const ast::sf::action& action,
 	const lang::symbol_table& symbols,
-	const lang::item_price_data& item_price_data,
-	lang::action_set& action_set)
+	lang::action_set& set)
 {
 	return action.apply_visitor(x3::make_lambda_visitor<std::optional<compile_error>>(
-		[&](const ast::sf::unary_action& ua) {
-			return spirit_filter_add_unary_action(ua, symbols, item_price_data, action_set);
+		[&](const ast::sf::set_color_action& a) {
+			return spirit_filter_add_set_color_action(a, symbols, set);
+		},
+		[&](const ast::sf::set_font_size_action& a) {
+			return spirit_filter_add_set_font_size_action(a, symbols, set);
+		},
+		[&](const ast::sf::minimap_icon_action& a) {
+			return spirit_filter_add_minimap_icon_action(a, symbols, set);
+		},
+		[&](const ast::sf::play_effect_action& a) {
+			return spirit_filter_add_play_effect_action(a, symbols, set);
+		},
+		[&](const ast::sf::play_alert_sound_action& a) {
+			return spirit_filter_add_play_alert_sound_action(a, symbols, set);
+		},
+		[&](const ast::sf::custom_alert_sound_action& a) {
+			return spirit_filter_add_custom_alert_sound_action(a, symbols, set);
+		},
+		[&](const ast::sf::disable_drop_sound_action&) {
+			set.disable_drop_sound = lang::disable_drop_sound_action{parser::get_position_info(action)};
+			return std::nullopt;
 		},
 		[&](const ast::sf::compound_action& ca) {
-			return spirit_filter_add_compound_action(ca, symbols, item_price_data, action_set);
+			return spirit_filter_add_compound_action(ca, symbols, set);
 		}
 	));
 }
@@ -129,98 +417,71 @@ spirit_filter_add_action(
 std::optional<compile_error>
 real_filter_add_action(
 	const parser::ast::rf::action& a,
-	lang::action_set& action_set)
+	lang::action_set& set)
 {
 	using result_type = std::optional<compile_error>;
 
 	return a.apply_visitor(x3::make_lambda_visitor<result_type>(
 		[&](const ast::rf::color_action& action) {
-			return real_filter_add_color_action(action, action_set);
+			return real_filter_add_color_action(action, set);
 		},
 		[&](const ast::rf::set_font_size_action& action) -> result_type {
-			const auto origin = parser::get_position_info(action);
-
-			if (action_set.set_font_size) {
-				return errors::action_redefinition{origin, (*action_set.set_font_size).origin};
-			}
-
-			action_set.set_font_size = lang::font_size_action{lang::integer{action.font_size.value}, origin};
-			return std::nullopt;
-		},
-		[&](const ast::rf::play_alert_sound_action& action) -> result_type {
-			const auto origin = parser::get_position_info(action);
-
-			if (action_set.set_alert_sound) {
-				return errors::action_redefinition{origin, (*action_set.set_alert_sound).origin};
-			}
-
-			action_set.set_alert_sound = lang::alert_sound_action{
-				real_filter_make_alert_sound(action.sound_id, action.volume, false),
-				origin};
-			return std::nullopt;
-		},
-		[&](const ast::rf::play_alert_sound_positional_action& action) -> result_type {
-			const auto origin = parser::get_position_info(action);
-
-			if (action_set.set_alert_sound) {
-				return errors::action_redefinition{origin, (*action_set.set_alert_sound).origin};
-			}
-
-			action_set.set_alert_sound = lang::alert_sound_action{
-				real_filter_make_alert_sound(action.sound_id, action.volume, true),
-				origin};
-			return std::nullopt;
-		},
-		[&](const ast::rf::custom_alert_sound_action& action) -> result_type {
-			const auto origin = parser::get_position_info(action);
-
-			if (action_set.set_alert_sound) {
-				return errors::action_redefinition{origin, (*action_set.set_alert_sound).origin};
-			}
-
-			action_set.set_alert_sound = lang::alert_sound_action{
-				lang::alert_sound{lang::custom_alert_sound{lang::path{evaluate(action.path)}}},
-				origin};
-			return std::nullopt;
-		},
-		[&](const ast::rf::disable_drop_sound_action& action) -> result_type {
-			const auto origin = parser::get_position_info(action);
-
-			if (action_set.disable_default_drop_sound) {
-				return errors::action_redefinition{origin, (*action_set.disable_default_drop_sound).origin};
-			}
-
-			action_set.disable_default_drop_sound = lang::disable_default_drop_sound_action{origin};
-			return std::nullopt;
+			return real_filter_add_action_impl(
+				lang::font_size_action{
+					lang::integer{action.font_size.value},
+					parser::get_position_info(action)
+				},
+				set.set_font_size);
 		},
 		[&](const ast::rf::minimap_icon_action& action) -> result_type {
-			const auto origin = parser::get_position_info(action);
-
-			if (action_set.set_minimap_icon) {
-				return errors::action_redefinition{origin, (*action_set.set_minimap_icon).origin};
-			}
-
 			std::variant<lang::minimap_icon, compile_error> icon_or_error = evaluate(action.icon);
 			if (std::holds_alternative<compile_error>(icon_or_error))
 				return std::get<compile_error>(std::move(icon_or_error));
 
-			auto& icon = std::get<lang::minimap_icon>(icon_or_error);
-			action_set.set_minimap_icon = lang::minimap_icon_action{icon, origin};
-			return std::nullopt;
+			return real_filter_add_action_impl(
+				lang::minimap_icon_action{
+					std::get<lang::minimap_icon>(icon_or_error),
+					parser::get_position_info(action)},
+				set.minimap_icon);
 		},
 		[&](const ast::rf::play_effect_action& action) -> result_type {
-			const auto origin = parser::get_position_info(action);
-
-			if (action_set.set_beam_effect) {
-				return errors::action_redefinition{origin, (*action_set.set_beam_effect).origin};
-			}
-
-			action_set.set_beam_effect = lang::beam_effect_action{
-				lang::beam_effect{evaluate(action.suit), lang::boolean{action.is_temporary}},
-				origin};
-			return std::nullopt;
+			return real_filter_add_action_impl(
+				lang::play_effect_action{
+					lang::play_effect{evaluate(action.suit), action.is_temporary},
+					parser::get_position_info(action)
+				},
+				set.play_effect);
+		},
+		[&](const ast::rf::play_alert_sound_action& action) -> result_type {
+			return real_filter_add_action_impl(
+				lang::alert_sound_action{
+					real_filter_make_alert_sound(action.sound_id, action.volume, false),
+					parser::get_position_info(action)
+				},
+				set.play_alert_sound);
+		},
+		[&](const ast::rf::play_alert_sound_positional_action& action) -> result_type {
+			return real_filter_add_action_impl(
+				lang::alert_sound_action{
+					real_filter_make_alert_sound(action.sound_id, action.volume, true),
+					parser::get_position_info(action)
+				},
+				set.play_alert_sound);
+		},
+		[&](const ast::rf::custom_alert_sound_action& action) -> result_type {
+			return real_filter_add_action_impl(
+				lang::alert_sound_action{
+					lang::alert_sound{lang::custom_alert_sound{evaluate(action.path)}},
+					parser::get_position_info(action)
+				},
+				set.play_alert_sound);
+		},
+		[&](const ast::rf::disable_drop_sound_action& action) -> result_type {
+			return real_filter_add_action_impl(
+				lang::disable_drop_sound_action{parser::get_position_info(action)},
+				set.disable_drop_sound);
 		}
 	));
 }
 
-}
+} // namespace fs::compiler::detail

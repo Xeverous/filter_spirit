@@ -73,27 +73,38 @@ void output_range_condition(
 	}
 }
 
-void output_socket_group_condition(
-	std::optional<lang::socket_group_condition> cond,
+void output_socket_spec_condition(
+	bool links_matter,
+	std::optional<lang::socket_spec_condition> cond,
 	std::ostream& output_stream)
 {
 	if (!cond.has_value())
 		return;
 
-	const auto output_letter = [&](char letter, int times)
-	{
+	const auto output_letter = [&](char letter, int times) {
 		for (int i = 0; i < times; ++i)
 			output_stream << letter;
 	};
 
-	const lang::socket_group& sg = (*cond).group;
-	assert(sg.is_valid());
+	if (links_matter) {
+		output_stream << '\t' << kw::socket_group << ' ';
+	}
+	else {
+		output_stream << '\t' << kw::sockets << ' ';
+	}
 
-	output_stream << '\t' << kw::socket_group << ' ';
-	output_letter(kw::r, sg.r);
-	output_letter(kw::g, sg.g);
-	output_letter(kw::b, sg.b);
-	output_letter(kw::w, sg.w);
+	const lang::socket_spec_condition::container_type& sgs = (*cond).values;
+	for (lang::socket_group sg : sgs) {
+		assert(sg.is_valid());
+
+		output_letter(kw::r, sg.r);
+		output_letter(kw::g, sg.g);
+		output_letter(kw::b, sg.b);
+		output_letter(kw::w, sg.w);
+		output_letter(kw::a, sg.a);
+		output_letter(kw::d, sg.d);
+	}
+
 	output_stream << '\n';
 }
 
@@ -182,7 +193,6 @@ void condition_set::generate(std::ostream& output_stream) const
 	output_range_condition(drop_level, kw::drop_level,     output_stream);
 	output_range_condition(quality,    kw::quality,        output_stream);
 	output_range_condition(rarity,     kw::rarity,         output_stream);
-	output_range_condition(sockets,    kw::sockets,        output_stream);
 	output_range_condition(links,      kw::linked_sockets, output_stream);
 	output_range_condition(height,     kw::height,         output_stream);
 	output_range_condition(width,      kw::width,          output_stream);
@@ -190,7 +200,8 @@ void condition_set::generate(std::ostream& output_stream) const
 	output_range_condition(gem_level,  kw::gem_level,      output_stream);
 	output_range_condition(map_tier,   kw::map_tier,       output_stream);
 
-	output_socket_group_condition(socket_group, output_stream);
+	output_socket_spec_condition(false, sockets,      output_stream);
+	output_socket_spec_condition(true,  socket_group, output_stream);
 
 	output_boolean_condition(is_identified,       kw::identified,       output_stream);
 	output_boolean_condition(is_corrupted,        kw::corrupted,        output_stream);

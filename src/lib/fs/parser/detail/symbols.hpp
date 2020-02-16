@@ -127,6 +127,22 @@ namespace rf
 	};
 	const comparison_operators_ comparison_operators;
 
+	struct socket_spec_comparison_operators_ : x3::symbols<lang::socket_spec_comparison_type>
+	{
+		socket_spec_comparison_operators_()
+		{
+			add
+				("<",  lang::socket_spec_comparison_type::less)
+				("<=", lang::socket_spec_comparison_type::less_equal)
+				("=",  lang::socket_spec_comparison_type::equal)
+				(">",  lang::socket_spec_comparison_type::greater)
+				(">=", lang::socket_spec_comparison_type::greater_equal)
+				("==", lang::socket_spec_comparison_type::exact)
+			;
+		}
+	};
+	const socket_spec_comparison_operators_ socket_spec_comparison_operators;
+
 	struct numeric_comparison_condition_properties_ : x3::symbols<lang::numeric_comparison_condition_property>
 	{
 		numeric_comparison_condition_properties_()
@@ -135,7 +151,6 @@ namespace rf
 				(lang::keywords::rf::item_level,     lang::numeric_comparison_condition_property::item_level)
 				(lang::keywords::rf::drop_level,     lang::numeric_comparison_condition_property::drop_level)
 				(lang::keywords::rf::quality,        lang::numeric_comparison_condition_property::quality)
-				(lang::keywords::rf::sockets,        lang::numeric_comparison_condition_property::sockets)
 				(lang::keywords::rf::linked_sockets, lang::numeric_comparison_condition_property::links)
 				(lang::keywords::rf::height,         lang::numeric_comparison_condition_property::height)
 				(lang::keywords::rf::width,          lang::numeric_comparison_condition_property::width)
@@ -162,17 +177,17 @@ namespace rf
 	};
 	const string_array_condition_properties_ string_array_condition_properties;
 
-	struct socket_spec_condition_properties_ : x3::symbols<lang::socket_spec_condition_property>
+	struct socket_spec_condition_properties_ : x3::symbols<bool>
 	{
 		socket_spec_condition_properties_()
 		{
 			add
-				(lang::keywords::rf::sockets,      lang::socket_spec_condition_property::sockets)
-				(lang::keywords::rf::socket_group, lang::socket_spec_condition_property::socket_group)
+				(lang::keywords::rf::sockets,      false)
+				(lang::keywords::rf::socket_group, true)
 			;
 		}
 	};
-	socket_spec_condition_properties_ socket_spec_condition_properties;
+	const socket_spec_condition_properties_ socket_spec_condition_properties;
 
 	struct boolean_condition_properties_ : x3::symbols<lang::boolean_condition_property>
 	{
@@ -208,6 +223,18 @@ namespace rf
 		}
 	};
 	const color_actions_ color_actions;
+
+	struct play_alert_sound_actions_ : x3::symbols<bool>
+	{
+		play_alert_sound_actions_()
+		{
+			add
+				(lang::keywords::rf::play_alert_sound,            false)
+				(lang::keywords::rf::play_alert_sound_positional, true)
+			;
+		}
+	};
+	const play_alert_sound_actions_ play_alert_sound_actions;
 
 	// ---- filter structure ----
 
@@ -256,24 +283,6 @@ namespace sf
 		}
 	};
 	const queries_ queries;
-
-	struct unary_action_types_ : x3::symbols<lang::unary_action_type>
-	{
-		unary_action_types_()
-		{
-			add // TODO refactor mappings (split them eg depending on expected arguments, correct naming)
-				(lang::keywords::rf::set_border_color,           lang::unary_action_type::set_border_color)
-				(lang::keywords::rf::set_text_color,             lang::unary_action_type::set_text_color)
-				(lang::keywords::rf::set_background_color,       lang::unary_action_type::set_background_color)
-				(lang::keywords::rf::set_font_size,              lang::unary_action_type::set_font_size)
-				(lang::keywords::rf::play_alert_sound,           lang::unary_action_type::set_alert_sound)
-				(lang::keywords::rf::disable_drop_sound,         lang::unary_action_type::play_default_drop_sound)
-				(lang::keywords::rf::minimap_icon,               lang::unary_action_type::set_minimap_icon)
-				(lang::keywords::rf::play_effect,                lang::unary_action_type::set_beam)
-			;
-		}
-	};
-	const unary_action_types_ unary_action_types;
 } // namespace sf
 
 } // namespace fs::parser::detail::symbols

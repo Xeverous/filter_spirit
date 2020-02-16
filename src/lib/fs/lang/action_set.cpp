@@ -19,9 +19,9 @@ void output_color_action(
 		return;
 
 	const lang::color& c = (*color_action).c;
-	output_stream << '\t' << name << ' ' << c.r << ' ' << c.g << ' ' << c.b;
+	output_stream << '\t' << name << ' ' << c.r.value << ' ' << c.g.value << ' ' << c.b.value;
 	if (c.a.has_value())
-		output_stream << ' ' << *c.a;
+		output_stream << ' ' << (*c.a).value;
 
 	output_stream << '\n';
 }
@@ -36,18 +36,18 @@ void output_font_size(
 	output_stream << '\t' << kw::set_font_size << ' ' << (*font_size_action).size.value << '\n';
 }
 
-void output_built_in_alert_sound(
-	lang::built_in_alert_sound alert_sound,
+void output_builtin_alert_sound(
+	lang::builtin_alert_sound alert_sound,
 	std::ostream& output_stream)
 {
 	output_stream << '\t';
 
-	if (alert_sound.is_positional.value)
+	if (alert_sound.is_positional)
 		output_stream << kw::play_alert_sound_positional;
 	else
 		output_stream << kw::play_alert_sound;
 
-	output_stream << ' ' << alert_sound.id.value;
+	output_stream << ' ' << alert_sound.sound_id.value;
 
 	if (alert_sound.volume.has_value())
 		output_stream << ' ' << (*alert_sound.volume).value;
@@ -72,8 +72,8 @@ void output_alert_sound(
 
 	const lang::alert_sound& as = (*alert_sound_action).alert;
 	std::visit(utility::visitor{
-		[&output_stream](lang::built_in_alert_sound sound) {
-			output_built_in_alert_sound(sound, output_stream);
+		[&output_stream](lang::builtin_alert_sound sound) {
+			output_builtin_alert_sound(sound, output_stream);
 		},
 		[&output_stream](const lang::custom_alert_sound& sound) {
 			output_custom_alert_sound(sound, output_stream);
@@ -82,7 +82,7 @@ void output_alert_sound(
 }
 
 void output_disabled_drop_sound(
-	std::optional<lang::disable_default_drop_sound_action> action,
+	std::optional<lang::disable_drop_sound_action> action,
 	std::ostream& output_stream)
 {
 	if (!action)
@@ -112,8 +112,6 @@ void output_suit(lang::suit s, std::ostream& output_stream)
 		case lang::suit::yellow:
 			output_stream << kw::yellow;
 			break;
-		default:
-			break;
 	}
 }
 
@@ -138,8 +136,6 @@ void output_shape(lang::shape s, std::ostream& output_stream)
 		case lang::shape::triangle:
 			output_stream << kw::triangle;
 			break;
-		default:
-			break;
 	}
 }
 
@@ -160,16 +156,16 @@ void output_minimap_icon(
 }
 
 void output_beam_effect(
-	std::optional<lang::beam_effect_action> beam_effect_action,
+	std::optional<lang::play_effect_action> play_effect_action,
 	std::ostream& output_stream)
 {
-	if (!beam_effect_action.has_value())
+	if (!play_effect_action.has_value())
 		return;
 
-	const lang::beam_effect& be = (*beam_effect_action).beam;
+	const lang::play_effect& effect = (*play_effect_action).beam;
 	output_stream << '\t' << kw::play_effect << ' ';
-	output_suit(be.color, output_stream);
-	if (be.is_temporary.value)
+	output_suit(effect.color, output_stream);
+	if (effect.is_temporary)
 		output_stream << ' ' << kw::temp;
 
 	output_stream << '\n';
@@ -187,10 +183,10 @@ void action_set::generate(std::ostream& output_stream) const
 	output_color_action(set_background_color, kw::set_background_color, output_stream);
 
 	output_font_size(set_font_size, output_stream);
-	output_alert_sound(set_alert_sound, output_stream);
-	output_disabled_drop_sound(disable_default_drop_sound, output_stream);
-	output_minimap_icon(set_minimap_icon, output_stream);
-	output_beam_effect(set_beam_effect, output_stream);
+	output_alert_sound(play_alert_sound, output_stream);
+	output_disabled_drop_sound(disable_drop_sound, output_stream);
+	output_minimap_icon(minimap_icon, output_stream);
+	output_beam_effect(play_effect, output_stream);
 }
 
 void action_set::override_with(action_set&& other)
@@ -207,16 +203,16 @@ void action_set::override_with(action_set&& other)
 	if (other.set_font_size)
 		set_font_size = *other.set_font_size;
 
-	if (other.set_alert_sound)
-		set_alert_sound = std::move(*other.set_alert_sound);
+	if (other.play_alert_sound)
+		play_alert_sound = std::move(*other.play_alert_sound);
 
-	disable_default_drop_sound = other.disable_default_drop_sound;
+	disable_drop_sound = other.disable_drop_sound;
 
-	if (other.set_minimap_icon)
-		set_minimap_icon = *other.set_minimap_icon;
+	if (other.minimap_icon)
+		minimap_icon = *other.minimap_icon;
 
-	if (other.set_beam_effect)
-		set_beam_effect = *other.set_beam_effect;
+	if (other.play_effect)
+		play_effect = *other.play_effect;
 }
 
 bool operator==(const action_set& lhs, const action_set& rhs)
@@ -225,10 +221,10 @@ bool operator==(const action_set& lhs, const action_set& rhs)
 		&& lhs.set_text_color == rhs.set_text_color
 		&& lhs.set_background_color == rhs.set_background_color
 		&& lhs.set_font_size == rhs.set_font_size
-		&& lhs.set_alert_sound == rhs.set_alert_sound
-		&& lhs.disable_default_drop_sound == rhs.disable_default_drop_sound
-		&& lhs.set_minimap_icon == rhs.set_minimap_icon
-		&& lhs.set_beam_effect == rhs.set_beam_effect;
+		&& lhs.play_alert_sound == rhs.play_alert_sound
+		&& lhs.disable_drop_sound == rhs.disable_drop_sound
+		&& lhs.minimap_icon == rhs.minimap_icon
+		&& lhs.play_effect == rhs.play_effect;
 }
 
 bool operator!=(const action_set& lhs, const action_set& rhs)
