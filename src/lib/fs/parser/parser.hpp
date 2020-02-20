@@ -34,6 +34,8 @@ public:
 	 * For non-derived types it returns empty, invalid range - this is not wanted,
 	 * empty ranges have no use in this program. Wrap the overload to force compiler
 	 * error instead - much better than a segfault from unexpectedly invalid/empty range.
+	 *
+	 * The current position_cache_type used throws on invalid position_tagged input.
 	 */
 	[[nodiscard]]
 	std::string_view position_of(const x3::position_tagged& ast) const
