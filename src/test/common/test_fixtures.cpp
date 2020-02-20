@@ -1,16 +1,14 @@
-#include <fst/common/test_fixtures.hpp>
+#include "common/test_fixtures.hpp"
 
-#include <fs/lang/item_price_data.hpp>
 #include <fs/parser/parser.hpp>
 #include <fs/compiler/compiler.hpp>
 #include <fs/log/string_logger.hpp>
 
-#define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
 
 #include <utility>
 
-namespace fst
+namespace fs::test
 {
 
 const std::string& minimal_input()
@@ -35,13 +33,6 @@ pr::sf::parse_success_data parser_fixture::parse(std::string_view input)
 	}
 
 	return std::get<pr::sf::parse_success_data>(std::move(parse_result));
-}
-
-std::variant<fs::lang::symbol_table, fs::compiler::compile_error>
-compiler_fixture::resolve_symbols(
-	const std::vector<pr::ast::sf::definition>& defs)
-{
-	return fs::compiler::resolve_spirit_filter_symbols(defs, fs::lang::item_price_data{});
 }
 
 }

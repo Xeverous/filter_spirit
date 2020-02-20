@@ -1,10 +1,11 @@
-#include <fst/common/string_operations.hpp>
+#include "common/string_operations.hpp"
 
 #include <fs/utility/string_helpers.hpp>
 #include <fs/log/string_logger.hpp>
 
 #include <string_view>
 #include <utility>
+#include <tuple>
 
 namespace
 {
@@ -46,10 +47,24 @@ void find_and_print_mismatched_line(
 
 }
 
-namespace fst
+namespace fs::test
 {
 
-std::string_view search(std::string_view input, std::string_view pattern)
+search_state::search_state(std::string_view input, std::string_view pattern)
+: searcher(pattern.data(), pattern.data() + pattern.size())
+, first(input.data())
+, last(input.data() + input.size())
+{
+	next();
+}
+
+search_state& search_state::next()
+{
+	std::tie(first, last) = searcher(first, last);
+	return *this;
+}
+
+search_state search(std::string_view input, std::string_view pattern)
 {
 	BOOST_TEST_REQUIRE(!input.empty(), "test is written incorrectly, input is empty");
 	BOOST_TEST_REQUIRE(!pattern.empty(), "test is written incorrectly, pattern is empty");
@@ -59,16 +74,11 @@ std::string_view search(std::string_view input, std::string_view pattern)
 	 * Since we always want to get that text in order to compare it with error description,
 	 * a failed search should be flagged as internal test error.
 	 */
-	const char *const pattern_first = pattern.data();
-	const char *const pattern_last  = pattern.data() + pattern.size();
-	std::default_searcher<const char*> searcher(pattern_first, pattern_last);
-	const char *const input_first = input.data();
-	const char *const input_last  = input.data() + input.size();
-	const auto pair = searcher(input_first, input_last);
-	BOOST_TEST_REQUIRE((pair.first != input_last),
+	auto ss = search_state(input, pattern);
+	BOOST_TEST_REQUIRE(!ss.result().empty(),
 		"test is written incorrectly, search within tested input code failed\n"
 		"input:\n" << input << "\npattern:\n" << pattern);
-	return fs::utility::make_string_view(pair.first, pair.second);
+	return ss;
 }
 
 boost::test_tools::predicate_result compare_ranges(

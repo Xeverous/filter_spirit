@@ -25,12 +25,12 @@ void print_error_impl(
 {
 	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
-		lookup_data.position_of(error.place_of_duplicated_name),
+		lookup_data.position_of(error.duplicated_name),
 		log::strings::error,
 		"name already exists");
 	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
-		lookup_data.position_of(error.place_of_original_name),
+		lookup_data.position_of(error.original_name),
 		log::strings::note,
 		"first defined here");
 }
@@ -42,7 +42,7 @@ void print_error_impl(
 {
 	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
-		lookup_data.position_of(error.place_of_name),
+		lookup_data.position_of(error.name),
 		log::strings::error,
 		"no such name exists");
 }
@@ -55,7 +55,7 @@ void print_error_impl(
 	if (error.max_allowed) {
 		stream.print_line_number_with_description_and_underlined_code(
 			lookup_data.get_view_of_whole_content(),
-			lookup_data.position_of(error.place_of_arguments),
+			lookup_data.position_of(error.arguments),
 			log::strings::error,
 			"invalid amount of arguments, expected from ",
 			error.min_allowed,
@@ -67,7 +67,7 @@ void print_error_impl(
 	else {
 		stream.print_line_number_with_description_and_underlined_code(
 			lookup_data.get_view_of_whole_content(),
-			lookup_data.position_of(error.place_of_arguments),
+			lookup_data.position_of(error.arguments),
 			log::strings::error,
 			"invalid amount of arguments, expected ",
 			error.min_allowed,
@@ -112,7 +112,7 @@ void print_error_impl(
 {
 	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
-		lookup_data.position_of(error.place_of_expression),
+		lookup_data.position_of(error.expression),
 		log::strings::error,
 		"type mismatch in expression, expected expression of type '",
 		fs::lang::to_string_view(error.expected_type),
@@ -181,12 +181,12 @@ void print_error_impl(
 {
 	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
-		lookup_data.position_of(error.place_of_redefinition),
+		lookup_data.position_of(error.redefinition),
 		log::strings::error,
 		"condition redefinition (the same condition can not be specified again in the same block or nested blocks)");
 	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
-		lookup_data.position_of(error.place_of_original_definition),
+		lookup_data.position_of(error.original_definition),
 		log::strings::note,
 		"first defined here");
 }
@@ -198,12 +198,12 @@ void print_error_impl(
 {
 	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
-		lookup_data.position_of(error.place_of_redefinition),
+		lookup_data.position_of(error.redefinition),
 		log::strings::error,
 		"action redefinition (the same action can not be specified again in the same block)");
 	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
-		lookup_data.position_of(error.place_of_original_definition),
+		lookup_data.position_of(error.original_definition),
 		log::strings::note,
 		"first defined here");
 }
@@ -215,12 +215,12 @@ void print_error_impl(
 {
 	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
-		lookup_data.position_of(error.place_of_redefinition),
+		lookup_data.position_of(error.redefinition),
 		log::strings::error,
 		"lower bound redefinition (the same bound for comparison can not be specified again in the same block or nested blocks)");
 	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
-		lookup_data.position_of(error.place_of_original_definition),
+		lookup_data.position_of(error.original_definition),
 		log::strings::note,
 		"first defined here");
 }
@@ -232,12 +232,12 @@ void print_error_impl(
 {
 	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
-		lookup_data.position_of(error.place_of_redefinition),
+		lookup_data.position_of(error.redefinition),
 		log::strings::error,
 		"upper bound redefinition (the same bound for comparison can not be specified again in the same block or nested blocks)");
 	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
-		lookup_data.position_of(error.place_of_original_definition),
+		lookup_data.position_of(error.original_definition),
 		log::strings::note,
 		"first defined here");
 }

@@ -1,13 +1,10 @@
-#include <fst/common/test_fixtures.hpp>
+#include "common/test_fixtures.hpp"
 
 #include <fs/parser/parser.hpp>
 
-#define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
 
-using namespace fs;
-
-namespace fst
+namespace fs::test
 {
 
 BOOST_AUTO_TEST_SUITE(parser_suite)
@@ -37,24 +34,29 @@ BOOST_AUTO_TEST_SUITE(parser_suite)
 			expect_parse_failure("str = \"abc");
 		}
 
-		BOOST_AUTO_TEST_CASE(array_missing_close_bracket)
+		BOOST_AUTO_TEST_CASE(string_with_line_break)
 		{
-			expect_parse_failure("arr = [1, 2, 3, 4");
+			expect_parse_failure("str = \"ab\nc\"");
 		}
 
-		BOOST_AUTO_TEST_CASE(array_missing_open_bracket)
+		BOOST_AUTO_TEST_CASE(too_large_integer)
 		{
-			expect_parse_failure("arr = 1, 2, 3, 4]");
+			expect_parse_failure("val = 123456789123456789");
 		}
 
-		BOOST_AUTO_TEST_CASE(array_missing_delimeter)
+		BOOST_AUTO_TEST_CASE(duplicated_eq_sign_1)
 		{
-			expect_parse_failure("arr = [1, 2, 3 4]");
+			expect_parse_failure("val == 1");
 		}
 
-		BOOST_AUTO_TEST_CASE(array_missing_element)
+		BOOST_AUTO_TEST_CASE(duplicated_eq_sign_2)
 		{
-			expect_parse_failure("arr = [1, 2, , 4]");
+			expect_parse_failure("val = = 2");
+		}
+
+		BOOST_AUTO_TEST_CASE(missing_value)
+		{
+			expect_parse_failure("x = \n y = 2");
 		}
 
 	BOOST_AUTO_TEST_SUITE_END()

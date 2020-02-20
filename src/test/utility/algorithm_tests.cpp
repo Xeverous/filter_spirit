@@ -1,6 +1,5 @@
 #include <fs/utility/algorithm.hpp>
 
-#define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
 
 #include <algorithm>
@@ -53,7 +52,6 @@ BOOST_FIXTURE_TEST_SUITE(algorithm_suite, algorithm_fixture)
 			BOOST_TEST(input.empty());
 			BOOST_TEST(output.empty());
 		}
-
 
 		BOOST_AUTO_TEST_CASE(single_element)
 		{

@@ -266,8 +266,8 @@ namespace sf
 	struct compound_action_expression : std::vector<action>, x3::position_tagged {};
 
 	struct value_expression : x3::variant<
-			sequence,
-			compound_action_expression
+			compound_action_expression,
+			sequence
 		>, x3::position_tagged
 	{
 		using base_type::base_type;

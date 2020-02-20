@@ -4,6 +4,8 @@
 #include <fs/lang/action_properties.hpp>
 #include <fs/lang/condition_properties.hpp>
 
+#include <boost/test/unit_test.hpp>
+
 #include <ostream>
 #include <optional>
 
@@ -24,20 +26,10 @@
  * Note: ADL will not work if type is defined in a namespace and overload is in global scope
  * Note: the last option can not be a template because boost's implementation already is and doing so results in ambiguous calls
  */
+BOOST_TEST_DONT_PRINT_LOG_VALUE(std::optional<int>)
+
 namespace fs::lang
 {
-
-inline
-std::ostream& boost_test_print_type(std::ostream& os, unary_action_type at)
-{
-	return os << "(action_type: " << static_cast<int>(at) << ")";
-}
-
-inline
-std::ostream& boost_test_print_type(std::ostream& os, array_condition_property scp)
-{
-	return os << "(string_condition_property: " << static_cast<int>(scp) << ")";
-}
 
 inline
 std::ostream& boost_test_print_type(std::ostream& os, suit s)
@@ -59,6 +51,5 @@ std::ostream& boost_test_print_type(std::ostream& os, std::optional<object_type>
 	else
 		return os << "(object_type: ?)";
 }
-
 
 }

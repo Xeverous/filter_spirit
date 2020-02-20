@@ -146,7 +146,7 @@ namespace sf
 	BOOST_SPIRIT_DEFINE(sequence)
 
 	const value_expression_type value_expression = "expression";
-	const auto value_expression_def = sequence | compound_action_expression;
+	const auto value_expression_def = compound_action_expression | sequence;
 	BOOST_SPIRIT_DEFINE(value_expression)
 
 	// ---- definitions ----

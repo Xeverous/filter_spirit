@@ -13,13 +13,13 @@ namespace fs::compiler::errors
 
 struct name_already_exists
 {
-	lang::position_tag place_of_duplicated_name;
-	lang::position_tag place_of_original_name;
+	lang::position_tag duplicated_name;
+	lang::position_tag original_name;
 };
 
 struct no_such_name
 {
-	lang::position_tag place_of_name;
+	lang::position_tag name;
 };
 
 struct invalid_amount_of_arguments
@@ -27,7 +27,7 @@ struct invalid_amount_of_arguments
 	int min_allowed;
 	std::optional<int> max_allowed;
 	int actual;
-	lang::position_tag place_of_arguments;
+	lang::position_tag arguments;
 };
 
 struct invalid_integer_value
@@ -42,7 +42,7 @@ struct type_mismatch
 {
 	lang::object_type expected_type;
 	lang::object_type actual_type;
-	lang::position_tag place_of_expression;
+	lang::position_tag expression;
 };
 
 struct empty_socket_spec
@@ -68,28 +68,28 @@ struct duplicate_influence
 
 struct condition_redefinition
 {
-	lang::position_tag place_of_redefinition;
-	lang::position_tag place_of_original_definition;
+	lang::position_tag redefinition;
+	lang::position_tag original_definition;
 };
 
 // this is only for real filters
 // spirit filters allow to override actions in nested blocks
 struct action_redefinition
 {
-	lang::position_tag place_of_redefinition;
-	lang::position_tag place_of_original_definition;
+	lang::position_tag redefinition;
+	lang::position_tag original_definition;
 };
 
 struct lower_bound_redefinition
 {
-	lang::position_tag place_of_redefinition;
-	lang::position_tag place_of_original_definition;
+	lang::position_tag redefinition;
+	lang::position_tag original_definition;
 };
 
 struct upper_bound_redefinition
 {
-	lang::position_tag place_of_redefinition;
-	lang::position_tag place_of_original_definition;
+	lang::position_tag redefinition;
+	lang::position_tag original_definition;
 };
 
 enum class internal_compiler_error_cause
