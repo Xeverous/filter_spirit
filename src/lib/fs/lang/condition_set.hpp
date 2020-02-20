@@ -93,7 +93,7 @@ struct range_condition
 };
 
 using rarity_range_condition = range_condition<rarity>;
-using numeric_range_condition = range_condition<int>;
+using integer_range_condition = range_condition<int>;
 using fractional_range_condition = range_condition<double>;
 
 struct boolean_condition
@@ -145,24 +145,24 @@ struct condition_set
 	[[nodiscard]]
 	bool is_valid() const;
 
-	numeric_range_condition item_level;
-	numeric_range_condition drop_level;
-	numeric_range_condition quality;
+	integer_range_condition item_level;
+	integer_range_condition drop_level;
+	integer_range_condition quality;
 	rarity_range_condition rarity;
 	std::optional<strings_condition> class_;
 	std::optional<strings_condition> base_type;
-	numeric_range_condition links;
+	integer_range_condition links;
 	std::optional<socket_spec_condition> sockets;
 	std::optional<socket_spec_condition> socket_group;
-	numeric_range_condition height;
-	numeric_range_condition width;
+	integer_range_condition height;
+	integer_range_condition width;
 	std::optional<strings_condition> has_explicit_mod;
 	std::optional<strings_condition> has_enchantment;
 	std::optional<strings_condition> prophecy;
 	std::optional<influences_condition> has_influence;
-	numeric_range_condition stack_size;
-	numeric_range_condition gem_level;
-	numeric_range_condition map_tier;
+	integer_range_condition stack_size;
+	integer_range_condition gem_level;
+	integer_range_condition map_tier;
 	std::optional<boolean_condition> is_identified;
 	std::optional<boolean_condition> is_corrupted;
 	std::optional<boolean_condition> is_elder_item;
