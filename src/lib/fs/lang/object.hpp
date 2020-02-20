@@ -45,13 +45,13 @@ BETTER_ENUM(object_type, int,
 
 
 [[nodiscard]]
-object_type type_of_object(const object_variant& obj) noexcept;
+object_type object_type_of(const object_variant& obj) noexcept;
 
 struct single_object
 {
 	object_type type() const noexcept
 	{
-		return type_of_object(value);
+		return object_type_of(value);
 	}
 
 	object_variant value;
@@ -93,47 +93,46 @@ bool operator!=(const object& lhs, const object& rhs) noexcept { return !(lhs ==
 
 namespace detail {
 	template <typename T> [[nodiscard]] constexpr
-	object_type type_to_enum_impl() noexcept
+	object_type object_type_of_impl() noexcept
 	{
 		static_assert(sizeof(T) == 0, "missing implementation for this type");
 		return object_type::none; // return statement only to silence compiler/editors
 	}
 
 	template <> constexpr
-	object_type type_to_enum_impl<none>() noexcept { return object_type::none; }
+	object_type object_type_of_impl<none>() noexcept { return object_type::none; }
 	template <> constexpr
-	object_type type_to_enum_impl<temp>() noexcept { return object_type::temp; }
+	object_type object_type_of_impl<temp>() noexcept { return object_type::temp; }
 	template <> constexpr
-	object_type type_to_enum_impl<boolean>() noexcept { return object_type::boolean; }
+	object_type object_type_of_impl<boolean>() noexcept { return object_type::boolean; }
 	template <> constexpr
-	object_type type_to_enum_impl<floating_point>() noexcept { return object_type::floating_point; }
+	object_type object_type_of_impl<floating_point>() noexcept { return object_type::floating_point; }
 	template <> constexpr
-	object_type type_to_enum_impl<integer>() noexcept { return object_type::integer; }
+	object_type object_type_of_impl<integer>() noexcept { return object_type::integer; }
 	template <> constexpr
-	object_type type_to_enum_impl<socket_spec>() noexcept { return object_type::socket_group; }
+	object_type object_type_of_impl<socket_spec>() noexcept { return object_type::socket_group; }
 	template <> constexpr
-	object_type type_to_enum_impl<influence>() noexcept { return object_type::influence; }
+	object_type object_type_of_impl<influence>() noexcept { return object_type::influence; }
 	template <> constexpr
-	object_type type_to_enum_impl<rarity>() noexcept { return object_type::rarity; }
+	object_type object_type_of_impl<rarity>() noexcept { return object_type::rarity; }
 	template <> constexpr
-	object_type type_to_enum_impl<shape>() noexcept { return object_type::shape; }
+	object_type object_type_of_impl<shape>() noexcept { return object_type::shape; }
 	template <> constexpr
-	object_type type_to_enum_impl<suit>() noexcept { return object_type::suit; }
+	object_type object_type_of_impl<suit>() noexcept { return object_type::suit; }
 	template <> constexpr
-	object_type type_to_enum_impl<string>() noexcept { return object_type::string; }
+	object_type object_type_of_impl<string>() noexcept { return object_type::string; }
 	template <> constexpr
-	object_type type_to_enum_impl<action_set>() noexcept { return object_type::action_set; }
+	object_type object_type_of_impl<action_set>() noexcept { return object_type::action_set; }
 }
 
-// TODO change to _v trait
 template <typename T> [[nodiscard]] constexpr
-object_type type_to_enum() noexcept
+object_type object_type_of() noexcept
 {
 	static_assert(
 		traits::is_variant_alternative_v<T, object_variant>,
 		"T must be one of object type alternatives");
 
-	return detail::type_to_enum_impl<T>();
+	return detail::object_type_of_impl<T>();
 }
 
 }

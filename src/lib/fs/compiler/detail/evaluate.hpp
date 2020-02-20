@@ -132,7 +132,7 @@ template <typename T>
 get_as(const lang::single_object& sobj)
 {
 	if (!std::holds_alternative<T>(sobj.value)) {
-		return errors::type_mismatch{lang::type_to_enum<T>(), sobj.type(), sobj.origin};
+		return errors::type_mismatch{lang::object_type_of<T>(), sobj.type(), sobj.origin};
 	}
 
 	return std::get<T>(sobj.value);

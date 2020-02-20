@@ -8,7 +8,7 @@ static_assert(
 	object_type::_size() == traits::variant_size_v<object_variant>,
 	"there must be exactly one enum for each object_variant variant type");
 
-object_type type_of_object(const object_variant& obj) noexcept
+object_type object_type_of(const object_variant& obj) noexcept
 {
 	return object_type::_from_index(obj.index());
 }
