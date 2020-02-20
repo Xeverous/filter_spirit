@@ -693,9 +693,8 @@ namespace rf
 
 namespace fs::parser
 {
-	// TODO rename to position_tag_of
 	template <typename T>
-	boost::spirit::x3::position_tagged get_position_info(const T& ast)
+	boost::spirit::x3::position_tagged position_tag_of(const T& ast)
 	{
 		static_assert(std::is_base_of_v<boost::spirit::x3::position_tagged, T>, "T must be derived from position_tagged");
 		// intentional object slicing

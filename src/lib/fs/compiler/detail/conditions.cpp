@@ -302,7 +302,7 @@ spirit_filter_add_rarity_comparison_condition(
 
 	auto& rar = std::get<lang::rarity>(rar_or_err);
 
-	return add_range_condition(condition.comparison_type.value, rar, parser::get_position_info(condition), set.rarity);
+	return add_range_condition(condition.comparison_type.value, rar, parser::position_tag_of(condition), set.rarity);
 }
 
 [[nodiscard]] std::optional<compile_error>
@@ -324,7 +324,7 @@ spirit_filter_add_numeric_comparison_condition(
 		return std::get<compile_error>(std::move(int_or_err));
 
 	auto& intgr = std::get<lang::integer>(int_or_err);
-	const auto origin = parser::get_position_info(condition);
+	const auto origin = parser::position_tag_of(condition);
 	return add_numeric_comparison_condition(condition.property, condition.comparison_type.value, intgr, origin, set);
 }
 
@@ -350,7 +350,7 @@ spirit_filter_add_string_array_condition(
 		strings.push_back(std::move(std::get<lang::string>(str_or_err).value));
 	}
 
-	const auto condition_origin = parser::get_position_info(condition);
+	const auto condition_origin = parser::position_tag_of(condition);
 	return add_string_array_condition(condition.property, strings, condition.exact_match.required, condition_origin, set);
 }
 
@@ -376,7 +376,7 @@ spirit_filter_add_has_influence_condition(
 	}
 
 	return add_has_influence_condition(
-		influences, condition.exact_match.required, parser::get_position_info(condition), set.has_influence);
+		influences, condition.exact_match.required, parser::position_tag_of(condition), set.has_influence);
 }
 
 [[nodiscard]] std::optional<compile_error>
@@ -407,7 +407,7 @@ spirit_filter_add_socket_spec_condition(
 		lang::socket_spec_condition{
 			condition.comparison_type,
 			std::move(specs),
-			parser::get_position_info(condition)
+			parser::position_tag_of(condition)
 		},
 		set);
 }
@@ -432,7 +432,7 @@ spirit_filter_add_boolean_condition(
 
 	return add_boolean_condition(
 		std::get<lang::boolean>(bool_or_err),
-		parser::get_position_info(condition),
+		parser::position_tag_of(condition),
 		condition.property,
 		condition_set);
 }
@@ -445,7 +445,7 @@ real_filter_add_numeric_comparison_condition(
 	lang::condition_set& set)
 {
 	const lang::integer intgr = detail::evaluate(numeric_condition.integer);
-	const auto origin = parser::get_position_info(numeric_condition);
+	const auto origin = parser::position_tag_of(numeric_condition);
 	const lang::comparison_type cmp = numeric_condition.comparison_type.value;
 	return add_numeric_comparison_condition(numeric_condition.property, cmp, intgr, origin, set);
 }
@@ -455,7 +455,7 @@ real_filter_add_string_array_condition(
 	const parser::ast::rf::string_array_condition& condition,
 	lang::condition_set& set)
 {
-	const auto origin = parser::get_position_info(condition);
+	const auto origin = parser::position_tag_of(condition);
 	const bool exact_match = condition.exact_match.required;
 
 	std::vector<std::string> strings;
@@ -473,14 +473,14 @@ real_filter_add_has_influence_condition(
 	std::optional<lang::influences_condition>& target)
 {
 	const auto num_inf = static_cast<int>(condition.influence_literals.size());
-	const auto condition_origin = parser::get_position_info(condition);
+	const auto condition_origin = parser::position_tag_of(condition);
 	if (num_inf != 1 && num_inf != 2) {
 		return errors::invalid_amount_of_arguments{1, 2, num_inf, condition_origin};
 	}
 
 	boost::container::static_vector<std::pair<lang::influence, lang::position_tag>, 2> influences;
 	for (auto inf : condition.influence_literals) {
-		influences.emplace_back(detail::evaluate(inf), parser::get_position_info(inf));
+		influences.emplace_back(detail::evaluate(inf), parser::position_tag_of(inf));
 	}
 
 	return add_has_influence_condition(influences, condition.exact_match.required, condition_origin, target);
@@ -506,7 +506,7 @@ real_filter_add_socket_spec_condition(
 		lang::socket_spec_condition{
 			condition.comparison_type,
 			std::move(specs),
-			parser::get_position_info(condition)
+			parser::position_tag_of(condition)
 		},
 		set);
 }
@@ -565,7 +565,7 @@ real_filter_add_condition(
 			return add_range_condition(
 				rarity_condition.comparison_type.value,
 				evaluate(rarity_condition.rarity),
-				parser::get_position_info(rarity_condition),
+				parser::position_tag_of(rarity_condition),
 				condition_set.rarity);
 		},
 		[&](const ast::rf::numeric_condition& numeric_condition) -> result_type {
@@ -583,7 +583,7 @@ real_filter_add_condition(
 		[&](const ast::rf::boolean_condition& boolean_condition) -> result_type {
 			return add_boolean_condition(
 				evaluate(boolean_condition.value),
-				parser::get_position_info(boolean_condition),
+				parser::position_tag_of(boolean_condition),
 				boolean_condition.property,
 				condition_set);
 		}

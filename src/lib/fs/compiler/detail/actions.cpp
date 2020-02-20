@@ -90,7 +90,7 @@ spirit_filter_add_set_color_action(
 		return std::get<compile_error>(col_or_err);
 	}
 
-	auto act = lang::color_action{std::get<lang::color>(col_or_err), parser::get_position_info(action)};
+	auto act = lang::color_action{std::get<lang::color>(col_or_err), parser::position_tag_of(action)};
 	return spirit_filter_add_set_color_action_impl(action.action_type, act, set);
 }
 
@@ -117,7 +117,7 @@ spirit_filter_add_set_font_size_action(
 	auto int_obj = std::get<lang::integer>(int_or_err);
 
 	// override previous action
-	set.set_font_size = lang::font_size_action{int_obj, parser::get_position_info(action)};
+	set.set_font_size = lang::font_size_action{int_obj, parser::position_tag_of(action)};
 	return std::nullopt;
 }
 
@@ -162,7 +162,7 @@ spirit_filter_add_minimap_icon_action(
 	// override previous action
 	set.minimap_icon = lang::minimap_icon_action{
 		std::get<lang::minimap_icon>(icon_or_err),
-		parser::get_position_info(action)
+		parser::position_tag_of(action)
 	};
 	return std::nullopt;
 }
@@ -197,7 +197,7 @@ spirit_filter_add_play_effect_action(
 		// override previous action
 		set.play_effect = lang::play_effect_action{
 			lang::play_effect{suit, true},
-			parser::get_position_info(action)
+			parser::position_tag_of(action)
 		};
 		return std::nullopt;
 	}
@@ -205,7 +205,7 @@ spirit_filter_add_play_effect_action(
 	// override previous action
 	set.play_effect = lang::play_effect_action{
 		lang::play_effect{suit, true},
-		parser::get_position_info(action)
+		parser::position_tag_of(action)
 	};
 	return std::nullopt;
 }
@@ -251,7 +251,7 @@ spirit_filter_add_play_alert_sound_action(
 	// override previous action
 	set.play_alert_sound = lang::alert_sound_action{
 		lang::alert_sound{std::get<lang::builtin_alert_sound>(bas_or_err)},
-		parser::get_position_info(action)
+		parser::position_tag_of(action)
 	};
 	return std::nullopt;
 }
@@ -279,7 +279,7 @@ spirit_filter_add_custom_alert_sound_action(
 
 	set.play_alert_sound = lang::alert_sound_action{
 		lang::alert_sound{lang::custom_alert_sound{std::move(str)}},
-		parser::get_position_info(action)
+		parser::position_tag_of(action)
 	};
 	return std::nullopt;
 }
@@ -334,7 +334,7 @@ real_filter_add_color_action(
 		return std::get<compile_error>(std::move(col_or_err));
 	}
 
-	auto act = lang::color_action{std::get<lang::color>(col_or_err), parser::get_position_info(action)};
+	auto act = lang::color_action{std::get<lang::color>(col_or_err), parser::position_tag_of(action)};
 
 	switch (action.action) {
 		case lang::color_action_type::set_border_color: {
@@ -405,7 +405,7 @@ spirit_filter_add_action(
 			return spirit_filter_add_custom_alert_sound_action(a, symbols, set);
 		},
 		[&](const ast::sf::disable_drop_sound_action&) {
-			set.disable_drop_sound = lang::disable_drop_sound_action{parser::get_position_info(action)};
+			set.disable_drop_sound = lang::disable_drop_sound_action{parser::position_tag_of(action)};
 			return std::nullopt;
 		},
 		[&](const ast::sf::compound_action& ca) {
@@ -429,7 +429,7 @@ real_filter_add_action(
 			return real_filter_add_action_impl(
 				lang::font_size_action{
 					lang::integer{action.font_size.value},
-					parser::get_position_info(action)
+					parser::position_tag_of(action)
 				},
 				set.set_font_size);
 		},
@@ -441,14 +441,14 @@ real_filter_add_action(
 			return real_filter_add_action_impl(
 				lang::minimap_icon_action{
 					std::get<lang::minimap_icon>(icon_or_error),
-					parser::get_position_info(action)},
+					parser::position_tag_of(action)},
 				set.minimap_icon);
 		},
 		[&](const ast::rf::play_effect_action& action) -> result_type {
 			return real_filter_add_action_impl(
 				lang::play_effect_action{
 					lang::play_effect{evaluate(action.suit), action.is_temporary},
-					parser::get_position_info(action)
+					parser::position_tag_of(action)
 				},
 				set.play_effect);
 		},
@@ -456,7 +456,7 @@ real_filter_add_action(
 			return real_filter_add_action_impl(
 				lang::alert_sound_action{
 					real_filter_make_alert_sound(action.sound_id, action.volume, false),
-					parser::get_position_info(action)
+					parser::position_tag_of(action)
 				},
 				set.play_alert_sound);
 		},
@@ -464,7 +464,7 @@ real_filter_add_action(
 			return real_filter_add_action_impl(
 				lang::alert_sound_action{
 					real_filter_make_alert_sound(action.sound_id, action.volume, true),
-					parser::get_position_info(action)
+					parser::position_tag_of(action)
 				},
 				set.play_alert_sound);
 		},
@@ -472,13 +472,13 @@ real_filter_add_action(
 			return real_filter_add_action_impl(
 				lang::alert_sound_action{
 					lang::alert_sound{lang::custom_alert_sound{evaluate(action.path)}},
-					parser::get_position_info(action)
+					parser::position_tag_of(action)
 				},
 				set.play_alert_sound);
 		},
 		[&](const ast::rf::disable_drop_sound_action& action) -> result_type {
 			return real_filter_add_action_impl(
-				lang::disable_drop_sound_action{parser::get_position_info(action)},
+				lang::disable_drop_sound_action{parser::position_tag_of(action)},
 				set.disable_drop_sound);
 		}
 	));

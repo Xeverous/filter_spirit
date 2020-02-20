@@ -41,8 +41,8 @@ add_constant_from_definition(
 	const ast::sf::value_expression& value_expression = def.value;
 
 	if (const auto it = symbols.find(wanted_name.value); it != symbols.end()) {
-		const lang::position_tag place_of_original_name = parser::get_position_info(it->second.name_origin);
-		const lang::position_tag place_of_duplicated_name = parser::get_position_info(wanted_name);
+		const lang::position_tag place_of_original_name = parser::position_tag_of(it->second.name_origin);
+		const lang::position_tag place_of_duplicated_name = parser::position_tag_of(wanted_name);
 		return errors::name_already_exists{place_of_duplicated_name, place_of_original_name};
 	}
 
@@ -56,7 +56,7 @@ add_constant_from_definition(
 		wanted_name.value,
 		lang::named_object{
 			std::get<lang::object>(std::move(expr_result)),
-			parser::get_position_info(wanted_name)});
+			parser::position_tag_of(wanted_name)});
 	assert(pair.second); // C++20: use [[assert]]
 	(void) pair; // ignore insertion result in release builds
 	return std::nullopt;
@@ -78,7 +78,7 @@ std::optional<compile_error> apply_statements_recursively(
 			},
 			[&](const ast::sf::visibility_statement& vs) {
 				blocks.push_back(lang::item_filter_block{
-					lang::item_visibility{vs.show, parser::get_position_info(vs)},
+					lang::item_visibility{vs.show, parser::position_tag_of(vs)},
 					parent_conditions,
 					parent_actions});
 				return std::nullopt;
@@ -166,7 +166,10 @@ compile_real_filter(
 
 		}
 
-		filter_block.visibility = lang::item_visibility{block.visibility.show, parser::get_position_info(block.visibility)};
+		filter_block.visibility = lang::item_visibility{
+			block.visibility.show,
+			parser::position_tag_of(block.visibility)
+		};
 		filter.blocks.push_back(std::move(filter_block));
 	}
 

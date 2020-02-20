@@ -81,13 +81,13 @@ evaluate(parser::ast::rf::color_literal cl)
 {
 	std::optional<std::pair<lang::integer, lang::position_tag>> a;
 	if (cl.a) {
-		a = std::make_pair(evaluate(*cl.a), parser::get_position_info(*cl.a));
+		a = std::make_pair(evaluate(*cl.a), parser::position_tag_of(*cl.a));
 	}
 
 	return make_color(
-		{evaluate(cl.r), parser::get_position_info(cl.r)},
-		{evaluate(cl.g), parser::get_position_info(cl.g)},
-		{evaluate(cl.b), parser::get_position_info(cl.b)},
+		{evaluate(cl.r), parser::position_tag_of(cl.r)},
+		{evaluate(cl.g), parser::position_tag_of(cl.g)},
+		{evaluate(cl.b), parser::position_tag_of(cl.b)},
 		a
 	);
 }
@@ -121,7 +121,7 @@ evaluate(parser::ast::rf::icon_literal il)
 {
 	return make_minimap_icon(
 		detail::evaluate(il.size),
-		parser::get_position_info(il.size),
+		parser::position_tag_of(il.size),
 		detail::evaluate(il.suit),
 		detail::evaluate(il.shape)
 	);

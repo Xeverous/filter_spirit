@@ -43,11 +43,11 @@ expect_integer_in_range(
 evaluate_literal(const ast::sf::literal_expression& expression)
 {
 	using result_type = std::variant<lang::single_object, compile_error>;
-	using parser::get_position_info;
+	using parser::position_tag_of;
 
 	return expression.apply_visitor(x3::make_lambda_visitor<result_type>(
 		[](ast::sf::none_literal literal) -> result_type {
-			return lang::single_object{lang::none{}, get_position_info(literal)};
+			return lang::single_object{lang::none{}, position_tag_of(literal)};
 		},
 		[](ast::sf::socket_spec_literal literal) -> result_type {
 			std::variant<lang::socket_spec, compile_error> ss_or_err =
@@ -59,32 +59,32 @@ evaluate_literal(const ast::sf::literal_expression& expression)
 
 			return lang::single_object{
 				std::get<lang::socket_spec>(ss_or_err),
-				parser::get_position_info(literal)
+				parser::position_tag_of(literal)
 			};
 		},
 		[](ast::sf::boolean_literal literal) -> result_type {
-			return lang::single_object{lang::boolean{literal.value}, get_position_info(literal)};
+			return lang::single_object{lang::boolean{literal.value}, position_tag_of(literal)};
 		},
 		[](ast::sf::integer_literal literal) -> result_type {
-			return lang::single_object{lang::integer{literal.value}, get_position_info(literal)};
+			return lang::single_object{lang::integer{literal.value}, position_tag_of(literal)};
 		},
 		[](ast::sf::floating_point_literal literal) -> result_type {
-			return lang::single_object{lang::floating_point{literal.value}, get_position_info(literal)};
+			return lang::single_object{lang::floating_point{literal.value}, position_tag_of(literal)};
 		},
 		[](ast::sf::rarity_literal literal) -> result_type {
-			return lang::single_object{lang::rarity{literal.value}, get_position_info(literal)};
+			return lang::single_object{lang::rarity{literal.value}, position_tag_of(literal)};
 		},
 		[](ast::sf::shape_literal literal) -> result_type {
-			return lang::single_object{lang::shape{literal.value}, get_position_info(literal)};
+			return lang::single_object{lang::shape{literal.value}, position_tag_of(literal)};
 		},
 		[](ast::sf::suit_literal literal) -> result_type {
-			return lang::single_object{lang::suit{literal.value}, get_position_info(literal)};
+			return lang::single_object{lang::suit{literal.value}, position_tag_of(literal)};
 		},
 		[](ast::sf::influence_literal literal) -> result_type {
-			return lang::single_object{lang::influence{literal.value}, get_position_info(literal)};
+			return lang::single_object{lang::influence{literal.value}, position_tag_of(literal)};
 		},
 		[](const ast::sf::string_literal& literal) -> result_type {
-			return lang::single_object{lang::string{literal}, get_position_info(literal)};
+			return lang::single_object{lang::string{literal}, position_tag_of(literal)};
 		}
 	));
 }
@@ -94,7 +94,7 @@ evaluate_identifier(
 	const ast::sf::identifier& identifier,
 	const lang::symbol_table& symbols)
 {
-	const auto origin = parser::get_position_info(identifier);
+	const auto origin = parser::position_tag_of(identifier);
 
 	// try to make a socket_spec first - their literals look like identifiers
 	std::variant<lang::socket_spec, compile_error> ss_or_err =
@@ -133,7 +133,7 @@ evaluate_compound_action(
 			return *std::move(error);
 	}
 
-	const auto origin = parser::get_position_info(expr);
+	const auto origin = parser::position_tag_of(expr);
 
 	return lang::object{
 		lang::object::container_type{lang::single_object{std::move(set), origin}},
@@ -249,12 +249,12 @@ evaluate_socket_spec_literal(
 			lang::limits::min_item_sockets,
 			lang::limits::max_item_sockets,
 			literal.socket_count.value,
-			parser::get_position_info(literal.socket_count)
+			parser::position_tag_of(literal.socket_count)
 		};
 	}
 
 	std::variant<lang::socket_spec, compile_error> ss_or_err =
-		detail::make_socket_spec(literal.socket_colors.value, parser::get_position_info(literal.socket_colors));
+		detail::make_socket_spec(literal.socket_colors.value, parser::position_tag_of(literal.socket_colors));
 
 	if (std::holds_alternative<compile_error>(ss_or_err)) {
 		return std::get<compile_error>(std::move(ss_or_err));
@@ -288,7 +288,7 @@ evaluate_sequence(
 
 				return lang::object{
 					{std::get<lang::single_object>(std::move(sobj_or_err))},
-					parser::get_position_info(expr)
+					parser::position_tag_of(expr)
 				};
 			},
 			[&](const ast::sf::identifier& expr) {
@@ -309,7 +309,7 @@ evaluate_sequence(
 		std::move(obj.values.begin(), obj.values.end(), std::back_inserter(seq_values));
 	}
 
-	const auto sequence_origin = parser::get_position_info(sequence);
+	const auto sequence_origin = parser::position_tag_of(sequence);
 	const auto values_num = static_cast<int>(seq_values.size());
 
 	if (values_num < min_allowed_elements
