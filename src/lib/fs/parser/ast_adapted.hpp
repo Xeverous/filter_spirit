@@ -68,7 +68,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 	property, comparison_type, seq)
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::sf::string_sequence_condition,
+	fs::parser::ast::sf::string_array_condition,
 	property, exact_match, seq)
 
 BOOST_FUSION_ADAPT_STRUCT(

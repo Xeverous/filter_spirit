@@ -124,7 +124,7 @@ namespace sf
 
 	struct rarity_comparison_condition_class     : error_on_error, annotate_on_success {};
 	struct numeric_comparison_condition_class    : error_on_error, annotate_on_success {};
-	struct string_sequence_condition_class       : error_on_error, annotate_on_success {};
+	struct string_array_condition_class          : error_on_error, annotate_on_success {};
 	struct has_influence_condition_class         : error_on_error, annotate_on_success {};
 	struct socket_spec_condition_class           : error_on_error, annotate_on_success {};
 	struct boolean_condition_class               : error_on_error, annotate_on_success {};
@@ -322,8 +322,8 @@ namespace sf
 	using numeric_comparison_condition_type = x3::rule<numeric_comparison_condition_class, ast::sf::numeric_comparison_condition>;
 	BOOST_SPIRIT_DECLARE(numeric_comparison_condition_type)
 
-	using string_sequence_condition_type = x3::rule<string_sequence_condition_class, ast::sf::string_sequence_condition>;
-	BOOST_SPIRIT_DECLARE(string_sequence_condition_type)
+	using string_array_condition_type = x3::rule<string_array_condition_class, ast::sf::string_array_condition>;
+	BOOST_SPIRIT_DECLARE(string_array_condition_type)
 
 	using has_influence_condition_type = x3::rule<has_influence_condition_class, ast::sf::has_influence_condition>;
 	BOOST_SPIRIT_DECLARE(has_influence_condition_type)

@@ -176,12 +176,12 @@ namespace sf
 		> sequence;
 	BOOST_SPIRIT_DEFINE(numeric_comparison_condition)
 
-	const string_sequence_condition_type string_sequence_condition = "string sequence condition";
-	const auto string_sequence_condition_def =
+	const string_array_condition_type string_array_condition = "string array condition";
+	const auto string_array_condition_def =
 		x3::lexeme[symbols::rf::string_array_condition_properties >> common::not_alnum_or_underscore]
 		> common::exact_matching_policy_expression
 		> sequence;
-	BOOST_SPIRIT_DEFINE(string_sequence_condition)
+	BOOST_SPIRIT_DEFINE(string_array_condition)
 
 	const has_influence_condition_type has_influence_condition = "has influence condition";
 	const auto has_influence_condition_def =
@@ -207,7 +207,7 @@ namespace sf
 	const auto condition_def =
 		  rarity_comparison_condition
 		| numeric_comparison_condition
-		| string_sequence_condition
+		| string_array_condition
 		| has_influence_condition
 		| socket_spec_condition
 		| boolean_condition;

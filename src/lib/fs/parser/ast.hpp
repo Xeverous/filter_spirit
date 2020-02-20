@@ -334,7 +334,7 @@ namespace sf
 		sequence seq;
 	};
 
-	struct string_sequence_condition : x3::position_tagged
+	struct string_array_condition : x3::position_tagged
 	{
 		lang::string_array_condition_property property;
 		exact_matching_policy exact_match;
@@ -363,7 +363,7 @@ namespace sf
 	struct condition : x3::variant<
 			rarity_comparison_condition,
 			numeric_comparison_condition,
-			string_sequence_condition,
+			string_array_condition,
 			has_influence_condition,
 			socket_spec_condition,
 			boolean_condition

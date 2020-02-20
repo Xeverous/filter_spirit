@@ -330,7 +330,7 @@ spirit_filter_add_numeric_comparison_condition(
 
 [[nodiscard]] std::optional<compile_error>
 spirit_filter_add_string_array_condition(
-	const ast::sf::string_sequence_condition& condition,
+	const ast::sf::string_array_condition& condition,
 	const lang::symbol_table& symbols,
 	lang::condition_set& set)
 {
@@ -532,7 +532,7 @@ spirit_filter_add_conditions(
 			[&](const ast::sf::numeric_comparison_condition& comparison_condition) {
 				return spirit_filter_add_numeric_comparison_condition(comparison_condition, symbols, set);
 			},
-			[&](const ast::sf::string_sequence_condition& string_condition) {
+			[&](const ast::sf::string_array_condition& string_condition) {
 				return spirit_filter_add_string_array_condition(string_condition, symbols, set);
 			},
 			[&](const ast::sf::has_influence_condition& string_condition) {
