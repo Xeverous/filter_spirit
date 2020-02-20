@@ -8,6 +8,7 @@
 
 #include <optional>
 #include <vector>
+#include <type_traits>
 
 namespace fs::lang
 {
@@ -15,20 +16,21 @@ namespace fs::lang
 template <typename T>
 struct range_bound
 {
+	static_assert(std::is_trivial_v<T>, "T should be trivial");
+
 	T value;
 	bool inclusive;
 	position_tag origin;
 };
 
-// TODO more noexcept
-template <typename T>
-bool operator==(range_bound<T> left, range_bound<T> right)
+template <typename T> constexpr
+bool operator==(range_bound<T> left, range_bound<T> right) noexcept
 {
 	return left.value == right.value && left.inclusive == right.inclusive;
 }
 
-template <typename T>
-bool operator!=(range_bound<T> left, range_bound<T> right)
+template <typename T> constexpr
+bool operator!=(range_bound<T> left, range_bound<T> right) noexcept
 {
 	return !(left == right);
 }
@@ -36,7 +38,7 @@ bool operator!=(range_bound<T> left, range_bound<T> right)
 template <typename T>
 struct range_condition
 {
-	bool is_exact() const
+	constexpr bool is_exact() const noexcept
 	{
 		if (lower_bound.has_value() && upper_bound.has_value())
 			return *lower_bound == *upper_bound;
@@ -45,7 +47,7 @@ struct range_condition
 	}
 
 	// check whether 'value' can fit into currently specified range
-	bool includes(T value) const
+	constexpr bool includes(T value) const noexcept
 	{
 		if (lower_bound.has_value())
 		{
@@ -68,22 +70,22 @@ struct range_condition
 		return true;
 	}
 
-	bool has_anything() const
+	constexpr bool has_anything() const noexcept
 	{
 		return lower_bound.has_value() || upper_bound.has_value();
 	}
 
-	void set_exact(T value, position_tag origin)
+	constexpr void set_exact(T value, position_tag origin) noexcept
 	{
 		lower_bound = upper_bound = range_bound<T>{value, true, origin};
 	}
 
-	void set_lower_bound(T value, bool inclusive, position_tag origin)
+	constexpr void set_lower_bound(T value, bool inclusive, position_tag origin) noexcept
 	{
 		lower_bound = range_bound<T>{value, inclusive, origin};
 	}
 
-	void set_upper_bound(T value, bool inclusive, position_tag origin)
+	constexpr void set_upper_bound(T value, bool inclusive, position_tag origin) noexcept
 	{
 		upper_bound = range_bound<T>{value, inclusive, origin};
 	}
