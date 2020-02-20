@@ -20,7 +20,7 @@ using object_variant = std::variant<
 	boolean,
 	floating_point,
 	integer,
-	socket_group,
+	socket_spec,
 	influence,
 	rarity,
 	shape,
@@ -110,7 +110,7 @@ namespace detail {
 	template <> constexpr
 	object_type type_to_enum_impl<integer>() noexcept { return object_type::integer; }
 	template <> constexpr
-	object_type type_to_enum_impl<socket_group>() noexcept { return object_type::socket_group; }
+	object_type type_to_enum_impl<socket_spec>() noexcept { return object_type::socket_group; }
 	template <> constexpr
 	object_type type_to_enum_impl<influence>() noexcept { return object_type::influence; }
 	template <> constexpr

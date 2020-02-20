@@ -47,7 +47,7 @@ struct floating_point
 inline bool operator==(floating_point lhs, floating_point rhs) noexcept { return lhs.value == rhs.value; }
 inline bool operator!=(floating_point lhs, floating_point rhs) noexcept { return !(lhs == rhs); }
 
-struct socket_group // TODO rename to socket_spec
+struct socket_spec
 {
 	bool is_num_valid() const noexcept
 	{
@@ -72,11 +72,11 @@ struct socket_group // TODO rename to socket_spec
 	int d = 0; // delve sockets (on resonators)
 };
 
-inline bool operator==(socket_group lhs, socket_group rhs) noexcept
+inline bool operator==(socket_spec lhs, socket_spec rhs) noexcept
 {
 	return std::tie(lhs.r, lhs.g, lhs.b, lhs.w) == std::tie(rhs.r, rhs.g, rhs.b, rhs.w);
 }
-inline bool operator!=(socket_group lhs, socket_group rhs) noexcept { return !(lhs == rhs); }
+inline bool operator!=(socket_spec lhs, socket_spec rhs) noexcept { return !(lhs == rhs); }
 
 enum class influence { shaper, elder, crusader, redeemer, hunter, warlord };
 enum class rarity { normal, magic, rare, unique };

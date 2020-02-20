@@ -93,16 +93,16 @@ void output_socket_spec_condition(
 		output_stream << '\t' << kw::sockets << ' ';
 	}
 
-	const lang::socket_spec_condition::container_type& sgs = (*cond).values;
-	for (lang::socket_group sg : sgs) {
-		assert(sg.is_valid());
+	const lang::socket_spec_condition::container_type& specs = (*cond).values;
+	for (lang::socket_spec ss : specs) {
+		assert(ss.is_valid());
 
-		output_letter(kw::r, sg.r);
-		output_letter(kw::g, sg.g);
-		output_letter(kw::b, sg.b);
-		output_letter(kw::w, sg.w);
-		output_letter(kw::a, sg.a);
-		output_letter(kw::d, sg.d);
+		output_letter(kw::r, ss.r);
+		output_letter(kw::g, ss.g);
+		output_letter(kw::b, ss.b);
+		output_letter(kw::w, ss.w);
+		output_letter(kw::a, ss.a);
+		output_letter(kw::d, ss.d);
 	}
 
 	output_stream << '\n';

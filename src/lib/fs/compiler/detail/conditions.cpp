@@ -394,12 +394,12 @@ spirit_filter_add_socket_spec_condition(
 
 	lang::socket_spec_condition::container_type specs;
 	for (auto& val : obj.values) {
-		std::variant<lang::socket_group, compile_error> ss_or_err = detail::get_as_socket_spec(val);
+		std::variant<lang::socket_spec, compile_error> ss_or_err = detail::get_as_socket_spec(val);
 		if (std::holds_alternative<compile_error>(ss_or_err)) {
 			return std::get<compile_error>(ss_or_err);
 		}
 
-		specs.push_back(std::get<lang::socket_group>(ss_or_err));
+		specs.push_back(std::get<lang::socket_spec>(ss_or_err));
 	}
 
 	return add_socket_spec_condition(
@@ -493,12 +493,12 @@ real_filter_add_socket_spec_condition(
 {
 	lang::socket_spec_condition::container_type specs;
 	for (ast::rf::socket_spec_literal lit : condition.specs) {
-		std::variant<lang::socket_group, compile_error> ss_or_err = detail::evaluate_socket_spec_literal(lit);
+		std::variant<lang::socket_spec, compile_error> ss_or_err = detail::evaluate_socket_spec_literal(lit);
 		if (std::holds_alternative<compile_error>(ss_or_err)) {
 			return std::get<compile_error>(std::move(ss_or_err));
 		}
 
-		specs.push_back(std::get<lang::socket_group>(ss_or_err));
+		specs.push_back(std::get<lang::socket_spec>(ss_or_err));
 	}
 
 	return add_socket_spec_condition(

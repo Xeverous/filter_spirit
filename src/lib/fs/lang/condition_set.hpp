@@ -104,7 +104,7 @@ struct boolean_condition
 
 struct socket_spec_condition
 {
-	using container_type = boost::container::small_vector<socket_group, 6>;
+	using container_type = boost::container::small_vector<socket_spec, 6>;
 
 	socket_spec_comparison_type comparison_type;
 	container_type values;

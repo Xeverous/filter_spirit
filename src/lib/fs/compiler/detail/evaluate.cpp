@@ -50,7 +50,7 @@ evaluate_literal(const ast::sf::literal_expression& expression)
 			return lang::single_object{lang::none{}, get_position_info(literal)};
 		},
 		[](ast::sf::socket_spec_literal literal) -> result_type {
-			std::variant<lang::socket_group, compile_error> ss_or_err =
+			std::variant<lang::socket_spec, compile_error> ss_or_err =
 				detail::evaluate_socket_spec_literal(literal);
 
 			if (std::holds_alternative<compile_error>(ss_or_err)) {
@@ -58,7 +58,7 @@ evaluate_literal(const ast::sf::literal_expression& expression)
 			}
 
 			return lang::single_object{
-				std::get<lang::socket_group>(ss_or_err),
+				std::get<lang::socket_spec>(ss_or_err),
 				parser::get_position_info(literal)
 			};
 		},
@@ -97,14 +97,14 @@ evaluate_identifier(
 	const auto origin = parser::get_position_info(identifier);
 
 	// try to make a socket_spec first - their literals look like identifiers
-	std::variant<lang::socket_group, compile_error> ss_or_err =
+	std::variant<lang::socket_spec, compile_error> ss_or_err =
 		detail::make_socket_spec(identifier.value, origin);
 
-	if (std::holds_alternative<lang::socket_group>(ss_or_err)) {
+	if (std::holds_alternative<lang::socket_spec>(ss_or_err)) {
 		return lang::object{
 			lang::object::container_type{
 				lang::single_object{
-					std::get<lang::socket_group>(ss_or_err),
+					std::get<lang::socket_spec>(ss_or_err),
 					origin
 				}
 			},
@@ -180,7 +180,7 @@ make_color(
 	return lang::color{r.first, g.first, b.first};
 }
 
-std::variant<lang::socket_group, compile_error>
+std::variant<lang::socket_spec, compile_error>
 make_socket_spec(
 	const std::string& raw,
 	lang::position_tag origin)
@@ -188,30 +188,30 @@ make_socket_spec(
 	if (raw.empty())
 		return errors::empty_socket_spec{origin};
 
-	lang::socket_group sg;
+	lang::socket_spec ss;
 	for (char c : raw) {
 		namespace kw = lang::keywords::rf;
 
 		if (c == kw::r)
-			++sg.r;
+			++ss.r;
 		else if (c == kw::g)
-			++sg.g;
+			++ss.g;
 		else if (c == kw::b)
-			++sg.b;
+			++ss.b;
 		else if (c == kw::w)
-			++sg.w;
+			++ss.w;
 		else if (c == kw::a)
-			++sg.a;
+			++ss.a;
 		else if (c == kw::d)
-			++sg.d;
+			++ss.d;
 		else
 			return errors::illegal_characters_in_socket_spec{origin};
 	}
 
-	if (!sg.is_valid())
+	if (!ss.is_valid())
 		return errors::invalid_socket_spec{origin};
 
-	return sg;
+	return ss;
 }
 
 std::variant<lang::builtin_alert_sound, compile_error>
@@ -238,7 +238,7 @@ make_builtin_alert_sound(
 	return lang::builtin_alert_sound{positional, sound_id.first};
 }
 
-std::variant<lang::socket_group, compile_error>
+std::variant<lang::socket_spec, compile_error>
 evaluate_socket_spec_literal(
 	const ast::common::socket_spec_literal& literal)
 {
@@ -253,14 +253,14 @@ evaluate_socket_spec_literal(
 		};
 	}
 
-	std::variant<lang::socket_group, compile_error> ss_or_err =
+	std::variant<lang::socket_spec, compile_error> ss_or_err =
 		detail::make_socket_spec(literal.socket_colors.value, parser::get_position_info(literal.socket_colors));
 
 	if (std::holds_alternative<compile_error>(ss_or_err)) {
 		return std::get<compile_error>(std::move(ss_or_err));
 	}
 
-	auto& ss = std::get<lang::socket_group>(ss_or_err);
+	auto& ss = std::get<lang::socket_spec>(ss_or_err);
 	ss.num = literal.socket_count.value;
 	return ss;
 }
@@ -340,18 +340,18 @@ evaluate_value_expression(
 	));
 }
 
-[[nodiscard]] std::variant<lang::socket_group, compile_error>
+[[nodiscard]] std::variant<lang::socket_spec, compile_error>
 get_as_socket_spec(
 	const lang::single_object& obj)
 {
 	auto& val = obj.value;
 
-	if (std::holds_alternative<lang::socket_group>(val)) {
-		return std::get<lang::socket_group>(val);
+	if (std::holds_alternative<lang::socket_spec>(val)) {
+		return std::get<lang::socket_spec>(val);
 	}
 
 	if (std::holds_alternative<lang::integer>(val)) {
-		return lang::socket_group{std::get<lang::integer>(val).value};
+		return lang::socket_spec{std::get<lang::integer>(val).value};
 	}
 
 	return errors::type_mismatch{lang::object_type::socket_group, obj.type(), obj.origin};

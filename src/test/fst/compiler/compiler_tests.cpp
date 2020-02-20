@@ -134,7 +134,7 @@ array          = [1, 2, 3]
 			expect_object_in_symbols(symbols, lookup_data, "font_size",      lang::font_size{30},             search(input, "font_size"),      search(input, "FontSize(30)"));
 			expect_object_in_symbols(symbols, lookup_data, "sound_id",       lang::sound_id{7},               search(input, "sound_id"),       search(input, "SoundId(7)"));
 			expect_object_in_symbols(symbols, lookup_data, "volume",         lang::volume{300},               search(input, "volume"),         search(input, "Volume(300)"));
-			expect_object_in_symbols(symbols, lookup_data, "group",          lang::socket_group{1, 1 , 1, 0}, search(input, "group"),          search(input, "Group(\"RGB\")"));
+			expect_object_in_symbols(symbols, lookup_data, "group",          lang::socket_spec{1, 1 , 1, 0}, search(input, "group"),          search(input, "Group(\"RGB\")"));
 			expect_object_in_symbols(symbols, lookup_data, "influence",      lang::influence::elder,          search(input, "influence"),      search(input, "Elder"));
 			expect_object_in_symbols(symbols, lookup_data, "rarity",         lang::rarity::rare,              search(input, "rarity"),         search(input, "Rare"));
 			expect_object_in_symbols(symbols, lookup_data, "shape",          lang::shape::hexagon,            search(input, "shape"),          search(input, "Hexagon"));
@@ -225,7 +225,7 @@ Show
 			BOOST_TEST(b0_cond.item_level.includes(10));
 			if (b0_cond.socket_group.has_value())
 			{
-				const lang::socket_group& sg = (*b0_cond.socket_group).group;
+				const lang::socket_spec& sg = (*b0_cond.socket_group).group;
 				BOOST_TEST(sg.is_valid());
 				BOOST_TEST(sg.r == 1);
 				BOOST_TEST(sg.g == 1);

@@ -18,7 +18,7 @@ make_color(
 	std::pair<lang::integer, lang::position_tag> b,
 	std::optional<std::pair<lang::integer, lang::position_tag>> a);
 
-[[nodiscard]] std::variant<lang::socket_group, compile_error>
+[[nodiscard]] std::variant<lang::socket_spec, compile_error>
 make_socket_spec(
 	const std::string& raw,
 	lang::position_tag origin);
@@ -42,7 +42,7 @@ make_builtin_alert_sound(
 	std::pair<lang::integer, lang::position_tag> sound_id,
 	std::optional<std::pair<lang::integer, lang::position_tag>> volume);
 
-[[nodiscard]] std::variant<lang::socket_group, compile_error>
+[[nodiscard]] std::variant<lang::socket_spec, compile_error>
 evaluate_socket_spec_literal(
 	const parser::ast::common::socket_spec_literal& literal);
 
@@ -138,7 +138,7 @@ get_as(const lang::single_object& sobj)
 	return std::get<T>(sobj.value);
 }
 
-[[nodiscard]] std::variant<lang::socket_group, compile_error>
+[[nodiscard]] std::variant<lang::socket_spec, compile_error>
 get_as_socket_spec(
 	const lang::single_object& obj);
 
