@@ -29,6 +29,10 @@ namespace common
 	const auto whitespace_def = x3::space | comment;
 	BOOST_SPIRIT_DEFINE(whitespace)
 
+	const non_eol_whitespace_type non_eol_whitespace = "non-eol whitespace";
+	const auto non_eol_whitespace_def = x3::space - x3::eol;
+	BOOST_SPIRIT_DEFINE(non_eol_whitespace)
+
 	// ---- fundamental tokens ----
 
 	const identifier_impl_type identifier_impl = "identifier";
@@ -142,7 +146,7 @@ namespace sf
 	BOOST_SPIRIT_DEFINE(primitive_value)
 
 	const sequence_type sequence = "sequence";
-	const auto sequence_def = +primitive_value;
+	const auto sequence_def = x3::skip(common::non_eol_whitespace)[+primitive_value];
 	BOOST_SPIRIT_DEFINE(sequence)
 
 	const value_expression_type value_expression = "expression";

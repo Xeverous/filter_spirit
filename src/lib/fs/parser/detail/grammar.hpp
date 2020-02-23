@@ -211,6 +211,9 @@ namespace common
 	// dependency reasons. See config.hpp for details.
 	BOOST_SPIRIT_DECLARE(whitespace_type)
 
+	using non_eol_whitespace_type = x3::rule<struct non_eol_whitespace_class /*, intentionally nothing */>;
+	BOOST_SPIRIT_DECLARE(non_eol_whitespace_type)
+
 	// ---- fundamental tokens ----
 
 	// all comments are ignored
