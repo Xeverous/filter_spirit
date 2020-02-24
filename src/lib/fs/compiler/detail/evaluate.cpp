@@ -51,7 +51,7 @@ evaluate_literal(const ast::sf::literal_expression& expression)
 		},
 		[](ast::sf::socket_spec_literal literal) -> result_type {
 			std::variant<lang::socket_spec, compile_error> ss_or_err =
-				detail::evaluate_socket_spec_literal(literal);
+				detail::evaluate_socket_spec_literal(literal.socket_count, literal.socket_colors);
 
 			if (std::holds_alternative<compile_error>(ss_or_err)) {
 				return std::get<compile_error>(std::move(ss_or_err));
@@ -59,7 +59,7 @@ evaluate_literal(const ast::sf::literal_expression& expression)
 
 			return lang::single_object{
 				std::get<lang::socket_spec>(ss_or_err),
-				parser::position_tag_of(literal)
+				position_tag_of(literal)
 			};
 		},
 		[](ast::sf::boolean_literal literal) -> result_type {
@@ -90,29 +90,13 @@ evaluate_literal(const ast::sf::literal_expression& expression)
 }
 
 [[nodiscard]] std::variant<lang::object, compile_error>
-evaluate_identifier(
-	const ast::sf::identifier& identifier,
+evaluate_name(
+	const ast::sf::name& name,
 	const lang::symbol_table& symbols)
 {
-	const auto origin = parser::position_tag_of(identifier);
+	const auto origin = parser::position_tag_of(name);
 
-	// try to make a socket_spec first - their literals look like identifiers
-	std::variant<lang::socket_spec, compile_error> ss_or_err =
-		detail::make_socket_spec(identifier.value, origin);
-
-	if (std::holds_alternative<lang::socket_spec>(ss_or_err)) {
-		return lang::object{
-			lang::object::container_type{
-				lang::single_object{
-					std::get<lang::socket_spec>(ss_or_err),
-					origin
-				}
-			},
-			origin
-		};
-	}
-
-	const auto it = symbols.find(identifier.value);
+	const auto it = symbols.find(name.value.value);
 	if (it == symbols.end())
 		return errors::no_such_name{origin};
 
@@ -240,28 +224,35 @@ make_builtin_alert_sound(
 
 std::variant<lang::socket_spec, compile_error>
 evaluate_socket_spec_literal(
-	const ast::common::socket_spec_literal& literal)
+	boost::optional<parser::ast::common::integer_literal> int_lit,
+	const parser::ast::common::identifier& iden)
 {
-	if (literal.socket_count.value < lang::limits::min_item_sockets
-		|| literal.socket_count.value > lang::limits::max_item_sockets)
-	{
-		return errors::invalid_integer_value{
-			lang::limits::min_item_sockets,
-			lang::limits::max_item_sockets,
-			literal.socket_count.value,
-			parser::position_tag_of(literal.socket_count)
-		};
+	if (int_lit) {
+		auto& socket_count = *int_lit;
+
+		if (socket_count.value < lang::limits::min_item_sockets
+			|| socket_count.value > lang::limits::max_item_sockets)
+		{
+			return errors::invalid_integer_value{
+				lang::limits::min_item_sockets,
+				lang::limits::max_item_sockets,
+				socket_count.value,
+				parser::position_tag_of(socket_count)
+			};
+		}
 	}
 
 	std::variant<lang::socket_spec, compile_error> ss_or_err =
-		detail::make_socket_spec(literal.socket_colors.value, parser::position_tag_of(literal.socket_colors));
+		detail::make_socket_spec(iden.value, parser::position_tag_of(iden));
 
 	if (std::holds_alternative<compile_error>(ss_or_err)) {
 		return std::get<compile_error>(std::move(ss_or_err));
 	}
 
 	auto& ss = std::get<lang::socket_spec>(ss_or_err);
-	ss.num = literal.socket_count.value;
+	if (int_lit)
+		ss.num = (*int_lit).value;
+
 	return ss;
 }
 
@@ -291,8 +282,8 @@ evaluate_sequence(
 					parser::position_tag_of(expr)
 				};
 			},
-			[&](const ast::sf::identifier& expr) {
-				return evaluate_identifier(expr, symbols);
+			[&](const ast::sf::name& name) {
+				return evaluate_name(name, symbols);
 			}
 		));
 

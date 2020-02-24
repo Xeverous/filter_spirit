@@ -37,27 +37,26 @@ add_constant_from_definition(
 	const ast::sf::constant_definition& def,
 	lang::symbol_table& symbols)
 {
-	const ast::sf::identifier& wanted_name = def.name;
-	const ast::sf::value_expression& value_expression = def.value;
+	const auto wanted_name_origin = parser::position_tag_of(def.value_name);
+	const std::string& wanted_name = def.value_name.value.value;
 
-	if (const auto it = symbols.find(wanted_name.value); it != symbols.end()) {
+	if (const auto it = symbols.find(wanted_name); it != symbols.end()) {
 		const lang::position_tag place_of_original_name = parser::position_tag_of(it->second.name_origin);
-		const lang::position_tag place_of_duplicated_name = parser::position_tag_of(wanted_name);
-		return errors::name_already_exists{place_of_duplicated_name, place_of_original_name};
+		return errors::name_already_exists{wanted_name_origin, place_of_original_name};
 	}
 
 	std::variant<lang::object, compile_error> expr_result =
-		detail::evaluate_value_expression(value_expression, symbols);
+		detail::evaluate_value_expression(def.value, symbols);
 
 	if (std::holds_alternative<compile_error>(expr_result))
 		return std::get<compile_error>(std::move(expr_result));
 
 	const auto pair = symbols.emplace(
-		wanted_name.value,
+		wanted_name,
 		lang::named_object{
 			std::get<lang::object>(std::move(expr_result)),
-			parser::position_tag_of(wanted_name)});
-	assert(pair.second); // C++20: use [[assert]]
+			wanted_name_origin});
+	assert(pair.second);
 	(void) pair; // ignore insertion result in release builds
 	return std::nullopt;
 }

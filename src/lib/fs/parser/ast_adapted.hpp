@@ -44,7 +44,7 @@
 // ---- literal types ----
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::common::socket_spec_literal,
+	fs::parser::ast::sf::socket_spec_literal,
 	socket_count, socket_colors)
 
 // ---- expressions ----
@@ -55,7 +55,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::sf::constant_definition,
-	name, value)
+	value_name, value)
 
 // ---- conditions ----
 
@@ -104,6 +104,10 @@ BOOST_FUSION_ADAPT_STRUCT(
 	definitions, statements)
 
 // -------- real filter --------
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::rf::socket_spec_literal,
+	socket_count, socket_colors)
 
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::rf::color_literal,

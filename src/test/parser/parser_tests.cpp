@@ -38,7 +38,7 @@ bool test_literal(const T& literal, const Value& value)
 
 const sf::primitive_value* get_primitive(const sf::definition& def, const char* name)
 {
-	BOOST_TEST(def.def.name.value == name);
+	BOOST_TEST(def.def.value_name.value.value == name);
 
 	if (!holds_alternative<sf::sequence>(def.def.value.var)) {
 		BOOST_ERROR("expected sequence");
@@ -95,12 +95,12 @@ bool test_identifier_definition(const sf::definition& def, const char* name, con
 	}
 
 	const auto& prim = *prim_ptr;
-	if (!holds_alternative<sf::identifier>(prim.var)) {
-		BOOST_ERROR("expected identifier");
+	if (!holds_alternative<sf::name>(prim.var)) {
+		BOOST_ERROR("expected name");
 		return false;
 	}
 
-	const auto& iden = boost::get<sf::identifier>(prim.var);
+	const auto& iden = boost::get<sf::name>(prim.var).value;
 	if (iden.value != identifier) {
 		BOOST_ERROR("identifier was expected to be " << identifier << " but is " << iden.value);
 		return false;
@@ -124,8 +124,8 @@ BOOST_AUTO_TEST_SUITE(parser_success_suite)
 # test that parser correctly handles all comments, including this one
 ##
 # #
-n1 = 1 #
-n2 = 2 ## #text
+$n1 = 1 #
+$n2 = 2 ## #text
 )";
 
 		const sf::ast_type ast = parse(input).ast;
@@ -141,15 +141,15 @@ n2 = 2 ## #text
 	{
 		const std::string input = minimal_input() + R"(
 # test that parser can correctly parse various identifiers
-n1 = 1
-n_2 = 2
-n__3__ = 3
-bUt_RaIdEr_Is_fAsTeR = 4
-gOtTa_BuIlD_sOmE_dEfEnSe = 5
-GGG = 666
-not_a_keyword1 = ttrue
-not_a_keyword2 = falsee
-Identifiedd = Corruptedd
+$n1 = 1
+$n_2 = 2
+$n__3__ = 3
+$bUt_RaIdEr_Is_fAsTeR = 4
+$gOtTa_BuIlD_sOmE_dEfEnSe = 5
+$GGG = 666
+$not_a_keyword1 = $ttrue
+$not_a_keyword2 = $falsee
+$Identifiedd = $Corruptedd
 )";
 
 		const sf::ast_type ast = parse(input).ast;
@@ -171,7 +171,7 @@ Identifiedd = Corruptedd
 	BOOST_AUTO_TEST_CASE(empty_string)
 	{
 		const std::string input = minimal_input() + "\n"
-			"empty_string = \"\"";
+			"$empty_string = \"\"";
 
 		const sf::ast_type ast = parse(input).ast;
 
@@ -184,18 +184,18 @@ Identifiedd = Corruptedd
 	BOOST_AUTO_TEST_CASE(integer_sequence)
 	{
 		const std::string input = minimal_input() + "\n"
-			"integer    = 1\n"
-			"color_rgb  = 0 1 2\n"
-			"color_rgba = 3 4 5 255";
+			"$integer    = 1\n"
+			"$color_rgb  = 0 1 2\n"
+			"$color_rgba = 3 4 5 255";
 
 		const sf::ast_type ast = parse(input).ast;
 
 		const std::vector<sf::definition>& defs = ast.definitions;
 		BOOST_TEST_REQUIRE(static_cast<int>(defs.size()) == 3);
 
-		BOOST_TEST(defs[0].def.name.value == "integer");
-		BOOST_TEST(defs[1].def.name.value == "color_rgb");
-		BOOST_TEST(defs[2].def.name.value == "color_rgba");
+		BOOST_TEST(defs[0].def.value_name.value.value == "integer");
+		BOOST_TEST(defs[1].def.value_name.value.value == "color_rgb");
+		BOOST_TEST(defs[2].def.value_name.value.value == "color_rgba");
 
 		BOOST_TEST_REQUIRE(holds_alternative<sf::sequence>(defs[0].def.value.var));
 		const auto& seq0 = boost::get<sf::sequence>(defs[0].def.value.var);
@@ -221,14 +221,14 @@ Identifiedd = Corruptedd
 	BOOST_AUTO_TEST_CASE(string_sequence)
 	{
 		const std::string input = minimal_input() + "\n"
-			"currency_t1 = \"Exalted Orb\" \"Mirror of Kalandra\" \"Eternal Orb\" \"Mirror Shard\"";
+			"$currency_t1 = \"Exalted Orb\" \"Mirror of Kalandra\" \"Eternal Orb\" \"Mirror Shard\"";
 
 		const sf::ast_type ast = parse(input).ast;
 
 		const std::vector<sf::definition>& defs = ast.definitions;
 		BOOST_TEST_REQUIRE(static_cast<int>(defs.size()) == 1);
 
-		BOOST_TEST(defs[0].def.name.value == "currency_t1");
+		BOOST_TEST(defs[0].def.value_name.value.value == "currency_t1");
 
 		auto& val_expr = defs[0].def.value;
 		BOOST_TEST_REQUIRE(holds_alternative<sf::sequence>(val_expr.var));
@@ -249,14 +249,14 @@ Identifiedd = Corruptedd
 	BOOST_AUTO_TEST_CASE(empty_compound_action_definition)
 	{
 		const std::string input = minimal_input() + "\n"
-			"empty_action = {}";
+			"$empty_action = {}";
 
 		const sf::ast_type ast = parse(input).ast;
 
 		const std::vector<sf::definition>& defs = ast.definitions;
 		BOOST_TEST_REQUIRE(defs.size() == 1u);
 
-		BOOST_TEST(defs[0].def.name.value == "empty_action");
+		BOOST_TEST(defs[0].def.value_name.value.value == "empty_action");
 
 		auto& val_expr = defs[0].def.value;
 		BOOST_TEST_REQUIRE(holds_alternative<sf::compound_action_expression>(val_expr.var));
@@ -272,13 +272,13 @@ Identifiedd = Corruptedd
 		// this source but for the parser - AST is correct here
 		const std::string input = minimal_input() + R"(
 # sample comment
-SetBackgroundColor color_black
+SetBackgroundColor $color_black
 
 Class "Currency" {
-	SetBorderColor color_currency
+	SetBorderColor $color_currency
 
-	BaseType currency_t1 {
-		PlayAlertSound sound_currency
+	BaseType $currency_t1 {
+		PlayAlertSound $sound_currency
 		Show
 	}
 

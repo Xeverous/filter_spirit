@@ -36,6 +36,7 @@ struct integer
 inline bool operator==(integer lhs, integer rhs) noexcept { return lhs.value == rhs.value; }
 inline bool operator!=(integer lhs, integer rhs) noexcept { return !(lhs == rhs); }
 
+// TODO rename to "fractional"
 struct floating_point
 {
 	explicit floating_point(double value) : value(value) {}

@@ -493,7 +493,9 @@ real_filter_add_socket_spec_condition(
 {
 	lang::socket_spec_condition::container_type specs;
 	for (ast::rf::socket_spec_literal lit : condition.specs) {
-		std::variant<lang::socket_spec, compile_error> ss_or_err = detail::evaluate_socket_spec_literal(lit);
+		std::variant<lang::socket_spec, compile_error> ss_or_err =
+			detail::evaluate_socket_spec_literal(lit.socket_count, lit.socket_colors);
+
 		if (std::holds_alternative<compile_error>(ss_or_err)) {
 			return std::get<compile_error>(std::move(ss_or_err));
 		}

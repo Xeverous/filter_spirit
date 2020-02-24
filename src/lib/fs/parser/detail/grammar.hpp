@@ -99,7 +99,7 @@ namespace sf
 
 	// ---- fundamental tokens ----
 
-	// (all in common)
+	struct name_class                            : error_on_error, annotate_on_success {};
 
 	// ---- literal types ----
 
@@ -279,7 +279,8 @@ namespace sf
 
 	// ---- fundamental tokens ----
 
-	// (all in common)
+	using name_type = x3::rule<name_class, ast::sf::name>;
+	BOOST_SPIRIT_DECLARE(name_type)
 
 	// ---- literal types ----
 

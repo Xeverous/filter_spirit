@@ -130,12 +130,6 @@ namespace common
 		lang::influence value;
 	};
 
-	struct socket_spec_literal : x3::position_tagged
-	{
-		integer_literal socket_count;
-		identifier socket_colors;
-	};
-
 	struct none_literal : x3::position_tagged
 	{
 		void get_value() const {}
@@ -195,6 +189,19 @@ namespace sf
 
 	using identifier = common::identifier;
 
+	struct name : x3::position_tagged
+	{
+		auto& operator=(identifier id)
+		{
+			value = std::move(id);
+			return *this;
+		}
+
+		const auto& get_value () const { return value; }
+
+		identifier value;
+	};
+
 	// ---- literal types ----
 
 	using integer_literal = common::integer_literal;
@@ -219,21 +226,26 @@ namespace sf
 	using suit_literal = common::suit_literal;
 	using influence_literal = common::influence_literal;
 	using none_literal = common::none_literal;
-	using socket_spec_literal = common::socket_spec_literal;
+
+	struct socket_spec_literal : x3::position_tagged
+	{
+		boost::optional<integer_literal> socket_count;
+		identifier socket_colors;
+	};
 
 	// ---- expressions ----
 
 	struct literal_expression : x3::variant<
-			floating_point_literal,
-			socket_spec_literal,
-			integer_literal,
-			string_literal,
 			boolean_literal,
 			rarity_literal,
 			shape_literal,
 			suit_literal,
 			influence_literal,
-			none_literal
+			none_literal,
+			socket_spec_literal,
+			floating_point_literal,
+			integer_literal,
+			string_literal
 		>, x3::position_tagged
 	{
 		using base_type::base_type;
@@ -253,7 +265,7 @@ namespace sf
 		lang::query q;
 	};
 
-	struct primitive_value : x3::variant<literal_expression, identifier>, x3::position_tagged
+	struct primitive_value : x3::variant<name, literal_expression>, x3::position_tagged
 	{
 		using base_type::base_type;
 		using base_type::operator=;
@@ -299,7 +311,7 @@ namespace sf
 
 	struct constant_definition : x3::position_tagged
 	{
-		identifier name;
+		name value_name;
 		value_expression value;
 	};
 
@@ -516,7 +528,12 @@ namespace rf
 	using rarity_literal = common::rarity_literal;
 	using string_literal = common::string_literal;
 	using influence_literal = common::influence_literal;
-	using socket_spec_literal = common::socket_spec_literal;
+
+	struct socket_spec_literal : x3::position_tagged
+	{
+		integer_literal socket_count;
+		identifier socket_colors;
+	};
 
 	struct color_literal : x3::position_tagged
 	{

@@ -176,12 +176,12 @@ Show
 		BOOST_AUTO_TEST_CASE(constants)
 		{
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
-x = 36
-c1 = 1 2 x
+$x = 36
+$c1 = 1 2 $x
 
-SetTextColor c1
-SetBackgroundColor c1
-SetFontSize x
+SetTextColor $c1
+SetBackgroundColor $c1
+SetFontSize $x
 Show
 )");
 			const std::string_view expected_filter =
@@ -198,14 +198,14 @@ R"(Show
 		BOOST_AUTO_TEST_CASE(compound_action)
 		{
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
-x = 1 2 3
-comp = {
-	SetBorderColor x
-	SetTextColor x
+$x = 1 2 3
+$comp = {
+	SetBorderColor $x
+	SetTextColor $x
 }
 
 SetFontSize 36
-Set comp
+Set $comp
 Rarity Rare {
 	Show
 }
@@ -224,22 +224,22 @@ R"(Show
 		BOOST_AUTO_TEST_CASE(compound_action_in_compound_action)
 		{
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
-x = 1 2 3
-y = 11 22 33
+$x = 1 2 3
+$y = 11 22 33
 
-comp2 = {
-	SetBorderColor y
-	SetTextColor y
+$comp2 = {
+	SetBorderColor $y
+	SetTextColor $y
 }
 
-comp1 = {
-	SetBorderColor x
-	Set comp2
-	SetTextColor x
+$comp1 = {
+	SetBorderColor $x
+	Set $comp2
+	SetTextColor $x
 }
 
 SetFontSize 36
-Set comp1
+Set $comp1
 Rarity Rare {
 	Show
 }
@@ -265,28 +265,28 @@ Show
 		BOOST_AUTO_TEST_CASE(compound_action_override)
 		{
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
-x = 1 2 3
-y = 11 22 33
+$x = 1 2 3
+$y = 11 22 33
 
-comp2 = {
-	SetBorderColor y
-	SetTextColor y
+$comp2 = {
+	SetBorderColor $y
+	SetTextColor $y
 	SetFontSize 42
 }
 
-comp1 = {
-	SetBorderColor x
-	SetTextColor x
+$comp1 = {
+	SetBorderColor $x
+	SetTextColor $x
 }
 
 SetFontSize 36
-Set comp1
+Set $comp1
 Rarity Rare {
-	Set comp2
+	Set $comp2
 
 	Quality 20 {
 		SetBackgroundColor 50 50 50
-		Set comp1
+		Set $comp1
 		SetTextColor 100 100 100
 		Show
 	}
@@ -323,22 +323,22 @@ Show
 		BOOST_AUTO_TEST_CASE(nested_actions)
 		{
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
-x = 36
-y = 38
-c1 = 1 2 x
-c2 = 11 22 y
+$x = 36
+$y = 38
+$c1 = 1 2 $x
+$c2 = 11 22 $y
 
 BaseType "Vaal"
 Width > 1 {
-	SetBorderColor c2
-	SetBackgroundColor c2
-	SetFontSize y
+	SetBorderColor $c2
+	SetBackgroundColor $c2
+	SetFontSize $y
 	Show
 }
 
-SetTextColor c1
-SetBackgroundColor c1
-SetFontSize x
+SetTextColor $c1
+SetBackgroundColor $c1
+SetFontSize $x
 Show
 )");
 			const std::string_view expected_filter =

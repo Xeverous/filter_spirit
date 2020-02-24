@@ -44,7 +44,8 @@ make_builtin_alert_sound(
 
 [[nodiscard]] std::variant<lang::socket_spec, compile_error>
 evaluate_socket_spec_literal(
-	const parser::ast::common::socket_spec_literal& literal);
+	boost::optional<parser::ast::common::integer_literal> int_lit,
+	const parser::ast::common::identifier& iden);
 
 [[nodiscard]] std::variant<lang::object, compile_error>
 evaluate_sequence(

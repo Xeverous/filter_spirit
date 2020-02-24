@@ -98,6 +98,12 @@ namespace common
 
 namespace sf
 {
+	// ---- fundamental tokens ----
+
+	const name_type name = "name";
+	const auto name_def = x3::lexeme['$' >> common::identifier];
+	BOOST_SPIRIT_DEFINE(name)
+
 	// ---- literal types ----
 
 	const floating_point_literal_type floating_point_literal = "number (fractional)";
@@ -105,7 +111,7 @@ namespace sf
 	BOOST_SPIRIT_DEFINE(floating_point_literal)
 
 	const socket_spec_literal_type socket_spec_literal = "socket spec literal";
-	const auto socket_spec_literal_def = x3::lexeme[common::integer_literal >> common::identifier];
+	const auto socket_spec_literal_def = x3::lexeme[-common::integer_literal >> common::identifier];
 	BOOST_SPIRIT_DEFINE(socket_spec_literal)
 
 	// ---- expressions ----
@@ -119,22 +125,25 @@ namespace sf
 
 	const literal_expression_type literal_expression = "literal";
 	const auto literal_expression_def =
-	// order here is crucial in context-sensitive grammars
-	// this grammar is context-free but the order will affect performance
-	// we can clearly assume that integers and strings will be the most popular
-	// note: order should match types in literal_expression_type::attribute_type
-		  floating_point_literal
-		// must be attempted before integer literal, otherwise integer literal for eg "5GGG" would
-		// leave letters which immediately follow (no whitespace) that would trigger parse error
-		| socket_spec_literal
-		| common::integer_literal
-		| common::string_literal
-		| common::boolean_literal
+	// 1. Order here is crucial in context-sensitive grammars
+	// 2. Order should match types in literal_expression_type::attribute_type
+		// Keyword literals first. They are the most unique (only 1 allowed pattern of characters)
+		  common::boolean_literal
 		| common::rarity_literal
 		| common::shape_literal
 		| common::suit_literal
 		| common::influence_literal
-		| common::none_literal;
+		| common::none_literal
+		// 1. Must be attempted before integer literal, otherwise integer literal for eg "5GGG" would
+		// leave letters which immediately follow (no whitespace) that would trigger parse error
+		// 2. Must be attempted after all keyword literals, otherwise they will be incorrectly
+		// attempted as a socket spec and error as they do not consist only of R/G/B/W/A/D letters
+		| socket_spec_literal
+		// Must be attempted before integer literal. Otherwise integer literal will just consume
+		// the number and do not check if there is any . character following it.
+		| floating_point_literal
+		| common::integer_literal
+		| common::string_literal;
 	BOOST_SPIRIT_DEFINE(literal_expression)
 
 	const query_type query = "query";
@@ -142,7 +151,7 @@ namespace sf
 	BOOST_SPIRIT_DEFINE(query)
 
 	const primitive_value_type primitive_value = "primitive";
-	const auto primitive_value_def = literal_expression | common::identifier;
+	const auto primitive_value_def = name | literal_expression;
 	BOOST_SPIRIT_DEFINE(primitive_value)
 
 	const sequence_type sequence = "sequence";
@@ -156,7 +165,7 @@ namespace sf
 	// ---- definitions ----
 
 	const constant_definition_type constant_definition = "constant definiton";
-	const auto constant_definition_def = common::identifier >> '=' > value_expression;
+	const auto constant_definition_def = name >> '=' > value_expression;
 	BOOST_SPIRIT_DEFINE(constant_definition)
 
 	// future space for metedata definitions

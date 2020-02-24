@@ -108,54 +108,54 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 			* ut::description("test that all types can be used as constant"))
 		{
 			const std::string input_str = minimal_input() + R"(
-none           = None
-temp           = Temp
-boolean        = False
-fractional     = 3.5
-integer        = 123
-socket_spec    = 5RGB
-influence      = Elder
-rarity         = Rare
-shape          = Hexagon
-suit           = Yellow
-string         = "Leather Belt"
+$none           = None
+$temp           = Temp
+$boolean        = False
+$fractional     = 3.5
+$integer        = 123
+$socket_spec    = 5RGB
+$influence      = Elder
+$rarity         = Rare
+$shape          = Hexagon
+$suit           = Yellow
+$string         = "Leather Belt"
 )";
 			const std::string_view input = input_str;
 			const parser::sf::parse_success_data parse_data = parse(input);
 			const parser::lookup_data& lookup_data = parse_data.lookup_data;
 			const lang::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.definitions, lookup_data);
 
-			expect_object(symbols, lookup_data, "none", search(input, "none").result(),
+			expect_object(symbols, lookup_data, "none", search(input, "$none").result(),
 				{{lang::none{}, search(input, "None").result()}}
 			);
-			expect_object(symbols, lookup_data, "temp", search(input, "temp").result(),
+			expect_object(symbols, lookup_data, "temp", search(input, "$temp").result(),
 				{{lang::temp{}, search(input, "Temp").result()}}
 			);
-			expect_object(symbols, lookup_data, "boolean", search(input, "boolean").result(),
+			expect_object(symbols, lookup_data, "boolean", search(input, "$boolean").result(),
 				{{lang::boolean{false}, search(input, "False").result()}}
 			);
-			expect_object(symbols, lookup_data, "fractional", search(input, "fractional").result(),
+			expect_object(symbols, lookup_data, "fractional", search(input, "$fractional").result(),
 				{{lang::floating_point{3.5}, search(input, "3.5").result()}}
 			);
-			expect_object(symbols, lookup_data, "integer", search(input, "integer").result(),
+			expect_object(symbols, lookup_data, "integer", search(input, "$integer").result(),
 				{{lang::integer{123}, search(input, "123").result()}}
 			);
-			expect_object(symbols, lookup_data, "socket_spec", search(input, "socket_spec").result(),
+			expect_object(symbols, lookup_data, "socket_spec", search(input, "$socket_spec").result(),
 				{{lang::socket_spec{5, 1, 1, 1}, search(input, "5RGB").result()}}
 			);
-			expect_object(symbols, lookup_data, "influence", search(input, "influence").result(),
+			expect_object(symbols, lookup_data, "influence", search(input, "$influence").result(),
 				{{lang::influence::elder, search(input, "Elder").result()}}
 			);
-			expect_object(symbols, lookup_data, "rarity", search(input, "rarity").result(),
+			expect_object(symbols, lookup_data, "rarity", search(input, "$rarity").result(),
 				{{lang::rarity::rare, search(input, "Rare").result()}}
 			);
-			expect_object(symbols, lookup_data, "shape", search(input, "shape").result(),
+			expect_object(symbols, lookup_data, "shape", search(input, "$shape").result(),
 				{{lang::shape::hexagon, search(input, "Hexagon").result()}}
 			);
-			expect_object(symbols, lookup_data, "suit", search(input, "suit").result(),
+			expect_object(symbols, lookup_data, "suit", search(input, "$suit").result(),
 				{{lang::suit::yellow, search(input, "Yellow").result()}}
 			);
-			expect_object(symbols, lookup_data, "string", search(input, "string").result(),
+			expect_object(symbols, lookup_data, "string", search(input, "$string").result(),
 				{{lang::string{"Leather Belt"}, search(input, "\"Leather Belt\"").result()}}
 			);
 		}
@@ -164,9 +164,9 @@ string         = "Leather Belt"
 			* ut::description("test that sequences of various lengths are correctly interpreted"))
 		{
 			const std::string input_str = minimal_input() + R"(
-x = 1 2
-y = 3 4 5
-z = 6 7 8 9
+$x = 1 2
+$y = 3 4 5
+$z = 6 7 8 9
 )";
 			const std::string_view input = input_str;
 			const parser::sf::parse_success_data parse_data = parse(input);
@@ -174,20 +174,20 @@ z = 6 7 8 9
 			const lang::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.definitions, lookup_data);
 
 			expect_object(
-				symbols, lookup_data, "x", search(input, "x").result(), {
+				symbols, lookup_data, "x", search(input, "$x").result(), {
 					{lang::integer{1}, search(input, "1").result()},
 					{lang::integer{2}, search(input, "2").result()}
 				}
 			);
 			expect_object(
-				symbols, lookup_data, "y", search(input, "y").result(), {
+				symbols, lookup_data, "y", search(input, "$y").result(), {
 					{lang::integer{3}, search(input, "3").result()},
 					{lang::integer{4}, search(input, "4").result()},
 					{lang::integer{5}, search(input, "5").result()},
 				}
 			);
 			expect_object(
-				symbols, lookup_data, "z", search(input, "z").result(), {
+				symbols, lookup_data, "z", search(input, "$z").result(), {
 					{lang::integer{6}, search(input, "6").result()},
 					{lang::integer{7}, search(input, "7").result()},
 					{lang::integer{8}, search(input, "8").result()},
@@ -199,9 +199,9 @@ z = 6 7 8 9
 		BOOST_AUTO_TEST_CASE(sequence_socket_spec_definitions)
 		{
 			const std::string input_str = minimal_input() + R"(
-x = 1 RR
-y = 3GGG 2
-z = 4W 0 6 RGB
+$x = 1 RR
+$y = 3GGG 2
+$z = 4W 0 6 RGB
 )";
 			const std::string_view input = input_str;
 			const parser::sf::parse_success_data parse_data = parse(input);
@@ -209,19 +209,19 @@ z = 4W 0 6 RGB
 			const lang::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.definitions, lookup_data);
 
 			expect_object(
-				symbols, lookup_data, "x", search(input, "x").result(), {
+				symbols, lookup_data, "x", search(input, "$x").result(), {
 					{lang::integer{1}, search(input, "1").result()},
 					{lang::socket_spec{std::nullopt, 2}, search(input, "RR").result()}
 				}
 			);
 			expect_object(
-				symbols, lookup_data, "y", search(input, "y").result(), {
+				symbols, lookup_data, "y", search(input, "$y").result(), {
 					{lang::socket_spec{3, 0, 3}, search(input, "3GGG").result()},
 					{lang::integer{2}, search(input, "2").result()},
 				}
 			);
 			expect_object(
-				symbols, lookup_data, "z", search(input, "z").result(), {
+				symbols, lookup_data, "z", search(input, "$z").result(), {
 					{lang::socket_spec{4, 0, 0, 0, 1}, search(input, "4W").result()},
 					{lang::integer{0}, search(input, "0").result()},
 					{lang::integer{6}, search(input, "6").result()},

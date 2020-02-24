@@ -87,24 +87,22 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 		BOOST_AUTO_TEST_CASE(name_already_exists)
 		{
 			const std::string input_str = minimal_input() + R"(
-some_var = 0
-xyz = 1
-some_other_var = 2
-xyz = 3
+$some_var = 0
+$xyz = 1
+$some_other_var = 2
+$xyz = 3
 )";
 			const std::string_view input = input_str;
 			const parser::sf::parse_success_data parse_data = parse(input);
 			const compile_error error = expect_error_when_resolving_symbols(parse_data.ast.definitions);
 			const auto& error_desc = expect_error_of_type<errors::name_already_exists>(error, parse_data.lookup_data);
 
-			const std::string_view pattern = "xyz";
-			const std::string_view expected_original_name = search(input, pattern).result();
+			auto xyz_search = search(input, "$xyz");
+			const std::string_view expected_original_name = xyz_search.result();
 			const std::string_view reported_original_name = parse_data.lookup_data.position_of(error_desc.original_name);
 			BOOST_TEST(compare_ranges(expected_original_name, reported_original_name, input));
 
-			const char *const search_first = expected_original_name.data() + expected_original_name.size();
-			const char *const search_last  = input.data() + input.size();
-			const std::string_view expected_duplicated_name = search(utility::make_string_view(search_first, search_last), pattern).result();
+			const std::string_view expected_duplicated_name = xyz_search.next().result();
 			const std::string_view reported_duplicated_name = parse_data.lookup_data.position_of(error_desc.duplicated_name);
 			BOOST_TEST(compare_ranges(expected_duplicated_name, reported_duplicated_name, input));
 		}
@@ -112,15 +110,15 @@ xyz = 3
 		BOOST_AUTO_TEST_CASE(no_such_name)
 		{
 			const std::string input_str = minimal_input() + R"(
-abc = 0
-xyz = non_existent_obj
+$abc = 0
+$xyz = $non_existent_obj
 )";
 			const std::string_view input = input_str;
 			const parser::sf::parse_success_data parse_data = parse(input);
 			const compile_error error = expect_error_when_resolving_symbols(parse_data.ast.definitions);
 			const auto& error_desc = expect_error_of_type<errors::no_such_name>(error, parse_data.lookup_data);
 
-			const std::string_view expected_name = search(input, "non_existent_obj").result();
+			const std::string_view expected_name = search(input, "$non_existent_obj").result();
 			const std::string_view reported_name = parse_data.lookup_data.position_of(error_desc.name);
 			BOOST_TEST(compare_ranges(expected_name, reported_name, input));
 		}
@@ -226,11 +224,11 @@ Quality > 0
 			const compile_error error = expect_error_when_compiling(parse_data.ast);
 			const auto& error_desc = expect_error_of_type<errors::lower_bound_redefinition>(error, parse_data.lookup_data);
 
-			const std::string_view expected_original = search(input, "Quality").result();
+			const std::string_view expected_original = search(input, "Quality = 10").result();
 			const std::string_view reported_original = parse_data.lookup_data.position_of(error_desc.original_definition);
 			BOOST_TEST(compare_ranges(expected_original, reported_original, input));
 
-			const std::string_view expected_redef = search(input, "Quality").next().result();
+			const std::string_view expected_redef = search(input, "Quality > 0").result();
 			const std::string_view reported_redef = parse_data.lookup_data.position_of(error_desc.redefinition);
 			BOOST_TEST(compare_ranges(expected_redef, reported_redef, input));
 		}

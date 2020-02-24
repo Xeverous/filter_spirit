@@ -31,32 +31,32 @@ BOOST_AUTO_TEST_SUITE(parser_suite)
 
 		BOOST_AUTO_TEST_CASE(string_missing_close_quote)
 		{
-			expect_parse_failure("str = \"abc");
+			expect_parse_failure("$str = \"abc");
 		}
 
 		BOOST_AUTO_TEST_CASE(string_with_line_break)
 		{
-			expect_parse_failure("str = \"ab\nc\"");
+			expect_parse_failure("$str = \"ab\nc\"");
 		}
 
 		BOOST_AUTO_TEST_CASE(too_large_integer)
 		{
-			expect_parse_failure("val = 123456789123456789");
+			expect_parse_failure("$val = 123456789123456789");
 		}
 
 		BOOST_AUTO_TEST_CASE(duplicated_eq_sign_1)
 		{
-			expect_parse_failure("val == 1");
+			expect_parse_failure("$val == 1");
 		}
 
 		BOOST_AUTO_TEST_CASE(duplicated_eq_sign_2)
 		{
-			expect_parse_failure("val = = 2");
+			expect_parse_failure("$val = = 2");
 		}
 
 		BOOST_AUTO_TEST_CASE(missing_value)
 		{
-			expect_parse_failure("x = \n y = 2");
+			expect_parse_failure("$x = \n $y = 2");
 		}
 
 	BOOST_AUTO_TEST_SUITE_END()
