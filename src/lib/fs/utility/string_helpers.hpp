@@ -10,6 +10,11 @@ namespace fs::utility
 
 [[nodiscard]] std::string ptime_to_pretty_string(boost::posix_time::ptime time);
 
+inline bool contains(std::string_view source, std::string_view fragment) noexcept
+{
+	return source.find(fragment) != std::string_view::npos;
+}
+
 // supports any line break style
 [[nodiscard]] int count_lines(const char* first, const char* last) noexcept;
 

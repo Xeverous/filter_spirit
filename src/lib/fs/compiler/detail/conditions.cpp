@@ -283,6 +283,47 @@ add_boolean_condition(
 // ---- spirit filter helpers ----
 
 [[nodiscard]] std::optional<compile_error>
+spirit_filter_add_autogen_condition(
+	const ast::sf::autogen_condition& condition,
+	lang::spirit_condition_set& set)
+{
+	const auto condition_origin = parser::position_tag_of(condition);
+
+	if (set.autogen.has_value())
+		return errors::condition_redefinition{condition_origin, (*set.autogen).origin};
+
+	set.autogen = lang::autogen_condition{condition.cat_expr.category, condition_origin};
+	return std::nullopt;
+}
+
+[[nodiscard]] std::optional<compile_error>
+spirit_filter_add_price_comparison_condition(
+	const ast::sf::price_comparison_condition& condition,
+	const lang::symbol_table& symbols,
+	lang::spirit_condition_set& set)
+{
+	std::variant<lang::object, compile_error> obj_or_err = detail::evaluate_sequence(condition.seq, symbols, 1, 1);
+	if (std::holds_alternative<compile_error>(obj_or_err)) {
+		return std::get<compile_error>(std::move(obj_or_err));
+	}
+
+	auto& obj = std::get<lang::object>(obj_or_err);
+	assert(obj.values.size() == 1u);
+
+	std::variant<lang::fractional, compile_error> frac_or_err = detail::get_as_fractional(obj.values[0]);
+	if (std::holds_alternative<compile_error>(frac_or_err))
+		return std::get<compile_error>(std::move(frac_or_err));
+
+	auto& frac = std::get<lang::fractional>(frac_or_err);
+
+	return add_range_condition(
+		condition.comparison_type.value,
+		frac.value,
+		parser::position_tag_of(condition),
+		set.price);
+}
+
+[[nodiscard]] std::optional<compile_error>
 spirit_filter_add_rarity_comparison_condition(
 	const ast::sf::rarity_comparison_condition& condition,
 	const lang::symbol_table& symbols,
@@ -522,29 +563,35 @@ std::optional<compile_error>
 spirit_filter_add_conditions(
 	const std::vector<ast::sf::condition>& conditions,
 	const lang::symbol_table& symbols,
-	lang::condition_set& set)
+	lang::spirit_condition_set& set)
 {
 	for (const ast::sf::condition& condition : conditions) {
 		using result_type = std::optional<compile_error>;
 
 		auto error = condition.apply_visitor(x3::make_lambda_visitor<result_type>(
+			[&](const ast::sf::autogen_condition& autogen_condition) {
+				return spirit_filter_add_autogen_condition(autogen_condition, set);
+			},
+			[&](const ast::sf::price_comparison_condition& comparison_condition) {
+				return spirit_filter_add_price_comparison_condition(comparison_condition, symbols, set);
+			},
 			[&](const ast::sf::rarity_comparison_condition& comparison_condition) {
-				return spirit_filter_add_rarity_comparison_condition(comparison_condition, symbols, set);
+				return spirit_filter_add_rarity_comparison_condition(comparison_condition, symbols, set.conditions);
 			},
 			[&](const ast::sf::numeric_comparison_condition& comparison_condition) {
-				return spirit_filter_add_numeric_comparison_condition(comparison_condition, symbols, set);
+				return spirit_filter_add_numeric_comparison_condition(comparison_condition, symbols, set.conditions);
 			},
 			[&](const ast::sf::string_array_condition& string_condition) {
-				return spirit_filter_add_string_array_condition(string_condition, symbols, set);
+				return spirit_filter_add_string_array_condition(string_condition, symbols, set.conditions);
 			},
 			[&](const ast::sf::has_influence_condition& string_condition) {
-				return spirit_filter_add_has_influence_condition(string_condition, symbols, set);
+				return spirit_filter_add_has_influence_condition(string_condition, symbols, set.conditions);
 			},
 			[&](const ast::sf::socket_spec_condition& socket_spec_condition) {
-				return spirit_filter_add_socket_spec_condition(socket_spec_condition, symbols, set);
+				return spirit_filter_add_socket_spec_condition(socket_spec_condition, symbols, set.conditions);
 			},
 			[&](const ast::sf::boolean_condition& boolean_condition) {
-				return spirit_filter_add_boolean_condition(boolean_condition, symbols, set);
+				return spirit_filter_add_boolean_condition(boolean_condition, symbols, set.conditions);
 			}
 		));
 

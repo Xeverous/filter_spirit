@@ -106,6 +106,9 @@ namespace rf
 // keywords used in spirit filters
 namespace sf
 {
+	constexpr auto price = "Price";
+	constexpr auto autogen = "Autogen";
+
 	// some item types are commented - there is no point in querying for them
 	// and/or sites like poe.watch and poe.ninja do not report their prices
 	constexpr auto cards           = "cards";           // 2.0 - The Awakening (Warbands + Tempest)
@@ -127,14 +130,14 @@ namespace sf
 	constexpr auto uniques_eq_unambiguous    = "uniques_eq_unambiguous";
 	constexpr auto uniques_eq_ambiguous      = "uniques_eq_ambiguous";
 
-	constexpr auto uniques_flask_unambiguous = "uniques_flask_unambiguous";
-	constexpr auto uniques_flask_ambiguous   = "uniques_flask_ambiguous";
+	constexpr auto uniques_flasks_unambiguous = "uniques_flasks_unambiguous";
+	constexpr auto uniques_flasks_ambiguous   = "uniques_flasks_ambiguous";
 
-	constexpr auto uniques_jewel_unambiguous = "uniques_jewel_unambiguous";
-	constexpr auto uniques_jewel_ambiguous   = "uniques_jewel_ambiguous";
+	constexpr auto uniques_jewels_unambiguous = "uniques_jewels_unambiguous";
+	constexpr auto uniques_jewels_ambiguous   = "uniques_jewels_ambiguous";
 
-	constexpr auto uniques_map_unambiguous   = "uniques_map_unambiguous";
-	constexpr auto uniques_map_ambiguous     = "uniques_map_ambiguous";
+	constexpr auto uniques_maps_unambiguous   = "uniques_maps_unambiguous";
+	constexpr auto uniques_maps_ambiguous     = "uniques_maps_ambiguous";
 } // namespace sf
 
 }

@@ -151,9 +151,9 @@ namespace sf
 		| common::string_literal;
 	BOOST_SPIRIT_DEFINE(literal_expression)
 
-	const query_type query = "query";
-	const auto query_def = '$' > x3::lexeme[symbols::sf::queries >> common::not_alnum_or_underscore];
-	BOOST_SPIRIT_DEFINE(query)
+	const item_category_expression_type item_category_expression = "item category expression";
+	const auto item_category_expression_def = x3::lexeme[symbols::sf::item_categories >> common::not_alnum_or_underscore];
+	BOOST_SPIRIT_DEFINE(item_category_expression)
 
 	const primitive_value_type primitive_value = "primitive";
 	const auto primitive_value_def = name | literal_expression;
@@ -179,6 +179,19 @@ namespace sf
 	BOOST_SPIRIT_DEFINE(definition)
 
 	// ---- conditions ----
+
+	const autogen_condition_type autogen_condition = "autogen condition";
+	const auto autogen_condition_def =
+		x3::lexeme[lang::keywords::sf::autogen >> common::not_alnum_or_underscore]
+		> item_category_expression;
+	BOOST_SPIRIT_DEFINE(autogen_condition)
+
+	const price_comparison_condition_type price_comparison_condition = "price comparison condition";
+	const auto price_comparison_condition_def =
+		x3::lexeme[lang::keywords::sf::price >> common::not_alnum_or_underscore]
+		> common::comparison_operator_expression
+		> sequence;
+	BOOST_SPIRIT_DEFINE(price_comparison_condition)
 
 	const rarity_comparison_condition_type rarity_comparison_condition = "rarity comparison condition";
 	const auto rarity_comparison_condition_def =
@@ -223,7 +236,9 @@ namespace sf
 
 	const condition_type condition = "condition";
 	const auto condition_def =
-		  rarity_comparison_condition
+		  autogen_condition
+		| price_comparison_condition
+		| rarity_comparison_condition
 		| numeric_comparison_condition
 		| string_array_condition
 		| has_influence_condition

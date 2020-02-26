@@ -1,7 +1,6 @@
 #include <fs/compiler/detail/evaluate.hpp>
 #include <fs/compiler/detail/actions.hpp>
 #include <fs/lang/queries.hpp>
-#include <fs/lang/price_range.hpp>
 #include <fs/lang/position_tag.hpp>
 #include <fs/lang/keywords.hpp>
 #include <fs/lang/limits.hpp>
@@ -334,11 +333,27 @@ evaluate_value_expression(
 	));
 }
 
-[[nodiscard]] std::variant<lang::socket_spec, compile_error>
-get_as_socket_spec(
-	const lang::single_object& obj)
+[[nodiscard]] std::variant<lang::fractional, compile_error>
+get_as_fractional(const lang::single_object& sobj)
 {
-	auto& val = obj.value;
+	auto& val = sobj.value;
+
+	if (std::holds_alternative<lang::fractional>(val)) {
+		return std::get<lang::fractional>(val);
+	}
+
+	if (std::holds_alternative<lang::integer>(val)) {
+		return lang::fractional{std::get<lang::integer>(val)};
+	}
+
+	return errors::type_mismatch{lang::object_type::fractional, sobj.type(), sobj.origin};
+}
+
+std::variant<lang::socket_spec, compile_error>
+get_as_socket_spec(
+	const lang::single_object& sobj)
+{
+	auto& val = sobj.value;
 
 	if (std::holds_alternative<lang::socket_spec>(val)) {
 		return std::get<lang::socket_spec>(val);
@@ -348,7 +363,7 @@ get_as_socket_spec(
 		return lang::socket_spec{std::get<lang::integer>(val).value};
 	}
 
-	return errors::type_mismatch{lang::object_type::socket_group, obj.type(), obj.origin};
+	return errors::type_mismatch{lang::object_type::socket_group, sobj.type(), sobj.origin};
 }
 
 } // namespace fs::compiler::detail

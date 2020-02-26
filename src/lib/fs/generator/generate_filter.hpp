@@ -2,10 +2,9 @@
 
 #include <fs/lang/item_price_data.hpp>
 #include <fs/generator/options.hpp>
-#include <fs/log/logger.hpp>
 
-#include <string_view>
 #include <optional>
+#include <string_view>
 
 namespace fs::generator::sf
 {

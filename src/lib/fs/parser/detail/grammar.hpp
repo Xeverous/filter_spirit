@@ -111,7 +111,7 @@ namespace sf
 
 	struct compound_action_expression_class      : error_on_error, annotate_on_success {};
 	struct literal_expression_class              : error_on_error, annotate_on_success {};
-	struct query_class                           : error_on_error, annotate_on_success {};
+	struct item_category_expression_class        : error_on_error, annotate_on_success {};
 	struct primitive_value_class                 : error_on_error, annotate_on_success {};
 	struct sequence_class                        : error_on_error, annotate_on_success {};
 	struct value_expression_class                : error_on_error, annotate_on_success {};
@@ -123,6 +123,8 @@ namespace sf
 
 	// ---- conditions ----
 
+	struct autogen_condition_class               : error_on_error, annotate_on_success {};
+	struct price_comparison_condition_class      : error_on_error, annotate_on_success {};
 	struct rarity_comparison_condition_class     : error_on_error, annotate_on_success {};
 	struct numeric_comparison_condition_class    : error_on_error, annotate_on_success {};
 	struct string_array_condition_class          : error_on_error, annotate_on_success {};
@@ -302,8 +304,8 @@ namespace sf
 	using literal_expression_type = x3::rule<literal_expression_class, ast::sf::literal_expression>;
 	BOOST_SPIRIT_DECLARE(literal_expression_type)
 
-	using query_type = x3::rule<query_class, ast::sf::query>;
-	BOOST_SPIRIT_DECLARE(query_type)
+	using item_category_expression_type = x3::rule<item_category_expression_class, ast::sf::item_category_expression>;
+	BOOST_SPIRIT_DECLARE(item_category_expression_type)
 
 	using primitive_value_type = x3::rule<primitive_value_class, ast::sf::primitive_value>;
 	BOOST_SPIRIT_DECLARE(primitive_value_type)
@@ -323,6 +325,12 @@ namespace sf
 	BOOST_SPIRIT_DECLARE(definition_type)
 
 	// ---- conditions ----
+
+	using autogen_condition_type = x3::rule<autogen_condition_class, ast::sf::autogen_condition>;
+	BOOST_SPIRIT_DECLARE(autogen_condition_type)
+
+	using price_comparison_condition_type = x3::rule<price_comparison_condition_class, ast::sf::price_comparison_condition>;
+	BOOST_SPIRIT_DECLARE(price_comparison_condition_type)
 
 	using rarity_comparison_condition_type = x3::rule<rarity_comparison_condition_class, ast::sf::rarity_comparison_condition>;
 	BOOST_SPIRIT_DECLARE(rarity_comparison_condition_type)

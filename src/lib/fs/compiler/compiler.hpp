@@ -14,8 +14,8 @@ namespace fs::compiler
 resolve_spirit_filter_symbols(
 	const std::vector<parser::ast::sf::definition>& definitions);
 
-[[nodiscard]] std::variant<lang::item_filter, compile_error>
-compile_spirit_filter(
+[[nodiscard]] std::variant<lang::spirit_item_filter, compile_error>
+compile_spirit_filter_statements(
 	const std::vector<parser::ast::sf::statement>& statements,
 	const lang::symbol_table& symbols);
 

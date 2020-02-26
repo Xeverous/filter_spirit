@@ -2,6 +2,7 @@
 
 #include <fs/lang/object.hpp>
 #include <fs/lang/position_tag.hpp>
+#include <fs/utility/better_enum.hpp>
 
 #include <variant>
 #include <optional>
@@ -92,8 +93,32 @@ struct upper_bound_redefinition
 	lang::position_tag original_definition;
 };
 
-enum class internal_compiler_error_cause
+struct price_without_autogen
 {
+	lang::position_tag visibility_origin;
+
+	// price is a range-based condition so we allow
+	// an optional second origin to be specified
+	lang::position_tag price_origin;
+	std::optional<lang::position_tag> another_price_origin;
+};
+
+enum class autogen_error_cause
+{
+	expected_empty_condition,
+	invalid_rarity_condition,
+	invalid_class_condition
+};
+
+struct autogen_error
+{
+	autogen_error_cause cause;
+	lang::position_tag autogen_origin;
+	lang::position_tag condition_origin;
+	lang::position_tag visibility_origin;
+};
+
+BETTER_ENUM(internal_compiler_error_cause, int,
 	add_boolean_condition,
 	add_range_condition,
 	add_numeric_comparison_condition,
@@ -102,7 +127,8 @@ enum class internal_compiler_error_cause
 	real_filter_add_color_action,
 
 	spirit_filter_add_set_color_action_impl,
-};
+	spirit_filter_verify_autogen_conditions
+)
 
 struct internal_compiler_error
 {
@@ -129,6 +155,8 @@ using compile_error = std::variant<
 	errors::action_redefinition,
 	errors::lower_bound_redefinition,
 	errors::upper_bound_redefinition,
+	errors::price_without_autogen,
+	errors::autogen_error,
 	errors::internal_compiler_error
 >;
 

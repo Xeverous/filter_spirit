@@ -2,13 +2,11 @@
 
 namespace fs::lang
 {
-	enum class query
+	enum class item_category
 	{
 		cards,
-		enchants_helmet,
 		prophecies,
 		essences,
-		leaguestones,
 		fossils,
 		resonators,
 		scarabs,
@@ -17,11 +15,27 @@ namespace fs::lang
 		catalysts,
 		uniques_eq_unambiguous,
 		uniques_eq_ambiguous,
-		uniques_flask_unambiguous,
-		uniques_flask_ambiguous,
-		uniques_jewel_unambiguous,
-		uniques_jewel_ambiguous,
-		uniques_map_unambiguous,
-		uniques_map_ambiguous
+		uniques_flasks_unambiguous,
+		uniques_flasks_ambiguous,
+		uniques_jewels_unambiguous,
+		uniques_jewels_ambiguous,
+		uniques_maps_unambiguous,
+		uniques_maps_ambiguous
+
+		// not supported (yet)
+		// enchants_helmet
 	};
+
+	inline bool is_uniques_category(item_category cat) noexcept
+	{
+		return
+			   cat == item_category::uniques_eq_unambiguous
+			|| cat == item_category::uniques_eq_ambiguous
+			|| cat == item_category::uniques_flasks_unambiguous
+			|| cat == item_category::uniques_flasks_ambiguous
+			|| cat == item_category::uniques_jewels_unambiguous
+			|| cat == item_category::uniques_jewels_ambiguous
+			|| cat == item_category::uniques_maps_unambiguous
+			|| cat == item_category::uniques_maps_ambiguous;
+	}
 }

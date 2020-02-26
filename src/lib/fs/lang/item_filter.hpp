@@ -1,7 +1,6 @@
 #pragma once
 #include <fs/lang/condition_set.hpp>
 #include <fs/lang/action_set.hpp>
-#include <fs/lang/queries.hpp>
 
 #include <iosfwd>
 #include <optional>
@@ -13,7 +12,7 @@ namespace fs::lang
 struct item_visibility
 {
 	bool show;
-	lang::position_tag origin;
+	position_tag origin;
 };
 
 struct item_filter_block
@@ -25,16 +24,18 @@ struct item_filter_block
 	action_set actions;
 };
 
-struct query_autogen
+struct autogen_extension
 {
-	query value;
-	position_tag origin;
+	fractional_range_condition price_range;
+	autogen_condition condition;
 };
 
-// spirit filter extensions
-struct spirit_item_filter_block : item_filter_block
+struct spirit_item_filter_block
 {
-	std::optional<query_autogen> autogen;
+	item_filter_block block;
+
+	// spirit filter extensions
+	std::optional<autogen_extension> autogen;
 };
 
 /**

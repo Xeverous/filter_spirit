@@ -4,6 +4,7 @@
 
 #include <fs/compiler/compiler.hpp>
 #include <fs/compiler/print_error.hpp>
+#include <fs/generator/make_filter.hpp>
 #include <fs/lang/position_tag.hpp>
 #include <fs/log/string_logger.hpp>
 #include <fs/utility/visitor.hpp>
@@ -87,17 +88,18 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 			const parser::lookup_data& lookup_data,
 			const lang::symbol_table& symbols)
 		{
-			std::variant<lang::item_filter, compiler::compile_error> result =
-				compiler::compile_spirit_filter(top_level_statements, symbols);
+			std::variant<lang::spirit_item_filter, compiler::compile_error> sf_or_err =
+				compiler::compile_spirit_filter_statements(top_level_statements, symbols);
 
-			if (std::holds_alternative<compiler::compile_error>(result)) {
-				const auto& error = std::get<compiler::compile_error>(result);
+			if (std::holds_alternative<compiler::compile_error>(sf_or_err)) {
+				const auto& error = std::get<compiler::compile_error>(sf_or_err);
 				log::string_logger logger;
 				compiler::print_error(error, lookup_data, logger);
-				BOOST_FAIL("building filter blocks failed but should not:\n" << logger.str());
+				BOOST_FAIL("building spirit filter blocks failed but should not:\n" << logger.str());
 			}
 
-			return std::get<lang::item_filter>(std::move(result));
+			const auto& spirit_filter = std::get<lang::spirit_item_filter>(sf_or_err);
+			return generator::make_filter(spirit_filter, /* empty item price data */ {});
 		}
 	};
 

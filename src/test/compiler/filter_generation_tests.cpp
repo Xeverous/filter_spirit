@@ -453,25 +453,39 @@ Show
 			ipd.divination_cards.push_back(lang::divination_card{lang::price_data{100, false}, "Abandoned Wealth", 5});
 			ipd.divination_cards.push_back(lang::divination_card{lang::price_data{1000, false}, "The Doctor", 8});
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
-low = $divination(0, 5)
+Class "Divination Card"
+Autogen cards {
+	Price >= 100
+	{ Show }
 
-BaseType $divination(100, _) { Show }
-BaseType $divination(10, 100) { Show }
-BaseType $divination(5, 10) { Show }
-BaseType low { Hide }
+	Price < 100
+	Price >= 10
+	{ Show }
+
+	Price < 10
+	Price >= 5
+	{ Show }
+
+	Price < 5
+	{ Hide }
+}
 )", ipd);
 			const std::string_view expected_filter =
 R"(Show
-	BaseType "Abandoned Wealth" "The Doctor"
+	Class == "Divination Card"
+	BaseType == "Abandoned Wealth" "The Doctor"
 
 Show
-	BaseType "A Dab of Ink"
+	Class == "Divination Card"
+	BaseType == "A Dab of Ink"
 
 Show
-	BaseType "Humility"
+	Class == "Divination Card"
+	BaseType == "Humility"
 
 Hide
-	BaseType "Rain of Chaos"
+	Class == "Divination Card"
+	BaseType == "Rain of Chaos"
 
 )";
 

@@ -26,6 +26,7 @@ target_sources(filter_spirit
 		fs/compiler/detail/evaluate.cpp
 		fs/generator/generate_filter.cpp
 		fs/generator/generator.cpp
+		fs/generator/make_filter.hpp
 		fs/lang/action_set.cpp
 		fs/lang/condition_set.cpp
 		fs/lang/item_filter.cpp
@@ -50,6 +51,7 @@ target_sources(filter_spirit
 		fs/compiler/compiler.hpp
 		fs/compiler/error.hpp
 		fs/compiler/print_error.hpp
+		fs/generator/make_filter.cpp
 		fs/generator/generate_filter.hpp
 		fs/generator/generator.hpp
 		fs/generator/options.hpp
@@ -66,7 +68,6 @@ target_sources(filter_spirit
 		fs/lang/limits.hpp
 		fs/lang/object.hpp
 		fs/lang/position_tag.hpp
-		fs/lang/price_range.hpp
 		fs/lang/primitive_types.hpp
 		fs/lang/queries.hpp
 		fs/lang/symbol_table.hpp
@@ -92,6 +93,7 @@ target_sources(filter_spirit
 		fs/parser/detail/symbols.hpp
 		fs/parser/error.hpp
 		fs/parser/parser.hpp
+		fs/utility/assert.hpp
 		fs/utility/algorithm.hpp
 		fs/utility/better_enum.hpp
 		fs/utility/dump_json.hpp

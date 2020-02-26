@@ -139,8 +139,10 @@ get_as(const lang::single_object& sobj)
 	return std::get<T>(sobj.value);
 }
 
+[[nodiscard]] std::variant<lang::fractional, compile_error>
+get_as_fractional(const lang::single_object& sobj);
+
 [[nodiscard]] std::variant<lang::socket_spec, compile_error>
-get_as_socket_spec(
-	const lang::single_object& obj);
+get_as_socket_spec(const lang::single_object& sobj);
 
 } // namespace fs::compiler::detail

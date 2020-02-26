@@ -3,6 +3,7 @@
 #include <fs/lang/primitive_types.hpp>
 #include <fs/lang/position_tag.hpp>
 #include <fs/lang/condition_properties.hpp>
+#include <fs/lang/queries.hpp>
 
 #include <boost/container/small_vector.hpp>
 
@@ -38,6 +39,12 @@ bool operator!=(range_bound<T> left, range_bound<T> right) noexcept
 template <typename T>
 struct range_condition
 {
+	constexpr range_condition() = default;
+	constexpr range_condition(T val, position_tag origin)
+	{
+		set_exact(val, origin);
+	}
+
 	constexpr bool is_exact() const noexcept
 	{
 		if (lower_bound.has_value() && upper_bound.has_value())
@@ -70,7 +77,7 @@ struct range_condition
 		return true;
 	}
 
-	constexpr bool has_anything() const noexcept
+	constexpr bool has_bound() const noexcept
 	{
 		return lower_bound.has_value() || upper_bound.has_value();
 	}
@@ -88,6 +95,38 @@ struct range_condition
 	constexpr void set_upper_bound(T value, bool inclusive, position_tag origin) noexcept
 	{
 		upper_bound = range_bound<T>{value, inclusive, origin};
+	}
+
+	constexpr std::optional<lang::position_tag> first_origin() const noexcept
+	{
+		if (lower_bound.has_value() && upper_bound.has_value()) {
+			if (compare((*lower_bound).origin, (*upper_bound).origin) < 0)
+				return (*lower_bound).origin;
+			else
+				return (*upper_bound).origin;
+		}
+		else if (lower_bound.has_value()) {
+			return (*lower_bound).origin;
+		}
+		else if (upper_bound.has_value()) {
+			return (*upper_bound).origin;
+		}
+		else {
+			return std::nullopt;
+		}
+	}
+
+	constexpr std::optional<lang::position_tag> second_origin() const noexcept
+	{
+		if (lower_bound.has_value() && upper_bound.has_value()) {
+			if (compare((*lower_bound).origin, (*upper_bound).origin) < 0)
+				return (*upper_bound).origin;
+			else
+				return (*lower_bound).origin;
+		}
+		else {
+			return std::nullopt;
+		}
 	}
 
 	std::optional<range_bound<T>> lower_bound;
@@ -177,10 +216,19 @@ struct condition_set
 	std::optional<boolean_condition> is_blighted_map;
 };
 
-// spirit filter extensions
-struct spirit_condition_set : condition_set
+struct autogen_condition
 {
+	item_category category;
+	position_tag origin;
+};
+
+struct spirit_condition_set
+{
+	condition_set conditions;
+
+	// spirit filter extensions
 	fractional_range_condition price;
+	std::optional<autogen_condition> autogen;
 };
 
 }

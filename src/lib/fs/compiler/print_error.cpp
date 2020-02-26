@@ -243,36 +243,82 @@ void print_error_impl(
 }
 
 void print_error_impl(
-	errors::internal_compiler_error error,
+	errors::price_without_autogen error,
+	const parser::lookup_data& lookup_data,
+	log::message_stream& stream)
+{
+	stream.print_line_number_with_description_and_underlined_code(
+		lookup_data.get_view_of_whole_content(),
+		lookup_data.position_of(error.visibility_origin),
+		log::strings::error,
+		"generation of a block with price bound has missing autogeneration specifier");
+
+	stream.print_line_number_with_description_and_underlined_code(
+		lookup_data.get_view_of_whole_content(),
+		lookup_data.position_of(error.price_origin),
+		log::strings::note,
+		"price bound specified here");
+
+	if (error.another_price_origin) {
+		stream.print_line_number_with_description_and_underlined_code(
+			lookup_data.get_view_of_whole_content(),
+			lookup_data.position_of(*error.another_price_origin),
+			log::strings::note,
+			"another price bound specified here");
+	}
+}
+
+void print_error_impl(
+	errors::autogen_error error,
 	const parser::lookup_data& lookup_data,
 	log::message_stream& stream)
 {
 	const auto error_str = [&]() {
 		switch (error.cause) {
-			using error_cause = errors::internal_compiler_error_cause;
+			using cause_t = errors::autogen_error_cause;
 
-			case error_cause::add_boolean_condition:
-				return "add_boolean_condition";
-			case error_cause::add_range_condition:
-				return "add_range_condition";
-			case error_cause::add_numeric_comparison_condition:
-				return "add_numeric_comparison_condition";
-			case error_cause::add_string_array_condition:
-				return "add_string_array_condition";
-			case error_cause::real_filter_add_color_action:
-				return "real_filter_add_color_action";
-			case error_cause::spirit_filter_add_set_color_action_impl:
-				return "spirit_filter_add_set_color_action_impl";
-			default:
-				return "(unknown)";
+			case cause_t::expected_empty_condition:
+				return "expected this condition to be empty";
+			case cause_t::invalid_rarity_condition:
+				return "expected no rarity condition or one that allows 'Unique'";
+			case cause_t::invalid_class_condition:
+				return "invalid class condition"; // TODO this is underspecified
+			// intentionally no default case
+			// GCC warns when a switch has no default and does not cover all enums
 		}
+
+		return "(unknown)";
 	}();
 
 	stream.print_line_number_with_description_and_underlined_code(
 		lookup_data.get_view_of_whole_content(),
+		lookup_data.position_of(error.visibility_origin),
+		log::strings::error,
+		"autogeneration here with invalid combination of conditions");
+
+	stream.print_line_number_with_description_and_underlined_code(
+		lookup_data.get_view_of_whole_content(),
+		lookup_data.position_of(error.condition_origin),
+		log::strings::note,
+		error_str);
+
+	stream.print_line_number_with_description_and_underlined_code(
+		lookup_data.get_view_of_whole_content(),
+		lookup_data.position_of(error.autogen_origin),
+		log::strings::note,
+		"autogeneration specified here");
+}
+
+void print_error_impl(
+	errors::internal_compiler_error error,
+	const parser::lookup_data& lookup_data,
+	log::message_stream& stream)
+{
+	stream.print_line_number_with_description_and_underlined_code(
+		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.origin),
 		log::strings::internal_compiler_error,
-		error_str,
+		error.cause._to_string(),
 		"\n",
 		log::strings::request_bug_report);
 }

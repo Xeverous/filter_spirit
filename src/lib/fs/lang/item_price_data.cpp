@@ -333,6 +333,7 @@ log::message_stream& operator<<(log::message_stream& stream, const item_price_da
 {
 	return stream << "item price data:\n"
 		"\tdivination cards: " << ipd.divination_cards.size() << "\n"
+		"\tcatalysts       : " << ipd.catalysts.size() << "\n"
 		"\toils            : " << ipd.oils.size() << "\n"
 		"\tincubators      : " << ipd.incubators.size() << "\n"
 		"\tessences        : " << ipd.essences.size() << "\n"
@@ -374,6 +375,7 @@ void item_price_data::sort()
 		};
 
 	std::sort(divination_cards.begin(), divination_cards.end(), compare_by_name_asc);
+	std::sort(catalysts.begin(),        catalysts.end(),        compare_by_name_asc);
 	std::sort(oils.begin(),             oils.end(),             compare_by_name_asc);
 	std::sort(incubators.begin(),       incubators.end(),       compare_by_name_asc);
 	std::sort(essences.begin(),         essences.end(),         compare_by_name_asc);

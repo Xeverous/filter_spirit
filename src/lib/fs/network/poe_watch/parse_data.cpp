@@ -38,7 +38,9 @@ BETTER_ENUM(frame_type, int,
 
 namespace categories // avoids name conflicts with types in lang namespace
 {
-	// note: names of these are expected to match poe.watch's JSON strings
+	// https://api.poe.watch/categories
+	// names of these are expected to match poe.watch's JSON strings
+	// we use _to_string on these enums
 
 	BETTER_ENUM(accessory_type, int, amulet, belt, ring, unknown = -1)
 	struct accessory
@@ -54,7 +56,20 @@ namespace categories // avoids name conflicts with types in lang namespace
 
 	struct divination_card {};
 
-	BETTER_ENUM(currency_type, int, currency, essence, piece, fossil, resonator, vial, net, incubator, splinter, oil, unknown = -1)
+	BETTER_ENUM(currency_type, int,
+		currency,
+		essence,
+		piece,
+		fossil,
+		resonator,
+		vial,
+		net,
+		incubator,
+		splinter,
+		oil,
+		catalyst,
+		influence,
+		unknown = -1)
 	struct currency
 	{
 		currency_type type;
@@ -79,7 +94,7 @@ namespace categories // avoids name conflicts with types in lang namespace
 
 	struct jewel {};
 
-	BETTER_ENUM(map_type, int, map, fragment, unique, scarab, unknown = -1)
+	BETTER_ENUM(map_type, int, map, fragment, unique, scarab, watchstone, unknown = -1)
 	struct map
 	{
 		map_type type;
@@ -89,13 +104,56 @@ namespace categories // avoids name conflicts with types in lang namespace
 
 	struct prophecy {};
 
-	BETTER_ENUM(weapon_type, int, bow, claw, dagger, oneaxe, onemace, onesword, rod, sceptre, staff, twoaxe, twomace, twosword, wand, runedagger, warstaff, unknown = -1)
+	BETTER_ENUM(weapon_type, int,
+		bow,
+		claw,
+		dagger,
+		oneaxe,
+		onemace,
+		onesword,
+		rod,
+		sceptre,
+		staff,
+		twoaxe,
+		twomace,
+		twosword,
+		wand,
+		runedagger,
+		warstaff,
+		unknown = -1)
 	struct weapon
 	{
 		weapon_type type;
 	};
 
-	BETTER_ENUM(base_type, int, amulet, belt, ring, boots, chest, gloves, helmet, quiver, shield, jewel, bow, claw, dagger, oneaxe, onemace, onesword, rod, sceptre, staff, twoaxe, twomace, twosword, wand, unknown = -1)
+	BETTER_ENUM(base_type, int,
+		amulet,
+		belt,
+		ring,
+		boots,
+		chest,
+		gloves,
+		helmet,
+		quiver,
+		shield,
+		bow,
+		claw,
+		dagger,
+		oneaxe,
+		onemace,
+		onesword,
+		sceptre,
+		staff,
+		twoaxe,
+		twomace,
+		twosword,
+		wand,
+
+		// these 2 are no longer reported but keep them for back-compat with past downloads
+		jewel,
+		rod,
+
+		unknown = -1)
 	struct base
 	{
 		base_type type;
@@ -108,7 +166,11 @@ namespace categories // avoids name conflicts with types in lang namespace
 		bool is_warlord;
 	};
 
-	struct beast {};
+	BETTER_ENUM(beast_type, int, beast, /* (Metamorph) */ sample, unknown = -1)
+	struct beast
+	{
+		beast_type type;
+	};
 } // namespace categories
 
 using item_category_variant = std::variant<
@@ -196,7 +258,20 @@ log::message_stream& operator<<(log::message_stream& stream, const item& item)
 					(base.is_hunter   ? "Hunter "   : "" ) <<
 					(base.is_warlord  ? "Warlord "  : "" ) << "\n";
 		},
-		[&](categories::beast)           { stream << "beast\n"; }
+		[&](categories::beast b) {
+			switch (b.type) {
+				case categories::beast_type::beast:
+					stream << "beast";
+					break;
+				case categories::beast_type::sample:
+					stream << "metamorph sample";
+					break;
+				case categories::beast_type::unknown:
+					stream << "(unknown)";
+					break;
+			}
+			stream << '\n';
+		}
 	}, item.category);
 
 	return stream;
@@ -208,6 +283,7 @@ bool is_low_confidence(int daily, int current)
 	return daily < 10 || current < 10;
 }
 
+// example query: https://api.poe.watch/compact?league=Standard
 // vector index is item ID
 [[nodiscard]] std::vector<std::optional<lang::price_data>>
 parse_compact(std::string_view compact_json, log::logger& logger)
@@ -217,11 +293,32 @@ parse_compact(std::string_view compact_json, log::logger& logger)
 	if (!json.is_array())
 		throw network::json_parse_error("compact JSON must be an array but it is not");
 
+	/*
+	 * poe.watch has a relative database. Some of API endpoints can be matched together.
+	 * - /itemdata reports an array of {item properties + item ID}
+	 * - /compact reports an array of {price stats + item ID}
+	 *
+	 * This function parses compact JSON so we make an array of price_data objects.
+	 * IDs in the database are auto-incremented by 1 for each new item so instead
+	 * of using a map<price_data, id> we have a vector<price_data> where item ID is
+	 * the index. This gives the fastest possible lookup. We store items in optional
+	 * in case there are some gaps due to removed items.
+	 */
 	std::vector<std::optional<lang::price_data>> item_prices;
-	item_prices.resize(32768); // expect about 30 000 items
+	// expect about 30 000 items, round to power of 2 for optimal allocator call
+	item_prices.resize(32768);
 	std::size_t max_id = 0;
 	for (const auto& item : json) {
 		const auto id = item.at("id").get<std::size_t>();
+
+		// Prevent out-of-memory problems in case of API ID changes or bugs.
+		// Assuming sizeof(typename item_prices::value_type) == 24, we limit
+		// max used memory by a single compact query to ~400 MB.
+		if (id > (1 << 24)) {
+			logger.warning() << "A price data entry has abnormally big ID: "
+				<< id << ", skipping this entry\n";
+			continue;
+		}
 
 		if (id >= item_prices.size()) // C++20: [[unlikely]]
 			item_prices.resize(id * 2);
@@ -368,7 +465,7 @@ item_category_variant parse_item_category(const nlohmann::json& entry)
 		};
 	}
 	if (category_str == "beast") {
-		return categories::beast{};
+		return categories::beast{json_to_enum<categories::beast_type>(group)};
 	}
 
 	throw network::json_parse_error("item has unrecognized category: " + category_str);
@@ -390,6 +487,7 @@ item parse_item(const nlohmann::json& item_json)
 		parse_item_category(item_json)};
 }
 
+// https://api.poe.watch/itemdata
 [[nodiscard]] std::vector<item>
 parse_itemdata(std::string_view itemdata_json, log::logger& logger)
 {
@@ -425,6 +523,7 @@ parse_itemdata(std::string_view itemdata_json, log::logger& logger)
 namespace fs::network::poe_watch
 {
 
+// https://api.poe.watch/leagues
 std::vector<lang::league> parse_league_info(std::string_view league_json)
 {
 	nlohmann::json json = nlohmann::json::parse(league_json);
@@ -501,12 +600,12 @@ parse_item_price_data(
 
 		if (itm.frame == +frame_type::unique) {
 			if (!itm.base_type) {
-				logger.warning() << "A unique item without base type has been found: " << itm;
+				logger.warning() << "A unique item without base type has been found. Ignored item: " << itm;
 				continue;
 			}
 
 			if ((*itm.base_type).empty()) {
-				logger.warning() << "A unique item with empty string base type has been found: " << itm;
+				logger.warning() << "A unique item with empty string base type has been found. Ignored item: " << itm;
 				continue;
 			}
 
@@ -580,19 +679,22 @@ parse_item_price_data(
 			else if (curr.type == +categories::currency_type::oil) {
 				result.oils.push_back(elementary_item{price_data, std::move(itm.name)});
 			}
+			if (curr.type == +categories::currency_type::catalyst) {
+				result.catalysts.push_back(elementary_item{price_data, std::move(itm.name)});
+			}
 
 			// we do not care about other currency items
 			continue;
 		}
 		else if (std::holds_alternative<categories::divination_card>(itm.category)) {
 			if (!itm.max_stack_size) {
-				logger.warning() << "A divination card without stack size specified has been found: " << itm;
-				continue;
+				logger.warning() << "A divination card without stack size specified has been found: " << itm
+					<< "Assuming for safety the card might have a stack size of 1, which so far was the case with this bug.";
 			}
 
 			result.divination_cards.push_back(lang::divination_card{
 				elementary_item{price_data, std::move(itm.name)},
-				*itm.max_stack_size});
+				itm.max_stack_size.value_or(1)});
 			continue;
 		}
 		else if (std::holds_alternative<categories::prophecy>(itm.category)) {
@@ -605,7 +707,9 @@ parse_item_price_data(
 			if (map.type == +categories::map_type::scarab)
 				result.scarabs.push_back(elementary_item{price_data, std::move(itm.name)});
 
-			// we do not care about other map items
+			// We do not care about other map items.
+			// We do actually want to make use of Watchstone price data but
+			// unfortunately all unique watchstones have "Ivory Watchstone" base.
 			continue;
 		}
 		else if (std::holds_alternative<categories::base>(itm.category)) {
@@ -643,7 +747,9 @@ parse_item_price_data(
 			continue;
 		}
 
-		logger.warning() << "An item did not match any category or group, skipping: " << itm;
+		logger.warning() << "An item did not match any category or group, skipping: " << itm <<
+			"Please report this even if the item does not make sense for use in filters as this"
+			" problem might actually be hiding some more complex bug.";
 	}
 
 	return result;

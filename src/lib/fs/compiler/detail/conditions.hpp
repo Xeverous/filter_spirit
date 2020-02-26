@@ -14,7 +14,7 @@ namespace fs::compiler::detail
 spirit_filter_add_conditions(
 	const std::vector<parser::ast::sf::condition>& conditions,
 	const lang::symbol_table& symbols,
-	lang::condition_set& condition_set);
+	lang::spirit_condition_set& condition_set);
 
 [[nodiscard]] std::optional<compile_error>
 real_filter_add_condition(

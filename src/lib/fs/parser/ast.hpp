@@ -259,17 +259,17 @@ namespace sf
 		using base_type::operator=;
 	};
 
-	struct query : x3::position_tagged
+	struct item_category_expression : x3::position_tagged
 	{
-		auto& operator=(lang::query qry)
+		auto& operator=(lang::item_category cat)
 		{
-			q = qry;
+			category = cat;
 			return *this;
 		}
 
-		auto get_value() const { return q; }
+		auto get_value() const { return category; }
 
-		lang::query q;
+		lang::item_category category;
 	};
 
 	struct primitive_value : x3::variant<name, literal_expression>, x3::position_tagged
@@ -340,6 +340,25 @@ namespace sf
 	using comparison_operator_expression = common::comparison_operator_expression;
 	using exact_matching_policy = common::exact_matching_policy;
 
+	struct autogen_condition : x3::position_tagged
+	{
+		auto& operator=(item_category_expression expr)
+		{
+			cat_expr = expr;
+			return *this;
+		}
+
+		auto get_value() const { return cat_expr; }
+
+		item_category_expression cat_expr;
+	};
+
+	struct price_comparison_condition : x3::position_tagged
+	{
+		comparison_operator_expression comparison_type;
+		sequence seq;
+	};
+
 	struct rarity_comparison_condition : x3::position_tagged
 	{
 		comparison_operator_expression comparison_type;
@@ -380,6 +399,8 @@ namespace sf
 	};
 
 	struct condition : x3::variant<
+			autogen_condition,
+			price_comparison_condition,
 			rarity_comparison_condition,
 			numeric_comparison_condition,
 			string_array_condition,

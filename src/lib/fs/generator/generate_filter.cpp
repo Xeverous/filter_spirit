@@ -1,5 +1,6 @@
 #include <fs/generator/generate_filter.hpp>
 #include <fs/generator/generator.hpp>
+#include <fs/generator/make_filter.hpp>
 #include <fs/lang/symbol_table.hpp>
 #include <fs/parser/parser.hpp>
 #include <fs/parser/ast_adapted.hpp> // required adaptation info for fs::log::structure_printer
@@ -49,7 +50,7 @@ std::optional<std::string> generate_filter_without_preamble(
 	if (options.print_ast)
 		fs::log::structure_printer()(parse_data.ast);
 
-	logger.info() << "compiling filter template\n";
+	logger.info() << "resolving filter template symbols\n";
 
 	std::variant<lang::symbol_table, compiler::compile_error> symbols_or_error =
 		compiler::resolve_spirit_filter_symbols(parse_data.ast.definitions);
@@ -58,19 +59,23 @@ std::optional<std::string> generate_filter_without_preamble(
 		return std::nullopt;
 	}
 
-	const auto& map = std::get<lang::symbol_table>(symbols_or_error);
-	const std::variant<lang::item_filter, compiler::compile_error> filter_or_error =
-		compiler::compile_spirit_filter(parse_data.ast.statements, map);
+	logger.info() << "compiling filter template\n";
 
-	if (std::holds_alternative<compiler::compile_error>(filter_or_error)) {
-		compiler::print_error(std::get<compiler::compile_error>(filter_or_error), parse_data.lookup_data, logger);
+	const auto& symbols = std::get<lang::symbol_table>(symbols_or_error);
+	const std::variant<lang::spirit_item_filter, compiler::compile_error> spirit_filter_or_error =
+		compiler::compile_spirit_filter_statements(parse_data.ast.statements, symbols);
+
+	if (std::holds_alternative<compiler::compile_error>(spirit_filter_or_error)) {
+		compiler::print_error(std::get<compiler::compile_error>(spirit_filter_or_error), parse_data.lookup_data, logger);
 		return std::nullopt;
 	}
 
+	const auto& spirit_filter = std::get<lang::spirit_item_filter>(spirit_filter_or_error);
+	lang::item_filter filter = make_filter(spirit_filter, item_price_data);
+
 	logger.info() << "compilation successful\n";
 
-	const auto& filter = std::get<lang::item_filter>(filter_or_error);
-	return to_raw_filter(filter);
+	return to_string(filter);
 }
 
 }

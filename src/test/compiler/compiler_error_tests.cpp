@@ -73,9 +73,10 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 			std::variant<lang::symbol_table, compile_error> symbols_or_error = resolve_symbols(fs.definitions);
 			BOOST_TEST_REQUIRE(std::holds_alternative<lang::symbol_table>(symbols_or_error));
 			auto& symbols = std::get<lang::symbol_table>(symbols_or_error);
-			std::variant<lang::item_filter, compile_error> filter_or_err = compiler::compile_spirit_filter(fs.statements, symbols);
-			BOOST_TEST_REQUIRE(std::holds_alternative<compile_error>(filter_or_err));
-			return std::get<compile_error>(filter_or_err);
+			std::variant<lang::spirit_item_filter, compile_error> sf_or_err =
+				compiler::compile_spirit_filter_statements(fs.statements, symbols);
+			BOOST_TEST_REQUIRE(std::holds_alternative<compile_error>(sf_or_err));
+			return std::get<compile_error>(sf_or_err);
 		}
 	};
 

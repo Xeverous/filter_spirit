@@ -60,6 +60,10 @@ BOOST_FUSION_ADAPT_STRUCT(
 // ---- conditions ----
 
 BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::sf::price_comparison_condition,
+	comparison_type, seq)
+
+BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::sf::rarity_comparison_condition,
 	comparison_type, seq)
 

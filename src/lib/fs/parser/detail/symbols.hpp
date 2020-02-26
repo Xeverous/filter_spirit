@@ -255,34 +255,35 @@ namespace rf
 // symbols used exclusively in spirit filter template language
 namespace sf
 {
-	struct queries_ : x3::symbols<lang::query>
+	struct item_categories_ : x3::symbols<lang::item_category>
 	{
-		queries_()
+		item_categories_()
 		{
 			add
-				(lang::keywords::sf::cards,           fs::lang::query::cards)
-				(lang::keywords::sf::enchants_helmet, fs::lang::query::enchants_helmet)
-				(lang::keywords::sf::prophecies,      fs::lang::query::prophecies)
-				(lang::keywords::sf::essences,        fs::lang::query::essences)
-				(lang::keywords::sf::leaguestones,    fs::lang::query::leaguestones)
-				(lang::keywords::sf::fossils,         fs::lang::query::fossils)
-				(lang::keywords::sf::resonators,      fs::lang::query::resonators)
-				(lang::keywords::sf::scarabs,         fs::lang::query::scarabs)
-				(lang::keywords::sf::incubators,      fs::lang::query::incubators)
-				(lang::keywords::sf::oils,            fs::lang::query::oils)
-				(lang::keywords::sf::catalysts,       fs::lang::query::catalysts)
-				(lang::keywords::sf::uniques_eq_unambiguous,    fs::lang::query::uniques_eq_unambiguous)
-				(lang::keywords::sf::uniques_eq_ambiguous,      fs::lang::query::uniques_eq_ambiguous)
-				(lang::keywords::sf::uniques_flask_unambiguous, fs::lang::query::uniques_flask_unambiguous)
-				(lang::keywords::sf::uniques_flask_ambiguous,   fs::lang::query::uniques_flask_ambiguous)
-				(lang::keywords::sf::uniques_jewel_unambiguous, fs::lang::query::uniques_jewel_unambiguous)
-				(lang::keywords::sf::uniques_jewel_ambiguous,   fs::lang::query::uniques_jewel_ambiguous)
-				(lang::keywords::sf::uniques_map_unambiguous,   fs::lang::query::uniques_map_unambiguous)
-				(lang::keywords::sf::uniques_map_ambiguous,     fs::lang::query::uniques_map_ambiguous)
+				(lang::keywords::sf::cards,           fs::lang::item_category::cards)
+				(lang::keywords::sf::prophecies,      fs::lang::item_category::prophecies)
+				(lang::keywords::sf::essences,        fs::lang::item_category::essences)
+				(lang::keywords::sf::fossils,         fs::lang::item_category::fossils)
+				(lang::keywords::sf::resonators,      fs::lang::item_category::resonators)
+				(lang::keywords::sf::scarabs,         fs::lang::item_category::scarabs)
+				(lang::keywords::sf::incubators,      fs::lang::item_category::incubators)
+				(lang::keywords::sf::oils,            fs::lang::item_category::oils)
+				(lang::keywords::sf::catalysts,       fs::lang::item_category::catalysts)
+				(lang::keywords::sf::uniques_eq_unambiguous,    fs::lang::item_category::uniques_eq_unambiguous)
+				(lang::keywords::sf::uniques_eq_ambiguous,      fs::lang::item_category::uniques_eq_ambiguous)
+				(lang::keywords::sf::uniques_flasks_unambiguous, fs::lang::item_category::uniques_flasks_unambiguous)
+				(lang::keywords::sf::uniques_flasks_ambiguous,   fs::lang::item_category::uniques_flasks_ambiguous)
+				(lang::keywords::sf::uniques_jewels_unambiguous, fs::lang::item_category::uniques_jewels_unambiguous)
+				(lang::keywords::sf::uniques_jewels_ambiguous,   fs::lang::item_category::uniques_jewels_ambiguous)
+				(lang::keywords::sf::uniques_maps_unambiguous,   fs::lang::item_category::uniques_maps_unambiguous)
+				(lang::keywords::sf::uniques_maps_ambiguous,     fs::lang::item_category::uniques_maps_ambiguous)
+
+				// not supported (yet)
+				// (lang::keywords::sf::enchants_helmet, fs::lang::item_category::enchants_helmet)
 			;
 		}
 	};
-	const queries_ queries;
+	const item_categories_ item_categories;
 } // namespace sf
 
 } // namespace fs::parser::detail::symbols

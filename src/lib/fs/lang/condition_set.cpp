@@ -37,7 +37,7 @@ void output_range_condition(
 	const char* name,
 	std::ostream& output_stream)
 {
-	if (!range.has_anything())
+	if (!range.has_bound())
 		return;
 
 	if (range.is_exact())
