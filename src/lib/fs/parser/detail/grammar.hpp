@@ -83,6 +83,7 @@ namespace common
 	struct shape_literal_class                   : error_on_error, annotate_on_success {};
 	struct suit_literal_class                    : error_on_error, annotate_on_success {};
 	struct influence_literal_class               : error_on_error, annotate_on_success {};
+	struct temp_literal_class                    : error_on_error, annotate_on_success {};
 	struct none_literal_class                    : error_on_error, annotate_on_success {};
 
 	struct comparison_operator_expression_class  : error_on_error, annotate_on_success {};
@@ -253,6 +254,9 @@ namespace common
 
 	using influence_literal_type = x3::rule<influence_literal_class, ast::common::influence_literal>;
 	BOOST_SPIRIT_DECLARE(influence_literal_type)
+
+	using temp_literal_type = x3::rule<temp_literal_class, ast::common::temp_literal>;
+	BOOST_SPIRIT_DECLARE(temp_literal_type)
 
 	using none_literal_type = x3::rule<none_literal_class, ast::common::none_literal>;
 	BOOST_SPIRIT_DECLARE(none_literal_type)

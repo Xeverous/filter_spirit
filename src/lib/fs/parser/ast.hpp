@@ -130,6 +130,11 @@ namespace common
 		lang::influence value;
 	};
 
+	struct temp_literal : x3::position_tagged
+	{
+		void get_value() const {}
+	};
+
 	struct none_literal : x3::position_tagged
 	{
 		void get_value() const {}
@@ -225,6 +230,7 @@ namespace sf
 	using shape_literal = common::shape_literal;
 	using suit_literal = common::suit_literal;
 	using influence_literal = common::influence_literal;
+	using temp_literal = common::temp_literal;
 	using none_literal = common::none_literal;
 
 	struct socket_spec_literal : x3::position_tagged
@@ -241,6 +247,7 @@ namespace sf
 			shape_literal,
 			suit_literal,
 			influence_literal,
+			temp_literal,
 			none_literal,
 			socket_spec_literal,
 			floating_point_literal,

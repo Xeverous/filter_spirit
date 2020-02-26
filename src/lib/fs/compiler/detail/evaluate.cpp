@@ -46,6 +46,9 @@ evaluate_literal(const ast::sf::literal_expression& expression)
 	using parser::position_tag_of;
 
 	return expression.apply_visitor(x3::make_lambda_visitor<result_type>(
+		[](ast::sf::temp_literal literal) -> result_type {
+			return lang::single_object{lang::temp{}, position_tag_of(literal)};
+		},
 		[](ast::sf::none_literal literal) -> result_type {
 			return lang::single_object{lang::none{}, position_tag_of(literal)};
 		},

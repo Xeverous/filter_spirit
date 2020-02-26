@@ -77,6 +77,10 @@ namespace common
 	const auto influence_literal_def = x3::lexeme[symbols::rf::influences >> not_alnum_or_underscore];
 	BOOST_SPIRIT_DEFINE(influence_literal)
 
+	const temp_literal_type temp_literal = "temp literal";
+	const auto temp_literal_def = x3::lexeme[lang::keywords::rf::temp >> not_alnum_or_underscore] > x3::attr(ast::common::temp_literal{});
+	BOOST_SPIRIT_DEFINE(temp_literal)
+
 	const none_literal_type none_literal = "none literal";
 	const auto none_literal_def = x3::lexeme[lang::keywords::rf::none >> not_alnum_or_underscore] > x3::attr(ast::common::none_literal{});
 	BOOST_SPIRIT_DEFINE(none_literal)
@@ -133,6 +137,7 @@ namespace sf
 		| common::shape_literal
 		| common::suit_literal
 		| common::influence_literal
+		| common::temp_literal
 		| common::none_literal
 		// 1. Must be attempted before integer literal, otherwise integer literal for eg "5GGG" would
 		// leave letters which immediately follow (no whitespace) that would trigger parse error
