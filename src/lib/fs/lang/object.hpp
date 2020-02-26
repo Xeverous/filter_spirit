@@ -18,7 +18,7 @@ using object_variant = std::variant<
 	none,
 	temp,
 	boolean,
-	floating_point,
+	fractional,
 	integer,
 	socket_spec,
 	influence,
@@ -33,7 +33,7 @@ BETTER_ENUM(object_type, int,
 	none,
 	temp,
 	boolean,
-	floating_point,
+	fractional,
 	integer,
 	socket_group,
 	influence,
@@ -106,7 +106,7 @@ namespace detail {
 	template <> constexpr
 	object_type object_type_of_impl<boolean>() noexcept { return object_type::boolean; }
 	template <> constexpr
-	object_type object_type_of_impl<floating_point>() noexcept { return object_type::floating_point; }
+	object_type object_type_of_impl<fractional>() noexcept { return object_type::fractional; }
 	template <> constexpr
 	object_type object_type_of_impl<integer>() noexcept { return object_type::integer; }
 	template <> constexpr

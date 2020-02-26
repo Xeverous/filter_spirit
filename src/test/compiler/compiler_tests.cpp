@@ -135,7 +135,7 @@ $string         = "Leather Belt"
 				{{lang::boolean{false}, search(input, "False").result()}}
 			);
 			expect_object(symbols, lookup_data, "fractional", search(input, "$fractional").result(),
-				{{lang::floating_point{3.5}, search(input, "3.5").result()}}
+				{{lang::fractional{3.5}, search(input, "3.5").result()}}
 			);
 			expect_object(symbols, lookup_data, "integer", search(input, "$integer").result(),
 				{{lang::integer{123}, search(input, "123").result()}}

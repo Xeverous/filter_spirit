@@ -36,17 +36,16 @@ struct integer
 inline bool operator==(integer lhs, integer rhs) noexcept { return lhs.value == rhs.value; }
 inline bool operator!=(integer lhs, integer rhs) noexcept { return !(lhs == rhs); }
 
-// TODO rename to "fractional"
-struct floating_point
+struct fractional
 {
-	explicit floating_point(double value) : value(value) {}
-	explicit floating_point(integer n) : value(n.value) {}
+	explicit fractional(double value) : value(value) {}
+	explicit fractional(integer n) : value(n.value) {}
 
 	double value;
 };
 
-inline bool operator==(floating_point lhs, floating_point rhs) noexcept { return lhs.value == rhs.value; }
-inline bool operator!=(floating_point lhs, floating_point rhs) noexcept { return !(lhs == rhs); }
+inline bool operator==(fractional lhs, fractional rhs) noexcept { return lhs.value == rhs.value; }
+inline bool operator!=(fractional lhs, fractional rhs) noexcept { return !(lhs == rhs); }
 
 struct socket_spec
 {

@@ -72,7 +72,7 @@ evaluate_literal(const ast::sf::literal_expression& expression)
 			return lang::single_object{lang::integer{literal.value}, position_tag_of(literal)};
 		},
 		[](ast::sf::floating_point_literal literal) -> result_type {
-			return lang::single_object{lang::floating_point{literal.value}, position_tag_of(literal)};
+			return lang::single_object{lang::fractional{literal.value}, position_tag_of(literal)};
 		},
 		[](ast::sf::rarity_literal literal) -> result_type {
 			return lang::single_object{lang::rarity{literal.value}, position_tag_of(literal)};
