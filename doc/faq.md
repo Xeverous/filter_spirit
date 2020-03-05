@@ -35,12 +35,14 @@ No. Invalid blocks are not generated. Consider this:
 
 ```
 Class "Divination Card"
-BaseType $divination(100, 150) {
+Autogen cars
+Price >= 100
+Price < 150 {
 	# ...
 }
 ```
 
-What if at the moment of generation there are no cards worth \[100, 150) chaos? The query would return an empty array which would lead to a generation of such block:
+What if at the moment of generation there are no cards worth \[100, 150) chaos? The autogeneration would output an empty array which would lead to a generation of such block:
 
 ```
 Show
@@ -54,6 +56,10 @@ This block is invalid but since there is nothing it should catch such blocks are
 **Is this program allowed (does not break GGG's ToS)?**
 
 Yes. this program does not interact with the game client in any way. It only produces a text file that is later read by it.
+
+**I have a networking problem. Can you...?**
+
+FS uses [libcurl](https://curl.haxx.se) for networking. It is possible to expose much more of [its options](https://curl.haxx.se/libcurl/c/curl_easy_setopt.html). Just inform me what is the problem and what specific you need. Note that some of the options read environmental variables so some of them may already be used this way.
 
 ## design of FS
 
@@ -71,21 +77,10 @@ There are more parser libraries available, namely: YACC (used by GDB), Bison and
 - They are not really libraries. They have some library parts but mostly they are separate programs that given grammar spec, they generate code. This complicates the build process, complicates your own code and breaks working with any IDE.
 - They all generate C. So forget about automatic memory management (in the form of garbage collection or RAII), you will have to code it yourself. And forget about type safety - everything is `void*`, any wrong cast will likely result in a segfault.
 
-**Why arrays have `[elem, ...]` syntax? In actual filters you just place more strings in the same line.**
+**Why are `{` and `}` required? Would not indent alone be enough?**
 
-Again, parsing problems, this time even more complex.
-
-`<identifier> = <expr>` is much easier to implement because the parser does not have to check if there are multiple expressions. If there is an array it is delimited by `[]` and is treated as one expression with multiple subexpressions separated by `,`.
-
-```
-101 102 103 # a color or an array of integers?
-```
+Grammars utilizing [off-side rule](https://en.wikipedia.org/wiki/Off-side_rule) require additional state, make many context-free subgrammars context-sensitive which in turn makes implementation more complex which in turn means "probably more bugs". Such grammars are prone to silent typo/indent errors/bugs while tokens such as `{}` must always match so a typo practically always ends in a parse error.
 
 Obviously there would be some way to deal with such problems but I prefer to have a context-free grammar rather than something that requires to write a ton of if-else to handle all corner cases.
 
-Using line breaks as a delimiter and/or indent does not appeal to me because:
-
-- Mistaken indentation has a very high chance to be parsed successfully, whereas an unmatched bracket is always a clear error.
-- If whitespace affects parsing, code can not be freely formatted.
-  - If you want to allow some relaxed formatting (eg ignoring line breaks when a bracked is not closed) that will be a lot of pain to handle all cases and a place for lots of potential bugs.
-- Grammars utilizing [off-side rule](https://en.wikipedia.org/wiki/Off-side_rule) require additional state, make many subgrammars context-sensitive which makes implementation more complex.
+PoE filters are already somewhat white-space sensitive as some rules (eg `BaseType`) accept an arbitrary amount of tokens and there are no clearly visible delimeters - the only thing that currently delimits such rules is the line ending. I do not want to rely more on whitespace as such grammars result in much smaller "design space" and much less concrete error messages.

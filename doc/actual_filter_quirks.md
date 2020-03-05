@@ -28,6 +28,7 @@ Given that:
 - Resonators fall into `"Delve Stackable Socketable Currency"`, `"Stackable Socketable Currency"`, `"Socketable Currency"` and `"Currency"` classes but not into `"Stackable Currency"`. This is inconsistent with how other supersets of item classes are handled - other supersets either do work (`"Axes"` vs `"Two Hand Axes"`) or error when loading (`"Two Axes"`). The behaviour inconsistency border is the fact whether given superset-class-name is a direct substring of subset-class-name.
 - ~~Resonators can have 1-4 sockets and Item Filter detects that correctly. Jeweller's orb errors on resonators reporting that they have no sockets. Everyone knows why it is that but ... new players gonna be mad with such contradictory descriptions.~~ **Fixed in 3.8**: the error upon using Jeweller's Orb on a resonator is now: "Item has fixed Sockets".
 - ~~`#` starts a comment untill end of line. `#` is not accepted in some contexts:~~ **fixed in 3.8**
+- (not my list): https://github.com/xhul-github/xhul-filter/blob/master/misc.txt
 
 ```
 # as of 3.8, nothing from this example code occurs

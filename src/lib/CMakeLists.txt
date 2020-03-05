@@ -2,6 +2,11 @@ find_package(nlohmann_json 3.0.0 REQUIRED)
 find_package(OpenSSL REQUIRED)
 find_package(Boost 1.68 REQUIRED COMPONENTS filesystem)
 
+# libcurl >=7.17 has no requirements for string argument lifetimes
+# FS relies on this in the implementation, so such version is a must
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(libcurl REQUIRED IMPORTED_TARGET libcurl>=7.17.0)
+
 # Some source files are shared with tests, GUI and CLI executables.
 # Compile these as shared library so that it can be reused by both
 # without the need to list and compile the same sources twice.
@@ -37,7 +42,9 @@ target_sources(filter_spirit
 		fs/utility/file.cpp
 		fs/utility/dump_json.cpp
 		fs/utility/string_helpers.cpp
-		fs/network/http.cpp
+		fs/network/url_encode.cpp
+		fs/network/download.cpp
+		fs/network/curl/error.cpp
 		fs/network/poe_watch/download_data.cpp
 		fs/network/poe_watch/parse_data.cpp
 		fs/network/poe_watch/api_data.cpp
@@ -76,9 +83,12 @@ target_sources(filter_spirit
 		fs/log/logger.hpp
 		fs/log/null_logger.hpp
 		fs/log/structure_printer.hpp
-		fs/network/async_download.hpp
+		fs/network/url_encode.hpp
 		fs/network/exceptions.hpp
-		fs/network/http.hpp
+		fs/network/download.hpp
+		fs/network/curl/easy.hpp
+		fs/network/curl/error.hpp
+		fs/network/curl/libcurl.hpp
 		fs/network/poe_ninja/api_data.hpp
 		fs/network/poe_ninja/download_data.hpp
 		fs/network/poe_ninja/parse_data.hpp
@@ -127,11 +137,25 @@ target_compile_options(filter_spirit
 		$<$<CXX_COMPILER_ID:MSVC>:/W4>
 )
 
+# https://gitlab.kitware.com/cmake/cmake/issues/20431
+get_target_property(CURL_INCLUDE_DIR PkgConfig::libcurl INTERFACE_INCLUDE_DIRECTORIES)
+target_link_directories(filter_spirit
+	PUBLIC
+		${CURL_INCLUDE_DIR}/../bin)
+
 target_link_libraries(filter_spirit
-	PRIVATE
+	PUBLIC
 		nlohmann_json::nlohmann_json
 		OpenSSL::SSL
 		Boost::filesystem
+		PkgConfig::libcurl
+)
+
+# FS uses atomic operations in networking callbacks
+target_link_libraries(filter_spirit
+	PUBLIC
+		$<$<CXX_COMPILER_ID:GNU>:atomic>
+		$<$<CXX_COMPILER_ID:Clang>:atomic>
 )
 
 # Windows requires additional networking libraries for Boost ASIO

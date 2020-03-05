@@ -4,6 +4,7 @@
 #include <fs/version.hpp>
 #include <fs/log/console_logger.hpp>
 #include <fs/lang/item_price_data.hpp>
+#include <fs/network/curl/libcurl.hpp>
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/program_options.hpp>
@@ -46,6 +47,9 @@ void print_help(const boost::program_options::options_description& options)
 
 int run(int argc, char* argv[])
 {
+	// libcurl requires global setup + cleanup before using it
+	fs::network::curl::libcurl libcurl;
+
 	fs::log::console_logger logger;
 
 	try {
@@ -65,6 +69,31 @@ int run(int argc, char* argv[])
 				"run with no item price data (all price queries will have no results)")
 			("read,r", po::value(&data_read_dir)->value_name("DIRPATH"),
 				"read item price data (JSON files) from specified directory")
+		;
+
+		boost::optional<std::string> opt_proxy;
+		boost::optional<std::string> opt_ca_bundle;
+		bool no_ssl_verify_peer = false;
+		bool no_ssl_verify_host = false;
+		long timeout_ms = 0;
+		po::options_description networking_options("networking options");
+		networking_options.add_options()
+			("proxy,x", po::value(&opt_proxy)->value_name("PROXY"),
+				("use PROXY for transfers, example values: \"http://my.proxy:80\","
+					" \"https://user:password@proxyserver.com:3128\""
+					" see https://curl.haxx.se/libcurl/c/CURLOPT_PROXY.html for"
+					" more examples, documentation and environmental variables"))
+			("ca-bundle,b", po::value(&opt_ca_bundle)->value_name("FILEPATH"),
+				("Use specified Certificate Authority bundle for SSL/TLS connections."
+					" By default FS uses a built-in bundle which is a copy of"
+					" the certificates that are delivered with Mozilla Firefox."
+					" This option has no effect when you opt out of SSL verification."))
+			("no-ssl-peer", po::bool_switch(&no_ssl_verify_peer),
+				("do not verify the authenticity of the peer's certificate"))
+			("no-ssl-host", po::bool_switch(&no_ssl_verify_host),
+				("do not verify certificate's name against host name"))
+			("timeout,t", po::value(&timeout_ms)->value_name("MILLISECONDS"),
+				("timeout for networking operations, 0 means never timeout, default: 0"))
 		;
 
 		boost::optional<std::string> data_save_dir;
@@ -113,6 +142,7 @@ int run(int argc, char* argv[])
 		po::options_description all_options;
 		all_options
 			.add(data_obtaining_options)
+			.add(networking_options)
 			.add(data_storing_options)
 			.add(generation_options)
 			.add(positional_options)
@@ -130,6 +160,18 @@ int run(int argc, char* argv[])
 		}
 
 		// running through the command line
+		fs::network::network_settings net_settings;
+		net_settings.timeout_milliseconds = timeout_ms;
+		net_settings.ssl_verify_host = !no_ssl_verify_host;
+		net_settings.ssl_verify_peer = !no_ssl_verify_peer;
+
+		if (opt_ca_bundle)
+			net_settings.ca_info_path = (*opt_ca_bundle).c_str();
+		else
+			net_settings.ca_info_path = "certificates/cacert.pem";
+
+		if (opt_proxy)
+			net_settings.proxy = (*opt_proxy).c_str();
 
 		if (opt_help) {
 			print_help(all_options);
@@ -143,7 +185,7 @@ int run(int argc, char* argv[])
 		}
 
 		if (opt_list_leagues) {
-			list_leagues(logger);
+			list_leagues(net_settings, logger);
 			return EXIT_SUCCESS;
 		}
 
@@ -168,7 +210,10 @@ int run(int argc, char* argv[])
 				return obtain_item_price_info(
 					download_league_name_ninja,
 					download_league_name_watch,
-					data_read_dir, data_save_dir, logger);
+					net_settings,
+					data_read_dir,
+					data_save_dir,
+					logger);
 			}
 		}();
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <fs/log/logger.hpp>
+#include <fs/network/download.hpp>
 #include <fs/lang/item_price_data.hpp>
 
 #include <boost/optional.hpp>
@@ -8,12 +9,16 @@
 
 #include <string>
 
-void list_leagues(fs::log::logger& logger);
+void
+list_leagues(
+	fs::network::network_settings net_settings,
+	fs::log::logger& logger);
 
 [[nodiscard]] std::optional<fs::lang::item_price_info>
 obtain_item_price_info(
 	const boost::optional<std::string>& download_league_name_ninja,
 	const boost::optional<std::string>& download_league_name_watch,
+	fs::network::network_settings net_settings,
 	const boost::optional<std::string>& data_read_dir,
 	const boost::optional<std::string>& data_save_dir,
 	fs::log::logger& logger);

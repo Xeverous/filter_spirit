@@ -81,10 +81,9 @@ bool generate_item_filter_impl(
 
 } // namespace
 
-void list_leagues(log::logger& logger)
+void list_leagues(network::network_settings net_settings, log::logger& logger)
 {
-	std::future<network::poe_watch::api_league_data> leagues_future = network::poe_watch::async_download_leagues(logger);
-	const auto league_data = leagues_future.get();
+	const auto league_data = network::poe_watch::async_download_leagues(net_settings, logger).get();
 	const std::vector<lang::league> leagues = network::poe_watch::parse_league_info(league_data.leagues);
 
 	auto stream = logger.info();
@@ -101,6 +100,7 @@ std::optional<lang::item_price_info>
 obtain_item_price_info(
 	const boost::optional<std::string>& download_league_name_ninja,
 	const boost::optional<std::string>& download_league_name_watch,
+	network::network_settings net_settings,
 	const boost::optional<std::string>& data_read_dir,
 	const boost::optional<std::string>& data_save_dir,
 	fs::log::logger& logger)
@@ -124,7 +124,8 @@ obtain_item_price_info(
 
 	lang::item_price_info info;
 	if (download_league_name_ninja) {
-		auto api_data = network::poe_ninja::async_download_item_price_data(*download_league_name_ninja, logger).get();
+		auto api_data = network::poe_ninja::async_download_item_price_data(
+			*download_league_name_ninja, net_settings, logger).get();
 
 		info.metadata.data_source = lang::data_source_type::poe_ninja;
 		info.metadata.league_name = *download_league_name_ninja;
@@ -136,7 +137,8 @@ obtain_item_price_info(
 		info.data = network::poe_ninja::parse_item_price_data(api_data, logger);
 	}
 	else if (download_league_name_watch) {
-		auto api_data = network::poe_watch::async_download_item_price_data(*download_league_name_watch, logger).get();
+		auto api_data = network::poe_watch::async_download_item_price_data(
+			*download_league_name_watch, net_settings, logger).get();
 
 		info.metadata.data_source = lang::data_source_type::poe_watch;
 		info.metadata.league_name = *download_league_name_watch;

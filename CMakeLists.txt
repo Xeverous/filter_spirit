@@ -1,6 +1,10 @@
 # https://pabloariasal.github.io/2018/02/19/its-time-to-do-cmake-right/
 # https://cliutils.gitlab.io/modern-cmake/
 
+# 3.13 is required for:
+# - relative source file paths
+# - target_link_directories()
+# - INTERFACE_LINK_LIBRARIES
 cmake_minimum_required(VERSION 3.13...3.16)
 
 if(${CMAKE_VERSION} VERSION_LESS 3.12)

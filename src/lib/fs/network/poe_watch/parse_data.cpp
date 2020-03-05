@@ -689,7 +689,7 @@ parse_item_price_data(
 		else if (std::holds_alternative<categories::divination_card>(itm.category)) {
 			if (!itm.max_stack_size) {
 				logger.warning() << "A divination card without stack size specified has been found: " << itm
-					<< "Assuming for safety the card might have a stack size of 1, which so far was the case with this bug.";
+					<< "Assuming for safety the card might have a stack size of 1, which so far was the case with this bug.\n";
 			}
 
 			result.divination_cards.push_back(lang::divination_card{
