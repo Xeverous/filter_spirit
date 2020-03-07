@@ -532,11 +532,18 @@ std::vector<lang::league> parse_league_info(std::string_view league_json)
 		throw network::json_parse_error("league JSON must be an array but it is not");
 
 	std::vector<lang::league> leagues;
+	leagues.reserve(json.size());
+
 	for (const auto& item : json) {
 		leagues.push_back(lang::league{
 			item.at("id").get<int>(),
 			item.at("name").get<std::string>(),
-			item.at("display").get<std::string>()});
+			item.at("display").get<std::string>(),
+			item.at("hardcore").get<bool>(),
+			item.at("upcoming").get<bool>(),
+			item.at("active").get<bool>(),
+			item.at("event").get<bool>(),
+			item.at("challenge").get<bool>()});
 	}
 
 	// sort leagues by ID - this will improve consistency in the output

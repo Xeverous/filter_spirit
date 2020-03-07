@@ -92,8 +92,12 @@ void list_leagues(network::network_settings net_settings, log::logger& logger)
 	// print leaue.name because that's the name that the API expects
 	// printing different name style would confuse users - these names are quered
 	// to be later to the API as league name
-	for (const lang::league& league : leagues)
-		stream << league.name << '\n';
+	for (const lang::league& league : leagues) {
+		if (league.is_active)
+			stream << league.name << '\n';
+		else if (league.is_upcoming)
+			stream << league.name << " (upcoming)\n";
+	}
 }
 
 std::optional<lang::item_price_info>
