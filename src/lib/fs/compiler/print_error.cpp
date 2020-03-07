@@ -241,6 +241,18 @@ void print_error_impl(
 }
 
 void print_error_impl(
+	errors::invalid_set_alert_sound error,
+	const parser::lookup_data& lookup_data,
+	log::message_stream& stream)
+{
+	stream.print_line_number_with_description_and_underlined_code(
+		lookup_data.get_view_of_whole_content(),
+		lookup_data.position_of(error.sequence_origin),
+		log::strings::error,
+		"invalid alert sound: does not match any of: built-in (1-2 integers), custom (1 string)");
+}
+
+void print_error_impl(
 	errors::price_without_autogen error,
 	const parser::lookup_data& lookup_data,
 	log::message_stream& stream)

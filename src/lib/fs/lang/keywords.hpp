@@ -106,6 +106,9 @@ namespace rf
 // keywords used in spirit filters
 namespace sf
 {
+	// ---- condition extensions ----
+
+	// autogeneration feature
 	constexpr auto price = "Price";
 	constexpr auto autogen = "Autogen";
 
@@ -138,6 +141,9 @@ namespace sf
 
 	constexpr auto uniques_maps_unambiguous   = "uniques_maps_unambiguous";
 	constexpr auto uniques_maps_ambiguous     = "uniques_maps_ambiguous";
+
+	// ---- action extensions ----
+	constexpr auto set_alert_sound = "SetAlertSound";
 } // namespace sf
 
 }

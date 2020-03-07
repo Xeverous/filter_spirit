@@ -141,6 +141,7 @@ namespace sf
 	struct play_effect_action_class              : error_on_error, annotate_on_success {};
 	struct play_alert_sound_action_class         : error_on_error, annotate_on_success {};
 	struct custom_alert_sound_action_class       : error_on_error, annotate_on_success {};
+	struct set_alert_sound_action_class          : error_on_error, annotate_on_success {};
 	struct disable_drop_sound_action_class       : error_on_error, annotate_on_success {};
 	struct compound_action_class                 : error_on_error, annotate_on_success {};
 	struct action_class                          : error_on_error, annotate_on_success {};
@@ -372,6 +373,9 @@ namespace sf
 
 	using custom_alert_sound_action_type = x3::rule<custom_alert_sound_action_class, ast::sf::custom_alert_sound_action>;
 	BOOST_SPIRIT_DECLARE(custom_alert_sound_action_type)
+
+	using set_alert_sound_action_type = x3::rule<set_alert_sound_action_class, ast::sf::set_alert_sound_action>;
+	BOOST_SPIRIT_DECLARE(set_alert_sound_action_type)
 
 	using disable_drop_sound_action_type = x3::rule<disable_drop_sound_action_class, ast::sf::disable_drop_sound_action>;
 	BOOST_SPIRIT_DECLARE(disable_drop_sound_action_type)

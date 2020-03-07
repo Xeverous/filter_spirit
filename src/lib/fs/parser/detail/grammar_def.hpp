@@ -284,6 +284,12 @@ namespace sf
 		> sequence;
 	BOOST_SPIRIT_DEFINE(custom_alert_sound_action)
 
+	const set_alert_sound_action_type set_alert_sound_action = "set alert sound action";
+	const auto set_alert_sound_action_def =
+		x3::lexeme[lang::keywords::sf::set_alert_sound >> common::not_alnum_or_underscore]
+		> sequence;
+	BOOST_SPIRIT_DEFINE(set_alert_sound_action)
+
 	const disable_drop_sound_action_type disable_drop_sound_action = "disable drop sound action";
 	const auto disable_drop_sound_action_def =
 		x3::lexeme[lang::keywords::rf::disable_drop_sound >> common::not_alnum_or_underscore]
@@ -303,6 +309,7 @@ namespace sf
 		| play_effect_action
 		| play_alert_sound_action
 		| custom_alert_sound_action
+		| set_alert_sound_action
 		| disable_drop_sound_action
 		| compound_action;
 	BOOST_SPIRIT_DEFINE(action)

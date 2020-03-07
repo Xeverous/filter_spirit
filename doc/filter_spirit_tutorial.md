@@ -524,7 +524,7 @@ ShapedMap       Boolean
 ElderMap        Boolean
 BlightedMap     Boolean
 
-# FS extensions - explained further down this article
+# FS autogeneration extensions - explained further down this article
 Autogen         Identifier
 Price           [< | > | <= | >= | =] Integer
 ```
@@ -551,11 +551,12 @@ SetBackgroundColor       Integer Integer Integer [Integer]
 
 SetFontSize              Integer
 
-#                        sound ID  volume
+# first token is built-in sound ID, second is volume
 PlayAlertSound           Integer [Integer]
 PlayAlertSoundPositional Integer [Integer]
 
 # path can be absolute or just the file name
+# note: custom sounds do not support specifying volume
 CustomAlertSound         String
 
 # Some items always play specific built-in sounds,
@@ -569,6 +570,12 @@ PlayEffect               Suit [Temp]
 
 # FS extension - applies predefined group of actions
 Set                      $identifier
+
+# FS extension - this action accepts both PlayAlertSound
+# and CustomAlertSound tokens. Useful when you want to use
+# constants because the constant can be freely changed
+# what sound variant it refers to.
+SetAlertSound            String | (Integer [Integer])
 ```
 
 Examples:

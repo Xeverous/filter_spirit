@@ -93,6 +93,11 @@ struct upper_bound_redefinition
 	lang::position_tag original_definition;
 };
 
+struct invalid_set_alert_sound
+{
+	lang::position_tag sequence_origin;
+};
+
 struct price_without_autogen
 {
 	lang::position_tag visibility_origin;
@@ -155,6 +160,7 @@ using compile_error = std::variant<
 	errors::action_redefinition,
 	errors::lower_bound_redefinition,
 	errors::upper_bound_redefinition,
+	errors::invalid_set_alert_sound,
 	errors::price_without_autogen,
 	errors::autogen_error,
 	errors::internal_compiler_error

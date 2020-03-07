@@ -341,7 +341,8 @@ log::message_stream& operator<<(log::message_stream& stream, const item_price_da
 		"\tprophecies      : " << ipd.prophecies.size() << "\n"
 		"\tresonators      : " << ipd.resonators.size() << "\n"
 		"\tscarabs         : " << ipd.scarabs.size() << "\n"
-		"\thelmet enchants : " << ipd.helmet_enchants.size() << "\n"
+		// not supported (yet)
+		// "\thelmet enchants : " << ipd.helmet_enchants.size() << "\n"
 		"\tgems            : " << ipd.gems.size() << "\n"
 		"\tbases           : " << ipd.bases.size() << "\n"
 		"\tunique equipment (unambiguous): " << ipd.unique_eq.unambiguous.size() << "\n"
@@ -350,8 +351,8 @@ log::message_stream& operator<<(log::message_stream& stream, const item_price_da
 		"\tunique flasks (ambiguous)     : " << ipd.unique_flasks.ambiguous.size() << "\n"
 		"\tunique jewels (unambiguous)   : " << ipd.unique_jewels.unambiguous.size() << "\n"
 		"\tunique jewels (ambiguous)     : " << ipd.unique_jewels.ambiguous.size() << "\n"
-		"\tunique map (unambiguous)      : " << ipd.unique_maps.unambiguous.size() << "\n"
-		"\tunique map (ambiguous)        : " << ipd.unique_maps.ambiguous.size() << "\n";
+		"\tunique maps (unambiguous)     : " << ipd.unique_maps.unambiguous.size() << "\n"
+		"\tunique maps (ambiguous)       : " << ipd.unique_maps.ambiguous.size() << "\n";
 }
 
 log::message_stream& operator<<(log::message_stream& stream, const item_price_metadata& ipm)

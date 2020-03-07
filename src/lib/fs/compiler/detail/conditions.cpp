@@ -2,6 +2,7 @@
 #include <fs/compiler/detail/evaluate.hpp>
 #include <fs/lang/position_tag.hpp>
 #include <fs/lang/condition_set.hpp>
+#include <fs/lang/limits.hpp>
 #include <fs/utility/assert.hpp>
 
 #include <boost/container/static_vector.hpp>
@@ -170,16 +171,26 @@ add_string_array_condition(
 	};
 }
 
+using influences_container = boost::container::static_vector<
+	std::pair<
+		lang::influence,
+		lang::position_tag
+	>,
+	lang::limits::max_filter_influences
+>;
+
 [[nodiscard]] std::optional<compile_error>
 add_has_influence_condition(
-	boost::container::static_vector<std::pair<lang::influence, lang::position_tag>, 2> influences,
+	influences_container influences,
 	bool is_exact_match,
 	lang::position_tag origin,
 	std::optional<lang::influences_condition>& target)
 {
-	if (influences.size() == 2u) {
-		if (influences[0].first == influences[1].first) {
-			return errors::duplicate_influence{influences[0].second, influences[1].second};
+	for (std::size_t i = 0; i < influences.size(); ++i) {
+		for (std::size_t j = 0; j < influences.size(); ++j) {
+			if (j != i && influences[i].first == influences[j].first) {
+				return errors::duplicate_influence{influences[i].second, influences[j].second};
+			}
 		}
 	}
 
@@ -402,12 +413,16 @@ spirit_filter_add_has_influence_condition(
 	const lang::symbol_table& symbols,
 	lang::condition_set& set)
 {
-	std::variant<lang::object, compile_error> obj_or_err = detail::evaluate_sequence(condition.seq, symbols, 1, 2);
+	namespace lim = lang::limits;
+
+	std::variant<lang::object, compile_error> obj_or_err =
+		detail::evaluate_sequence(condition.seq, symbols, 1, lim::max_filter_influences);
+
 	if (std::holds_alternative<compile_error>(obj_or_err)) {
 		return std::get<compile_error>(std::move(obj_or_err));
 	}
 
-	boost::container::static_vector<std::pair<lang::influence, lang::position_tag>, 2> influences;
+	influences_container influences;
 	auto& obj = std::get<lang::object>(obj_or_err);
 	for (auto& sobj : obj.values) {
 		std::variant<lang::influence, compile_error> inf_or_err = detail::get_as<lang::influence>(sobj);
@@ -516,11 +531,13 @@ real_filter_add_has_influence_condition(
 {
 	const auto num_inf = static_cast<int>(condition.influence_literals.size());
 	const auto condition_origin = parser::position_tag_of(condition);
-	if (num_inf != 1 && num_inf != 2) {
-		return errors::invalid_amount_of_arguments{1, 2, num_inf, condition_origin};
+
+	namespace lim = lang::limits;
+	if (num_inf < 1 || num_inf > lim::max_filter_influences) {
+		return errors::invalid_amount_of_arguments{1, lim::max_filter_influences, num_inf, condition_origin};
 	}
 
-	boost::container::static_vector<std::pair<lang::influence, lang::position_tag>, 2> influences;
+	influences_container influences;
 	for (auto inf : condition.influence_literals) {
 		influences.emplace_back(detail::evaluate(inf), parser::position_tag_of(inf));
 	}

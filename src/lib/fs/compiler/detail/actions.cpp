@@ -191,7 +191,7 @@ spirit_filter_add_play_effect_action(
 	auto& suit = std::get<lang::suit>(suit_or_err);
 
 	if (args_num == 2) {
-		std::variant<lang::temp, compile_error> temp_or_err = detail::get_as<lang::temp>(obj.values[0]);
+		std::variant<lang::temp, compile_error> temp_or_err = detail::get_as<lang::temp>(obj.values[1]);
 		if (std::holds_alternative<compile_error>(temp_or_err))
 			return std::get<compile_error>(std::move(temp_or_err));
 
@@ -205,25 +205,17 @@ spirit_filter_add_play_effect_action(
 
 	// override previous action
 	set.play_effect = lang::play_effect_action{
-		lang::play_effect{suit, true},
+		lang::play_effect{suit, false},
 		parser::position_tag_of(action)
 	};
 	return std::nullopt;
 }
 
-[[nodiscard]] std::optional<compile_error>
-spirit_filter_add_play_alert_sound_action(
-	const ast::sf::play_alert_sound_action& action,
-	const lang::symbol_table& symbols,
-	lang::action_set& set)
+[[nodiscard]] std::variant<lang::builtin_alert_sound, compile_error>
+make_builtin_alert_sound(
+	bool positional,
+	const lang::object& obj)
 {
-	std::variant<lang::object, compile_error> obj_or_err = detail::evaluate_sequence(action.seq, symbols, 1, 2);
-	if (std::holds_alternative<compile_error>(obj_or_err)) {
-		return std::get<compile_error>(std::move(obj_or_err));
-	}
-
-	auto& obj = std::get<lang::object>(obj_or_err);
-
 	const auto args_num = static_cast<int>(obj.values.size());
 	BOOST_ASSERT(args_num == 1 || args_num == 2);
 
@@ -243,7 +235,28 @@ spirit_filter_add_play_alert_sound_action(
 	}
 
 	std::variant<lang::builtin_alert_sound, compile_error> bas_or_err =
-		detail::make_builtin_alert_sound(action.positional, sound_id, volume);
+		detail::make_builtin_alert_sound(positional, sound_id, volume);
+
+	if (std::holds_alternative<compile_error>(bas_or_err)) {
+		return std::get<compile_error>(std::move(bas_or_err));
+	}
+
+	return std::get<lang::builtin_alert_sound>(std::move(bas_or_err));
+}
+
+[[nodiscard]] std::optional<compile_error>
+spirit_filter_add_play_alert_sound_action(
+	const ast::sf::play_alert_sound_action& action,
+	const lang::symbol_table& symbols,
+	lang::action_set& set)
+{
+	std::variant<lang::object, compile_error> obj_or_err = detail::evaluate_sequence(action.seq, symbols, 1, 2);
+	if (std::holds_alternative<compile_error>(obj_or_err)) {
+		return std::get<compile_error>(std::move(obj_or_err));
+	}
+
+	auto& obj = std::get<lang::object>(obj_or_err);
+	std::variant<lang::builtin_alert_sound, compile_error> bas_or_err = make_builtin_alert_sound(action.positional, obj);
 
 	if (std::holds_alternative<compile_error>(bas_or_err)) {
 		return std::get<compile_error>(std::move(bas_or_err));
@@ -251,10 +264,22 @@ spirit_filter_add_play_alert_sound_action(
 
 	// override previous action
 	set.play_alert_sound = lang::alert_sound_action{
-		lang::alert_sound{std::get<lang::builtin_alert_sound>(bas_or_err)},
+		lang::alert_sound{std::get<lang::builtin_alert_sound>(std::move(bas_or_err))},
 		parser::position_tag_of(action)
 	};
 	return std::nullopt;
+}
+
+[[nodiscard]] std::variant<lang::custom_alert_sound, compile_error>
+make_custom_alert_sound(
+	const lang::single_object& sobj)
+{
+	std::variant<lang::string, compile_error> str_or_err = detail::get_as<lang::string>(sobj);
+	if (std::holds_alternative<compile_error>(str_or_err))
+		return std::get<compile_error>(std::move(str_or_err));
+
+	auto& str = std::get<lang::string>(str_or_err);
+	return lang::custom_alert_sound{std::move(str)};
 }
 
 [[nodiscard]] std::optional<compile_error>
@@ -272,17 +297,59 @@ spirit_filter_add_custom_alert_sound_action(
 
 	BOOST_ASSERT(obj.values.size() == 1u);
 
-	std::variant<lang::string, compile_error> str_or_err = detail::get_as<lang::string>(obj.values[0]);
-	if (std::holds_alternative<compile_error>(str_or_err))
-		return std::get<compile_error>(std::move(str_or_err));
-
-	auto& str = std::get<lang::string>(str_or_err);
+	std::variant<lang::custom_alert_sound, compile_error> alert_or_err = make_custom_alert_sound(obj.values[0]);
+	if (std::holds_alternative<compile_error>(alert_or_err))
+		return std::get<compile_error>(std::move(alert_or_err));
 
 	set.play_alert_sound = lang::alert_sound_action{
-		lang::alert_sound{lang::custom_alert_sound{std::move(str)}},
+		lang::alert_sound{std::get<lang::custom_alert_sound>(std::move(alert_or_err))},
 		parser::position_tag_of(action)
 	};
 	return std::nullopt;
+}
+
+[[nodiscard]] std::optional<compile_error>
+spirit_filter_add_set_alert_sound_action(
+	const ast::sf::set_alert_sound_action& action,
+	const lang::symbol_table& symbols,
+	lang::action_set& set)
+{
+	std::variant<lang::object, compile_error> obj_or_err = detail::evaluate_sequence(action.seq, symbols, 1, 2);
+	if (std::holds_alternative<compile_error>(obj_or_err)) {
+		return std::get<compile_error>(std::move(obj_or_err));
+	}
+
+	auto& obj = std::get<lang::object>(obj_or_err);
+
+	const auto args_num = static_cast<int>(obj.values.size());
+	BOOST_ASSERT(args_num == 1 || args_num == 2);
+
+	// 1st: attempt custom alert sound
+	// fallthrough if error occured
+	if (args_num == 1) {
+		std::variant<lang::custom_alert_sound, compile_error> cas_or_err = make_custom_alert_sound(obj.values[0]);
+		if (std::holds_alternative<lang::custom_alert_sound>(cas_or_err)) {
+			set.play_alert_sound = lang::alert_sound_action{
+				lang::alert_sound{std::get<lang::custom_alert_sound>(std::move(cas_or_err))},
+				parser::position_tag_of(action)
+			};
+			return std::nullopt;
+		}
+	}
+
+	// 2nd: attempt non-positional play alert sound
+	std::variant<lang::builtin_alert_sound, compile_error> bas_or_err = make_builtin_alert_sound(false, obj);
+	if (std::holds_alternative<lang::builtin_alert_sound>(bas_or_err)) {
+		set.play_alert_sound = lang::alert_sound_action{
+			lang::alert_sound{std::get<lang::builtin_alert_sound>(std::move(bas_or_err))},
+			parser::position_tag_of(action)
+		};
+		return std::nullopt;
+	}
+
+	// TODO improve this error - ideally it should contain both custom and built-in alert sound errors
+	// such thing right now is not possible because error storing 2 errors creates a circular definition
+	return errors::invalid_set_alert_sound{parser::position_tag_of(action.seq)};
 }
 
 [[nodiscard]] std::optional<compile_error>
@@ -404,6 +471,9 @@ spirit_filter_add_action(
 		},
 		[&](const ast::sf::custom_alert_sound_action& a) {
 			return spirit_filter_add_custom_alert_sound_action(a, symbols, set);
+		},
+		[&](const ast::sf::set_alert_sound_action& a) {
+			return spirit_filter_add_set_alert_sound_action(a, symbols, set);
 		},
 		[&](const ast::sf::disable_drop_sound_action&) {
 			set.disable_drop_sound = lang::disable_drop_sound_action{parser::position_tag_of(action)};

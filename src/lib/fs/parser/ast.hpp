@@ -479,6 +479,19 @@ namespace sf
 		sequence seq;
 	};
 
+	struct set_alert_sound_action : x3::position_tagged
+	{
+		auto& operator=(sequence s)
+		{
+			seq = std::move(s);
+			return *this;
+		}
+
+		const auto& get_value() const { return seq; }
+
+		sequence seq;
+	};
+
 	struct disable_drop_sound_action : x3::position_tagged
 	{
 		void get_value() const {}
@@ -504,6 +517,7 @@ namespace sf
 			play_effect_action,
 			play_alert_sound_action,
 			custom_alert_sound_action,
+			set_alert_sound_action,
 			disable_drop_sound_action,
 			compound_action
 		>, x3::position_tagged
