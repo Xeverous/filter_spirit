@@ -1,9 +1,9 @@
 #pragma once
 
 #include <fs/utility/type_traits.hpp>
-#include <fs/utility/type_name.hpp>
 
 #include <boost/fusion/include/for_each.hpp>
+#include <boost/type_index.hpp>
 
 #include <iostream>
 
@@ -28,7 +28,7 @@ struct structure_printer
 	operator()(const T& ast) const
 	{
 		tab(indent);
-		std::cout << fs::utility::type_name<T>().get() << " [\n";
+		std::cout << boost::typeindex::type_id<T>().pretty_name() << " [\n";
 		for (const auto& elem : ast)
 		{
 			structure_printer(indent + 1)(elem);
@@ -42,7 +42,7 @@ struct structure_printer
 	operator()(const T& arithmetic) const
 	{
 		tab(indent);
-		std::cout << fs::utility::type_name<T>().get() << " { " << arithmetic << " }\n";
+		std::cout << boost::typeindex::type_id<T>().pretty_name() << " { " << arithmetic << " }\n";
 	}
 
 	template <typename T>
@@ -50,7 +50,7 @@ struct structure_printer
 	operator()(const T&) const
 	{
 		tab(indent);
-		std::cout << fs::utility::type_name<T>().get() << "\n";
+		std::cout << boost::typeindex::type_id<T>().pretty_name() << "\n";
 	}
 
 	template <typename T>
@@ -75,7 +75,7 @@ struct structure_printer
 	operator()(const T& seq) const
 	{
 		tab(indent);
-		std::cout << fs::utility::type_name<T>().get() << " {\n";
+		std::cout << boost::typeindex::type_id<T>().pretty_name() << " {\n";
 		boost::fusion::for_each(
 			seq,
 			[this](const auto& arg) {
@@ -91,7 +91,7 @@ struct structure_printer
 	operator()(const T& obj) const
 	{
 		tab(indent);
-		std::cout << fs::utility::type_name<T>().get() << " {\n";
+		std::cout << boost::typeindex::type_id<T>().pretty_name() << " {\n";
 		structure_printer(indent + 1)(obj.get_value());
 		tab(indent);
 		std::cout << "}\n";
@@ -102,7 +102,8 @@ struct structure_printer
 	operator()(T value) const
 	{
 		tab(indent);
-		std::cout << "enum " << fs::utility::type_name<T>().get() << " { " << static_cast<int>(value) << " }\n";
+		std::cout << "enum " << boost::typeindex::type_id<T>().pretty_name()
+			<< " { " << static_cast<int>(value) << " }\n";
 	}
 
 	template <typename... T>

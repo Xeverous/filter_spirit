@@ -36,6 +36,7 @@ Some of the code is very verbose (`std::variant<T1, T2> v = f(); if (std::holds_
 - `boost/system` - error handling, used in filesystem and networking.
 - `boost/unit_test` - obvious. Boost Test library might be a huge overkill when Google Test is much simpler, but since FS already uses a ton of boost there is not much point in dragging more dependencies.
 - `boost/format` - string formatting.
+- `boost/type_index` - pretty-printing type names with and without RTTI
 - `boost/assert` - much better than the `assert` macro inherited from C.
 - `nlohmann/json` - JSON parser library. Might switch to `boost/json` once it gets official approval and is integrated into official boost repository.
 - OpenSSL - implementation of network cryptography. One of possible SSL implementations for libcurl.

@@ -109,8 +109,6 @@ target_sources(filter_spirit
 		fs/utility/dump_json.hpp
 		fs/utility/file.hpp
 		fs/utility/holds_alternative.hpp
-		fs/utility/type_list.hpp
-		fs/utility/type_name.hpp
 		fs/utility/type_traits.hpp
 		fs/utility/visitor.hpp
 		fs/utility/string_helpers.hpp
