@@ -173,6 +173,48 @@ Show
 			BOOST_TEST(compare_strings(expected_filter, actual_filter));
 		}
 
+		BOOST_AUTO_TEST_CASE(socket_spec_conditions)
+		{
+			const std::string actual_filter = generate_filter(minimal_input() + R"(
+Sockets        1 2 3R AA 3D 5GBW { Show }
+Sockets     =  1 2 3R AA 3D 5GBW { Show }
+Sockets     == 1 2 3R AA 3D 5GBW { Show }
+Sockets     >= 1 2 3R AA 3D 5GBW { Show }
+SocketGroup    1 2 3R AA 3D 5GBW { Show }
+SocketGroup =  1 2 3R AA 3D 5GBW { Show }
+SocketGroup == 1 2 3R AA 3D 5GBW { Show }
+SocketGroup >= 1 2 3R AA 3D 5GBW { Show }
+)");
+			const std::string_view expected_filter =
+R"(Show
+	Sockets = 1 2 3R AA 3D 5GBW
+
+Show
+	Sockets = 1 2 3R AA 3D 5GBW
+
+Show
+	Sockets == 1 2 3R AA 3D 5GBW
+
+Show
+	Sockets >= 1 2 3R AA 3D 5GBW
+
+Show
+	SocketGroup = 1 2 3R AA 3D 5GBW
+
+Show
+	SocketGroup = 1 2 3R AA 3D 5GBW
+
+Show
+	SocketGroup == 1 2 3R AA 3D 5GBW
+
+Show
+	SocketGroup >= 1 2 3R AA 3D 5GBW
+
+)";
+
+			BOOST_TEST(compare_strings(expected_filter, actual_filter));
+		}
+
 		BOOST_AUTO_TEST_CASE(constants)
 		{
 			const std::string actual_filter = generate_filter(minimal_input() + R"(

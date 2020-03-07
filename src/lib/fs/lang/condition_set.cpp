@@ -74,10 +74,10 @@ void output_range_condition(
 
 void output_socket_spec_condition(
 	bool links_matter,
-	std::optional<lang::socket_spec_condition> cond,
+	std::optional<lang::socket_spec_condition> condition,
 	std::ostream& output_stream)
 {
-	if (!cond.has_value())
+	if (!condition.has_value())
 		return;
 
 	const auto output_letter = [&](char letter, int times) {
@@ -86,15 +86,43 @@ void output_socket_spec_condition(
 	};
 
 	if (links_matter) {
-		output_stream << '\t' << kw::socket_group << ' ';
+		output_stream << '\t' << kw::socket_group;
 	}
 	else {
-		output_stream << '\t' << kw::sockets << ' ';
+		output_stream << '\t' << kw::sockets;
 	}
 
-	const lang::socket_spec_condition::container_type& specs = (*cond).values;
+	auto& cond = *condition;
+
+	switch (cond.comparison_type) {
+		case lang::socket_spec_comparison_type::less:
+			output_stream << " <";
+			break;
+		case lang::socket_spec_comparison_type::less_equal:
+			output_stream << " <=";
+			break;
+		case lang::socket_spec_comparison_type::equal:
+			output_stream << " =";
+			break;
+		case lang::socket_spec_comparison_type::greater:
+			output_stream << " >";
+			break;
+		case lang::socket_spec_comparison_type::greater_equal:
+			output_stream << " >=";
+			break;
+		case lang::socket_spec_comparison_type::exact:
+			output_stream << " ==";
+			break;
+	}
+
+	const lang::socket_spec_condition::container_type& specs = cond.values;
 	for (lang::socket_spec ss : specs) {
 		BOOST_ASSERT(ss.is_valid());
+
+		output_stream << ' ';
+
+		if (ss.num.has_value())
+			output_stream << *ss.num;
 
 		output_letter(kw::r, ss.r);
 		output_letter(kw::g, ss.g);
