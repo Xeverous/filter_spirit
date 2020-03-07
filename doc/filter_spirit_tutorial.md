@@ -479,29 +479,33 @@ FS supports all conditions that the actual filters support. Some conditions allo
   - If `==` is not present, it will match an item **with at least one of specified influences**.
   - If `==` is present, it will only match items **with all specified influences**.
 
+Grammar overview (not a normative documentation as actual EBNF grammar specifications are much harder to read):
+
 ```
 X       # X token is required
 [X]     # X token is optional
 X | Y   # X or Y token
 X...    # 0 or more X tokens
 X X...  # 1 or more X tokens
+
+# token CMP: < | > | <= | >= | =
+# token SS: [Integer] R...G...B...W...A...D...
 ```
 
-Grammar overview (not a normative documentation as actual EBNF grammar specifications are much harder to read):
-
 ```
-Rarity        [< | > | <= | >= | =] Rarity
-ItemLevel     [< | > | <= | >= | =] Integer
-DropLevel     [< | > | <= | >= | =] Integer
-Quality       [< | > | <= | >= | =] Integer
-LinkedSockets [< | > | <= | >= | =] Integer
-Height        [< | > | <= | >= | =] Integer
-Width         [< | > | <= | >= | =] Integer
-StackSize     [< | > | <= | >= | =] Integer
-GemLevel      [< | > | <= | >= | =] Integer
-MapTier       [< | > | <= | >= | =] Integer
-AreaLevel     [< | > | <= | >= | =] Integer
-CorruptedMods [< | > | <= | >= | =] Integer
+
+Rarity        [CMP] Rarity
+ItemLevel     [CMP] Integer
+DropLevel     [CMP] Integer
+Quality       [CMP] Integer
+LinkedSockets [CMP] Integer
+Height        [CMP] Integer
+Width         [CMP] Integer
+StackSize     [CMP] Integer
+GemLevel      [CMP] Integer
+MapTier       [CMP] Integer
+AreaLevel     [CMP] Integer
+CorruptedMods [CMP] Integer
 
 Class          [==] String String...
 BaseType       [==] String String...
@@ -510,8 +514,8 @@ HasEnchantment [==] String String...
 Prophecy       [==] String String...
 HasInfluence   [==] Influence Influence...
 
-Sockets     [< | > | <= | >= | = | ==] [Integer] R...G...B...W...A...D...
-SocketGroup [< | > | <= | >= | = | ==] [Integer] R...G...B...W...A...D...
+Sockets     [CMP | ==] SS SS...
+SocketGroup [CMP | ==] SS SS...
 
 AnyEnchantment  Boolean
 Identified      Boolean
@@ -527,7 +531,7 @@ BlightedMap     Boolean
 
 # FS autogeneration extensions - explained further down this article
 Autogen         Identifier
-Price           [< | > | <= | >= | =] Integer
+Price           [CMP] Integer
 ```
 
 Examples:
@@ -538,7 +542,8 @@ BaseType "Shard" "Splinter"
 BaseType == "The Wolf"
 MapTier = 16
 Sockets 6
-SocketGroup >= 4RR
+Sockets >= 4RR
+SocketGroup >= 1 2 3R AA 3D 5GBW
 ```
 
 ## actions
