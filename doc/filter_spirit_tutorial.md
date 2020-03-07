@@ -15,7 +15,6 @@ Real filters have no access to following information:
 
 - player level
 - league
-- zone level, although there is a strong correlation of `ItemLevel` of dropped items
 - item full name after identification (only base type name)
 - whether the item has been allocated to you (while playing in a party)
 - whether the item has multiple variants (some uniques have)
@@ -501,6 +500,8 @@ Width         [< | > | <= | >= | =] Integer
 StackSize     [< | > | <= | >= | =] Integer
 GemLevel      [< | > | <= | >= | =] Integer
 MapTier       [< | > | <= | >= | =] Integer
+AreaLevel     [< | > | <= | >= | =] Integer
+CorruptedMods [< | > | <= | >= | =] Integer
 
 Class          [==] String String...
 BaseType       [==] String String...
@@ -515,6 +516,7 @@ SocketGroup [< | > | <= | >= | = | ==] [Integer] R...G...B...W...A...D...
 AnyEnchantment  Boolean
 Identified      Boolean
 Corrupted       Boolean
+Mirrored        Boolean
 ElderItem       Boolean
 ShaperItem      Boolean
 FracturedItem   Boolean
