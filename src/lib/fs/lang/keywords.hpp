@@ -41,6 +41,7 @@ namespace rf
 	constexpr auto gem_level        = "GemLevel";
 	constexpr auto identified       = "Identified";
 	constexpr auto corrupted        = "Corrupted";
+	constexpr auto mirrored         = "Mirrored";
 	constexpr auto elder_item       = "ElderItem";
 	constexpr auto shaper_item      = "ShaperItem";
 	constexpr auto fractured_item   = "FracturedItem";

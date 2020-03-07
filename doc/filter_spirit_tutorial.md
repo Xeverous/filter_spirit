@@ -17,7 +17,6 @@ Real filters have no access to following information:
 - league
 - zone level, although there is a strong correlation of `ItemLevel` of dropped items
 - item full name after identification (only base type name)
-- whether the item is mirrored
 - whether the item has been allocated to you (while playing in a party)
 - whether the item has multiple variants (some uniques have)
 - whether the item has any drop restrictions

@@ -266,6 +266,9 @@ add_boolean_condition(
 		case lang::boolean_condition_property::corrupted: {
 			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_corrupted);
 		}
+		case lang::boolean_condition_property::mirrored: {
+			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_mirrored);
+		}
 		case lang::boolean_condition_property::elder_item: {
 			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_elder_item);
 		}
