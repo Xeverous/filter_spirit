@@ -2,6 +2,7 @@
 #include <fs/compiler/detail/evaluate.hpp>
 #include <fs/lang/position_tag.hpp>
 #include <fs/lang/condition_set.hpp>
+#include <fs/utility/assert.hpp>
 
 #include <boost/container/static_vector.hpp>
 #include <boost/spirit/home/x3/support/utility/lambda_visitor.hpp>
@@ -308,7 +309,7 @@ spirit_filter_add_price_comparison_condition(
 	}
 
 	auto& obj = std::get<lang::object>(obj_or_err);
-	assert(obj.values.size() == 1u);
+	BOOST_ASSERT(obj.values.size() == 1u);
 
 	std::variant<lang::fractional, compile_error> frac_or_err = detail::get_as_fractional(obj.values[0]);
 	if (std::holds_alternative<compile_error>(frac_or_err))
@@ -335,7 +336,7 @@ spirit_filter_add_rarity_comparison_condition(
 	}
 
 	auto& obj = std::get<lang::object>(obj_or_err);
-	assert(obj.values.size() == 1u);
+	BOOST_ASSERT(obj.values.size() == 1u);
 
 	std::variant<lang::rarity, compile_error> rar_or_err = detail::get_as<lang::rarity>(obj.values[0]);
 	if (std::holds_alternative<compile_error>(rar_or_err))
@@ -358,7 +359,7 @@ spirit_filter_add_numeric_comparison_condition(
 	}
 
 	auto& obj = std::get<lang::object>(obj_or_err);
-	assert(obj.values.size() == 1u);
+	BOOST_ASSERT(obj.values.size() == 1u);
 
 	std::variant<lang::integer, compile_error> int_or_err = detail::get_as<lang::integer>(obj.values[0]);
 	if (std::holds_alternative<compile_error>(int_or_err))
@@ -465,7 +466,7 @@ spirit_filter_add_boolean_condition(
 	}
 
 	auto& obj = std::get<lang::object>(obj_or_err);
-	assert(obj.values.size() == 1u);
+	BOOST_ASSERT(obj.values.size() == 1u);
 
 	std::variant<lang::boolean, compile_error> bool_or_err = detail::get_as<lang::boolean>(obj.values[0]);
 	if (std::holds_alternative<compile_error>(bool_or_err))

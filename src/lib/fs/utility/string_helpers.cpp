@@ -1,6 +1,5 @@
 #include <fs/utility/string_helpers.hpp>
-
-#include <cassert>
+#include <fs/utility/assert.hpp>
 
 namespace
 {
@@ -115,7 +114,7 @@ int count_lines(const char* first, const char* last) noexcept
 
 std::string_view make_string_view(const char* first, const char* last) noexcept
 {
-	assert(first <= last);
+	BOOST_ASSERT(first <= last);
 
 	if (first == last)
 		return std::string_view();

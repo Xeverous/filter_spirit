@@ -4,8 +4,6 @@
 #include <fs/utility/algorithm.hpp>
 #include <fs/utility/string_helpers.hpp>
 
-#include <cassert>
-
 namespace
 {
 

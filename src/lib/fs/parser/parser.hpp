@@ -4,11 +4,11 @@
 #include <fs/parser/detail/config.hpp>
 #include <fs/log/logger.hpp>
 #include <fs/utility/string_helpers.hpp>
+#include <fs/utility/assert.hpp>
 
 #include <string_view>
 #include <variant>
 #include <utility>
-#include <cassert>
 
 namespace fs::parser
 {
@@ -54,7 +54,7 @@ private:
 	[[nodiscard]]
 	detail::range_type get_range_of_whole_content() const
 	{
-		assert(!position_cache.get_positions().empty());
+		BOOST_ASSERT(!position_cache.get_positions().empty());
 		return detail::range_type(position_cache.first(), position_cache.last());
 	}
 

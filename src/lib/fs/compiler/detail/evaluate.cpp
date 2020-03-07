@@ -5,8 +5,8 @@
 #include <fs/lang/keywords.hpp>
 #include <fs/lang/limits.hpp>
 #include <fs/utility/holds_alternative.hpp>
+#include <fs/utility/assert.hpp>
 
-#include <cassert>
 #include <utility>
 
 #include <boost/spirit/home/x3/support/utility/lambda_visitor.hpp>
@@ -265,7 +265,7 @@ evaluate_sequence(
 	int min_allowed_elements,
 	std::optional<int> max_allowed_elements)
 {
-	assert(!sequence.empty());
+	BOOST_ASSERT(!sequence.empty());
 
 	lang::object::container_type seq_values;
 	seq_values.reserve(sequence.size());

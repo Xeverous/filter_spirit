@@ -1,6 +1,5 @@
 #include <fs/log/logger.hpp>
 
-#include <cassert>
 #include <utility>
 
 namespace fs::log

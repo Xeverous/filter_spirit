@@ -1,7 +1,6 @@
 #include <fs/lang/condition_set.hpp>
 #include <fs/lang/keywords.hpp>
-
-#include <cassert>
+#include <fs/utility/assert.hpp>
 
 namespace
 {
@@ -95,7 +94,7 @@ void output_socket_spec_condition(
 
 	const lang::socket_spec_condition::container_type& specs = (*cond).values;
 	for (lang::socket_spec ss : specs) {
-		assert(ss.is_valid());
+		BOOST_ASSERT(ss.is_valid());
 
 		output_letter(kw::r, ss.r);
 		output_letter(kw::g, ss.g);

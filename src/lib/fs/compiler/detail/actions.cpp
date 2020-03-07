@@ -1,5 +1,6 @@
 #include <fs/compiler/detail/evaluate.hpp>
 #include <fs/compiler/detail/actions.hpp>
+#include <fs/utility/assert.hpp>
 
 #include <boost/spirit/home/x3/support/utility/lambda_visitor.hpp>
 
@@ -58,7 +59,7 @@ spirit_filter_add_set_color_action(
 	auto& obj = std::get<lang::object>(obj_or_err);
 
 	const auto args_num = static_cast<int>(obj.values.size());
-	assert(args_num == 3 || args_num == 4);
+	BOOST_ASSERT(args_num == 3 || args_num == 4);
 
 	std::variant<lang::integer, compile_error> int0_or_err = detail::get_as<lang::integer>(obj.values[0]);
 	if (std::holds_alternative<compile_error>(int0_or_err))
@@ -107,7 +108,7 @@ spirit_filter_add_set_font_size_action(
 
 	auto& obj = std::get<lang::object>(obj_or_err);
 
-	assert(obj.values.size() == 1u);
+	BOOST_ASSERT(obj.values.size() == 1u);
 
 	// TODO add erorr handling for font size
 	std::variant<lang::integer, compile_error> int_or_err = detail::get_as<lang::integer>(obj.values[0]);
@@ -134,7 +135,7 @@ spirit_filter_add_minimap_icon_action(
 
 	auto& obj = std::get<lang::object>(obj_or_err);
 
-	assert(obj.values.size() == 3u);
+	BOOST_ASSERT(obj.values.size() == 3u);
 
 	std::variant<lang::integer, compile_error> int_or_err = detail::get_as<lang::integer>(obj.values[0]);
 	if (std::holds_alternative<compile_error>(int_or_err))
@@ -181,7 +182,7 @@ spirit_filter_add_play_effect_action(
 	auto& obj = std::get<lang::object>(obj_or_err);
 
 	const auto args_num = static_cast<int>(obj.values.size());
-	assert(args_num == 1 || args_num == 2);
+	BOOST_ASSERT(args_num == 1 || args_num == 2);
 
 	std::variant<lang::suit, compile_error> suit_or_err = detail::get_as<lang::suit>(obj.values[0]);
 	if (std::holds_alternative<compile_error>(suit_or_err))
@@ -224,7 +225,7 @@ spirit_filter_add_play_alert_sound_action(
 	auto& obj = std::get<lang::object>(obj_or_err);
 
 	const auto args_num = static_cast<int>(obj.values.size());
-	assert(args_num == 1 || args_num == 2);
+	BOOST_ASSERT(args_num == 1 || args_num == 2);
 
 	std::variant<lang::integer, compile_error> sid_or_err = detail::get_as<lang::integer>(obj.values[0]);
 	if (std::holds_alternative<compile_error>(sid_or_err))
@@ -269,7 +270,7 @@ spirit_filter_add_custom_alert_sound_action(
 
 	auto& obj = std::get<lang::object>(obj_or_err);
 
-	assert(obj.values.size() == 1u);
+	BOOST_ASSERT(obj.values.size() == 1u);
 
 	std::variant<lang::string, compile_error> str_or_err = detail::get_as<lang::string>(obj.values[0]);
 	if (std::holds_alternative<compile_error>(str_or_err))
@@ -297,7 +298,7 @@ spirit_filter_add_compound_action(
 
 	auto& obj = std::get<lang::object>(obj_or_err);
 
-	assert(obj.values.size() == 1u);
+	BOOST_ASSERT(obj.values.size() == 1u);
 
 	std::variant<lang::action_set, compile_error> as_or_err = detail::get_as<lang::action_set>(obj.values[0]);
 	if (std::holds_alternative<compile_error>(as_or_err))
