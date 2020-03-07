@@ -363,7 +363,7 @@ get_as_socket_spec(
 		return lang::socket_spec{std::get<lang::integer>(val).value};
 	}
 
-	return errors::type_mismatch{lang::object_type::socket_group, sobj.type(), sobj.origin};
+	return errors::type_mismatch{lang::object_type::socket_spec, sobj.type(), sobj.origin};
 }
 
 } // namespace fs::compiler::detail

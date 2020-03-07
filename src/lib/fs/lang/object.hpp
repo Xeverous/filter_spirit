@@ -35,7 +35,7 @@ BETTER_ENUM(object_type, int,
 	boolean,
 	fractional,
 	integer,
-	socket_group,
+	socket_spec,
 	influence,
 	rarity,
 	shape,
@@ -110,7 +110,7 @@ namespace detail {
 	template <> constexpr
 	object_type object_type_of_impl<integer>() noexcept { return object_type::integer; }
 	template <> constexpr
-	object_type object_type_of_impl<socket_spec>() noexcept { return object_type::socket_group; }
+	object_type object_type_of_impl<socket_spec>() noexcept { return object_type::socket_spec; }
 	template <> constexpr
 	object_type object_type_of_impl<influence>() noexcept { return object_type::influence; }
 	template <> constexpr
