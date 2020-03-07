@@ -50,6 +50,8 @@ namespace rf
 	constexpr auto elder_map        = "ElderMap";
 	constexpr auto blighted_map     = "BlightedMap";
 	constexpr auto map_tier         = "MapTier";
+	constexpr auto area_level       = "AreaLevel";
+	constexpr auto corrupted_mods   = "CorruptedMods";
 
 	constexpr auto r = 'R';
 	constexpr auto g = 'G';

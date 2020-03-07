@@ -35,7 +35,9 @@ enum class numeric_comparison_condition_property
 	width,
 	stack_size,
 	gem_level,
-	map_tier
+	map_tier,
+	area_level,
+	corrupted_mods
 };
 
 // all conditions which work with array of strings

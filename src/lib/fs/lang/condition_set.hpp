@@ -204,6 +204,8 @@ struct condition_set
 	integer_range_condition stack_size;
 	integer_range_condition gem_level;
 	integer_range_condition map_tier;
+	integer_range_condition area_level;
+	integer_range_condition corrupted_mods;
 	std::optional<boolean_condition> is_identified;
 	std::optional<boolean_condition> is_corrupted;
 	std::optional<boolean_condition> is_elder_item;

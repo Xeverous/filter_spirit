@@ -157,6 +157,8 @@ namespace rf
 				(lang::keywords::rf::stack_size,     lang::numeric_comparison_condition_property::stack_size)
 				(lang::keywords::rf::gem_level,      lang::numeric_comparison_condition_property::gem_level)
 				(lang::keywords::rf::map_tier,       lang::numeric_comparison_condition_property::map_tier)
+				(lang::keywords::rf::area_level,     lang::numeric_comparison_condition_property::area_level)
+				(lang::keywords::rf::corrupted_mods, lang::numeric_comparison_condition_property::corrupted_mods)
 			;
 		}
 	};

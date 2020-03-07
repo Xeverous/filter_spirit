@@ -113,6 +113,12 @@ add_numeric_comparison_condition(
 		case lang::numeric_comparison_condition_property::map_tier: {
 			return add_range_condition(cmp, intgr.value, condition_origin, set.map_tier);
 		}
+		case lang::numeric_comparison_condition_property::area_level: {
+			return add_range_condition(cmp, intgr.value, condition_origin, set.area_level);
+		}
+		case lang::numeric_comparison_condition_property::corrupted_mods: {
+			return add_range_condition(cmp, intgr.value, condition_origin, set.corrupted_mods);
+		}
 	}
 
 	return errors::internal_compiler_error{

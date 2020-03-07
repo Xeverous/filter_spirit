@@ -216,16 +216,18 @@ namespace fs::lang
 
 void condition_set::generate(std::ostream& output_stream) const
 {
-	output_range_condition(item_level, kw::item_level,     output_stream);
-	output_range_condition(drop_level, kw::drop_level,     output_stream);
-	output_range_condition(quality,    kw::quality,        output_stream);
-	output_range_condition(rarity,     kw::rarity,         output_stream);
-	output_range_condition(links,      kw::linked_sockets, output_stream);
-	output_range_condition(height,     kw::height,         output_stream);
-	output_range_condition(width,      kw::width,          output_stream);
-	output_range_condition(stack_size, kw::stack_size,     output_stream);
-	output_range_condition(gem_level,  kw::gem_level,      output_stream);
-	output_range_condition(map_tier,   kw::map_tier,       output_stream);
+	output_range_condition(item_level,     kw::item_level,     output_stream);
+	output_range_condition(drop_level,     kw::drop_level,     output_stream);
+	output_range_condition(quality,        kw::quality,        output_stream);
+	output_range_condition(rarity,         kw::rarity,         output_stream);
+	output_range_condition(links,          kw::linked_sockets, output_stream);
+	output_range_condition(height,         kw::height,         output_stream);
+	output_range_condition(width,          kw::width,          output_stream);
+	output_range_condition(stack_size,     kw::stack_size,     output_stream);
+	output_range_condition(gem_level,      kw::gem_level,      output_stream);
+	output_range_condition(map_tier,       kw::map_tier,       output_stream);
+	output_range_condition(area_level,     kw::area_level,     output_stream);
+	output_range_condition(corrupted_mods, kw::corrupted_mods, output_stream);
 
 	output_socket_spec_condition(false, sockets,      output_stream);
 	output_socket_spec_condition(true,  socket_group, output_stream);
