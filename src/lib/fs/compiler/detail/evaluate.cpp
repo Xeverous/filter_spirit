@@ -206,8 +206,7 @@ make_builtin_alert_sound(
 	std::pair<lang::integer, lang::position_tag> sound_id,
 	std::optional<std::pair<lang::integer, lang::position_tag>> volume)
 {
-	// TODO find what is the actual maximum sound id and replace the hardcoded limit
-	std::optional<compile_error> err = expect_integer_in_range(sound_id.first, sound_id.second, 0, 30);
+	std::optional<compile_error> err = expect_integer_in_range(sound_id.first, sound_id.second, 1, 16);
 	if (err) {
 		return *std::move(err);
 	}

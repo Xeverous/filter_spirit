@@ -234,6 +234,25 @@ Quality > 0
 			BOOST_TEST(compare_ranges(expected_redef, reported_redef, input));
 		}
 
+		BOOST_AUTO_TEST_CASE(invalid_sound_id)
+		{
+			const std::string input_str = minimal_input() + R"(
+PlayAlertSound 17
+)";
+			const std::string_view input = input_str;
+			const parser::sf::parse_success_data parse_data = parse(input);
+			const compile_error error = expect_error_when_compiling(parse_data.ast);
+			const auto& error_desc = expect_error_of_type<errors::invalid_integer_value>(error, parse_data.lookup_data);
+
+			BOOST_TEST(error_desc.min_allowed_value == 1);
+			BOOST_TEST((error_desc.max_allowed_value == 16));
+			BOOST_TEST(error_desc.actual_value == 17);
+
+			const std::string_view expected_origin = search(input, "17").result();
+			const std::string_view reported_origin = parse_data.lookup_data.position_of(error_desc.origin);
+			BOOST_TEST(compare_ranges(expected_origin, reported_origin, input));
+		}
+
 	BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE_END()
