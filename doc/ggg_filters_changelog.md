@@ -6,6 +6,16 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 
 *newest at the top*
 
+### 3.10 (Delirium) - [Item Filter information](https://www.pathofexile.com/forum/view-thread/2784312)
+
+- [patch notes](https://www.pathofexile.com/forum/view-thread/2784310) - new skills, cards and unique items
+- [reddit post - new minimap icons and colors preview](https://old.reddit.com/r/pathofexile/comments/fhn16d/lootfilter_stuffs_demo_of_the_new_filter_icons/)
+
+### 3.9.2f
+
+- [Upcoming filter improvements post](https://www.pathofexile.com/forum/view-thread/2771031) - `AreaLevel`, `CorruptedMods`, `Mirrored`, `Continue`, socket condition changes and more
+- [questions on reddit answered by RhysGGG](https://www.reddit.com/r/pathofexile/comments/f2t4tz/inconsistencies_in_new_filter_syntaxes)
+
 ### 3.9 (Metamorph) - [Item Filter information](https://www.pathofexile.com/forum/view-thread/2687401)
 
 - [patch notes](https://www.pathofexile.com/forum/view-thread/2687400) - new gems, base types, uniques and cards
