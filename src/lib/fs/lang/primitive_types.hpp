@@ -80,9 +80,9 @@ inline bool operator!=(socket_spec lhs, socket_spec rhs) noexcept { return !(lhs
 
 enum class influence { shaper, elder, crusader, redeemer, hunter, warlord };
 enum class rarity { normal, magic, rare, unique };
-enum class shape { circle, diamond, hexagon, square, star, triangle };
+enum class shape { circle, diamond, hexagon, square, star, triangle, cross, moon, raindrop, kite, pentagon, upside_down_house };
 // suit is named "suit" to avoid name conflict with "color"
-enum class suit { red, green, blue, white, brown, yellow };
+enum class suit { red, green, blue, white, brown, yellow, cyan, grey, orange, pink, purple };
 
 struct string
 {

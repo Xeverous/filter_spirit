@@ -131,8 +131,8 @@ expression(s) | type | notes
 `-1.2e-3` | FloatingPoint | scientific notation syntax as defined by C99 or C++11 standard
 `RGB`, `3GGG`, `AA` | SocketSpec | `W` - white socket, `A` - abyss socket, `D` - resonator socket
 `Normal`, `Magic`, `Rare`, `Unique` | Rarity |
-`Circle`, `Diamond`, `Hexagon`, `Square`, `Star`, `Triangle` | Shape |
-`Red`, `Green`, `Blue`, `White`, `Brown`, `Yellow` | Suit |
+`Circle`, `Diamond`, `Hexagon`, `Square`, `Star`, `Triangle`, `Cross`, `Moon`, `Raindrop`, `Kite`, `Pentagon`, `UpsideDownHouse` | Shape |
+`Red`, `Green`, `Blue`, `White`, `Brown`, `Yellow`, `Cyan`, `Grey`, `Orange`, `Pink`, `Purple` | Suit |
 `Shaper`, `Elder`, `Crusader`, `Redeemer`, `Hunter`, `Warlord` | Influence |
 `"abc"` | String | UTF-8 encoding, line breaking characters (LF and CR) not allowed between quotes
 

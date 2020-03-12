@@ -64,6 +64,12 @@ namespace rf
 				(lang::keywords::rf::square,   lang::shape::square)
 				(lang::keywords::rf::star,     lang::shape::star)
 				(lang::keywords::rf::triangle, lang::shape::triangle)
+				(lang::keywords::rf::cross,    lang::shape::cross)
+				(lang::keywords::rf::moon,     lang::shape::moon)
+				(lang::keywords::rf::raindrop, lang::shape::raindrop)
+				(lang::keywords::rf::kite,     lang::shape::kite)
+				(lang::keywords::rf::pentagon, lang::shape::pentagon)
+				(lang::keywords::rf::upside_down_house, lang::shape::upside_down_house)
 			;
 		}
 	};
@@ -80,6 +86,11 @@ namespace rf
 				(lang::keywords::rf::white,  lang::suit::white)
 				(lang::keywords::rf::brown,  lang::suit::brown)
 				(lang::keywords::rf::yellow, lang::suit::yellow)
+				(lang::keywords::rf::cyan,   lang::suit::cyan)
+				(lang::keywords::rf::grey,   lang::suit::grey)
+				(lang::keywords::rf::orange, lang::suit::orange)
+				(lang::keywords::rf::pink,   lang::suit::pink)
+				(lang::keywords::rf::purple, lang::suit::purple)
 			;
 		}
 

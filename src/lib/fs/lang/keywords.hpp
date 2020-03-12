@@ -87,6 +87,12 @@ namespace rf
 	constexpr auto white  = "White";
 	constexpr auto brown  = "Brown";
 	constexpr auto yellow = "Yellow";
+	// new colors added before Delirium (3.10)
+	constexpr auto cyan   = "Cyan";
+	constexpr auto grey   = "Grey";
+	constexpr auto orange = "Orange";
+	constexpr auto pink   = "Pink";
+	constexpr auto purple = "Purple";
 
 	constexpr auto circle   = "Circle";
 	constexpr auto diamond  = "Diamond";
@@ -94,6 +100,13 @@ namespace rf
 	constexpr auto square   = "Square";
 	constexpr auto star     = "Star";
 	constexpr auto triangle = "Triangle";
+	// new shapes added before Delirium (3.10)
+	constexpr auto cross    = "Cross";
+	constexpr auto moon     = "Moon";
+	constexpr auto raindrop = "Raindrop";
+	constexpr auto kite     = "Kite";
+	constexpr auto pentagon = "Pentagon";
+	constexpr auto upside_down_house = "UpsideDownHouse";
 
 	constexpr auto shaper      = "Shaper";
 	constexpr auto elder       = "Elder";

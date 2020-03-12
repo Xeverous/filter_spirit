@@ -112,6 +112,21 @@ void output_suit(lang::suit s, std::ostream& output_stream)
 		case lang::suit::yellow:
 			output_stream << kw::yellow;
 			break;
+		case lang::suit::cyan:
+			output_stream << kw::cyan;
+			break;
+		case lang::suit::grey:
+			output_stream << kw::grey;
+			break;
+		case lang::suit::orange:
+			output_stream << kw::orange;
+			break;
+		case lang::suit::pink:
+			output_stream << kw::pink;
+			break;
+		case lang::suit::purple:
+			output_stream << kw::purple;
+			break;
 	}
 }
 
@@ -135,6 +150,24 @@ void output_shape(lang::shape s, std::ostream& output_stream)
 			break;
 		case lang::shape::triangle:
 			output_stream << kw::triangle;
+			break;
+		case lang::shape::cross:
+			output_stream << kw::cross;
+			break;
+		case lang::shape::moon:
+			output_stream << kw::moon;
+			break;
+		case lang::shape::raindrop:
+			output_stream << kw::raindrop;
+			break;
+		case lang::shape::kite:
+			output_stream << kw::kite;
+			break;
+		case lang::shape::pentagon:
+			output_stream << kw::pentagon;
+			break;
+		case lang::shape::upside_down_house:
+			output_stream << kw::upside_down_house;
 			break;
 	}
 }

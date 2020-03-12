@@ -486,6 +486,52 @@ Show
 			BOOST_TEST(compare_strings(expected_filter, actual_filter));
 		}
 
+		BOOST_AUTO_TEST_CASE(delirium_new_colors_and_shapes)
+		{
+			const std::string actual_filter = generate_filter(minimal_input() + R"(
+MinimapIcon 0 Cyan Cross
+{ Show }
+
+MinimapIcon 1 Grey Moon
+{ Show }
+
+MinimapIcon 2 Orange Raindrop
+{ Show }
+
+MinimapIcon 0 Pink Kite
+{ Show }
+
+MinimapIcon 1 Purple Pentagon
+{ Show }
+
+MinimapIcon 2 Cyan UpsideDownHouse
+{ Show }
+
+)");
+			const std::string_view expected_filter =
+R"(Show
+	MinimapIcon 0 Cyan Cross
+
+Show
+	MinimapIcon 1 Grey Moon
+
+Show
+	MinimapIcon 2 Orange Raindrop
+
+Show
+	MinimapIcon 0 Pink Kite
+
+Show
+	MinimapIcon 1 Purple Pentagon
+
+Show
+	MinimapIcon 2 Cyan UpsideDownHouse
+
+)";
+
+			BOOST_TEST(compare_strings(expected_filter, actual_filter));
+		}
+
 		BOOST_AUTO_TEST_CASE(simple_price_queries)
 		{
 			lang::item_price_data ipd;
