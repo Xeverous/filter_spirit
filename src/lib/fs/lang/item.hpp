@@ -176,12 +176,14 @@ struct item
 	 * and not being able to have it. Item filter blocks can reject an item because
 	 * it is impossible to compare lack of property to any value of it. Example:
 	 * "Sockets < 6" will reject divination cards because a card can not ever have
-	 * sockets - not being able to have sockets is not treated as 0. TODO verify if this
-	 * exact example is actually correct.
+	 * sockets - not being able to have sockets is not treated as 0.
 	 *
 	 * The value of being able or not is the same for all items of the same class - for
 	 * example, all gems can be corrupted, all equipment items can be identified, all
 	 * divination cards can not be corrputed, all maps can not be synthesised.
+	 *
+	 * There seems to be some exceptions to this rule unfortunately, see
+	 * https://old.reddit.com/r/pathofexile/comments/f2t4tz/inconsistencies_in_new_filter_syntaxes/fjxf1mx
 	 */
 	std::optional<int> item_level;
 	std::optional<int> drop_level;

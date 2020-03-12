@@ -3,6 +3,7 @@
 #include <fs/compiler/detail/actions.hpp>
 #include <fs/compiler/detail/conditions.hpp>
 #include <fs/lang/item_filter.hpp>
+#include <fs/lang/item_classes.hpp>
 #include <fs/utility/assert.hpp>
 #include <fs/utility/string_helpers.hpp>
 
@@ -65,12 +66,33 @@ add_constant_from_definition(
 
 // ---- compile_spirit_filter_statements helpers ----
 
+bool condition_contains(const lang::strings_condition& condition, std::string_view fragment)
+{
+	for (const auto& str : condition.strings) {
+		if (utility::contains(str, fragment))
+			return true;
+	}
+
+	return false;
+}
+
 [[nodiscard]] std::optional<compile_error>
 verify_autogen_cards(
 	lang::position_tag autogen_origin,
 	const lang::condition_set& conditions,
 	lang::position_tag visibility_origin)
 {
+	if (conditions.class_.has_value()) {
+		if (!condition_contains(*conditions.class_, fs::lang::classes::cards)) {
+			return errors::autogen_error{
+				errors::autogen_error_cause::invalid_class_condition,
+				autogen_origin,
+				(*conditions.class_).origin,
+				visibility_origin
+			};
+		}
+	}
+
 	if (conditions.prophecy.has_value()) {
 		return errors::autogen_error{
 			errors::autogen_error_cause::expected_empty_condition,
@@ -96,16 +118,6 @@ verify_autogen_cards(
 	}
 
 	return std::nullopt;
-}
-
-bool condition_contains(const lang::strings_condition& condition, std::string_view fragment)
-{
-	for (const auto& str : condition.strings) {
-		if (utility::contains(str, fragment))
-			return true;
-	}
-
-	return false;
 }
 
 [[nodiscard]] std::optional<compile_error>

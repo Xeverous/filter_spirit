@@ -1,8 +1,10 @@
 #include <fs/generator/make_filter.hpp>
 #include <fs/lang/item_filter.hpp>
 #include <fs/lang/condition_set.hpp>
+#include <fs/lang/item_classes.hpp>
 #include <fs/utility/assert.hpp>
 
+#include <string>
 #include <utility>
 #include <type_traits>
 
@@ -154,7 +156,7 @@ make_filter_block(
 				autogen.price_range,
 				autogen.condition.origin);
 			result_block.conditions.class_ = lang::strings_condition{
-				{"Divination Card"}, // TODO or "Cards"?
+				{fs::lang::classes::cards},
 				true,
 				autogen.condition.origin};
 			break;
@@ -165,7 +167,7 @@ make_filter_block(
 				autogen.price_range,
 				autogen.condition.origin);
 			result_block.conditions.class_ = lang::strings_condition{
-				{"Stackable Currency"}, // TODO verify
+				{fs::lang::classes::prophecies},
 				true,
 				autogen.condition.origin};
 			break;
@@ -176,7 +178,7 @@ make_filter_block(
 				autogen.price_range,
 				autogen.condition.origin);
 			result_block.conditions.class_ = lang::strings_condition{
-				{"Stackable Currency"}, // TODO verify
+				{fs::lang::classes::essences},
 				true,
 				autogen.condition.origin};
 			break;
@@ -187,7 +189,7 @@ make_filter_block(
 				autogen.price_range,
 				autogen.condition.origin);
 			result_block.conditions.class_ = lang::strings_condition{
-				{"Stackable Currency"}, // TODO this is not fully correct
+				{fs::lang::classes::fossils},
 				true,
 				autogen.condition.origin};
 			break;
@@ -198,7 +200,7 @@ make_filter_block(
 				autogen.price_range,
 				autogen.condition.origin);
 			result_block.conditions.class_ = lang::strings_condition{
-				{"Stackable Currency"}, // TODO this is not fully correct
+				{fs::lang::classes::resonators},
 				true,
 				autogen.condition.origin};
 			break;
@@ -209,7 +211,7 @@ make_filter_block(
 				autogen.price_range,
 				autogen.condition.origin);
 			result_block.conditions.class_ = lang::strings_condition{
-				{"Stackable Currency"}, // TODO verify
+				{fs::lang::classes::scarabs},
 				true,
 				autogen.condition.origin};
 			break;
@@ -220,7 +222,7 @@ make_filter_block(
 				autogen.price_range,
 				autogen.condition.origin);
 			result_block.conditions.class_ = lang::strings_condition{
-				{"Stackable Currency"}, // TODO verify
+				{fs::lang::classes::incubators},
 				true,
 				autogen.condition.origin};
 			break;
@@ -231,7 +233,7 @@ make_filter_block(
 				autogen.price_range,
 				autogen.condition.origin);
 			result_block.conditions.class_ = lang::strings_condition{
-				{"Stackable Currency"}, // TODO verify
+				{fs::lang::classes::oils},
 				true,
 				autogen.condition.origin};
 			break;
@@ -242,7 +244,7 @@ make_filter_block(
 				autogen.price_range,
 				autogen.condition.origin);
 			result_block.conditions.class_ = lang::strings_condition{
-				{"Stackable Currency"}, // TODO verify
+				{fs::lang::classes::catalysts},
 				true,
 				autogen.condition.origin};
 			break;
