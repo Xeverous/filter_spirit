@@ -160,3 +160,7 @@ target_link_libraries(filter_spirit
 if(WIN32)
 	target_link_libraries(filter_spirit PRIVATE wsock32 ws2_32)
 endif()
+
+if(IPO_SUPPORTED AND FILTER_SPIRIT_ENABLE_LTO)
+	set_target_properties(filter_spirit PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
+endif()

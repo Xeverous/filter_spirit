@@ -33,6 +33,8 @@ option(FILTER_SPIRIT_BUILD_EXECUTABLE_CLI
 	"build Filter Spirit command line program" ON)
 option(FILTER_SPIRIT_BUILD_TESTS
 	"build Filter Spirit tests" ON)
+option(FILTER_SPIRIT_ENABLE_LTO
+	"enable link-time optimization for all FS targets" ON)
 
 ##############################################################################
 # specify explicitly where to output all binary objects
@@ -42,13 +44,12 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 include(CheckIPOSupported)
-check_ipo_supported(RESULT supported OUTPUT error)
+check_ipo_supported(RESULT IPO_SUPPORTED OUTPUT IPO_ERROR)
 
-if(supported)
-    message(STATUS "IPO / LTO supported, enabling")
-    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+if(IPO_SUPPORTED AND FILTER_SPIRIT_ENABLE_LTO)
+	message(STATUS "IPO / LTO supported, enabling for FS targets")
 else()
-    message(STATUS "IPO / LTO not supported: <${error}>, will not enable")
+	message(STATUS "IPO / LTO not supported: <${IPO_ERROR}>, will not enable")
 endif()
 
 ##############################################################################

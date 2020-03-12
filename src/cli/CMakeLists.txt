@@ -38,3 +38,7 @@ target_link_libraries(filter_spirit_cli
 		Boost::program_options
 		Boost::filesystem
 )
+
+if(IPO_SUPPORTED AND FILTER_SPIRIT_ENABLE_LTO)
+	set_target_properties(filter_spirit_cli PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
+endif()
