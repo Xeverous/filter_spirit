@@ -6,7 +6,7 @@ namespace fs::version
 {
 
 constexpr int major = 0;
-constexpr int minor = 4;
+constexpr int minor = 5;
 constexpr int patch = 0;
 
 // C++20: add constexpr

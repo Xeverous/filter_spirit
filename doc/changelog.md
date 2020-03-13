@@ -1,5 +1,15 @@
 # Filter Spirit changelog
 
+## version 0.5.0 (13.03.2020)
+
+- Implemented new `Sockets` and `SocketGroup`, `AreaLevel`, `Corrupted` and other conditions as on https://www.pathofexile.com/forum/view-thread/2771031
+- Added missing `Temp` implementation for `PlayEffect`
+- Added new colors (suits) and shapes for minimap icons as on https://www.pathofexile.com/forum/view-thread/2784312
+- **Breaking change** - redesigned syntax of constants to be more in-line with actual filters. See documentation for examples. Also renamed some conditions/actions to make then exactly the same as in real filters.
+- New feature - condition extension: `SetAlertSound` will accept both values that are normally accepted by `PlayAlertSound` and `CustomAlertSound` - this gives the convenience to use a constant that can change which sound it refers to without having to rewrite all actions that (until now) referred specifically to either built-in sound or custom sound.
+- **Breaking change** - redesigned query syntax to be more intuitive and closer to actual filters syntax. This is now called `Autogen`. Autogeneration now does more verification and supports more item categories. You can also influence its output and behavior by using new `Price` condition and regular filter conditions. See documentation for examples.
+- Sadly, no support for `Continue`, `None` and `-1` for minimap icons.
+
 ## version 0.4.0 (29.01.2020)
 
 - New small features:
