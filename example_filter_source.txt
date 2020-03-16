@@ -221,7 +221,7 @@ Class "Currency" {
 		Show
 	}
 
-	BaseType "Catalyst" "Oil" {
+	BaseType "Catalyst" "Oil" "Delirium Orb" {
 		SetTextColor $color_black
 		SetBackgroundColor $color_currency
 		SetFontSize $font_currency_t2
@@ -639,6 +639,15 @@ Class "Map Fragments" {
 		SetBackgroundColor 255 0 255
 		SetFontSize $font_max
 		SetAlertSound $alert_misc_pale_court
+		Show
+	}
+
+	BaseType "Simulacrum" {
+		SetTextColor $color_breach
+		SetBorderColor $color_breach
+		SetBackgroundColor $color_white
+		SetFontSize $font_max
+		SetAlertSound $alert_misc_breachstone
 		Show
 	}
 }
