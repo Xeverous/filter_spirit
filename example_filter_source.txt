@@ -65,6 +65,9 @@ $font_currency_t2    = $font_max
 $font_currency_t3    = 38
 $font_currency_t4    = 34
 $font_currency_delve = $font_currency_t2
+$font_scarab_top     = 42
+$font_scarab_mid     = 40
+$font_scarab_low     = 38
 $font_essence        = $font_max
 $font_mid_divination = $font_currency_t3
 $font_low_divination = $font_currency_t4
@@ -105,6 +108,9 @@ $alert_currency_blessing  = $alert_mlg_airhorn
 $alert_currency_vial      = $alert_intervention # TODO API pricing
 $alert_currency_essence_best  = $alert_explosion
 $alert_currency_essence_other = $alert_hitmarker
+$alert_scarab_top         = $alert_mlg_airhorn
+$alert_scarab_mid         = $alert_airhorn
+$alert_scarab_low         = $alert_intervention
 $alert_gem_awakened       = $alert_john_cena_earrape
 $alert_gem_drop_only      = $alert_hitmarker
 $alert_gem_20_quality     = $alert_airhorn
@@ -185,6 +191,8 @@ $icon_reliquary       = $icon_currency_t1
 $icon_map_top         = 0 White Cross
 $icon_map_mid         = 2 White Cross
 $icon_map_blight      = 0 Orange Cross
+$icon_scarab_top      = 0 White Kite
+$icon_scarab_mid      = 2 White Kite
 $icon_error           = 0 Red Square
 
 $bases_t1 = "Eternal Burgonet" "Lion Pelt" "Hubris Circlet" "Nightmare Bascinet" "Titan Gauntlets" "Slink Gloves" "Sorcerer Gloves" "Dragonscale Gauntlets" "Titan Greaves" "Slink Boots" "Sorcerer Boots" "Dragonscale Boots" "Assassin's Boots" "Glorious Plate" "Assassin's Garb" "Vaal Regalia" "Titanium Spirit Shield" "Harbinger Bow" "Ambusher" "Ezomyte Dagger" "Platinum Kris" "Imperial Skean" "Demon Dagger" "Void Sceptre" "Sambar Sceptre" "Profane Wand" "Prophecy Wand" "Tornado Wand" "Opal Wand" "Imbued Wand" "Demon's Horn" "Steel Ring" "Opal Ring" "Blue Pearl Amulet" "Marble Amulet" "Crystal Belt" "Bone Helmet" "Two-Toned Boots" "Spiked Gloves" "Gripped Gloves" "Fingerless Silk Gloves"
@@ -584,9 +592,45 @@ Class "Atlas Region Upgrade Item" {
 	Show
 }
 
+{
+	Autogen scarabs
+	{
+		Price >= 20
+		{
+			SetTextColor $color_sacrifice
+			SetBorderColor $color_sacrifice
+			SetBackgroundColor $color_white
+			SetFontSize $font_scarab_top
+			SetAlertSound $alert_scarab_top
+			MinimapIcon $icon_scarab_top
+			Show
+		}
+
+		Price < 20
+		Price >= 10
+		{
+			SetTextColor $color_sacrifice
+			SetBorderColor $color_sacrifice
+			SetBackgroundColor $color_white
+			SetFontSize $font_scarab_mid
+			SetAlertSound $alert_scarab_mid
+			MinimapIcon $icon_scarab_mid
+			Show
+		}
+	}
+
+	BaseType "Scarab" {
+		SetTextColor $color_sacrifice
+		SetBorderColor $color_sacrifice
+		SetBackgroundColor $color_black
+		SetFontSize $font_scarab_low
+		SetAlertSound $alert_scarab_low
+		Show
+	}
+}
+
 # top map fragment items
-# TODO: scarabs should have own block with API prices
-BaseType "Divine Vessel" "Scarab" {
+BaseType "Divine Vessel" {
 	SetTextColor $color_sacrifice
 	SetBorderColor $color_sacrifice
 	SetBackgroundColor $color_white
