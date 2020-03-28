@@ -105,6 +105,7 @@ $alert_currency_blessing  = $alert_mlg_airhorn
 $alert_currency_vial      = $alert_intervention # TODO API pricing
 $alert_currency_essence_best  = $alert_explosion
 $alert_currency_essence_other = $alert_hitmarker
+$alert_gem_awakened       = $alert_john_cena_earrape
 $alert_gem_drop_only      = $alert_hitmarker
 $alert_gem_20_quality     = $alert_airhorn
 $alert_gem_quality        = $alert_hitmarker
@@ -169,9 +170,8 @@ $beam_delve_fossil    = $beam_currency
 $beam_delve_resonator = $beam_currency
 $beam_divination      = Blue
 
-$minimap_top_gem         = 0 Green Circle
-$minimap_mid_gem         = 1 Green Circle
-$minimap_low_gem         = 2 Green Circle
+$icon_gem_awakened       = 0 Green Diamond
+$icon_gem_20_quality     = 0 Green Circle
 $minimap_top_unique      = 0 Brown Triangle
 $minimap_mid_unique      = 1 Brown Triangle
 $minimap_6L              = 0 Red Hexagon
@@ -392,6 +392,16 @@ Class "Incubator" {
 }
 
 Class "Gem" {
+	BaseType "Awakened" {
+		SetBackgroundColor $color_white
+		SetTextColor $color_gem
+		SetBorderColor $color_gem
+		SetFontSize $font_max
+		SetAlertSound $alert_gem_awakened
+		MinimapIcon $icon_gem_awakened
+		Show
+	}
+
 	BaseType "Empower" "Enhance" "Enlighten" "Portal" "Vaal Breach" {
 		SetFontSize 40
 		SetAlertSound $alert_gem_drop_only
@@ -404,6 +414,7 @@ Class "Gem" {
 		Quality 20 {
 			SetBackgroundColor $color_white
 			SetAlertSound $alert_gem_20_quality
+			MinimapIcon $icon_gem_20_quality
 			Show
 		}
 
@@ -420,6 +431,7 @@ Class "Gem" {
 	Quality 20 {
 		SetBackgroundColor $color_white
 		SetAlertSound $alert_gem_20_quality
+		MinimapIcon $icon_gem_20_quality
 		Show
 	}
 
