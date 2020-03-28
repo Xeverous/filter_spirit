@@ -55,7 +55,7 @@ $color_veiled_item      = 150 100 158
 
 $currency_t1 = "Exalted Orb" "Mirror of Kalandra" "Eternal Orb" "Albino Rhoa Feather" "Mirror Shard"
 $currency_t2 = "Divine Orb" "Chaos Orb" "Gemcutter's Prism" "Orb of Regret" "Regal Orb" "Stacked Deck" "Vaal Orb" "Simple Sextant" "Prime Sextant" "Awakened Sextant" "Remnant of Corruption" "Exalted Shard" "Orb of Annulment" "Orb of Binding" "Orb of Horizons" "Harbinger's Orb" "Engineer's Orb" "Ancient Orb" "Stacked Deck" "Vial of"
-$currency_t3 = "Cartographer's Chisel" "Jeweller's Orb" "Orb of Alchemy" "Orb of Chance" "Orb of Fusing" "Orb of Scouring" "Silver Coin" "Blessed Orb"
+$currency_t3 = "Cartographer's Chisel" "Jeweller's Orb" "Orb of Alchemy" "Orb of Alteration" "Orb of Chance" "Orb of Fusing" "Orb of Scouring" "Silver Coin" "Blessed Orb"
 $currency_t4 = "Annulment Shard" "Binding Shard" "Horizon Shard" "Harbinger's Shard" "Engineer's Shard" "Ancient Shard" "Chaos Shard" "Regal Shard" "Alchemy Shard"
 
 $font_min            = 18
@@ -237,7 +237,6 @@ Class "Currency" {
 		SetFontSize $font_currency_t3
 		SetAlertSound $alert_currency_t3
 		PlayEffect $beam_currency
-		MinimapIcon $minimap_currency_t3
 		Show
 	}
 
@@ -282,11 +281,6 @@ Class "Currency" {
 
 	BaseType "Orb of Augmentation" {
 		SetTextColor 120 165 202
-		Show
-	}
-
-	BaseType "Orb of Alteration" {
-		SetTextColor 170 210 255
 		Show
 	}
 
