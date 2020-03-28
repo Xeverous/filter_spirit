@@ -4,6 +4,7 @@
 
 $color_white            = 255 255 255
 $color_black            =   0   0   0 255
+$color_orange           = 255 127   0
 $color_red              = 255   0   0
 $color_error            = $color_red
 
@@ -137,6 +138,7 @@ $alert_divination_maybe_pickup  = $alert_hitmarker # TODO this should be differe
 $alert_divination_best    = $alert_john_cena_earrape
 $alert_divination_mid     = $alert_john_cena
 $alert_divination_low     = $alert_airhorn
+$alert_map_blight         = $alert_mlg_airhorn
 $alert_map_t16            = $alert_metal_gear
 $alert_map_red            = $alert_metal_gear
 $alert_map_yellow         = $alert_whip
@@ -180,6 +182,9 @@ $minimap_currency_t3     = 2 Yellow Star
 $minimap_delve_fossil    = $minimap_currency_t2
 $minimap_delve_resonator = $minimap_currency_t2
 $minimap_reliquary       = $minimap_currency_t1
+$minimap_map_top         = 0 White Cross
+$minimap_map_mid         = 2 White Cross
+$minimap_map_blight      = 0 Orange Cross
 $minimap_error           = 0 Red Square
 
 $bases_t1 = "Eternal Burgonet" "Lion Pelt" "Hubris Circlet" "Nightmare Bascinet" "Titan Gauntlets" "Slink Gloves" "Sorcerer Gloves" "Dragonscale Gauntlets" "Titan Greaves" "Slink Boots" "Sorcerer Boots" "Dragonscale Boots" "Assassin's Boots" "Glorious Plate" "Assassin's Garb" "Vaal Regalia" "Titanium Spirit Shield" "Harbinger Bow" "Ambusher" "Ezomyte Dagger" "Platinum Kris" "Imperial Skean" "Demon Dagger" "Void Sceptre" "Sambar Sceptre" "Profane Wand" "Prophecy Wand" "Tornado Wand" "Opal Wand" "Imbued Wand" "Demon's Horn" "Steel Ring" "Opal Ring" "Blue Pearl Amulet" "Marble Amulet" "Crystal Belt" "Bone Helmet" "Two-Toned Boots" "Spiked Gloves" "Gripped Gloves" "Fingerless Silk Gloves"
@@ -825,6 +830,17 @@ Class "Maps" {
 #		# what do to? how to highlight?
 #	}
 
+	BlightedMap True {
+		SetTextColor $color_white
+		SetBorderColor $color_white
+		SetBackgroundColor $color_orange
+		SetFontSize $font_max
+		SetAlertSound $alert_map_blight
+		PlayEffect $beam_good_map
+		MinimapIcon $minimap_map_blight
+		Show
+	}
+
 	MapTier >= 16 {
 		SetTextColor $color_white
 		SetBorderColor $color_white
@@ -832,6 +848,7 @@ Class "Maps" {
 		SetFontSize $font_max
 		SetAlertSound $alert_map_t16
 		PlayEffect $beam_good_map
+		MinimapIcon $minimap_map_top
 		Show
 	}
 
@@ -840,6 +857,7 @@ Class "Maps" {
 		SetBackgroundColor $color_black
 		SetFontSize $font_map
 		SetAlertSound $alert_map_red
+		MinimapIcon $minimap_map_mid
 		Show
 	}
 
