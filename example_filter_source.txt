@@ -170,22 +170,22 @@ $beam_delve_fossil    = $beam_currency
 $beam_delve_resonator = $beam_currency
 $beam_divination      = Blue
 
-$icon_gem_awakened       = 0 Green Diamond
-$icon_gem_20_quality     = 0 Green Circle
-$minimap_top_unique      = 0 Brown Triangle
-$minimap_mid_unique      = 1 Brown Triangle
-$minimap_6L              = 0 Red Hexagon
-$minimap_fishing_rod     = 0 White Star
-$minimap_currency_t1     = 0 Yellow Star
-$minimap_currency_t2     = 1 Yellow Star
-$minimap_currency_t3     = 2 Yellow Star
-$minimap_delve_fossil    = $minimap_currency_t2
-$minimap_delve_resonator = $minimap_currency_t2
-$minimap_reliquary       = $minimap_currency_t1
-$minimap_map_top         = 0 White Cross
-$minimap_map_mid         = 2 White Cross
-$minimap_map_blight      = 0 Orange Cross
-$minimap_error           = 0 Red Square
+$icon_gem_awakened    = 0 Green Diamond
+$icon_gem_20_quality  = 0 Green Circle
+$icon_top_unique      = 0 Brown Triangle
+$icon_mid_unique      = 1 Brown Triangle
+$icon_6L              = 0 Red Hexagon
+$icon_fishing_rod     = 0 White Star
+$icon_currency_t1     = 0 Yellow Star
+$icon_currency_t2     = 1 Yellow Star
+$icon_currency_t3     = 2 Yellow Star
+$icon_delve_fossil    = $icon_currency_t2
+$icon_delve_resonator = $icon_currency_t2
+$icon_reliquary       = $icon_currency_t1
+$icon_map_top         = 0 White Cross
+$icon_map_mid         = 2 White Cross
+$icon_map_blight      = 0 Orange Cross
+$icon_error           = 0 Red Square
 
 $bases_t1 = "Eternal Burgonet" "Lion Pelt" "Hubris Circlet" "Nightmare Bascinet" "Titan Gauntlets" "Slink Gloves" "Sorcerer Gloves" "Dragonscale Gauntlets" "Titan Greaves" "Slink Boots" "Sorcerer Boots" "Dragonscale Boots" "Assassin's Boots" "Glorious Plate" "Assassin's Garb" "Vaal Regalia" "Titanium Spirit Shield" "Harbinger Bow" "Ambusher" "Ezomyte Dagger" "Platinum Kris" "Imperial Skean" "Demon Dagger" "Void Sceptre" "Sambar Sceptre" "Profane Wand" "Prophecy Wand" "Tornado Wand" "Opal Wand" "Imbued Wand" "Demon's Horn" "Steel Ring" "Opal Ring" "Blue Pearl Amulet" "Marble Amulet" "Crystal Belt" "Bone Helmet" "Two-Toned Boots" "Spiked Gloves" "Gripped Gloves" "Fingerless Silk Gloves"
 
@@ -202,7 +202,7 @@ Class "Currency" {
 		SetFontSize $font_max
 		SetAlertSound $alert_currency_t1
 		PlayEffect $beam_currency
-		MinimapIcon $minimap_currency_t1
+		MinimapIcon $icon_currency_t1
 		Show
 	}
 
@@ -213,7 +213,7 @@ Class "Currency" {
 		SetFontSize $font_max
 		SetAlertSound $alert_currency_t1
 		PlayEffect $beam_currency
-		MinimapIcon $minimap_currency_t1
+		MinimapIcon $icon_currency_t1
 		Show
 	}
 
@@ -223,7 +223,7 @@ Class "Currency" {
 		SetFontSize $font_currency_t2
 		SetAlertSound $alert_currency_t2
 		PlayEffect $beam_currency
-		MinimapIcon $minimap_currency_t2
+		MinimapIcon $icon_currency_t2
 		Show
 	}
 
@@ -233,7 +233,7 @@ Class "Currency" {
 		SetFontSize $font_currency_t2
 		SetAlertSound $alert_currency_t2
 		PlayEffect $beam_currency
-		MinimapIcon $minimap_currency_t2
+		MinimapIcon $icon_currency_t2
 		Show
 	}
 
@@ -301,7 +301,7 @@ Class "Currency" {
 		SetFontSize $font_currency_t2
 		SetAlertSound $alert_currency_fossil
 		PlayEffect $beam_delve_fossil
-		MinimapIcon $minimap_delve_fossil
+		MinimapIcon $icon_delve_fossil
 		Show
 	}
 
@@ -311,7 +311,7 @@ Class "Currency" {
 		SetFontSize $font_currency_t2
 		SetAlertSound $alert_currency_resonator
 		PlayEffect $beam_delve_resonator
-		MinimapIcon $minimap_delve_resonator
+		MinimapIcon $icon_delve_resonator
 		Show
 	}
 
@@ -387,7 +387,7 @@ Class "Incubator" {
 	SetFontSize $font_currency_t2
 	SetAlertSound $alert_currency_t2
 	PlayEffect $beam_currency
-	MinimapIcon $minimap_currency_t2
+	MinimapIcon $icon_currency_t2
 	Show
 }
 
@@ -483,7 +483,7 @@ LinkedSockets 6 {
 	SetFontSize $font_max
 	SetAlertSound $alert_unique_6L
 	PlayEffect $beam_top_unique
-	MinimapIcon $minimap_top_unique
+	MinimapIcon $icon_top_unique
 	Show
 }
 
@@ -505,7 +505,7 @@ Rarity Unique {
 		SetBackgroundColor $color_white
 		SetAlertSound $alert_unique_best
 		PlayEffect $beam_top_unique
-		MinimapIcon $minimap_top_unique
+		MinimapIcon $icon_top_unique
 
 		Autogen uniques_eq_unambiguous     { Show }
 		Autogen uniques_flasks_unambiguous { Show }
@@ -519,7 +519,7 @@ Rarity Unique {
 		SetBackgroundColor $color_white
 		SetAlertSound $alert_unique_good
 		PlayEffect $beam_top_unique
-		MinimapIcon $minimap_mid_unique
+		MinimapIcon $icon_mid_unique
 
 		Autogen uniques_eq_unambiguous     { Show }
 		Autogen uniques_flasks_unambiguous { Show }
@@ -542,7 +542,7 @@ LinkedSockets 6 {
 	SetFontSize $font_max
 	SetAlertSound $alert_6L
 	PlayEffect $beam_6L
-	MinimapIcon $minimap_6L
+	MinimapIcon $icon_6L
 	Show
 }
 
@@ -580,7 +580,7 @@ Class "Atlas Region Upgrade Item" {
 	SetBackgroundColor $color_labirynth
 	SetFontSize $font_max
 	SetAlertSound $alert_incursion_item
-	MinimapIcon $minimap_reliquary
+	MinimapIcon $icon_reliquary
 	Show
 }
 
@@ -684,7 +684,7 @@ Class "Misc Map Item" {
 		SetFontSize $font_max
 		SetAlertSound $alert_misc_reliquary
 		PlayEffect $beam_reliquary
-		MinimapIcon $minimap_reliquary
+		MinimapIcon $icon_reliquary
 		Show
 	}
 }
@@ -724,7 +724,7 @@ Class "Fishing Rods" {
 	SetFontSize $font_max
 	SetAlertSound $alert_fishing_rod
 	PlayEffect $beam_fishing_rod
-	MinimapIcon $minimap_fishing_rod
+	MinimapIcon $icon_fishing_rod
 	Show
 }
 
@@ -849,7 +849,7 @@ Class "Maps" {
 		SetFontSize $font_max
 		SetAlertSound $alert_map_blight
 		PlayEffect $beam_good_map
-		MinimapIcon $minimap_map_blight
+		MinimapIcon $icon_map_blight
 		Show
 	}
 
@@ -860,7 +860,7 @@ Class "Maps" {
 		SetFontSize $font_max
 		SetAlertSound $alert_map_t16
 		PlayEffect $beam_good_map
-		MinimapIcon $minimap_map_top
+		MinimapIcon $icon_map_top
 		Show
 	}
 
@@ -869,7 +869,7 @@ Class "Maps" {
 		SetBackgroundColor $color_black
 		SetFontSize $font_map
 		SetAlertSound $alert_map_red
-		MinimapIcon $minimap_map_mid
+		MinimapIcon $icon_map_mid
 		Show
 	}
 
@@ -1259,5 +1259,5 @@ SetBorderColor $color_error
 SetFontSize $font_max
 SetAlertSound $alert_error
 PlayEffect Red
-MinimapIcon $minimap_error
+MinimapIcon $icon_error
 Show
