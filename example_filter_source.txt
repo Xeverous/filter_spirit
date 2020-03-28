@@ -62,10 +62,11 @@ $font_min            = 18
 $font_max            = 42
 $font_currency_t2    = $font_max
 $font_currency_t3    = 38
-$font_currency_t4    = $font_currency_t3
+$font_currency_t4    = 34
 $font_currency_delve = $font_currency_t2
 $font_essence        = $font_max
-$font_mid_divinaton  = $font_currency_t3
+$font_mid_divination = $font_currency_t3
+$font_low_divination = $font_currency_t4
 $font_map            = $font_max
 $font_abyss_jewel    = $font_max
 $font_jewel          = 40
@@ -741,23 +742,25 @@ Class "Microtransactions" {
 Class "Divination Card" {
 	SetTextColor $color_divination
 
-	# place here 1-stack-size cards that you always want to pickup
-	BaseType "The Void" "The Cartographer" "Chaotic Disposition" {
+	# 1-stack-size cards - always wanted to pickup
+	BaseType "Chaotic Disposition" "The Void" "Divine Justice" "The Cartographer" "The Heroic Shot" {
+		PlayEffect $beam_divination
+		SetBorderColor $color_divination
+		SetFontSize $font_mid_divination
 		SetAlertSound $alert_divination_stack_1
 		PlayEffect $beam_divination
+		MinimapIcon 1 Blue Square
 		Show
 	}
 
-	# place here low-value cards that you always want to pickup
-	BaseType "The Gambler" "Jack in the Box" "Emperor's Luck" "Her Mask" "Humility" "Loyalty" "Lucky Connections" "Lucky Deck" "No Traces" "The Calling" "The Catalyst" "The Encroaching Darkness" "The Gambler" "The Gemcutter" "The Innocent" "The Inventor" "The Master Artisan" "The Obscured" "The Puzzle" "The Risk" "The Survivalist" "The Throne" "The Wrath" "The Wretched" "Three Faces in the Dark" "Three Voices" "Vinia's Token" {
+	# low-value cards granting currency
+	BaseType "The Gambler" "Emperor's Luck" "Humility" "Loyalty" "Lucky Connections" "Lucky Deck" "No Traces" "The Catalyst" "The Encroaching Darkness" "The Gambler" "The Gemcutter" "The Innocent" "The Inventor" "The Master Artisan" "The Obscured" "The Puzzle" "The Risk" "The Survivalist" "The Wrath" "Three Faces in the Dark" "Vinia's Token" {
+		PlayEffect $beam_divination
+		SetBorderColor $color_divination
+		SetFontSize $font_mid_divination
 		SetAlertSound $alert_divination_always_pickup
-		PlayEffect Blue Temp
-		Show
-	}
-
-	# place here low-value cards that you would like to pickup for some reason
-	BaseType "Rain of Chaos" "The Scholar" {
-		SetAlertSound $alert_divination_maybe_pickup
+		PlayEffect $beam_divination Temp
+		MinimapIcon 2 Blue Square
 		Show
 	}
 
@@ -779,7 +782,7 @@ Class "Divination Card" {
 		Price >= 10
 		{
 			SetBorderColor $color_divination
-			SetFontSize $font_mid_divinaton
+			SetFontSize $font_mid_divination
 			SetAlertSound $alert_divination_mid
 			PlayEffect $beam_divination
 			MinimapIcon 1 Blue Square
@@ -787,18 +790,33 @@ Class "Divination Card" {
 		}
 
 		Price < 10
-		Price >= 1
+		Price > 1
 		{
 			SetTextColor $color_divination
-			SetFontSize $font_mid_divinaton
+			SetFontSize $font_low_divination
 			SetAlertSound $alert_divination_low
 			PlayEffect $beam_divination Temp
 			MinimapIcon 2 Blue Square
 			Show
 		}
+
+		# poe.ninja seems to round prices to 1c
+		# or too many players sell for 1 chaos
+		# therefore, make this section inclusive to exactly 1c
+		Price <= 1
+		{
+			SetTextColor $color_divination
+			SetFontSize $font_min
+			Show
+		}
 	}
 
-	# < 1c shits (eg Carrion Crow)
+	# unknown cards
+	SetBorderColor $color_red
+	SetTextColor $color_divination
+	SetFontSize $font_mid_divination
+	SetAlertSound $alert_divination_mid
+	PlayEffect $beam_divination Temp
 	Show
 }
 
