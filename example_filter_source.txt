@@ -814,14 +814,11 @@ Class "Divination Card" {
 		Show
 	}
 
-	# low-value cards granting currency
-	BaseType "The Gambler" "Emperor's Luck" "Humility" "Loyalty" "Lucky Connections" "Lucky Deck" "No Traces" "The Catalyst" "The Encroaching Darkness" "The Gambler" "The Gemcutter" "The Innocent" "The Inventor" "The Master Artisan" "The Obscured" "The Puzzle" "The Risk" "The Survivalist" "The Wrath" "Three Faces in the Dark" "Vinia's Token" {
-		PlayEffect $beam_divination
-		SetBorderColor $color_divination
+	# low-value cards granting currency or useful fragments
+	BaseType "The Gambler" "Emperor's Luck" "Humility" "Loyalty" "Lucky Connections" "Lucky Deck" "No Traces" "The Catalyst" "The Encroaching Darkness" "The Gambler" "The Gemcutter" "The Innocent" "The Inventor" "The Master Artisan" "The Obscured" "The Puzzle" "The Risk" "The Survivalist" "The Wrath" "Three Faces in the Dark" "Vinia's Token" "Coveted Possession" "Sambodhi's Vow" "The Tinkerer's Table" "Monochrome" "Cameria's Cut" "Buried Treasure" "Last Hope" "The Journey" "The Fool" "Underground Forest" "The Deal" "Vinia's Token" "Demigod's Wager" "More is Never Enough" "The Union" "The Seeker" "The Sephirot" {
 		SetFontSize $font_mid_divination
 		SetAlertSound $alert_divination_always_pickup
 		PlayEffect $beam_divination Temp
-		MinimapIcon 2 Blue Square
 		Show
 	}
 
@@ -857,7 +854,6 @@ Class "Divination Card" {
 			SetFontSize $font_low_divination
 			SetAlertSound $alert_divination_low
 			PlayEffect $beam_divination Temp
-			MinimapIcon 2 Blue Square
 			Show
 		}
 
