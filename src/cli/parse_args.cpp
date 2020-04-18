@@ -30,9 +30,9 @@ void print_help(const boost::program_options::options_description& options)
 		"generate/refresh an item filter (using newest available online data):\n"
 		"./filter_spirit_cli -n \"Standard\" -g filter_template.txt output.filter\n"
 		"download API data for future reuse:\n"
-		"./filter_spirit_cli -n \"Standard\" -s .\n"
+		"./filter_spirit_cli -n \"Standard\" -s price_data_dump\n"
 		"generate/refresh an item filter (using previously saved data):\n"
-		"./filter_spirit_cli -r . -g filter_template.txt output.filter\n";
+		"./filter_spirit_cli -r price_data_dump -g filter_template.txt output.filter\n";
 
 	options.print(std::cout);
 
@@ -104,11 +104,15 @@ int run(int argc, char* argv[])
 		;
 
 		bool opt_generate = false;
-		bool opt_print_ast = false;
+		fs::generator::settings st;
 		po::options_description generation_options("generation options");
 		generation_options.add_options()
-			("generate,g",  po::bool_switch(&opt_generate),  "generate an item filter")
-			("print-ast,a", po::bool_switch(&opt_print_ast), "print abstract syntax tree (for debug purposes)")
+			("generate,g",  po::bool_switch(&opt_generate), "generate an item filter")
+			("print-ast,a", po::bool_switch(&st.print_ast), "print abstract syntax tree (for debug purposes)")
+			("stop-on-error", po::bool_switch(&st.compile_settings.error_handling.stop_on_error),
+				"stop on first error")
+			("warning-is-error", po::bool_switch(&st.compile_settings.error_handling.treat_warnings_as_errors),
+				"treat warnings as errors")
 		;
 
 		boost::optional<std::string> input_path;
@@ -218,7 +222,7 @@ int run(int argc, char* argv[])
 		}();
 
 		if (opt_generate) {
-			if (!generate_item_filter(item_price_info, input_path, output_path, opt_print_ast, logger)) {
+			if (!generate_item_filter(item_price_info, input_path, output_path, st, logger)) {
 				logger.info() << "filter generation failed\n";
 				return EXIT_FAILURE;
 			}

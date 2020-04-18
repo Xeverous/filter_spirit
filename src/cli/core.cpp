@@ -53,7 +53,7 @@ bool generate_item_filter_impl(
 	const lang::item_price_info& item_price_info,
 	const boost::filesystem::path& source_filepath,
 	const boost::filesystem::path& output_filepath,
-	bool print_ast,
+	fs::generator::settings st,
 	log::logger& logger)
 {
 	std::optional<std::string> source_file_content = utility::load_file(source_filepath, logger);
@@ -64,7 +64,7 @@ bool generate_item_filter_impl(
 	std::optional<std::string> filter_content = generator::sf::generate_filter(
 		*source_file_content,
 		item_price_info,
-		generator::options{print_ast},
+		st,
 		logger);
 
 	if (!filter_content)
@@ -161,7 +161,7 @@ bool generate_item_filter(
 	const std::optional<lang::item_price_info>& item_price_info,
 	const boost::optional<std::string>& input_path,
 	const boost::optional<std::string>& output_path,
-	bool print_ast,
+	fs::generator::settings st,
 	fs::log::logger& logger)
 {
 	if (!item_price_info) {
@@ -179,7 +179,7 @@ bool generate_item_filter(
 		return false;
 	}
 
-	return generate_item_filter_impl(*item_price_info, *input_path, *output_path, print_ast, logger);
+	return generate_item_filter_impl(*item_price_info, *input_path, *output_path, st, logger);
 }
 
 int print_data_save_info(

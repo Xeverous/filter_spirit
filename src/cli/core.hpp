@@ -2,6 +2,7 @@
 
 #include <fs/log/logger.hpp>
 #include <fs/network/download.hpp>
+#include <fs/generator/settings.hpp>
 #include <fs/lang/item_price_data.hpp>
 
 #include <boost/optional.hpp>
@@ -28,7 +29,7 @@ generate_item_filter(
 	const std::optional<fs::lang::item_price_info>& item_data,
 	const boost::optional<std::string>& source_filepath,
 	const boost::optional<std::string>& output_filepath,
-	bool print_ast,
+	fs::generator::settings st,
 	fs::log::logger& logger);
 
 [[nodiscard]] int // <= exit status

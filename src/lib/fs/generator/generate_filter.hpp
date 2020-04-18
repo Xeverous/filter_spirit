@@ -1,7 +1,7 @@
 #pragma once
 
 #include <fs/lang/item_price_data.hpp>
-#include <fs/generator/options.hpp>
+#include <fs/generator/settings.hpp>
 
 #include <optional>
 #include <string_view>
@@ -14,7 +14,7 @@ namespace fs::generator::sf
  *
  * @param input filter template source code
  * @param item_price_info item price data and metadata
- * @param options filter generation options
+ * @param st filter generation settings
  * @param logger logger instance
  * @return filter file content or nothing if error occured
  */
@@ -22,7 +22,7 @@ namespace fs::generator::sf
 std::optional<std::string> generate_filter(
 	std::string_view input,
 	const lang::item_price_info& item_price_info,
-	options options,
+	settings st,
 	log::logger& logger);
 
 // mostly for tests
@@ -30,7 +30,7 @@ std::optional<std::string> generate_filter(
 std::optional<std::string> generate_filter_without_preamble(
 	std::string_view input,
 	const lang::item_price_data& item_price_data,
-	options options,
+	settings st,
 	log::logger& logger);
 
 }

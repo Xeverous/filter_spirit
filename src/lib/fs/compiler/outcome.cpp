@@ -1,6 +1,8 @@
-#include <fs/compiler/print_error.hpp>
+#include <fs/lang/limits.hpp>
 #include <fs/parser/parser.hpp>
+#include <fs/compiler/outcome.hpp>
 #include <fs/log/logger.hpp>
+#include <fs/utility/visitor.hpp>
 #include <fs/utility/algorithm.hpp>
 #include <fs/utility/string_helpers.hpp>
 
@@ -10,13 +12,9 @@ namespace
 using namespace fs;
 using namespace fs::compiler;
 
-// recursion point for errors that contain other errors
-void print_error_variant(
-	const compile_error& error,
-	const parser::lookup_data& lookup_data,
-	log::message_stream& stream);
+// ---- errors ----
 
-void print_error_impl(
+void output_error_impl(
 	errors::name_already_exists error,
 	const parser::lookup_data& lookup_data,
 	log::message_stream& stream)
@@ -33,7 +31,7 @@ void print_error_impl(
 		"first defined here");
 }
 
-void print_error_impl(
+void output_error_impl(
 	errors::no_such_name error,
 	const parser::lookup_data& lookup_data,
 	log::message_stream& stream)
@@ -45,7 +43,7 @@ void print_error_impl(
 		"no such name exists");
 }
 
-void print_error_impl(
+void output_error_impl(
 	errors::invalid_amount_of_arguments error,
 	const parser::lookup_data& lookup_data,
 	log::message_stream& stream)
@@ -74,7 +72,7 @@ void print_error_impl(
 	}
 }
 
-void print_error_impl(
+void output_error_impl(
 	errors::invalid_integer_value error,
 	const parser::lookup_data& lookup_data,
 	log::message_stream& stream)
@@ -103,7 +101,7 @@ void print_error_impl(
 	}
 }
 
-void print_error_impl(
+void output_error_impl(
 	errors::type_mismatch error,
 	const parser::lookup_data& lookup_data,
 	log::message_stream& stream)
@@ -119,7 +117,7 @@ void print_error_impl(
 		"'");
 }
 
-void print_error_impl(
+void output_error_impl(
 	errors::empty_socket_spec error,
 	const parser::lookup_data& lookup_data,
 	log::message_stream& stream)
@@ -131,8 +129,8 @@ void print_error_impl(
 		"socket group can not be empty");
 }
 
-void print_error_impl(
-	errors::illegal_characters_in_socket_spec error,
+void output_error_impl(
+	errors::illegal_character_in_socket_spec error,
 	const parser::lookup_data& lookup_data,
 	log::message_stream& stream)
 {
@@ -140,10 +138,12 @@ void print_error_impl(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.origin),
 		log::strings::error,
-		"invalid socket group (use only R/G/B/W/A/D characters)");
+		"illegal character in socket group at position ",
+		error.character_index,
+		" (use only R/G/B/W/A/D characters)");
 }
 
-void print_error_impl(
+void output_error_impl(
 	errors::invalid_socket_spec error,
 	const parser::lookup_data& lookup_data,
 	log::message_stream& stream)
@@ -155,7 +155,7 @@ void print_error_impl(
 		"invalid socket group");
 }
 
-void print_error_impl(
+void output_error_impl(
 	errors::duplicate_influence error,
 	const parser::lookup_data& lookup_data,
 	log::message_stream& stream)
@@ -172,7 +172,7 @@ void print_error_impl(
 		"first defined here");
 }
 
-void print_error_impl(
+void output_error_impl(
 	errors::condition_redefinition error,
 	const parser::lookup_data& lookup_data,
 	log::message_stream& stream)
@@ -189,7 +189,7 @@ void print_error_impl(
 		"first defined here");
 }
 
-void print_error_impl(
+void output_error_impl(
 	errors::action_redefinition error,
 	const parser::lookup_data& lookup_data,
 	log::message_stream& stream)
@@ -206,7 +206,7 @@ void print_error_impl(
 		"first defined here");
 }
 
-void print_error_impl(
+void output_error_impl(
 	errors::lower_bound_redefinition error,
 	const parser::lookup_data& lookup_data,
 	log::message_stream& stream)
@@ -223,7 +223,7 @@ void print_error_impl(
 		"first defined here");
 }
 
-void print_error_impl(
+void output_error_impl(
 	errors::upper_bound_redefinition error,
 	const parser::lookup_data& lookup_data,
 	log::message_stream& stream)
@@ -240,7 +240,7 @@ void print_error_impl(
 		"first defined here");
 }
 
-void print_error_impl(
+void output_error_impl(
 	errors::invalid_set_alert_sound error,
 	const parser::lookup_data& lookup_data,
 	log::message_stream& stream)
@@ -252,7 +252,7 @@ void print_error_impl(
 		"invalid alert sound: does not match any of: built-in (1-2 integers), custom (1 string)");
 }
 
-void print_error_impl(
+void output_error_impl(
 	errors::price_without_autogen error,
 	const parser::lookup_data& lookup_data,
 	log::message_stream& stream)
@@ -278,7 +278,7 @@ void print_error_impl(
 	}
 }
 
-void print_error_impl(
+void output_error_impl(
 	errors::autogen_error error,
 	const parser::lookup_data& lookup_data,
 	log::message_stream& stream)
@@ -319,7 +319,7 @@ void print_error_impl(
 		"autogeneration specified here");
 }
 
-void print_error_impl(
+void output_error_impl(
 	errors::internal_compiler_error error,
 	const parser::lookup_data& lookup_data,
 	log::message_stream& stream)
@@ -333,14 +333,106 @@ void print_error_impl(
 		log::strings::request_bug_report);
 }
 
-void print_error_variant(
-	const compile_error& error,
+void output_error_variant(
+	const error& err,
 	const parser::lookup_data& lookup_data,
 	log::message_stream& stream)
 {
 	std::visit(
-		[&](const auto& error) { print_error_impl(error, lookup_data, stream); },
-		error);
+		[&](const auto& err) { output_error_impl(err, lookup_data, stream); },
+		err);
+}
+
+// ---- warnings ----
+
+void output_warning_impl(
+	warnings::font_size_outside_range warn,
+	const parser::lookup_data& lookup_data,
+	log::message_stream& stream)
+{
+	stream.print_line_number_with_description_and_underlined_code(
+		lookup_data.get_view_of_whole_content(),
+		lookup_data.position_of(warn.origin),
+		log::strings::warning,
+		"font size outside allowed range (",
+		lang::limits::min_filter_font_size,
+		" - ",
+		lang::limits::max_filter_font_size,
+		")");
+}
+
+void output_warning_variant(
+	const warning& warn,
+	const parser::lookup_data& lookup_data,
+	log::message_stream& stream)
+{
+	std::visit(
+		[&](const auto& warn) { output_warning_impl(warn, lookup_data, stream); },
+		warn);
+}
+
+// ---- notes ----
+
+void output_note_impl(
+	notes::fixed_text note,
+	const parser::lookup_data& /* lookup_data */,
+	log::message_stream& stream)
+{
+	stream << note.text;
+}
+
+void output_note_impl(
+	notes::failed_operations_count note,
+	const parser::lookup_data& /* lookup_data */,
+	log::message_stream& stream)
+{
+	stream << "failed " << note.operation_name << ": " << note.count;
+}
+
+void output_note_variant(
+	const note& n,
+	const parser::lookup_data& lookup_data,
+	log::message_stream& stream)
+{
+	std::visit(
+		[&](const auto& n) { output_note_impl(n, lookup_data, stream); },
+		n);
+}
+
+// ---- main dispatching ----
+
+
+// For case when there are/will be multiple errors:
+// we call a separate function to hold 1 stream message
+
+void output_error(
+	const error& err,
+	const parser::lookup_data& lookup_data,
+	log::logger& logger)
+{
+	auto stream = logger.error();
+	stream << "error:\n";
+	output_error_variant(err, lookup_data, stream);
+}
+
+void output_warning(
+	const warning& warn,
+	const parser::lookup_data& lookup_data,
+	log::logger& logger)
+{
+	auto stream = logger.warning();
+	stream << "warning:\n";
+	output_warning_variant(warn, lookup_data, stream);
+}
+
+void output_note(
+	const note& n,
+	const parser::lookup_data& lookup_data,
+	log::logger& logger)
+{
+	auto stream = logger.info();
+	stream << "note:\n";
+	output_note_variant(n, lookup_data, stream);
 }
 
 }
@@ -348,16 +440,18 @@ void print_error_variant(
 namespace fs::compiler
 {
 
-void print_error(
-	const compile_error& error,
+void output_logs(
+	const log_container& logs,
 	const parser::lookup_data& lookup_data,
 	log::logger& logger)
 {
-	auto stream = logger.error();
-	stream << "compile error\n";
-	// For case when there are/will be multiple errors:
-	// we call a separate function to hold 1 stream message
-	print_error_variant(error, lookup_data, stream);
+	for (const auto& msg : logs) {
+		std::visit(utility::visitor{
+			[&](const error& err) { output_error(err, lookup_data, logger); },
+			[&](const warning& warn) { output_warning(warn, lookup_data, logger); },
+			[&](const note& n) { output_note(n, lookup_data, logger); }
+		}, msg);
+	}
 }
 
 }

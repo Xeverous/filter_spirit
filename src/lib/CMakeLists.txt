@@ -25,7 +25,7 @@ target_sources(filter_spirit
 		fs/parser/parser.cpp
 		fs/parser/detail/grammar.cpp
 		fs/compiler/compiler.cpp
-		fs/compiler/print_error.cpp
+		fs/compiler/outcome.cpp
 		fs/compiler/detail/actions.cpp
 		fs/compiler/detail/conditions.cpp
 		fs/compiler/detail/evaluate.cpp
@@ -56,8 +56,7 @@ target_sources(filter_spirit
 		fs/compiler/detail/conditions.hpp
 		fs/compiler/detail/evaluate.hpp
 		fs/compiler/compiler.hpp
-		fs/compiler/error.hpp
-		fs/compiler/print_error.hpp
+		fs/compiler/outcome.hpp
 		fs/generator/make_filter.cpp
 		fs/generator/generate_filter.hpp
 		fs/generator/generator.hpp

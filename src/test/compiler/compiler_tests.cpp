@@ -3,7 +3,7 @@
 #include "common/string_operations.hpp"
 
 #include <fs/compiler/compiler.hpp>
-#include <fs/compiler/print_error.hpp>
+#include <fs/compiler/outcome.hpp>
 #include <fs/generator/make_filter.hpp>
 #include <fs/lang/position_tag.hpp>
 #include <fs/log/string_logger.hpp>
@@ -71,17 +71,16 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 			const std::vector<parser::ast::sf::definition>& defs,
 			const parser::lookup_data& lookup_data)
 		{
-			const std::variant<lang::symbol_table, compiler::compile_error> symbols_or_error =
-				resolve_symbols(defs);
+			compiler::outcome<lang::symbol_table> symbols_outcome = resolve_symbols(defs);
 
-			if (std::holds_alternative<compiler::compile_error>(symbols_or_error)) {
-				const auto& error = std::get<compiler::compile_error>(symbols_or_error);
+			if (compiler::has_errors(symbols_outcome.logs())) {
 				log::string_logger logger;
-				compiler::print_error(error, lookup_data, logger);
+				compiler::output_logs(symbols_outcome.logs(), lookup_data, logger);
 				BOOST_FAIL("resolve_symbols failed but should not:\n" << logger.str());
 			}
 
-			return std::get<lang::symbol_table>(std::move(symbols_or_error));
+			BOOST_TEST_REQUIRE(symbols_outcome.has_result());
+			return std::move(symbols_outcome).result();
 		}
 
 		static
@@ -90,18 +89,17 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 			const parser::lookup_data& lookup_data,
 			const lang::symbol_table& symbols)
 		{
-			std::variant<lang::spirit_item_filter, compiler::compile_error> sf_or_err =
-				compiler::compile_spirit_filter_statements(top_level_statements, symbols);
+			compiler::outcome<lang::spirit_item_filter> sf_outcome =
+				compiler::compile_spirit_filter_statements(compiler::settings{}, top_level_statements, symbols);
 
-			if (std::holds_alternative<compiler::compile_error>(sf_or_err)) {
-				const auto& error = std::get<compiler::compile_error>(sf_or_err);
+			if (compiler::has_errors(sf_outcome.logs())) {
 				log::string_logger logger;
-				compiler::print_error(error, lookup_data, logger);
+				compiler::output_logs(sf_outcome.logs(), lookup_data, logger);
 				BOOST_FAIL("building spirit filter blocks failed but should not:\n" << logger.str());
 			}
 
-			const auto& spirit_filter = std::get<lang::spirit_item_filter>(sf_or_err);
-			return generator::make_filter(spirit_filter, /* empty item price data */ {});
+			BOOST_TEST_REQUIRE(sf_outcome.has_result());
+			return generator::make_filter(sf_outcome.result(), /* empty item price data */ {});
 		}
 	};
 

@@ -221,6 +221,7 @@ namespace strings
 {
 
 constexpr auto note = "note: ";
+constexpr auto warning = "warning: ";
 constexpr auto error = "error: ";
 
 constexpr auto internal_compiler_error = "internal compiler error: ";
