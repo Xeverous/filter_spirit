@@ -20,6 +20,8 @@ namespace ut = boost::unit_test;
 namespace fs::test
 {
 
+// note: object's internal origin is not checked
+// use the second pair element
 void expect_object(
 	const lang::symbol_table& symbols,
 	const parser::lookup_data& lookup_data,
@@ -146,16 +148,16 @@ $string         = "Leather Belt"
 				{{lang::socket_spec{5, 1, 1, 1}, search(input, "5RGB").result()}}
 			);
 			expect_object(symbols, lookup_data, "influence", search(input, "$influence").result(),
-				{{lang::influence::elder, search(input, "Elder").result()}}
+				{{lang::influence{lang::influence_type::elder}, search(input, "Elder").result()}}
 			);
 			expect_object(symbols, lookup_data, "rarity", search(input, "$rarity").result(),
-				{{lang::rarity::rare, search(input, "Rare").result()}}
+				{{lang::rarity{lang::rarity_type::rare}, search(input, "Rare").result()}}
 			);
 			expect_object(symbols, lookup_data, "shape", search(input, "$shape").result(),
-				{{lang::shape::hexagon, search(input, "Hexagon").result()}}
+				{{lang::shape{lang::shape_type::hexagon}, search(input, "Hexagon").result()}}
 			);
 			expect_object(symbols, lookup_data, "suit", search(input, "$suit").result(),
-				{{lang::suit::yellow, search(input, "Yellow").result()}}
+				{{lang::suit{lang::suit_type::yellow}, search(input, "Yellow").result()}}
 			);
 			expect_object(symbols, lookup_data, "string", search(input, "$string").result(),
 				{{lang::string{"Leather Belt"}, search(input, "\"Leather Belt\"").result()}}

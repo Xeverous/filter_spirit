@@ -87,37 +87,37 @@ add_numeric_comparison_condition(
 {
 	switch (property) {
 		case lang::numeric_comparison_condition_property::item_level: {
-			return add_range_condition(cmp, intgr.value, condition_origin, set.item_level);
+			return add_range_condition(cmp, intgr, condition_origin, set.item_level);
 		}
 		case lang::numeric_comparison_condition_property::drop_level: {
-			return add_range_condition(cmp, intgr.value, condition_origin, set.drop_level);
+			return add_range_condition(cmp, intgr, condition_origin, set.drop_level);
 		}
 		case lang::numeric_comparison_condition_property::quality: {
-			return add_range_condition(cmp, intgr.value, condition_origin, set.quality);
+			return add_range_condition(cmp, intgr, condition_origin, set.quality);
 		}
 		case lang::numeric_comparison_condition_property::links: {
-			return add_range_condition(cmp, intgr.value, condition_origin, set.links);
+			return add_range_condition(cmp, intgr, condition_origin, set.links);
 		}
 		case lang::numeric_comparison_condition_property::height: {
-			return add_range_condition(cmp, intgr.value, condition_origin, set.height);
+			return add_range_condition(cmp, intgr, condition_origin, set.height);
 		}
 		case lang::numeric_comparison_condition_property::width: {
-			return add_range_condition(cmp, intgr.value, condition_origin, set.width);
+			return add_range_condition(cmp, intgr, condition_origin, set.width);
 		}
 		case lang::numeric_comparison_condition_property::stack_size: {
-			return add_range_condition(cmp, intgr.value, condition_origin, set.stack_size);
+			return add_range_condition(cmp, intgr, condition_origin, set.stack_size);
 		}
 		case lang::numeric_comparison_condition_property::gem_level: {
-			return add_range_condition(cmp, intgr.value, condition_origin, set.gem_level);
+			return add_range_condition(cmp, intgr, condition_origin, set.gem_level);
 		}
 		case lang::numeric_comparison_condition_property::map_tier: {
-			return add_range_condition(cmp, intgr.value, condition_origin, set.map_tier);
+			return add_range_condition(cmp, intgr, condition_origin, set.map_tier);
 		}
 		case lang::numeric_comparison_condition_property::area_level: {
-			return add_range_condition(cmp, intgr.value, condition_origin, set.area_level);
+			return add_range_condition(cmp, intgr, condition_origin, set.area_level);
 		}
 		case lang::numeric_comparison_condition_property::corrupted_mods: {
-			return add_range_condition(cmp, intgr.value, condition_origin, set.corrupted_mods);
+			return add_range_condition(cmp, intgr, condition_origin, set.corrupted_mods);
 		}
 	}
 
@@ -178,10 +178,7 @@ add_string_array_condition(
 }
 
 using influences_container = boost::container::static_vector<
-	std::pair<
-		lang::influence,
-		lang::position_tag
-	>,
+	lang::influence,
 	lang::limits::max_filter_influences
 >;
 
@@ -194,8 +191,8 @@ add_has_influence_condition(
 {
 	for (std::size_t i = 0; i < influences.size(); ++i) {
 		for (std::size_t j = 0; j < influences.size(); ++j) {
-			if (j != i && influences[i].first == influences[j].first) {
-				return errors::duplicate_influence{influences[i].second, influences[j].second};
+			if (j != i && influences[i] == influences[j]) {
+				return errors::duplicate_influence{influences[i].origin, influences[j].origin};
 			}
 		}
 	}
@@ -203,21 +200,21 @@ add_has_influence_condition(
 	if (target.has_value())
 		return errors::condition_redefinition{origin, (*target).origin};
 
-	const auto contains = [&](lang::influence infl) {
-		for (const auto val : influences)
-			if (val.first == infl)
+	const auto contains = [&](lang::influence_type type) {
+		for (const auto infl : influences)
+			if (infl.value == type)
 				return true;
 
 		return false;
 	};
 
 	target = lang::influences_condition{
-		contains(lang::influence::shaper),
-		contains(lang::influence::elder),
-		contains(lang::influence::crusader),
-		contains(lang::influence::redeemer),
-		contains(lang::influence::hunter),
-		contains(lang::influence::warlord),
+		contains(lang::influence_type::shaper),
+		contains(lang::influence_type::elder),
+		contains(lang::influence_type::crusader),
+		contains(lang::influence_type::redeemer),
+		contains(lang::influence_type::hunter),
+		contains(lang::influence_type::warlord),
 		is_exact_match,
 		origin
 	};
@@ -339,7 +336,7 @@ spirit_filter_add_price_comparison_condition(
 
 	return add_range_condition(
 		condition.comparison_type.value,
-		frac.value,
+		frac,
 		parser::position_tag_of(condition),
 		set.price);
 }
@@ -438,7 +435,7 @@ spirit_filter_add_has_influence_condition(
 		if (std::holds_alternative<compile_error>(inf_or_err))
 			return std::get<compile_error>(std::move(inf_or_err));
 
-		influences.emplace_back(std::get<lang::influence>(inf_or_err), sobj.origin);
+		influences.emplace_back(std::get<lang::influence>(inf_or_err));
 	}
 
 	return add_has_influence_condition(
@@ -548,7 +545,7 @@ real_filter_add_has_influence_condition(
 
 	influences_container influences;
 	for (auto inf : condition.influence_literals) {
-		influences.emplace_back(detail::evaluate(inf), parser::position_tag_of(inf));
+		influences.emplace_back(detail::evaluate(inf));
 	}
 
 	return add_has_influence_condition(influences, condition.exact_match.required, condition_origin, target);

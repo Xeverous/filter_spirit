@@ -188,7 +188,7 @@ struct item
 	std::optional<int> item_level;
 	std::optional<int> drop_level;
 	std::optional<int> quality;
-	std::optional<rarity> rarity_;
+	std::optional<rarity_type> rarity_;
 	std::optional<socket_info> socket_info;
 	std::optional<std::vector<std::string>> explicit_mods;
 	std::optional<std::vector<std::string>> enchantments;

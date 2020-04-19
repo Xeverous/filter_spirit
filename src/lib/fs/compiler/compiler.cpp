@@ -146,7 +146,7 @@ verify_autogen_uniques(
 	const lang::condition_set& conditions,
 	lang::position_tag visibility_origin)
 {
-	if (!conditions.rarity.includes(lang::rarity::unique)) {
+	if (!conditions.rarity.includes(lang::rarity_type::unique)) {
 		return errors::autogen_error{
 			errors::autogen_error_cause::invalid_rarity_condition,
 			autogen.origin,

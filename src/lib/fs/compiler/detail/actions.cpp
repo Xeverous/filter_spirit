@@ -73,17 +73,17 @@ spirit_filter_add_set_color_action(
 	if (std::holds_alternative<compile_error>(int2_or_err))
 		return std::get<compile_error>(std::move(int2_or_err));
 
-	const auto r = std::make_pair(std::get<lang::integer>(int0_or_err), obj.values[0].origin);
-	const auto g = std::make_pair(std::get<lang::integer>(int1_or_err), obj.values[1].origin);
-	const auto b = std::make_pair(std::get<lang::integer>(int2_or_err), obj.values[2].origin);
-	std::optional<std::pair<lang::integer, lang::position_tag>> a;
+	const auto r = std::get<lang::integer>(int0_or_err);
+	const auto g = std::get<lang::integer>(int1_or_err);
+	const auto b = std::get<lang::integer>(int2_or_err);
+	std::optional<lang::integer> a;
 
 	if (args_num == 4) {
 		std::variant<lang::integer, compile_error> int3_or_err = detail::get_as<lang::integer>(obj.values[3]);
 		if (std::holds_alternative<compile_error>(int3_or_err))
 			return std::get<compile_error>(std::move(int3_or_err));
 
-		a = std::make_pair(std::get<lang::integer>(int3_or_err), obj.values[3].origin);
+		a = std::get<lang::integer>(int3_or_err);
 	}
 
 	std::variant<lang::color, compile_error> col_or_err = detail::make_color(r, g, b, a);
@@ -154,7 +154,7 @@ spirit_filter_add_minimap_icon_action(
 	auto shape = std::get<lang::shape>(shape_or_err);
 
 	std::variant<lang::minimap_icon, compile_error> icon_or_err =
-		detail::make_minimap_icon(size, obj.values[0].origin, suit, shape);
+		detail::make_minimap_icon(size, suit, shape);
 
 	if (std::holds_alternative<compile_error>(icon_or_err)) {
 		return std::get<compile_error>(std::move(icon_or_err));
@@ -223,15 +223,15 @@ make_builtin_alert_sound(
 	if (std::holds_alternative<compile_error>(sid_or_err))
 		return std::get<compile_error>(std::move(sid_or_err));
 
-	auto sound_id = std::make_pair(std::get<lang::integer>(sid_or_err), obj.values[0].origin);
-	std::optional<std::pair<lang::integer, lang::position_tag>> volume;
+	auto sound_id = std::get<lang::integer>(sid_or_err);
+	std::optional<lang::integer> volume;
 
 	if (args_num == 2) {
 		std::variant<lang::integer, compile_error> vol_or_err = detail::get_as<lang::integer>(obj.values[1]);
 		if (std::holds_alternative<compile_error>(vol_or_err))
 			return std::get<compile_error>(std::move(vol_or_err));
 
-		volume = std::make_pair(std::get<lang::integer>(vol_or_err), obj.values[1].origin);
+		volume = std::get<lang::integer>(vol_or_err);
 	}
 
 	std::variant<lang::builtin_alert_sound, compile_error> bas_or_err =

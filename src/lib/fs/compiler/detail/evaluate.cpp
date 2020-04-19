@@ -25,13 +25,12 @@ namespace
 [[nodiscard]] std::optional<compile_error>
 expect_integer_in_range(
 	lang::integer int_obj,
-	lang::position_tag origin,
 	int min_allowed_value,
 	std::optional<int> max_allowed_value)
 {
 	const auto val = int_obj.value;
 	if (val < min_allowed_value || (max_allowed_value && val > *max_allowed_value))
-		return errors::invalid_integer_value{min_allowed_value, max_allowed_value, val, origin};
+		return errors::invalid_integer_value{min_allowed_value, max_allowed_value, val, int_obj.origin};
 
 	return std::nullopt;
 }
@@ -43,15 +42,16 @@ evaluate_literal(const ast::sf::literal_expression& expression)
 {
 	using result_type = std::variant<lang::single_object, compile_error>;
 	using parser::position_tag_of;
+	const auto expr_origin = position_tag_of(expression);
 
 	return expression.apply_visitor(x3::make_lambda_visitor<result_type>(
-		[](ast::sf::temp_literal literal) -> result_type {
-			return lang::single_object{lang::temp{}, position_tag_of(literal)};
+		[&](ast::sf::temp_literal literal) -> result_type {
+			return lang::single_object{lang::temp{position_tag_of(literal)}, expr_origin};
 		},
-		[](ast::sf::none_literal literal) -> result_type {
-			return lang::single_object{lang::none{}, position_tag_of(literal)};
+		[&](ast::sf::none_literal literal) -> result_type {
+			return lang::single_object{lang::none{position_tag_of(literal)}, expr_origin};
 		},
-		[](ast::sf::socket_spec_literal literal) -> result_type {
+		[&](ast::sf::socket_spec_literal literal) -> result_type {
 			std::variant<lang::socket_spec, compile_error> ss_or_err =
 				detail::evaluate_socket_spec_literal(literal.socket_count, literal.socket_colors);
 
@@ -59,34 +59,31 @@ evaluate_literal(const ast::sf::literal_expression& expression)
 				return std::get<compile_error>(std::move(ss_or_err));
 			}
 
-			return lang::single_object{
-				std::get<lang::socket_spec>(ss_or_err),
-				position_tag_of(literal)
-			};
+			return lang::single_object{std::get<lang::socket_spec>(ss_or_err), expr_origin};
 		},
-		[](ast::sf::boolean_literal literal) -> result_type {
-			return lang::single_object{lang::boolean{literal.value}, position_tag_of(literal)};
+		[&](ast::sf::boolean_literal literal) -> result_type {
+			return lang::single_object{lang::boolean{literal.value, position_tag_of(literal)}, expr_origin};
 		},
-		[](ast::sf::integer_literal literal) -> result_type {
-			return lang::single_object{lang::integer{literal.value}, position_tag_of(literal)};
+		[&](ast::sf::integer_literal literal) -> result_type {
+			return lang::single_object{lang::integer{literal.value, position_tag_of(literal)}, expr_origin};
 		},
-		[](ast::sf::floating_point_literal literal) -> result_type {
-			return lang::single_object{lang::fractional{literal.value}, position_tag_of(literal)};
+		[&](ast::sf::floating_point_literal literal) -> result_type {
+			return lang::single_object{lang::fractional{literal.value, position_tag_of(literal)}, expr_origin};
 		},
-		[](ast::sf::rarity_literal literal) -> result_type {
-			return lang::single_object{lang::rarity{literal.value}, position_tag_of(literal)};
+		[&](ast::sf::rarity_literal literal) -> result_type {
+			return lang::single_object{lang::rarity{literal.value, position_tag_of(literal)}, expr_origin};
 		},
-		[](ast::sf::shape_literal literal) -> result_type {
-			return lang::single_object{lang::shape{literal.value}, position_tag_of(literal)};
+		[&](ast::sf::shape_literal literal) -> result_type {
+			return lang::single_object{lang::shape{literal.value, position_tag_of(literal)}, expr_origin};
 		},
-		[](ast::sf::suit_literal literal) -> result_type {
-			return lang::single_object{lang::suit{literal.value}, position_tag_of(literal)};
+		[&](ast::sf::suit_literal literal) -> result_type {
+			return lang::single_object{lang::suit{literal.value, position_tag_of(literal)}, expr_origin};
 		},
-		[](ast::sf::influence_literal literal) -> result_type {
-			return lang::single_object{lang::influence{literal.value}, position_tag_of(literal)};
+		[&](ast::sf::influence_literal literal) -> result_type {
+			return lang::single_object{lang::influence{literal.value, position_tag_of(literal)}, expr_origin};
 		},
-		[](const ast::sf::string_literal& literal) -> result_type {
-			return lang::single_object{lang::string{literal}, position_tag_of(literal)};
+		[&](const ast::sf::string_literal& literal) -> result_type {
+			return lang::single_object{lang::string{literal, position_tag_of(literal)}, expr_origin};
 		}
 	));
 }
@@ -134,36 +131,36 @@ namespace fs::compiler::detail
 
 std::variant<lang::color, compile_error>
 make_color(
-	std::pair<lang::integer, lang::position_tag> r,
-	std::pair<lang::integer, lang::position_tag> g,
-	std::pair<lang::integer, lang::position_tag> b,
-	std::optional<std::pair<lang::integer, lang::position_tag>> a)
+	lang::integer r,
+	lang::integer g,
+	lang::integer b,
+	std::optional<lang::integer> a)
 {
-	std::optional<compile_error> err = expect_integer_in_range(r.first, r.second, 0, 255);
+	std::optional<compile_error> err = expect_integer_in_range(r, 0, 255);
 	if (err) {
 		return *std::move(err);
 	}
 
-	err = expect_integer_in_range(g.first, g.second, 0, 255);
+	err = expect_integer_in_range(g, 0, 255);
 	if (err) {
 		return *std::move(err);
 	}
 
-	err = expect_integer_in_range(b.first, b.second, 0, 255);
+	err = expect_integer_in_range(b, 0, 255);
 	if (err) {
 		return *std::move(err);
 	}
 
 	if (a) {
-		err = expect_integer_in_range((*a).first, (*a).second, 0, 255);
+		err = expect_integer_in_range(*a, 0, 255);
 		if (err) {
 			return *std::move(err);
 		}
 
-		return lang::color{r.first, g.first, b.first, (*a).first};
+		return lang::color{r, g, b, *a};
 	}
 
-	return lang::color{r.first, g.first, b.first};
+	return lang::color{r, g, b};
 }
 
 std::variant<lang::socket_spec, compile_error>
@@ -197,30 +194,31 @@ make_socket_spec(
 	if (!ss.is_valid())
 		return errors::invalid_socket_spec{origin};
 
+	ss.origin = origin;
 	return ss;
 }
 
 std::variant<lang::builtin_alert_sound, compile_error>
 make_builtin_alert_sound(
 	bool positional,
-	std::pair<lang::integer, lang::position_tag> sound_id,
-	std::optional<std::pair<lang::integer, lang::position_tag>> volume)
+	lang::integer sound_id,
+	std::optional<lang::integer> volume)
 {
-	std::optional<compile_error> err = expect_integer_in_range(sound_id.first, sound_id.second, 1, 16);
+	std::optional<compile_error> err = expect_integer_in_range(sound_id, 1, 16);
 	if (err) {
 		return *std::move(err);
 	}
 
 	if (volume) {
-		err = expect_integer_in_range((*volume).first, (*volume).second, 0, 300);
+		err = expect_integer_in_range(*volume, 0, 300);
 		if (err) {
 			return *std::move(err);
 		}
 
-		return lang::builtin_alert_sound{positional, sound_id.first, (*volume).first};
+		return lang::builtin_alert_sound{positional, sound_id, *volume};
 	}
 
-	return lang::builtin_alert_sound{positional, sound_id.first};
+	return lang::builtin_alert_sound{positional, sound_id};
 }
 
 std::variant<lang::socket_spec, compile_error>
@@ -250,6 +248,7 @@ evaluate_socket_spec_literal(
 		return std::get<compile_error>(std::move(ss_or_err));
 	}
 
+	// TODO adjust origin to also contain the integer literal
 	auto& ss = std::get<lang::socket_spec>(ss_or_err);
 	if (int_lit)
 		ss.num = (*int_lit).value;
@@ -342,7 +341,8 @@ get_as_fractional(const lang::single_object& sobj)
 	}
 
 	if (std::holds_alternative<lang::integer>(val)) {
-		return lang::fractional{std::get<lang::integer>(val)};
+		const auto& intgr = std::get<lang::integer>(val);
+		return lang::fractional{static_cast<double>(intgr.value), intgr.origin};
 	}
 
 	return errors::type_mismatch{lang::object_type::fractional, sobj.type(), sobj.origin};
@@ -359,7 +359,11 @@ get_as_socket_spec(
 	}
 
 	if (std::holds_alternative<lang::integer>(val)) {
-		return lang::socket_spec{std::get<lang::integer>(val).value};
+		const auto& intgr = std::get<lang::integer>(val);
+		lang::socket_spec ss;
+		ss.num = intgr.value;
+		ss.origin = intgr.origin;
+		return ss;
 	}
 
 	return errors::type_mismatch{lang::object_type::socket_spec, sobj.type(), sobj.origin};
