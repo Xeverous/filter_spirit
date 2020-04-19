@@ -255,7 +255,7 @@ make_filter_block(
 				autogen.price_range,
 				autogen.condition.origin);
 			result_block.conditions.rarity = lang::rarity_range_condition(
-				lang::rarity::unique,
+				lang::rarity{lang::rarity_type::unique, autogen.condition.origin},
 				autogen.condition.origin);
 			break;
 		case lang::item_category::uniques_eq_ambiguous:
@@ -265,7 +265,7 @@ make_filter_block(
 				autogen.price_range,
 				autogen.condition.origin);
 			result_block.conditions.rarity = lang::rarity_range_condition(
-				lang::rarity::unique,
+				lang::rarity{lang::rarity_type::unique, autogen.condition.origin},
 				autogen.condition.origin);
 			break;
 		case lang::item_category::uniques_flasks_unambiguous:
@@ -275,7 +275,7 @@ make_filter_block(
 				autogen.price_range,
 				autogen.condition.origin);
 			result_block.conditions.rarity = lang::rarity_range_condition(
-				lang::rarity::unique,
+				lang::rarity{lang::rarity_type::unique, autogen.condition.origin},
 				autogen.condition.origin);
 			break;
 		case lang::item_category::uniques_flasks_ambiguous:
@@ -285,7 +285,7 @@ make_filter_block(
 				autogen.price_range,
 				autogen.condition.origin);
 			result_block.conditions.rarity = lang::rarity_range_condition(
-				lang::rarity::unique,
+				lang::rarity{lang::rarity_type::unique, autogen.condition.origin},
 				autogen.condition.origin);
 			break;
 		case lang::item_category::uniques_jewels_unambiguous:
@@ -295,7 +295,7 @@ make_filter_block(
 				autogen.price_range,
 				autogen.condition.origin);
 			result_block.conditions.rarity = lang::rarity_range_condition(
-				lang::rarity::unique,
+				lang::rarity{lang::rarity_type::unique, autogen.condition.origin},
 				autogen.condition.origin);
 			break;
 		case lang::item_category::uniques_jewels_ambiguous:
@@ -305,7 +305,7 @@ make_filter_block(
 				autogen.price_range,
 				autogen.condition.origin);
 			result_block.conditions.rarity = lang::rarity_range_condition(
-				lang::rarity::unique,
+				lang::rarity{lang::rarity_type::unique, autogen.condition.origin},
 				autogen.condition.origin);
 			break;
 		// TODO maps should use tier condition to filter results
@@ -316,7 +316,7 @@ make_filter_block(
 				autogen.price_range,
 				autogen.condition.origin);
 			result_block.conditions.rarity = lang::rarity_range_condition(
-				lang::rarity::unique,
+				lang::rarity{lang::rarity_type::unique, autogen.condition.origin},
 				autogen.condition.origin);
 			break;
 		case lang::item_category::uniques_maps_ambiguous:
@@ -326,7 +326,7 @@ make_filter_block(
 				autogen.price_range,
 				autogen.condition.origin);
 			result_block.conditions.rarity = lang::rarity_range_condition(
-				lang::rarity::unique,
+				lang::rarity{lang::rarity_type::unique, autogen.condition.origin},
 				autogen.condition.origin);
 			break;
 	}

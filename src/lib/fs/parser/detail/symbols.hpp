@@ -39,75 +39,75 @@ namespace rf
 	};
 	const booleans_ booleans;
 
-	struct rarities_ : x3::symbols<lang::rarity>
+	struct rarities_ : x3::symbols<lang::rarity_type>
 	{
 		rarities_()
 		{
 			add
-				(lang::keywords::rf::normal, lang::rarity::normal)
-				(lang::keywords::rf::magic,  lang::rarity::magic)
-				(lang::keywords::rf::rare,   lang::rarity::rare)
-				(lang::keywords::rf::unique, lang::rarity::unique)
+				(lang::keywords::rf::normal, lang::rarity_type::normal)
+				(lang::keywords::rf::magic,  lang::rarity_type::magic)
+				(lang::keywords::rf::rare,   lang::rarity_type::rare)
+				(lang::keywords::rf::unique, lang::rarity_type::unique)
 			;
 		}
 	};
 	const rarities_ rarities;
 
-	struct shapes_ : x3::symbols<lang::shape>
+	struct shapes_ : x3::symbols<lang::shape_type>
 	{
 		shapes_()
 		{
 			add
-				(lang::keywords::rf::circle,   lang::shape::circle)
-				(lang::keywords::rf::diamond,  lang::shape::diamond)
-				(lang::keywords::rf::hexagon,  lang::shape::hexagon)
-				(lang::keywords::rf::square,   lang::shape::square)
-				(lang::keywords::rf::star,     lang::shape::star)
-				(lang::keywords::rf::triangle, lang::shape::triangle)
-				(lang::keywords::rf::cross,    lang::shape::cross)
-				(lang::keywords::rf::moon,     lang::shape::moon)
-				(lang::keywords::rf::raindrop, lang::shape::raindrop)
-				(lang::keywords::rf::kite,     lang::shape::kite)
-				(lang::keywords::rf::pentagon, lang::shape::pentagon)
-				(lang::keywords::rf::upside_down_house, lang::shape::upside_down_house)
+				(lang::keywords::rf::circle,   lang::shape_type::circle)
+				(lang::keywords::rf::diamond,  lang::shape_type::diamond)
+				(lang::keywords::rf::hexagon,  lang::shape_type::hexagon)
+				(lang::keywords::rf::square,   lang::shape_type::square)
+				(lang::keywords::rf::star,     lang::shape_type::star)
+				(lang::keywords::rf::triangle, lang::shape_type::triangle)
+				(lang::keywords::rf::cross,    lang::shape_type::cross)
+				(lang::keywords::rf::moon,     lang::shape_type::moon)
+				(lang::keywords::rf::raindrop, lang::shape_type::raindrop)
+				(lang::keywords::rf::kite,     lang::shape_type::kite)
+				(lang::keywords::rf::pentagon, lang::shape_type::pentagon)
+				(lang::keywords::rf::upside_down_house, lang::shape_type::upside_down_house)
 			;
 		}
 	};
 	const shapes_ shapes;
 
-	struct suits_ : x3::symbols<lang::suit>
+	struct suits_ : x3::symbols<lang::suit_type>
 	{
 		suits_()
 		{
 			add
-				(lang::keywords::rf::red,    lang::suit::red)
-				(lang::keywords::rf::green,  lang::suit::green)
-				(lang::keywords::rf::blue,   lang::suit::blue)
-				(lang::keywords::rf::white,  lang::suit::white)
-				(lang::keywords::rf::brown,  lang::suit::brown)
-				(lang::keywords::rf::yellow, lang::suit::yellow)
-				(lang::keywords::rf::cyan,   lang::suit::cyan)
-				(lang::keywords::rf::grey,   lang::suit::grey)
-				(lang::keywords::rf::orange, lang::suit::orange)
-				(lang::keywords::rf::pink,   lang::suit::pink)
-				(lang::keywords::rf::purple, lang::suit::purple)
+				(lang::keywords::rf::red,    lang::suit_type::red)
+				(lang::keywords::rf::green,  lang::suit_type::green)
+				(lang::keywords::rf::blue,   lang::suit_type::blue)
+				(lang::keywords::rf::white,  lang::suit_type::white)
+				(lang::keywords::rf::brown,  lang::suit_type::brown)
+				(lang::keywords::rf::yellow, lang::suit_type::yellow)
+				(lang::keywords::rf::cyan,   lang::suit_type::cyan)
+				(lang::keywords::rf::grey,   lang::suit_type::grey)
+				(lang::keywords::rf::orange, lang::suit_type::orange)
+				(lang::keywords::rf::pink,   lang::suit_type::pink)
+				(lang::keywords::rf::purple, lang::suit_type::purple)
 			;
 		}
 
 	};
 	const suits_ suits;
 
-	struct influences_ : x3::symbols<lang::influence>
+	struct influences_ : x3::symbols<lang::influence_type>
 	{
 		influences_()
 		{
 			add
-				(lang::keywords::rf::shaper,   lang::influence::shaper)
-				(lang::keywords::rf::elder,    lang::influence::elder)
-				(lang::keywords::rf::crusader, lang::influence::crusader)
-				(lang::keywords::rf::redeemer, lang::influence::redeemer)
-				(lang::keywords::rf::hunter,   lang::influence::hunter)
-				(lang::keywords::rf::warlord,  lang::influence::warlord)
+				(lang::keywords::rf::shaper,   lang::influence_type::shaper)
+				(lang::keywords::rf::elder,    lang::influence_type::elder)
+				(lang::keywords::rf::crusader, lang::influence_type::crusader)
+				(lang::keywords::rf::redeemer, lang::influence_type::redeemer)
+				(lang::keywords::rf::hunter,   lang::influence_type::hunter)
+				(lang::keywords::rf::warlord,  lang::influence_type::warlord)
 			;
 		}
 	};

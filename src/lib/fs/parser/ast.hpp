@@ -80,54 +80,54 @@ namespace common
 
 	struct rarity_literal : x3::position_tagged
 	{
-		rarity_literal& operator=(lang::rarity r)
+		rarity_literal& operator=(lang::rarity_type r)
 		{
 			value = r;
 			return *this;
 		}
 
-		lang::rarity get_value() const { return value; }
+		lang::rarity_type get_value() const { return value; }
 
-		lang::rarity value;
+		lang::rarity_type value;
 	};
 
 	struct shape_literal : x3::position_tagged
 	{
-		shape_literal& operator=(lang::shape s)
+		shape_literal& operator=(lang::shape_type s)
 		{
 			value = s;
 			return *this;
 		}
 
-		lang::shape get_value() const { return value; }
+		lang::shape_type get_value() const { return value; }
 
-		lang::shape value;
+		lang::shape_type value;
 	};
 
 	struct suit_literal : x3::position_tagged
 	{
-		suit_literal& operator=(lang::suit s)
+		suit_literal& operator=(lang::suit_type s)
 		{
 			value = s;
 			return *this;
 		}
 
-		lang::suit get_value() const { return value; }
+		lang::suit_type get_value() const { return value; }
 
-		lang::suit value;
+		lang::suit_type value;
 	};
 
 	struct influence_literal : x3::position_tagged
 	{
-		influence_literal& operator=(lang::influence i)
+		influence_literal& operator=(lang::influence_type i)
 		{
 			value = i;
 			return *this;
 		}
 
-		lang::influence get_value() const { return value; }
+		lang::influence_type get_value() const { return value; }
 
-		lang::influence value;
+		lang::influence_type value;
 	};
 
 	struct temp_literal : x3::position_tagged

@@ -141,17 +141,17 @@ inline bool operator!=(disable_drop_sound_action lhs, disable_drop_sound_action 
 
 struct minimap_icon
 {
-	minimap_icon(integer size, suit color, shape shape)
-	: size(size), color(color), shape(shape) {}
+	minimap_icon(integer size, suit color, shape shape_)
+	: size(size), color(color), shape_(shape_) {}
 
 	integer size;
 	suit color;
-	shape shape;
+	shape shape_;
 };
 
 inline bool operator==(minimap_icon lhs, minimap_icon rhs) noexcept
 {
-	return std::tie(lhs.size, lhs.color, lhs.shape) == std::tie(rhs.size, rhs.color, rhs.shape);
+	return std::tie(lhs.size, lhs.color, lhs.shape_) == std::tie(rhs.size, rhs.color, rhs.shape_);
 }
 inline bool operator!=(minimap_icon lhs, minimap_icon rhs) noexcept { return !(lhs == rhs); }
 

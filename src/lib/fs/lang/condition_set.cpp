@@ -8,22 +8,20 @@ namespace
 using namespace fs;
 namespace kw = lang::keywords::rf;
 
-std::ostream& operator<<(std::ostream& os, lang::rarity r)
+std::ostream& operator<<(std::ostream& os, lang::rarity_type r)
 {
 	switch (r) {
-		case lang::rarity::normal:
+		case lang::rarity_type::normal:
 			os << kw::normal;
 			break;
-		case lang::rarity::magic:
+		case lang::rarity_type::magic:
 			os << kw::magic;
 			break;
-		case lang::rarity::rare:
+		case lang::rarity_type::rare:
 			os << kw::rare;
 			break;
-		case lang::rarity::unique:
+		case lang::rarity_type::unique:
 			os << kw::unique;
-			break;
-		default:
 			break;
 	}
 
@@ -41,7 +39,7 @@ void output_range_condition(
 
 	if (range.is_exact())
 	{
-		output_stream << '\t' << name << " = " << (*range.lower_bound).value << '\n';
+		output_stream << '\t' << name << " = " << (*range.lower_bound).value.value << '\n';
 		return;
 	}
 
@@ -51,9 +49,9 @@ void output_range_condition(
 		const lang::range_bound<T>& bound = *range.lower_bound;
 
 		if (bound.inclusive)
-			output_stream << ">= " << bound.value;
+			output_stream << ">= " << bound.value.value;
 		else
-			output_stream << "> " << bound.value;
+			output_stream << "> " << bound.value.value;
 
 		output_stream << '\n';
 	}
@@ -64,9 +62,9 @@ void output_range_condition(
 		const lang::range_bound<T>& bound = *range.upper_bound;
 
 		if (bound.inclusive)
-			output_stream << "<= " << bound.value;
+			output_stream << "<= " << bound.value.value;
 		else
-			output_stream << "< " << bound.value;
+			output_stream << "< " << bound.value.value;
 
 		output_stream << '\n';
 	}
