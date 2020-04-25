@@ -33,6 +33,8 @@ option(FILTER_SPIRIT_BUILD_EXECUTABLE_CLI
 	"build Filter Spirit command line program" ON)
 option(FILTER_SPIRIT_BUILD_TESTS
 	"build Filter Spirit tests" ON)
+option(FILTER_SPIRIT_ENABLE_ASSERTION_EXCEPTIONS
+	"ON: throw on assertion failure; OFF: rely on assert() behavior" OFF)
 
 ##############################################################################
 # specify explicitly where to output all binary objects
