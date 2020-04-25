@@ -122,7 +122,7 @@ spirit_filter_add_minimap_icon_action(
 	lang::action_set& set)
 {
 	return detail::evaluate_sequence(st, action.seq, symbols, 3, 3)
-		.map_result<lang::minimap_icon>([&](lang::object obj) {
+		.map_result<lang::minimap_icon>([](lang::object obj) {
 			BOOST_ASSERT(obj.values.size() == 3u);
 
 			return detail::get_as<lang::integer>(obj.values[0])
@@ -144,7 +144,7 @@ spirit_filter_add_play_effect_action(
 	lang::action_set& set)
 {
 	return detail::evaluate_sequence(st, action.seq, symbols, 1, 2)
-		.map_result<lang::play_effect>([&](lang::object obj) {
+		.map_result<lang::play_effect>([](lang::object obj) {
 			const auto num_values = obj.values.size();
 			BOOST_ASSERT(num_values == 1u || num_values == 2u);
 
