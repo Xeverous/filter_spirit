@@ -31,7 +31,7 @@ target_sources(filter_spirit
 		fs/compiler/detail/evaluate.cpp
 		fs/generator/generate_filter.cpp
 		fs/generator/generator.cpp
-		fs/generator/make_filter.hpp
+		fs/generator/make_filter.cpp
 		fs/lang/action_set.cpp
 		fs/lang/condition_set.cpp
 		fs/lang/item_filter.cpp
@@ -57,10 +57,10 @@ target_sources(filter_spirit
 		fs/compiler/detail/evaluate.hpp
 		fs/compiler/compiler.hpp
 		fs/compiler/outcome.hpp
-		fs/generator/make_filter.cpp
+		fs/generator/make_filter.hpp
 		fs/generator/generate_filter.hpp
 		fs/generator/generator.hpp
-		fs/generator/options.hpp
+		fs/generator/settings.hpp
 		fs/lang/action_properties.hpp
 		fs/lang/action_set.hpp
 		fs/lang/condition_properties.hpp
@@ -134,6 +134,10 @@ target_compile_options(filter_spirit
 		$<$<CXX_COMPILER_ID:Clang>:-Wall -Wpedantic -ffast-math>
 		$<$<CXX_COMPILER_ID:MSVC>:/W4>
 )
+
+if(FILTER_SPIRIT_ENABLE_ASSERTION_EXCEPTIONS)
+	target_compile_definitions(filter_spirit PRIVATE BOOST_ENABLE_ASSERT_HANDLER)
+endif()
 
 # https://gitlab.kitware.com/cmake/cmake/issues/20431
 get_target_property(CURL_INCLUDE_DIR PkgConfig::libcurl INTERFACE_INCLUDE_DIRECTORIES)
