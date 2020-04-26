@@ -32,6 +32,10 @@ target_compile_options(filter_spirit_cli
 		$<$<CXX_COMPILER_ID:MSVC>:/W4>
 )
 
+if(FILTER_SPIRIT_ENABLE_LTO)
+	set_target_properties(filter_spirit_cli PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
+endif()
+
 target_link_libraries(filter_spirit_cli
 	PRIVATE
 		filter_spirit

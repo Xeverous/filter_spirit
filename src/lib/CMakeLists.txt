@@ -139,6 +139,10 @@ if(FILTER_SPIRIT_ENABLE_ASSERTION_EXCEPTIONS)
 	target_compile_definitions(filter_spirit PRIVATE BOOST_ENABLE_ASSERT_HANDLER)
 endif()
 
+if(FILTER_SPIRIT_ENABLE_LTO)
+	set_target_properties(filter_spirit PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
+endif()
+
 # https://gitlab.kitware.com/cmake/cmake/issues/20431
 get_target_property(CURL_INCLUDE_DIR PkgConfig::libcurl INTERFACE_INCLUDE_DIRECTORIES)
 target_link_directories(filter_spirit
