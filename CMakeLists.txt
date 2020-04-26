@@ -31,6 +31,8 @@ endif()
 
 option(FILTER_SPIRIT_BUILD_EXECUTABLE_CLI
 	"build Filter Spirit command line program" ON)
+option(FILTER_SPIRIT_BUILD_EXECUTABLE_GUI
+	"build Filter Spirit graphic user interface program" ON)
 option(FILTER_SPIRIT_BUILD_TESTS
 	"build Filter Spirit tests" ON)
 option(FILTER_SPIRIT_ENABLE_ASSERTION_EXCEPTIONS
