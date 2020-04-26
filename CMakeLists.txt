@@ -35,6 +35,8 @@ option(FILTER_SPIRIT_BUILD_TESTS
 	"build Filter Spirit tests" ON)
 option(FILTER_SPIRIT_ENABLE_ASSERTION_EXCEPTIONS
 	"ON: throw on assertion failure; OFF: rely on assert() behavior" OFF)
+option(FILTER_SPIRIT_ENABLE_LTO
+	"enable link-time optimization for Filter Spirit targets" ON)
 
 ##############################################################################
 # specify explicitly where to output all binary objects
@@ -43,16 +45,16 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-include(CheckIPOSupported)
-check_ipo_supported(RESULT supported OUTPUT error)
+if(FILTER_SPIRIT_ENABLE_LTO)
+	include(CheckIPOSupported)
+	check_ipo_supported(RESULT IPO_SUPPORTED OUTPUT IPO_ERROR)
 
-if(supported)
-    message(STATUS "IPO / LTO supported, enabling")
-    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
-else()
-    message(STATUS "IPO / LTO not supported: <${error}>, will not enable")
+	if(IPO_SUPPORTED)
+		message(STATUS "IPO / LTO supported, enabling")
+	else()
+		message(FATAL_ERROR "IPO / LTO not supported: ${IPO_ERROR}, change settings or compiler")
+	endif()
 endif()
-
 ##############################################################################
 
 add_subdirectory(src)
