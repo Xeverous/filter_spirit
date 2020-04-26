@@ -6,7 +6,7 @@
 #include <fs/compiler/settings.hpp>
 #include <fs/compiler/outcome.hpp>
 
-#include <variant>
+#include <vector>
 
 namespace fs::compiler
 {
