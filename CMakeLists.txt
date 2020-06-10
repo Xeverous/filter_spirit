@@ -41,6 +41,7 @@ option(FILTER_SPIRIT_ADD_FILESYSTEM_LINK
 	"add linker command for standard filesystem library (required by earlier GCC and Clang versions)" OFF)
 option(FILTER_SPIRIT_ENABLE_LTO
 	"enable link-time optimization for Filter Spirit targets" ON)
+set(FILTER_SPIRIT_PLATFORM "" CACHE STRING "win64 (64-bit Windows 7 or newer) or gtk (any platform that suppored by GTK3)")
 
 ##############################################################################
 # specify explicitly where to output all binary objects
