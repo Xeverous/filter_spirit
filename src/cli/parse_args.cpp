@@ -194,24 +194,24 @@ int run(int argc, char* argv[])
 		}
 
 		if (info_path) {
-			return print_data_save_info(*info_path, logger);
+			return print_item_price_report(*info_path, logger);
 		}
 
 		if (!compare_paths.empty()) {
 			return compare_data_saves(compare_paths, logger);
 		}
 
-		const auto item_price_info = [&]() -> std::optional<fs::lang::item_price_info> {
+		const auto item_price_report = [&]() -> std::optional<fs::lang::item_price_report> {
 			if (opt_empty_data) {
 				// user explicitly stated to use empty data, some find it useful to write SSF filters where price queries are not used
-				fs::lang::item_price_info info;
-				info.metadata.data_source = fs::lang::data_source_type::none;
-				info.metadata.league_name = "(none)";
-				info.metadata.download_date = boost::posix_time::ptime(boost::posix_time::not_a_date_time);
-				return info;
+				fs::lang::item_price_report report;
+				report.metadata.data_source = fs::lang::data_source_type::none;
+				report.metadata.league_name = "(none)";
+				report.metadata.download_date = boost::posix_time::ptime(boost::posix_time::not_a_date_time);
+				return report;
 			}
 			else {
-				return obtain_item_price_info(
+				return obtain_item_price_report(
 					download_league_name_ninja,
 					download_league_name_watch,
 					net_settings,
@@ -222,7 +222,7 @@ int run(int argc, char* argv[])
 		}();
 
 		if (opt_generate) {
-			if (!generate_item_filter(item_price_info, input_path, output_path, st, logger)) {
+			if (!generate_item_filter(item_price_report, input_path, output_path, st, logger)) {
 				logger.info() << "filter generation failed\n";
 				return EXIT_FAILURE;
 			}

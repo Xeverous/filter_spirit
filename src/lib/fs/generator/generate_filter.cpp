@@ -15,17 +15,17 @@ namespace fs::generator::sf
 
 std::optional<std::string> generate_filter(
 	std::string_view input,
-	const lang::item_price_info& item_price_info,
+	const lang::item_price_report& report,
 	settings st,
 	log::logger& logger)
 {
-	std::optional<std::string> maybe_filter = generate_filter_without_preamble(input, item_price_info.data, st, logger);
+	std::optional<std::string> maybe_filter = generate_filter_without_preamble(input, report.data, st, logger);
 
 	if (!maybe_filter)
 		return std::nullopt;
 
 	std::string& filter = *maybe_filter;
-	prepend_metadata(item_price_info.metadata, filter);
+	prepend_metadata(report.metadata, filter);
 	return filter;
 }
 

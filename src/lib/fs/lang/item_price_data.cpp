@@ -363,9 +363,9 @@ log::message_stream& operator<<(log::message_stream& stream, const item_price_me
 		"\titem price data for league: " << ipm.league_name << "\n";
 }
 
-log::message_stream& operator<<(log::message_stream& stream, const item_price_info& ipi)
+log::message_stream& operator<<(log::message_stream& stream, const item_price_report& ipr)
 {
-	return stream << ipi.metadata << ipi.data;
+	return stream << ipr.metadata << ipr.data;
 }
 
 void item_price_data::sort()
@@ -389,9 +389,9 @@ void item_price_data::sort()
 	std::sort(bases.begin(),            bases.end(),            compare_by_name_asc);
 }
 
-void compare_item_price_info(
-	const item_price_info& lhs,
-	const item_price_info& rhs,
+void compare_item_price_reports(
+	const item_price_report& lhs,
+	const item_price_report& rhs,
 	log::logger& log)
 {
 	auto stream = log.info();
