@@ -51,6 +51,8 @@ target_sources(filter_spirit
 		fs/network/poe_ninja/download_data.cpp
 		fs/network/poe_ninja/parse_data.cpp
 		fs/network/poe_ninja/api_data.cpp
+		fs/network/ggg/download_data.cpp
+		fs/network/ggg/parse_data.cpp
 	PUBLIC
 		fs/compiler/detail/actions.hpp
 		fs/compiler/detail/conditions.hpp
@@ -95,6 +97,9 @@ target_sources(filter_spirit
 		fs/network/poe_watch/api_data.hpp
 		fs/network/poe_watch/download_data.hpp
 		fs/network/poe_watch/parse_data.hpp
+		fs/network/ggg/api_data.hpp
+		fs/network/ggg/download_data.hpp
+		fs/network/ggg/parse_data.hpp
 		fs/parser/ast.hpp
 		fs/parser/ast_adapted.hpp
 		fs/parser/detail/config.hpp

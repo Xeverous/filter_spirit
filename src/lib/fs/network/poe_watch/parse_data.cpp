@@ -532,30 +532,40 @@ std::vector<lang::league> parse_league_info(std::string_view league_json)
 	if (!json.is_array()) // C++20: [[unlikely]]
 		throw network::json_parse_error("league JSON must be an array but it is not");
 
-	std::vector<lang::league> leagues;
+	struct league_with_id
+	{
+		int id;
+		lang::league league;
+	};
+
+	std::vector<league_with_id> leagues;
 	leagues.reserve(json.size());
 
 	for (const auto& item : json) {
-		leagues.push_back(lang::league{
+		leagues.push_back(league_with_id{
 			item.at("id").get<int>(),
-			item.at("name").get<std::string>(),
-			item.at("display").get<std::string>(),
-			item.at("hardcore").get<bool>(),
-			item.at("upcoming").get<bool>(),
-			item.at("active").get<bool>(),
-			item.at("event").get<bool>(),
-			item.at("challenge").get<bool>()});
+			lang::league{
+				item.at("name").get<std::string>(),
+				item.at("hardcore").get<bool>()
+			}
+		});
 	}
 
 	// sort leagues by ID - this will improve consistency in the output
 	std::sort(
 		leagues.begin(),
 		leagues.end(),
-		[](const lang::league& left, const lang::league& right) {
+		[](const league_with_id& left, const league_with_id& right) {
 			return left.id < right.id;
 		});
 
-	return leagues;
+	std::vector<lang::league> result;
+	result.reserve(leagues.size());
+
+	for (league_with_id& lwi : leagues)
+		result.push_back(std::move(lwi.league));
+
+	return result;
 }
 
 lang::item_price_data
