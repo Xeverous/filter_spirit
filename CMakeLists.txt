@@ -39,6 +39,7 @@ option(FILTER_SPIRIT_ENABLE_ASSERTION_EXCEPTIONS
 	"ON: throw on assertion failure; OFF: rely on assert() behavior" OFF)
 option(FILTER_SPIRIT_ENABLE_LTO
 	"enable link-time optimization for Filter Spirit targets" ON)
+set(FILTER_SPIRIT_PLATFORM "" CACHE STRING "win64 (64-bit Windows 7 or newer) or gtk (any platform that suppored by GTK3)")
 
 ##############################################################################
 # specify explicitly where to output all binary objects

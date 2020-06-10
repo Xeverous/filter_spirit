@@ -12,7 +12,25 @@ target_sources(filter_spirit_gui
 		ui.hpp
 		ui.cpp
 		user_state.hpp
+		user_state.cpp
+		gui_logger.hpp
+		gui_logger.cpp
+		platform/modal_dialogs.hpp
 )
+
+if(FILTER_SPIRIT_PLATFORM STREQUAL "win64")
+	target_sources(filter_spirit_gui PRIVATE
+		platform/windows/modal_dialogs.cpp
+		platform/windows/string_utils.hpp
+		platform/windows/string_utils.cpp
+		platform/windows/generic_utils.hpp
+		platform/windows/generic_utils.cpp
+		platform/windows/com_utils.hpp)
+elseif(FILTER_SPIRIT_PLATFORM STREQUAL "gtk")
+	# (nothing currently)
+else()
+	message(FATAL_ERROR "missing or invalid FILTER_SPIRIT_PLATFORM")
+endif()
 
 target_include_directories(filter_spirit_gui
 	PRIVATE
