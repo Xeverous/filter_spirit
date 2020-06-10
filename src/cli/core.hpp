@@ -15,8 +15,8 @@ list_leagues(
 	fs::network::network_settings net_settings,
 	fs::log::logger& logger);
 
-[[nodiscard]] std::optional<fs::lang::item_price_info>
-obtain_item_price_info(
+[[nodiscard]] std::optional<fs::lang::item_price_report>
+obtain_item_price_report(
 	const boost::optional<std::string>& download_league_name_ninja,
 	const boost::optional<std::string>& download_league_name_watch,
 	fs::network::network_settings net_settings,
@@ -26,14 +26,14 @@ obtain_item_price_info(
 
 [[nodiscard]] bool
 generate_item_filter(
-	const std::optional<fs::lang::item_price_info>& item_data,
+	const std::optional<fs::lang::item_price_report>& report,
 	const boost::optional<std::string>& source_filepath,
 	const boost::optional<std::string>& output_filepath,
 	fs::generator::settings st,
 	fs::log::logger& logger);
 
 [[nodiscard]] int // <= exit status
-print_data_save_info(
+print_item_price_report(
 	const std::string& path,
 	fs::log::logger& logger);
 

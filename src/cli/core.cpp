@@ -13,21 +13,21 @@ using namespace fs;
 namespace
 {
 
-[[nodiscard]] std::optional<lang::item_price_info>
-load_item_price_info(const std::string& path, log::logger& logger)
+[[nodiscard]] std::optional<lang::item_price_report>
+load_item_price_report(const std::string& path, log::logger& logger)
 {
-	lang::item_price_info info;
-	if (!info.metadata.load(path, logger)) {
+	lang::item_price_report report;
+	if (!report.metadata.load(path, logger)) {
 		logger.error() << "failed to load item price metadata\n";
 		return std::nullopt;
 	}
 
-	if (!info.data.load_and_parse(info.metadata, path, logger)) {
+	if (!report.data.load_and_parse(report.metadata, path, logger)) {
 		logger.error() << "failed to load item price data\n";
 		return std::nullopt;
 	}
 
-	return info;
+	return report;
 }
 
 template <typename T>
@@ -50,7 +50,7 @@ void save_api_data(
 }
 
 bool generate_item_filter_impl(
-	const lang::item_price_info& item_price_info,
+	const lang::item_price_report& report,
 	const boost::filesystem::path& source_filepath,
 	const boost::filesystem::path& output_filepath,
 	fs::generator::settings st,
@@ -62,10 +62,7 @@ bool generate_item_filter_impl(
 		return false;
 
 	std::optional<std::string> filter_content = generator::sf::generate_filter(
-		*source_file_content,
-		item_price_info,
-		st,
-		logger);
+		*source_file_content, report, st, logger);
 
 	if (!filter_content)
 		return false;
@@ -100,8 +97,8 @@ void list_leagues(network::network_settings net_settings, log::logger& logger)
 	}
 }
 
-std::optional<lang::item_price_info>
-obtain_item_price_info(
+std::optional<lang::item_price_report>
+obtain_item_price_report(
 	const boost::optional<std::string>& download_league_name_ninja,
 	const boost::optional<std::string>& download_league_name_watch,
 	network::network_settings net_settings,
@@ -123,48 +120,48 @@ obtain_item_price_info(
 	}
 
 	if (data_read_dir) {
-		return load_item_price_info(*data_read_dir, logger);
+		return load_item_price_report(*data_read_dir, logger);
 	}
 
-	lang::item_price_info info;
+	lang::item_price_report report;
 	if (download_league_name_ninja) {
 		auto api_data = network::poe_ninja::async_download_item_price_data(
 			*download_league_name_ninja, net_settings, logger).get();
 
-		info.metadata.data_source = lang::data_source_type::poe_ninja;
-		info.metadata.league_name = *download_league_name_ninja;
-		info.metadata.download_date = boost::posix_time::microsec_clock::universal_time();
+		report.metadata.data_source = lang::data_source_type::poe_ninja;
+		report.metadata.league_name = *download_league_name_ninja;
+		report.metadata.download_date = boost::posix_time::microsec_clock::universal_time();
 
 		if (data_save_dir)
-			save_api_data(api_data, info.metadata, *data_save_dir, logger);
+			save_api_data(api_data, report.metadata, *data_save_dir, logger);
 
-		info.data = network::poe_ninja::parse_item_price_data(api_data, logger);
+		report.data = network::poe_ninja::parse_item_price_data(api_data, logger);
 	}
 	else if (download_league_name_watch) {
 		auto api_data = network::poe_watch::async_download_item_price_data(
 			*download_league_name_watch, net_settings, logger).get();
 
-		info.metadata.data_source = lang::data_source_type::poe_watch;
-		info.metadata.league_name = *download_league_name_watch;
-		info.metadata.download_date = boost::posix_time::microsec_clock::universal_time();
+		report.metadata.data_source = lang::data_source_type::poe_watch;
+		report.metadata.league_name = *download_league_name_watch;
+		report.metadata.download_date = boost::posix_time::microsec_clock::universal_time();
 
 		if (data_save_dir)
-			save_api_data(api_data, info.metadata, *data_save_dir, logger);
+			save_api_data(api_data, report.metadata, *data_save_dir, logger);
 
-		info.data = network::poe_watch::parse_item_price_data(api_data, logger);
+		report.data = network::poe_watch::parse_item_price_data(api_data, logger);
 	}
 
-	return info;
+	return report;
 }
 
 bool generate_item_filter(
-	const std::optional<lang::item_price_info>& item_price_info,
+	const std::optional<lang::item_price_report>& report,
 	const boost::optional<std::string>& input_path,
 	const boost::optional<std::string>& output_path,
 	fs::generator::settings st,
 	fs::log::logger& logger)
 {
-	if (!item_price_info) {
+	if (!report) {
 		logger.error() << "no item price data, giving up on filter generation\n";
 		return false;
 	}
@@ -179,19 +176,19 @@ bool generate_item_filter(
 		return false;
 	}
 
-	return generate_item_filter_impl(*item_price_info, *input_path, *output_path, st, logger);
+	return generate_item_filter_impl(*report, *input_path, *output_path, st, logger);
 }
 
-int print_data_save_info(
+int print_item_price_report(
 	const std::string& path,
 	fs::log::logger& logger)
 {
-	std::optional<lang::item_price_info> data = load_item_price_info(path, logger);
-	if (!data) {
+	std::optional<lang::item_price_report> report = load_item_price_report(path, logger);
+	if (!report) {
 		return EXIT_FAILURE;
 	}
 
-	logger.info() << "" << *data;
+	logger.info() << "" << *report;
 
 	return EXIT_SUCCESS;
 }
@@ -205,20 +202,20 @@ int compare_data_saves(
 		return EXIT_FAILURE;
 	}
 
-	std::optional<lang::item_price_info> data_lhs = load_item_price_info(paths[0], logger);
-	if (!data_lhs) {
+	std::optional<lang::item_price_report> report_lhs = load_item_price_report(paths[0], logger);
+	if (!report_lhs) {
 		return EXIT_FAILURE;
 	}
 
-	std::optional<lang::item_price_info> data_rhs = load_item_price_info(paths[1], logger);
-	if (!data_lhs) {
+	std::optional<lang::item_price_report> report_rhs = load_item_price_report(paths[1], logger);
+	if (!report_rhs) {
 		return EXIT_FAILURE;
 	}
 
-	(*data_lhs).data.sort();
-	(*data_rhs).data.sort();
+	(*report_lhs).data.sort();
+	(*report_rhs).data.sort();
 
-	lang::compare_item_price_info(*data_lhs, *data_rhs, logger);
+	lang::compare_item_price_reports(*report_lhs, *report_rhs, logger);
 
 	return EXIT_SUCCESS;
 }

@@ -149,21 +149,21 @@ struct item_price_metadata
 
 log::message_stream& operator<<(log::message_stream& stream, const item_price_metadata& ipm);
 
-struct item_price_info
+struct item_price_report
 {
 	item_price_data data;
 	item_price_metadata metadata;
 };
 
-log::message_stream& operator<<(log::message_stream& stream, const item_price_info& ipi);
+log::message_stream& operator<<(log::message_stream& stream, const item_price_report& ipr);
 
 /**
  * Produce logs about differences in 2 item data sets
  *
  * both item data inputs must be sorted
  */
-void compare_item_price_info(
-	const item_price_info& lhs,
-	const item_price_info& rhs,
+void compare_item_price_reports(
+	const item_price_report& lhs,
+	const item_price_report& rhs,
 	log::logger& log);
 }
