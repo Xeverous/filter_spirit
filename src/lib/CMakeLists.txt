@@ -116,6 +116,7 @@ target_sources(filter_spirit
 		fs/utility/holds_alternative.hpp
 		fs/utility/type_traits.hpp
 		fs/utility/visitor.hpp
+		fs/utility/y_combinator.hpp
 		fs/utility/string_helpers.hpp
 		fs/version.hpp
 )
