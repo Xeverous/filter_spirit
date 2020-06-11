@@ -40,8 +40,8 @@ struct network_settings
 	long timeout_milliseconds = 0; /** (no timeout) */
 	bool ssl_verify_peer = true;
 	bool ssl_verify_host = true;
-	const char* ca_info_path = nullptr;
-	const char* proxy = nullptr;
+	std::string ca_info_path = {};
+	std::string proxy = {};
 };
 
 /**
