@@ -99,15 +99,15 @@ setup_download(
 		return false;
 	}
 
-	if (settings.ca_info_path != nullptr) {
-		if (const auto ec = easy.ca_info(settings.ca_info_path); ec) {
+	if (!settings.ca_info_path.empty()) {
+		if (const auto ec = easy.ca_info(settings.ca_info_path.c_str()); ec) {
 			save_error_to_all(results, ec);
 			return false;
 		}
 	}
 
-	if (settings.proxy != nullptr) {
-		if (const auto ec = easy.proxy(settings.proxy); ec) {
+	if (!settings.proxy.empty()) {
+		if (const auto ec = easy.proxy(settings.proxy.c_str()); ec) {
 			save_error_to_all(results, ec);
 			return false;
 		}
@@ -130,7 +130,7 @@ download(
 	std::vector<request_result> results(urls.size());
 	curl::easy_handle easy;
 
-	if (!setup_download(easy, settings, results))
+	if (!setup_download(easy, std::move(settings), results))
 		return download_result{std::move(results)};
 
 	if (info) {
