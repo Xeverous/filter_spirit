@@ -10,6 +10,8 @@
 #include <fs/utility/file.hpp>
 #include <fs/log/logger.hpp>
 
+#include <utility>
+
 using namespace fs;
 
 namespace
@@ -82,7 +84,7 @@ bool generate_item_filter_impl(
 
 void list_leagues(network::network_settings net_settings, log::logger& logger)
 {
-	const auto league_data = network::ggg::async_download_leagues(net_settings, nullptr, logger).get();
+	const auto league_data = network::ggg::async_download_leagues(std::move(net_settings), nullptr, logger).get();
 	const std::vector<lang::league> leagues = network::ggg::parse_league_info(league_data);
 
 	auto stream = logger.info();
@@ -122,7 +124,7 @@ obtain_item_price_report(
 	lang::item_price_report report;
 	if (download_league_name_ninja) {
 		auto api_data = network::poe_ninja::async_download_item_price_data(
-			*download_league_name_ninja, net_settings, nullptr, logger).get();
+			*download_league_name_ninja, std::move(net_settings), nullptr, logger).get();
 
 		report.metadata.data_source = lang::data_source_type::poe_ninja;
 		report.metadata.league_name = *download_league_name_ninja;
@@ -135,7 +137,7 @@ obtain_item_price_report(
 	}
 	else if (download_league_name_watch) {
 		auto api_data = network::poe_watch::async_download_item_price_data(
-			*download_league_name_watch, net_settings, nullptr, logger).get();
+			*download_league_name_watch, std::move(net_settings), nullptr, logger).get();
 
 		report.metadata.data_source = lang::data_source_type::poe_watch;
 		report.metadata.league_name = *download_league_name_watch;

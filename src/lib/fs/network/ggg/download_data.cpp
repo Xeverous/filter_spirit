@@ -26,9 +26,9 @@ async_download_leagues(
 
 	return std::async(std::launch::async, [](network_settings settings, download_info* info) {
 		std::vector<std::string> urls = { leagues_url };
-		download_result result = download("api.pathofexile.com", urls, settings, info);
+		download_result result = download("api.pathofexile.com", urls, std::move(settings), info);
 		return api_league_data{std::move(result.results[0].data)};
-	}, settings, info);
+	}, std::move(settings), info);
 }
 
 }

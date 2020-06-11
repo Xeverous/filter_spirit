@@ -61,7 +61,7 @@ async_download_item_price_data(
 		log_download(u, logger);
 
 	return std::async(std::launch::async, [](std::vector<std::string> urls, network_settings settings, download_info* info) {
-		download_result result = download(target_name, urls, settings, info);
+		download_result result = download(target_name, urls, std::move(settings), info);
 		// use preprocessor library to auto-repeat some boilerplate
 		// z = n + 1 (n is 0-based, z is 1-based), we ignore z
 		// d (data) is not needed, we ignore it
@@ -70,7 +70,7 @@ async_download_item_price_data(
 			BOOST_PP_REPEAT(21, MOVE_RESULT_N,)
 		};
 		#undef MOVE_RESULT_N
-	}, std::move(urls), settings, info);
+	}, std::move(urls), std::move(settings), info);
 }
 
 }

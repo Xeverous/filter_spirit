@@ -170,12 +170,12 @@ int run(int argc, char* argv[])
 		net_settings.ssl_verify_peer = !no_ssl_verify_peer;
 
 		if (opt_ca_bundle)
-			net_settings.ca_info_path = (*opt_ca_bundle).c_str();
+			net_settings.ca_info_path = *opt_ca_bundle;
 		else
 			net_settings.ca_info_path = "certificates/cacert.pem";
 
 		if (opt_proxy)
-			net_settings.proxy = (*opt_proxy).c_str();
+			net_settings.proxy = *opt_proxy;
 
 		if (opt_help) {
 			print_help(all_options);
