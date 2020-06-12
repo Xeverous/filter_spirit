@@ -40,7 +40,7 @@ struct network_settings
 	long timeout_milliseconds = 0; /** (no timeout) */
 	bool ssl_verify_peer = true;
 	bool ssl_verify_host = true;
-	std::string ca_info_path = {};
+	std::string ca_info_path = "certificates/cacert.pem";
 	std::string proxy = {};
 };
 

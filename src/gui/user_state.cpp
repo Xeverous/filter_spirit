@@ -1,6 +1,7 @@
 #include "user_state.hpp"
 
 #include <fs/generator/generate_filter.hpp>
+#include <fs/network/ggg/download_data.hpp>
 #include <fs/utility/file.hpp>
 
 void user_state::load_filter_template()

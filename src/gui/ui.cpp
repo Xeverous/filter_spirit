@@ -4,8 +4,16 @@
 
 #include <elements/support.hpp>
 #include <elements/element.hpp>
+#include <infra/support.hpp>
+
+#include <fs/utility/async.hpp>
+#include <fs/utility/y_combinator.hpp>
+#include <fs/network/ggg/parse_data.hpp>
 
 #include <functional>
+#include <vector>
+#include <string>
+#include <string_view>
 
 namespace
 {
@@ -15,6 +23,21 @@ namespace
 namespace el = cycfi::elements;
 
 auto constexpr background_color = el::rgba(45, 45, 45, 255);
+
+double calculate_progress(std::size_t done, std::size_t size)
+{
+	if (size == 0)
+		return 0.0; // avoid division by 0, report no progress instead
+
+	return static_cast<double>(done) / size;
+}
+
+template <typename Subject>
+el::proxy<cycfi::remove_cvref_t<Subject>>
+make_proxy(Subject&& subject)
+{
+	return { std::forward<Subject>(subject) };
+}
 
 auto group_margin_size()
 {
@@ -76,22 +99,103 @@ auto make_path_settings(el::host_window_handle window, el::view& view, user_stat
 		);
 }
 
-auto make_builtin_options_api_selection(user_state& state)
+auto make_league_selection_menu(const std::vector<std::string_view>& league_names, user_state& state)
+{
+	return el::selection_menu(
+		[&state](std::string_view selected)
+		{ state.generation.league_state.selected_league = selected; },
+		league_names).first;
+}
+
+void update_download_state(
+	el::deck_element& league_selection_refresh_element,
+	el::progress_bar_base& league_selection_refresh_progress_bar,
+	el::proxy<el::basic_menu>& league_selection_menu,
+	el::view& view,
+	user_state& state)
+{
+	if (fs::utility::is_ready(state.generation.league_state.leagues_future)) {
+		std::vector<fs::lang::league> leagues = fs::network::ggg::parse_league_info(
+			state.generation.league_state.leagues_future.get());
+
+		std::vector<std::string_view> league_names;
+		for (const auto& league : leagues)
+			league_names.push_back(league.name);
+
+		league_selection_menu.subject(make_league_selection_menu(league_names, state));
+		league_selection_refresh_element.select(1); // swicth to refresh button
+		state.logger.info() << "refreshed with " << league_names.size() << "leagues";
+	}
+	else {
+		const auto xfer_info = state.generation.league_state.league_download_info.xfer_info.load(std::memory_order_relaxed);
+		league_selection_refresh_progress_bar.value(
+			calculate_progress(xfer_info.bytes_downloaded_so_far, xfer_info.expected_download_size));
+
+		// post again
+		view.post(
+			[&]() {
+				update_download_state(
+					league_selection_refresh_element,
+					league_selection_refresh_progress_bar,
+					league_selection_menu,
+					view,
+					state);
+			}
+		);
+	}
+
+	view.refresh();
+}
+
+auto make_builtin_options_api_selection(el::view& view, user_state& state)
 {
 	constexpr auto poe_ninja = "poe.ninja";
 	constexpr auto poe_watch = "poe.watch";
 	constexpr auto none = "no API data";
 
+	auto league_selection_menu = el::share(make_proxy(make_league_selection_menu({ "Standard", "Hardcore" }, state)));
+
+	auto league_selection_refresh_progress_bar = el::share(el::progress_bar(el::box(el::colors::black), el::box(el::get_theme().indicator_color)));
+	auto league_selection_refresh_button = el::share(el::button(el::icons::cycle, "refresh"));
+
+	auto league_selection_refresh_element = el::share(el::deck(
+		el::hold(league_selection_refresh_progress_bar),
+		el::hold(league_selection_refresh_button)
+	));
+	league_selection_refresh_element->select(1);
+
+	auto refresh_available_leagues = [league_selection_refresh_element, league_selection_refresh_progress_bar, league_selection_menu, &view, &state](bool) mutable {
+		league_selection_refresh_element->select(0); // swicth to progress bar
+		league_selection_refresh_progress_bar->value(0);
+		view.refresh();
+
+		state.generation.league_state.leagues_future = fs::network::ggg::async_download_leagues(
+			state.program.networking, &state.generation.league_state.league_download_info, state.logger);
+
+		view.post(
+			[&]() {
+				update_download_state(
+					*league_selection_refresh_element,
+					*league_selection_refresh_progress_bar,
+					*league_selection_menu,
+					view,
+					state);
+			}
+		);
+	};
+
+	league_selection_refresh_button->on_click = refresh_available_leagues;
+	//view.post([refresh_available_leagues]() mutable { refresh_available_leagues(false); });
+
 	return
-		el::vtile(el::htile(
+		el::htile(
 			el::vtile(
 				el::align_left_middle(el::label("item price data API")),
 				el::align_left_middle(el::label("league to download item prices for"))
 			),
 			el::vtile(
 				el::selection_menu(
-					[&state](std::string_view selected)
-					{
+					[&state](std::string_view selected) {
 						if (selected == poe_ninja)
 							state.generation.data_source = fs::lang::data_source_type::poe_ninja;
 						else if (selected == poe_watch)
@@ -99,29 +203,17 @@ auto make_builtin_options_api_selection(user_state& state)
 						else
 							state.generation.data_source = fs::lang::data_source_type::none;
 					},
-					{
-						poe_ninja,
-						poe_watch,
-						none
-					}
+					{ poe_ninja, poe_watch, none }
 				).first,
 				el::htile(
-					el::selection_menu(
-						[&state](std::string_view selected)
-						{
-							state.generation.league = selected;
-						},
-						{
-							"Standard", "Hardcore"
-						}
-					).first,
-					make_button(el::icons::cycle, "refresh", [](bool){})
+					el::hold(league_selection_menu),
+					el::hold(league_selection_refresh_element)
 				)
 			)
-		));
+		);
 }
 
-auto make_builtin_options(user_state& state)
+auto make_builtin_options(el::view& view, user_state& state)
 {
 	return
 		el::group("built-in generation options", el::margin(group_margin_size(),
@@ -136,7 +228,7 @@ auto make_builtin_options(user_state& state)
 						el::input_box().first
 					))
 				),
-				make_builtin_options_api_selection(state)
+				make_builtin_options_api_selection(view, state)
 			)
 		));
 }
@@ -184,7 +276,7 @@ auto make_tab_main(el::host_window_handle window, el::view& view, user_state& st
 			el::htile(
 				el::vtile(
 					make_path_settings(window, view, state),
-					make_builtin_options(state),
+					make_builtin_options(view, state),
 					make_filter_supplied_options()
 				),
 				el::group("loot preview", el::align_center_middle(el::label("TODO").font_size(100)))

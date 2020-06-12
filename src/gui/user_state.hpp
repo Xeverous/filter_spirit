@@ -4,9 +4,12 @@
 
 #include <fs/lang/item_price_data.hpp>
 #include <fs/lang/item_filter.hpp>
+#include <fs/network/download.hpp>
+#include <fs/network/ggg/download_data.hpp>
 #include <fs/log/logger.hpp>
 
 #include <string>
+#include <future>
 
 struct filter_state
 {
@@ -15,27 +18,23 @@ struct filter_state
 	std::optional<fs::lang::item_price_report> price_report;
 };
 
+struct league_selection_state
+{
+	std::string selected_league;
+	fs::network::download_info league_download_info;
+	std::future<fs::network::ggg::api_league_data> leagues_future;
+};
+
 struct generation_settings
 {
 	std::string filter_template_path;
-	// std::string output_directory;
-	// std::string generated_files_name_scheme;
 	fs::lang::data_source_type data_source;
-	std::string league;
-};
-
-struct networking_settings
-{
-	std::string proxy;
-	std::string certificases_bundle_path;
-	int timeout;
-	bool ssl_verify_peer;
-	bool ssl_verify_host;
+	league_selection_state league_state;
 };
 
 struct program_settings
 {
-	networking_settings networking;
+	fs::network::network_settings networking;
 };
 
 struct user_state
@@ -45,6 +44,7 @@ struct user_state
 
 	void load_filter_template();
 	void parse_filter_template();
+	void download_available_leagues();
 
 	filter_state filter;
 	generation_settings generation;

@@ -5,6 +5,7 @@
 #include <string_view>
 #include <cstdint>
 #include <utility>
+#include <exception>
 
 /**
  * how to use a logger:
@@ -227,6 +228,20 @@ constexpr auto error = "error: ";
 constexpr auto internal_compiler_error = "internal compiler error: ";
 constexpr auto request_bug_report = "Please report a bug with attached minimal filter source that reproduces it.\n";
 
+}
+
+template <typename F>
+void catch_and_log_exceptions(logger& log, F f)
+{
+	try {
+		f();
+	}
+	catch (const std::exception& e) {
+		log.error() << e.what();
+	}
+	catch (...) {
+		log.error() << "unknown error";
+	}
 }
 
 }
