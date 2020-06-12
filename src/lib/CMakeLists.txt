@@ -117,6 +117,7 @@ target_sources(filter_spirit
 		fs/utility/type_traits.hpp
 		fs/utility/visitor.hpp
 		fs/utility/string_helpers.hpp
+		fs/utility/async.hpp
 		fs/version.hpp
 )
 
