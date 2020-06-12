@@ -55,6 +55,7 @@ public:
 	outcome() = delete;
 
 	// success ctors
+
 	outcome(result_type result)
 	: _result(std::move(result))
 	{
