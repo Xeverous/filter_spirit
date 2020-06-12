@@ -171,8 +171,6 @@ int run(int argc, char* argv[])
 
 		if (opt_ca_bundle)
 			net_settings.ca_info_path = *opt_ca_bundle;
-		else
-			net_settings.ca_info_path = "certificates/cacert.pem";
 
 		if (opt_proxy)
 			net_settings.proxy = *opt_proxy;
