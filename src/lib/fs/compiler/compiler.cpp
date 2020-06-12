@@ -383,11 +383,18 @@ compile_spirit_filter_statements(
 	std::vector<lang::spirit_item_filter_block> blocks;
 	// start with empty conditions and actions
 	// thats the default state before any nesting
-	return compile_statements_recursively(
+	outcome<lang::spirit_item_filter> result = compile_statements_recursively(
 		st, {}, {}, statements, symbols, blocks)
 	.map_result<lang::spirit_item_filter>([&]() {
 		return lang::spirit_item_filter{std::move(blocks)};
 	});
+
+	// This function is the point when we want to stop proceeding on any errors.
+	// Otherwise the returned filter could contain broken state.
+	if (has_errors(result.logs()))
+		return std::move(result).logs();
+
+	return result;
 }
 
 outcome<lang::item_filter>
