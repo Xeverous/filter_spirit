@@ -181,8 +181,7 @@ int run(int argc, char* argv[])
 		}
 
 		if (opt_version) {
-			namespace v = fs::version;
-			std::cout << v::major << '.' << v::minor << '.' << v::patch << '\n';
+			std::cout << to_string(fs::version::current()) << '\n';
 			return EXIT_SUCCESS;
 		}
 
