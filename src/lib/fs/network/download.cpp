@@ -9,6 +9,13 @@ namespace
 
 namespace net = fs::network;
 
+// https://tools.ietf.org/html/rfc7231#section-5.5.3
+std::string fs_user_agent()
+{
+	return "FilterSpirit/" + to_string(fs::version::current())
+		+ " (" + fs::version::repository_link + ")";
+}
+
 std::size_t write_callback(char* data, std::size_t /* size */, std::size_t nmemb, void* userdata)
 {
 	auto& result = *reinterpret_cast<net::request_result*>(userdata);
@@ -76,10 +83,7 @@ setup_download(
 		return false;
 	}
 
-	if (const auto ec = easy.user_agent(
-		(std::string("Filter Spirit/") + fs::version::version_string()).c_str());
-		ec)
-	{
+	if (const auto ec = easy.user_agent(fs_user_agent().c_str()); ec) {
 		save_error_to_all(results, ec);
 		return false;
 	}
