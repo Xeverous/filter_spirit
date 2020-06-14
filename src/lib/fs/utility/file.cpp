@@ -72,24 +72,15 @@ bool save_file(const std::filesystem::path& path, std::string_view file_contents
 	return true;
 }
 
-bool create_directory_if_not_exists(const std::filesystem::path& dirpath, log::logger& logger)
+bool create_directories(const std::filesystem::path& dirpath, log::logger& logger)
 {
+	// Note: in case all directories already exist, this functions returns false
+	// but reports no error. Therefore, only error code is checked.
 	std::error_code ec;
-	const auto status = sfs::status(dirpath, ec);
-	if (!status_known(status)) {
-		logger.error() << "failed to stat path " << dirpath.generic_string()
+	if (std::filesystem::create_directories(dirpath, ec); ec) {
+		logger.error() << "failed to create " << dirpath.generic_string()
 			<< ": " << ec.message() << '\n';
 		return false;
-	}
-
-	if (!sfs::exists(status)) {
-		logger.info() << "directory " << dirpath.generic_string() << " does not exist, creating\n";
-
-		if (!std::filesystem::create_directory(dirpath, ec)) {
-			logger.error() << "failed to create " << dirpath.generic_string()
-				<< ": " << ec.message() << '\n';
-			return false;
-		}
 	}
 
 	return true;
