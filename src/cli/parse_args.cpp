@@ -200,12 +200,9 @@ int run(int argc, char* argv[])
 
 		const auto item_price_report = [&]() -> std::optional<fs::lang::item_price_report> {
 			if (opt_empty_data) {
-				// user explicitly stated to use empty data, some find it useful to write SSF filters where price queries are not used
-				fs::lang::item_price_report report;
-				report.metadata.data_source = fs::lang::data_source_type::none;
-				report.metadata.league_name = "(none)";
-				report.metadata.download_date = boost::posix_time::ptime(boost::posix_time::not_a_date_time);
-				return report;
+				// user explicitly stated to use empty data, some find it useful
+				// to write SSF filters where price queries are not used
+				return fs::lang::item_price_report();
 			}
 			else {
 				return obtain_item_price_report(
