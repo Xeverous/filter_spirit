@@ -124,7 +124,7 @@ FS does not need to install anything (it's fully portable). You can download lat
 
 ## build dependencies
 
-- C++17 compiler (`<filesystem>` not required)
+- C++17 compiler
 - Boost 1.70+:
   - spirit (FS uses newest X3 parser)
   - fusion
@@ -136,7 +136,6 @@ FS does not need to install anything (it's fully portable). You can download lat
   - beast
   - asio
   - system
-  - **filesystem**
   - **unit_test_framework** (only if you build tests)
 - nlohmann/json 3.0+
 - **OpenSSL** 1.1+

@@ -159,9 +159,16 @@ target_link_libraries(filter_spirit
 	PUBLIC
 		nlohmann_json::nlohmann_json
 		OpenSSL::SSL
-		Boost::filesystem
 		PkgConfig::libcurl
 )
+
+# earlier GCC and Clang versions which support C++17 require explicit link to filesystem library
+if(FILTER_SPIRIT_ADD_FILESYSTEM_LINK)
+	target_link_libraries(filter_spirit
+		$<$<CXX_COMPILER_ID:GNU>:stdc++fs>
+		$<$<CXX_COMPILER_ID:Clang>:c++fs>
+	)
+endif()
 
 # FS uses atomic operations in networking callbacks
 target_link_libraries(filter_spirit

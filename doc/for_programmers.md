@@ -32,8 +32,6 @@ Some of the code is very verbose (`std::variant<T1, T2> v = f(); if (std::holds_
 - `boost/container` - extra data structures which mix some STL containers with different tradeoffs. Only for optimization.
 - `boost/program_options` - command line parser.
 - `boost/date_time` - this is rather obvious.
-- `boost/filesystem` - file I/O.
-- `boost/system` - error handling, used in filesystem and networking.
 - `boost/unit_test` - obvious. Boost Test library might be a huge overkill when Google Test is much simpler, but since FS already uses a ton of boost there is not much point in dragging more dependencies.
 - `boost/format` - string formatting.
 - `boost/type_index` - pretty-printing type names with and without RTTI

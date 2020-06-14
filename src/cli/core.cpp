@@ -55,8 +55,8 @@ void save_api_data(
 
 bool generate_item_filter_impl(
 	const lang::item_price_report& report,
-	const boost::filesystem::path& source_filepath,
-	const boost::filesystem::path& output_filepath,
+	const std::filesystem::path& source_filepath,
+	const std::filesystem::path& output_filepath,
 	fs::generator::settings st,
 	log::logger& logger)
 {
