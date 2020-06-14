@@ -142,9 +142,9 @@ struct item_price_metadata
 	[[nodiscard]] bool save(const std::filesystem::path& directory, fs::log::logger& logger) const;
 	[[nodiscard]] bool load(const std::filesystem::path& directory, fs::log::logger& logger);
 
-	std::string league_name;
-	data_source_type data_source;
-	boost::posix_time::ptime download_date;
+	std::string league_name = "(none)";
+	data_source_type data_source = data_source_type::none;
+	boost::posix_time::ptime download_date = boost::posix_time::ptime(boost::posix_time::not_a_date_time);
 };
 
 log::message_stream& operator<<(log::message_stream& stream, const item_price_metadata& ipm);
