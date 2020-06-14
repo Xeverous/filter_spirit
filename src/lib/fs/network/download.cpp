@@ -2,6 +2,8 @@
 #include <fs/network/download.hpp>
 #include <fs/version.hpp>
 
+#include <curl/curl.h>
+
 #include <utility>
 
 namespace
@@ -13,7 +15,7 @@ namespace net = fs::network;
 std::string fs_user_agent()
 {
 	return "FilterSpirit/" + to_string(fs::version::current())
-		+ " (" + fs::version::repository_link + ")";
+		+ " (" + fs::version::repository_link + ") " + curl_version();
 }
 
 std::size_t write_callback(char* data, std::size_t /* size */, std::size_t nmemb, void* userdata)
