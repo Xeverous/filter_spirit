@@ -407,7 +407,7 @@ constexpr auto field_download_date = "download_date";
 
 bool item_price_metadata::save(const std::filesystem::path& directory, fs::log::logger& logger) const
 {
-	if (!utility::create_directory_if_not_exists(directory, logger))
+	if (!utility::create_directories(directory, logger))
 		return false;
 
 	nlohmann::json json = {

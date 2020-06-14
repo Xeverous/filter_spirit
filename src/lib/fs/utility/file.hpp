@@ -23,6 +23,6 @@ save_file(const std::filesystem::path& path, std::string_view file_contents);
 save_file(const std::filesystem::path& path, std::string_view file_contents, log::logger& logger);
 
 [[nodiscard]] bool
-create_directory_if_not_exists(const std::filesystem::path& dirpath, log::logger& logger);
+create_directories(const std::filesystem::path& dirpath, log::logger& logger);
 
 }
