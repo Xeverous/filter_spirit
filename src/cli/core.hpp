@@ -6,7 +6,6 @@
 #include <fs/lang/item_price_data.hpp>
 
 #include <boost/optional.hpp>
-#include <boost/filesystem/path.hpp>
 
 #include <string>
 

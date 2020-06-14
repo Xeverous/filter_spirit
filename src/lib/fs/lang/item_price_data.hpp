@@ -3,13 +3,13 @@
 #include <fs/log/logger.hpp>
 #include <fs/lang/data_source_type.hpp>
 
-#include <boost/filesystem/path.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
 #include <vector>
 #include <string>
 #include <unordered_map>
 #include <utility>
+#include <filesystem>
 
 namespace fs::lang
 {
@@ -139,8 +139,8 @@ log::message_stream& operator<<(log::message_stream& stream, const item_price_da
 
 struct item_price_metadata
 {
-	[[nodiscard]] bool save(const boost::filesystem::path& directory, fs::log::logger& logger) const;
-	[[nodiscard]] bool load(const boost::filesystem::path& directory, fs::log::logger& logger);
+	[[nodiscard]] bool save(const std::filesystem::path& directory, fs::log::logger& logger) const;
+	[[nodiscard]] bool load(const std::filesystem::path& directory, fs::log::logger& logger);
 
 	std::string league_name;
 	data_source_type data_source;

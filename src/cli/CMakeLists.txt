@@ -40,5 +40,4 @@ target_link_libraries(filter_spirit_cli
 	PRIVATE
 		filter_spirit
 		Boost::program_options
-		Boost::filesystem
 )

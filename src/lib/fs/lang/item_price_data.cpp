@@ -405,7 +405,7 @@ constexpr auto field_league_name = "league_name";
 constexpr auto field_data_source = "data_source";
 constexpr auto field_download_date = "download_date";
 
-bool item_price_metadata::save(const boost::filesystem::path& directory, fs::log::logger& logger) const
+bool item_price_metadata::save(const std::filesystem::path& directory, fs::log::logger& logger) const
 {
 	if (!utility::create_directory_if_not_exists(directory, logger))
 		return false;
@@ -427,7 +427,7 @@ bool item_price_metadata::save(const boost::filesystem::path& directory, fs::log
 	return true;
 }
 
-bool item_price_metadata::load(const boost::filesystem::path& directory, fs::log::logger& logger)
+bool item_price_metadata::load(const std::filesystem::path& directory, fs::log::logger& logger)
 {
 	std::error_code ec;
 	const auto path = directory / filename_metadata;

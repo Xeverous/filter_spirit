@@ -115,7 +115,7 @@ FS does not need to install anything. You can download latest release and immedi
 
 ## build dependencies
 
-- C++17 compiler (`<filesystem>` not required)
+- C++17 compiler
 - Boost 1.70 OR older with Spirit headers updated to 1.70; this project uses:
   - spirit (newest X3 library)
   - fusion
@@ -127,7 +127,6 @@ FS does not need to install anything. You can download latest release and immedi
   - beast
   - asio
   - system
-  - **filesystem**
   - **unit_test_framework** (only if you build tests)
 - nlohmann/json
 - **OpenSSL** (preferably 1.1+)
