@@ -20,41 +20,33 @@ std::future<api_league_data>
 async_download_leagues(
 	network_settings settings,
 	download_info* info,
-	log::logger& logger)
+	const log::monitor& logger)
 {
-	std::vector<std::string> urls = { "https://api.poe.watch/leagues" };
-	for (const auto& u : urls)
-		log_download(u, logger);
-
-	return std::async(std::launch::async, [](std::vector<std::string> urls, network_settings settings, download_info* info) {
-		download_result result = download(target_name, urls, std::move(settings), info);
+	return std::async(std::launch::async, [](network_settings settings, download_info* info, const log::monitor& logger) {
+		std::vector<std::string> urls = { "https://api.poe.watch/leagues" };
+		download_result result = download(target_name, urls, std::move(settings), info, logger);
 		return api_league_data{std::move(result.results[0].data)};
-	}, std::move(urls), std::move(settings), info);
+	}, std::move(settings), info, std::ref(logger));
 }
 
-std::future<api_item_price_data>
-async_download_item_price_data(
-	std::string league_name,
-	network_settings settings,
+api_item_price_data
+download_item_price_data(
+	const std::string& league_name,
+	const network_settings& settings,
 	download_info* info,
-	log::logger& logger)
+	const log::monitor& logger)
 {
 	std::vector<std::string> urls = {
 		"https://api.poe.watch/itemdata",
 		"https://api.poe.watch/compact?league=" + url_encode(league_name)
 	};
 
-	for (const auto& u : urls)
-		log_download(u, logger);
+	download_result result = download(target_name, urls, settings, info, logger);
 
-	return std::async(std::launch::async, [](std::vector<std::string> urls, network_settings settings, download_info* info) {
-		download_result result = download(target_name, urls, std::move(settings), info);
-
-		return api_item_price_data {
-			std::move(result.results[0].data),
-			std::move(result.results[1].data)
-		};
-	}, std::move(urls), std::move(settings), info);
+	return api_item_price_data {
+		std::move(result.results[0].data),
+		std::move(result.results[1].data)
+	};
 }
 
 }

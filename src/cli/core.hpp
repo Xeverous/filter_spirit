@@ -6,6 +6,7 @@
 #include <fs/lang/item_price_data.hpp>
 
 #include <boost/optional.hpp>
+#include <boost/date_time/posix_time/posix_time_types.hpp>
 
 #include <string>
 
@@ -18,9 +19,9 @@ list_leagues(
 obtain_item_price_report(
 	const boost::optional<std::string>& download_league_name_ninja,
 	const boost::optional<std::string>& download_league_name_watch,
+	boost::posix_time::time_duration expiration_time,
 	fs::network::network_settings net_settings,
 	const boost::optional<std::string>& data_read_dir,
-	const boost::optional<std::string>& data_save_dir,
 	fs::log::logger& logger);
 
 [[nodiscard]] bool

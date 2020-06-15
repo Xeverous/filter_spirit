@@ -18,12 +18,12 @@ constexpr auto target_name = "poe.ninja/api";
 namespace fs::network::poe_ninja
 {
 
-std::future<api_item_price_data>
-async_download_item_price_data(
-	std::string league_name,
-	network_settings settings,
+api_item_price_data
+download_item_price_data(
+	const std::string& league_name,
+	const network_settings& settings,
 	download_info* info,
-	log::logger& logger)
+	const log::monitor& logger)
 {
 	std::string league_encoded = url_encode(league_name);
 
@@ -57,20 +57,15 @@ async_download_item_price_data(
 	#undef CURRENCY_OVERVIEW_LINK
 	#undef ITEM_OVERVIEW_LINK
 
-	for (const auto& u : urls)
-		log_download(u, logger);
-
-	return std::async(std::launch::async, [](std::vector<std::string> urls, network_settings settings, download_info* info) {
-		download_result result = download(target_name, urls, std::move(settings), info);
-		// use preprocessor library to auto-repeat some boilerplate
-		// z = n + 1 (n is 0-based, z is 1-based), we ignore z
-		// d (data) is not needed, we ignore it
-		#define MOVE_RESULT_N(z, n, d) std::move(result.results[n].data),
-		return api_item_price_data {
-			BOOST_PP_REPEAT(21, MOVE_RESULT_N,)
-		};
-		#undef MOVE_RESULT_N
-	}, std::move(urls), std::move(settings), info);
+	download_result result = download(target_name, urls, settings, info, logger);
+	// use preprocessor library to auto-repeat some boilerplate
+	// z = n + 1 (n is 0-based, z is 1-based), we ignore z
+	// d (data) is not needed, we ignore it
+	#define MOVE_RESULT_N(z, n, d) std::move(result.results[n].data),
+	return api_item_price_data {
+		BOOST_PP_REPEAT(21, MOVE_RESULT_N,)
+	};
+	#undef MOVE_RESULT_N
 }
 
 }

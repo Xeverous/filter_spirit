@@ -1,6 +1,7 @@
 #pragma once
 
 #include <fs/log/logger.hpp>
+#include <fs/log/monitor.hpp>
 
 #include <atomic>
 #include <future>
@@ -56,12 +57,8 @@ struct network_settings
 download(
 	std::string_view target_name,
 	const std::vector<std::string>& urls,
-	network_settings settings,
-	download_info* info);
-
-void
-log_download(
-	std::string_view target_url,
-	log::logger& logger);
+	const network_settings& settings,
+	download_info* info,
+	const fs::log::monitor& logger);
 
 }

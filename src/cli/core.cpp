@@ -1,57 +1,19 @@
 #include "core.hpp"
 
 #include <fs/generator/generate_filter.hpp>
-#include <fs/network/poe_ninja/download_data.hpp>
-#include <fs/network/poe_ninja/parse_data.hpp>
-#include <fs/network/poe_watch/download_data.hpp>
-#include <fs/network/poe_watch/parse_data.hpp>
+#include <fs/network/item_price_report.hpp>
 #include <fs/network/ggg/download_data.hpp>
 #include <fs/network/ggg/parse_data.hpp>
 #include <fs/utility/file.hpp>
 #include <fs/log/logger.hpp>
 
+#include <filesystem>
 #include <utility>
 
 using namespace fs;
 
 namespace
 {
-
-[[nodiscard]] std::optional<lang::item_price_report>
-load_item_price_report(const std::string& path, log::logger& logger)
-{
-	lang::item_price_report report;
-	if (!report.metadata.load(path, logger)) {
-		logger.error() << "failed to load item price metadata\n";
-		return std::nullopt;
-	}
-
-	if (!report.data.load_and_parse(report.metadata, path, logger)) {
-		logger.error() << "failed to load item price data\n";
-		return std::nullopt;
-	}
-
-	return report;
-}
-
-template <typename T>
-void save_api_data(
-	const T& api_data, // T must have save(dir, logger) overload
-	const lang::item_price_metadata& metadata,
-	const std::string& data_save_dir,
-	log::logger& logger)
-{
-	if (!metadata.save(data_save_dir, logger)) {
-		logger.error() << "failed to save item price metadata\n";
-		return;
-	}
-
-	if (!api_data.save(data_save_dir, logger)) {
-		logger.error() << "failed to save item price data\n";
-	}
-
-	logger.info() << "item price data successfully saved\n";
-}
 
 bool generate_item_filter_impl(
 	const lang::item_price_report& report,
@@ -60,7 +22,8 @@ bool generate_item_filter_impl(
 	fs::generator::settings st,
 	log::logger& logger)
 {
-	std::optional<std::string> source_file_content = utility::load_file(source_filepath, logger);
+	log::monitor mon(logger);
+	std::optional<std::string> source_file_content = utility::load_file(source_filepath, mon);
 
 	if (!source_file_content)
 		return false;
@@ -71,7 +34,7 @@ bool generate_item_filter_impl(
 	if (!filter_content)
 		return false;
 
-	if (utility::save_file(output_filepath, *filter_content, logger)) {
+	if (utility::save_file(output_filepath, *filter_content, mon)) {
 		logger.info() << "item filter successfully saved as " << output_filepath.generic_string() << '\n';
 		return true;
 	}
@@ -84,24 +47,24 @@ bool generate_item_filter_impl(
 
 void list_leagues(network::network_settings net_settings, log::logger& logger)
 {
-	const auto league_data = network::ggg::async_download_leagues(std::move(net_settings), nullptr, logger).get();
+	log::monitor mon(logger);
+	const auto league_data = network::ggg::async_download_leagues(std::move(net_settings), nullptr, mon).get();
 	const std::vector<lang::league> leagues = network::ggg::parse_league_info(league_data);
 
 	auto stream = logger.info();
 	stream << "available leagues:\n";
 
-	for (const lang::league& league : leagues) {
+	for (const lang::league& league : leagues)
 		stream << league.name << '\n';
-	}
 }
 
 std::optional<lang::item_price_report>
 obtain_item_price_report(
 	const boost::optional<std::string>& download_league_name_ninja,
 	const boost::optional<std::string>& download_league_name_watch,
+	boost::posix_time::time_duration expiration_time,
 	network::network_settings net_settings,
 	const boost::optional<std::string>& data_read_dir,
-	const boost::optional<std::string>& data_save_dir,
 	fs::log::logger& logger)
 {
 	if ((download_league_name_watch && data_read_dir)
@@ -112,44 +75,34 @@ obtain_item_price_report(
 		return std::nullopt;
 	}
 
-	if (data_read_dir && data_save_dir) {
-		logger.error() << "reading and saving can not be specified at the same time\n";
-		return std::nullopt;
-	}
-
+	log::monitor mon(logger);
 	if (data_read_dir) {
-		return load_item_price_report(*data_read_dir, logger);
+		return lang::load_item_price_report(*data_read_dir, mon);
 	}
 
-	lang::item_price_report report;
+	network::item_price_report_cache cache;
+	cache.load_cache_file_from_disk(mon);
 	if (download_league_name_ninja) {
-		auto api_data = network::poe_ninja::async_download_item_price_data(
-			*download_league_name_ninja, std::move(net_settings), nullptr, logger).get();
-
-		report.metadata.data_source = lang::data_source_type::poe_ninja;
-		report.metadata.league_name = *download_league_name_ninja;
-		report.metadata.download_date = boost::posix_time::microsec_clock::universal_time();
-
-		if (data_save_dir)
-			save_api_data(api_data, report.metadata, *data_save_dir, logger);
-
-		report.data = network::poe_ninja::parse_item_price_data(api_data, logger);
+		return cache.async_get_report(
+			std::move(*download_league_name_ninja),
+			lang::data_source_type::poe_ninja,
+			expiration_time,
+			std::move(net_settings),
+			nullptr,
+			mon).get();
 	}
 	else if (download_league_name_watch) {
-		auto api_data = network::poe_watch::async_download_item_price_data(
-			*download_league_name_watch, std::move(net_settings), nullptr, logger).get();
-
-		report.metadata.data_source = lang::data_source_type::poe_watch;
-		report.metadata.league_name = *download_league_name_watch;
-		report.metadata.download_date = boost::posix_time::microsec_clock::universal_time();
-
-		if (data_save_dir)
-			save_api_data(api_data, report.metadata, *data_save_dir, logger);
-
-		report.data = network::poe_watch::parse_item_price_data(api_data, logger);
+		return cache.async_get_report(
+			std::move(*download_league_name_watch),
+			lang::data_source_type::poe_watch,
+			expiration_time,
+			std::move(net_settings),
+			nullptr,
+			mon).get();
 	}
 
-	return report;
+	logger.error() << "no option specified how to obtain item price data\n";
+	return std::nullopt;
 }
 
 bool generate_item_filter(
@@ -181,7 +134,8 @@ int print_item_price_report(
 	const std::string& path,
 	fs::log::logger& logger)
 {
-	std::optional<lang::item_price_report> report = load_item_price_report(path, logger);
+	log::monitor mon(logger);
+	std::optional<lang::item_price_report> report = lang::load_item_price_report(path, mon);
 	if (!report) {
 		return EXIT_FAILURE;
 	}
@@ -200,12 +154,13 @@ int compare_data_saves(
 		return EXIT_FAILURE;
 	}
 
-	std::optional<lang::item_price_report> report_lhs = load_item_price_report(paths[0], logger);
+	log::monitor mon(logger);
+	std::optional<lang::item_price_report> report_lhs = lang::load_item_price_report(paths[0], mon);
 	if (!report_lhs) {
 		return EXIT_FAILURE;
 	}
 
-	std::optional<lang::item_price_report> report_rhs = load_item_price_report(paths[1], logger);
+	std::optional<lang::item_price_report> report_rhs = lang::load_item_price_report(paths[1], mon);
 	if (!report_rhs) {
 		return EXIT_FAILURE;
 	}
