@@ -3,6 +3,7 @@
 #include <future>
 #include <chrono>
 #include <mutex>
+#include <exception>
 
 // async stuff utils
 
@@ -12,6 +13,21 @@ template <typename T>
 bool is_ready(const std::future<T>& future)
 {
 	return future.wait_for(std::chrono::seconds(0)) == std::future_status::ready;
+}
+
+template <typename R, typename T> [[nodiscard]]
+std::future<R> make_ready_future(T&& value)
+{
+	std::promise<R> promise;
+	std::future<R> future = promise.get_future();
+	try {
+		promise.set_value(std::forward<T>(value));
+		return future;
+	}
+	catch (...) {
+		promise.set_exception(std::current_exception());
+		return future;
+	}
 }
 
 namespace impl {
