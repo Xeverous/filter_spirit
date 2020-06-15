@@ -1,7 +1,6 @@
 #include "common/string_operations.hpp"
 
 #include <fs/utility/string_helpers.hpp>
-#include <fs/log/string_logger.hpp>
 
 #include <string_view>
 #include <utility>
