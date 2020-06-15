@@ -2,7 +2,7 @@
 
 #include <fs/network/poe_watch/api_data.hpp>
 #include <fs/network/download.hpp>
-#include <fs/log/logger.hpp>
+#include <fs/log/monitor.hpp>
 
 #include <future>
 #include <string>
@@ -14,13 +14,13 @@ namespace fs::network::poe_watch
 async_download_leagues(
 	network_settings settings,
 	download_info* info,
-	log::logger& logger);
+	const log::monitor& logger);
 
-[[nodiscard]] std::future<api_item_price_data>
-async_download_item_price_data(
-	std::string league_name,
-	network_settings settings,
+[[nodiscard]] api_item_price_data
+download_item_price_data(
+	const std::string& league_name,
+	const network_settings& settings,
 	download_info* info,
-	log::logger& logger);
+	const log::monitor& logger);
 
 }

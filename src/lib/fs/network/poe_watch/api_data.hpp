@@ -1,6 +1,6 @@
 #pragma once
 
-#include <fs/log/logger.hpp>
+#include <fs/log/monitor.hpp>
 
 #include <string>
 #include <filesystem>
@@ -15,8 +15,8 @@ struct api_league_data
 
 struct api_item_price_data
 {
-	[[nodiscard]] bool save(const std::filesystem::path& directory, log::logger& logger) const;
-	[[nodiscard]] bool load(const std::filesystem::path& directory, log::logger& logger);
+	[[nodiscard]] bool save(const std::filesystem::path& directory, const log::monitor& logger) const;
+	[[nodiscard]] bool load(const std::filesystem::path& directory, const log::monitor& logger);
 
 	// https://poe.watch/api
 	std::string itemdata_json;

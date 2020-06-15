@@ -72,7 +72,7 @@ void save_error_to_all(std::vector<net::request_result>& results, std::error_cod
 [[nodiscard]] bool
 setup_download(
 	net::curl::easy_handle& easy,
-	net::network_settings settings,
+	const net::network_settings& settings,
 	std::vector<net::request_result>& results)
 {
 	if (const auto ec = easy.write_callback(write_callback); ec) {
@@ -122,6 +122,16 @@ setup_download(
 	return true;
 }
 
+void
+log_download(
+	const fs::log::monitor& logger,
+	std::string_view target_url)
+{
+	logger([target_url](fs::log::logger& logger) {
+		logger.info() << "downloading from " << target_url << '\n';
+	});
+}
+
 } // namespace
 
 namespace fs::network {
@@ -130,13 +140,14 @@ download_result
 download(
 	std::string_view target_name,
 	const std::vector<std::string>& urls,
-	network_settings settings,
-	download_info* info)
+	const network_settings& settings,
+	download_info* info,
+	const fs::log::monitor& logger)
 {
 	std::vector<request_result> results(urls.size());
 	curl::easy_handle easy;
 
-	if (!setup_download(easy, std::move(settings), results))
+	if (!setup_download(easy, settings, results))
 		return download_result{std::move(results)};
 
 	if (info) {
@@ -160,6 +171,7 @@ download(
 			continue;
 		}
 
+		log_download(logger, urls[i]);
 		if (const auto ec = easy.url(urls[i].c_str()); ec) {
 			save_error(results[i], ec);
 			continue;
@@ -185,14 +197,6 @@ download(
 	}
 
 	return download_result{std::move(results)};
-}
-
-void
-log_download(
-	std::string_view target_url,
-	log::logger& logger)
-{
-	logger.info() << "downloading from " << target_url << '\n';
 }
 
 }

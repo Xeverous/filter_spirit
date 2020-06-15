@@ -23,16 +23,16 @@ void print_help(const boost::program_options::options_description& options)
 	std::cout <<
 		"Filter Spirit - advanced item filter generator for Path of Exile game client\n\n"
 		"Usage:\n"
-		"./filter_spirit_cli <data_obtaining_option> [data_storing_option] [-g input_path output_path [generation_option]...]\n"
+		"./filter_spirit_cli <data_obtaining_option> [cache_option]... [-g input_path output_path [generation_option]...]\n"
 		"./filter_spirit_cli <generic_option>\n"
 		"\n"
 		"Examples:\n"
-		"generate/refresh an item filter (using newest available online data):\n"
-		"./filter_spirit_cli -n \"Standard\" -g filter_template.txt output.filter\n"
+		"generate/refresh an item filter (using data not older than 2 hours):\n"
+		"./filter_spirit_cli -n \"Standard\" -a 120 -g filter_template.txt output.filter\n"
 		"download API data for future reuse:\n"
-		"./filter_spirit_cli -n \"Standard\" -s price_data_dump\n"
+		"./filter_spirit_cli -n \"Standard\" -a 0\n"
 		"generate/refresh an item filter (using previously saved data):\n"
-		"./filter_spirit_cli -r price_data_dump -g filter_template.txt output.filter\n";
+		"./filter_spirit_cli -r cache/ninja_Standard -g filter_template.txt output.filter\n";
 
 	options.print(std::cout);
 
@@ -68,14 +68,22 @@ int run(int argc, char* argv[])
 			("empty-data,e",     po::bool_switch(&opt_empty_data),
 				"run with no item price data (all price queries will have no results)")
 			("read,r", po::value(&data_read_dir)->value_name("DIRPATH"),
-				"read item price data (JSON files) from specified directory")
+				"read item price data (JSON files) from specified directory (ignores age option)")
+		;
+
+		int max_age;
+		po::options_description cache_options("cache options");
+		cache_options.add_options()
+			("age,a", po::value(&max_age)->value_name("MINUTES")->default_value(60),
+				"max age of cached item price data - too old data will be redownloaded, "
+				"otherwise it is read from file cache; set to 0 if you always want to download")
 		;
 
 		boost::optional<std::string> opt_proxy;
 		boost::optional<std::string> opt_ca_bundle;
 		bool no_ssl_verify_peer = false;
 		bool no_ssl_verify_host = false;
-		long timeout_ms = 0;
+		long timeout_ms;
 		po::options_description networking_options("networking options");
 		networking_options.add_options()
 			("proxy,x", po::value(&opt_proxy)->value_name("PROXY"),
@@ -92,15 +100,8 @@ int run(int argc, char* argv[])
 				("do not verify the authenticity of the peer's certificate"))
 			("no-ssl-host", po::bool_switch(&no_ssl_verify_host),
 				("do not verify certificate's name against host name"))
-			("timeout,t", po::value(&timeout_ms)->value_name("MILLISECONDS"),
-				("timeout for networking operations, 0 means never timeout, default: 0"))
-		;
-
-		boost::optional<std::string> data_save_dir;
-		po::options_description data_storing_options("data storing options (use if you would like to save item price data for future use)");
-		data_storing_options.add_options()
-			("save,s", po::value(&data_save_dir)->value_name("DIRPATH"),
-				"save item price data (JSON files) to specified directory (requires download option)")
+			("timeout,t", po::value(&timeout_ms)->value_name("MILLISECONDS")->default_value(5000),
+				("timeout for networking operations, 0 means never timeout"))
 		;
 
 		bool opt_generate = false;
@@ -108,7 +109,7 @@ int run(int argc, char* argv[])
 		po::options_description generation_options("generation options");
 		generation_options.add_options()
 			("generate,g",  po::bool_switch(&opt_generate), "generate an item filter")
-			("print-ast,a", po::bool_switch(&st.print_ast), "print abstract syntax tree (for debug purposes)")
+			("print-ast,p", po::bool_switch(&st.print_ast), "print abstract syntax tree (for debug purposes)")
 			("stop-on-error", po::bool_switch(&st.compile_settings.error_handling.stop_on_error),
 				"stop on first error")
 			("warning-is-error", po::bool_switch(&st.compile_settings.error_handling.treat_warnings_as_errors),
@@ -132,7 +133,7 @@ int run(int argc, char* argv[])
 		std::vector<std::string> compare_paths;
 		po::options_description generic_options("generic options (use 1)");
 		generic_options.add_options()
-			("list-leagues,l", po::bool_switch(&opt_list_leagues), "download and list leagues")
+			("list-leagues,l", po::bool_switch(&opt_list_leagues), "download and list available leagues")
 			("help,h",         po::bool_switch(&opt_help),    "print this message")
 			("version,v",      po::bool_switch(&opt_version), "print version number")
 			("info,i",         po::value(&info_path)->value_name("DIRPATH"), "show information about given item price data save")
@@ -146,8 +147,8 @@ int run(int argc, char* argv[])
 		po::options_description all_options;
 		all_options
 			.add(data_obtaining_options)
+			.add(cache_options)
 			.add(networking_options)
-			.add(data_storing_options)
 			.add(generation_options)
 			.add(positional_options)
 			.add(generic_options);
@@ -208,9 +209,9 @@ int run(int argc, char* argv[])
 				return obtain_item_price_report(
 					download_league_name_ninja,
 					download_league_name_watch,
+					boost::posix_time::minutes(max_age),
 					net_settings,
 					data_read_dir,
-					data_save_dir,
 					logger);
 			}
 		}();
