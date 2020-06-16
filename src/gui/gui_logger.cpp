@@ -23,7 +23,7 @@ el::color severity_to_color(fs::log::severity s)
 	return el::colors::white;
 }
 
-void remove_trailing_whitespace(std::string& str)
+std::string remove_trailing_whitespace(std::string str)
 {
 	auto const is_whitespace = [](char c) {
 		return c == ' ' || c == '\t' || c == '\r' || c == '\n';
@@ -31,26 +31,46 @@ void remove_trailing_whitespace(std::string& str)
 
 	while (!str.empty() && is_whitespace(str.back()))
 		str.pop_back();
+
+	return str;
 }
 
 }
 
-void gui_logger::end_message()
+void gui_logger::update_ui()
 {
 	BOOST_ASSERT(_ui_element != nullptr);
 	BOOST_ASSERT(_view != nullptr);
 
-	remove_trailing_whitespace(_string_logger.str());
+	// remove_trailing_whitespace(_string_logger.str());
 
-	_ui_element->push_back(el::share(
-		el::align_left(el::static_text_box(
-			std::move(_string_logger.str()),
-			el::get_theme().text_box_font,
-			el::get_theme().text_box_font_size,
-			severity_to_color(_severity)
-		))
-	));
-	_string_logger.str().clear();
+	bool needs_refresh = _logger([&](fs::log::buffer_logger& logger) {
+		if (logger.messages().empty())
+			return false;
 
+		for (const fs::log::buffer_logger::message& m : logger.messages()) {
+			_ui_element->push_back(el::share(
+				el::no_vstretch(el::align_left(el::static_text_box(
+					remove_trailing_whitespace(m.text),
+					el::get_theme().text_box_font,
+					el::get_theme().text_box_font_size,
+					severity_to_color(m.s)
+				)))
+			));
+		}
+		logger.clear();
+		return true;
+	});
+
+	if (needs_refresh)
+		_view->refresh();
+}
+
+void gui_logger::clear_logs()
+{
+	_logger([&](fs::log::buffer_logger& logger) {
+		logger.clear();
+	});
+	_ui_element->clear();
 	_view->refresh();
 }

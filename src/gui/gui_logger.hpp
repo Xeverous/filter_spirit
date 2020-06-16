@@ -1,7 +1,7 @@
 #pragma once
 
-#include <fs/log/logger.hpp>
-#include <fs/log/string_logger.hpp>
+#include <fs/log/monitor.hpp>
+#include <fs/log/buffer_logger.hpp>
 
 #include <elements/view.hpp>
 #include <elements/element/tile.hpp>
@@ -9,9 +9,14 @@
 #include <memory>
 #include <utility>
 
-class gui_logger : public fs::log::logger
+class gui_logger
 {
 public:
+	gui_logger()
+	: _monitor(_)
+	{
+	}
+
 	// This is a bit ugly (should be done in the constructor) but needs to be done
 	// later to avoid cyclic dependency between state and UI code.
 	void set_ui_elements(std::shared_ptr<cycfi::elements::vtile_composite> ui_element, cycfi::elements::view& view)
@@ -20,36 +25,31 @@ public:
 		_view = &view;
 	}
 
-	void begin_message(fs::log::severity s) override
+	void update()
 	{
-		_severity = s;
+		update_ui();
 	}
 
-	void end_message() override;
+	void clear_logs();
 
-	void add(std::string_view text) override
-	{
-		_string_logger.add(text);
-	}
-
-	void add(char character) override
-	{
-		_string_logger.add(character);
-	}
-
-	void add(std::int64_t number) override
-	{
-		_string_logger.add(number);
-	}
-
-	void add(std::uint64_t number) override
-	{
-		_string_logger.add(number);
-	}
+	      fs::log::monitor& monitor()       { return _monitor; }
+	const fs::log::monitor& monitor() const { return _monitor; }
 
 private:
-	fs::log::severity _severity = fs::log::severity::info;
-	fs::log::string_logger _string_logger;
+	void update_ui();
+
+	template <typename F>
+	auto _logger(F f)
+	{
+		return _monitor([f](fs::log::logger& logger) {
+			// this downcast is safe because the class knows
+			// what logger type the monitor has been initialized with
+			return f(static_cast<fs::log::buffer_logger&>(logger));
+		});
+	}
+
+	fs::log::buffer_logger _; // should never be used directly
+	fs::log::monitor _monitor;
 	std::shared_ptr<cycfi::elements::vtile_composite> _ui_element;
 	cycfi::elements::view* _view = nullptr;
 };
