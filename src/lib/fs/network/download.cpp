@@ -18,7 +18,7 @@ std::string fs_user_agent()
 		+ " (" + fs::version::repository_link + ") " + curl_version();
 }
 
-std::size_t write_callback(char* data, std::size_t /* size */, std::size_t nmemb, void* userdata)
+std::size_t write_callback(char* data, std::size_t /* size */, std::size_t nmemb, void* userdata) noexcept
 {
 	auto& result = *reinterpret_cast<net::request_result*>(userdata);
 
@@ -43,7 +43,7 @@ int xferinfo_callback(
 	curl_off_t dltotal,
 	curl_off_t dlnow,
 	curl_off_t /* ultotal */,
-	curl_off_t /* ulnow */)
+	curl_off_t /* ulnow */) noexcept
 {
 	auto& info = *reinterpret_cast<net::download_info*>(userdata);
 
@@ -151,6 +151,8 @@ download(
 		return download_result{std::move(results)};
 
 	if (info) {
+		info->requests_total.store(urls.size(), std::memory_order::memory_order_release);
+
 		if (auto ec = easy.xferinfo_callback(xferinfo_callback); ec) {
 			save_error_to_all(results, ec);
 			return net::download_result{std::move(results)};

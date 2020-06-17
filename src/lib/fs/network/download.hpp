@@ -33,7 +33,8 @@ struct download_info
 {
 	// updated real-time
 	std::atomic<download_xfer_info> xfer_info = {};
-	std::atomic<std::size_t> requests_complete = 0;
+	std::atomic_size_t requests_complete = 0;
+	std::atomic_size_t requests_total = 0;
 };
 
 struct network_settings
