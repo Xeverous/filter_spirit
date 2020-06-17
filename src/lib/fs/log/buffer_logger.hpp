@@ -81,6 +81,9 @@ public:
 			l.message(m.s) << m.text;
 	}
 
+	      auto& messages()       { return _buffer; }
+	const auto& messages() const { return _buffer; }
+
 	void clear()
 	{
 		_buffer.clear();
