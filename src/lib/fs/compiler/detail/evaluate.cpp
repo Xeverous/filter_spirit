@@ -82,6 +82,9 @@ evaluate_literal(
 		[&](ast::sf::influence_literal literal) -> result_type {
 			return lang::single_object{lang::influence{literal.value, position_tag_of(literal)}, expr_origin};
 		},
+		[&](ast::sf::shaper_voice_line_literal literal) -> result_type {
+			return lang::single_object{lang::shaper_voice_line{literal.value, position_tag_of(literal)}, expr_origin};
+		},
 		[&](const ast::sf::string_literal& literal) -> result_type {
 			return lang::single_object{lang::string{literal, position_tag_of(literal)}, expr_origin};
 		}
@@ -215,25 +218,31 @@ make_socket_spec(
 	return {ss, std::move(logs)};
 }
 
+outcome<lang::builtin_alert_sound_id>
+make_builtin_alert_sound_id(
+	lang::integer sound_id)
+{
+	return make_integer_in_range(sound_id, lang::limits::min_filter_sound_id, lang::limits::max_filter_sound_id)
+		.map_result<lang::builtin_alert_sound_id>([](lang::integer sound_id) {
+			return lang::builtin_alert_sound_id{sound_id};
+		});
+}
+
 outcome<lang::builtin_alert_sound>
 make_builtin_alert_sound(
 	settings /* st */,
 	bool positional,
-	lang::integer sound_id,
+	lang::builtin_alert_sound_id sound_id,
 	std::optional<lang::integer> volume)
 {
 	if (volume) {
-		return make_integer_in_range(sound_id, lang::limits::min_filter_sound_id, lang::limits::max_filter_sound_id)
-			.merge_with(make_integer_in_range(*volume, lang::limits::min_filter_volume, lang::limits::max_filter_volume))
-			.map_result<lang::builtin_alert_sound>([&](lang::integer sound_id, lang::integer volume) {
+		return make_integer_in_range(*volume, lang::limits::min_filter_volume, lang::limits::max_filter_volume)
+			.map_result<lang::builtin_alert_sound>([&](lang::integer volume) {
 				return lang::builtin_alert_sound{positional, sound_id, volume};
 			});
 	}
 	else {
-		return make_integer_in_range(sound_id, lang::limits::min_filter_sound_id, lang::limits::max_filter_sound_id)
-			.map_result<lang::builtin_alert_sound>([&](lang::integer sound_id) {
-				return lang::builtin_alert_sound{positional, sound_id};
-			});
+		return lang::builtin_alert_sound{positional, sound_id};
 	}
 }
 

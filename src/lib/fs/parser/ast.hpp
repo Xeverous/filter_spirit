@@ -130,6 +130,19 @@ namespace common
 		lang::influence_type value;
 	};
 
+	struct shaper_voice_line_literal : x3::position_tagged
+	{
+		auto& operator=(lang::shaper_voice_line_type sh)
+		{
+			value = sh;
+			return *this;
+		}
+
+		auto get_value() const { return value; }
+
+		lang::shaper_voice_line_type value;
+	};
+
 	struct temp_literal : x3::position_tagged
 	{
 		void get_value() const {}
@@ -230,6 +243,7 @@ namespace sf
 	using shape_literal = common::shape_literal;
 	using suit_literal = common::suit_literal;
 	using influence_literal = common::influence_literal;
+	using shaper_voice_line_literal = common::shaper_voice_line_literal;
 	using temp_literal = common::temp_literal;
 	using none_literal = common::none_literal;
 
@@ -247,6 +261,7 @@ namespace sf
 			shape_literal,
 			suit_literal,
 			influence_literal,
+			shaper_voice_line_literal,
 			temp_literal,
 			none_literal,
 			socket_spec_literal,
@@ -570,6 +585,7 @@ namespace rf
 	using rarity_literal = common::rarity_literal;
 	using string_literal = common::string_literal;
 	using influence_literal = common::influence_literal;
+	using shaper_voice_line_literal = common::shaper_voice_line_literal;
 
 	struct socket_spec_literal : x3::position_tagged
 	{
@@ -670,15 +686,24 @@ namespace rf
 		integer_literal font_size;
 	};
 
+	struct sound_id : x3::variant<
+		integer_literal,
+		shaper_voice_line_literal
+	>, x3::position_tagged
+	{
+		using base_type::base_type;
+		using base_type::operator=;
+	};
+
 	struct play_alert_sound_action : x3::position_tagged
 	{
-		integer_literal sound_id;
+		sound_id id;
 		boost::optional<integer_literal> volume;
 	};
 
 	struct play_alert_sound_positional_action : x3::position_tagged
 	{
-		integer_literal sound_id;
+		sound_id id;
 		boost::optional<integer_literal> volume;
 	};
 

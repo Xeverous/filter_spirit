@@ -133,6 +133,7 @@ expression(s) | type | notes
 `Normal`, `Magic`, `Rare`, `Unique` | Rarity |
 `Circle`, `Diamond`, `Hexagon`, `Square`, `Star`, `Triangle`, `Cross`, `Moon`, `Raindrop`, `Kite`, `Pentagon`, `UpsideDownHouse` | Shape |
 `Red`, `Green`, `Blue`, `White`, `Brown`, `Yellow`, `Cyan`, `Grey`, `Orange`, `Pink`, `Purple` | Suit |
+`ShMirror`, `ShExalted`, `ShDivine`, `ShGeneral`, `ShRegal`, `ShChaos`, `ShFusing`, `ShAlchemy`, `ShVaal`, `ShBlessed` | ShaperVoiceLine
 `Shaper`, `Elder`, `Crusader`, `Redeemer`, `Hunter`, `Warlord` | Influence |
 `"abc"` | String | UTF-8 encoding, line breaking characters (LF and CR) not allowed between quotes
 
@@ -558,8 +559,8 @@ SetBackgroundColor       Integer Integer Integer [Integer]
 SetFontSize              Integer
 
 # first token is built-in sound ID, second is volume
-PlayAlertSound           Integer [Integer]
-PlayAlertSoundPositional Integer [Integer]
+PlayAlertSound           (Integer | ShaperVoiceLine) [Integer]
+PlayAlertSoundPositional (Integer | ShaperVoiceLine) [Integer]
 
 # path can be absolute or just the file name
 # note: custom sounds do not support specifying volume
@@ -581,7 +582,7 @@ Set                      $identifier
 # and CustomAlertSound tokens. Useful when you want to use
 # constants because the constant can be freely changed
 # what sound variant it refers to.
-SetAlertSound            String | (Integer [Integer])
+SetAlertSound            String | ((Integer | ShaperVoiceLine) [Integer])
 ```
 
 Examples:

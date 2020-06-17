@@ -36,6 +36,53 @@ void output_font_size(
 	output_stream << '\t' << kw::set_font_size << ' ' << (*font_size_action).size.value << '\n';
 }
 
+void output_builtin_alert_sound_id(
+	lang::builtin_alert_sound_id sound_id,
+	std::ostream& output_stream)
+{
+	output_stream << ' ';
+
+	std::visit(utility::visitor{
+		[&output_stream](lang::integer sound_id) {
+			output_stream << sound_id.value;
+		},
+		[&output_stream](lang::shaper_voice_line sound_id) {
+			switch (sound_id.value) {
+				case lang::shaper_voice_line_type::mirror:
+					output_stream << kw::sh_mirror;
+					break;
+				case lang::shaper_voice_line_type::exalted:
+					output_stream << kw::sh_exalted;
+					break;
+				case lang::shaper_voice_line_type::divine:
+					output_stream << kw::sh_divine;
+					break;
+				case lang::shaper_voice_line_type::general:
+					output_stream << kw::sh_general;
+					break;
+				case lang::shaper_voice_line_type::regal:
+					output_stream << kw::sh_regal;
+					break;
+				case lang::shaper_voice_line_type::chaos:
+					output_stream << kw::sh_chaos;
+					break;
+				case lang::shaper_voice_line_type::fusing:
+					output_stream << kw::sh_fusing;
+					break;
+				case lang::shaper_voice_line_type::alchemy:
+					output_stream << kw::sh_alchemy;
+					break;
+				case lang::shaper_voice_line_type::vaal:
+					output_stream << kw::sh_vaal;
+					break;
+				case lang::shaper_voice_line_type::blessed:
+					output_stream << kw::sh_blessed;
+					break;
+			}
+		}
+	}, sound_id.id);
+}
+
 void output_builtin_alert_sound(
 	lang::builtin_alert_sound alert_sound,
 	std::ostream& output_stream)
@@ -47,7 +94,7 @@ void output_builtin_alert_sound(
 	else
 		output_stream << kw::play_alert_sound;
 
-	output_stream << ' ' << alert_sound.sound_id.value;
+	output_builtin_alert_sound_id(alert_sound.sound_id, output_stream);
 
 	if (alert_sound.volume.has_value())
 		output_stream << ' ' << (*alert_sound.volume).value;

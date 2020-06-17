@@ -120,6 +120,7 @@ $influence      = Elder
 $rarity         = Rare
 $shape          = Hexagon
 $suit           = Yellow
+$shaper_voice   = ShChaos
 $string         = "Leather Belt"
 )";
 			const std::string_view input = input_str;
@@ -156,6 +157,9 @@ $string         = "Leather Belt"
 			);
 			expect_object(symbols, lookup_data, "suit", search(input, "$suit").result(),
 				{{lang::suit{lang::suit_type::yellow}, search(input, "Yellow").result()}}
+			);
+			expect_object(symbols, lookup_data, "shaper_voice", search(input, "$shaper_voice").result(),
+				{{lang::shaper_voice_line{lang::shaper_voice_line_type::chaos}, search(input, "ShChaos").result()}}
 			);
 			expect_object(symbols, lookup_data, "string", search(input, "$string").result(),
 				{{lang::string{"Leather Belt"}, search(input, "\"Leather Belt\"").result()}}
@@ -247,7 +251,7 @@ $z = 4W 0 6 RGB
 							BOOST_ERROR("expected built-in alert sound but got different");
 
 						const auto& actual = std::get<lang::builtin_alert_sound>(actual_alert_sound.sound);
-						BOOST_TEST(actual.sound_id.value == expected.sound_id.value);
+						BOOST_TEST((actual.sound_id.id == expected.sound_id.id));
 						BOOST_TEST((actual.volume == expected.volume));
 						BOOST_TEST(actual.is_positional == expected.is_positional);
 					},
@@ -288,7 +292,7 @@ $z = 4W 0 6 RGB
 			static
 			void expect_builtin_alert_sound(
 				std::string expression,
-				lang::integer sound_id,
+				lang::builtin_alert_sound_id sound_id,
 				std::optional<lang::integer> volume = std::nullopt)
 			{
 				expect_alert_sound_impl(
@@ -314,14 +318,24 @@ $z = 4W 0 6 RGB
 
 			using namespace lang;
 
-			BOOST_AUTO_TEST_CASE(builtin_sound_id)
+			BOOST_AUTO_TEST_CASE(builtin_sound_id_integer)
 			{
-				expect_builtin_alert_sound("1", integer{1});
+				expect_builtin_alert_sound("1", lang::builtin_alert_sound_id{integer{1}});
 			}
 
-			BOOST_AUTO_TEST_CASE(builtin_sound_id_and_volume)
+			BOOST_AUTO_TEST_CASE(builtin_sound_id_and_volume_integer)
 			{
-				expect_builtin_alert_sound("1 300", integer{1}, integer{300});
+				expect_builtin_alert_sound("1 300", lang::builtin_alert_sound_id{integer{1}}, integer{300});
+			}
+
+			BOOST_AUTO_TEST_CASE(builtin_sound_id_shaper)
+			{
+				expect_builtin_alert_sound("ShGeneral", lang::builtin_alert_sound_id{shaper_voice_line{shaper_voice_line_type::general}});
+			}
+
+			BOOST_AUTO_TEST_CASE(builtin_sound_id_and_volume_shaper)
+			{
+				expect_builtin_alert_sound("ShGeneral 300", lang::builtin_alert_sound_id{shaper_voice_line{shaper_voice_line_type::general}}, integer{300});
 			}
 
 			BOOST_AUTO_TEST_CASE(custom_path)

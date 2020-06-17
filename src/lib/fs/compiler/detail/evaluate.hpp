@@ -38,11 +38,22 @@ make_minimap_icon(
 	return lang::minimap_icon{size, suit, shape};
 }
 
+[[nodiscard]] outcome<lang::builtin_alert_sound_id>
+make_builtin_alert_sound_id(
+	lang::integer sound_id);
+
+[[nodiscard]] inline outcome<lang::builtin_alert_sound_id>
+make_builtin_alert_sound_id(
+	lang::shaper_voice_line sound_id)
+{
+	return lang::builtin_alert_sound_id{sound_id};
+}
+
 [[nodiscard]] outcome<lang::builtin_alert_sound>
 make_builtin_alert_sound(
 	settings st,
 	bool positional,
-	lang::integer sound_id,
+	lang::builtin_alert_sound_id sound_id,
 	std::optional<lang::integer> volume = std::nullopt);
 
 [[nodiscard]] outcome<lang::socket_spec>
@@ -111,6 +122,12 @@ evaluate(parser::ast::rf::suit_literal sl)
 evaluate(parser::ast::rf::shape_literal sl)
 {
 	return {sl.value, parser::position_tag_of(sl)};
+}
+
+[[nodiscard]] inline lang::shaper_voice_line
+evaluate(parser::ast::rf::shaper_voice_line_literal svll)
+{
+	return {svll.value, parser::position_tag_of(svll)};
 }
 
 [[nodiscard]] inline lang::influence

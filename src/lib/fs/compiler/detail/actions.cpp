@@ -169,6 +169,36 @@ spirit_filter_add_play_effect_action(
 		});
 }
 
+[[nodiscard]] outcome<lang::builtin_alert_sound_id>
+make_builtin_alert_sound_id(
+	const lang::single_object& sobj)
+{
+	auto integer_sound_id = detail::get_as<lang::integer>(sobj);
+	auto shaper_sound_id = detail::get_as<lang::shaper_voice_line>(sobj);
+
+	if (integer_sound_id.has_result()) {
+		return std::move(integer_sound_id).map_result<lang::builtin_alert_sound_id>([](lang::integer sound_id) {
+			return detail::make_builtin_alert_sound_id(sound_id);
+		});
+	}
+	else if (shaper_sound_id.has_result()) {
+		return std::move(shaper_sound_id).map_result<lang::builtin_alert_sound_id>([](lang::shaper_voice_line sound_id) {
+			return detail::make_builtin_alert_sound_id(sound_id);
+		});
+	}
+	else {
+		log_container logs;
+		// main error
+		logs.emplace_back(error(errors::invalid_builtin_alert_sound_id{sobj.origin}));
+		// errors specifying each sound ID variant problems
+		logs.emplace_back(note{notes::fixed_text{"in attempt of integer sound ID"}});
+		integer_sound_id.move_logs_to(logs);
+		logs.emplace_back(note{notes::fixed_text{"in attempt of Shaper voice line sound ID"}});
+		shaper_sound_id.move_logs_to(logs);
+		return logs;
+	}
+}
+
 [[nodiscard]] outcome<lang::builtin_alert_sound>
 make_builtin_alert_sound(
 	settings st,
@@ -178,18 +208,18 @@ make_builtin_alert_sound(
 	const auto num_args = obj.values.size();
 	BOOST_ASSERT(num_args == 1u || num_args == 2u);
 
-	auto sound_id = detail::get_as<lang::integer>(obj.values[0]);
+	auto sound_id = make_builtin_alert_sound_id(obj.values[0]);
 
 	if (num_args == 2u) {
 		return std::move(sound_id)
 			.merge_with(detail::get_as<lang::integer>(obj.values[1]))
-			.map_result<lang::builtin_alert_sound>([&](lang::integer sound_id, lang::integer volume) {
+			.map_result<lang::builtin_alert_sound>([&](lang::builtin_alert_sound_id sound_id, lang::integer volume) {
 				return detail::make_builtin_alert_sound(st, positional, sound_id, volume);
 			});
 	}
 	else {
 		return std::move(sound_id)
-			.map_result<lang::builtin_alert_sound>([&](lang::integer sound_id) {
+			.map_result<lang::builtin_alert_sound>([&](lang::builtin_alert_sound_id sound_id) {
 				return detail::make_builtin_alert_sound(st, positional, sound_id);
 			});
 	}
@@ -366,23 +396,37 @@ real_filter_add_color_action(
 		});
 }
 
+[[nodiscard]] lang::builtin_alert_sound_id
+real_filter_make_builtin_alert_sound_id(
+	ast::rf::sound_id sound_id)
+{
+	return sound_id.apply_visitor(x3::make_lambda_visitor<lang::builtin_alert_sound_id>(
+		[](ast::rf::integer_literal sound_id) {
+			return lang::builtin_alert_sound_id{detail::evaluate(sound_id)};
+		},
+		[](ast::rf::shaper_voice_line_literal sound_id) {
+			return lang::builtin_alert_sound_id{detail::evaluate(sound_id)};
+		}
+	));
+}
+
 [[nodiscard]] lang::alert_sound
-real_filter_make_alert_sound(
-	ast::rf::integer_literal sound_id,
+real_filter_make_builtin_alert_sound(
+	ast::rf::sound_id sound_id,
 	boost::optional<ast::rf::integer_literal> volume,
 	bool positional)
 {
 	if (volume) {
 		return lang::alert_sound{lang::builtin_alert_sound{
 			positional,
-			detail::evaluate(sound_id),
+			real_filter_make_builtin_alert_sound_id(sound_id),
 			detail::evaluate(*volume)
 		}};
 	}
 	else {
 		return lang::alert_sound{lang::builtin_alert_sound{
 			positional,
-			detail::evaluate(sound_id)
+			real_filter_make_builtin_alert_sound_id(sound_id)
 		}};
 	}
 }
@@ -469,7 +513,7 @@ real_filter_add_action(
 		[&](const ast::rf::play_alert_sound_action& action) -> result_type {
 			return real_filter_add_action_impl(
 				lang::alert_sound_action{
-					real_filter_make_alert_sound(action.sound_id, action.volume, false),
+					real_filter_make_builtin_alert_sound(action.id, action.volume, false),
 					parser::position_tag_of(action)
 				},
 				set.play_alert_sound);
@@ -477,7 +521,7 @@ real_filter_add_action(
 		[&](const ast::rf::play_alert_sound_positional_action& action) -> result_type {
 			return real_filter_add_action_impl(
 				lang::alert_sound_action{
-					real_filter_make_alert_sound(action.sound_id, action.volume, true),
+					real_filter_make_builtin_alert_sound(action.id, action.volume, true),
 					parser::position_tag_of(action)
 				},
 				set.play_alert_sound);

@@ -532,6 +532,52 @@ Show
 			BOOST_TEST(compare_strings(expected_filter, actual_filter));
 		}
 
+		BOOST_AUTO_TEST_CASE(shaper_voice_lines)
+		{
+			const std::string actual_filter = generate_filter(minimal_input() + R"(
+PlayAlertSound ShExalted
+{ Show }
+
+PlayAlertSound ShDivine 250
+{ Show }
+
+PlayAlertSoundPositional ShRegal
+{ Show }
+
+PlayAlertSoundPositional ShFusing 200
+{ Show }
+
+SetAlertSound ShAlchemy
+{ Show }
+
+SetAlertSound ShVaal 150
+{ Show }
+
+)");
+			const std::string_view expected_filter =
+R"(Show
+	PlayAlertSound ShExalted
+
+Show
+	PlayAlertSound ShDivine 250
+
+Show
+	PlayAlertSoundPositional ShRegal
+
+Show
+	PlayAlertSoundPositional ShFusing 200
+
+Show
+	PlayAlertSound ShAlchemy
+
+Show
+	PlayAlertSound ShVaal 150
+
+)";
+
+			BOOST_TEST(compare_strings(expected_filter, actual_filter));
+		}
+
 		BOOST_AUTO_TEST_CASE(simple_price_queries)
 		{
 			lang::item_price_data ipd;

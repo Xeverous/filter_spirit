@@ -250,6 +250,26 @@ namespace rf
 	};
 	const play_alert_sound_actions_ play_alert_sound_actions;
 
+	struct shaper_voice_lines_ : x3::symbols<lang::shaper_voice_line_type>
+	{
+		shaper_voice_lines_()
+		{
+			add
+				(lang::keywords::rf::sh_mirror,  lang::shaper_voice_line_type::mirror)
+				(lang::keywords::rf::sh_exalted, lang::shaper_voice_line_type::exalted)
+				(lang::keywords::rf::sh_divine,  lang::shaper_voice_line_type::divine)
+				(lang::keywords::rf::sh_general, lang::shaper_voice_line_type::general)
+				(lang::keywords::rf::sh_regal,   lang::shaper_voice_line_type::regal)
+				(lang::keywords::rf::sh_chaos,   lang::shaper_voice_line_type::chaos)
+				(lang::keywords::rf::sh_fusing,  lang::shaper_voice_line_type::fusing)
+				(lang::keywords::rf::sh_alchemy, lang::shaper_voice_line_type::alchemy)
+				(lang::keywords::rf::sh_vaal,    lang::shaper_voice_line_type::vaal)
+				(lang::keywords::rf::sh_blessed, lang::shaper_voice_line_type::blessed)
+			;
+		}
+	};
+	const shaper_voice_lines_ shaper_voice_lines;
+
 	// ---- filter structure ----
 
 	struct visibility_literals_ : x3::symbols<bool>

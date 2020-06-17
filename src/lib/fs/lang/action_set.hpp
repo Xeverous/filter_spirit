@@ -64,13 +64,34 @@ inline bool operator!=(font_size_action lhs, font_size_action rhs)
 	return !(lhs == rhs);
 }
 
+struct builtin_alert_sound_id
+{
+	explicit builtin_alert_sound_id(integer id)
+	: id(id) {}
+
+	explicit builtin_alert_sound_id(shaper_voice_line svl)
+	: id(svl) {}
+
+	std::variant<integer, shaper_voice_line> id;
+};
+
+inline bool operator==(builtin_alert_sound_id lhs, builtin_alert_sound_id rhs)
+{
+	return lhs.id == rhs.id;
+}
+
+inline bool operator!=(builtin_alert_sound_id lhs, builtin_alert_sound_id rhs)
+{
+	return !(lhs == rhs);
+}
+
 struct builtin_alert_sound
 {
-	explicit builtin_alert_sound(bool is_positional, integer sound_id, std::optional<integer> volume = std::nullopt)
-	:  is_positional(is_positional), sound_id(sound_id), volume(volume) {}
+	explicit builtin_alert_sound(bool is_positional, builtin_alert_sound_id sound_id, std::optional<integer> volume = std::nullopt)
+	: is_positional(is_positional), sound_id(sound_id), volume(volume) {}
 
 	bool is_positional;
-	integer sound_id;
+	builtin_alert_sound_id sound_id;
 	std::optional<integer> volume;
 };
 

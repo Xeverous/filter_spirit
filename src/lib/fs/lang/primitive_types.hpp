@@ -139,6 +139,16 @@ struct suit
 inline bool operator==(suit lhs, suit rhs) noexcept { return lhs.value == rhs.value; }
 inline bool operator!=(suit lhs, suit rhs) noexcept { return !(lhs == rhs); }
 
+enum class shaper_voice_line_type { mirror, exalted, divine, general, regal, chaos, fusing, alchemy, vaal, blessed };
+struct shaper_voice_line
+{
+	shaper_voice_line_type value;
+	position_tag origin = {};
+};
+
+inline bool operator==(shaper_voice_line lhs, shaper_voice_line rhs) noexcept { return lhs.value == rhs.value; }
+inline bool operator!=(shaper_voice_line lhs, shaper_voice_line rhs) noexcept { return !(lhs == rhs); }
+
 struct string
 {
 	std::string value;

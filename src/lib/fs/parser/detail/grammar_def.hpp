@@ -77,6 +77,10 @@ namespace common
 	const auto influence_literal_def = x3::lexeme[symbols::rf::influences >> not_alnum_or_underscore];
 	BOOST_SPIRIT_DEFINE(influence_literal)
 
+	const shaper_voice_line_literal_type shaper_voice_line_literal = "shaper voice line literal";
+	const auto shaper_voice_line_literal_def = x3::lexeme[symbols::rf::shaper_voice_lines >> not_alnum_or_underscore];
+	BOOST_SPIRIT_DEFINE(shaper_voice_line_literal)
+
 	const temp_literal_type temp_literal = "temp literal";
 	const auto temp_literal_def = x3::lexeme[lang::keywords::rf::temp >> not_alnum_or_underscore] > x3::attr(ast::common::temp_literal{});
 	BOOST_SPIRIT_DEFINE(temp_literal)
@@ -137,6 +141,7 @@ namespace sf
 		| common::shape_literal
 		| common::suit_literal
 		| common::influence_literal
+		| common::shaper_voice_line_literal
 		| common::temp_literal
 		| common::none_literal
 		// 1. Must be attempted before integer literal, otherwise integer literal for eg "5GGG" would
@@ -439,17 +444,21 @@ namespace rf
 		> common::integer_literal;
 	BOOST_SPIRIT_DEFINE(set_font_size_action)
 
+	const sound_id_type sound_id = "sound ID";
+	const auto sound_id_def = common::integer_literal | common::shaper_voice_line_literal;
+	BOOST_SPIRIT_DEFINE(sound_id)
+
 	const play_alert_sound_action_type play_alert_sound_action = "alert sound action";
 	const auto play_alert_sound_action_def =
 		x3::lexeme[lang::keywords::rf::play_alert_sound >> common::not_alnum_or_underscore]
-		> common::integer_literal   // sound ID
+		> sound_id
 		> -common::integer_literal; // volume (optional token)
 	BOOST_SPIRIT_DEFINE(play_alert_sound_action)
 
 	const play_alert_sound_positional_action_type play_alert_sound_positional_action = "positional alert sound action";
 	const auto play_alert_sound_positional_action_def =
 		x3::lexeme[lang::keywords::rf::play_alert_sound_positional >> common::not_alnum_or_underscore]
-		> common::integer_literal   // sound ID
+		> sound_id
 		> -common::integer_literal; // volume (optional token)
 	BOOST_SPIRIT_DEFINE(play_alert_sound_positional_action)
 

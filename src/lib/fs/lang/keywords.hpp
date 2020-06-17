@@ -108,6 +108,17 @@ namespace rf
 	constexpr auto pentagon = "Pentagon";
 	constexpr auto upside_down_house = "UpsideDownHouse";
 
+	constexpr auto sh_mirror  = "ShMirror";
+	constexpr auto sh_exalted = "ShExalted";
+	constexpr auto sh_divine  = "ShDivine";
+	constexpr auto sh_general = "ShGeneral"; // "Orb Of Immense Power"
+	constexpr auto sh_regal   = "ShRegal";
+	constexpr auto sh_chaos   = "ShChaos";
+	constexpr auto sh_fusing  = "ShFusing";
+	constexpr auto sh_alchemy = "ShAlchemy";
+	constexpr auto sh_vaal    = "ShVaal";
+	constexpr auto sh_blessed = "ShBlessed";
+
 	constexpr auto shaper      = "Shaper";
 	constexpr auto elder       = "Elder";
 	constexpr auto crusader    = "Crusader";
