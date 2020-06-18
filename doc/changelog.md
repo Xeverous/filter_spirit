@@ -1,5 +1,14 @@
 # Filter Spirit changelog
 
+## version 0.6.0 (18.06.2020)
+
+- Added support for `HasInfluence None`.
+- Added support for `EnchantmentPassiveNode`.
+- Unified comparison operators implementation. FS should now accept every possible operator combination that real filters accept.
+- Added support for Shaper voice lines. They are also supported by `SetAlertSound` extension.
+- `-a` argument is now `-p`.
+- **New behavior:** FS no longer requires explicit save paths in the command line, instead it automatically downloads or uses cached data if it's not too old. Control max allowed age with `-a` parameter.
+
 ## version 0.5.0 (13.03.2020)
 
 - Implemented new `Sockets` and `SocketGroup`, `AreaLevel`, `Corrupted` and other conditions as on https://www.pathofexile.com/forum/view-thread/2771031
