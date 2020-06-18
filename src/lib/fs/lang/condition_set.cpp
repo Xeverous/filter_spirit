@@ -167,23 +167,28 @@ void output_influences_condition(
 	if (cond.exact_match_required)
 		output_stream << " ==";
 
-	if (cond.shaper)
-		output_stream << ' ' << kw::shaper;
+	if (cond.is_none()) {
+		output_stream << ' ' << kw::none;
+	}
+	else {
+		if (cond.shaper)
+			output_stream << ' ' << kw::shaper;
 
-	if (cond.elder)
-		output_stream << ' ' << kw::elder;
+		if (cond.elder)
+			output_stream << ' ' << kw::elder;
 
-	if (cond.crusader)
-		output_stream << ' ' << kw::crusader;
+		if (cond.crusader)
+			output_stream << ' ' << kw::crusader;
 
-	if (cond.redeemer)
-		output_stream << ' ' << kw::redeemer;
+		if (cond.redeemer)
+			output_stream << ' ' << kw::redeemer;
 
-	if (cond.hunter)
-		output_stream << ' ' << kw::hunter;
+		if (cond.hunter)
+			output_stream << ' ' << kw::hunter;
 
-	if (cond.warlord)
-		output_stream << ' ' << kw::warlord;
+		if (cond.warlord)
+			output_stream << ' ' << kw::warlord;
+	}
 
 	output_stream << '\n';
 }
@@ -266,17 +271,7 @@ bool condition_set::is_valid() const
 		return true;
 	};
 
-	const bool influences_valid = [&]() {
-		if (!has_influence)
-			return true;
-
-		// at least 1 influence must be present
-		auto& inf = *has_influence;
-		return inf.shaper || inf.elder || inf.crusader || inf.redeemer || inf.hunter || inf.warlord;
-	}();
-
-	return influences_valid
-		&& is_valid_strings_condition(class_)
+	return is_valid_strings_condition(class_)
 		&& is_valid_strings_condition(base_type)
 		&& is_valid_strings_condition(has_explicit_mod)
 		&& is_valid_strings_condition(has_enchantment)

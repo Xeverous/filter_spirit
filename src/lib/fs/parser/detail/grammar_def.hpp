@@ -368,6 +368,10 @@ namespace rf
 	const auto influence_literal_array_def = +x3::lexeme[common::influence_literal >> common::not_alnum_or_underscore];
 	BOOST_SPIRIT_DEFINE(influence_literal_array)
 
+	const influence_spec_type influence_spec = "influence spec";
+	const auto influence_spec_def = x3::lexeme[common::none_literal >> common::not_alnum_or_underscore] | influence_literal_array;
+	BOOST_SPIRIT_DEFINE(influence_spec)
+
 	const socket_spec_literal_type socket_spec_literal = "socket spec literal";
 	const auto socket_spec_literal_def =
 		x3::lexeme[
@@ -404,7 +408,7 @@ namespace rf
 	const auto has_influence_condition_def =
 		x3::lexeme[lang::keywords::rf::has_influence >> common::not_alnum_or_underscore]
 		> common::exact_matching_policy_expression
-		> influence_literal_array;
+		> influence_spec;
 	BOOST_SPIRIT_DEFINE(has_influence_condition)
 
 	const socket_spec_condition_type socket_spec_condition = "socket spec condition";

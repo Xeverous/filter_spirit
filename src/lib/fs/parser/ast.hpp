@@ -586,6 +586,7 @@ namespace rf
 	using string_literal = common::string_literal;
 	using influence_literal = common::influence_literal;
 	using shaper_voice_line_literal = common::shaper_voice_line_literal;
+	using none_literal = common::none_literal;
 
 	struct socket_spec_literal : x3::position_tagged
 	{
@@ -609,8 +610,16 @@ namespace rf
 	};
 
 	struct string_literal_array : std::vector<string_literal>, x3::position_tagged {};
-
 	struct influence_literal_array : std::vector<influence_literal>, x3::position_tagged {};
+
+	struct influence_spec : x3::variant<
+		influence_literal_array,
+		none_literal
+	>, x3::position_tagged
+	{
+		using base_type::base_type;
+		using base_type::operator=;
+	};
 
 	using comparison_operator_expression = common::comparison_operator_expression;
 	using exact_matching_policy = common::exact_matching_policy;
@@ -638,7 +647,7 @@ namespace rf
 	struct has_influence_condition : x3::position_tagged
 	{
 		exact_matching_policy exact_match;
-		influence_literal_array influence_literals;
+		influence_spec spec;
 	};
 
 	struct socket_spec_condition : x3::position_tagged

@@ -135,7 +135,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::rf::has_influence_condition,
-	exact_match, influence_literals)
+	exact_match, spec)
 
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::rf::socket_spec_condition,

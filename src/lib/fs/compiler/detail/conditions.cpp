@@ -173,6 +173,15 @@ add_string_array_condition(
 	});
 }
 
+/*
+ * Empty container represents "HasInfluence None".
+ *
+ * This is a bit limiting implementation, because
+ * it does not allow to track all possible origins
+ * (especially "None" literal origin) but such detailed
+ * debug information is not currently needed; also many
+ * other conditions also track only condition name origin.
+*/
 using influences_container = boost::container::static_vector<
 	lang::influence,
 	lang::limits::max_filter_influences
@@ -422,6 +431,12 @@ spirit_filter_add_has_influence_condition(
 {
 	return detail::evaluate_sequence(st, condition.seq, symbols, 1, lang::limits::max_filter_influences)
 		.map_result<influences_container>([&](lang::object obj) -> outcome<influences_container> {
+			if (obj.values.size() == 1u) {
+				auto none = detail::get_as<lang::none>(obj.values.front());
+				if (none.has_result())
+					return influences_container();
+			}
+
 			influences_container influences;
 			log_container logs;
 
@@ -534,32 +549,53 @@ real_filter_add_string_array_condition(
 	return add_string_array_condition(condition.property, std::move(strings), exact_match, origin, set);
 }
 
+[[nodiscard]] outcome<influences_container>
+real_filter_make_influences_container(
+	const ast::rf::influence_spec& spec,
+	lang::position_tag condition_origin)
+{
+	using result_type = outcome<influences_container>;
+
+	return spec.apply_visitor(x3::make_lambda_visitor<result_type>(
+		[&](const ast::rf::influence_literal_array& array) -> result_type {
+			const auto num_inf = static_cast<int>(array.size());
+
+			if (num_inf < 1 || num_inf > lang::limits::max_filter_influences) {
+				return error(errors::invalid_amount_of_arguments{
+					/* min */ 1, /* max */ lang::limits::max_filter_influences, /* actual */ num_inf, condition_origin});
+			}
+
+			influences_container influences;
+			for (auto inf : array) {
+				influences.emplace_back(detail::evaluate(inf));
+			}
+
+			return influences;
+		},
+		[](ast::rf::none_literal /* literal */) -> result_type {
+			return influences_container();
+		}
+	));
+}
+
 [[nodiscard]] outcome<>
 real_filter_add_has_influence_condition(
 	settings st,
 	const ast::rf::has_influence_condition& condition,
 	std::optional<lang::influences_condition>& target)
 {
-	const auto num_inf = static_cast<int>(condition.influence_literals.size());
 	const auto condition_origin = parser::position_tag_of(condition);
 
-	if (num_inf < 1 || num_inf > lang::limits::max_filter_influences) {
-		return error(errors::invalid_amount_of_arguments{
-			/* min */ 1, /* max */ lang::limits::max_filter_influences, /* actual */ num_inf, condition_origin});
-	}
+	return real_filter_make_influences_container(condition.spec, condition_origin)
+		.map_result([&](influences_container influences) {
+			return add_has_influence_condition(
+				st,
+				std::move(influences),
+				condition.exact_match.required,
+				condition_origin,
+				target);
+		});
 
-	influences_container influences;
-	// TODO what if condition.influence_literals.size() > influences.max_size()?
-	for (auto inf : condition.influence_literals) {
-		influences.emplace_back(detail::evaluate(inf));
-	}
-
-	return add_has_influence_condition(
-		st,
-		std::move(influences),
-		condition.exact_match.required,
-		condition_origin,
-		target);
 }
 
 [[nodiscard]] outcome<>

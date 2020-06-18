@@ -168,6 +168,11 @@ struct strings_condition
 
 struct influences_condition
 {
+	bool is_none() const
+	{
+		return !(shaper || elder || crusader || redeemer || hunter || warlord);
+	}
+
 	bool shaper;
 	bool elder;
 	bool crusader;

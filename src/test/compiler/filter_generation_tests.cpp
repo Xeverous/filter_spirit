@@ -155,12 +155,17 @@ Show
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
 BaseType "Leather Belt"
 {
+	HasInfluence    None             { Show }
 	HasInfluence == Crusader Hunter  { Show }
 	HasInfluence    Redeemer Warlord { Show }
 }
 )");
 			const std::string_view expected_filter =
 R"(Show
+	BaseType "Leather Belt"
+	HasInfluence None
+
+Show
 	BaseType "Leather Belt"
 	HasInfluence == Crusader Hunter
 

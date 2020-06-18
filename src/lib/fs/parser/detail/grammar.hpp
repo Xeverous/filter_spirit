@@ -176,6 +176,7 @@ namespace rf
 	struct icon_literal_class                    : error_on_error, annotate_on_success {};
 	struct string_literal_array_class            : error_on_error, annotate_on_success {};
 	struct influence_literal_array_class         : error_on_error, annotate_on_success {};
+	struct influence_spec_class                  : error_on_error, annotate_on_success {};
 	struct socket_spec_literal_class             : error_on_error, annotate_on_success {};
 
 	// ---- conditions ----
@@ -422,6 +423,9 @@ namespace rf
 
 	using influence_literal_array_type = x3::rule<influence_literal_array_class, ast::rf::influence_literal_array>;
 	BOOST_SPIRIT_DECLARE(influence_literal_array_type)
+
+	using influence_spec_type = x3::rule<influence_spec_class, ast::rf::influence_spec>;
+	BOOST_SPIRIT_DECLARE(influence_spec_type)
 
 	using socket_spec_literal_type = x3::rule<socket_spec_literal_class, ast::rf::socket_spec_literal>;
 	BOOST_SPIRIT_DECLARE(socket_spec_literal_type)
