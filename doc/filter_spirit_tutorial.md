@@ -475,10 +475,6 @@ FS supports all conditions that the actual filters support. Some conditions allo
 
 - Place 1 condition per line.
 - Numeric and `Rarity` conditions accept comparison operator - one of `<`, `>`, `<=`, `>=`, `=`. Operator is optional (defaults to `=`).
-- String-based conditions accept optional `==` token which enables exact maching. `BaseType == "The Wolf"` will match only *The Wolf* card, `BaseType "The Wolf"` will match all *The Wolf*, *The Wolf's Legacy* and *The Wolf's Shadow*.
-- `HasInfluence` condition behaves differently with `==`:
-  - If `==` is not present, it will match an item **with at least one of specified influences**.
-  - If `==` is present, it will only match items **with all specified influences**.
 
 Grammar overview (not a normative documentation as actual EBNF grammar specifications are much harder to read):
 
@@ -490,6 +486,7 @@ X...    # 0 or more X tokens
 X X...  # 1 or more X tokens
 
 # token CMP: < | > | <= | >= | =
+# token EQ: = | ==
 # token SS: [Integer] R...G...B...W...A...D...
 ```
 
@@ -508,12 +505,12 @@ MapTier       [CMP] Integer
 AreaLevel     [CMP] Integer
 CorruptedMods [CMP] Integer
 
-Class          [==] String String...
-BaseType       [==] String String...
-HasExplicitMod [==] String String...
-HasEnchantment [==] String String...
-Prophecy       [==] String String...
-HasInfluence   [==] Influence Influence...
+Class          [EQ] String String...
+BaseType       [EQ] String String...
+HasExplicitMod [EQ] String String...
+HasEnchantment [EQ] String String...
+Prophecy       [EQ] String String...
+HasInfluence   [EQ] Influence Influence...
 
 Sockets     [CMP | ==] SS SS...
 SocketGroup [CMP | ==] SS SS...
@@ -546,6 +543,16 @@ Sockets 6
 Sockets >= 4RR
 SocketGroup >= 1 2 3R AA 3D 5GBW
 ```
+
+### (nothing) vs `=` vs `==`
+
+- Unless otherwise specified, `(nothing)` has the same meaning as `=`.
+- Analogical for all string-based conditions: `BaseType == "The Wolf"` will match only *The Wolf* card, `BaseType "The Wolf"` and `BaseType = "The Wolf"` will match all *The Wolf*, *The Wolf's Legacy* and *The Wolf's Shadow*.
+- Game client reports error upon loading a filter which has `==` with names that are not complete.
+- `HasInfluence` condition behaves differently with `==`:
+  - If there is nothing or `=`, it will match an item **with at least one of specified influences**.
+  - If there is `==`, it will only match items **with all specified influences**.
+- `Sockets` and `SocketGroup` have very complex matching rules. They are explained by Rhys in [this reddit thread](https://www.reddit.com/r/pathofexile/comments/f2t4tz/inconsistencies_in_new_filter_syntaxes/). FS preserves them as-is in generated filters.
 
 ## actions
 

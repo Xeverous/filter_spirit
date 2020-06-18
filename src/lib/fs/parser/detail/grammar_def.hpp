@@ -96,7 +96,7 @@ namespace common
 	BOOST_SPIRIT_DEFINE(comparison_operator_expression)
 
 	const exact_matching_policy_expression_type exact_matching_policy_expression = "exact matching policy expression";
-	const auto exact_matching_policy_expression_def = ("==" > x3::attr(true)) | x3::attr(false);
+	const auto exact_matching_policy_expression_def = ("==" > x3::attr(true)) | ("=" > x3::attr(false)) | x3::attr(false);
 	BOOST_SPIRIT_DEFINE(exact_matching_policy_expression)
 
 	const visibility_statement_type visibility_statement = "visibility statement";
