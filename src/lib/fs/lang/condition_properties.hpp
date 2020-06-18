@@ -39,6 +39,7 @@ enum class string_array_condition_property
 	has_explicit_mod,
 	has_enchantment,
 	prophecy,
+	enchantment_passive_node
 };
 
 // all conditions which are boolean tests

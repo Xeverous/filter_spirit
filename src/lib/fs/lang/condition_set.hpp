@@ -212,6 +212,7 @@ struct condition_set
 	std::optional<strings_condition> has_explicit_mod;
 	std::optional<strings_condition> has_enchantment;
 	std::optional<strings_condition> prophecy;
+	std::optional<strings_condition> enchantment_passive_node;
 	std::optional<influences_condition> has_influence;
 	integer_range_condition stack_size;
 	integer_range_condition gem_level;

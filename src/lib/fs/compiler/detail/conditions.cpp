@@ -166,6 +166,9 @@ add_string_array_condition(
 		case lang::string_array_condition_property::prophecy: {
 			return add_string_array_condition_impl(std::move(strings), exact_match, condition_origin, set.prophecy);
 		}
+		case lang::string_array_condition_property::enchantment_passive_node: {
+			return add_string_array_condition_impl(std::move(strings), exact_match, condition_origin, set.enchantment_passive_node);
+		}
 	}
 
 	return error(errors::internal_compiler_error{

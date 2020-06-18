@@ -135,6 +135,10 @@ Class "Divination Card"
 	BaseType == "The Wolf" "The Demon" { Show }
 	BaseType    "The Wolf" "The Demon" { Show }
 }
+
+EnchantmentPassiveNode    "Damage while you have a Herald" { Show }
+EnchantmentPassiveNode =  "Damage while you have a Herald" { Show }
+EnchantmentPassiveNode == "Damage while you have a Herald" { Show }
 )");
 			const std::string_view expected_filter =
 R"(Show
@@ -144,6 +148,15 @@ R"(Show
 Show
 	Class "Divination Card"
 	BaseType "The Wolf" "The Demon"
+
+Show
+	EnchantmentPassiveNode "Damage while you have a Herald"
+
+Show
+	EnchantmentPassiveNode "Damage while you have a Herald"
+
+Show
+	EnchantmentPassiveNode == "Damage while you have a Herald"
 
 )";
 

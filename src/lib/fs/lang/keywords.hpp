@@ -53,6 +53,7 @@ namespace rf
 	constexpr auto map_tier         = "MapTier";
 	constexpr auto area_level       = "AreaLevel";
 	constexpr auto corrupted_mods   = "CorruptedMods";
+	constexpr auto enchantment_passive_node = "EnchantmentPassiveNode";
 
 	constexpr auto r = 'R';
 	constexpr auto g = 'G';

@@ -247,11 +247,12 @@ void condition_set::generate(std::ostream& output_stream) const
 	output_boolean_condition(is_elder_map,        kw::elder_map,        output_stream);
 	output_boolean_condition(is_blighted_map,     kw::blighted_map,     output_stream);
 
-	output_strings_condition(class_,           kw::class_,           output_stream);
-	output_strings_condition(base_type,        kw::base_type,        output_stream);
-	output_strings_condition(has_explicit_mod, kw::has_explicit_mod, output_stream);
-	output_strings_condition(has_enchantment,  kw::has_enchantment,  output_stream);
-	output_strings_condition(prophecy,         kw::prophecy,         output_stream);
+	output_strings_condition(class_,                   kw::class_,                   output_stream);
+	output_strings_condition(base_type,                kw::base_type,                output_stream);
+	output_strings_condition(has_explicit_mod,         kw::has_explicit_mod,         output_stream);
+	output_strings_condition(has_enchantment,          kw::has_enchantment,          output_stream);
+	output_strings_condition(prophecy,                 kw::prophecy,                 output_stream);
+	output_strings_condition(enchantment_passive_node, kw::enchantment_passive_node, output_stream);
 
 	output_influences_condition(has_influence, kw::has_influence, output_stream);
 }
@@ -275,7 +276,8 @@ bool condition_set::is_valid() const
 		&& is_valid_strings_condition(base_type)
 		&& is_valid_strings_condition(has_explicit_mod)
 		&& is_valid_strings_condition(has_enchantment)
-		&& is_valid_strings_condition(prophecy);
+		&& is_valid_strings_condition(prophecy)
+		&& is_valid_strings_condition(enchantment_passive_node);
 }
 
 }
