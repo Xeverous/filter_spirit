@@ -6,6 +6,25 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 
 *newest at the top*
 
+### 3.11 (Harvest) - [Item Filter information](https://www.pathofexile.com/forum/view-thread/2873743)
+
+- [patch notes](https://www.pathofexile.com/forum/view-thread/2873739) - Herald nerfs and other changes
+- Added `HasInfluence None` parameter.
+- Added `EnchantmentPassiveNode` parameter to filter Cluster Jewels by enchantment type.
+
+### 3.10.2b
+
+From the [patchnotes](https://www.pathofexile.com/forum/view-thread/2867400):
+
+- You can now filter for items without being required to use special alphanumeric characters, such as "Maelstrom Staff" rather than "Maelström Staff".
+
+### 3.10.1
+
+From the [patch notes](https://www.pathofexile.com/forum/view-thread/2806232):
+
+- Added an `EnableDropSound` parameter that can be used in Item Filters.
+- Fixed an issue with the `PlayAlertSound` parameter in Item Filters not handling the `Continue` command correctly.
+
 ### 3.10 (Delirium) - [Item Filter information](https://www.pathofexile.com/forum/view-thread/2784312)
 
 - [patch notes](https://www.pathofexile.com/forum/view-thread/2784310) - new skills, cards and unique items
@@ -74,7 +93,7 @@ From the [patch notes](https://www.pathofexile.com/forum/view-thread/2167029):
 
 - [patch notes](https://www.pathofexile.com/forum/view-thread/2036284) - new gems, base types, uniques and cards
 
-### 3.0 (Fall of Oriath + Harbinger) - [Item Filter information](https://www.pathofexile.com/forum/view-thread/19308480)
+### 3.0 (Fall of Oriath + Harbinger) - [Item Filter information](https://www.pathofexile.com/forum/view-thread/1930848)
 
 From the [patch notes](https://www.pathofexile.com/forum/view-thread/1930316):
 
