@@ -154,7 +154,7 @@ struct socket_spec_condition
 {
 	using container_type = boost::container::small_vector<socket_spec, 6>;
 
-	socket_spec_comparison_type comparison_type;
+	comparison_type comparison;
 	container_type values;
 	position_tag origin;
 };

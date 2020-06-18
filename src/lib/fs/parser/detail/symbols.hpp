@@ -130,29 +130,14 @@ namespace rf
 			add
 				("<",  lang::comparison_type::less)
 				("<=", lang::comparison_type::less_equal)
-				("=",  lang::comparison_type::equal)
+				("=",  lang::comparison_type::equal_soft)
+				("==", lang::comparison_type::equal_hard)
 				(">",  lang::comparison_type::greater)
 				(">=", lang::comparison_type::greater_equal)
 			;
 		}
 	};
 	const comparison_operators_ comparison_operators;
-
-	struct socket_spec_comparison_operators_ : x3::symbols<lang::socket_spec_comparison_type>
-	{
-		socket_spec_comparison_operators_()
-		{
-			add
-				("<",  lang::socket_spec_comparison_type::less)
-				("<=", lang::socket_spec_comparison_type::less_equal)
-				("=",  lang::socket_spec_comparison_type::equal)
-				(">",  lang::socket_spec_comparison_type::greater)
-				(">=", lang::socket_spec_comparison_type::greater_equal)
-				("==", lang::socket_spec_comparison_type::exact)
-			;
-		}
-	};
-	const socket_spec_comparison_operators_ socket_spec_comparison_operators;
 
 	struct numeric_comparison_condition_properties_ : x3::symbols<lang::numeric_comparison_condition_property>
 	{

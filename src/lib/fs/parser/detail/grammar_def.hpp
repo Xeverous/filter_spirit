@@ -92,7 +92,7 @@ namespace common
 	// ---- rules ----
 
 	const comparison_operator_expression_type comparison_operator_expression = "comparison operator";
-	const auto comparison_operator_expression_def = symbols::rf::comparison_operators | x3::attr(lang::comparison_type::equal);
+	const auto comparison_operator_expression_def = symbols::rf::comparison_operators | x3::attr(lang::comparison_type::equal_soft);
 	BOOST_SPIRIT_DEFINE(comparison_operator_expression)
 
 	const exact_matching_policy_expression_type exact_matching_policy_expression = "exact matching policy expression";
@@ -229,7 +229,7 @@ namespace sf
 	const socket_spec_condition_type socket_spec_condition = "socket spec condition";
 	const auto socket_spec_condition_def =
 		x3::lexeme[symbols::rf::socket_spec_condition_properties >> common::not_alnum_or_underscore]
-		> (symbols::rf::socket_spec_comparison_operators | x3::attr(lang::socket_spec_comparison_type::equal))
+		> common::comparison_operator_expression
 		> sequence;
 	BOOST_SPIRIT_DEFINE(socket_spec_condition)
 
@@ -414,7 +414,7 @@ namespace rf
 	const socket_spec_condition_type socket_spec_condition = "socket spec condition";
 	const auto socket_spec_condition_def =
 		x3::lexeme[symbols::rf::socket_spec_condition_properties >> common::not_alnum_or_underscore]
-		> (symbols::rf::socket_spec_comparison_operators | x3::attr(lang::socket_spec_comparison_type::equal))
+		> common::comparison_operator_expression
 		> +socket_spec_literal;
 	BOOST_SPIRIT_DEFINE(socket_spec_condition)
 

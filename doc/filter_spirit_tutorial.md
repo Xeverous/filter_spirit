@@ -471,10 +471,7 @@ Class "Currency" {
 
 ## conditions
 
-FS supports all conditions that the actual filters support. Some conditions allow values of multiple types.
-
-- Place 1 condition per line.
-- Numeric and `Rarity` conditions accept comparison operator - one of `<`, `>`, `<=`, `>=`, `=`. Operator is optional (defaults to `=`).
+FS supports all conditions that the actual filters support. Some conditions allow values of multiple types. Place 1 condition per line.
 
 Grammar overview (not a normative documentation as actual EBNF grammar specifications are much harder to read):
 
@@ -485,7 +482,7 @@ X | Y   # X or Y token
 X...    # 0 or more X tokens
 X X...  # 1 or more X tokens
 
-# token CMP: < | > | <= | >= | =
+# token CMP: < | > | <= | >= | = | ==
 # token EQ: = | ==
 # token SS: [Integer] R...G...B...W...A...D...
 ```
@@ -512,8 +509,8 @@ HasEnchantment [EQ] String String...
 Prophecy       [EQ] String String...
 HasInfluence   [EQ] Influence Influence...
 
-Sockets     [CMP | ==] SS SS...
-SocketGroup [CMP | ==] SS SS...
+Sockets     [CMP] SS SS...
+SocketGroup [CMP] SS SS...
 
 AnyEnchantment  Boolean
 Identified      Boolean
@@ -546,7 +543,8 @@ SocketGroup >= 1 2 3R AA 3D 5GBW
 
 ### (nothing) vs `=` vs `==`
 
-- Unless otherwise specified, `(nothing)` has the same meaning as `=`.
+- Comparison operator is optional. Unless otherwise specified, `(nothing)` has the same meaning as `=`.
+- For numeric and `Rarity` conditions there is no difference between `=` and `==`.
 - Analogical for all string-based conditions: `BaseType == "The Wolf"` will match only *The Wolf* card, `BaseType "The Wolf"` and `BaseType = "The Wolf"` will match all *The Wolf*, *The Wolf's Legacy* and *The Wolf's Shadow*.
 - Game client reports error upon loading a filter which has `==` with names that are not complete.
 - `HasInfluence` condition behaves differently with `==`:

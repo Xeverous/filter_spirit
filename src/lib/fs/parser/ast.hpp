@@ -403,7 +403,7 @@ namespace sf
 	struct socket_spec_condition : x3::position_tagged
 	{
 		bool links_matter;
-		lang::socket_spec_comparison_type comparison_type;
+		comparison_operator_expression comparison_type;
 		sequence seq;
 	};
 
@@ -653,7 +653,7 @@ namespace rf
 	struct socket_spec_condition : x3::position_tagged
 	{
 		bool links_matter;
-		lang::socket_spec_comparison_type comparison_type;
+		comparison_operator_expression comparison_type;
 		std::vector<socket_spec_literal> specs;
 	};
 

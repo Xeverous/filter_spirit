@@ -92,24 +92,24 @@ void output_socket_spec_condition(
 
 	auto& cond = *condition;
 
-	switch (cond.comparison_type) {
-		case lang::socket_spec_comparison_type::less:
+	switch (cond.comparison) {
+		case lang::comparison_type::less:
 			output_stream << " <";
 			break;
-		case lang::socket_spec_comparison_type::less_equal:
+		case lang::comparison_type::less_equal:
 			output_stream << " <=";
 			break;
-		case lang::socket_spec_comparison_type::equal:
+		case lang::comparison_type::equal_soft:
 			output_stream << " =";
 			break;
-		case lang::socket_spec_comparison_type::greater:
+		case lang::comparison_type::equal_hard:
+			output_stream << " ==";
+			break;
+		case lang::comparison_type::greater:
 			output_stream << " >";
 			break;
-		case lang::socket_spec_comparison_type::greater_equal:
+		case lang::comparison_type::greater_equal:
 			output_stream << " >=";
-			break;
-		case lang::socket_spec_comparison_type::exact:
-			output_stream << " ==";
 			break;
 	}
 

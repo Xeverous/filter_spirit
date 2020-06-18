@@ -31,7 +31,8 @@ add_range_condition(
 	lang::range_condition<T>& target)
 {
 	switch (comparison_type) {
-		case lang::comparison_type::equal: {
+		case lang::comparison_type::equal_soft:
+		case lang::comparison_type::equal_hard: {
 			if (target.lower_bound.has_value())
 				return error(errors::lower_bound_redefinition{condition_origin, (*target.lower_bound).origin});
 
@@ -480,7 +481,6 @@ spirit_filter_add_socket_spec_condition(
 					.map_result([&](lang::socket_spec ss) { specs.push_back(ss); })
 					.move_logs_to(logs);
 
-
 				if (!should_continue(st.error_handling, logs))
 					return logs;
 			}
@@ -491,7 +491,7 @@ spirit_filter_add_socket_spec_condition(
 			return add_socket_spec_condition(
 				condition.links_matter,
 				lang::socket_spec_condition{
-					condition.comparison_type,
+					condition.comparison_type.value,
 					std::move(specs),
 					parser::position_tag_of(condition)
 				},
@@ -620,7 +620,7 @@ real_filter_add_socket_spec_condition(
 		.merge_with(add_socket_spec_condition(
 			condition.links_matter,
 			lang::socket_spec_condition{
-				condition.comparison_type,
+				condition.comparison_type.value,
 				std::move(specs),
 				parser::position_tag_of(condition)
 			},

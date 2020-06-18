@@ -3,24 +3,14 @@
 namespace fs::lang
 {
 
-// < <= = > >=
 enum class comparison_type
 {
 	less,
 	less_equal,
-	equal,
+	equal_soft,
+	equal_hard,
 	greater,
 	greater_equal
-};
-
-enum class socket_spec_comparison_type
-{
-	less,
-	less_equal,
-	equal,
-	greater,
-	greater_equal,
-	exact
 };
 
 // all conditions which use comparison against integers
