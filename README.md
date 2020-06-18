@@ -8,9 +8,16 @@ If you ever worked with web stuff - a perfect analogy is that Filter Spirit is t
 
 The project is under construction, but a command-line version is already available. Message me ([/u/Xeverous](https://old.reddit.com/user/Xeverous/) on reddit or Xeverous#2151 on Discord) if you are interested in it or have any questions/suggestions/whatever. You can also open an issue.
 
-I plan to release first graphical version at the end of Delirium league or a bit earlier and then iterate over opinions/suggestions to prepare a more important release before 3.11 league start.
+I planned to release first graphical version at the end of Delirium league or a bit earlier but you know, it's my first that large project and I'm also playing the game and working full-time. Also, graduation soon... I should have more time after Harvest launch.
 
-I'm currently [heavily contributing to elements](https://github.com/cycfi/elements/issues?q=author%3AXeverous) which is planned to be a  library behind FS GUI. Obviously I could use something well-known like Qt or wxWidgets but none of them fully satisfy my requirements so I decided to contribute to a new promising project instead. Call it a bit of Shaper's perfection syndrome.
+I'm also currently [heavily contributing to elements](https://github.com/cycfi/elements/issues?q=author%3AXeverous) which is planned to be a library behind FS GUI. Obviously I could use something well-known like Qt or wxWidgets but none of them fully satisfy my requirements so I decided to contribute to a new promising project instead. Call it a bit of Shaper's perfection syndrome.
+
+Thanks to some users, I'm thinking of more program interface opportunities:
+
+- Visual Studio Code plugin that uses FS in the background.
+- WASM-compiled build, hosted on a static GitHub Pages website.
+
+Please contact me if you are familiar with web-related technologies and would like to help in making these.
 
 ## overview
 
