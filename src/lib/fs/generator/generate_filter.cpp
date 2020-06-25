@@ -54,7 +54,7 @@ std::optional<std::string> generate_filter_without_preamble(
 
 	const compiler::outcome<lang::symbol_table> symbols_outcome =
 		compiler::resolve_spirit_filter_symbols(st.compile_settings, parse_data.ast.definitions);
-	compiler::output_logs(symbols_outcome.logs(), parse_data.lookup_data, logger);
+	compiler::output_logs(symbols_outcome.logs(), parse_data.lookup, logger);
 
 	if (!symbols_outcome.has_result())
 		return std::nullopt;
@@ -63,7 +63,7 @@ std::optional<std::string> generate_filter_without_preamble(
 
 	const compiler::outcome<lang::spirit_item_filter> spirit_filter_outcome =
 		compiler::compile_spirit_filter_statements(st.compile_settings, parse_data.ast.statements, symbols_outcome.result());
-	compiler::output_logs(spirit_filter_outcome.logs(), parse_data.lookup_data, logger);
+	compiler::output_logs(spirit_filter_outcome.logs(), parse_data.lookup, logger);
 
 	if (!spirit_filter_outcome.has_result())
 		return std::nullopt;

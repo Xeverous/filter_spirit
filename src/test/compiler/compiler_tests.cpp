@@ -125,7 +125,7 @@ $string         = "Leather Belt"
 )";
 			const std::string_view input = input_str;
 			const parser::sf::parse_success_data parse_data = parse(input);
-			const parser::lookup_data& lookup_data = parse_data.lookup_data;
+			const parser::lookup_data& lookup_data = parse_data.lookup;
 			const lang::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.definitions, lookup_data);
 
 			expect_object(symbols, lookup_data, "none", search(input, "$none").result(),
@@ -176,7 +176,7 @@ $z = 6 7 8 9
 )";
 			const std::string_view input = input_str;
 			const parser::sf::parse_success_data parse_data = parse(input);
-			const parser::lookup_data& lookup_data = parse_data.lookup_data;
+			const parser::lookup_data& lookup_data = parse_data.lookup;
 			const lang::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.definitions, lookup_data);
 
 			expect_object(
@@ -211,7 +211,7 @@ $z = 4W 0 6 RGB
 )";
 			const std::string_view input = input_str;
 			const parser::sf::parse_success_data parse_data = parse(input);
-			const parser::lookup_data& lookup_data = parse_data.lookup_data;
+			const parser::lookup_data& lookup_data = parse_data.lookup;
 			const lang::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.definitions, lookup_data);
 
 			expect_object(
@@ -274,11 +274,11 @@ $z = 4W 0 6 RGB
 				const std::string input_str = minimal_input() + action + "\nShow";
 				const std::string_view input = input_str;
 				const parser::sf::parse_success_data parse_data = parse(input);
-				const parser::lookup_data& lookup_data = parse_data.lookup_data;
+				const parser::lookup_data& lookup_data = parse_data.lookup;
 				const lang::symbol_table symbols =
 					expect_success_when_resolving_symbols(parse_data.ast.definitions, lookup_data);
 				const lang::item_filter filter =
-					expect_success_when_building_filter(parse_data.ast.statements, parse_data.lookup_data, symbols);
+					expect_success_when_building_filter(parse_data.ast.statements, parse_data.lookup, symbols);
 				BOOST_TEST_REQUIRE(static_cast<int>(filter.blocks.size()) == 1);
 				const lang::item_filter_block& block = filter.blocks[0];
 				BOOST_TEST(block.visibility.show == true);
