@@ -8,22 +8,20 @@ namespace
 using namespace fs;
 namespace kw = lang::keywords::rf;
 
-std::ostream& operator<<(std::ostream& os, lang::rarity r)
+std::ostream& operator<<(std::ostream& os, lang::rarity_type r)
 {
 	switch (r) {
-		case lang::rarity::normal:
+		case lang::rarity_type::normal:
 			os << kw::normal;
 			break;
-		case lang::rarity::magic:
+		case lang::rarity_type::magic:
 			os << kw::magic;
 			break;
-		case lang::rarity::rare:
+		case lang::rarity_type::rare:
 			os << kw::rare;
 			break;
-		case lang::rarity::unique:
+		case lang::rarity_type::unique:
 			os << kw::unique;
-			break;
-		default:
 			break;
 	}
 
@@ -41,7 +39,7 @@ void output_range_condition(
 
 	if (range.is_exact())
 	{
-		output_stream << '\t' << name << " = " << (*range.lower_bound).value << '\n';
+		output_stream << '\t' << name << " = " << (*range.lower_bound).value.value << '\n';
 		return;
 	}
 
@@ -51,9 +49,9 @@ void output_range_condition(
 		const lang::range_bound<T>& bound = *range.lower_bound;
 
 		if (bound.inclusive)
-			output_stream << ">= " << bound.value;
+			output_stream << ">= " << bound.value.value;
 		else
-			output_stream << "> " << bound.value;
+			output_stream << "> " << bound.value.value;
 
 		output_stream << '\n';
 	}
@@ -64,9 +62,9 @@ void output_range_condition(
 		const lang::range_bound<T>& bound = *range.upper_bound;
 
 		if (bound.inclusive)
-			output_stream << "<= " << bound.value;
+			output_stream << "<= " << bound.value.value;
 		else
-			output_stream << "< " << bound.value;
+			output_stream << "< " << bound.value.value;
 
 		output_stream << '\n';
 	}
@@ -94,24 +92,24 @@ void output_socket_spec_condition(
 
 	auto& cond = *condition;
 
-	switch (cond.comparison_type) {
-		case lang::socket_spec_comparison_type::less:
+	switch (cond.comparison) {
+		case lang::comparison_type::less:
 			output_stream << " <";
 			break;
-		case lang::socket_spec_comparison_type::less_equal:
+		case lang::comparison_type::less_equal:
 			output_stream << " <=";
 			break;
-		case lang::socket_spec_comparison_type::equal:
+		case lang::comparison_type::equal_soft:
 			output_stream << " =";
 			break;
-		case lang::socket_spec_comparison_type::greater:
+		case lang::comparison_type::equal_hard:
+			output_stream << " ==";
+			break;
+		case lang::comparison_type::greater:
 			output_stream << " >";
 			break;
-		case lang::socket_spec_comparison_type::greater_equal:
+		case lang::comparison_type::greater_equal:
 			output_stream << " >=";
-			break;
-		case lang::socket_spec_comparison_type::exact:
-			output_stream << " ==";
 			break;
 	}
 
@@ -169,23 +167,28 @@ void output_influences_condition(
 	if (cond.exact_match_required)
 		output_stream << " ==";
 
-	if (cond.shaper)
-		output_stream << ' ' << kw::shaper;
+	if (cond.is_none()) {
+		output_stream << ' ' << kw::none;
+	}
+	else {
+		if (cond.shaper)
+			output_stream << ' ' << kw::shaper;
 
-	if (cond.elder)
-		output_stream << ' ' << kw::elder;
+		if (cond.elder)
+			output_stream << ' ' << kw::elder;
 
-	if (cond.crusader)
-		output_stream << ' ' << kw::crusader;
+		if (cond.crusader)
+			output_stream << ' ' << kw::crusader;
 
-	if (cond.redeemer)
-		output_stream << ' ' << kw::redeemer;
+		if (cond.redeemer)
+			output_stream << ' ' << kw::redeemer;
 
-	if (cond.hunter)
-		output_stream << ' ' << kw::hunter;
+		if (cond.hunter)
+			output_stream << ' ' << kw::hunter;
 
-	if (cond.warlord)
-		output_stream << ' ' << kw::warlord;
+		if (cond.warlord)
+			output_stream << ' ' << kw::warlord;
+	}
 
 	output_stream << '\n';
 }
@@ -244,11 +247,12 @@ void condition_set::generate(std::ostream& output_stream) const
 	output_boolean_condition(is_elder_map,        kw::elder_map,        output_stream);
 	output_boolean_condition(is_blighted_map,     kw::blighted_map,     output_stream);
 
-	output_strings_condition(class_,           kw::class_,           output_stream);
-	output_strings_condition(base_type,        kw::base_type,        output_stream);
-	output_strings_condition(has_explicit_mod, kw::has_explicit_mod, output_stream);
-	output_strings_condition(has_enchantment,  kw::has_enchantment,  output_stream);
-	output_strings_condition(prophecy,         kw::prophecy,         output_stream);
+	output_strings_condition(class_,                   kw::class_,                   output_stream);
+	output_strings_condition(base_type,                kw::base_type,                output_stream);
+	output_strings_condition(has_explicit_mod,         kw::has_explicit_mod,         output_stream);
+	output_strings_condition(has_enchantment,          kw::has_enchantment,          output_stream);
+	output_strings_condition(prophecy,                 kw::prophecy,                 output_stream);
+	output_strings_condition(enchantment_passive_node, kw::enchantment_passive_node, output_stream);
 
 	output_influences_condition(has_influence, kw::has_influence, output_stream);
 }
@@ -268,21 +272,12 @@ bool condition_set::is_valid() const
 		return true;
 	};
 
-	const bool influences_valid = [&]() {
-		if (!has_influence)
-			return true;
-
-		// at least 1 influence must be present
-		auto& inf = *has_influence;
-		return inf.shaper || inf.elder || inf.crusader || inf.redeemer || inf.hunter || inf.warlord;
-	}();
-
-	return influences_valid
-		&& is_valid_strings_condition(class_)
+	return is_valid_strings_condition(class_)
 		&& is_valid_strings_condition(base_type)
 		&& is_valid_strings_condition(has_explicit_mod)
 		&& is_valid_strings_condition(has_enchantment)
-		&& is_valid_strings_condition(prophecy);
+		&& is_valid_strings_condition(prophecy)
+		&& is_valid_strings_condition(enchantment_passive_node);
 }
 
 }

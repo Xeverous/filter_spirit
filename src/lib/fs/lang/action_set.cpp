@@ -36,6 +36,53 @@ void output_font_size(
 	output_stream << '\t' << kw::set_font_size << ' ' << (*font_size_action).size.value << '\n';
 }
 
+void output_builtin_alert_sound_id(
+	lang::builtin_alert_sound_id sound_id,
+	std::ostream& output_stream)
+{
+	output_stream << ' ';
+
+	std::visit(utility::visitor{
+		[&output_stream](lang::integer sound_id) {
+			output_stream << sound_id.value;
+		},
+		[&output_stream](lang::shaper_voice_line sound_id) {
+			switch (sound_id.value) {
+				case lang::shaper_voice_line_type::mirror:
+					output_stream << kw::sh_mirror;
+					break;
+				case lang::shaper_voice_line_type::exalted:
+					output_stream << kw::sh_exalted;
+					break;
+				case lang::shaper_voice_line_type::divine:
+					output_stream << kw::sh_divine;
+					break;
+				case lang::shaper_voice_line_type::general:
+					output_stream << kw::sh_general;
+					break;
+				case lang::shaper_voice_line_type::regal:
+					output_stream << kw::sh_regal;
+					break;
+				case lang::shaper_voice_line_type::chaos:
+					output_stream << kw::sh_chaos;
+					break;
+				case lang::shaper_voice_line_type::fusing:
+					output_stream << kw::sh_fusing;
+					break;
+				case lang::shaper_voice_line_type::alchemy:
+					output_stream << kw::sh_alchemy;
+					break;
+				case lang::shaper_voice_line_type::vaal:
+					output_stream << kw::sh_vaal;
+					break;
+				case lang::shaper_voice_line_type::blessed:
+					output_stream << kw::sh_blessed;
+					break;
+			}
+		}
+	}, sound_id.id);
+}
+
 void output_builtin_alert_sound(
 	lang::builtin_alert_sound alert_sound,
 	std::ostream& output_stream)
@@ -47,7 +94,7 @@ void output_builtin_alert_sound(
 	else
 		output_stream << kw::play_alert_sound;
 
-	output_stream << ' ' << alert_sound.sound_id.value;
+	output_builtin_alert_sound_id(alert_sound.sound_id, output_stream);
 
 	if (alert_sound.volume.has_value())
 		output_stream << ' ' << (*alert_sound.volume).value;
@@ -91,82 +138,82 @@ void output_disabled_drop_sound(
 	output_stream << '\t' << kw::disable_drop_sound << '\n';
 }
 
-void output_suit(lang::suit s, std::ostream& output_stream)
+void output_suit(lang::suit_type s, std::ostream& output_stream)
 {
 	switch (s) {
-		case lang::suit::red:
+		case lang::suit_type::red:
 			output_stream << kw::red;
 			break;
-		case lang::suit::green:
+		case lang::suit_type::green:
 			output_stream << kw::green;
 			break;
-		case lang::suit::blue:
+		case lang::suit_type::blue:
 			output_stream << kw::blue;
 			break;
-		case lang::suit::white:
+		case lang::suit_type::white:
 			output_stream << kw::white;
 			break;
-		case lang::suit::brown:
+		case lang::suit_type::brown:
 			output_stream << kw::brown;
 			break;
-		case lang::suit::yellow:
+		case lang::suit_type::yellow:
 			output_stream << kw::yellow;
 			break;
-		case lang::suit::cyan:
+		case lang::suit_type::cyan:
 			output_stream << kw::cyan;
 			break;
-		case lang::suit::grey:
+		case lang::suit_type::grey:
 			output_stream << kw::grey;
 			break;
-		case lang::suit::orange:
+		case lang::suit_type::orange:
 			output_stream << kw::orange;
 			break;
-		case lang::suit::pink:
+		case lang::suit_type::pink:
 			output_stream << kw::pink;
 			break;
-		case lang::suit::purple:
+		case lang::suit_type::purple:
 			output_stream << kw::purple;
 			break;
 	}
 }
 
-void output_shape(lang::shape s, std::ostream& output_stream)
+void output_shape(lang::shape_type s, std::ostream& output_stream)
 {
 	switch (s) {
-		case lang::shape::circle:
+		case lang::shape_type::circle:
 			output_stream << kw::circle;
 			break;
-		case lang::shape::diamond:
+		case lang::shape_type::diamond:
 			output_stream << kw::diamond;
 			break;
-		case lang::shape::hexagon:
+		case lang::shape_type::hexagon:
 			output_stream << kw::hexagon;
 			break;
-		case lang::shape::square:
+		case lang::shape_type::square:
 			output_stream << kw::square;
 			break;
-		case lang::shape::star:
+		case lang::shape_type::star:
 			output_stream << kw::star;
 			break;
-		case lang::shape::triangle:
+		case lang::shape_type::triangle:
 			output_stream << kw::triangle;
 			break;
-		case lang::shape::cross:
+		case lang::shape_type::cross:
 			output_stream << kw::cross;
 			break;
-		case lang::shape::moon:
+		case lang::shape_type::moon:
 			output_stream << kw::moon;
 			break;
-		case lang::shape::raindrop:
+		case lang::shape_type::raindrop:
 			output_stream << kw::raindrop;
 			break;
-		case lang::shape::kite:
+		case lang::shape_type::kite:
 			output_stream << kw::kite;
 			break;
-		case lang::shape::pentagon:
+		case lang::shape_type::pentagon:
 			output_stream << kw::pentagon;
 			break;
-		case lang::shape::upside_down_house:
+		case lang::shape_type::upside_down_house:
 			output_stream << kw::upside_down_house;
 			break;
 	}
@@ -182,9 +229,9 @@ void output_minimap_icon(
 	const lang::minimap_icon& mi = (*minimap_icon_action).icon;
 	output_stream << '\t' << kw::minimap_icon << ' ' << mi.size.value << ' ';
 
-	output_suit(mi.color, output_stream);
+	output_suit(mi.color.value, output_stream);
 	output_stream << ' ';
-	output_shape(mi.shape, output_stream);
+	output_shape(mi.shape_.value, output_stream);
 	output_stream << '\n';
 }
 
@@ -197,7 +244,7 @@ void output_beam_effect(
 
 	const lang::play_effect& effect = (*play_effect_action).beam;
 	output_stream << '\t' << kw::play_effect << ' ';
-	output_suit(effect.color, output_stream);
+	output_suit(effect.color.value, output_stream);
 	if (effect.is_temporary)
 		output_stream << ' ' << kw::temp;
 

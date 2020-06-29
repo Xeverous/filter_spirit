@@ -1,8 +1,23 @@
 # Filter Spirit
 
-Advanced item filter generator for Path of Exile that uses it's own [DSL](https://en.wikipedia.org/wiki/Domain-specific_language) and online item price APIs. Basically a separate pseudo-programming language that lets you write item filters using item price data from poe.ninja or poe.watch available at generation time. Create multiple filter variants and refresh whenever you want to always be up to date with market prices.
+Advanced item filter generator for Path of Exile that uses it's own [DSL](https://en.wikipedia.org/wiki/Domain-specific_language) and online item price APIs. Basically an enhanced filter language that lets you write item filters with more convenience and using item price data from poe.ninja or poe.watch available at generation time. Create multiple filter variants and refresh whenever you want to always be up to date with market prices.
 
-The project is under construction, message [/u/Xeverous](https://old.reddit.com/user/Xeverous/) on reddit or Xeverous#2151 on Discord if you are interested in it's early development or have any questions/suggestions/whatever. You can also open an issue.
+If you ever worked with web stuff - a perfect analogy is that Filter Spirit is the same for real filters as are LESS and Sass for CSS.
+
+## news
+
+The project is under construction, but a command-line version is already available. Message me ([/u/Xeverous](https://old.reddit.com/user/Xeverous/) on reddit or Xeverous#2151 on Discord) if you are interested in it or have any questions/suggestions/whatever. You can also open an issue.
+
+I planned to release first graphical version at the end of Delirium league or a bit earlier but you know, it's my first that large project and I'm also playing the game and working full-time. Also, graduation soon... I should have more time after Harvest launch.
+
+I'm also currently [heavily contributing to elements](https://github.com/cycfi/elements/issues?q=author%3AXeverous) which is planned to be a library behind FS GUI. Obviously I could use something well-known like Qt or wxWidgets but none of them fully satisfy my requirements so I decided to contribute to a new promising project instead. Call it a bit of Shaper's perfection syndrome.
+
+Thanks to some users, I'm thinking of more program interface opportunities:
+
+- Visual Studio Code plugin that uses FS in the background.
+- WASM-compiled build, hosted on a static GitHub Pages website.
+
+Please contact me if you are familiar with web-related technologies and would like to help in making these.
 
 ## overview
 
@@ -10,10 +25,10 @@ Core features:
 
 - **Generation-time error checking**. FS has own parser and compiler that performs semantic analysis - it is not a blind text-copy-paste script.
 - **Language features dedicated to elimination of filter code duplication**:
-  - **named constants**: `const red = RGB(255, 0, 0)`
-  - **named style groups**: `x = { SetFontSize 42 SetTextColor black }`
+  - **named constants**: `$red = 255 0 0`
+  - **named style groups**: `$x = { SetFontSize 42 SetTextColor $black }`
   - **nesting of filter blocks** to inherit conditions and override actions
-- **querying item prices**: `BaseType $divination(10, 100)` pulls data from API to list div cards worth 10-100c at generation time. Refresh whenever you want - your filter is always up-to-date with market prices.
+- **querying item prices**: `Autogen cards Price > 50` pulls data from API to list div cards worth 50+ chaos at generation time. Refresh whenever you want - your filter is always up-to-date with market prices.
 
 Planned features:
 
@@ -24,15 +39,15 @@ Planned features:
 
 ## example code
 
-There is a full example filter template source in the repository although the syntax is a subject to change.
+There is a full example filter template source in the repository. You can also browse `src/test/compiler/filter_generation_tests.cpp` for even more examples.
 
 ```
-color_white  = RGB(255, 255, 255, 255)
-color_hammer = RGB(162,  85,   0) # (default opacity)
+$color_white  = 255 255 255 255
+$color_hammer = 162  85   0 # (will use default opacity)
 
-BaseType ["Gavel", "Stone Hammer", "Rock Breaker"] {
-	SetTextColor color_white
-	SetBackgroundColor color_hammer
+BaseType "Gavel" "Stone Hammer" "Rock Breaker" {
+	SetTextColor $color_white
+	SetBackgroundColor $color_hammer
 	# above BaseType conditon will be inherited by all nested blocks
 	# above actions will be inherited and can be overriden by nested blocks
 
@@ -56,39 +71,40 @@ BaseType ["Gavel", "Stone Hammer", "Rock Breaker"] {
 }
 
 Class "Divination Card" {
-	SetTextColor color_divination
+	SetTextColor $color_divination
 
 	# cards that you always want to pickup
-	BaseType ["The Void", "The Cartographer", "Chaotic Disposition"] {
-		SetAlertSound alert_divination_stack_1
-		SetBeam beam_divination
+	BaseType "The Void" "The Cartographer" "Chaotic Disposition" {
+		SetAlertSound $alert_divination_stack_1
+		PlayEffect $effect_divination
 		Show
 	}
 
-	# 100c+
-	BaseType $divination(100, _) {
-		SetTextColor color_black
-		SetBorderColor color_divination
-		SetBackgroundColor color_divination
-		SetFontSize font_max
-		SetAlertSound alert_divination_best
-		SetBeam beam_divination
-		SetMinimapIcon MinimapIcon(0, Blue, Square)
-		Show
-	}
+	Autogen cards {
+		Price >= 100 {
+			SetTextColor $color_black
+			SetBorderColor $color_divination
+			SetBackgroundColor $color_divination
+			SetFontSize $font_max
+			SetAlertSound $alert_divination_best
+			PlayEffect $effect_divination
+			MinimapIcon 0 Blue Square
+			Show
+		}
 
-	# 10 - 100c
-	BaseType $divination(10, 100) {
-		SetBorderColor color_divination
-		SetFontSize font_mid_divinaton
-		SetAlertSound alert_divination_mid
-		SetBeam beam_divination
-		SetMinimapIcon MinimapIcon(1, Blue, Square)
-		Show
+		Price < 100
+		Price >= 10 {
+			SetBorderColor $color_divination
+			SetFontSize $font_mid_divinaton
+			SetAlertSound $alert_divination_mid
+			PlayEffect $effect_divination
+			MinimapIcon 1 Blue Square
+			Show
+		}
 	}
 
 	# if you really hate these cards
-	BaseType ["Rain of Chaos", "Carrion Crow"] {
+	BaseType "Rain of Chaos" "Carrion Crow" {
 		Hide
 	}
 
@@ -111,13 +127,13 @@ In Windows, you can quickly open command line in desired directory by typing "cm
 
 ## runtime dependencies
 
-FS does not need to install anything. You can download latest release and immediately use the program.
+FS does not need to install anything (it's fully portable). You can download latest release and immediately use the program.
 
 ## build dependencies
 
-- C++17 compiler (`<filesystem>` not required)
-- Boost 1.70 OR older with Spirit headers updated to 1.70; this project uses:
-  - spirit (newest X3 library)
+- C++17 compiler
+- Boost 1.70+:
+  - spirit (FS uses newest X3 parser)
   - fusion
   - preprocessor
   - optional
@@ -127,16 +143,16 @@ FS does not need to install anything. You can download latest release and immedi
   - beast
   - asio
   - system
-  - **filesystem**
   - **unit_test_framework** (only if you build tests)
-- nlohmann/json
-- **OpenSSL** (preferably 1.1+)
+- nlohmann/json 3.0+
+- **OpenSSL** 1.1+
+- **libcurl** 7.17+
 
-Bolded dependencies require linking, all dependencies are exposed as targets in CMake script.
+Bolded dependencies need to be build. Rest are header-only libraries.
 
 ## building
 
-modern CMake build script
+Modern CMake build script. All dependencies are exposed as targets. See comments inside the build recipe for more information.
 
 ```
 mkdir build

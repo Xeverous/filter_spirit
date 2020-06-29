@@ -135,7 +135,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::rf::has_influence_condition,
-	exact_match, influence_literals)
+	exact_match, spec)
 
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::rf::socket_spec_condition,
@@ -151,11 +151,11 @@ BOOST_FUSION_ADAPT_STRUCT(
 
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::rf::play_alert_sound_action,
-	sound_id, volume)
+	id, volume)
 
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::rf::play_alert_sound_positional_action,
-	sound_id, volume)
+	id, volume)
 
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::rf::play_effect_action,

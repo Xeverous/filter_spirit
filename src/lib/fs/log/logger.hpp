@@ -156,6 +156,11 @@ public:
 		return message_stream(severity::error, *this);
 	}
 
+	[[nodiscard]] message_stream message(severity s)
+	{
+		return message_stream(s, *this);
+	}
+
 	virtual void add(std::string_view text) = 0;
 	virtual void add(char character) = 0;
 	virtual void add(std::int64_t number) = 0;
@@ -221,6 +226,7 @@ namespace strings
 {
 
 constexpr auto note = "note: ";
+constexpr auto warning = "warning: ";
 constexpr auto error = "error: ";
 
 constexpr auto internal_compiler_error = "internal compiler error: ";

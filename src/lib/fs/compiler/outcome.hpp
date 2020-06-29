@@ -1,13 +1,15 @@
 #pragma once
 
+#include <fs/compiler/settings.hpp>
+#include <fs/parser/parser.hpp>
 #include <fs/lang/object.hpp>
 #include <fs/lang/position_tag.hpp>
 #include <fs/utility/better_enum.hpp>
+#include <fs/utility/outcome.hpp>
+#include <fs/log/logger.hpp>
 
 #include <variant>
 #include <optional>
-
-// all possible compilation errors
 
 namespace fs::compiler::errors
 {
@@ -51,9 +53,10 @@ struct empty_socket_spec
 	lang::position_tag origin;
 };
 
-struct illegal_characters_in_socket_spec
+struct illegal_character_in_socket_spec
 {
 	lang::position_tag origin;
+	int character_index;
 };
 
 struct invalid_socket_spec
@@ -91,6 +94,11 @@ struct upper_bound_redefinition
 {
 	lang::position_tag redefinition;
 	lang::position_tag original_definition;
+};
+
+struct invalid_builtin_alert_sound_id
+{
+	lang::position_tag origin;
 };
 
 struct invalid_set_alert_sound
@@ -141,29 +149,121 @@ struct internal_compiler_error
 	lang::position_tag origin;
 };
 
-}
+} // namespace fs::compiler:errors
+
+namespace fs::compiler::warnings
+{
+
+struct font_size_outside_range
+{
+	lang::position_tag origin;
+};
+
+} // namespace fs::compiler::warnings
+
+namespace fs::compiler::notes
+{
+
+struct fixed_text
+{
+	const char* text;
+};
+
+struct failed_operations_count
+{
+	const char* operation_name;
+	int count;
+};
+
+} // namespace fs::compiler::notes
 
 namespace fs::compiler
 {
 
-using compile_error = std::variant<
+using error = std::variant<
 	errors::name_already_exists,
 	errors::no_such_name,
 	errors::invalid_amount_of_arguments,
 	errors::invalid_integer_value,
 	errors::type_mismatch,
 	errors::empty_socket_spec,
-	errors::illegal_characters_in_socket_spec,
+	errors::illegal_character_in_socket_spec,
 	errors::invalid_socket_spec,
 	errors::duplicate_influence,
 	errors::condition_redefinition,
 	errors::action_redefinition,
 	errors::lower_bound_redefinition,
 	errors::upper_bound_redefinition,
+	errors::invalid_builtin_alert_sound_id,
 	errors::invalid_set_alert_sound,
 	errors::price_without_autogen,
 	errors::autogen_error,
 	errors::internal_compiler_error
 >;
+
+using warning = std::variant<
+	warnings::font_size_outside_range
+>;
+
+using note = std::variant<
+	notes::fixed_text,
+	notes::failed_operations_count
+>;
+
+using log_message = std::variant<error, warning, note>;
+
+constexpr std::size_t outcome_buffer_size = 4;
+
+template <typename... R>
+using outcome = utility::outcome<log_message, outcome_buffer_size, R...>;
+
+using log_container = utility::outcome_base<log_message, outcome_buffer_size>::log_container_type;
+
+inline bool has_errors(const log_container& logs)
+{
+	for (const auto& msg : logs)
+		if (std::holds_alternative<error>(msg))
+			return true;
+
+	return false;
+}
+
+inline bool has_warnings(const log_container& logs)
+{
+	for (const auto& msg : logs)
+		if (std::holds_alternative<warning>(msg))
+			return true;
+
+	return false;
+}
+
+inline bool has_warnings_or_errors(const log_container& logs)
+{
+	return has_warnings(logs) || has_errors(logs);
+}
+
+inline bool should_continue(error_handling_settings settings, const log_container& logs)
+{
+	if (settings.stop_on_error) {
+		if (has_errors(logs) || (settings.treat_warnings_as_errors && has_warnings_or_errors(logs)))
+			return false;
+	}
+
+	return true;
+}
+
+template <typename... R>
+bool should_continue(error_handling_settings settings, const outcome<R...>& o)
+{
+	if (!o.has_result())
+		return false;
+
+	return should_continue(settings, o.logs());
+}
+
+void output_logs(
+	const log_container& logs,
+	const parser::lookup_data& lookup_data,
+	log::logger& logger);
 
 } // namespace fs::compiler

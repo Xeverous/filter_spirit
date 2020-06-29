@@ -53,6 +53,7 @@ namespace rf
 	constexpr auto map_tier         = "MapTier";
 	constexpr auto area_level       = "AreaLevel";
 	constexpr auto corrupted_mods   = "CorruptedMods";
+	constexpr auto enchantment_passive_node = "EnchantmentPassiveNode";
 
 	constexpr auto r = 'R';
 	constexpr auto g = 'G';
@@ -107,6 +108,17 @@ namespace rf
 	constexpr auto kite     = "Kite";
 	constexpr auto pentagon = "Pentagon";
 	constexpr auto upside_down_house = "UpsideDownHouse";
+
+	constexpr auto sh_mirror  = "ShMirror";
+	constexpr auto sh_exalted = "ShExalted";
+	constexpr auto sh_divine  = "ShDivine";
+	constexpr auto sh_general = "ShGeneral"; // "Orb Of Immense Power"
+	constexpr auto sh_regal   = "ShRegal";
+	constexpr auto sh_chaos   = "ShChaos";
+	constexpr auto sh_fusing  = "ShFusing";
+	constexpr auto sh_alchemy = "ShAlchemy";
+	constexpr auto sh_vaal    = "ShVaal";
+	constexpr auto sh_blessed = "ShBlessed";
 
 	constexpr auto shaper      = "Shaper";
 	constexpr auto elder       = "Elder";

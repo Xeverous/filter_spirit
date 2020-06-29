@@ -64,13 +64,34 @@ inline bool operator!=(font_size_action lhs, font_size_action rhs)
 	return !(lhs == rhs);
 }
 
+struct builtin_alert_sound_id
+{
+	explicit builtin_alert_sound_id(integer id)
+	: id(id) {}
+
+	explicit builtin_alert_sound_id(shaper_voice_line svl)
+	: id(svl) {}
+
+	std::variant<integer, shaper_voice_line> id;
+};
+
+inline bool operator==(builtin_alert_sound_id lhs, builtin_alert_sound_id rhs)
+{
+	return lhs.id == rhs.id;
+}
+
+inline bool operator!=(builtin_alert_sound_id lhs, builtin_alert_sound_id rhs)
+{
+	return !(lhs == rhs);
+}
+
 struct builtin_alert_sound
 {
-	explicit builtin_alert_sound(bool is_positional, integer sound_id, std::optional<integer> volume = std::nullopt)
-	:  is_positional(is_positional), sound_id(sound_id), volume(volume) {}
+	explicit builtin_alert_sound(bool is_positional, builtin_alert_sound_id sound_id, std::optional<integer> volume = std::nullopt)
+	: is_positional(is_positional), sound_id(sound_id), volume(volume) {}
 
 	bool is_positional;
-	integer sound_id;
+	builtin_alert_sound_id sound_id;
 	std::optional<integer> volume;
 };
 
@@ -141,17 +162,17 @@ inline bool operator!=(disable_drop_sound_action lhs, disable_drop_sound_action 
 
 struct minimap_icon
 {
-	minimap_icon(integer size, suit color, shape shape)
-	: size(size), color(color), shape(shape) {}
+	minimap_icon(integer size, suit color, shape shape_)
+	: size(size), color(color), shape_(shape_) {}
 
 	integer size;
 	suit color;
-	shape shape;
+	shape shape_;
 };
 
 inline bool operator==(minimap_icon lhs, minimap_icon rhs) noexcept
 {
-	return std::tie(lhs.size, lhs.color, lhs.shape) == std::tie(rhs.size, rhs.color, rhs.shape);
+	return std::tie(lhs.size, lhs.color, lhs.shape_) == std::tie(rhs.size, rhs.color, rhs.shape_);
 }
 inline bool operator!=(minimap_icon lhs, minimap_icon rhs) noexcept { return !(lhs == rhs); }
 

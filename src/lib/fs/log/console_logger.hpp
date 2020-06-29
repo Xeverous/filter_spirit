@@ -25,6 +25,7 @@ public:
 
 	void end_message() override
 	{
+		std::cout << std::flush;
 	}
 
 	void add(std::string_view text) override

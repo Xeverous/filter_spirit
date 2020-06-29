@@ -133,6 +133,7 @@ expression(s) | type | notes
 `Normal`, `Magic`, `Rare`, `Unique` | Rarity |
 `Circle`, `Diamond`, `Hexagon`, `Square`, `Star`, `Triangle`, `Cross`, `Moon`, `Raindrop`, `Kite`, `Pentagon`, `UpsideDownHouse` | Shape |
 `Red`, `Green`, `Blue`, `White`, `Brown`, `Yellow`, `Cyan`, `Grey`, `Orange`, `Pink`, `Purple` | Suit |
+`ShMirror`, `ShExalted`, `ShDivine`, `ShGeneral`, `ShRegal`, `ShChaos`, `ShFusing`, `ShAlchemy`, `ShVaal`, `ShBlessed` | ShaperVoiceLine
 `Shaper`, `Elder`, `Crusader`, `Redeemer`, `Hunter`, `Warlord` | Influence |
 `"abc"` | String | UTF-8 encoding, line breaking characters (LF and CR) not allowed between quotes
 
@@ -470,14 +471,7 @@ Class "Currency" {
 
 ## conditions
 
-FS supports all conditions that the actual filters support. Some conditions allow values of multiple types.
-
-- Place 1 condition per line.
-- Numeric and `Rarity` conditions accept comparison operator - one of `<`, `>`, `<=`, `>=`, `=`. Operator is optional (defaults to `=`).
-- String-based conditions accept optional `==` token which enables exact maching. `BaseType == "The Wolf"` will match only *The Wolf* card, `BaseType "The Wolf"` will match all *The Wolf*, *The Wolf's Legacy* and *The Wolf's Shadow*.
-- `HasInfluence` condition behaves differently with `==`:
-  - If `==` is not present, it will match an item **with at least one of specified influences**.
-  - If `==` is present, it will only match items **with all specified influences**.
+FS supports all conditions that the actual filters support. Some conditions allow values of multiple types. Place 1 condition per line.
 
 Grammar overview (not a normative documentation as actual EBNF grammar specifications are much harder to read):
 
@@ -485,15 +479,15 @@ Grammar overview (not a normative documentation as actual EBNF grammar specifica
 X       # X token is required
 [X]     # X token is optional
 X | Y   # X or Y token
-X...    # 0 or more X tokens
-X X...  # 1 or more X tokens
+X*      # 0 or more X tokens
+X+      # 1 or more X tokens
 
-# token CMP: < | > | <= | >= | =
-# token SS: [Integer] R...G...B...W...A...D...
+# token CMP: < | > | <= | >= | = | ==
+# token EQ: = | ==
+# token SS: [Integer] R*G*B*W*A*D*
 ```
 
 ```
-
 Rarity        [CMP] Rarity
 ItemLevel     [CMP] Integer
 DropLevel     [CMP] Integer
@@ -507,15 +501,16 @@ MapTier       [CMP] Integer
 AreaLevel     [CMP] Integer
 CorruptedMods [CMP] Integer
 
-Class          [==] String String...
-BaseType       [==] String String...
-HasExplicitMod [==] String String...
-HasEnchantment [==] String String...
-Prophecy       [==] String String...
-HasInfluence   [==] Influence Influence...
+Class                  [EQ] None | String+
+BaseType               [EQ] None | String+
+HasExplicitMod         [EQ] None | String+
+HasEnchantment         [EQ] None | String+
+Prophecy               [EQ] None | String+
+EnchantmentPassiveNode [EQ] None | String+
+HasInfluence           [EQ] None | Influence+
 
-Sockets     [CMP | ==] SS SS...
-SocketGroup [CMP | ==] SS SS...
+Sockets     [CMP] SS+
+SocketGroup [CMP] SS+
 
 AnyEnchantment  Boolean
 Identified      Boolean
@@ -546,6 +541,22 @@ Sockets >= 4RR
 SocketGroup >= 1 2 3R AA 3D 5GBW
 ```
 
+### (nothing) vs `=` vs `==`
+
+- Comparison operator is optional. Unless otherwise specified, `(nothing)` has the same meaning as `=`.
+- For numeric and `Rarity` conditions there is no difference between `=` and `==`.
+- Analogical for all string-based conditions: `BaseType == "The Wolf"` will match only *The Wolf* card, `BaseType "The Wolf"` and `BaseType = "The Wolf"` will match all *The Wolf*, *The Wolf's Legacy* and *The Wolf's Shadow*.
+- Game client reports error upon loading a filter which has `==` with names that are not complete.
+- `HasInfluence` condition behaves differently with `==`:
+  - If there is nothing or `=`, it will match an item **with at least one of specified influences**.
+  - If there is `==`, it will only match items **with all specified influences**.
+- `Sockets` and `SocketGroup` have very complex matching rules. They are explained by Rhys in [this reddit thread](https://www.reddit.com/r/pathofexile/comments/f2t4tz/inconsistencies_in_new_filter_syntaxes/). FS preserves them as-is in generated filters.
+
+### `None` in array-based conditions
+
+- `None` in `HasInfluence` is an official filter feature - it generates such block and it matches only items which have no influence.
+- `None` in other array conditions is a FS extension. It causes that block to not be generated. Useful when the value comes from elsewhere - use code like `$chance_bases = None` when you do not want specific blocks to be generated.
+
 ## actions
 
 The optional 4th value for colors is the opacity value. `0` means fully transparent, `255` fully opaque. The default opacity is unknown but it is somewhat transparent.
@@ -558,8 +569,8 @@ SetBackgroundColor       Integer Integer Integer [Integer]
 SetFontSize              Integer
 
 # first token is built-in sound ID, second is volume
-PlayAlertSound           Integer [Integer]
-PlayAlertSoundPositional Integer [Integer]
+PlayAlertSound           (Integer | ShaperVoiceLine) [Integer]
+PlayAlertSoundPositional (Integer | ShaperVoiceLine) [Integer]
 
 # path can be absolute or just the file name
 # note: custom sounds do not support specifying volume
@@ -581,7 +592,7 @@ Set                      $identifier
 # and CustomAlertSound tokens. Useful when you want to use
 # constants because the constant can be freely changed
 # what sound variant it refers to.
-SetAlertSound            String | (Integer [Integer])
+SetAlertSound            String | ((Integer | ShaperVoiceLine) [Integer])
 ```
 
 Examples:

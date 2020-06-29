@@ -92,10 +92,10 @@ void print_parse_errors(const parse_failure_data& parse_data, log::logger& logge
 	}
 
 	for (const parse_error& error : parse_data.errors)
-		print_error(error, parse_data.lookup_data, logger);
+		print_error(error, parse_data.lookup, logger);
 
 	logger.info().print_line_number_with_description_and_pointed_code(
-		parse_data.lookup_data.get_view_of_whole_content(),
+		parse_data.lookup.get_view_of_whole_content(),
 		parse_data.parser_stop_position,
 		"parser stopped here");
 }

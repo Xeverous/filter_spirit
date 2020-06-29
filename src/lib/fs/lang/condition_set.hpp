@@ -4,6 +4,7 @@
 #include <fs/lang/position_tag.hpp>
 #include <fs/lang/condition_properties.hpp>
 #include <fs/lang/queries.hpp>
+#include <fs/utility/type_traits.hpp>
 
 #include <boost/container/small_vector.hpp>
 
@@ -17,7 +18,10 @@ namespace fs::lang
 template <typename T>
 struct range_bound
 {
-	static_assert(std::is_trivial_v<T>, "T should be trivial");
+	// used in the implementation
+	// T should be a lang type
+	static_assert(traits::has_origin_member_v<T>);
+	static_assert(traits::has_value_member_v<T>);
 
 	T value;
 	bool inclusive;
@@ -54,23 +58,26 @@ struct range_condition
 	}
 
 	// check whether 'value' can fit into currently specified range
-	constexpr bool includes(T value) const noexcept
+	template <typename V>
+	constexpr bool includes(V value) const noexcept
 	{
+		static_assert(std::is_same_v<V, decltype(T::value)>);
+
 		if (lower_bound.has_value())
 		{
-			if ((*lower_bound).value > value)
+			if ((*lower_bound).value.value > value)
 				return false;
 
-			if ((*lower_bound).value == value && !(*lower_bound).inclusive)
+			if ((*lower_bound).value.value == value && !(*lower_bound).inclusive)
 				return false;
 		}
 
 		if (upper_bound.has_value())
 		{
-			if ((*upper_bound).value < value)
+			if ((*upper_bound).value.value < value)
 				return false;
 
-			if ((*upper_bound).value == value && !(*upper_bound).inclusive)
+			if ((*upper_bound).value.value == value && !(*upper_bound).inclusive)
 				return false;
 		}
 
@@ -134,8 +141,8 @@ struct range_condition
 };
 
 using rarity_range_condition = range_condition<rarity>;
-using integer_range_condition = range_condition<int>;
-using fractional_range_condition = range_condition<double>;
+using integer_range_condition = range_condition<integer>;
+using fractional_range_condition = range_condition<fractional>;
 
 struct boolean_condition
 {
@@ -147,7 +154,7 @@ struct socket_spec_condition
 {
 	using container_type = boost::container::small_vector<socket_spec, 6>;
 
-	socket_spec_comparison_type comparison_type;
+	comparison_type comparison;
 	container_type values;
 	position_tag origin;
 };
@@ -161,6 +168,11 @@ struct strings_condition
 
 struct influences_condition
 {
+	bool is_none() const
+	{
+		return !(shaper || elder || crusader || redeemer || hunter || warlord);
+	}
+
 	bool shaper;
 	bool elder;
 	bool crusader;
@@ -200,6 +212,7 @@ struct condition_set
 	std::optional<strings_condition> has_explicit_mod;
 	std::optional<strings_condition> has_enchantment;
 	std::optional<strings_condition> prophecy;
+	std::optional<strings_condition> enchantment_passive_node;
 	std::optional<influences_condition> has_influence;
 	integer_range_condition stack_size;
 	integer_range_condition gem_level;

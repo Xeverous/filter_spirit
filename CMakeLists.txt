@@ -12,7 +12,7 @@ if(${CMAKE_VERSION} VERSION_LESS 3.12)
 endif()
 
 project(filter_spirit
-	VERSION 0.5.0
+	VERSION 0.6.0
 	DESCRIPTION "advanced item filter generator for the game Path of Exile using own DSL and online APIs"
 	LANGUAGES CXX)
 
@@ -33,6 +33,12 @@ option(FILTER_SPIRIT_BUILD_EXECUTABLE_CLI
 	"build Filter Spirit command line program" ON)
 option(FILTER_SPIRIT_BUILD_TESTS
 	"build Filter Spirit tests" ON)
+option(FILTER_SPIRIT_ENABLE_ASSERTION_EXCEPTIONS
+	"ON: throw on assertion failure; OFF: rely on assert() behavior" OFF)
+option(FILTER_SPIRIT_ADD_FILESYSTEM_LINK
+	"add linker command for standard filesystem library (required by earlier GCC and Clang versions)" OFF)
+option(FILTER_SPIRIT_ENABLE_LTO
+	"enable link-time optimization for Filter Spirit targets" ON)
 
 ##############################################################################
 # specify explicitly where to output all binary objects
@@ -41,16 +47,16 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-include(CheckIPOSupported)
-check_ipo_supported(RESULT supported OUTPUT error)
+if(FILTER_SPIRIT_ENABLE_LTO)
+	include(CheckIPOSupported)
+	check_ipo_supported(RESULT IPO_SUPPORTED OUTPUT IPO_ERROR)
 
-if(supported)
-    message(STATUS "IPO / LTO supported, enabling")
-    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
-else()
-    message(STATUS "IPO / LTO not supported: <${error}>, will not enable")
+	if(IPO_SUPPORTED)
+		message(STATUS "IPO / LTO supported, enabling")
+	else()
+		message(FATAL_ERROR "IPO / LTO not supported: ${IPO_ERROR}, change settings or compiler")
+	endif()
 endif()
-
 ##############################################################################
 
 add_subdirectory(src)

@@ -3,7 +3,7 @@
 #include "common/string_operations.hpp"
 
 #include <fs/compiler/compiler.hpp>
-#include <fs/compiler/print_error.hpp>
+#include <fs/compiler/outcome.hpp>
 #include <fs/generator/make_filter.hpp>
 #include <fs/lang/position_tag.hpp>
 #include <fs/log/string_logger.hpp>
@@ -20,6 +20,8 @@ namespace ut = boost::unit_test;
 namespace fs::test
 {
 
+// note: object's internal origin is not checked
+// use the second pair element
 void expect_object(
 	const lang::symbol_table& symbols,
 	const parser::lookup_data& lookup_data,
@@ -69,17 +71,16 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 			const std::vector<parser::ast::sf::definition>& defs,
 			const parser::lookup_data& lookup_data)
 		{
-			const std::variant<lang::symbol_table, compiler::compile_error> symbols_or_error =
-				resolve_symbols(defs);
+			compiler::outcome<lang::symbol_table> symbols_outcome = resolve_symbols(defs);
 
-			if (std::holds_alternative<compiler::compile_error>(symbols_or_error)) {
-				const auto& error = std::get<compiler::compile_error>(symbols_or_error);
+			if (compiler::has_errors(symbols_outcome.logs())) {
 				log::string_logger logger;
-				compiler::print_error(error, lookup_data, logger);
+				compiler::output_logs(symbols_outcome.logs(), lookup_data, logger);
 				BOOST_FAIL("resolve_symbols failed but should not:\n" << logger.str());
 			}
 
-			return std::get<lang::symbol_table>(std::move(symbols_or_error));
+			BOOST_TEST_REQUIRE(symbols_outcome.has_result());
+			return std::move(symbols_outcome).result();
 		}
 
 		static
@@ -88,18 +89,17 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 			const parser::lookup_data& lookup_data,
 			const lang::symbol_table& symbols)
 		{
-			std::variant<lang::spirit_item_filter, compiler::compile_error> sf_or_err =
-				compiler::compile_spirit_filter_statements(top_level_statements, symbols);
+			compiler::outcome<lang::spirit_item_filter> sf_outcome =
+				compiler::compile_spirit_filter_statements(compiler::settings{}, top_level_statements, symbols);
 
-			if (std::holds_alternative<compiler::compile_error>(sf_or_err)) {
-				const auto& error = std::get<compiler::compile_error>(sf_or_err);
+			if (compiler::has_errors(sf_outcome.logs())) {
 				log::string_logger logger;
-				compiler::print_error(error, lookup_data, logger);
+				compiler::output_logs(sf_outcome.logs(), lookup_data, logger);
 				BOOST_FAIL("building spirit filter blocks failed but should not:\n" << logger.str());
 			}
 
-			const auto& spirit_filter = std::get<lang::spirit_item_filter>(sf_or_err);
-			return generator::make_filter(spirit_filter, /* empty item price data */ {});
+			BOOST_TEST_REQUIRE(sf_outcome.has_result());
+			return generator::make_filter(sf_outcome.result(), /* empty item price data */ {});
 		}
 	};
 
@@ -120,11 +120,12 @@ $influence      = Elder
 $rarity         = Rare
 $shape          = Hexagon
 $suit           = Yellow
+$shaper_voice   = ShChaos
 $string         = "Leather Belt"
 )";
 			const std::string_view input = input_str;
 			const parser::sf::parse_success_data parse_data = parse(input);
-			const parser::lookup_data& lookup_data = parse_data.lookup_data;
+			const parser::lookup_data& lookup_data = parse_data.lookup;
 			const lang::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.definitions, lookup_data);
 
 			expect_object(symbols, lookup_data, "none", search(input, "$none").result(),
@@ -146,16 +147,19 @@ $string         = "Leather Belt"
 				{{lang::socket_spec{5, 1, 1, 1}, search(input, "5RGB").result()}}
 			);
 			expect_object(symbols, lookup_data, "influence", search(input, "$influence").result(),
-				{{lang::influence::elder, search(input, "Elder").result()}}
+				{{lang::influence{lang::influence_type::elder}, search(input, "Elder").result()}}
 			);
 			expect_object(symbols, lookup_data, "rarity", search(input, "$rarity").result(),
-				{{lang::rarity::rare, search(input, "Rare").result()}}
+				{{lang::rarity{lang::rarity_type::rare}, search(input, "Rare").result()}}
 			);
 			expect_object(symbols, lookup_data, "shape", search(input, "$shape").result(),
-				{{lang::shape::hexagon, search(input, "Hexagon").result()}}
+				{{lang::shape{lang::shape_type::hexagon}, search(input, "Hexagon").result()}}
 			);
 			expect_object(symbols, lookup_data, "suit", search(input, "$suit").result(),
-				{{lang::suit::yellow, search(input, "Yellow").result()}}
+				{{lang::suit{lang::suit_type::yellow}, search(input, "Yellow").result()}}
+			);
+			expect_object(symbols, lookup_data, "shaper_voice", search(input, "$shaper_voice").result(),
+				{{lang::shaper_voice_line{lang::shaper_voice_line_type::chaos}, search(input, "ShChaos").result()}}
 			);
 			expect_object(symbols, lookup_data, "string", search(input, "$string").result(),
 				{{lang::string{"Leather Belt"}, search(input, "\"Leather Belt\"").result()}}
@@ -172,7 +176,7 @@ $z = 6 7 8 9
 )";
 			const std::string_view input = input_str;
 			const parser::sf::parse_success_data parse_data = parse(input);
-			const parser::lookup_data& lookup_data = parse_data.lookup_data;
+			const parser::lookup_data& lookup_data = parse_data.lookup;
 			const lang::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.definitions, lookup_data);
 
 			expect_object(
@@ -207,7 +211,7 @@ $z = 4W 0 6 RGB
 )";
 			const std::string_view input = input_str;
 			const parser::sf::parse_success_data parse_data = parse(input);
-			const parser::lookup_data& lookup_data = parse_data.lookup_data;
+			const parser::lookup_data& lookup_data = parse_data.lookup;
 			const lang::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.definitions, lookup_data);
 
 			expect_object(
@@ -247,7 +251,7 @@ $z = 4W 0 6 RGB
 							BOOST_ERROR("expected built-in alert sound but got different");
 
 						const auto& actual = std::get<lang::builtin_alert_sound>(actual_alert_sound.sound);
-						BOOST_TEST(actual.sound_id.value == expected.sound_id.value);
+						BOOST_TEST((actual.sound_id.id == expected.sound_id.id));
 						BOOST_TEST((actual.volume == expected.volume));
 						BOOST_TEST(actual.is_positional == expected.is_positional);
 					},
@@ -270,11 +274,11 @@ $z = 4W 0 6 RGB
 				const std::string input_str = minimal_input() + action + "\nShow";
 				const std::string_view input = input_str;
 				const parser::sf::parse_success_data parse_data = parse(input);
-				const parser::lookup_data& lookup_data = parse_data.lookup_data;
+				const parser::lookup_data& lookup_data = parse_data.lookup;
 				const lang::symbol_table symbols =
 					expect_success_when_resolving_symbols(parse_data.ast.definitions, lookup_data);
 				const lang::item_filter filter =
-					expect_success_when_building_filter(parse_data.ast.statements, parse_data.lookup_data, symbols);
+					expect_success_when_building_filter(parse_data.ast.statements, parse_data.lookup, symbols);
 				BOOST_TEST_REQUIRE(static_cast<int>(filter.blocks.size()) == 1);
 				const lang::item_filter_block& block = filter.blocks[0];
 				BOOST_TEST(block.visibility.show == true);
@@ -288,7 +292,7 @@ $z = 4W 0 6 RGB
 			static
 			void expect_builtin_alert_sound(
 				std::string expression,
-				lang::integer sound_id,
+				lang::builtin_alert_sound_id sound_id,
 				std::optional<lang::integer> volume = std::nullopt)
 			{
 				expect_alert_sound_impl(
@@ -314,14 +318,24 @@ $z = 4W 0 6 RGB
 
 			using namespace lang;
 
-			BOOST_AUTO_TEST_CASE(builtin_sound_id)
+			BOOST_AUTO_TEST_CASE(builtin_sound_id_integer)
 			{
-				expect_builtin_alert_sound("1", integer{1});
+				expect_builtin_alert_sound("1", lang::builtin_alert_sound_id{integer{1}});
 			}
 
-			BOOST_AUTO_TEST_CASE(builtin_sound_id_and_volume)
+			BOOST_AUTO_TEST_CASE(builtin_sound_id_and_volume_integer)
 			{
-				expect_builtin_alert_sound("1 300", integer{1}, integer{300});
+				expect_builtin_alert_sound("1 300", lang::builtin_alert_sound_id{integer{1}}, integer{300});
+			}
+
+			BOOST_AUTO_TEST_CASE(builtin_sound_id_shaper)
+			{
+				expect_builtin_alert_sound("ShGeneral", lang::builtin_alert_sound_id{shaper_voice_line{shaper_voice_line_type::general}});
+			}
+
+			BOOST_AUTO_TEST_CASE(builtin_sound_id_and_volume_shaper)
+			{
+				expect_builtin_alert_sound("ShGeneral 300", lang::builtin_alert_sound_id{shaper_voice_line{shaper_voice_line_type::general}}, integer{300});
 			}
 
 			BOOST_AUTO_TEST_CASE(custom_path)

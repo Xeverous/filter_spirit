@@ -77,6 +77,10 @@ namespace common
 	const auto influence_literal_def = x3::lexeme[symbols::rf::influences >> not_alnum_or_underscore];
 	BOOST_SPIRIT_DEFINE(influence_literal)
 
+	const shaper_voice_line_literal_type shaper_voice_line_literal = "shaper voice line literal";
+	const auto shaper_voice_line_literal_def = x3::lexeme[symbols::rf::shaper_voice_lines >> not_alnum_or_underscore];
+	BOOST_SPIRIT_DEFINE(shaper_voice_line_literal)
+
 	const temp_literal_type temp_literal = "temp literal";
 	const auto temp_literal_def = x3::lexeme[lang::keywords::rf::temp >> not_alnum_or_underscore] > x3::attr(ast::common::temp_literal{});
 	BOOST_SPIRIT_DEFINE(temp_literal)
@@ -88,11 +92,11 @@ namespace common
 	// ---- rules ----
 
 	const comparison_operator_expression_type comparison_operator_expression = "comparison operator";
-	const auto comparison_operator_expression_def = symbols::rf::comparison_operators | x3::attr(lang::comparison_type::equal);
+	const auto comparison_operator_expression_def = symbols::rf::comparison_operators | x3::attr(lang::comparison_type::equal_soft);
 	BOOST_SPIRIT_DEFINE(comparison_operator_expression)
 
 	const exact_matching_policy_expression_type exact_matching_policy_expression = "exact matching policy expression";
-	const auto exact_matching_policy_expression_def = ("==" > x3::attr(true)) | x3::attr(false);
+	const auto exact_matching_policy_expression_def = ("==" > x3::attr(true)) | ("=" > x3::attr(false)) | x3::attr(false);
 	BOOST_SPIRIT_DEFINE(exact_matching_policy_expression)
 
 	const visibility_statement_type visibility_statement = "visibility statement";
@@ -137,6 +141,7 @@ namespace sf
 		| common::shape_literal
 		| common::suit_literal
 		| common::influence_literal
+		| common::shaper_voice_line_literal
 		| common::temp_literal
 		| common::none_literal
 		// 1. Must be attempted before integer literal, otherwise integer literal for eg "5GGG" would
@@ -224,7 +229,7 @@ namespace sf
 	const socket_spec_condition_type socket_spec_condition = "socket spec condition";
 	const auto socket_spec_condition_def =
 		x3::lexeme[symbols::rf::socket_spec_condition_properties >> common::not_alnum_or_underscore]
-		> (symbols::rf::socket_spec_comparison_operators | x3::attr(lang::socket_spec_comparison_type::equal))
+		> common::comparison_operator_expression
 		> sequence;
 	BOOST_SPIRIT_DEFINE(socket_spec_condition)
 
@@ -363,6 +368,10 @@ namespace rf
 	const auto influence_literal_array_def = +x3::lexeme[common::influence_literal >> common::not_alnum_or_underscore];
 	BOOST_SPIRIT_DEFINE(influence_literal_array)
 
+	const influence_spec_type influence_spec = "influence spec";
+	const auto influence_spec_def = x3::lexeme[common::none_literal >> common::not_alnum_or_underscore] | influence_literal_array;
+	BOOST_SPIRIT_DEFINE(influence_spec)
+
 	const socket_spec_literal_type socket_spec_literal = "socket spec literal";
 	const auto socket_spec_literal_def =
 		x3::lexeme[
@@ -399,13 +408,13 @@ namespace rf
 	const auto has_influence_condition_def =
 		x3::lexeme[lang::keywords::rf::has_influence >> common::not_alnum_or_underscore]
 		> common::exact_matching_policy_expression
-		> influence_literal_array;
+		> influence_spec;
 	BOOST_SPIRIT_DEFINE(has_influence_condition)
 
 	const socket_spec_condition_type socket_spec_condition = "socket spec condition";
 	const auto socket_spec_condition_def =
 		x3::lexeme[symbols::rf::socket_spec_condition_properties >> common::not_alnum_or_underscore]
-		> (symbols::rf::socket_spec_comparison_operators | x3::attr(lang::socket_spec_comparison_type::equal))
+		> common::comparison_operator_expression
 		> +socket_spec_literal;
 	BOOST_SPIRIT_DEFINE(socket_spec_condition)
 
@@ -439,17 +448,21 @@ namespace rf
 		> common::integer_literal;
 	BOOST_SPIRIT_DEFINE(set_font_size_action)
 
+	const sound_id_type sound_id = "sound ID";
+	const auto sound_id_def = common::integer_literal | common::shaper_voice_line_literal;
+	BOOST_SPIRIT_DEFINE(sound_id)
+
 	const play_alert_sound_action_type play_alert_sound_action = "alert sound action";
 	const auto play_alert_sound_action_def =
 		x3::lexeme[lang::keywords::rf::play_alert_sound >> common::not_alnum_or_underscore]
-		> common::integer_literal   // sound ID
+		> sound_id
 		> -common::integer_literal; // volume (optional token)
 	BOOST_SPIRIT_DEFINE(play_alert_sound_action)
 
 	const play_alert_sound_positional_action_type play_alert_sound_positional_action = "positional alert sound action";
 	const auto play_alert_sound_positional_action_def =
 		x3::lexeme[lang::keywords::rf::play_alert_sound_positional >> common::not_alnum_or_underscore]
-		> common::integer_literal   // sound ID
+		> sound_id
 		> -common::integer_literal; // volume (optional token)
 	BOOST_SPIRIT_DEFINE(play_alert_sound_positional_action)
 

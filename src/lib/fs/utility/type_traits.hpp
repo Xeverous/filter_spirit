@@ -185,4 +185,26 @@ struct has_void_get_value : detail::has_void_get_value_impl<T> {};
 template <typename T>
 constexpr bool has_void_get_value_v = has_void_get_value<T>::value;
 
+
+
+template <typename, typename = void>
+struct has_value_member : std::false_type {};
+
+template <typename T>
+struct has_value_member<T, std::void_t<decltype(std::declval<T>().value)>> : std::true_type {};
+
+template <typename T>
+constexpr bool has_value_member_v = has_value_member<T>::value;
+
+
+
+template <typename, typename = void>
+struct has_origin_member : std::false_type {};
+
+template <typename T>
+struct has_origin_member<T, std::void_t<decltype(std::declval<T>().origin)>> : std::true_type {};
+
+template <typename T>
+constexpr bool has_origin_member_v = has_origin_member<T>::value;
+
 }

@@ -4,6 +4,7 @@
 
 $color_white            = 255 255 255
 $color_black            =   0   0   0 255
+$color_orange           = 255 127   0
 $color_red              = 255   0   0
 $color_error            = $color_red
 
@@ -55,17 +56,21 @@ $color_veiled_item      = 150 100 158
 
 $currency_t1 = "Exalted Orb" "Mirror of Kalandra" "Eternal Orb" "Albino Rhoa Feather" "Mirror Shard"
 $currency_t2 = "Divine Orb" "Chaos Orb" "Gemcutter's Prism" "Orb of Regret" "Regal Orb" "Stacked Deck" "Vaal Orb" "Simple Sextant" "Prime Sextant" "Awakened Sextant" "Remnant of Corruption" "Exalted Shard" "Orb of Annulment" "Orb of Binding" "Orb of Horizons" "Harbinger's Orb" "Engineer's Orb" "Ancient Orb" "Stacked Deck" "Vial of"
-$currency_t3 = "Cartographer's Chisel" "Jeweller's Orb" "Orb of Alchemy" "Orb of Chance" "Orb of Fusing" "Orb of Scouring" "Silver Coin" "Blessed Orb"
+$currency_t3 = "Cartographer's Chisel" "Jeweller's Orb" "Orb of Alchemy" "Orb of Alteration" "Orb of Chance" "Orb of Fusing" "Orb of Scouring" "Silver Coin" "Blessed Orb"
 $currency_t4 = "Annulment Shard" "Binding Shard" "Horizon Shard" "Harbinger's Shard" "Engineer's Shard" "Ancient Shard" "Chaos Shard" "Regal Shard" "Alchemy Shard"
 
 $font_min            = 18
 $font_max            = 42
 $font_currency_t2    = $font_max
 $font_currency_t3    = 38
-$font_currency_t4    = $font_currency_t3
+$font_currency_t4    = 34
 $font_currency_delve = $font_currency_t2
+$font_scarab_top     = 42
+$font_scarab_mid     = 40
+$font_scarab_low     = 38
 $font_essence        = $font_max
-$font_mid_divinaton  = $font_currency_t3
+$font_mid_divination = $font_currency_t3
+$font_low_divination = $font_currency_t4
 $font_map            = $font_max
 $font_abyss_jewel    = $font_max
 $font_jewel          = 40
@@ -103,6 +108,10 @@ $alert_currency_blessing  = $alert_mlg_airhorn
 $alert_currency_vial      = $alert_intervention # TODO API pricing
 $alert_currency_essence_best  = $alert_explosion
 $alert_currency_essence_other = $alert_hitmarker
+$alert_scarab_top         = $alert_mlg_airhorn
+$alert_scarab_mid         = $alert_airhorn
+$alert_scarab_low         = $alert_intervention
+$alert_gem_awakened       = $alert_john_cena_earrape
 $alert_gem_drop_only      = $alert_hitmarker
 $alert_gem_20_quality     = $alert_airhorn
 $alert_gem_quality        = $alert_hitmarker
@@ -136,6 +145,7 @@ $alert_divination_maybe_pickup  = $alert_hitmarker # TODO this should be differe
 $alert_divination_best    = $alert_john_cena_earrape
 $alert_divination_mid     = $alert_john_cena
 $alert_divination_low     = $alert_airhorn
+$alert_map_blight         = $alert_mlg_airhorn
 $alert_map_t16            = $alert_metal_gear
 $alert_map_red            = $alert_metal_gear
 $alert_map_yellow         = $alert_whip
@@ -166,20 +176,24 @@ $beam_delve_fossil    = $beam_currency
 $beam_delve_resonator = $beam_currency
 $beam_divination      = Blue
 
-$minimap_top_gem         = 0 Green Circle
-$minimap_mid_gem         = 1 Green Circle
-$minimap_low_gem         = 2 Green Circle
-$minimap_top_unique      = 0 Brown Triangle
-$minimap_mid_unique      = 1 Brown Triangle
-$minimap_6L              = 0 Red Hexagon
-$minimap_fishing_rod     = 0 White Star
-$minimap_currency_t1     = 0 Yellow Star
-$minimap_currency_t2     = 1 Yellow Star
-$minimap_currency_t3     = 2 Yellow Star
-$minimap_delve_fossil    = $minimap_currency_t2
-$minimap_delve_resonator = $minimap_currency_t2
-$minimap_reliquary       = $minimap_currency_t1
-$minimap_error           = 0 Red Square
+$icon_gem_awakened    = 0 Green Diamond
+$icon_gem_20_quality  = 0 Green Circle
+$icon_top_unique      = 0 Brown Triangle
+$icon_mid_unique      = 1 Brown Triangle
+$icon_6L              = 0 Red Hexagon
+$icon_fishing_rod     = 0 White Star
+$icon_currency_t1     = 0 Yellow Star
+$icon_currency_t2     = 1 Yellow Star
+$icon_currency_t3     = 2 Yellow Star
+$icon_delve_fossil    = $icon_currency_t2
+$icon_delve_resonator = $icon_currency_t2
+$icon_reliquary       = $icon_currency_t1
+$icon_map_top         = 0 White Cross
+$icon_map_mid         = 2 White Cross
+$icon_map_blight      = 0 Orange Cross
+$icon_scarab_top      = 0 White Kite
+$icon_scarab_mid      = 2 White Kite
+$icon_error           = 0 Red Square
 
 $bases_t1 = "Eternal Burgonet" "Lion Pelt" "Hubris Circlet" "Nightmare Bascinet" "Titan Gauntlets" "Slink Gloves" "Sorcerer Gloves" "Dragonscale Gauntlets" "Titan Greaves" "Slink Boots" "Sorcerer Boots" "Dragonscale Boots" "Assassin's Boots" "Glorious Plate" "Assassin's Garb" "Vaal Regalia" "Titanium Spirit Shield" "Harbinger Bow" "Ambusher" "Ezomyte Dagger" "Platinum Kris" "Imperial Skean" "Demon Dagger" "Void Sceptre" "Sambar Sceptre" "Profane Wand" "Prophecy Wand" "Tornado Wand" "Opal Wand" "Imbued Wand" "Demon's Horn" "Steel Ring" "Opal Ring" "Blue Pearl Amulet" "Marble Amulet" "Crystal Belt" "Bone Helmet" "Two-Toned Boots" "Spiked Gloves" "Gripped Gloves" "Fingerless Silk Gloves"
 
@@ -196,7 +210,7 @@ Class "Currency" {
 		SetFontSize $font_max
 		SetAlertSound $alert_currency_t1
 		PlayEffect $beam_currency
-		MinimapIcon $minimap_currency_t1
+		MinimapIcon $icon_currency_t1
 		Show
 	}
 
@@ -207,7 +221,7 @@ Class "Currency" {
 		SetFontSize $font_max
 		SetAlertSound $alert_currency_t1
 		PlayEffect $beam_currency
-		MinimapIcon $minimap_currency_t1
+		MinimapIcon $icon_currency_t1
 		Show
 	}
 
@@ -217,7 +231,7 @@ Class "Currency" {
 		SetFontSize $font_currency_t2
 		SetAlertSound $alert_currency_t2
 		PlayEffect $beam_currency
-		MinimapIcon $minimap_currency_t2
+		MinimapIcon $icon_currency_t2
 		Show
 	}
 
@@ -227,7 +241,7 @@ Class "Currency" {
 		SetFontSize $font_currency_t2
 		SetAlertSound $alert_currency_t2
 		PlayEffect $beam_currency
-		MinimapIcon $minimap_currency_t2
+		MinimapIcon $icon_currency_t2
 		Show
 	}
 
@@ -237,7 +251,6 @@ Class "Currency" {
 		SetFontSize $font_currency_t3
 		SetAlertSound $alert_currency_t3
 		PlayEffect $beam_currency
-		MinimapIcon $minimap_currency_t3
 		Show
 	}
 
@@ -285,11 +298,6 @@ Class "Currency" {
 		Show
 	}
 
-	BaseType "Orb of Alteration" {
-		SetTextColor 170 210 255
-		Show
-	}
-
 	BaseType "Chromatic Orb" {
 		SetTextColor 175 255 200
 		Show
@@ -301,7 +309,7 @@ Class "Currency" {
 		SetFontSize $font_currency_t2
 		SetAlertSound $alert_currency_fossil
 		PlayEffect $beam_delve_fossil
-		MinimapIcon $minimap_delve_fossil
+		MinimapIcon $icon_delve_fossil
 		Show
 	}
 
@@ -311,7 +319,7 @@ Class "Currency" {
 		SetFontSize $font_currency_t2
 		SetAlertSound $alert_currency_resonator
 		PlayEffect $beam_delve_resonator
-		MinimapIcon $minimap_delve_resonator
+		MinimapIcon $icon_delve_resonator
 		Show
 	}
 
@@ -387,11 +395,21 @@ Class "Incubator" {
 	SetFontSize $font_currency_t2
 	SetAlertSound $alert_currency_t2
 	PlayEffect $beam_currency
-	MinimapIcon $minimap_currency_t2
+	MinimapIcon $icon_currency_t2
 	Show
 }
 
 Class "Gem" {
+	BaseType "Awakened" {
+		SetBackgroundColor $color_white
+		SetTextColor $color_gem
+		SetBorderColor $color_gem
+		SetFontSize $font_max
+		SetAlertSound $alert_gem_awakened
+		MinimapIcon $icon_gem_awakened
+		Show
+	}
+
 	BaseType "Empower" "Enhance" "Enlighten" "Portal" "Vaal Breach" {
 		SetFontSize 40
 		SetAlertSound $alert_gem_drop_only
@@ -404,6 +422,7 @@ Class "Gem" {
 		Quality 20 {
 			SetBackgroundColor $color_white
 			SetAlertSound $alert_gem_20_quality
+			MinimapIcon $icon_gem_20_quality
 			Show
 		}
 
@@ -420,6 +439,7 @@ Class "Gem" {
 	Quality 20 {
 		SetBackgroundColor $color_white
 		SetAlertSound $alert_gem_20_quality
+		MinimapIcon $icon_gem_20_quality
 		Show
 	}
 
@@ -471,7 +491,7 @@ LinkedSockets 6 {
 	SetFontSize $font_max
 	SetAlertSound $alert_unique_6L
 	PlayEffect $beam_top_unique
-	MinimapIcon $minimap_top_unique
+	MinimapIcon $icon_top_unique
 	Show
 }
 
@@ -493,7 +513,7 @@ Rarity Unique {
 		SetBackgroundColor $color_white
 		SetAlertSound $alert_unique_best
 		PlayEffect $beam_top_unique
-		MinimapIcon $minimap_top_unique
+		MinimapIcon $icon_top_unique
 
 		Autogen uniques_eq_unambiguous     { Show }
 		Autogen uniques_flasks_unambiguous { Show }
@@ -507,7 +527,7 @@ Rarity Unique {
 		SetBackgroundColor $color_white
 		SetAlertSound $alert_unique_good
 		PlayEffect $beam_top_unique
-		MinimapIcon $minimap_mid_unique
+		MinimapIcon $icon_mid_unique
 
 		Autogen uniques_eq_unambiguous     { Show }
 		Autogen uniques_flasks_unambiguous { Show }
@@ -530,7 +550,7 @@ LinkedSockets 6 {
 	SetFontSize $font_max
 	SetAlertSound $alert_6L
 	PlayEffect $beam_6L
-	MinimapIcon $minimap_6L
+	MinimapIcon $icon_6L
 	Show
 }
 
@@ -568,13 +588,49 @@ Class "Atlas Region Upgrade Item" {
 	SetBackgroundColor $color_labirynth
 	SetFontSize $font_max
 	SetAlertSound $alert_incursion_item
-	MinimapIcon $minimap_reliquary
+	MinimapIcon $icon_reliquary
 	Show
 }
 
+{
+	Autogen scarabs
+	{
+		Price >= 20
+		{
+			SetTextColor $color_sacrifice
+			SetBorderColor $color_sacrifice
+			SetBackgroundColor $color_white
+			SetFontSize $font_scarab_top
+			SetAlertSound $alert_scarab_top
+			MinimapIcon $icon_scarab_top
+			Show
+		}
+
+		Price < 20
+		Price >= 10
+		{
+			SetTextColor $color_sacrifice
+			SetBorderColor $color_sacrifice
+			SetBackgroundColor $color_white
+			SetFontSize $font_scarab_mid
+			SetAlertSound $alert_scarab_mid
+			MinimapIcon $icon_scarab_mid
+			Show
+		}
+	}
+
+	BaseType "Scarab" {
+		SetTextColor $color_sacrifice
+		SetBorderColor $color_sacrifice
+		SetBackgroundColor $color_black
+		SetFontSize $font_scarab_low
+		SetAlertSound $alert_scarab_low
+		Show
+	}
+}
+
 # top map fragment items
-# TODO: scarabs should have own block with API prices
-BaseType "Divine Vessel" "Scarab" {
+BaseType "Divine Vessel" {
 	SetTextColor $color_sacrifice
 	SetBorderColor $color_sacrifice
 	SetBackgroundColor $color_white
@@ -672,7 +728,7 @@ Class "Misc Map Item" {
 		SetFontSize $font_max
 		SetAlertSound $alert_misc_reliquary
 		PlayEffect $beam_reliquary
-		MinimapIcon $minimap_reliquary
+		MinimapIcon $icon_reliquary
 		Show
 	}
 }
@@ -712,7 +768,7 @@ Class "Fishing Rods" {
 	SetFontSize $font_max
 	SetAlertSound $alert_fishing_rod
 	PlayEffect $beam_fishing_rod
-	MinimapIcon $minimap_fishing_rod
+	MinimapIcon $icon_fishing_rod
 	Show
 }
 
@@ -747,23 +803,22 @@ Class "Microtransactions" {
 Class "Divination Card" {
 	SetTextColor $color_divination
 
-	# place here 1-stack-size cards that you always want to pickup
-	BaseType "The Void" "The Cartographer" "Chaotic Disposition" {
+	# 1-stack-size cards - always wanted to pickup
+	BaseType "Chaotic Disposition" "The Void" "Divine Justice" "The Cartographer" "The Heroic Shot" {
+		PlayEffect $beam_divination
+		SetBorderColor $color_divination
+		SetFontSize $font_mid_divination
 		SetAlertSound $alert_divination_stack_1
 		PlayEffect $beam_divination
+		MinimapIcon 1 Blue Square
 		Show
 	}
 
-	# place here low-value cards that you always want to pickup
-	BaseType "The Gambler" "Jack in the Box" "Emperor's Luck" "Her Mask" "Humility" "Loyalty" "Lucky Connections" "Lucky Deck" "No Traces" "The Calling" "The Catalyst" "The Encroaching Darkness" "The Gambler" "The Gemcutter" "The Innocent" "The Inventor" "The Master Artisan" "The Obscured" "The Puzzle" "The Risk" "The Survivalist" "The Throne" "The Wrath" "The Wretched" "Three Faces in the Dark" "Three Voices" "Vinia's Token" {
+	# low-value cards granting currency or useful fragments
+	BaseType "The Gambler" "Emperor's Luck" "Humility" "Loyalty" "Lucky Connections" "Lucky Deck" "No Traces" "The Catalyst" "The Encroaching Darkness" "The Gambler" "The Gemcutter" "The Innocent" "The Inventor" "The Master Artisan" "The Obscured" "The Puzzle" "The Risk" "The Survivalist" "The Wrath" "Three Faces in the Dark" "Vinia's Token" "Coveted Possession" "Sambodhi's Vow" "The Tinkerer's Table" "Monochrome" "Cameria's Cut" "Buried Treasure" "Last Hope" "The Journey" "The Fool" "Underground Forest" "The Deal" "Vinia's Token" "Demigod's Wager" "More is Never Enough" "The Union" "The Seeker" "The Sephirot" {
+		SetFontSize $font_mid_divination
 		SetAlertSound $alert_divination_always_pickup
-		PlayEffect Blue Temp
-		Show
-	}
-
-	# place here low-value cards that you would like to pickup for some reason
-	BaseType "Rain of Chaos" "The Scholar" {
-		SetAlertSound $alert_divination_maybe_pickup
+		PlayEffect $beam_divination Temp
 		Show
 	}
 
@@ -785,7 +840,7 @@ Class "Divination Card" {
 		Price >= 10
 		{
 			SetBorderColor $color_divination
-			SetFontSize $font_mid_divinaton
+			SetFontSize $font_mid_divination
 			SetAlertSound $alert_divination_mid
 			PlayEffect $beam_divination
 			MinimapIcon 1 Blue Square
@@ -793,18 +848,32 @@ Class "Divination Card" {
 		}
 
 		Price < 10
-		Price >= 1
+		Price > 1
 		{
 			SetTextColor $color_divination
-			SetFontSize $font_mid_divinaton
+			SetFontSize $font_low_divination
 			SetAlertSound $alert_divination_low
 			PlayEffect $beam_divination Temp
-			MinimapIcon 2 Blue Square
+			Show
+		}
+
+		# poe.ninja seems to round prices to 1c
+		# or too many players sell for 1 chaos
+		# therefore, make this section inclusive to exactly 1c
+		Price <= 1
+		{
+			SetTextColor $color_divination
+			SetFontSize $font_min
 			Show
 		}
 	}
 
-	# < 1c shits (eg Carrion Crow)
+	# unknown cards
+	SetBorderColor $color_red
+	SetTextColor $color_divination
+	SetFontSize $font_mid_divination
+	SetAlertSound $alert_divination_mid
+	PlayEffect $beam_divination Temp
 	Show
 }
 
@@ -813,6 +882,17 @@ Class "Maps" {
 #		# what do to? how to highlight?
 #	}
 
+	BlightedMap True {
+		SetTextColor $color_white
+		SetBorderColor $color_white
+		SetBackgroundColor $color_orange
+		SetFontSize $font_max
+		SetAlertSound $alert_map_blight
+		PlayEffect $beam_good_map
+		MinimapIcon $icon_map_blight
+		Show
+	}
+
 	MapTier >= 16 {
 		SetTextColor $color_white
 		SetBorderColor $color_white
@@ -820,6 +900,7 @@ Class "Maps" {
 		SetFontSize $font_max
 		SetAlertSound $alert_map_t16
 		PlayEffect $beam_good_map
+		MinimapIcon $icon_map_top
 		Show
 	}
 
@@ -828,6 +909,7 @@ Class "Maps" {
 		SetBackgroundColor $color_black
 		SetFontSize $font_map
 		SetAlertSound $alert_map_red
+		MinimapIcon $icon_map_mid
 		Show
 	}
 
@@ -1217,5 +1299,5 @@ SetBorderColor $color_error
 SetFontSize $font_max
 SetAlertSound $alert_error
 PlayEffect Red
-MinimapIcon $minimap_error
+MinimapIcon $icon_error
 Show

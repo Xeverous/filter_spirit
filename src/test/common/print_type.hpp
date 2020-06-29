@@ -32,7 +32,7 @@ namespace fs::lang
 {
 
 inline
-std::ostream& boost_test_print_type(std::ostream& os, suit s)
+std::ostream& boost_test_print_type(std::ostream& os, suit_type s)
 {
 	return os << "(suit: " << static_cast<int>(s) << ")";
 }

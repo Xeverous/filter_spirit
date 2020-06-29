@@ -25,13 +25,13 @@ target_sources(filter_spirit
 		fs/parser/parser.cpp
 		fs/parser/detail/grammar.cpp
 		fs/compiler/compiler.cpp
-		fs/compiler/print_error.cpp
+		fs/compiler/outcome.cpp
 		fs/compiler/detail/actions.cpp
 		fs/compiler/detail/conditions.cpp
 		fs/compiler/detail/evaluate.cpp
 		fs/generator/generate_filter.cpp
 		fs/generator/generator.cpp
-		fs/generator/make_filter.hpp
+		fs/generator/make_filter.cpp
 		fs/lang/action_set.cpp
 		fs/lang/condition_set.cpp
 		fs/lang/item_filter.cpp
@@ -51,17 +51,19 @@ target_sources(filter_spirit
 		fs/network/poe_ninja/download_data.cpp
 		fs/network/poe_ninja/parse_data.cpp
 		fs/network/poe_ninja/api_data.cpp
+		fs/network/ggg/download_data.cpp
+		fs/network/ggg/parse_data.cpp
+		fs/network/item_price_report.cpp
 	PUBLIC
 		fs/compiler/detail/actions.hpp
 		fs/compiler/detail/conditions.hpp
 		fs/compiler/detail/evaluate.hpp
 		fs/compiler/compiler.hpp
-		fs/compiler/error.hpp
-		fs/compiler/print_error.hpp
-		fs/generator/make_filter.cpp
+		fs/compiler/outcome.hpp
+		fs/generator/make_filter.hpp
 		fs/generator/generate_filter.hpp
 		fs/generator/generator.hpp
-		fs/generator/options.hpp
+		fs/generator/settings.hpp
 		fs/lang/action_properties.hpp
 		fs/lang/action_set.hpp
 		fs/lang/condition_properties.hpp
@@ -80,10 +82,12 @@ target_sources(filter_spirit
 		fs/lang/queries.hpp
 		fs/lang/symbol_table.hpp
 		fs/log/string_logger.hpp
+		fs/log/buffer_logger.hpp
 		fs/log/console_logger.hpp
 		fs/log/logger.hpp
 		fs/log/null_logger.hpp
 		fs/log/structure_printer.hpp
+		fs/log/monitor.hpp
 		fs/network/url_encode.hpp
 		fs/network/exceptions.hpp
 		fs/network/download.hpp
@@ -96,6 +100,10 @@ target_sources(filter_spirit
 		fs/network/poe_watch/api_data.hpp
 		fs/network/poe_watch/download_data.hpp
 		fs/network/poe_watch/parse_data.hpp
+		fs/network/ggg/api_data.hpp
+		fs/network/ggg/download_data.hpp
+		fs/network/ggg/parse_data.hpp
+		fs/network/item_price_report.hpp
 		fs/parser/ast.hpp
 		fs/parser/ast_adapted.hpp
 		fs/parser/detail/config.hpp
@@ -113,6 +121,7 @@ target_sources(filter_spirit
 		fs/utility/type_traits.hpp
 		fs/utility/visitor.hpp
 		fs/utility/string_helpers.hpp
+		fs/utility/async.hpp
 		fs/version.hpp
 )
 
@@ -136,6 +145,14 @@ target_compile_options(filter_spirit
 		$<$<CXX_COMPILER_ID:MSVC>:/W4>
 )
 
+if(FILTER_SPIRIT_ENABLE_ASSERTION_EXCEPTIONS)
+	target_compile_definitions(filter_spirit PRIVATE BOOST_ENABLE_ASSERT_HANDLER)
+endif()
+
+if(FILTER_SPIRIT_ENABLE_LTO)
+	set_target_properties(filter_spirit PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
+endif()
+
 # https://gitlab.kitware.com/cmake/cmake/issues/20431
 get_target_property(CURL_INCLUDE_DIR PkgConfig::libcurl INTERFACE_INCLUDE_DIRECTORIES)
 target_link_directories(filter_spirit
@@ -146,9 +163,16 @@ target_link_libraries(filter_spirit
 	PUBLIC
 		nlohmann_json::nlohmann_json
 		OpenSSL::SSL
-		Boost::filesystem
 		PkgConfig::libcurl
 )
+
+# earlier GCC and Clang versions which support C++17 require explicit link to filesystem library
+if(FILTER_SPIRIT_ADD_FILESYSTEM_LINK)
+	target_link_libraries(filter_spirit
+		$<$<CXX_COMPILER_ID:GNU>:stdc++fs>
+		$<$<CXX_COMPILER_ID:Clang>:c++fs>
+	)
+endif()
 
 # FS uses atomic operations in networking callbacks
 target_link_libraries(filter_spirit

@@ -22,108 +22,118 @@ namespace
 
 // ---- generic helpers ----
 
-[[nodiscard]] std::optional<compile_error>
-expect_integer_in_range(
+// this could actually return something like bounded_integer<Min, Max>
+// so far all use cases provide constexpr min/max values
+[[nodiscard]] outcome<lang::integer>
+make_integer_in_range(
 	lang::integer int_obj,
-	lang::position_tag origin,
 	int min_allowed_value,
 	std::optional<int> max_allowed_value)
 {
 	const auto val = int_obj.value;
 	if (val < min_allowed_value || (max_allowed_value && val > *max_allowed_value))
-		return errors::invalid_integer_value{min_allowed_value, max_allowed_value, val, origin};
+		return error(errors::invalid_integer_value{min_allowed_value, max_allowed_value, val, int_obj.origin});
 
-	return std::nullopt;
+	return int_obj;
 }
 
 // ---- spirit filter ----
 
-[[nodiscard]] std::variant<lang::single_object, compile_error>
-evaluate_literal(const ast::sf::literal_expression& expression)
+[[nodiscard]] outcome<lang::single_object>
+evaluate_literal(
+	settings st,
+	const ast::sf::literal_expression& expression)
 {
-	using result_type = std::variant<lang::single_object, compile_error>;
+	using result_type = outcome<lang::single_object>;
 	using parser::position_tag_of;
+	const auto expr_origin = position_tag_of(expression);
 
 	return expression.apply_visitor(x3::make_lambda_visitor<result_type>(
-		[](ast::sf::temp_literal literal) -> result_type {
-			return lang::single_object{lang::temp{}, position_tag_of(literal)};
+		[&](ast::sf::temp_literal literal) -> result_type {
+			return lang::single_object{lang::temp{position_tag_of(literal)}, expr_origin};
 		},
-		[](ast::sf::none_literal literal) -> result_type {
-			return lang::single_object{lang::none{}, position_tag_of(literal)};
+		[&](ast::sf::none_literal literal) -> result_type {
+			return lang::single_object{lang::none{position_tag_of(literal)}, expr_origin};
 		},
-		[](ast::sf::socket_spec_literal literal) -> result_type {
-			std::variant<lang::socket_spec, compile_error> ss_or_err =
-				detail::evaluate_socket_spec_literal(literal.socket_count, literal.socket_colors);
-
-			if (std::holds_alternative<compile_error>(ss_or_err)) {
-				return std::get<compile_error>(std::move(ss_or_err));
-			}
-
-			return lang::single_object{
-				std::get<lang::socket_spec>(ss_or_err),
-				position_tag_of(literal)
-			};
+		[&](ast::sf::socket_spec_literal literal) -> result_type {
+			return detail::evaluate_socket_spec_literal(st, literal.socket_count, literal.socket_colors)
+				.map_result<lang::single_object>([&](lang::socket_spec ss) {
+					return lang::single_object{ss, expr_origin};
+				});
 		},
-		[](ast::sf::boolean_literal literal) -> result_type {
-			return lang::single_object{lang::boolean{literal.value}, position_tag_of(literal)};
+		[&](ast::sf::boolean_literal literal) -> result_type {
+			return lang::single_object{lang::boolean{literal.value, position_tag_of(literal)}, expr_origin};
 		},
-		[](ast::sf::integer_literal literal) -> result_type {
-			return lang::single_object{lang::integer{literal.value}, position_tag_of(literal)};
+		[&](ast::sf::integer_literal literal) -> result_type {
+			return lang::single_object{lang::integer{literal.value, position_tag_of(literal)}, expr_origin};
 		},
-		[](ast::sf::floating_point_literal literal) -> result_type {
-			return lang::single_object{lang::fractional{literal.value}, position_tag_of(literal)};
+		[&](ast::sf::floating_point_literal literal) -> result_type {
+			return lang::single_object{lang::fractional{literal.value, position_tag_of(literal)}, expr_origin};
 		},
-		[](ast::sf::rarity_literal literal) -> result_type {
-			return lang::single_object{lang::rarity{literal.value}, position_tag_of(literal)};
+		[&](ast::sf::rarity_literal literal) -> result_type {
+			return lang::single_object{lang::rarity{literal.value, position_tag_of(literal)}, expr_origin};
 		},
-		[](ast::sf::shape_literal literal) -> result_type {
-			return lang::single_object{lang::shape{literal.value}, position_tag_of(literal)};
+		[&](ast::sf::shape_literal literal) -> result_type {
+			return lang::single_object{lang::shape{literal.value, position_tag_of(literal)}, expr_origin};
 		},
-		[](ast::sf::suit_literal literal) -> result_type {
-			return lang::single_object{lang::suit{literal.value}, position_tag_of(literal)};
+		[&](ast::sf::suit_literal literal) -> result_type {
+			return lang::single_object{lang::suit{literal.value, position_tag_of(literal)}, expr_origin};
 		},
-		[](ast::sf::influence_literal literal) -> result_type {
-			return lang::single_object{lang::influence{literal.value}, position_tag_of(literal)};
+		[&](ast::sf::influence_literal literal) -> result_type {
+			return lang::single_object{lang::influence{literal.value, position_tag_of(literal)}, expr_origin};
 		},
-		[](const ast::sf::string_literal& literal) -> result_type {
-			return lang::single_object{lang::string{literal}, position_tag_of(literal)};
+		[&](ast::sf::shaper_voice_line_literal literal) -> result_type {
+			return lang::single_object{lang::shaper_voice_line{literal.value, position_tag_of(literal)}, expr_origin};
+		},
+		[&](const ast::sf::string_literal& literal) -> result_type {
+			return lang::single_object{lang::string{literal, position_tag_of(literal)}, expr_origin};
 		}
 	));
 }
 
-[[nodiscard]] std::variant<lang::object, compile_error>
+[[nodiscard]] outcome<lang::object>
 evaluate_name(
 	const ast::sf::name& name,
 	const lang::symbol_table& symbols)
 {
-	const auto origin = parser::position_tag_of(name);
+	const auto name_origin = parser::position_tag_of(name);
 
 	const auto it = symbols.find(name.value.value);
 	if (it == symbols.end())
-		return errors::no_such_name{origin};
+		return error(errors::no_such_name{name_origin});
 
-	return lang::object{it->second.object_instance.values, origin};
+	/*
+	 * Named objects should have origin pointing to the name;
+	 * this is much better for any error messages than pointing to
+	 * the origin of the value, which could be defined may assignments upwards.
+	 */
+	return lang::object{it->second.object_instance.values, name_origin};
 }
 
-[[nodiscard]] std::variant<lang::object, compile_error>
+[[nodiscard]] outcome<lang::object>
 evaluate_compound_action(
+	settings st,
 	const ast::sf::compound_action_expression& expr,
 	const lang::symbol_table& symbols)
 {
 	lang::action_set set;
+	log_container logs;
 
 	for (const ast::sf::action& act : expr) {
-		std::optional<compile_error> error = detail::spirit_filter_add_action(act, symbols, set);
+		detail::spirit_filter_add_action(st, act, symbols, set).move_logs_to(logs);
 
-		if (error)
-			return *std::move(error);
+		if (!should_continue(st.error_handling, logs))
+			return logs;
 	}
 
 	const auto origin = parser::position_tag_of(expr);
 
-	return lang::object{
-		lang::object::container_type{lang::single_object{std::move(set), origin}},
-		origin
+	return {
+		lang::object{
+			lang::object::container_type{lang::single_object{std::move(set), origin}},
+			origin
+		},
+		std::move(logs)
 	};
 }
 
@@ -132,51 +142,52 @@ evaluate_compound_action(
 namespace fs::compiler::detail
 {
 
-std::variant<lang::color, compile_error>
+outcome<lang::color>
 make_color(
-	std::pair<lang::integer, lang::position_tag> r,
-	std::pair<lang::integer, lang::position_tag> g,
-	std::pair<lang::integer, lang::position_tag> b,
-	std::optional<std::pair<lang::integer, lang::position_tag>> a)
+	settings /* st */,
+	lang::integer r,
+	lang::integer g,
+	lang::integer b,
+	std::optional<lang::integer> a)
 {
-	std::optional<compile_error> err = expect_integer_in_range(r.first, r.second, 0, 255);
-	if (err) {
-		return *std::move(err);
-	}
-
-	err = expect_integer_in_range(g.first, g.second, 0, 255);
-	if (err) {
-		return *std::move(err);
-	}
-
-	err = expect_integer_in_range(b.first, b.second, 0, 255);
-	if (err) {
-		return *std::move(err);
-	}
+	auto rgb = make_integer_in_range(r, 0, 255)
+		.merge_with(make_integer_in_range(g, 0, 255))
+		.merge_with(make_integer_in_range(b, 0, 255));
 
 	if (a) {
-		err = expect_integer_in_range((*a).first, (*a).second, 0, 255);
-		if (err) {
-			return *std::move(err);
-		}
-
-		return lang::color{r.first, g.first, b.first, (*a).first};
+		return std::move(rgb)
+			.merge_with(make_integer_in_range(*a, 0, 255))
+			.map_result<lang::color>([](lang::integer r, lang::integer g, lang::integer b, lang::integer a) {
+				return lang::color{r, g, b, a};
+			});
 	}
-
-	return lang::color{r.first, g.first, b.first};
+	else {
+		return std::move(rgb)
+			.map_result<lang::color>([](lang::integer r, lang::integer g, lang::integer b) {
+				return lang::color{r, g, b};
+			});
+	}
 }
 
-std::variant<lang::socket_spec, compile_error>
+// TODO this does not make a full socket_spec, only the RGBWAD subset
+// either make a subtype representing number-less socket specs or refactor this function
+outcome<lang::socket_spec>
 make_socket_spec(
+	settings st,
 	const std::string& raw,
 	lang::position_tag origin)
 {
-	if (raw.empty())
-		return errors::empty_socket_spec{origin};
+	if (raw.empty()) {
+		// nothing more to do at this point, return failure immediately
+		return error(errors::empty_socket_spec{origin});
+	}
 
 	lang::socket_spec ss;
-	for (char c : raw) {
+	log_container logs;
+
+	for (std::size_t i = 0; i < raw.size(); ++i) {
 		namespace kw = lang::keywords::rf;
+		const auto c = raw[i];
 
 		if (c == kw::r)
 			++ss.r;
@@ -191,41 +202,56 @@ make_socket_spec(
 		else if (c == kw::d)
 			++ss.d;
 		else
-			return errors::illegal_characters_in_socket_spec{origin};
+			logs.emplace_back(error(errors::illegal_character_in_socket_spec{origin, static_cast<int>(i)}));
+
+		if (!should_continue(st.error_handling, logs))
+			return logs;
 	}
 
-	if (!ss.is_valid())
-		return errors::invalid_socket_spec{origin};
+	if (!ss.is_valid()) {
+		// return failure now, can not work go further with invalid socket spec
+		logs.emplace_back(error(errors::invalid_socket_spec{origin}));
+		return logs;
+	}
 
-	return ss;
+	ss.origin = origin;
+	return {ss, std::move(logs)};
 }
 
-std::variant<lang::builtin_alert_sound, compile_error>
-make_builtin_alert_sound(
-	bool positional,
-	std::pair<lang::integer, lang::position_tag> sound_id,
-	std::optional<std::pair<lang::integer, lang::position_tag>> volume)
+outcome<lang::builtin_alert_sound_id>
+make_builtin_alert_sound_id(
+	lang::integer sound_id)
 {
-	std::optional<compile_error> err = expect_integer_in_range(sound_id.first, sound_id.second, 1, 16);
-	if (err) {
-		return *std::move(err);
-	}
-
-	if (volume) {
-		err = expect_integer_in_range((*volume).first, (*volume).second, 0, 300);
-		if (err) {
-			return *std::move(err);
-		}
-
-		return lang::builtin_alert_sound{positional, sound_id.first, (*volume).first};
-	}
-
-	return lang::builtin_alert_sound{positional, sound_id.first};
+	return make_integer_in_range(sound_id, lang::limits::min_filter_sound_id, lang::limits::max_filter_sound_id)
+		.map_result<lang::builtin_alert_sound_id>([](lang::integer sound_id) {
+			return lang::builtin_alert_sound_id{sound_id};
+		});
 }
 
-std::variant<lang::socket_spec, compile_error>
+outcome<lang::builtin_alert_sound>
+make_builtin_alert_sound(
+	settings /* st */,
+	bool positional,
+	lang::builtin_alert_sound_id sound_id,
+	std::optional<lang::integer> volume)
+{
+	if (volume) {
+		return make_integer_in_range(*volume, lang::limits::min_filter_volume, lang::limits::max_filter_volume)
+			.map_result<lang::builtin_alert_sound>([&](lang::integer volume) {
+				return lang::builtin_alert_sound{positional, sound_id, volume};
+			});
+	}
+	else {
+		return lang::builtin_alert_sound{positional, sound_id};
+	}
+}
+
+// TODO improve error handling in this function
+// refactor so that int_lit is checked once
+outcome<lang::socket_spec>
 evaluate_socket_spec_literal(
-	boost::optional<parser::ast::common::integer_literal> int_lit,
+	settings st,
+	boost::optional<ast::common::integer_literal> int_lit,
 	const parser::ast::common::identifier& iden)
 {
 	if (int_lit) {
@@ -234,31 +260,27 @@ evaluate_socket_spec_literal(
 		if (socket_count.value < lang::limits::min_item_sockets
 			|| socket_count.value > lang::limits::max_item_sockets)
 		{
-			return errors::invalid_integer_value{
+			return error{errors::invalid_integer_value{
 				lang::limits::min_item_sockets,
 				lang::limits::max_item_sockets,
 				socket_count.value,
-				parser::position_tag_of(socket_count)
-			};
+				parser::position_tag_of(socket_count)}};
 		}
 	}
 
-	std::variant<lang::socket_spec, compile_error> ss_or_err =
-		detail::make_socket_spec(iden.value, parser::position_tag_of(iden));
+	return detail::make_socket_spec(st, iden.value, parser::position_tag_of(iden))
+		.map_result<lang::socket_spec>([&](lang::socket_spec ss) {
+			// TODO adjust origin to also contain the integer literal
+			if (int_lit)
+				ss.num = (*int_lit).value;
 
-	if (std::holds_alternative<compile_error>(ss_or_err)) {
-		return std::get<compile_error>(std::move(ss_or_err));
-	}
-
-	auto& ss = std::get<lang::socket_spec>(ss_or_err);
-	if (int_lit)
-		ss.num = (*int_lit).value;
-
-	return ss;
+			return ss;
+		});
 }
 
-std::variant<lang::object, compile_error>
+outcome<lang::object>
 evaluate_sequence(
+	settings st,
 	const ast::sf::sequence& sequence,
 	const lang::symbol_table& symbols,
 	int min_allowed_elements,
@@ -268,71 +290,75 @@ evaluate_sequence(
 
 	lang::object::container_type seq_values;
 	seq_values.reserve(sequence.size());
+
+	log_container log;
+
 	for (const ast::sf::primitive_value& primitive : sequence) {
-		using result_type = std::variant<lang::object, compile_error>;
+		using result_type = outcome<lang::object>;
 
-		auto res = primitive.apply_visitor(x3::make_lambda_visitor<result_type>(
+		primitive.apply_visitor(x3::make_lambda_visitor<result_type>(
 			[&](const ast::sf::literal_expression& expr) -> result_type {
-				std::variant<lang::single_object, compile_error> sobj_or_err = evaluate_literal(expr);
-				if (std::holds_alternative<compile_error>(sobj_or_err)) {
-					return std::get<compile_error>(sobj_or_err);
-				}
-
-				return lang::object{
-					{std::get<lang::single_object>(std::move(sobj_or_err))},
-					parser::position_tag_of(expr)
-				};
+				return evaluate_literal(st, expr).map_result<lang::object>(
+					[&](lang::single_object so) {
+						return lang::object{{std::move(so)}, parser::position_tag_of(expr)};
+					}
+				);
 			},
 			[&](const ast::sf::name& name) {
 				return evaluate_name(name, symbols);
 			}
-		));
+		))
+		.map_result([&](lang::object obj) {
+			/*
+			 * Flatten the sequence to the parent sequence,
+			 * append elements from this sequence in the same order.
+			 * During flatteting, intentionally lose the seq origin - the
+			 * parent one will be more appropriate for any diagnostic messages.
+			 */
+			std::move(obj.values.begin(), obj.values.end(), std::back_inserter(seq_values));
+		})
+		.move_logs_to(log);
 
-		if (std::holds_alternative<compile_error>(res))
-			return std::get<compile_error>(std::move(res));
-
-		auto& obj = std::get<lang::object>(res);
-		/*
-		 * Flatten the sequence to the parent sequence,
-		 * append elements from this sequence in the same order.
-		 * During flatteting, intentionally lose the seq origin - the
-		 * parent one will be more appropriate for any diagnostic messages.
-		 */
-		std::move(obj.values.begin(), obj.values.end(), std::back_inserter(seq_values));
+		if (!should_continue(st.error_handling, log))
+			return log;
 	}
 
 	const auto sequence_origin = parser::position_tag_of(sequence);
-	const auto values_num = static_cast<int>(seq_values.size());
+	const auto num_elements = static_cast<int>(seq_values.size());
 
-	if (values_num < min_allowed_elements
-		|| (max_allowed_elements && values_num > *max_allowed_elements))
+	if (num_elements < min_allowed_elements
+		|| (max_allowed_elements && num_elements > *max_allowed_elements))
 	{
-		return errors::invalid_amount_of_arguments{
-			min_allowed_elements, max_allowed_elements, values_num, sequence_origin
-		};
+		// It is possible to return object + log here, but there are functions
+		// that expect the result of this function to match required min/max
+		// elements. Therefore, only log is returned.
+		log.emplace_back(error(errors::invalid_amount_of_arguments{
+			min_allowed_elements, max_allowed_elements, num_elements, sequence_origin}));
+		return log;
 	}
 
-	return lang::object{std::move(seq_values), sequence_origin};
+	return {lang::object{std::move(seq_values), sequence_origin}, std::move(log)};
 }
 
-std::variant<lang::object, compile_error>
+outcome<lang::object>
 evaluate_value_expression(
+	settings st,
 	const ast::sf::value_expression& value_expression,
 	const lang::symbol_table& symbols)
 {
-	using result_type = std::variant<lang::object, compile_error>;
+	using result_type = outcome<lang::object>;
 
 	return value_expression.apply_visitor(x3::make_lambda_visitor<result_type>(
 		[&](const ast::sf::sequence& seq) {
-			return evaluate_sequence(seq, symbols);
+			return evaluate_sequence(st, seq, symbols);
 		},
 		[&](const ast::sf::compound_action_expression& expr) {
-			return evaluate_compound_action(expr, symbols);
+			return evaluate_compound_action(st, expr, symbols);
 		}
 	));
 }
 
-[[nodiscard]] std::variant<lang::fractional, compile_error>
+[[nodiscard]] outcome<lang::fractional>
 get_as_fractional(const lang::single_object& sobj)
 {
 	auto& val = sobj.value;
@@ -342,13 +368,14 @@ get_as_fractional(const lang::single_object& sobj)
 	}
 
 	if (std::holds_alternative<lang::integer>(val)) {
-		return lang::fractional{std::get<lang::integer>(val)};
+		const auto& intgr = std::get<lang::integer>(val);
+		return lang::fractional{static_cast<double>(intgr.value), intgr.origin};
 	}
 
-	return errors::type_mismatch{lang::object_type::fractional, sobj.type(), sobj.origin};
+	return error(errors::type_mismatch{lang::object_type::fractional, sobj.type(), sobj.origin});
 }
 
-std::variant<lang::socket_spec, compile_error>
+outcome<lang::socket_spec>
 get_as_socket_spec(
 	const lang::single_object& sobj)
 {
@@ -359,10 +386,14 @@ get_as_socket_spec(
 	}
 
 	if (std::holds_alternative<lang::integer>(val)) {
-		return lang::socket_spec{std::get<lang::integer>(val).value};
+		const auto& intgr = std::get<lang::integer>(val);
+		lang::socket_spec ss;
+		ss.num = intgr.value;
+		ss.origin = intgr.origin;
+		return ss;
 	}
 
-	return errors::type_mismatch{lang::object_type::socket_spec, sobj.type(), sobj.origin};
+	return error(errors::type_mismatch{lang::object_type::socket_spec, sobj.type(), sobj.origin});
 }
 
 } // namespace fs::compiler::detail

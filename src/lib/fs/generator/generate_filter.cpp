@@ -4,9 +4,9 @@
 #include <fs/lang/symbol_table.hpp>
 #include <fs/parser/parser.hpp>
 #include <fs/parser/ast_adapted.hpp> // required adaptation info for fs::log::structure_printer
-#include <fs/compiler/error.hpp>
-#include <fs/compiler/print_error.hpp>
 #include <fs/compiler/compiler.hpp>
+#include <fs/compiler/outcome.hpp>
+#include <fs/compiler/settings.hpp>
 #include <fs/log/logger.hpp>
 #include <fs/log/structure_printer.hpp>
 
@@ -15,24 +15,24 @@ namespace fs::generator::sf
 
 std::optional<std::string> generate_filter(
 	std::string_view input,
-	const lang::item_price_info& item_price_info,
-	options options,
+	const lang::item_price_report& report,
+	settings st,
 	log::logger& logger)
 {
-	std::optional<std::string> maybe_filter = generate_filter_without_preamble(input, item_price_info.data, options, logger);
+	std::optional<std::string> maybe_filter = generate_filter_without_preamble(input, report.data, st, logger);
 
 	if (!maybe_filter)
 		return std::nullopt;
 
 	std::string& filter = *maybe_filter;
-	prepend_metadata(item_price_info.metadata, filter);
+	prepend_metadata(report.metadata, filter);
 	return filter;
 }
 
 std::optional<std::string> generate_filter_without_preamble(
 	std::string_view input,
 	const lang::item_price_data& item_price_data,
-	options options,
+	settings st,
 	log::logger& logger)
 {
 	logger.info() << "" << item_price_data; // add << "" to workaround calling <<(rvalue, item_price_data)
@@ -47,31 +47,28 @@ std::optional<std::string> generate_filter_without_preamble(
 	logger.info() << "parse successful\n";
 	const auto& parse_data = std::get<parser::sf::parse_success_data>(parse_result);
 
-	if (options.print_ast)
+	if (st.print_ast)
 		fs::log::structure_printer()(parse_data.ast);
 
 	logger.info() << "resolving filter template symbols\n";
 
-	std::variant<lang::symbol_table, compiler::compile_error> symbols_or_error =
-		compiler::resolve_spirit_filter_symbols(parse_data.ast.definitions);
-	if (std::holds_alternative<compiler::compile_error>(symbols_or_error)) {
-		compiler::print_error(std::get<compiler::compile_error>(symbols_or_error), parse_data.lookup_data, logger);
+	const compiler::outcome<lang::symbol_table> symbols_outcome =
+		compiler::resolve_spirit_filter_symbols(st.compile_settings, parse_data.ast.definitions);
+	compiler::output_logs(symbols_outcome.logs(), parse_data.lookup, logger);
+
+	if (!symbols_outcome.has_result())
 		return std::nullopt;
-	}
 
 	logger.info() << "compiling filter template\n";
 
-	const auto& symbols = std::get<lang::symbol_table>(symbols_or_error);
-	const std::variant<lang::spirit_item_filter, compiler::compile_error> spirit_filter_or_error =
-		compiler::compile_spirit_filter_statements(parse_data.ast.statements, symbols);
+	const compiler::outcome<lang::spirit_item_filter> spirit_filter_outcome =
+		compiler::compile_spirit_filter_statements(st.compile_settings, parse_data.ast.statements, symbols_outcome.result());
+	compiler::output_logs(spirit_filter_outcome.logs(), parse_data.lookup, logger);
 
-	if (std::holds_alternative<compiler::compile_error>(spirit_filter_or_error)) {
-		compiler::print_error(std::get<compiler::compile_error>(spirit_filter_or_error), parse_data.lookup_data, logger);
+	if (!spirit_filter_outcome.has_result())
 		return std::nullopt;
-	}
 
-	const auto& spirit_filter = std::get<lang::spirit_item_filter>(spirit_filter_or_error);
-	lang::item_filter filter = make_filter(spirit_filter, item_price_data);
+	lang::item_filter filter = make_filter(spirit_filter_outcome.result(), item_price_data);
 
 	logger.info() << "compilation successful\n";
 

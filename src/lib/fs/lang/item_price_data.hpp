@@ -1,15 +1,18 @@
 #pragma once
 
-#include <fs/log/logger.hpp>
+#include <fs/log/monitor.hpp>
 #include <fs/lang/data_source_type.hpp>
 
-#include <boost/filesystem/path.hpp>
+#include <nlohmann/json.hpp>
+
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
 #include <vector>
 #include <string>
 #include <unordered_map>
 #include <utility>
+#include <filesystem>
+#include <optional>
 
 namespace fs::lang
 {
@@ -100,8 +103,8 @@ struct item_price_data
 	[[nodiscard]] bool
 	load_and_parse(
 		const item_price_metadata& metadata,
-		const std::string& directory_path,
-		log::logger& logger);
+		const std::filesystem::path& directory_path,
+		const log::monitor& logger);
 
 	/**
 	 * @brief sort all non-unique item categories by name
@@ -137,33 +140,41 @@ struct item_price_data
 
 log::message_stream& operator<<(log::message_stream& stream, const item_price_data& ipd);
 
+nlohmann::json to_json(const item_price_metadata& metadata);
+std::optional<item_price_metadata> from_json(const nlohmann::json& object, const log::monitor& logger);
+
 struct item_price_metadata
 {
-	[[nodiscard]] bool save(const boost::filesystem::path& directory, fs::log::logger& logger) const;
-	[[nodiscard]] bool load(const boost::filesystem::path& directory, fs::log::logger& logger);
+	[[nodiscard]] bool save(const std::filesystem::path& directory, const log::monitor& logger) const;
+	[[nodiscard]] bool load(const std::filesystem::path& directory, const log::monitor& logger);
 
-	std::string league_name;
-	data_source_type data_source;
-	boost::posix_time::ptime download_date;
+	std::string league_name = "(none)";
+	data_source_type data_source = data_source_type::none;
+	boost::posix_time::ptime download_date = boost::posix_time::ptime(boost::posix_time::not_a_date_time);
 };
 
 log::message_stream& operator<<(log::message_stream& stream, const item_price_metadata& ipm);
 
-struct item_price_info
+struct item_price_report
 {
 	item_price_data data;
 	item_price_metadata metadata;
 };
 
-log::message_stream& operator<<(log::message_stream& stream, const item_price_info& ipi);
+log::message_stream& operator<<(log::message_stream& stream, const item_price_report& ipr);
+
+std::optional<item_price_report>
+load_item_price_report(
+	const std::filesystem::path& directory,
+	const log::monitor& logger);
 
 /**
  * Produce logs about differences in 2 item data sets
  *
  * both item data inputs must be sorted
  */
-void compare_item_price_info(
-	const item_price_info& lhs,
-	const item_price_info& rhs,
+void compare_item_price_reports(
+	const item_price_report& lhs,
+	const item_price_report& rhs,
 	log::logger& log);
 }

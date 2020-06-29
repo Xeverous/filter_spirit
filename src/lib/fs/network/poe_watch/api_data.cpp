@@ -15,13 +15,13 @@ constexpr auto filename_itemdata = "itemdata.json";
 namespace fs::network::poe_watch
 {
 
-bool api_item_price_data::save(const boost::filesystem::path& directory, log::logger& logger) const
+bool api_item_price_data::save(const std::filesystem::path& directory, const log::monitor& logger) const
 {
 	return utility::save_file(directory / filename_compact, compact_json, logger)
 		&& utility::save_file(directory / filename_itemdata, itemdata_json, logger);
 }
 
-bool api_item_price_data::load(const boost::filesystem::path& directory, log::logger& logger)
+bool api_item_price_data::load(const std::filesystem::path& directory, const log::monitor& logger)
 {
 	std::optional<std::string> file_contents = utility::load_file(directory / filename_compact, logger);
 

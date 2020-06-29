@@ -21,7 +21,7 @@ std::string generate_filter(
 {
 	fs::log::string_logger logger;
 	std::optional<std::string> filter = fs::generator::sf::generate_filter_without_preamble(
-		input, ipd, fs::generator::options{}, logger);
+		input, ipd, fs::generator::settings{}, logger);
 	BOOST_TEST_REQUIRE(filter.has_value(), "filter generation failed:\n" << logger.str());
 	return *filter;
 }
@@ -134,7 +134,15 @@ Class "Divination Card"
 {
 	BaseType == "The Wolf" "The Demon" { Show }
 	BaseType    "The Wolf" "The Demon" { Show }
+
+	# these blocks should not be generated (empty array of names) (FS extension)
+	BaseType == None                   { Show }
+	BaseType    None                   { Show }
 }
+
+EnchantmentPassiveNode    "Damage while you have a Herald" { Show }
+EnchantmentPassiveNode =  "Damage while you have a Herald" { Show }
+EnchantmentPassiveNode == "Damage while you have a Herald" { Show }
 )");
 			const std::string_view expected_filter =
 R"(Show
@@ -144,6 +152,15 @@ R"(Show
 Show
 	Class "Divination Card"
 	BaseType "The Wolf" "The Demon"
+
+Show
+	EnchantmentPassiveNode "Damage while you have a Herald"
+
+Show
+	EnchantmentPassiveNode "Damage while you have a Herald"
+
+Show
+	EnchantmentPassiveNode == "Damage while you have a Herald"
 
 )";
 
@@ -155,12 +172,17 @@ Show
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
 BaseType "Leather Belt"
 {
+	HasInfluence    None             { Show }
 	HasInfluence == Crusader Hunter  { Show }
 	HasInfluence    Redeemer Warlord { Show }
 }
 )");
 			const std::string_view expected_filter =
 R"(Show
+	BaseType "Leather Belt"
+	HasInfluence None
+
+Show
 	BaseType "Leather Belt"
 	HasInfluence == Crusader Hunter
 
@@ -526,6 +548,52 @@ Show
 
 Show
 	MinimapIcon 2 Cyan UpsideDownHouse
+
+)";
+
+			BOOST_TEST(compare_strings(expected_filter, actual_filter));
+		}
+
+		BOOST_AUTO_TEST_CASE(shaper_voice_lines)
+		{
+			const std::string actual_filter = generate_filter(minimal_input() + R"(
+PlayAlertSound ShExalted
+{ Show }
+
+PlayAlertSound ShDivine 250
+{ Show }
+
+PlayAlertSoundPositional ShRegal
+{ Show }
+
+PlayAlertSoundPositional ShFusing 200
+{ Show }
+
+SetAlertSound ShAlchemy
+{ Show }
+
+SetAlertSound ShVaal 150
+{ Show }
+
+)");
+			const std::string_view expected_filter =
+R"(Show
+	PlayAlertSound ShExalted
+
+Show
+	PlayAlertSound ShDivine 250
+
+Show
+	PlayAlertSoundPositional ShRegal
+
+Show
+	PlayAlertSoundPositional ShFusing 200
+
+Show
+	PlayAlertSound ShAlchemy
+
+Show
+	PlayAlertSound ShVaal 150
 
 )";
 

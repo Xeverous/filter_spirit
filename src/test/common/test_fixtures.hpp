@@ -2,12 +2,11 @@
 
 #include <fs/lang/symbol_table.hpp>
 #include <fs/parser/parser.hpp>
-#include <fs/compiler/error.hpp>
 #include <fs/compiler/compiler.hpp>
+#include <fs/compiler/outcome.hpp>
 
 #include <string>
 #include <string_view>
-#include <variant>
 
 namespace fs::test
 {
@@ -25,10 +24,17 @@ class compiler_fixture : public parser_fixture
 {
 protected:
 	static
-	std::variant<lang::symbol_table, compiler::compile_error>
+	compiler::outcome<lang::symbol_table>
+	resolve_symbols(compiler::settings st, const std::vector<parser::ast::sf::definition>& defs)
+	{
+		return compiler::resolve_spirit_filter_symbols(st, defs);
+	}
+
+	static
+	compiler::outcome<lang::symbol_table>
 	resolve_symbols(const std::vector<parser::ast::sf::definition>& defs)
 	{
-		return compiler::resolve_spirit_filter_symbols(defs);
+		return resolve_symbols(compiler::settings{}, defs);
 	}
 };
 

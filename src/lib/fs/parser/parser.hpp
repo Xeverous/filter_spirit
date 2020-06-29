@@ -63,7 +63,7 @@ private:
 
 struct parse_failure_data
 {
-	lookup_data lookup_data;
+	lookup_data lookup;
 	error_holder_type errors;
 	const char* parser_stop_position;
 };
@@ -73,7 +73,7 @@ namespace sf
 	struct parse_success_data
 	{
 		ast::sf::ast_type ast;
-		lookup_data lookup_data;
+		lookup_data lookup;
 	};
 
 	[[nodiscard]]
@@ -85,7 +85,7 @@ namespace rf
 	struct parse_success_data
 	{
 		ast::rf::ast_type ast;
-		lookup_data lookup_data;
+		lookup_data lookup;
 	};
 
 	[[nodiscard]]
