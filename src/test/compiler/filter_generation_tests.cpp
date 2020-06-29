@@ -134,6 +134,10 @@ Class "Divination Card"
 {
 	BaseType == "The Wolf" "The Demon" { Show }
 	BaseType    "The Wolf" "The Demon" { Show }
+
+	# these blocks should not be generated (empty array of names) (FS extension)
+	BaseType == None                   { Show }
+	BaseType    None                   { Show }
 }
 
 EnchantmentPassiveNode    "Damage while you have a Herald" { Show }

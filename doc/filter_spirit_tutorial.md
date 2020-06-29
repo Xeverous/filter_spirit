@@ -479,16 +479,15 @@ Grammar overview (not a normative documentation as actual EBNF grammar specifica
 X       # X token is required
 [X]     # X token is optional
 X | Y   # X or Y token
-X...    # 0 or more X tokens
-X X...  # 1 or more X tokens
+X*      # 0 or more X tokens
+X+      # 1 or more X tokens
 
 # token CMP: < | > | <= | >= | = | ==
 # token EQ: = | ==
-# token SS: [Integer] R...G...B...W...A...D...
+# token SS: [Integer] R*G*B*W*A*D*
 ```
 
 ```
-
 Rarity        [CMP] Rarity
 ItemLevel     [CMP] Integer
 DropLevel     [CMP] Integer
@@ -502,16 +501,16 @@ MapTier       [CMP] Integer
 AreaLevel     [CMP] Integer
 CorruptedMods [CMP] Integer
 
-Class                  [EQ] String String...
-BaseType               [EQ] String String...
-HasExplicitMod         [EQ] String String...
-HasEnchantment         [EQ] String String...
-Prophecy               [EQ] String String...
-EnchantmentPassiveNode [EQ] String String...
-HasInfluence           [EQ] Influence Influence...
+Class                  [EQ] None | String+
+BaseType               [EQ] None | String+
+HasExplicitMod         [EQ] None | String+
+HasEnchantment         [EQ] None | String+
+Prophecy               [EQ] None | String+
+EnchantmentPassiveNode [EQ] None | String+
+HasInfluence           [EQ] None | Influence+
 
-Sockets     [CMP] SS SS...
-SocketGroup [CMP] SS SS...
+Sockets     [CMP] SS+
+SocketGroup [CMP] SS+
 
 AnyEnchantment  Boolean
 Identified      Boolean
@@ -552,6 +551,11 @@ SocketGroup >= 1 2 3R AA 3D 5GBW
   - If there is nothing or `=`, it will match an item **with at least one of specified influences**.
   - If there is `==`, it will only match items **with all specified influences**.
 - `Sockets` and `SocketGroup` have very complex matching rules. They are explained by Rhys in [this reddit thread](https://www.reddit.com/r/pathofexile/comments/f2t4tz/inconsistencies_in_new_filter_syntaxes/). FS preserves them as-is in generated filters.
+
+### `None` in array-based conditions
+
+- `None` in `HasInfluence` is an official filter feature - it generates such block and it matches only items which have no influence.
+- `None` in other array conditions is a FS extension. It causes that block to not be generated. Useful when the value comes from elsewhere - use code like `$chance_bases = None` when you do not want specific blocks to be generated.
 
 ## actions
 

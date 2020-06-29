@@ -402,6 +402,12 @@ spirit_filter_add_string_array_condition(
 {
 	return detail::evaluate_sequence(st, condition.seq, symbols)
 		.map_result<std::vector<std::string>>([&](lang::object obj) -> outcome<std::vector<std::string>> {
+			if (obj.values.size() == 1u) {
+				auto none = detail::get_as<lang::none>(obj.values.front());
+				if (none.has_result())
+					return std::vector<std::string>();
+			}
+
 			std::vector<std::string> strings;
 			log_container logs;
 
