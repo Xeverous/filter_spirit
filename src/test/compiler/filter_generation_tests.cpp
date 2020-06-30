@@ -130,14 +130,18 @@ R"(Show
 		BOOST_AUTO_TEST_CASE(strings_condition)
 		{
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
+$x = None
+
 Class "Divination Card"
 {
-	BaseType == "The Wolf" "The Demon" { Show }
-	BaseType    "The Wolf" "The Demon" { Show }
+	# Nones should be skipped
+	BaseType == "The Wolf" $x "The Demon" None { Show }
+	BaseType    "The Wolf" $x "The Demon" None { Show }
 
-	# these blocks should not be generated (empty array of names) (FS extension)
-	BaseType == None                   { Show }
-	BaseType    None                   { Show }
+	# these blocks should not be generated (only Nones)
+	BaseType == None { Show }
+	BaseType    None { Show }
+	BaseType    $x   { Show }
 }
 
 EnchantmentPassiveNode    "Damage while you have a Herald" { Show }

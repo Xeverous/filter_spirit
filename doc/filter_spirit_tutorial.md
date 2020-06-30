@@ -501,12 +501,12 @@ MapTier       [CMP] Integer
 AreaLevel     [CMP] Integer
 CorruptedMods [CMP] Integer
 
-Class                  [EQ] None | String+
-BaseType               [EQ] None | String+
-HasExplicitMod         [EQ] None | String+
-HasEnchantment         [EQ] None | String+
-Prophecy               [EQ] None | String+
-EnchantmentPassiveNode [EQ] None | String+
+Class                  [EQ] (None | String)+
+BaseType               [EQ] (None | String)+
+HasExplicitMod         [EQ] (None | String)+
+HasEnchantment         [EQ] (None | String)+
+Prophecy               [EQ] (None | String)+
+EnchantmentPassiveNode [EQ] (None | String)+
 HasInfluence           [EQ] None | Influence+
 
 Sockets     [CMP] SS+
@@ -554,8 +554,8 @@ SocketGroup >= 1 2 3R AA 3D 5GBW
 
 ### `None` in array-based conditions
 
-- `None` in `HasInfluence` is an official filter feature - it generates such block and it matches only items which have no influence.
-- `None` in other array conditions is a FS extension. It causes that block to not be generated. Useful when the value comes from elsewhere - use code like `$chance_bases = None` when you do not want specific blocks to be generated.
+- `None` in `HasInfluence` is an official filter feature - it generates such block and it matches only items which have no influence. `None` will be accepted only if it appears exactly once, not mixed with any influence names.
+- `None` in other array conditions is a FS extension. They are skipped. Useful when the value comes from elsewhere - e.g. in code like `$chance_bases = None [...] BaseType $chance_bases`. Multiple variables may be used within one condition. If a block gets only `None`s it will not be generated.
 
 ## actions
 
