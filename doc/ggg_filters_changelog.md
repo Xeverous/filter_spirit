@@ -6,6 +6,11 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 
 *newest at the top*
 
+### 3.11.1 (Harvest bugfixes)
+
+- [patch notes](https://www.pathofexile.com/forum/view-thread/2893980) - new seed types.
+- [reddit comments](https://old.reddit.com/r/pathofexile/comments/hk5c3n/3111_patch_notes/fwqo2yp/?context=3) about newly introduced items.
+
 ### 3.11 (Harvest) - [Item Filter information](https://www.pathofexile.com/forum/view-thread/2873743)
 
 - [patch notes](https://www.pathofexile.com/forum/view-thread/2873739) - Herald nerfs and other changes
@@ -14,7 +19,7 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 
 ### 3.10.2b
 
-From the [patchnotes](https://www.pathofexile.com/forum/view-thread/2867400):
+From the [patch notes](https://www.pathofexile.com/forum/view-thread/2867400):
 
 - You can now filter for items without being required to use special alphanumeric characters, such as "Maelstrom Staff" rather than "Maelström Staff".
 
