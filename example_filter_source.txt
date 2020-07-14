@@ -53,6 +53,8 @@ $color_conqueror_item   = 150 100 180
 $color_fractured_item   = 150 100 158
 $color_synthesised_item = 150 100 200
 $color_veiled_item      = 150 100 158
+$color_harvest          =   0 252 186
+$color_harbinger        =  64 255 255
 
 $currency_t1 = "Exalted Orb" "Mirror of Kalandra" "Eternal Orb" "Albino Rhoa Feather" "Mirror Shard"
 $currency_t2 = "Divine Orb" "Chaos Orb" "Gemcutter's Prism" "Orb of Regret" "Regal Orb" "Stacked Deck" "Vaal Orb" "Simple Sextant" "Prime Sextant" "Awakened Sextant" "Remnant of Corruption" "Exalted Shard" "Orb of Annulment" "Orb of Binding" "Orb of Horizons" "Harbinger's Orb" "Engineer's Orb" "Ancient Orb" "Stacked Deck" "Vial of"
@@ -225,7 +227,7 @@ Class "Currency" {
 		Show
 	}
 
-	BaseType $currency_t2 {
+	BaseType $currency_t2 "Facetor's Lens" "Infused Engineer's Orb" {
 		SetTextColor $color_black
 		SetBackgroundColor $color_currency
 		SetFontSize $font_currency_t2
@@ -270,6 +272,15 @@ Class "Currency" {
 
 	BaseType "Portal Scroll" {
 		SetTextColor 162 152 145
+		Show
+	}
+
+	BaseType "Time-light Scroll" "Fragmentation Scroll" "Deregulation Scroll" "Electroshock Scroll" "Haemocombustion Scroll" "Specularity Scroll" {
+		SetBackgroundColor $color_harbinger
+		SetBorderColor $color_harbinger
+		SetTextColor $color_black
+		SetAlertSound $alert_currency_t1
+		MinimapIcon 0 Blue Moon
 		Show
 	}
 
@@ -396,6 +407,25 @@ Class "Incubator" {
 	SetAlertSound $alert_currency_t2
 	PlayEffect $beam_currency
 	MinimapIcon $icon_currency_t2
+	Show
+}
+
+Class == "Harvest Seed" {
+	SetTextColor $color_harvest
+	SetBorderColor $color_harvest
+	SetBackgroundColor $color_black
+	SetAlertSound 2 300
+	SetFontSize $font_max
+	Show
+}
+
+Class == "Seed Enhancer" {
+	SetTextColor $color_black
+	SetBackgroundColor $color_harvest
+	SetBorderColor $color_harvest
+	SetFontSize $font_max
+	SetAlertSound 2 300
+	MinimapIcon 0 Cyan Raindrop
 	Show
 }
 
@@ -733,14 +763,24 @@ Class "Misc Map Item" {
 	}
 }
 
-BaseType "Offering to the Goddess" {
+{
 	SetBorderColor $color_labirynth
 	SetTextColor $color_black
 	SetBackgroundColor $color_labirynth
 	SetFontSize $font_max
-	SetAlertSound $alert_lab_offering
-	Show
+
+	BaseType "Tribute to the Goddess" "Gift to the Goddess" "Dedication to the Goddess" {
+		SetAlertSound $alert_currency_t2
+		MinimapIcon $icon_currency_t2
+		Show
+	}
+
+	BaseType "Offering to the Goddess" {
+		SetAlertSound $alert_lab_offering
+		Show
+	}
 }
+
 
 # note: Izaro will speak upon key drops
 # sound alerts here may feel like unnecessary noise
