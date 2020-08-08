@@ -70,6 +70,7 @@ target_sources(filter_spirit
 		fs/lang/condition_set.hpp
 		fs/lang/data_source_type.hpp
 		fs/lang/item.hpp
+		fs/lang/item.cpp
 		fs/lang/item_price_data.hpp
 		fs/lang/item_filter.hpp
 		fs/lang/item_classes.hpp
@@ -81,6 +82,7 @@ target_sources(filter_spirit
 		fs/lang/primitive_types.hpp
 		fs/lang/queries.hpp
 		fs/lang/symbol_table.hpp
+		fs/lang/influence_info.hpp
 		fs/log/string_logger.hpp
 		fs/log/buffer_logger.hpp
 		fs/log/console_logger.hpp

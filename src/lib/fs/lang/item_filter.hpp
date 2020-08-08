@@ -1,6 +1,8 @@
 #pragma once
+
 #include <fs/lang/condition_set.hpp>
 #include <fs/lang/action_set.hpp>
+#include <fs/lang/item.hpp>
 
 #include <iosfwd>
 #include <optional>
@@ -53,5 +55,17 @@ struct spirit_item_filter
 {
 	std::vector<spirit_item_filter_block> blocks;
 };
+
+struct item_filtering_result
+{
+	// final style applied to the item
+	item_visibility visibility;
+	action_set style;
+
+	// each element represents a match attempt against next filter block
+	std::vector<condition_set_match_result> match_history;
+};
+
+item_filtering_result pass_item_through_filter(const item& itm, const item_filter& filter, int area_level);
 
 }

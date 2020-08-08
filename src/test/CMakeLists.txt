@@ -15,9 +15,10 @@ target_sources(filter_spirit_test
 		compiler/compiler_error_tests.cpp
 		compiler/filter_generation_tests.cpp
 		compiler/compiler_tests.cpp
+		utility/algorithm_tests.cpp
+		utility/string_helpers_tests.cpp
 		common/test_fixtures.cpp
 		common/string_operations.cpp
-		utility/algorithm_tests.cpp
 		common/print_type.hpp
 		common/string_operations.hpp
 		common/test_fixtures.hpp

@@ -269,7 +269,7 @@ void action_set::generate(std::ostream& output_stream) const
 	output_beam_effect(play_effect, output_stream);
 }
 
-void action_set::override_with(action_set&& other)
+void action_set::override_with(const action_set& other)
 {
 	if (other.set_border_color)
 		set_border_color = *other.set_border_color;
@@ -284,9 +284,10 @@ void action_set::override_with(action_set&& other)
 		set_font_size = *other.set_font_size;
 
 	if (other.play_alert_sound)
-		play_alert_sound = std::move(*other.play_alert_sound);
+		play_alert_sound = *other.play_alert_sound;
 
-	disable_drop_sound = other.disable_drop_sound;
+	if (other.disable_drop_sound)
+		disable_drop_sound = *other.disable_drop_sound;
 
 	if (other.minimap_icon)
 		minimap_icon = *other.minimap_icon;

@@ -47,7 +47,7 @@ inline bool operator!=(boolean lhs, boolean rhs) noexcept { return !(lhs == rhs)
 struct integer
 {
 	int value;
-	position_tag origin= {};
+	position_tag origin = {};
 };
 
 inline bool operator==(integer lhs, integer rhs) noexcept { return lhs.value == rhs.value; }

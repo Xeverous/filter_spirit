@@ -227,12 +227,14 @@ add_has_influence_condition(
 	};
 
 	target = lang::influences_condition{
-		contains(lang::influence_type::shaper),
-		contains(lang::influence_type::elder),
-		contains(lang::influence_type::crusader),
-		contains(lang::influence_type::redeemer),
-		contains(lang::influence_type::hunter),
-		contains(lang::influence_type::warlord),
+		lang::influence_info{
+			contains(lang::influence_type::shaper),
+			contains(lang::influence_type::elder),
+			contains(lang::influence_type::crusader),
+			contains(lang::influence_type::redeemer),
+			contains(lang::influence_type::hunter),
+			contains(lang::influence_type::warlord)
+		},
 		is_exact_match,
 		origin
 	};

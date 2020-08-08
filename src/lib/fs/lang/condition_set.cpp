@@ -167,26 +167,26 @@ void output_influences_condition(
 	if (cond.exact_match_required)
 		output_stream << " ==";
 
-	if (cond.is_none()) {
+	if (cond.influence.is_none()) {
 		output_stream << ' ' << kw::none;
 	}
 	else {
-		if (cond.shaper)
+		if (cond.influence.shaper)
 			output_stream << ' ' << kw::shaper;
 
-		if (cond.elder)
+		if (cond.influence.elder)
 			output_stream << ' ' << kw::elder;
 
-		if (cond.crusader)
+		if (cond.influence.crusader)
 			output_stream << ' ' << kw::crusader;
 
-		if (cond.redeemer)
+		if (cond.influence.redeemer)
 			output_stream << ' ' << kw::redeemer;
 
-		if (cond.hunter)
+		if (cond.influence.hunter)
 			output_stream << ' ' << kw::hunter;
 
-		if (cond.warlord)
+		if (cond.influence.warlord)
 			output_stream << ' ' << kw::warlord;
 	}
 

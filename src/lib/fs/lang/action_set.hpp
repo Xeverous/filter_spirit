@@ -232,7 +232,7 @@ inline bool operator!=(play_effect_action lhs, play_effect_action rhs)
  */
 struct action_set
 {
-	void override_with(action_set&& other);
+	void override_with(const action_set& other);
 
 	void generate(std::ostream& output_stream) const;
 

@@ -20,6 +20,10 @@ inline bool contains(std::string_view source, std::string_view fragment) noexcep
 
 [[nodiscard]] std::string_view make_string_view(const char* first, const char* last) noexcept;
 
+[[nodiscard]] std::string_view ltrim(std::string_view str, char c);
+[[nodiscard]] std::string_view rtrim(std::string_view str, char c);
+[[nodiscard]] std::string_view trim(std::string_view str, char c);
+
 /**
  * A line with underline for pretty-printing
  *
