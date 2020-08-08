@@ -195,7 +195,7 @@ struct condition_set
 	rarity_range_condition rarity;
 	std::optional<strings_condition> class_;
 	std::optional<strings_condition> base_type;
-	integer_range_condition links; // TODO rename to linked_sockets
+	integer_range_condition linked_sockets;
 	std::optional<socket_spec_condition> sockets;
 	std::optional<socket_spec_condition> socket_group;
 	integer_range_condition height;
@@ -237,7 +237,7 @@ struct condition_set_match_result
 			&& rarity != false
 			&& class_ != false
 			&& base_type != false
-			&& links != false
+			&& linked_sockets != false
 			&& sockets != false
 			&& socket_group != false
 			&& height != false
@@ -271,7 +271,7 @@ struct condition_set_match_result
 	std::optional<bool> rarity;
 	std::optional<bool> class_;
 	std::optional<bool> base_type;
-	std::optional<bool> links;
+	std::optional<bool> linked_sockets;
 	std::optional<bool> sockets;
 	std::optional<bool> socket_group;
 	std::optional<bool> height;
