@@ -122,6 +122,41 @@ std::string_view make_string_view(const char* first, const char* last) noexcept
 	return std::string_view(first, last - first);
 }
 
+std::string_view ltrim(std::string_view str, char c)
+{
+	std::string_view::difference_type count = 0;
+
+	for (char ch : str) {
+		if (ch == c)
+			++count;
+		else
+			break;
+	}
+
+	str.remove_prefix(count);
+	return str;
+}
+
+std::string_view rtrim(std::string_view str, char c)
+{
+	std::string_view::difference_type count = 0;
+
+	for (auto it = str.rbegin(); it != str.rend(); ++it) {
+		if (*it == c)
+			++count;
+		else
+			break;
+	}
+
+	str.remove_suffix(count);
+	return str;
+}
+
+std::string_view trim(std::string_view str, char c)
+{
+	return rtrim(ltrim(str, c), c);
+}
+
 code_underliner::code_underliner(std::string_view all_code, std::string_view code_to_underline)
 : all_first(all_code.data())
 , all_last (all_code.data() + all_code.size())

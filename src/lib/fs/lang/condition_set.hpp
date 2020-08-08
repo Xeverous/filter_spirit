@@ -1,6 +1,7 @@
 #pragma once
 
 #include <fs/lang/primitive_types.hpp>
+#include <fs/lang/influence_info.hpp>
 #include <fs/lang/position_tag.hpp>
 #include <fs/lang/condition_properties.hpp>
 #include <fs/lang/queries.hpp>
@@ -168,17 +169,7 @@ struct strings_condition
 
 struct influences_condition
 {
-	bool is_none() const
-	{
-		return !(shaper || elder || crusader || redeemer || hunter || warlord);
-	}
-
-	bool shaper;
-	bool elder;
-	bool crusader;
-	bool redeemer;
-	bool hunter;
-	bool warlord;
+	influence_info influence;
 	bool exact_match_required;
 	position_tag origin;
 };
@@ -204,7 +195,7 @@ struct condition_set
 	rarity_range_condition rarity;
 	std::optional<strings_condition> class_;
 	std::optional<strings_condition> base_type;
-	integer_range_condition links;
+	integer_range_condition links; // TODO rename to linked_sockets
 	std::optional<socket_spec_condition> sockets;
 	std::optional<socket_spec_condition> socket_group;
 	integer_range_condition height;
@@ -230,6 +221,82 @@ struct condition_set
 	std::optional<boolean_condition> is_shaped_map;
 	std::optional<boolean_condition> is_elder_map;
 	std::optional<boolean_condition> is_blighted_map;
+};
+
+// represents an attempt to match specific item against specific filter block
+// true    => condition     satisfied
+// false   => condition not satisfied
+// (empty) => condition not present
+struct condition_set_match_result
+{
+	bool is_successful() const
+	{
+		return item_level != false
+			&& drop_level != false
+			&& quality != false
+			&& rarity != false
+			&& class_ != false
+			&& base_type != false
+			&& links != false
+			&& sockets != false
+			&& socket_group != false
+			&& height != false
+			&& width != false
+			&& has_explicit_mod != false
+			&& has_enchantment != false
+			&& prophecy != false
+			&& enchantment_passive_node != false
+			&& has_influence != false
+			&& stack_size != false
+			&& gem_level != false
+			&& map_tier != false
+			&& area_level != false
+			&& corrupted_mods != false
+			&& is_identified != false
+			&& is_corrupted != false
+			&& is_mirrored != false
+			&& is_elder_item != false
+			&& is_shaper_item != false
+			&& is_fractured_item != false
+			&& is_synthesised_item != false
+			&& is_enchanted != false
+			&& is_shaped_map != false
+			&& is_elder_map != false
+			&& is_blighted_map != false;
+	}
+
+	std::optional<bool> item_level;
+	std::optional<bool> drop_level;
+	std::optional<bool> quality;
+	std::optional<bool> rarity;
+	std::optional<bool> class_;
+	std::optional<bool> base_type;
+	std::optional<bool> links;
+	std::optional<bool> sockets;
+	std::optional<bool> socket_group;
+	std::optional<bool> height;
+	std::optional<bool> width;
+	std::optional<bool> has_explicit_mod;
+	std::optional<bool> has_enchantment;
+	std::optional<bool> prophecy;
+	std::optional<bool> enchantment_passive_node;
+	std::optional<bool> has_influence;
+	std::optional<bool> stack_size;
+	std::optional<bool> gem_level;
+	std::optional<bool> map_tier;
+	std::optional<bool> area_level;
+	std::optional<bool> corrupted_mods;
+	std::optional<bool> is_identified;
+	std::optional<bool> is_corrupted;
+	std::optional<bool> is_mirrored;
+	std::optional<bool> is_elder_item;
+	std::optional<bool> is_shaper_item;
+	std::optional<bool> is_fractured_item;
+	std::optional<bool> is_synthesised_item;
+	std::optional<bool> is_enchanted;
+	std::optional<bool> is_shaped_map;
+	std::optional<bool> is_elder_map;
+	std::optional<bool> is_blighted_map;
 };
 
 struct autogen_condition

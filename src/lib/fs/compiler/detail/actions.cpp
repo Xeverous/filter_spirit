@@ -348,7 +348,7 @@ spirit_filter_add_compound_action(
 			return detail::get_as<lang::action_set>(obj.values[0]);
 		})
 		.map_result([&](lang::action_set as) {
-			set.override_with(std::move(as));
+			set.override_with(as);
 		});
 }
 
