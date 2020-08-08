@@ -153,7 +153,7 @@ item_filtering_result pass_item_through_filter(const item& itm, const item_filte
 		test_range_condition(cs.drop_level,     itm.drop_level,      match_result.drop_level);
 		test_range_condition(cs.quality,        itm.quality,         match_result.quality);
 		test_range_condition(cs.rarity,         itm.rarity_,         match_result.rarity);
-		test_range_condition(cs.links,          itm.sockets.links(), match_result.links);
+		test_range_condition(cs.linked_sockets, itm.sockets.links(), match_result.linked_sockets);
 		test_range_condition(cs.height,         itm.height,          match_result.height);
 		test_range_condition(cs.width,          itm.width,           match_result.width);
 		test_range_condition(cs.stack_size,     itm.stack_size,      match_result.stack_size);

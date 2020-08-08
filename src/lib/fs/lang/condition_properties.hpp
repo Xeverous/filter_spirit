@@ -20,7 +20,7 @@ enum class numeric_comparison_condition_property
 	item_level,
 	drop_level,
 	quality,
-	links,
+	linked_sockets,
 	height,
 	width,
 	stack_size,

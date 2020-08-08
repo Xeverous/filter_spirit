@@ -147,7 +147,7 @@ namespace rf
 				(lang::keywords::rf::item_level,     lang::numeric_comparison_condition_property::item_level)
 				(lang::keywords::rf::drop_level,     lang::numeric_comparison_condition_property::drop_level)
 				(lang::keywords::rf::quality,        lang::numeric_comparison_condition_property::quality)
-				(lang::keywords::rf::linked_sockets, lang::numeric_comparison_condition_property::links)
+				(lang::keywords::rf::linked_sockets, lang::numeric_comparison_condition_property::linked_sockets)
 				(lang::keywords::rf::height,         lang::numeric_comparison_condition_property::height)
 				(lang::keywords::rf::width,          lang::numeric_comparison_condition_property::width)
 				(lang::keywords::rf::stack_size,     lang::numeric_comparison_condition_property::stack_size)

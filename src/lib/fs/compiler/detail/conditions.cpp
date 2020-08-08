@@ -96,8 +96,8 @@ add_numeric_comparison_condition(
 		case lang::numeric_comparison_condition_property::quality: {
 			return add_range_condition(cmp, intgr, condition_origin, set.quality);
 		}
-		case lang::numeric_comparison_condition_property::links: {
-			return add_range_condition(cmp, intgr, condition_origin, set.links);
+		case lang::numeric_comparison_condition_property::linked_sockets: {
+			return add_range_condition(cmp, intgr, condition_origin, set.linked_sockets);
 		}
 		case lang::numeric_comparison_condition_property::height: {
 			return add_range_condition(cmp, intgr, condition_origin, set.height);

@@ -223,7 +223,7 @@ void condition_set::generate(std::ostream& output_stream) const
 	output_range_condition(drop_level,     kw::drop_level,     output_stream);
 	output_range_condition(quality,        kw::quality,        output_stream);
 	output_range_condition(rarity,         kw::rarity,         output_stream);
-	output_range_condition(links,          kw::linked_sockets, output_stream);
+	output_range_condition(linked_sockets, kw::linked_sockets, output_stream);
 	output_range_condition(height,         kw::height,         output_stream);
 	output_range_condition(width,          kw::width,          output_stream);
 	output_range_condition(stack_size,     kw::stack_size,     output_stream);
