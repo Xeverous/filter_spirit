@@ -10,6 +10,30 @@ namespace fs::utility
 
 [[nodiscard]] std::string ptime_to_pretty_string(boost::posix_time::ptime time);
 
+inline bool starts_with(std::string_view source, std::string_view fragment) noexcept
+{
+	if (source.size() < fragment.size())
+		return false;
+
+	for (std::string_view::size_type i = 0; i < fragment.size(); ++i)
+		if (source[i] != fragment[i])
+			return false;
+
+	return true;
+}
+
+inline bool ends_with(std::string_view source, std::string_view fragment) noexcept
+{
+	if (source.size() < fragment.size())
+		return false;
+
+	for (std::string_view::size_type i = 0; i < fragment.size(); ++i)
+		if (*(source.rbegin() + i) != *(fragment.rbegin() + i))
+			return false;
+
+	return true;
+}
+
 inline bool contains(std::string_view source, std::string_view fragment) noexcept
 {
 	return source.find(fragment) != std::string_view::npos;
