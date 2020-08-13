@@ -3,8 +3,6 @@
 #include <fs/utility/assert.hpp>
 
 #include <elements/support.hpp>
-#include <elements/element/label.hpp>
-#include <elements/element/align.hpp>
 
 namespace el = cycfi::elements;
 
@@ -37,14 +35,26 @@ std::string remove_trailing_whitespace(std::string str)
 
 }
 
+std::shared_ptr<el::element> gui_logger::make_ui()
+{
+	_composite = el::share(el::vtile_composite());
+	auto scroller = el::share(el::vscroller(el::hold(_composite)));
+
+	_scroll_to_bottom = [scroller]() {
+		scroller->valign(1.0);
+	};
+
+	return scroller;
+}
+
 void gui_logger::update_ui()
 {
-	BOOST_ASSERT(_ui_element != nullptr);
+	BOOST_ASSERT(_composite != nullptr);
 	BOOST_ASSERT(_scroll_to_bottom);
 
 	_logger([&](fs::log::buffer_logger& logger) {
 		for (const fs::log::buffer_logger::message& m : logger.messages()) {
-			_ui_element->push_back(el::share(
+			_composite->push_back(el::share(
 				el::no_vstretch(el::align_left(el::static_text_box(
 					remove_trailing_whitespace(m.text),
 					el::get_theme().text_box_font,
@@ -67,5 +77,7 @@ void gui_logger::clear_logs()
 	_logger([&](fs::log::buffer_logger& logger) {
 		logger.clear();
 	});
-	_ui_element->clear();
+
+	BOOST_ASSERT(_composite != nullptr);
+	_composite->clear();
 }

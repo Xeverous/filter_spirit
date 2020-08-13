@@ -354,16 +354,6 @@ auto make_filter_supplied_options()
 
 auto make_tab_main_logs(user_state& state)
 {
-	auto log_container = el::share(el::vtile_composite());
-
-	auto scroller = el::share(el::vscroller(el::hold(log_container)));
-
-	auto scroll_to_bottom = [scroller]() {
-		scroller->valign(1.0);
-	};
-
-	state.logger.set_ui_elements(log_container, scroll_to_bottom);
-
 	auto clear_logs = [&state](bool) mutable {
 		state.logger.clear_logs();
 	};
@@ -371,7 +361,7 @@ auto make_tab_main_logs(user_state& state)
 	return
 		el::vtile(
 			el::layer(
-				el::hold(scroller),
+				el::hold(state.logger.make_ui()),
 				el::box(el::colors::black)
 			),
 			el::htile(
