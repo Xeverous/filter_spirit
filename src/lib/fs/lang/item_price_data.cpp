@@ -5,7 +5,6 @@
 #include <fs/network/poe_watch/parse_data.hpp>
 #include <fs/network/exceptions.hpp>
 #include <fs/log/logger.hpp>
-#include <fs/log/buffer_logger.hpp>
 #include <fs/utility/file.hpp>
 #include <fs/utility/algorithm.hpp>
 #include <fs/utility/dump_json.hpp>
@@ -268,46 +267,42 @@ bool is_undroppable_unique(std::string_view name) noexcept
 bool item_price_data::load_and_parse(
 	const item_price_metadata& metadata,
 	const std::filesystem::path& directory_path,
-	const log::monitor& logger)
+	log::logger& logger)
 {
 	try {
 		if (metadata.data_source == lang::data_source_type::poe_ninja) {
 			network::poe_ninja::api_item_price_data api_data;
 
 			if (!api_data.load(directory_path, logger)) {
-				logger([](log::logger& logger) { logger.error() << "failed to load item price data\n"; });
+				logger.error() << "failed to load item price data\n";
 				return false;
 			}
 
-			log::buffer_logger log_buf;
-			*this = network::poe_ninja::parse_item_price_data(api_data, log_buf);
-			logger([&log_buf](log::logger& logger) { log_buf.dump_to(logger); });
+			*this = network::poe_ninja::parse_item_price_data(api_data, logger);
 			return true;
 		}
 		else if (metadata.data_source == lang::data_source_type::poe_watch) {
 			network::poe_watch::api_item_price_data api_data;
 
 			if (!api_data.load(directory_path, logger)) {
-				logger([](log::logger& logger) { logger.error() << "failed to load item price data\n"; });
+				logger.error() << "failed to load item price data\n";
 				return false;
 			}
 
-			log::buffer_logger log_buf;
-			*this = network::poe_watch::parse_item_price_data(api_data, log_buf);
-			logger([&log_buf](log::logger& logger) { log_buf.dump_to(logger); });
+			*this = network::poe_watch::parse_item_price_data(api_data, logger);
 			return true;
 		}
 		else {
-			logger([](log::logger& logger) { logger.error() << "unknown data source\n"; });
+			logger.error() << "unknown data source\n";
 			return false;
 		}
 	}
 	catch (const network::json_parse_error& e) {
-		logger([&e](log::logger& logger) { logger.error() << "failed to parse JSON file: " << e.what() << '\n'; });
+		logger.error() << "failed to parse JSON file: " << e.what() << '\n';
 	}
 	catch (const nlohmann::json::exception& e) {
 		// no need to add more text, nlohmann exceptions are verbose
-		logger([&e](log::logger& logger) { logger.error() << e.what() << '\n'; });
+		logger.error() << e.what() << '\n';
 	}
 
 	return false;
@@ -397,9 +392,9 @@ void item_price_data::sort()
 void compare_item_price_reports(
 	const item_price_report& lhs,
 	const item_price_report& rhs,
-	log::logger& log)
+	log::logger& logger)
 {
-	auto stream = log.info();
+	auto stream = logger.info();
 	stream << "left price data:\n" << lhs.metadata << "right price data:\n" << rhs.metadata;
 	compare_item_price_data(lhs.data, rhs.data, stream);
 }
@@ -419,7 +414,7 @@ nlohmann::json to_json(const item_price_metadata& metadata)
 	};
 }
 
-std::optional<item_price_metadata> from_json(const nlohmann::json& json, const log::monitor& logger)
+std::optional<item_price_metadata> from_json(const nlohmann::json& json, log::logger& logger)
 {
 	item_price_metadata data;
 	data.league_name = json.at(field_league_name).get<std::string>();
@@ -432,25 +427,21 @@ std::optional<item_price_metadata> from_json(const nlohmann::json& json, const l
 		data.data_source = *data_source;
 	}
 	else {
-		logger([&](log::logger& logger) {
-			logger.error() << "failed to parse data source from metadata file\n";
-		});
+		logger.error() << "failed to parse data source from metadata file\n";
 		return std::nullopt;
 	}
 
 	data.download_date = boost::posix_time::from_iso_string(
 		json.at(field_download_date).get_ref<const std::string&>());
 	if (data.download_date.is_special()) {
-		logger([&](log::logger& logger) {
-			logger.error() << "invalid date in metadata file\n";
-		});
+		logger.error() << "invalid date in metadata file\n";
 		return std::nullopt;
 	}
 
 	return data;
 }
 
-bool item_price_metadata::save(const std::filesystem::path& directory, const log::monitor& logger) const
+bool item_price_metadata::save(const std::filesystem::path& directory, log::logger& logger) const
 {
 	if (!utility::create_directories(directory, logger))
 		return false;
@@ -459,25 +450,21 @@ bool item_price_metadata::save(const std::filesystem::path& directory, const log
 	std::error_code ec = utility::save_file(path, utility::dump_json(to_json(*this)));
 
 	if (ec) {
-		logger([&](log::logger& logger) {
-			logger.error() << "failed to save " << path.generic_string() << ": " << ec.message() << '\n';
-		});
+		logger.error() << "failed to save " << path.generic_string() << ": " << ec.message() << '\n';
 		return false;
 	}
 
 	return true;
 }
 
-bool item_price_metadata::load(const std::filesystem::path& directory, const log::monitor& logger)
+bool item_price_metadata::load(const std::filesystem::path& directory, log::logger& logger)
 {
 	std::error_code ec;
 	const auto path = directory / filename_metadata;
 	std::string file_content = utility::load_file(path, ec);
 
 	if (ec) {
-		logger([&](log::logger& logger) {
-			logger.error() << "failed to load " << path.generic_string() << ": " << ec.message() << '\n';
-		});
+		logger.error() << "failed to load " << path.generic_string() << ": " << ec.message() << '\n';
 		return false;
 	}
 
@@ -487,9 +474,7 @@ bool item_price_metadata::load(const std::filesystem::path& directory, const log
 		std::optional<item_price_metadata> metadata = from_json(json, logger);
 
 		if (!metadata) {
-			logger([](log::logger& logger) {
-				logger.error() << "failed to parse metadata JSON file\n";
-			});
+			logger.error() << "failed to parse metadata JSON file\n";
 			return false;
 		}
 
@@ -497,9 +482,7 @@ bool item_price_metadata::load(const std::filesystem::path& directory, const log
 		return true;
 	}
 	catch (const std::exception& e) {
-		logger([&](log::logger& logger) {
-			logger.error() << "when reading " << path.generic_string() << ": " << e.what() << '\n';
-		});
+		logger.error() << "when reading " << path.generic_string() << ": " << e.what() << '\n';
 		return false;
 	}
 }
@@ -507,16 +490,16 @@ bool item_price_metadata::load(const std::filesystem::path& directory, const log
 std::optional<item_price_report>
 load_item_price_report(
 	const std::filesystem::path& directory,
-	const log::monitor& logger)
+	log::logger& logger)
 {
 	lang::item_price_report report;
 	if (!report.metadata.load(directory, logger)) {
-		logger([](log::logger& logger) { logger.error() << "failed to load item price metadata\n"; });
+		logger.error() << "failed to load item price metadata\n";
 		return std::nullopt;
 	}
 
 	if (!report.data.load_and_parse(report.metadata, directory, logger)) {
-		logger([&](log::logger& logger) { logger.error() << "failed to load item price data\n"; });
+		logger.error() << "failed to load item price data\n";
 		return std::nullopt;
 	}
 

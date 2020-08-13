@@ -2,7 +2,7 @@
 
 #include <fs/lang/item_price_data.hpp>
 #include <fs/network/download.hpp>
-#include <fs/log/monitor.hpp>
+#include <fs/log/logger.hpp>
 #include <fs/version.hpp>
 
 #include <boost/date_time/posix_time/posix_time_types.hpp>
@@ -24,7 +24,7 @@ public:
 		boost::posix_time::time_duration expiration_time,
 		network_settings settings,
 		download_info* info,
-		const log::monitor& logger);
+		log::logger& logger);
 
 
 	struct metadata_save
@@ -37,8 +37,8 @@ public:
 	void update_disk_cache(metadata_save metadata);
 	void update_memory_cache(lang::item_price_report report);
 
-	bool update_cache_file_on_disk(const log::monitor& logger) const;
-	bool load_cache_file_from_disk(const log::monitor& logger);
+	bool update_cache_file_on_disk(log::logger& logger) const;
+	bool load_cache_file_from_disk(log::logger& logger);
 
 private:
 	[[nodiscard]] std::optional<lang::item_price_report>

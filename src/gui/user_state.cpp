@@ -4,15 +4,12 @@
 #include <fs/generator/make_filter.hpp>
 #include <fs/network/poe_ninja/download_data.hpp>
 #include <fs/utility/file.hpp>
-#include <fs/log/monitor.hpp>
 
 void user_state::load_filter_template()
 {
-	filter.template_source = fs::utility::load_file(generation.filter_template_path, logger.monitor());
+	filter.template_source = fs::utility::load_file(generation.filter_template_path, logger.logger());
 	if (filter.template_source) {
-		logger.monitor()([this](fs::log::logger& logger) {
-			logger.info() << "loaded filter template, " << (*filter.template_source).size() << " bytes";
-		});
+		logger.logger().info() << "loaded filter template, " << (*filter.template_source).size() << " bytes";
 	}
 
 	parse_filter_template();
@@ -24,9 +21,7 @@ void user_state::parse_filter_template()
 		return;
 
 	auto& source = *filter.template_source;
-	logger.monitor()([this, &source](fs::log::logger& logger) {
-		filter.spirit_filter = fs::generator::sf::parse_spirit_filter(source, {}, logger);
-	});
+	filter.spirit_filter = fs::generator::sf::parse_spirit_filter(source, {}, logger.logger());
 
 	recompute_real_filter();
 }
@@ -36,9 +31,7 @@ void user_state::recompute_real_filter()
 	if (!filter.spirit_filter)
 		return;
 
-	logger.monitor()([this](fs::log::logger& logger) {
-		logger.info() << "recomputing filter";
-	});
+	logger.logger().info() << "recomputing filter";
 	filter.real_filter = fs::generator::make_filter(*filter.spirit_filter, generation.item_price_data_state.price_report.data);
 
 	regenerate_loot_preview();

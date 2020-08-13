@@ -3,7 +3,6 @@
 #include <fs/network/poe_ninja/parse_data.hpp>
 #include <fs/network/poe_watch/download_data.hpp>
 #include <fs/network/poe_watch/parse_data.hpp>
-#include <fs/log/buffer_logger.hpp>
 #include <fs/utility/assert.hpp>
 #include <fs/utility/async.hpp>
 #include <fs/utility/string_helpers.hpp>
@@ -101,11 +100,11 @@ std::future<lang::item_price_report>
 async_load_item_price_report(
 	item_price_report_cache& self,
 	item_price_report_cache::metadata_save meta,
-	const log::monitor& logger)
+	log::logger& logger)
 {
 	return std::async(
 		std::launch::async,
-		[](item_price_report_cache& self, item_price_report_cache::metadata_save meta, const log::monitor& logger) {
+		[](item_price_report_cache& self, item_price_report_cache::metadata_save meta, log::logger& logger) {
 			std::optional<lang::item_price_report> report = lang::load_item_price_report(meta.path, logger);
 			if (!report)
 				throw std::runtime_error("failed to load item price report from disk");
@@ -121,25 +120,19 @@ void save_api_data(
 	const T& api_data, // T must have save(dir, logger) overload
 	const lang::item_price_metadata& metadata,
 	const std::string& data_save_dir,
-	const log::monitor& logger)
+	log::logger& logger)
 {
 	if (!metadata.save(data_save_dir, logger)) {
-		logger([](log::logger& logger) {
-			logger.error() << "failed to save item price metadata\n";
-		});
+		logger.error() << "failed to save item price metadata\n";
 		return;
 	}
 
 	if (!api_data.save(data_save_dir, logger)) {
-		logger([](log::logger& logger) {
-			logger.error() << "failed to save item price data\n";
-		});
+		logger.error() << "failed to save item price data\n";
 		return;
 	}
 
-	logger([](log::logger& logger) {
-		logger.info() << "item price data successfully saved\n";
-	});
+	logger.info() << "item price data successfully saved\n";
 }
 
 std::future<lang::item_price_report>
@@ -148,11 +141,11 @@ async_download_and_parse_ninja(
 	std::string league,
 	network_settings settings,
 	download_info* info,
-	const log::monitor& logger)
+	log::logger& logger)
 {
 	return std::async(
 		std::launch::async,
-		[](item_price_report_cache& self, std::string league, network_settings settings, download_info* info, const log::monitor& logger) {
+		[](item_price_report_cache& self, std::string league, network_settings settings, download_info* info, log::logger& logger) {
 			poe_ninja::api_item_price_data api_data = poe_ninja::download_item_price_data(league, settings, info, logger);
 
 			lang::item_price_report report;
@@ -163,9 +156,7 @@ async_download_and_parse_ninja(
 			std::string save_path = make_save_path(lang::data_source_type::poe_ninja, league);
 			save_api_data(api_data, report.metadata, save_path, logger);
 
-			log::buffer_logger log_buf;
-			report.data = poe_ninja::parse_item_price_data(api_data, log_buf);
-			logger([&log_buf](log::logger& logger) { log_buf.dump_to(logger); });
+			report.data = poe_ninja::parse_item_price_data(api_data, logger);
 
 			self.update_memory_cache(report);
 			self.update_disk_cache({report.metadata, save_path, version::current()});
@@ -181,11 +172,11 @@ download_and_parse_watch(
 	std::string league,
 	network_settings settings,
 	download_info* info,
-	const log::monitor& logger)
+	log::logger& logger)
 {
 	return std::async(
 		std::launch::async,
-		[](item_price_report_cache& self, std::string league, network_settings settings, download_info* info, const log::monitor& logger) {
+		[](item_price_report_cache& self, std::string league, network_settings settings, download_info* info, log::logger& logger) {
 			poe_watch::api_item_price_data api_data = poe_watch::download_item_price_data(league, settings, info, logger);
 
 			lang::item_price_report report;
@@ -196,9 +187,7 @@ download_and_parse_watch(
 			std::string save_path = make_save_path(lang::data_source_type::poe_watch, league);
 			save_api_data(api_data, report.metadata, save_path, logger);
 
-			log::buffer_logger log_buf;
-			report.data = poe_watch::parse_item_price_data(api_data, log_buf);
-			logger([&log_buf](log::logger& logger) { log_buf.dump_to(logger); });
+			report.data = poe_watch::parse_item_price_data(api_data, logger);
 
 			self.update_memory_cache(report);
 			self.update_disk_cache({report.metadata, save_path, version::current()});
@@ -219,7 +208,7 @@ item_price_report_cache::async_get_report(
 	boost::posix_time::time_duration expiration_time,
 	network_settings settings,
 	download_info* info,
-	const log::monitor& logger)
+	log::logger& logger)
 {
 	if (api == lang::data_source_type::none) {
 		return utility::make_ready_future<lang::item_price_report>(lang::item_price_report());
@@ -307,7 +296,7 @@ constexpr auto field_fs_version = "fs_version";
 
 constexpr auto cache_metadata_path = "cache/metadata.json";
 
-bool item_price_report_cache::update_cache_file_on_disk(const log::monitor& logger) const
+bool item_price_report_cache::update_cache_file_on_disk(log::logger& logger) const
 {
 	std::vector<metadata_save> saves = [this]() {
 		auto _ = std::lock_guard<std::mutex>(_disk_cache_mutex);
@@ -327,7 +316,7 @@ bool item_price_report_cache::update_cache_file_on_disk(const log::monitor& logg
 	return utility::save_file(cache_metadata_path, utility::dump_json(json), logger);
 }
 
-bool item_price_report_cache::load_cache_file_from_disk(const log::monitor& logger)
+bool item_price_report_cache::load_cache_file_from_disk(log::logger& logger)
 {
 	if (!std::filesystem::exists(cache_metadata_path)) {
 		// no recent cache file - behave as if it was empty and return success immediately
@@ -345,7 +334,7 @@ bool item_price_report_cache::load_cache_file_from_disk(const log::monitor& logg
 	for (const auto& obj : json) {
 		std::optional<lang::item_price_metadata> meta = lang::from_json(obj, logger);
 		if (!meta) {
-			logger([](log::logger& logger) { logger.error() << "failed to parse metadata\n"; });
+			logger.error() << "failed to parse metadata\n";
 			return false;
 		}
 

@@ -5,22 +5,35 @@
 namespace fs::log
 {
 
-message_stream::message_stream(severity s, logger& log)
-: log(&log)
+message_stream::message_stream(severity s, logger& l)
+: _logger(&l)
 {
-	log.begin_message(s);
+	_logger->begin_logging();
+	_logger->begin_message(s);
 }
 
 message_stream::~message_stream()
 {
-	if (log)
-		log->end_message();
+	if (_logger) {
+		_logger->end_message();
+		_logger->end_logging();
+	}
 }
 
 void swap(message_stream& lhs, message_stream& rhs) noexcept
 {
 	using std::swap;
-	swap(lhs.log, rhs.log);
+	swap(lhs._logger, rhs._logger);
+}
+
+message_stream& operator<<(message_stream& stream, severity s)
+{
+	if (stream._logger) {
+		stream._logger->end_message();
+		stream._logger->begin_message(s);
+	}
+
+	return stream;
 }
 
 void message_stream::print_line_number(int line_number)

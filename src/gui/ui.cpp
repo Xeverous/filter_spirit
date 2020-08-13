@@ -158,9 +158,7 @@ void update_download_state(
 
 		league_selection_menu.subject(make_league_selection_menu(state));
 		league_selection_refresh_element.select(1); // swicth to refresh button
-		state.logger.monitor()([&available_leagues](fs::log::logger& logger) {
-			logger.info() << available_leagues.size() << " non-SSF leagues are available\n";
-		});
+		state.logger.logger().info() << available_leagues.size() << " non-SSF leagues are available\n";
 	}
 	else {
 		const auto xfer_info = state.generation.league_state.league_download_info.xfer_info.load(std::memory_order_relaxed);
@@ -228,7 +226,7 @@ auto make_builtin_options_api_selection(user_state& state)
 		league_selection_refresh_progress_bar->value(0);
 
 		state.generation.league_state.leagues_future = fs::network::ggg::async_download_leagues(
-			state.program.networking, &state.generation.league_state.league_download_info, state.logger.monitor());
+			state.program.networking, &state.generation.league_state.league_download_info, state.logger.logger());
 		state.generation.league_state.download_running = true;
 	};
 	league_selection_refresh_button->on_click = [&state](bool) {
@@ -269,7 +267,7 @@ auto make_builtin_options_api_selection(user_state& state)
 			expiration_time,
 			state.program.networking,
 			&state.generation.item_price_data_state.download_info,
-			state.logger.monitor());
+			state.logger.logger());
 		state.generation.item_price_data_state.download_running = true;
 		item_price_data_status_label->set_text("downloading...");
 	};
@@ -358,12 +356,7 @@ auto make_tab_main_logs(user_state& state)
 {
 	auto log_container = el::share(el::vtile_composite());
 
-	auto scroller = el::share(el::vscroller(
-		el::layer(
-			el::hold(log_container),
-			el::box(el::colors::black)
-		)
-	));
+	auto scroller = el::share(el::vscroller(el::hold(log_container)));
 
 	auto scroll_to_bottom = [scroller]() {
 		scroller->valign(1.0);
@@ -377,7 +370,10 @@ auto make_tab_main_logs(user_state& state)
 
 	return
 		el::vtile(
-			el::hold(scroller),
+			el::layer(
+				el::hold(scroller),
+				el::box(el::colors::black)
+			),
 			el::htile(
 				make_button(el::icons::docs, "copy logs", [](bool){}),
 				make_button(el::icons::cancel, "clear logs", clear_logs)

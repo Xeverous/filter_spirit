@@ -1,6 +1,6 @@
 #pragma once
 
-#include <fs/log/monitor.hpp>
+#include <fs/log/logger.hpp>
 #include <fs/lang/data_source_type.hpp>
 
 #include <nlohmann/json.hpp>
@@ -104,7 +104,7 @@ struct item_price_data
 	load_and_parse(
 		const item_price_metadata& metadata,
 		const std::filesystem::path& directory_path,
-		const log::monitor& logger);
+		log::logger& logger);
 
 	/**
 	 * @brief sort all non-unique item categories by name
@@ -141,12 +141,12 @@ struct item_price_data
 log::message_stream& operator<<(log::message_stream& stream, const item_price_data& ipd);
 
 nlohmann::json to_json(const item_price_metadata& metadata);
-std::optional<item_price_metadata> from_json(const nlohmann::json& object, const log::monitor& logger);
+std::optional<item_price_metadata> from_json(const nlohmann::json& object, log::logger& logger);
 
 struct item_price_metadata
 {
-	[[nodiscard]] bool save(const std::filesystem::path& directory, const log::monitor& logger) const;
-	[[nodiscard]] bool load(const std::filesystem::path& directory, const log::monitor& logger);
+	[[nodiscard]] bool save(const std::filesystem::path& directory, log::logger& logger) const;
+	[[nodiscard]] bool load(const std::filesystem::path& directory, log::logger& logger);
 
 	std::string league_name = "(none)";
 	data_source_type data_source = data_source_type::none;
@@ -166,7 +166,7 @@ log::message_stream& operator<<(log::message_stream& stream, const item_price_re
 std::optional<item_price_report>
 load_item_price_report(
 	const std::filesystem::path& directory,
-	const log::monitor& logger);
+	log::logger& logger);
 
 /**
  * Produce logs about differences in 2 item data sets
@@ -176,5 +176,5 @@ load_item_price_report(
 void compare_item_price_reports(
 	const item_price_report& lhs,
 	const item_price_report& rhs,
-	log::logger& log);
+	log::logger& logger);
 }

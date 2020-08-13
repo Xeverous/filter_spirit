@@ -91,7 +91,7 @@ target_sources(filter_spirit
 		fs/log/logger.hpp
 		fs/log/null_logger.hpp
 		fs/log/structure_printer.hpp
-		fs/log/monitor.hpp
+		fs/log/thread_safe_logger.hpp
 		fs/network/url_encode.hpp
 		fs/network/exceptions.hpp
 		fs/network/download.hpp

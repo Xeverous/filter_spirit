@@ -1,6 +1,6 @@
 #pragma once
 
-#include <fs/log/monitor.hpp>
+#include <fs/log/logger.hpp>
 
 #include <string_view>
 #include <string>
@@ -171,9 +171,9 @@ struct map_fragments_database
 // stores all information required to generate example items
 struct item_database
 {
-	bool parse(std::string_view items_metadata_json, const log::monitor& mon);
+	bool parse(std::string_view items_metadata_json, log::logger& logger);
 
-	void print_stats(const log::monitor& mon) const;
+	void print_stats(log::logger& logger) const;
 
 	currency_item_database currency;
 	equippable_item_database equipment;
