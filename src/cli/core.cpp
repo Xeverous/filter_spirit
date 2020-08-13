@@ -22,8 +22,7 @@ bool generate_item_filter_impl(
 	fs::generator::settings st,
 	log::logger& logger)
 {
-	log::monitor mon(logger);
-	std::optional<std::string> source_file_content = utility::load_file(source_filepath, mon);
+	std::optional<std::string> source_file_content = utility::load_file(source_filepath, logger);
 
 	if (!source_file_content)
 		return false;
@@ -34,7 +33,7 @@ bool generate_item_filter_impl(
 	if (!filter_content)
 		return false;
 
-	if (utility::save_file(output_filepath, *filter_content, mon)) {
+	if (utility::save_file(output_filepath, *filter_content, logger)) {
 		logger.info() << "item filter successfully saved as " << output_filepath.generic_string() << '\n';
 		return true;
 	}
@@ -47,8 +46,7 @@ bool generate_item_filter_impl(
 
 void list_leagues(network::network_settings net_settings, log::logger& logger)
 {
-	log::monitor mon(logger);
-	const auto league_data = network::ggg::async_download_leagues(std::move(net_settings), nullptr, mon).get();
+	const auto league_data = network::ggg::async_download_leagues(std::move(net_settings), nullptr, logger).get();
 	const std::vector<lang::league> leagues = network::ggg::parse_league_info(league_data);
 
 	auto stream = logger.info();
@@ -75,13 +73,12 @@ obtain_item_price_report(
 		return std::nullopt;
 	}
 
-	log::monitor mon(logger);
 	if (data_read_dir) {
-		return lang::load_item_price_report(*data_read_dir, mon);
+		return lang::load_item_price_report(*data_read_dir, logger);
 	}
 
 	network::item_price_report_cache cache;
-	cache.load_cache_file_from_disk(mon);
+	cache.load_cache_file_from_disk(logger);
 	if (download_league_name_ninja) {
 		return cache.async_get_report(
 			std::move(*download_league_name_ninja),
@@ -89,7 +86,7 @@ obtain_item_price_report(
 			expiration_time,
 			std::move(net_settings),
 			nullptr,
-			mon).get();
+			logger).get();
 	}
 	else if (download_league_name_watch) {
 		return cache.async_get_report(
@@ -98,7 +95,7 @@ obtain_item_price_report(
 			expiration_time,
 			std::move(net_settings),
 			nullptr,
-			mon).get();
+			logger).get();
 	}
 
 	logger.error() << "no option specified how to obtain item price data\n";
@@ -134,8 +131,7 @@ int print_item_price_report(
 	const std::string& path,
 	fs::log::logger& logger)
 {
-	log::monitor mon(logger);
-	std::optional<lang::item_price_report> report = lang::load_item_price_report(path, mon);
+	std::optional<lang::item_price_report> report = lang::load_item_price_report(path, logger);
 	if (!report) {
 		return EXIT_FAILURE;
 	}
@@ -154,13 +150,12 @@ int compare_data_saves(
 		return EXIT_FAILURE;
 	}
 
-	log::monitor mon(logger);
-	std::optional<lang::item_price_report> report_lhs = lang::load_item_price_report(paths[0], mon);
+	std::optional<lang::item_price_report> report_lhs = lang::load_item_price_report(paths[0], logger);
 	if (!report_lhs) {
 		return EXIT_FAILURE;
 	}
 
-	std::optional<lang::item_price_report> report_rhs = lang::load_item_price_report(paths[1], mon);
+	std::optional<lang::item_price_report> report_rhs = lang::load_item_price_report(paths[1], logger);
 	if (!report_rhs) {
 		return EXIT_FAILURE;
 	}

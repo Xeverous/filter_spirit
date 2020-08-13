@@ -2,7 +2,7 @@
 
 #include <fs/network/ggg/api_data.hpp>
 #include <fs/network/download.hpp>
-#include <fs/log/monitor.hpp>
+#include <fs/log/logger.hpp>
 
 #include <future>
 
@@ -13,6 +13,6 @@ namespace fs::network::ggg
 async_download_leagues(
 	network_settings settings,
 	download_info* info,
-	const log::monitor& logger);
+	log::logger& logger);
 
 }

@@ -20,9 +20,9 @@ std::future<api_league_data>
 async_download_leagues(
 	network_settings settings,
 	download_info* info,
-	const log::monitor& logger)
+	log::logger& logger)
 {
-	return std::async(std::launch::async, [](network_settings settings, download_info* info, const log::monitor& logger) {
+	return std::async(std::launch::async, [](network_settings settings, download_info* info, log::logger& logger) {
 		std::vector<std::string> urls = { "https://api.poe.watch/leagues" };
 		download_result result = download(target_name, urls, std::move(settings), info, logger);
 		return api_league_data{std::move(result.results[0].data)};
@@ -34,7 +34,7 @@ download_item_price_data(
 	const std::string& league_name,
 	const network_settings& settings,
 	download_info* info,
-	const log::monitor& logger)
+	log::logger& logger)
 {
 	std::vector<std::string> urls = {
 		"https://api.poe.watch/itemdata",

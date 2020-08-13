@@ -20,9 +20,9 @@ std::future<api_league_data>
 async_download_leagues(
 	network_settings settings,
 	download_info* info,
-	const log::monitor& logger)
+	log::logger& logger)
 {
-	return std::async(std::launch::async, [](network_settings settings, download_info* info, const log::monitor& logger) {
+	return std::async(std::launch::async, [](network_settings settings, download_info* info, log::logger& logger) {
 		std::vector<std::string> urls = { leagues_url };
 		download_result result = download("api.pathofexile.com", urls, std::move(settings), info, logger);
 		return api_league_data{std::move(result.results[0].data)};

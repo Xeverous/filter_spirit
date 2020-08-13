@@ -57,7 +57,7 @@ namespace fs::network::poe_ninja
 	MACRO(unique_accessory, filename_unique_accessory) \
 	MACRO(beast, filename_beast)
 
-bool api_item_price_data::save(const std::filesystem::path& directory, const log::monitor& logger) const
+bool api_item_price_data::save(const std::filesystem::path& directory, log::logger& logger) const
 {
 #define SAVE(member_var, file_name) \
 	if (!utility::save_file(directory / file_name, member_var, logger)) {\
@@ -70,7 +70,7 @@ bool api_item_price_data::save(const std::filesystem::path& directory, const log
 	return true;
 }
 
-bool api_item_price_data::load(const std::filesystem::path& directory, const log::monitor& logger)
+bool api_item_price_data::load(const std::filesystem::path& directory, log::logger& logger)
 {
 	std::optional<std::string> file_contents;
 #define LOAD(member_var, file_name) \

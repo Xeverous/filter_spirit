@@ -1,7 +1,6 @@
 #pragma once
 
 #include <fs/log/logger.hpp>
-#include <fs/log/monitor.hpp>
 
 #include <atomic>
 #include <future>
@@ -60,6 +59,6 @@ download(
 	const std::vector<std::string>& urls,
 	const network_settings& settings,
 	download_info* info,
-	const fs::log::monitor& logger);
+	log::logger& logger);
 
 }

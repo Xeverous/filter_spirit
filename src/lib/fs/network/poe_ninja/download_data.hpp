@@ -2,7 +2,7 @@
 
 #include <fs/network/poe_ninja/api_data.hpp>
 #include <fs/network/download.hpp>
-#include <fs/log/monitor.hpp>
+#include <fs/log/logger.hpp>
 
 #include <string>
 
@@ -14,6 +14,6 @@ download_item_price_data(
 	const std::string& league_name,
 	const network_settings& settings,
 	download_info* info,
-	const log::monitor& logger);
+	log::logger& logger);
 
 }

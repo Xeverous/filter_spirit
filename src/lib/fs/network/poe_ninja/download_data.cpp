@@ -23,7 +23,7 @@ download_item_price_data(
 	const std::string& league_name,
 	const network_settings& settings,
 	download_info* info,
-	const log::monitor& logger)
+	log::logger& logger)
 {
 	std::string league_encoded = url_encode(league_name);
 

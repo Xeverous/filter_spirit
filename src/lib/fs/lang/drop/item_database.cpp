@@ -288,14 +288,12 @@ void expect_unreleased_item(const nlohmann::json& metadata_entry)
 
 namespace fs::lang::drop {
 
-bool item_database::parse(std::string_view items_metadata_json, const log::monitor& mon)
+bool item_database::parse(std::string_view items_metadata_json, log::logger& logger)
 {
 	const auto json = nlohmann::json::parse(items_metadata_json);
 
 	if (!json.is_object()) {
-		mon([](log::logger& logger) {
-			logger.error() << "items metadata JSON expected to be an object but is not!\n";
-		});
+		logger.error() << "items metadata JSON expected to be an object but is not!\n";
 		return false;
 	}
 
@@ -817,10 +815,8 @@ bool item_database::parse(std::string_view items_metadata_json, const log::monit
 			}
 		}
 		catch (const std::exception& e) {
-			mon([&](log::logger& logger) {
-				logger.error() << e.what() << "\n";
-				logger.info() << "skipping this metadata item \"" << path << "\": " << utility::dump_json(item_entry) << "\n";
-			});
+			logger.error() << e.what() << "\n" << log::severity::info << "skipping this metadata item \""
+				<< path << "\": " << utility::dump_json(item_entry) << "\n";
 		}
 	}
 

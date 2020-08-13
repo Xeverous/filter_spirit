@@ -124,12 +124,10 @@ setup_download(
 
 void
 log_download(
-	const fs::log::monitor& logger,
+	fs::log::logger& logger,
 	std::string_view target_url)
 {
-	logger([target_url](fs::log::logger& logger) {
-		logger.info() << "downloading from " << target_url << '\n';
-	});
+	logger.info() << "downloading from " << target_url << '\n';
 }
 
 } // namespace
@@ -142,7 +140,7 @@ download(
 	const std::vector<std::string>& urls,
 	const network_settings& settings,
 	download_info* info,
-	const fs::log::monitor& logger)
+	log::logger& logger)
 {
 	std::vector<request_result> results(urls.size());
 	curl::easy_handle easy;

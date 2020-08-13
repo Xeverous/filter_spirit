@@ -1,6 +1,6 @@
 #pragma once
 
-#include <fs/log/monitor.hpp>
+#include <fs/log/logger.hpp>
 
 #include <filesystem>
 #include <system_error>
@@ -13,14 +13,14 @@ namespace fs::utility
 [[nodiscard]] std::string
 load_file(const std::filesystem::path& path, std::error_code& ec);
 [[nodiscard]] std::optional<std::string>
-load_file(const std::filesystem::path& path, const log::monitor& logger);
+load_file(const std::filesystem::path& path, log::logger& logger);
 
 [[nodiscard]] std::error_code
 save_file(const std::filesystem::path& path, std::string_view file_contents);
 [[nodiscard]] bool
-save_file(const std::filesystem::path& path, std::string_view file_contents, const log::monitor& logger);
+save_file(const std::filesystem::path& path, std::string_view file_contents, log::logger& logger);
 
 [[nodiscard]] bool
-create_directories(const std::filesystem::path& dirpath, const log::monitor& logger);
+create_directories(const std::filesystem::path& dirpath, log::logger& logger);
 
 }

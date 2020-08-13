@@ -6,21 +6,6 @@
 #include <cstdint>
 #include <utility>
 
-/**
- * how to use a logger:
- *
- * convenience syntax for whole messages in 1 statement:
- *
- *     logger.warning() << str << num << "text";
- *
- * manual input:
- *
- *     logger.begin_warning_message();
- *     logger.add(str)
- *     logger << num << "text";
- *     logger.end_message();
- */
-
 namespace fs::log
 {
 
@@ -36,7 +21,7 @@ class logger;
 class message_stream
 {
 public:
-	message_stream(severity s, logger& log);
+	message_stream(severity s, logger& l);
 	~message_stream();
 
 	friend void swap(message_stream& lhs, message_stream& rhs) noexcept;
@@ -60,6 +45,8 @@ public:
 	// said differently, log.error() returns a message_stream rvalue and we want to support immediate << on it
 	template <typename T>
 	message_stream& operator<<(const T& val);
+
+	friend message_stream& operator<<(message_stream& stream, severity s);
 
 	void print_line_number(int line_number);
 
@@ -126,9 +113,9 @@ public:
 
 private:
 	message_stream()
-	: log(nullptr) {}
+	: _logger(nullptr) {}
 
-	logger* log;
+	logger* _logger;
 };
 
 /**
@@ -141,25 +128,28 @@ class logger
 public:
 	virtual ~logger() = default;
 
-	[[nodiscard]] message_stream info()
-	{
-		return message_stream(severity::info, *this);
-	}
-
-	[[nodiscard]] message_stream warning()
-	{
-		return message_stream(severity::warning, *this);
-	}
-
-	[[nodiscard]] message_stream error()
-	{
-		return message_stream(severity::error, *this);
-	}
-
 	[[nodiscard]] message_stream message(severity s)
 	{
 		return message_stream(s, *this);
 	}
+
+	[[nodiscard]] message_stream info()
+	{
+		return message(severity::info);
+	}
+
+	[[nodiscard]] message_stream warning()
+	{
+		return message(severity::warning);
+	}
+
+	[[nodiscard]] message_stream error()
+	{
+		return message(severity::error);
+	}
+
+	virtual void begin_logging() {}
+	virtual void end_logging() {}
 
 	virtual void add(std::string_view text) = 0;
 	virtual void add(char character) = 0;
@@ -172,8 +162,9 @@ public:
 	void add(std::uint32_t number) { add(static_cast<std::uint64_t>(number)); }
 	void add(std::uint16_t number) { add(static_cast<std::uint64_t>(number)); }
 
-private:
+protected:
 	friend class message_stream;
+	friend message_stream& operator<<(message_stream& stream, severity s);
 
 	virtual void begin_message(severity s) = 0;
 	virtual void end_message() = 0;
@@ -182,8 +173,8 @@ private:
 template <typename T>
 message_stream& message_stream::operator<<(const T& val)
 {
-	if (log)
-		log->add(val);
+	if (_logger)
+		_logger->add(val);
 
 	return *this;
 }
