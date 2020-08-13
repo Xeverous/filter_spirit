@@ -28,5 +28,5 @@ private:
 void
 make_and_bind_user_interface(
 	cycfi::elements::host_window_handle window,
-	view& v,
+	cycfi::elements::view& v,
 	user_state& state);

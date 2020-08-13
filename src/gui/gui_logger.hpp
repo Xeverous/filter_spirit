@@ -8,6 +8,7 @@
 
 #include <memory>
 #include <utility>
+#include <functional>
 
 class gui_logger
 {
@@ -19,10 +20,10 @@ public:
 
 	// This is a bit ugly (should be done in the constructor) but needs to be done
 	// later to avoid cyclic dependency between state and UI code.
-	void set_ui_elements(std::shared_ptr<cycfi::elements::vtile_composite> ui_element, cycfi::elements::view& view)
+	void set_ui_elements(std::shared_ptr<cycfi::elements::vtile_composite> ui_element, std::function<void()> scroll_to_bottom)
 	{
 		_ui_element = std::move(ui_element);
-		_view = &view;
+		_scroll_to_bottom = std::move(scroll_to_bottom);
 	}
 
 	void update()
@@ -51,5 +52,5 @@ private:
 	fs::log::buffer_logger _; // should never be used directly
 	fs::log::monitor _monitor;
 	std::shared_ptr<cycfi::elements::vtile_composite> _ui_element;
-	cycfi::elements::view* _view = nullptr;
+	std::function<void()> _scroll_to_bottom;
 };

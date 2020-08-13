@@ -40,12 +40,9 @@ std::string remove_trailing_whitespace(std::string str)
 void gui_logger::update_ui()
 {
 	BOOST_ASSERT(_ui_element != nullptr);
-	BOOST_ASSERT(_view != nullptr);
+	BOOST_ASSERT(_scroll_to_bottom);
 
-	bool needs_refresh = _logger([&](fs::log::buffer_logger& logger) {
-		if (logger.messages().empty())
-			return false;
-
+	_logger([&](fs::log::buffer_logger& logger) {
 		for (const fs::log::buffer_logger::message& m : logger.messages()) {
 			_ui_element->push_back(el::share(
 				el::no_vstretch(el::align_left(el::static_text_box(
@@ -57,12 +54,12 @@ void gui_logger::update_ui()
 			));
 		}
 
-		logger.clear();
-		return true;
-	});
+		// scroll only when new logs appear
+		if (!logger.messages().empty())
+			_scroll_to_bottom();
 
-	if (needs_refresh)
-		_view->refresh();
+		logger.clear();
+	});
 }
 
 void gui_logger::clear_logs()
@@ -71,5 +68,4 @@ void gui_logger::clear_logs()
 		logger.clear();
 	});
 	_ui_element->clear();
-	_view->refresh();
 }

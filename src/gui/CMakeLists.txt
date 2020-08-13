@@ -15,6 +15,8 @@ target_sources(filter_spirit_gui
 		user_state.cpp
 		gui_logger.hpp
 		gui_logger.cpp
+		item_preview.hpp
+		item_preview.cpp
 		platform/modal_dialogs.hpp
 )
 

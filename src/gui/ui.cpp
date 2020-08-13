@@ -1,5 +1,6 @@
 #include "ui.hpp"
 #include "user_state.hpp"
+#include "item_preview.hpp"
 #include "platform/modal_dialogs.hpp"
 
 #include <elements/support.hpp>
@@ -353,10 +354,22 @@ auto make_filter_supplied_options()
 		)));
 }
 
-auto make_tab_main_logs(view& v, user_state& state)
+auto make_tab_main_logs(user_state& state)
 {
 	auto log_container = el::share(el::vtile_composite());
-	state.logger.set_ui_elements(log_container, v);
+
+	auto scroller = el::share(el::vscroller(
+		el::layer(
+			el::hold(log_container),
+			el::box(el::colors::black)
+		)
+	));
+
+	auto scroll_to_bottom = [scroller]() {
+		scroller->valign(1.0);
+	};
+
+	state.logger.set_ui_elements(log_container, scroll_to_bottom);
 
 	auto clear_logs = [&state](bool) mutable {
 		state.logger.clear_logs();
@@ -364,23 +377,28 @@ auto make_tab_main_logs(view& v, user_state& state)
 
 	return
 		el::vtile(
-			el::vscroller(
-				el::min_size(
-					{800, 150},
-					el::layer(
-						el::hold(std::move(log_container)),
-						el::box(el::colors::black)
-					)
-				)
-			),
-			el::align_right(el::no_hstretch(el::htile(
+			el::hold(scroller),
+			el::htile(
 				make_button(el::icons::docs, "copy logs", [](bool){}),
 				make_button(el::icons::cancel, "clear logs", clear_logs)
-			)))
+			)
 		);
 }
 
-auto make_tab_main(el::host_window_handle window, view& v, user_state& state)
+auto make_tab_main_loot_preview()
+{
+	static auto flow_composite = el::flow_composite{};
+	flow_composite.push_back(share(item_preview("item preview", el::color(255, 0, 0), el::color(255, 0, 0), el::color(0, 255, 0))));
+
+	return el::group("loot preview", el::margin(group_margin_size(),
+		el::htile(
+			el::no_hstretch(el::vtile(el::button("generate loot"))),
+			el::align_top(el::flow(flow_composite))
+		)
+	));
+}
+
+auto make_tab_main(el::host_window_handle window, user_state& state)
 {
 	return
 		el::vtile(
@@ -390,9 +408,9 @@ auto make_tab_main(el::host_window_handle window, view& v, user_state& state)
 					make_builtin_options(state),
 					make_filter_supplied_options()
 				),
-				el::group("loot preview", el::align_center_middle(el::label("TODO").font_size(100)))
+				make_tab_main_loot_preview()
 			),
-			el::top_margin(3.0f, make_tab_main_logs(v, state))
+			el::top_margin(3.0f, make_tab_main_logs(state))
 		);
 }
 
@@ -464,13 +482,13 @@ auto make_tab(std::string text)
 auto
 make_user_interface(
 	el::host_window_handle window,
-	view& v,
+	el::view& v,
 	user_state& state)
 {
 	return el::vnotebook(
 		v,
 		el::deck(
-			make_page(make_tab_main(window, v, state)),
+			make_page(make_tab_main(window, state)),
 			make_page(make_tab_reference()),
 			make_page(make_tab_settings()),
 			make_page(make_tab_about())
@@ -486,7 +504,7 @@ make_user_interface(
 void
 make_and_bind_user_interface(
 	el::host_window_handle window,
-	view& v,
+	el::view& v,
 	user_state& state)
 {
 	v.content(
