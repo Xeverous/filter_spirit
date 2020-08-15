@@ -6,6 +6,8 @@
 #include <string_view>
 #include <optional>
 #include <algorithm>
+#include <exception>
+#include <stdexcept>
 
 namespace {
 
@@ -124,15 +126,9 @@ parse_elementary_item(
 	result.metadata_path = metadata_path;
 	result.name = metadata_entry.at("name").get<string_t>();
 	result.drop_level = metadata_entry.at("drop_level").get<int>();
+	result.width = metadata_entry.at("inventory_width").get<int>();
+	result.height = metadata_entry.at("inventory_height").get<int>();
 	return result;
-}
-
-loot::sizeable_item parse_item_size(const nlohmann::json& metadata_entry)
-{
-	return loot::sizeable_item{
-		metadata_entry.at("inventory_width").get<int>(),
-		metadata_entry.at("inventory_height").get<int>()
-	};
 }
 
 // metadata contains no information on item sockets, therefore this function requires max_sockets argument
@@ -156,9 +152,7 @@ parse_equippable_item(
 
 	loot::equippable_item result;
 	static_cast<loot::elementary_item&>(result) = std::move(*elem_item);
-	static_cast<loot::sizeable_item&>(result) = parse_item_size(metadata_entry);
 	result.is_atlas_base_type = tags_contains_tag(metadata_entry.at("tags"), "atlas_base_type");
-	result.has_abyss_socket = implicits_contains_implicit(metadata_entry.at("implicits"), "AbyssJewelSocketImplicit");
 
 	if (has_has_one_socket_implicit(metadata_entry.at("implicits")))
 		result.max_sockets = 1;
@@ -195,7 +189,6 @@ parse_gem(
 	loot::gem result;
 	static_cast<loot::elementary_item&>(result) = std::move(*elem_item);
 	result.max_level = get_max_gem_level(result.name, metadata_entry.at("tags"));
-	result.is_vaal_gem = utility::contains(result.name, "Vaal");
 	return result;
 }
 
@@ -225,7 +218,6 @@ parse_resonator(
 
 	loot::resonator result;
 	static_cast<loot::currency_item&>(result) = std::move(*curr_item);
-	static_cast<loot::sizeable_item&>(result) = parse_item_size(metadata_entry);
 	result.delve_sockets = get_resonator_socket_count(result.name);
 	return result;
 }
@@ -245,36 +237,6 @@ parse_map(
 	loot::map result;
 	static_cast<loot::elementary_item&>(result) = std::move(*elem_item);
 	// result.map_tier = get_map_tier(result.drop_level);
-	return result;
-}
-
-[[nodiscard]] std::optional<loot::quest_item>
-parse_quest_item(
-	std::string_view metadata_path,
-	const nlohmann::json& metadata_entry)
-{
-	std::optional<loot::elementary_item> elem_item = parse_elementary_item(metadata_path, metadata_entry);
-	if (!elem_item)
-		return std::nullopt;
-
-	loot::quest_item result;
-	static_cast<loot::elementary_item&>(result) = std::move(*elem_item);
-	static_cast<loot::sizeable_item&>(result) = parse_item_size(metadata_entry);
-	return result;
-}
-
-[[nodiscard]] std::optional<loot::unique_piece>
-parse_unique_piece(
-	std::string_view metadata_path,
-	const nlohmann::json& metadata_entry)
-{
-	std::optional<loot::elementary_item> elem_item = parse_elementary_item(metadata_path, metadata_entry);
-	if (!elem_item)
-		return std::nullopt;
-
-	loot::unique_piece result;
-	static_cast<loot::elementary_item&>(result) = std::move(*elem_item);
-	static_cast<loot::sizeable_item&>(result) = parse_item_size(metadata_entry);
 	return result;
 }
 
@@ -339,8 +301,18 @@ bool item_database::parse(std::string_view items_metadata_json, log::logger& log
 			}
 			else if (dir == "Belts") {
 				std::optional<equippable_item> eq_item = parse_equippable_item(path, item_entry, 0);
-				if (eq_item)
+				if (!eq_item)
+					continue;
+
+				if (implicits_contains_implicit(item_entry.at("implicits"), "AbyssJewelSocketImplicit")) {
+					if ((*eq_item).name != "Stygian Vise")
+						throw std::runtime_error("unknown item with an abyss socket implicit");
+
+					equipment.stygian_vise = std::move(*eq_item);
+				}
+				else {
 					equipment.belts.push_back(std::move(*eq_item));
+				}
 			}
 			else if (dir == "Armours") {
 				dir = walker.next_dir();
@@ -626,7 +598,10 @@ bool item_database::parse(std::string_view items_metadata_json, log::logger& log
 
 				const auto filename = walker.filename();
 				if (utility::starts_with(filename, "SkillGem")) {
-					gems.active_gems.push_back(std::move(*gm));
+					if (utility::contains((*gm).name, "Vaal"))
+						gems.vaal_active_gems.push_back(std::move(*gm));
+					else
+						gems.active_gems.push_back(std::move(*gm));
 				}
 				else if (utility::starts_with(filename, "SupportGem")) {
 					if (utility::starts_with((*gm).name, "Awakened"))
@@ -784,7 +759,7 @@ bool item_database::parse(std::string_view items_metadata_json, log::logger& log
 					labyrinth_trinkets.push_back(std::move(*elem_item));
 				}
 
-				std::optional<quest_item> q_item = parse_quest_item(path, item_entry);
+				std::optional<elementary_item> q_item = parse_elementary_item(path, item_entry);
 				if (!q_item)
 					continue;
 
@@ -804,7 +779,7 @@ bool item_database::parse(std::string_view items_metadata_json, log::logger& log
 					map_fragments.ordinary_scarabs.push_back(std::move(*elem_item));
 			}
 			else if (dir == "UniqueFragments") {
-				std::optional<unique_piece> piece = parse_unique_piece(path, item_entry);
+				std::optional<elementary_item> piece = parse_elementary_item(path, item_entry);
 				if (!piece)
 					continue;
 
@@ -876,6 +851,7 @@ log::message_stream& operator<<(log::message_stream& stream, const item_database
 		"amulets: " << db.equipment.amulets.size() << "\n"
 		"rings: " << db.equipment.rings.size() << "\n"
 		"belts: " << db.equipment.belts.size() << "\n"
+		"stygian vise: " << log_opt(db.equipment.stygian_vise) << "\n"
 		"talismans: " << db.equipment.talismans.size() << "\n"
 		"fishing rods: " << db.equipment.fishing_rods.size() << "\n"
 		"flasks:\n"
@@ -890,6 +866,7 @@ log::message_stream& operator<<(log::message_stream& stream, const item_database
 		"cluster jewels: " << db.jewels.cluster_jewels.size() << "\n"
 		"gems:\n"
 		"active gems: " << db.gems.active_gems.size() << "\n"
+		"vaal active gems: " << db.gems.active_gems.size() << "\n"
 		"support gems: " << db.gems.support_gems.size() << "\n"
 		"awakened support gems: " << db.gems.awakened_support_gems.size() << "\n"
 		"fragments:\n"
