@@ -7,7 +7,7 @@
 #include <vector>
 #include <optional>
 
-namespace fs::lang::drop {
+namespace fs::lang::loot {
 
 struct elementary_item
 {
