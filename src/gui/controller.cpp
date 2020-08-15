@@ -56,6 +56,9 @@ void process_event(events::league_selection_changed /* event */, user_interface&
 
 void process_event(events::api_selection_changed /* event */, user_interface& ui)
 {
+	ui.main().builtin_options().league_selection().api_selection_changed(
+		ui.main().builtin_options().api_selection().selected_api());
+
 	refresh_market_data(ui, false);
 }
 

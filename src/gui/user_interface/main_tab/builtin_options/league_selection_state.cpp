@@ -12,7 +12,9 @@ namespace {
 
 auto make_league_selection_menu(const std::vector<std::string>& leagues, std::function<void(std::string_view)> on_select)
 {
-	return el::selection_menu(std::move(on_select), leagues).first;
+	auto menu = el::selection_menu(std::move(on_select), leagues);
+	menu.second->set_text("(choose)");
+	return menu.first;
 }
 
 }
@@ -62,6 +64,14 @@ void league_selection_state::refresh_available_leagues(fs::network::download_set
 	_download_running = true;
 }
 
+void league_selection_state::api_selection_changed(fs::lang::data_source_type api)
+{
+	if (api == fs::lang::data_source_type::none)
+		_league_selection_main_element->select(1); // switch to label
+	else
+		_league_selection_main_element->select(0); // switch to menu + button
+}
+
 std::shared_ptr<el::element> league_selection_state::make_ui()
 {
 	_league_selection_menu = el::share(make_proxy(make_league_selection_menu(_available_leagues, make_league_selection_callback())));
@@ -74,8 +84,14 @@ std::shared_ptr<el::element> league_selection_state::make_ui()
 	));
 	_league_selection_refresh_element->select(1); // start with refresh button
 
-	return el::share(el::htile(
-		el::hold(_league_selection_menu),
-		el::hold(_league_selection_refresh_element)
+	_league_selection_main_element = el::share(el::deck(
+		el::htile(
+			el::hold(_league_selection_menu),
+			el::hold(_league_selection_refresh_element)
+		),
+		el::align_middle(el::label("(no leagues to choose from)"))
 	));
+	_league_selection_main_element->select(0); // start with menu + button
+
+	return _league_selection_main_element;
 }

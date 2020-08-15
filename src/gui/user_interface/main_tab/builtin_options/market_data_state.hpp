@@ -31,6 +31,8 @@ public:
 	const auto& price_report() const { return _price_report; }
 
 private:
+	void refresh_status_label();
+
 	event_inserter _inserter;
 
 	// actual state

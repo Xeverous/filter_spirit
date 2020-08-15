@@ -3,6 +3,7 @@
 #include "event.hpp"
 
 #include <fs/network/ggg/download_data.hpp>
+#include <fs/lang/data_source_type.hpp>
 #include <fs/log/logger.hpp>
 
 #include <elements/element.hpp>
@@ -36,6 +37,8 @@ public:
 		return _available_leagues;
 	}
 
+	void api_selection_changed(fs::lang::data_source_type api);
+
 private:
 	std::function<void(std::string_view)> make_league_selection_callback();
 
@@ -51,6 +54,7 @@ private:
 	std::future<fs::network::ggg::api_league_data> _leagues_future;
 
 	// UI elements
+	std::shared_ptr<cycfi::elements::deck_element> _league_selection_main_element;
 	std::shared_ptr<cycfi::elements::deck_element> _league_selection_refresh_element;
 	std::shared_ptr<cycfi::elements::progress_bar_base> _league_selection_refresh_progress_bar;
 	std::shared_ptr<cycfi::elements::proxy<cycfi::elements::basic_menu>> _league_selection_menu;

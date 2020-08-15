@@ -9,6 +9,24 @@
 
 namespace el = cycfi::elements;
 
+void market_data_state::refresh_status_label()
+{
+	if (_price_report.metadata.data_source == fs::lang::data_source_type::none) {
+		_market_data_refresh_element->select(2); // switch to no-refresh label
+		_market_data_status_label->set_text("(no data)");
+		return;
+	}
+
+	_market_data_refresh_element->select(1); // switch to refresh button
+
+	const auto& download_date = _price_report.metadata.download_date;
+	if (!download_date.is_special()) {
+		const auto now = boost::posix_time::microsec_clock::universal_time();
+		const auto time_diff = now - download_date;
+		_market_data_status_label->set_text("using cached data from " + to_string(time_diff) + " ago");
+	}
+}
+
 void market_data_state::update()
 {
 	if (_download_running) {
@@ -18,10 +36,7 @@ void market_data_state::update()
 
 			_inserter.push_event(events::price_report_changed{});
 
-			if (_price_report.metadata.data_source == fs::lang::data_source_type::none)
-				_market_data_refresh_element->select(2); // switch to no-refresh label
-			else
-				_market_data_refresh_element->select(1); // switch to refresh button
+			refresh_status_label();
 		}
 		else {
 			const auto requests_complete = _download_info.requests_complete.load(std::memory_order_relaxed);
@@ -31,13 +46,7 @@ void market_data_state::update()
 	}
 	else {
 		// no update running - just update UI label
-		const auto& download_date = _price_report.metadata.download_date;
-
-		if (!download_date.is_special()) {
-			const auto now = boost::posix_time::microsec_clock::universal_time();
-			const auto time_diff = now - download_date;
-			_market_data_status_label->set_text("using cached data from " + to_string(time_diff) + " ago");
-		}
+		refresh_status_label();
 	}
 }
 
@@ -70,7 +79,7 @@ std::shared_ptr<cycfi::elements::element> market_data_state::make_ui()
 		make_refresh_button([this](bool) {
 			_inserter.push_event(events::refresh_market_data{});
 		}),
-		el::label("(nothing to refresh)")
+		el::align_middle(el::label("(nothing to refresh)"))
 	));
 	_market_data_refresh_element->select(1);
 
