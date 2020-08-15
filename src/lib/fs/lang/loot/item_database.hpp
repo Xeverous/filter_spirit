@@ -14,10 +14,6 @@ struct elementary_item
 	std::string metadata_path;
 	std::string name;
 	int drop_level = 1;
-};
-
-struct sizeable_item
-{
 	int width = 1;
 	int height = 1;
 };
@@ -27,17 +23,15 @@ struct currency_item : elementary_item
 	int max_stack_size = 1;
 };
 
-struct equippable_item : elementary_item, sizeable_item
+struct equippable_item : elementary_item
 {
 	int max_sockets = 0;
 	bool is_atlas_base_type = false;
-	bool has_abyss_socket = false;
 };
 
 struct gem : elementary_item
 {
 	int max_level = 20;
-	bool is_vaal_gem = false;
 };
 
 struct map : elementary_item
@@ -45,17 +39,9 @@ struct map : elementary_item
 	// int map_tier; // TODO: Metadata does not contain such information, parse MapSeriesTiers.dat
 };
 
-struct quest_item : elementary_item, sizeable_item
-{
-};
-
-struct resonator : currency_item, sizeable_item
+struct resonator : currency_item
 {
 	int delve_sockets = 1;
-};
-
-struct unique_piece : elementary_item, sizeable_item
-{
 };
 
 struct currency_item_database
@@ -115,6 +101,7 @@ struct equippable_item_database
 	std::vector<equippable_item> amulets;
 	std::vector<equippable_item> rings;
 	std::vector<equippable_item> belts;
+	std::optional<equippable_item> stygian_vise; // the only base with an abyss socket
 
 	// other
 	std::vector<equippable_item> talismans;
@@ -140,6 +127,7 @@ struct jewel_database
 struct gem_database
 {
 	std::vector<gem> active_gems;
+	std::vector<gem> vaal_active_gems;
 	std::vector<gem> support_gems;
 	std::vector<gem> awakened_support_gems;
 };
@@ -184,12 +172,12 @@ struct item_database
 
 	std::vector<map> maps;
 
-	std::vector<quest_item> quest_items;
+	std::vector<elementary_item> quest_items;
 	std::vector<elementary_item> incubators;
 	std::vector<resonator> resonators;
 	std::vector<currency_item> divination_cards;
 	std::vector<elementary_item> metamorph_parts;
-	std::vector<unique_piece> unique_pieces;
+	std::vector<elementary_item> unique_pieces;
 
 	std::optional<elementary_item> incursion_key;
 	std::optional<elementary_item> incursion_bomb;
