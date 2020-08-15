@@ -1,4 +1,4 @@
-#include <fs/lang/drop/item_database.hpp>
+#include <fs/lang/loot/item_database.hpp>
 #include <fs/utility/dump_json.hpp>
 
 #include <nlohmann/json.hpp>
@@ -105,7 +105,7 @@ int get_max_gem_level(std::string_view gem_name, const nlohmann::json& item_tags
 	return 20;
 }
 
-[[nodiscard]] std::optional<drop::elementary_item>
+[[nodiscard]] std::optional<loot::elementary_item>
 parse_elementary_item(
 	std::string_view metadata_path,
 	const nlohmann::json& metadata_entry)
@@ -120,16 +120,16 @@ parse_elementary_item(
 		throw_field_error("release_state", release_state);
 	}
 
-	drop::elementary_item result;
+	loot::elementary_item result;
 	result.metadata_path = metadata_path;
 	result.name = metadata_entry.at("name").get<string_t>();
 	result.drop_level = metadata_entry.at("drop_level").get<int>();
 	return result;
 }
 
-drop::sizeable_item parse_item_size(const nlohmann::json& metadata_entry)
+loot::sizeable_item parse_item_size(const nlohmann::json& metadata_entry)
 {
-	return drop::sizeable_item{
+	return loot::sizeable_item{
 		metadata_entry.at("inventory_width").get<int>(),
 		metadata_entry.at("inventory_height").get<int>()
 	};
@@ -137,7 +137,7 @@ drop::sizeable_item parse_item_size(const nlohmann::json& metadata_entry)
 
 // metadata contains no information on item sockets, therefore this function requires max_sockets argument
 // we only check for has_one_socket implicit which appears on some bases - then override sockets to 1
-[[nodiscard]] std::optional<drop::equippable_item>
+[[nodiscard]] std::optional<loot::equippable_item>
 parse_equippable_item(
 	std::string_view metadata_path,
 	const nlohmann::json& metadata_entry,
@@ -150,13 +150,13 @@ parse_equippable_item(
 		throw_field_error("domain", domain);
 	}
 
-	std::optional<drop::elementary_item> elem_item = parse_elementary_item(metadata_path, metadata_entry);
+	std::optional<loot::elementary_item> elem_item = parse_elementary_item(metadata_path, metadata_entry);
 	if (!elem_item)
 		return std::nullopt;
 
-	drop::equippable_item result;
-	static_cast<drop::elementary_item&>(result) = std::move(*elem_item);
-	static_cast<drop::sizeable_item&>(result) = parse_item_size(metadata_entry);
+	loot::equippable_item result;
+	static_cast<loot::elementary_item&>(result) = std::move(*elem_item);
+	static_cast<loot::sizeable_item&>(result) = parse_item_size(metadata_entry);
 	result.is_atlas_base_type = tags_contains_tag(metadata_entry.at("tags"), "atlas_base_type");
 	result.has_abyss_socket = implicits_contains_implicit(metadata_entry.at("implicits"), "AbyssJewelSocketImplicit");
 
@@ -168,32 +168,32 @@ parse_equippable_item(
 	return result;
 }
 
-[[nodiscard]] std::optional<drop::currency_item>
+[[nodiscard]] std::optional<loot::currency_item>
 parse_currency_item(
 	std::string_view metadata_path,
 	const nlohmann::json& metadata_entry)
 {
-	std::optional<drop::elementary_item> elem_item = parse_elementary_item(metadata_path, metadata_entry);
+	std::optional<loot::elementary_item> elem_item = parse_elementary_item(metadata_path, metadata_entry);
 	if (!elem_item)
 		return std::nullopt;
 
-	drop::currency_item result;
-	static_cast<drop::elementary_item&>(result) = std::move(*elem_item);
+	loot::currency_item result;
+	static_cast<loot::elementary_item&>(result) = std::move(*elem_item);
 	result.max_stack_size = metadata_entry.at("properties").at("stack_size").get<int>();
 	return result;
 }
 
-[[nodiscard]] std::optional<drop::gem>
+[[nodiscard]] std::optional<loot::gem>
 parse_gem(
 	std::string_view metadata_path,
 	const nlohmann::json& metadata_entry)
 {
-	std::optional<drop::elementary_item> elem_item = parse_elementary_item(metadata_path, metadata_entry);
+	std::optional<loot::elementary_item> elem_item = parse_elementary_item(metadata_path, metadata_entry);
 	if (!elem_item)
 		return std::nullopt;
 
-	drop::gem result;
-	static_cast<drop::elementary_item&>(result) = std::move(*elem_item);
+	loot::gem result;
+	static_cast<loot::elementary_item&>(result) = std::move(*elem_item);
 	result.max_level = get_max_gem_level(result.name, metadata_entry.at("tags"));
 	result.is_vaal_gem = utility::contains(result.name, "Vaal");
 	return result;
@@ -214,67 +214,67 @@ get_resonator_socket_count(std::string_view resonator_name)
 		throw std::runtime_error("unrecognized resonator name");
 }
 
-[[nodiscard]] std::optional<drop::resonator>
+[[nodiscard]] std::optional<loot::resonator>
 parse_resonator(
 	std::string_view metadata_path,
 	const nlohmann::json& metadata_entry)
 {
-	std::optional<drop::currency_item> curr_item = parse_currency_item(metadata_path, metadata_entry);
+	std::optional<loot::currency_item> curr_item = parse_currency_item(metadata_path, metadata_entry);
 	if (!curr_item)
 		return std::nullopt;
 
-	drop::resonator result;
-	static_cast<drop::currency_item&>(result) = std::move(*curr_item);
-	static_cast<drop::sizeable_item&>(result) = parse_item_size(metadata_entry);
+	loot::resonator result;
+	static_cast<loot::currency_item&>(result) = std::move(*curr_item);
+	static_cast<loot::sizeable_item&>(result) = parse_item_size(metadata_entry);
 	result.delve_sockets = get_resonator_socket_count(result.name);
 	return result;
 }
 
-[[nodiscard]] std::optional<drop::map>
+[[nodiscard]] std::optional<loot::map>
 parse_map(
 	std::string_view metadata_path,
 	const nlohmann::json& metadata_entry)
 {
-	std::optional<drop::elementary_item> elem_item = parse_elementary_item(metadata_path, metadata_entry);
+	std::optional<loot::elementary_item> elem_item = parse_elementary_item(metadata_path, metadata_entry);
 	if (!elem_item)
 		return std::nullopt;
 
 	if (implicits_contains_implicit(metadata_entry.at("implicits"), "MapShaperInfluence"))
 		return std::nullopt; // skip guardian maps
 
-	drop::map result;
-	static_cast<drop::elementary_item&>(result) = std::move(*elem_item);
+	loot::map result;
+	static_cast<loot::elementary_item&>(result) = std::move(*elem_item);
 	// result.map_tier = get_map_tier(result.drop_level);
 	return result;
 }
 
-[[nodiscard]] std::optional<drop::quest_item>
+[[nodiscard]] std::optional<loot::quest_item>
 parse_quest_item(
 	std::string_view metadata_path,
 	const nlohmann::json& metadata_entry)
 {
-	std::optional<drop::elementary_item> elem_item = parse_elementary_item(metadata_path, metadata_entry);
+	std::optional<loot::elementary_item> elem_item = parse_elementary_item(metadata_path, metadata_entry);
 	if (!elem_item)
 		return std::nullopt;
 
-	drop::quest_item result;
-	static_cast<drop::elementary_item&>(result) = std::move(*elem_item);
-	static_cast<drop::sizeable_item&>(result) = parse_item_size(metadata_entry);
+	loot::quest_item result;
+	static_cast<loot::elementary_item&>(result) = std::move(*elem_item);
+	static_cast<loot::sizeable_item&>(result) = parse_item_size(metadata_entry);
 	return result;
 }
 
-[[nodiscard]] std::optional<drop::unique_piece>
+[[nodiscard]] std::optional<loot::unique_piece>
 parse_unique_piece(
 	std::string_view metadata_path,
 	const nlohmann::json& metadata_entry)
 {
-	std::optional<drop::elementary_item> elem_item = parse_elementary_item(metadata_path, metadata_entry);
+	std::optional<loot::elementary_item> elem_item = parse_elementary_item(metadata_path, metadata_entry);
 	if (!elem_item)
 		return std::nullopt;
 
-	drop::unique_piece result;
-	static_cast<drop::elementary_item&>(result) = std::move(*elem_item);
-	static_cast<drop::sizeable_item&>(result) = parse_item_size(metadata_entry);
+	loot::unique_piece result;
+	static_cast<loot::elementary_item&>(result) = std::move(*elem_item);
+	static_cast<loot::sizeable_item&>(result) = parse_item_size(metadata_entry);
 	return result;
 }
 
@@ -286,7 +286,7 @@ void expect_unreleased_item(const nlohmann::json& metadata_entry)
 
 } // namespace
 
-namespace fs::lang::drop {
+namespace fs::lang::loot {
 
 bool item_database::parse(std::string_view items_metadata_json, log::logger& logger)
 {
