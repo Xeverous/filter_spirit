@@ -44,9 +44,9 @@ bool generate_item_filter_impl(
 
 } // namespace
 
-void list_leagues(network::network_settings net_settings, log::logger& logger)
+void list_leagues(network::download_settings settings, log::logger& logger)
 {
-	const auto league_data = network::ggg::async_download_leagues(std::move(net_settings), nullptr, logger).get();
+	const auto league_data = network::ggg::async_download_leagues(std::move(settings), nullptr, logger).get();
 	const std::vector<lang::league> leagues = network::ggg::parse_league_info(league_data);
 
 	auto stream = logger.info();
@@ -61,7 +61,7 @@ obtain_item_price_report(
 	const boost::optional<std::string>& download_league_name_ninja,
 	const boost::optional<std::string>& download_league_name_watch,
 	boost::posix_time::time_duration expiration_time,
-	network::network_settings net_settings,
+	network::download_settings settings,
 	const boost::optional<std::string>& data_read_dir,
 	fs::log::logger& logger)
 {
@@ -84,7 +84,7 @@ obtain_item_price_report(
 			std::move(*download_league_name_ninja),
 			lang::data_source_type::poe_ninja,
 			expiration_time,
-			std::move(net_settings),
+			std::move(settings),
 			nullptr,
 			logger).get();
 	}
@@ -93,7 +93,7 @@ obtain_item_price_report(
 			std::move(*download_league_name_watch),
 			lang::data_source_type::poe_watch,
 			expiration_time,
-			std::move(net_settings),
+			std::move(settings),
 			nullptr,
 			logger).get();
 	}

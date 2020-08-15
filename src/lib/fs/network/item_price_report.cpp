@@ -139,13 +139,13 @@ std::future<lang::item_price_report>
 async_download_and_parse_ninja(
 	item_price_report_cache& self,
 	std::string league,
-	network_settings settings,
+	download_settings settings,
 	download_info* info,
 	log::logger& logger)
 {
 	return std::async(
 		std::launch::async,
-		[](item_price_report_cache& self, std::string league, network_settings settings, download_info* info, log::logger& logger) {
+		[](item_price_report_cache& self, std::string league, download_settings settings, download_info* info, log::logger& logger) {
 			poe_ninja::api_item_price_data api_data = poe_ninja::download_item_price_data(league, settings, info, logger);
 
 			lang::item_price_report report;
@@ -170,13 +170,13 @@ std::future<lang::item_price_report>
 download_and_parse_watch(
 	item_price_report_cache& self,
 	std::string league,
-	network_settings settings,
+	download_settings settings,
 	download_info* info,
 	log::logger& logger)
 {
 	return std::async(
 		std::launch::async,
-		[](item_price_report_cache& self, std::string league, network_settings settings, download_info* info, log::logger& logger) {
+		[](item_price_report_cache& self, std::string league, download_settings settings, download_info* info, log::logger& logger) {
 			poe_watch::api_item_price_data api_data = poe_watch::download_item_price_data(league, settings, info, logger);
 
 			lang::item_price_report report;
@@ -206,7 +206,7 @@ item_price_report_cache::async_get_report(
 	std::string league,
 	lang::data_source_type api,
 	boost::posix_time::time_duration expiration_time,
-	network_settings settings,
+	download_settings settings,
 	download_info* info,
 	log::logger& logger)
 {

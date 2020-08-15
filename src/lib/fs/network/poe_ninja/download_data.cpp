@@ -21,7 +21,7 @@ namespace fs::network::poe_ninja
 api_item_price_data
 download_item_price_data(
 	const std::string& league_name,
-	const network_settings& settings,
+	const download_settings& settings,
 	download_info* info,
 	log::logger& logger)
 {

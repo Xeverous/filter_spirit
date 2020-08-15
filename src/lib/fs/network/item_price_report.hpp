@@ -22,7 +22,7 @@ public:
 		std::string league,
 		lang::data_source_type api,
 		boost::posix_time::time_duration expiration_time,
-		network_settings settings,
+		download_settings settings,
 		download_info* info,
 		log::logger& logger);
 
