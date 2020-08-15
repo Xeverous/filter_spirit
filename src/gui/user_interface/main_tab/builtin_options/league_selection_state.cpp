@@ -4,6 +4,8 @@
 #include <fs/network/ggg/parse_data.hpp>
 #include <fs/utility/async.hpp>
 
+#include <utility>
+
 namespace el = cycfi::elements;
 
 namespace {
@@ -48,7 +50,7 @@ void league_selection_state::update(fs::log::logger& logger)
 	}
 }
 
-void league_selection_state::refresh_available_leagues(fs::network::network_settings ns, fs::log::logger& logger)
+void league_selection_state::refresh_available_leagues(fs::network::download_settings ds, fs::log::logger& logger)
 {
 	if (_download_running)
 		return; // ignore request if download is already in progress
@@ -56,7 +58,7 @@ void league_selection_state::refresh_available_leagues(fs::network::network_sett
 	_league_selection_refresh_element->select(0); // switch to progress bar
 	_league_selection_refresh_progress_bar->value(0);
 
-	_leagues_future = fs::network::ggg::async_download_leagues(ns, &_league_download_info, logger);
+	_leagues_future = fs::network::ggg::async_download_leagues(std::move(ds), &_league_download_info, logger);
 	_download_running = true;
 }
 

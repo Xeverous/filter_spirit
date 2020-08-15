@@ -5,6 +5,8 @@
 
 #include <elements/element.hpp>
 
+#include <utility>
+
 namespace el = cycfi::elements;
 
 void market_data_state::update()
@@ -43,13 +45,14 @@ void market_data_state::refresh_market_data(
 	fs::lang::data_source_type api,
 	std::string league,
 	boost::posix_time::time_duration max_age,
-	fs::network::network_settings ns,
+	fs::network::download_settings ds,
 	fs::log::logger& logger)
 {
 	if (league.empty())
 		return;
 
-	_price_report_future = _price_report_cache.async_get_report(league, api, max_age, ns, &_download_info, logger);
+	_price_report_future = _price_report_cache.async_get_report(
+		std::move(league), api, max_age, std::move(ds), &_download_info, logger);
 	_download_running = true;
 
 	_market_data_status_label->set_text("downloading...");

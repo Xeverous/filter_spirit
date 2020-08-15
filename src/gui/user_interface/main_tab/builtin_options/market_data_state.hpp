@@ -25,7 +25,7 @@ public:
 		fs::lang::data_source_type api,
 		std::string league,
 		boost::posix_time::time_duration max_age,
-		fs::network::network_settings ns,
+		fs::network::download_settings ds,
 		fs::log::logger& logger);
 
 	const auto& price_report() const { return _price_report; }

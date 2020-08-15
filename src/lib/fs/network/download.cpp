@@ -72,7 +72,7 @@ void save_error_to_all(std::vector<net::request_result>& results, std::error_cod
 [[nodiscard]] bool
 setup_download(
 	net::curl::easy_handle& easy,
-	const net::network_settings& settings,
+	const net::download_settings& settings,
 	std::vector<net::request_result>& results)
 {
 	if (const auto ec = easy.write_callback(write_callback); ec) {
@@ -138,7 +138,7 @@ download_result
 download(
 	std::string_view target_name,
 	const std::vector<std::string>& urls,
-	const network_settings& settings,
+	const download_settings& settings,
 	download_info* info,
 	log::logger& logger)
 {

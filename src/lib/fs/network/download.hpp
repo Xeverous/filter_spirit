@@ -36,7 +36,7 @@ struct download_info
 	std::atomic_size_t requests_total = 0;
 };
 
-struct network_settings
+struct download_settings
 {
 	long timeout_milliseconds = 0; /** (no timeout) */
 	bool ssl_verify_peer = true;
@@ -57,7 +57,7 @@ struct network_settings
 download(
 	std::string_view target_name,
 	const std::vector<std::string>& urls,
-	const network_settings& settings,
+	const download_settings& settings,
 	download_info* info,
 	log::logger& logger);
 

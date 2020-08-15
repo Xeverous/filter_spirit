@@ -45,7 +45,7 @@ void refresh_market_data(user_interface& ui, bool force)
 		ui.main().builtin_options().api_selection().selected_api(),
 		ui.main().builtin_options().league_selection().selected_league(),
 		force ? boost::posix_time::seconds(0) : boost::posix_time::seconds(3600), // TODO grab from settings
-		ui.settings().settings(),
+		ui.settings().download_settings(),
 		ui.main().logger().logger());
 }
 
@@ -67,7 +67,7 @@ void process_event(events::refresh_market_data /* event */, user_interface& ui)
 void process_event(events::refresh_available_leagues /* event */, user_interface& ui)
 {
 	ui.main().builtin_options().league_selection().refresh_available_leagues(
-		ui.settings().settings(),
+		ui.settings().download_settings(),
 		ui.main().logger().logger());
 }
 

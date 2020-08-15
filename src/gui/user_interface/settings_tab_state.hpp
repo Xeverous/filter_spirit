@@ -11,11 +11,11 @@ class settings_tab_state
 public:
 	std::shared_ptr<cycfi::elements::element> make_ui();
 
-	const fs::network::network_settings& settings() const
+	const fs::network::download_settings& download_settings() const
 	{
-		return _settings;
+		return _download_settings;
 	}
 
 private:
-	fs::network::network_settings _settings;
+	fs::network::download_settings _download_settings;
 };

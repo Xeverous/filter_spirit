@@ -23,7 +23,7 @@ public:
 
 	std::shared_ptr<cycfi::elements::element> make_ui();
 
-	void refresh_available_leagues(fs::network::network_settings ns, fs::log::logger& logger);
+	void refresh_available_leagues(fs::network::download_settings ds, fs::log::logger& logger);
 	void update(fs::log::logger& logger);
 
 	const std::string& selected_league() const

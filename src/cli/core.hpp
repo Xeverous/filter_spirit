@@ -12,7 +12,7 @@
 
 void
 list_leagues(
-	fs::network::network_settings net_settings,
+	fs::network::download_settings settings,
 	fs::log::logger& logger);
 
 [[nodiscard]] std::optional<fs::lang::item_price_report>
@@ -20,7 +20,7 @@ obtain_item_price_report(
 	const boost::optional<std::string>& download_league_name_ninja,
 	const boost::optional<std::string>& download_league_name_watch,
 	boost::posix_time::time_duration expiration_time,
-	fs::network::network_settings net_settings,
+	fs::network::download_settings settings,
 	const boost::optional<std::string>& data_read_dir,
 	fs::log::logger& logger);
 

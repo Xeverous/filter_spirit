@@ -165,16 +165,16 @@ int run(int argc, char* argv[])
 		}
 
 		// running through the command line
-		fs::network::network_settings net_settings;
-		net_settings.timeout_milliseconds = timeout_ms;
-		net_settings.ssl_verify_host = !no_ssl_verify_host;
-		net_settings.ssl_verify_peer = !no_ssl_verify_peer;
+		fs::network::download_settings download_settings;
+		download_settings.timeout_milliseconds = timeout_ms;
+		download_settings.ssl_verify_host = !no_ssl_verify_host;
+		download_settings.ssl_verify_peer = !no_ssl_verify_peer;
 
 		if (opt_ca_bundle)
-			net_settings.ca_info_path = *opt_ca_bundle;
+			download_settings.ca_info_path = *opt_ca_bundle;
 
 		if (opt_proxy)
-			net_settings.proxy = *opt_proxy;
+			download_settings.proxy = *opt_proxy;
 
 		if (opt_help) {
 			print_help(all_options);
@@ -187,7 +187,7 @@ int run(int argc, char* argv[])
 		}
 
 		if (opt_list_leagues) {
-			list_leagues(net_settings, logger);
+			list_leagues(download_settings, logger);
 			return EXIT_SUCCESS;
 		}
 
@@ -210,7 +210,7 @@ int run(int argc, char* argv[])
 					download_league_name_ninja,
 					download_league_name_watch,
 					boost::posix_time::minutes(max_age),
-					net_settings,
+					download_settings,
 					data_read_dir,
 					logger);
 			}

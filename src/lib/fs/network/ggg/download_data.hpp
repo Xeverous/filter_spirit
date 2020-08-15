@@ -11,7 +11,7 @@ namespace fs::network::ggg
 
 [[nodiscard]] std::future<api_league_data>
 async_download_leagues(
-	network_settings settings,
+	download_settings settings,
 	download_info* info,
 	log::logger& logger);
 
