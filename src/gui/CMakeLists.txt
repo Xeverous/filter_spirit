@@ -32,6 +32,8 @@ target_sources(filter_spirit_gui
 		user_interface/main_tab/filter_template_state.hpp
 		user_interface/main_tab/gui_logger.cpp
 		user_interface/main_tab/gui_logger.hpp
+		user_interface/main_tab/loot_preview_state.cpp
+		user_interface/main_tab/loot_preview_state.hpp
 		user_interface/main_tab_state.cpp
 		user_interface/main_tab_state.hpp
 		user_interface/settings_tab_state.cpp
