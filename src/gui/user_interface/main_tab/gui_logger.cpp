@@ -1,4 +1,5 @@
-#include "gui_logger.hpp"
+#include "user_interface/main_tab/gui_logger.hpp"
+#include "ui_utils.hpp"
 
 #include <fs/utility/assert.hpp>
 
@@ -6,8 +7,7 @@
 
 namespace el = cycfi::elements;
 
-namespace
-{
+namespace {
 
 el::color severity_to_color(fs::log::severity s)
 {
@@ -44,10 +44,21 @@ std::shared_ptr<el::element> gui_logger::make_ui()
 		scroller->valign(1.0);
 	};
 
-	return scroller;
+	return el::share(el::top_margin(3.0f, el::vtile(
+		el::layer(
+			el::hold(scroller),
+			el::box(el::colors::black)
+		),
+		el::htile(
+			make_button(el::icons::docs, "copy logs", [](bool){}),
+			make_button(el::icons::cancel, "clear logs", [this](bool) mutable {
+				clear_logs();
+			})
+		)
+	)));
 }
 
-void gui_logger::update_ui()
+void gui_logger::update()
 {
 	BOOST_ASSERT(_composite != nullptr);
 	BOOST_ASSERT(_scroll_to_bottom);

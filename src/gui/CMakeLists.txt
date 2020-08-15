@@ -8,16 +8,34 @@ add_executable(filter_spirit_gui)
 
 target_sources(filter_spirit_gui
 	PRIVATE
-		main.cpp
-		ui.hpp
-		ui.cpp
-		user_state.hpp
-		user_state.cpp
-		gui_logger.hpp
-		gui_logger.cpp
-		item_preview.hpp
+		controller.cpp
+		controller.hpp
+		event.hpp
 		item_preview.cpp
+		item_preview.hpp
+		main.cpp
 		platform/modal_dialogs.hpp
+		ui_utils.hpp
+		user_interface.cpp
+		user_interface.hpp
+		user_interface/generic/integer_input_box.cpp
+		user_interface/generic/integer_input_box.hpp
+		user_interface/main_tab/builtin_options/api_selection_state.cpp
+		user_interface/main_tab/builtin_options/api_selection_state.hpp
+		user_interface/main_tab/builtin_options/league_selection_state.cpp
+		user_interface/main_tab/builtin_options/league_selection_state.hpp
+		user_interface/main_tab/builtin_options/market_data_state.cpp
+		user_interface/main_tab/builtin_options/market_data_state.hpp
+		user_interface/main_tab/builtin_options_state.cpp
+		user_interface/main_tab/builtin_options_state.hpp
+		user_interface/main_tab/filter_template_state.cpp
+		user_interface/main_tab/filter_template_state.hpp
+		user_interface/main_tab/gui_logger.cpp
+		user_interface/main_tab/gui_logger.hpp
+		user_interface/main_tab_state.cpp
+		user_interface/main_tab_state.hpp
+		user_interface/settings_tab_state.cpp
+		user_interface/settings_tab_state.hpp
 )
 
 if(FILTER_SPIRIT_PLATFORM STREQUAL "win64")

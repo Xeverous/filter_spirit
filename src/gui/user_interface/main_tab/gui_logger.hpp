@@ -14,10 +14,7 @@ class gui_logger
 public:
 	std::shared_ptr<cycfi::elements::element> make_ui();
 
-	void update()
-	{
-		update_ui();
-	}
+	void update();
 
 	void clear_logs();
 
@@ -25,8 +22,6 @@ public:
 	const auto& logger() const { return _logger; }
 
 private:
-	void update_ui();
-
 	fs::log::thread_safe_logger<fs::log::buffer_logger> _logger;
 	std::shared_ptr<cycfi::elements::vtile_composite> _composite;
 	std::function<void()> _scroll_to_bottom;
