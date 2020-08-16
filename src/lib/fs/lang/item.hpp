@@ -12,9 +12,82 @@
 #include <vector>
 #include <string_view>
 #include <string>
+#include <initializer_list>
 
 namespace fs::lang
 {
+
+namespace item_class_names {
+
+	// core
+	constexpr auto currency_stackable = "Stackable Currency";
+	constexpr auto currency_delve = "Delve Stackable Socketable Currency";
+	constexpr auto incubator = "Incubator";
+	constexpr auto harvest_seed = "Harvest Seed";
+	constexpr auto harvest_seed_enhancer = "Seed Enhancer";
+	constexpr auto gem_active = "Active Skill Gems";
+	constexpr auto gem_support = "Support Skill Gems";
+	constexpr auto piece = "Piece";
+	constexpr auto incursion_item = "Incursion Item";
+	constexpr auto atlas_item = "Atlas Region Upgrade Item";
+	constexpr auto labyrinth_trinket = "Labyrinth Trinket";
+	constexpr auto labyrinth_item = "Labyrinth Item";
+	constexpr auto metamorph_sample = "Metamorph Sample";
+	constexpr auto divination_card = "Divination Card";
+	constexpr auto leaguestone = "Leaguestones";
+	constexpr auto map = "Maps";
+	constexpr auto map_fragment = "Map Fragments";
+	constexpr auto misc_map_item = "Misc Map Item";
+	constexpr auto quest_item = "Quest Items";
+	constexpr auto pantheon_sould = "Pantheon Soul";
+
+	// equipment - main parts
+	constexpr auto eq_gloves = "Gloves";
+	constexpr auto eq_boots = "Boots";
+	constexpr auto eq_helmet = "Helmets";
+	constexpr auto eq_body = "Body Armours";
+
+	// equipment - 1h
+	constexpr auto eq_claw = "Claws";
+	constexpr auto eq_dagger = "Daggers";
+	constexpr auto eq_rune_dagger = "Rune Daggers";
+	constexpr auto eq_sword_1h = "One Hand Swords";
+	constexpr auto eq_sword_thrusting = "Thrusting One Hand Swords";
+	constexpr auto eq_axe_1h = "One Hand Axes";
+	constexpr auto eq_mace_1h = "One Hand Maces";
+	constexpr auto eq_sceptre = "Sceptres";
+	constexpr auto eq_wand = "Wands";
+
+	// equipment - 2h
+	constexpr auto eq_bow = "Bows";
+	constexpr auto eq_staff = "Staves";
+	constexpr auto eq_warstaff = "Warstaves";
+	constexpr auto eq_sword_2h = "Two Hand Swords";
+	constexpr auto eq_axe_2h = "Two Hand Axes";
+	constexpr auto eq_mace_2h = "Two Hand Maces";
+	constexpr auto eq_fishing_rod = "Fishing Rods";
+
+	// equipment - offhand
+	constexpr auto eq_quiver = "Quivers";
+	constexpr auto eq_shield = "Shields";
+
+	// equipment - jewellery
+	constexpr auto eq_amulet = "Amulets";
+	constexpr auto eq_ring = "Rings";
+	constexpr auto eq_belt = "Belts";
+
+	// jewels
+	constexpr auto jewel = "Jewel";
+	constexpr auto jewel_abyss = "Abyss Jewel";
+
+	// flasks
+	constexpr auto flask_life = "Life Flasks";
+	constexpr auto flask_mana = "Mana Flasks";
+	constexpr auto flask_hybrid = "Hybrid Flasks";
+	constexpr auto flask_utility = "Utility Flasks";
+	constexpr auto flask_utility_critical = "Critical Utility Flasks";
+
+}
 
 template <typename T, std::size_t N>
 using svector = boost::container::static_vector<T, N>;
@@ -23,19 +96,23 @@ enum class item_validity
 {
 	valid,
 
+	identified_without_name,
+	unidentified_with_name,
+	unidentified_with_explicit_mods,
+	normal_rarity_with_name,
+	nonnormal_rarity_without_name,
 	resonator_or_abyss_socket_linked,
 	more_than_6_sockets,
-	negative_item_level,
-	negative_drop_level,
-	negative_height,
-	negative_width,
-	negative_quality,
-	negative_stack_size,
-	negative_gem_level,
-	negative_map_tier,
+	invalid_item_level,
+	invalid_drop_level,
+	invalid_height,
+	invalid_width,
+	invalid_quality,
+	invalid_stack_size,
+	invalid_gem_level,
+	invalid_map_tier,
 	empty_class,
-	empty_base_type,
-	unidentified_with_explicit_mods
+	empty_base_type
 };
 
 enum class socket_color { r, g, b, w, a, d }; // a = abyss, d = resonator (ctrl+C reports resonators with D sockets)
@@ -43,6 +120,14 @@ enum class socket_color { r, g, b, w, a, d }; // a = abyss, d = resonator (ctrl+
 // represents a single group of linked sockets
 struct linked_sockets
 {
+	linked_sockets() = default;
+
+	linked_sockets(std::initializer_list<socket_color> colors)
+	{
+		for (socket_color c : colors)
+			sockets.push_back(c);
+	}
+
 	bool is_valid() const noexcept
 	{
 		return verify() == item_validity::valid;
@@ -134,11 +219,23 @@ struct item
 
 	item_validity verify() const noexcept
 	{
+		if (name.has_value() && !is_identified)
+			return item_validity::unidentified_with_name;
+
+		if (!name.has_value() && is_identified)
+			return item_validity::identified_without_name;
+
+		if (name.has_value() && rarity_ == rarity_type::normal)
+			return item_validity::normal_rarity_with_name;
+
+		if (!name.has_value() && rarity_ != rarity_type::normal)
+			return item_validity::nonnormal_rarity_without_name;
+
 		if (height <= 0)
-			return item_validity::negative_height;
+			return item_validity::invalid_height;
 
 		if (width <= 0)
-			return item_validity::negative_width;
+			return item_validity::invalid_width;
 
 		if (class_.empty())
 			return item_validity::empty_class;
@@ -154,7 +251,7 @@ struct item
 		// at some point GGG will introduce negative quality. It could be actually
 		// useful for uniques such as the Forbidden Taste.
 		if (quality < 0)
-			return item_validity::negative_quality;
+			return item_validity::invalid_quality;
 
 		if (auto status = sockets.verify(); status != item_validity::valid)
 			return status;
@@ -164,13 +261,13 @@ struct item
 			return item_validity::unidentified_with_explicit_mods;
 
 		if (stack_size <= 0)
-			return item_validity::negative_stack_size;
+			return item_validity::invalid_stack_size;
 
 		if (gem_level <= 0)
-			return item_validity::negative_gem_level;
+			return item_validity::invalid_gem_level;
 
 		if (map_tier <= 0)
-			return item_validity::negative_map_tier;
+			return item_validity::invalid_map_tier;
 
 		return item_validity::valid;
 	}
@@ -180,6 +277,7 @@ struct item
 	 * an item with abnormal values in these will be conidered invalid
 	 */
 	std::string class_;
+	std::optional<std::string> name; // only for IDed items with non-normal rarity
 	std::string base_type;
 	int height = 0;
 	int width  = 0;
