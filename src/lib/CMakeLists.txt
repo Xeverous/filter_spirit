@@ -33,6 +33,7 @@ target_sources(filter_spirit
 		fs/generator/generator.cpp
 		fs/generator/make_filter.cpp
 		fs/lang/loot/item_database.cpp
+		fs/lang/loot/generator.cpp
 		fs/lang/action_set.cpp
 		fs/lang/condition_set.cpp
 		fs/lang/item_filter.cpp
@@ -66,6 +67,7 @@ target_sources(filter_spirit
 		fs/generator/generator.hpp
 		fs/generator/settings.hpp
 		fs/lang/loot/item_database.hpp
+		fs/lang/loot/generator.hpp
 		fs/lang/action_properties.hpp
 		fs/lang/action_set.hpp
 		fs/lang/condition_properties.hpp
