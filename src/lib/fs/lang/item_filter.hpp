@@ -56,11 +56,29 @@ struct spirit_item_filter
 	std::vector<spirit_item_filter_block> blocks;
 };
 
+// all of the styles applied to an item after filtering
+struct item_style
+{
+	item_style();
+
+	void override_with(const action_set& actions);
+
+	item_visibility visibility;
+
+	std::optional<color_action> border_color;
+	color_action text_color;
+	color_action background_color;
+	font_size_action font_size;
+	std::optional<alert_sound_action> play_alert_sound;
+	std::optional<disable_drop_sound_action> disable_drop_sound;
+	std::optional<minimap_icon_action> minimap_icon;
+	std::optional<play_effect_action> play_effect;
+};
+
 struct item_filtering_result
 {
 	// final style applied to the item
-	item_visibility visibility;
-	action_set style;
+	item_style style;
 
 	// each element represents a match attempt against next filter block
 	std::vector<condition_set_match_result> match_history;
