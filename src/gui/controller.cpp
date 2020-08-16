@@ -6,6 +6,11 @@
 
 namespace {
 
+void process_event(events::load_item_database /* event */, user_interface& ui)
+{
+	ui.main().loot_preview().load_item_database(ui.main().logger().logger());
+}
+
 void process_event(events::filter_template_path_changed /* event */, user_interface& ui)
 {
 	ui.main().filter_template().load_filter_template(ui.main().logger().logger());
@@ -34,9 +39,21 @@ void process_event(events::spirit_filter_changed /* event */, user_interface& ui
 	recompute_real_filter(ui);
 }
 
-void process_event(events::real_filter_changed /* event */, user_interface& /* ui */)
+void refresh_loot_preview(user_interface& ui)
 {
-	// TODO regenerate loot preview
+	const auto& maybe_real_filter = ui.main().filter_template().real_filter();
+	if (maybe_real_filter)
+		ui.main().loot_preview().refresh_loot_preview(*maybe_real_filter);
+}
+
+void process_event(events::real_filter_changed /* event */, user_interface& ui)
+{
+	refresh_loot_preview(ui);
+}
+
+void process_event(events::refresh_loot_preview /* event */, user_interface& ui)
+{
+	refresh_loot_preview(ui);
 }
 
 void refresh_market_data(user_interface& ui, bool force)

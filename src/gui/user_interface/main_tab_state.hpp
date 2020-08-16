@@ -16,6 +16,7 @@ public:
 	main_tab_state(event_inserter inserter)
 	: _filter_template(inserter)
 	, _builtin_options(inserter)
+	, _loot_preview(inserter)
 	{
 	}
 

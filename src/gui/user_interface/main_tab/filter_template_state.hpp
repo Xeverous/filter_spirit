@@ -27,6 +27,9 @@ public:
 	void parse_filter_template(fs::generator::settings st, fs::log::logger& logger);
 	void recompute_real_filter(const fs::lang::market::item_price_report& report, fs::log::logger& logger);
 
+	const auto& real_filter() const { return _real_filter; }
+	const auto& spirit_filter() const { return _spirit_filter; }
+
 private:
 	event_inserter _inserter;
 

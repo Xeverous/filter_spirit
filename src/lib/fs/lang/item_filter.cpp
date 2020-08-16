@@ -5,26 +5,10 @@
 
 #include <ostream>
 
-namespace fs::lang
-{
-
-void item_filter_block::generate(std::ostream& output_stream) const
-{
-	if (!conditions.is_valid())
-		return;
-
-	if (visibility.show)
-		output_stream << keywords::rf::show;
-	else
-		output_stream << keywords::rf::hide;
-	output_stream << '\n';
-
-	conditions.generate(output_stream);
-	actions.generate(output_stream);
-	output_stream << '\n';
-}
-
 namespace {
+
+using namespace fs;
+using namespace fs::lang;
 
 // return whether a given property satisfies strings_condition
 bool strings_condition_test(const strings_condition& condition, const std::string& property)
@@ -110,22 +94,73 @@ bool influences_condition_test(influences_condition condition, influence_info it
 	}
 }
 
-action_set default_item_style(const item& /* itm */)
+item_style default_item_style(const item& /* itm */)
 {
-	action_set result;
+	item_style result;
 
-	// initial color values taken from:
-	// https://www.reddit.com/r/pathofexile/comments/f2t4tz/inconsistencies_in_new_filter_syntaxes/fjvo44v/
-	result.set_text_color   = color_action{color{integer{200}, integer{200}, integer{200}, integer{255}}, {}};
-	result.set_border_color = color_action{color{integer{200}, integer{200}, integer{200}, integer{255}}, {}};
-	result.set_background_color = color_action{color{integer{0}, integer{0}, integer{0}, integer{240}}, {}};
-
-	// TODO more styles depending on item rarity and class
+	// TODO change colors depending on item rarity and class
 	// ...
 
 	return result;
 }
 
+} // namespace
+
+namespace fs::lang
+{
+
+void item_filter_block::generate(std::ostream& output_stream) const
+{
+	if (!conditions.is_valid())
+		return;
+
+	if (visibility.show)
+		output_stream << keywords::rf::show;
+	else
+		output_stream << keywords::rf::hide;
+	output_stream << '\n';
+
+	conditions.generate(output_stream);
+	actions.generate(output_stream);
+	output_stream << '\n';
+}
+
+
+item_style::item_style()
+: visibility{true, {}}
+// initial color values taken from:
+// https://www.reddit.com/r/pathofexile/comments/f2t4tz/inconsistencies_in_new_filter_syntaxes/fjvo44v/
+, text_color  {color{integer{200}, integer{200}, integer{200}, integer{255}}, {}}
+, background_color{color{integer{0}, integer{0}, integer{0}, integer{240}}, {}}
+, font_size{integer{32}, {}}
+{
+}
+
+void item_style::override_with(const action_set& actions)
+{
+	if (actions.set_border_color)
+		border_color = *actions.set_border_color;
+
+	if (actions.set_text_color)
+		text_color = *actions.set_text_color;
+
+	if (actions.set_background_color)
+		background_color = *actions.set_background_color;
+
+	if (actions.set_font_size)
+		font_size = *actions.set_font_size;
+
+	if (actions.play_alert_sound)
+		play_alert_sound = *actions.play_alert_sound;
+
+	if (actions.disable_drop_sound)
+		disable_drop_sound = *actions.disable_drop_sound;
+
+	if (actions.minimap_icon)
+		minimap_icon = *actions.minimap_icon;
+
+	if (actions.play_effect)
+		play_effect = *actions.play_effect;
 }
 
 item_filtering_result pass_item_through_filter(const item& itm, const item_filter& filter, int area_level)
@@ -134,7 +169,7 @@ item_filtering_result pass_item_through_filter(const item& itm, const item_filte
 	// each item is expected to traverse half of the filter on average
 	match_history.reserve(filter.blocks.size() / 2);
 
-	action_set item_style = default_item_style(itm);
+	item_style style = default_item_style(itm);
 
 	for (const item_filter_block& block : filter.blocks) {
 		BOOST_ASSERT(block.conditions.is_valid());
@@ -218,21 +253,14 @@ item_filtering_result pass_item_through_filter(const item& itm, const item_filte
 		match_history.push_back(match_result);
 
 		if (match_result.is_successful()) {
-			item_style.override_with(block.actions);
+			style.override_with(block.actions);
+			style.visibility = block.visibility;
 
-			return item_filtering_result{
-				block.visibility,
-				item_style,
-				std::move(match_history)
-			};
+			break;
 		}
 	}
 
-	return item_filtering_result{
-		item_visibility{true, {}},
-		item_style,
-		std::move(match_history)
-	};
+	return item_filtering_result{style, std::move(match_history)};
 }
 
 }

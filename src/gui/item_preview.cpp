@@ -15,7 +15,7 @@ void draw_background(const el::context& ctx, el::color color)
 
 void draw_border(const el::context& ctx, el::color color)
 {
-	ctx.canvas.line_width(1.0);
+	ctx.canvas.line_width(2.0);
 	ctx.canvas.stroke_style(color);
 	ctx.canvas.stroke_rect(ctx.bounds);
 }

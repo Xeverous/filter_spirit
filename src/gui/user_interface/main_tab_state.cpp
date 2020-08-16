@@ -16,11 +16,11 @@ std::shared_ptr<el::element> main_tab_state::make_ui(el::host_window_handle wind
 {
 	return el::share(el::vtile(
 		el::htile(
-			el::vtile(
+			el::no_hstretch(el::vtile(
 				el::hold(_filter_template.make_ui(window)),
 				el::hold(_builtin_options.make_ui()),
 				make_filter_supplied_options()
-			),
+			)),
 			el::hold(_loot_preview.make_ui())
 		),
 		el::hold(_logger.make_ui())
