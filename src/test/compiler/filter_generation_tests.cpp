@@ -3,7 +3,7 @@
 
 #include <fs/generator/generate_filter.hpp>
 #include <fs/log/string_logger.hpp>
-#include <fs/lang/item_price_data.hpp>
+#include <fs/lang/market/item_price_data.hpp>
 
 #include <boost/test/unit_test.hpp>
 
@@ -17,7 +17,7 @@ namespace {
 
 std::string generate_filter(
 	std::string_view input,
-	const fs::lang::item_price_data& ipd = {})
+	const fs::lang::market::item_price_data& ipd = {})
 {
 	fs::log::string_logger logger;
 	std::optional<std::string> filter = fs::generator::sf::generate_filter_without_preamble(
@@ -606,12 +606,15 @@ Show
 
 		BOOST_AUTO_TEST_CASE(simple_price_queries)
 		{
-			lang::item_price_data ipd;
-			ipd.divination_cards.push_back(lang::divination_card{lang::price_data{0.125, false}, "Rain of Chaos", 8});
-			ipd.divination_cards.push_back(lang::divination_card{lang::price_data{5, false}, "Humility", 9});
-			ipd.divination_cards.push_back(lang::divination_card{lang::price_data{10, false}, "A Dab of Ink", 9});
-			ipd.divination_cards.push_back(lang::divination_card{lang::price_data{100, false}, "Abandoned Wealth", 5});
-			ipd.divination_cards.push_back(lang::divination_card{lang::price_data{1000, false}, "The Doctor", 8});
+			using lang::market::divination_card;
+			using lang::market::price_data;
+
+			lang::market::item_price_data ipd;
+			ipd.divination_cards.push_back(divination_card{price_data{0.125, false}, "Rain of Chaos", 8});
+			ipd.divination_cards.push_back(divination_card{price_data{5, false}, "Humility", 9});
+			ipd.divination_cards.push_back(divination_card{price_data{10, false}, "A Dab of Ink", 9});
+			ipd.divination_cards.push_back(divination_card{price_data{100, false}, "Abandoned Wealth", 5});
+			ipd.divination_cards.push_back(divination_card{price_data{1000, false}, "The Doctor", 8});
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
 Class "Divination Card"
 Autogen cards {

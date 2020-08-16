@@ -286,7 +286,7 @@ bool is_low_confidence(int daily, int current)
 
 // example query: https://api.poe.watch/compact?league=Standard
 // vector index is item ID
-[[nodiscard]] std::vector<std::optional<lang::price_data>>
+[[nodiscard]] std::vector<std::optional<lang::market::price_data>>
 parse_compact(std::string_view compact_json, log::logger& logger)
 {
 	nlohmann::json json = nlohmann::json::parse(compact_json);
@@ -305,7 +305,7 @@ parse_compact(std::string_view compact_json, log::logger& logger)
 	 * the index. This gives the fastest possible lookup. We store items in optional
 	 * in case there are some gaps due to removed items.
 	 */
-	std::vector<std::optional<lang::price_data>> item_prices;
+	std::vector<std::optional<lang::market::price_data>> item_prices;
 	// expect about 30 000 items, round to power of 2 for optimal allocator call
 	item_prices.resize(32768);
 	std::size_t max_id = 0;
@@ -333,7 +333,7 @@ parse_compact(std::string_view compact_json, log::logger& logger)
 			continue;
 		}
 
-		item_prices[id] = lang::price_data{
+		item_prices[id] = lang::market::price_data{
 			item.at("mean").get<double>(),
 			is_low_confidence(
 				item.at("daily").get<int>(),
@@ -568,13 +568,13 @@ std::vector<lang::league> parse_league_info(std::string_view league_json)
 	return result;
 }
 
-lang::item_price_data
+lang::market::item_price_data
 parse_item_price_data(
 	const api_item_price_data& ipd,
 	log::logger& logger)
 {
 	logger.info() << "parsing item prices\n";
-	std::vector<std::optional<lang::price_data>> item_prices = parse_compact(ipd.compact_json, logger);
+	std::vector<std::optional<lang::market::price_data>> item_prices = parse_compact(ipd.compact_json, logger);
 	if (item_prices.empty())
 		throw network::json_parse_error("parsed empty list of item prices");
 
@@ -585,7 +585,7 @@ parse_item_price_data(
 
 	logger.info() << "item entries: " << itemdata.size() << '\n';
 
-	lang::item_price_data result;
+	lang::market::item_price_data result;
 	for (item& itm : itemdata) {
 		/*
 		 * Ignore items which do not have price information.
@@ -599,7 +599,7 @@ parse_item_price_data(
 			continue;
 		}
 
-		const lang::price_data& price_data = *item_prices[itm.id];
+		const lang::market::price_data& price_data = *item_prices[itm.id];
 
 		// ignore items with low confidence
 		if (price_data.is_low_confidence)
@@ -614,7 +614,7 @@ parse_item_price_data(
 		if (itm.frame == +frame_type::relic)
 			continue;
 
-		using lang::elementary_item;
+		using lang::market::elementary_item;
 
 		if (itm.frame == +frame_type::unique) {
 			if (!itm.base_type) {
@@ -633,7 +633,7 @@ parse_item_price_data(
 
 			// skip uniques which do not drop (eg fated items) - this will reduce ambiguity and
 			// not pollute the filter with items we would not care for
-			if (lang::is_undroppable_unique(itm.name))
+			if (lang::market::is_undroppable_unique(itm.name))
 				continue;
 
 			if (std::holds_alternative<categories::armour>(itm.category)
@@ -710,7 +710,7 @@ parse_item_price_data(
 					<< "Assuming for safety the card might have a stack size of 1, which so far was the case with this bug.\n";
 			}
 
-			result.divination_cards.push_back(lang::divination_card{
+			result.divination_cards.push_back(lang::market::divination_card{
 				elementary_item{price_data, std::move(itm.name)},
 				itm.max_stack_size.value_or(1)});
 			continue;
@@ -733,7 +733,7 @@ parse_item_price_data(
 		else if (std::holds_alternative<categories::base>(itm.category)) {
 			const auto& base = std::get<categories::base>(itm.category);
 
-			result.bases.push_back(lang::base{
+			result.bases.push_back(lang::market::base{
 				elementary_item{price_data, std::move(itm.name)},
 				base.ilvl,
 				base.is_shaper,
@@ -747,7 +747,7 @@ parse_item_price_data(
 		else if (std::holds_alternative<categories::gem>(itm.category)) {
 			const auto& gem = std::get<categories::gem>(itm.category);
 
-			result.gems.push_back(lang::gem{
+			result.gems.push_back(lang::market::gem{
 				elementary_item{price_data, std::move(itm.name)},
 				gem.level,
 				gem.quality,

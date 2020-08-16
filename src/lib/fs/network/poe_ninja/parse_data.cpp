@@ -2,7 +2,7 @@
 #include <fs/network/exceptions.hpp>
 #include <fs/utility/dump_json.hpp>
 #include <fs/utility/string_helpers.hpp>
-#include <fs/lang/item_price_data.hpp>
+#include <fs/lang/market/item_price_data.hpp>
 #include <fs/log/logger.hpp>
 
 #include <nlohmann/json.hpp>
@@ -67,19 +67,19 @@ void for_each_item(std::string_view json_str, log::logger& logger, F f)
 	}
 }
 
-[[nodiscard]] lang::price_data // (only for currency overview items)
+[[nodiscard]] lang::market::price_data // (only for currency overview items)
 get_currency_price_data(const nlohmann::json& item)
 {
-	return lang::price_data{
+	return lang::market::price_data{
 		item.at("chaosEquivalent").get<double>(),
 		currency_is_low_confidence(item)
 	};
 }
 
-[[nodiscard]] lang::price_data
+[[nodiscard]] lang::market::price_data
 get_item_price_data(const nlohmann::json& item)
 {
-	return lang::price_data{
+	return lang::market::price_data{
 		item.at("chaosValue").get<double>(),
 		is_low_confidence(item.at("count").get<int>())
 	};
@@ -91,19 +91,19 @@ get_item_name(const nlohmann::json& item)
 	return item.at("name").get<std::string>();
 }
 
-[[nodiscard]] lang::elementary_item
+[[nodiscard]] lang::market::elementary_item
 get_elementary_item_data(const nlohmann::json& item)
 {
-	return lang::elementary_item{
+	return lang::market::elementary_item{
 		get_item_price_data(item),
 		get_item_name(item)
 	};
 }
 
-[[nodiscard]] std::vector<lang::elementary_item> // (only for currency overview items)
+[[nodiscard]] std::vector<lang::market::elementary_item> // (only for currency overview items)
 parse_catalysts(std::string_view json_str, log::logger& logger)
 {
-	std::vector<lang::elementary_item> result;
+	std::vector<lang::market::elementary_item> result;
 
 	for_each_item(json_str, logger, [&](const nlohmann::json& item) {
 		auto& item_name = item.at("currencyTypeName").get_ref<const nlohmann::json::string_t&>();
@@ -111,7 +111,7 @@ parse_catalysts(std::string_view json_str, log::logger& logger)
 			return;
 
 		result.push_back(
-			lang::elementary_item{
+			lang::market::elementary_item{
 				get_currency_price_data(item),
 				item_name
 			}
@@ -121,10 +121,10 @@ parse_catalysts(std::string_view json_str, log::logger& logger)
 	return result;
 }
 
-[[nodiscard]] std::vector<lang::elementary_item>
+[[nodiscard]] std::vector<lang::market::elementary_item>
 parse_elementary_items(std::string_view json_str, log::logger& logger)
 {
-	std::vector<lang::elementary_item> result;
+	std::vector<lang::market::elementary_item> result;
 
 	for_each_item(json_str, logger, [&](const auto& item) {
 		result.push_back(get_elementary_item_data(item));
@@ -133,10 +133,10 @@ parse_elementary_items(std::string_view json_str, log::logger& logger)
 	return result;
 }
 
-[[nodiscard]] std::vector<lang::divination_card>
+[[nodiscard]] std::vector<lang::market::divination_card>
 parse_divination_cards(std::string_view json_str, log::logger& logger)
 {
-	std::vector<lang::divination_card> result;
+	std::vector<lang::market::divination_card> result;
 
 	for_each_item(json_str, logger, [&](const nlohmann::json& item) {
 		result.emplace_back(
@@ -148,10 +148,10 @@ parse_divination_cards(std::string_view json_str, log::logger& logger)
 	return result;
 }
 
-[[nodiscard]] std::vector<lang::gem>
+[[nodiscard]] std::vector<lang::market::gem>
 parse_gems(std::string_view json_str, log::logger& logger)
 {
-	std::vector<lang::gem> result;
+	std::vector<lang::market::gem> result;
 
 	for_each_item(json_str, logger, [&](const nlohmann::json& item) {
 		result.emplace_back(
@@ -165,10 +165,10 @@ parse_gems(std::string_view json_str, log::logger& logger)
 	return result;
 }
 
-[[nodiscard]] std::vector<lang::base>
+[[nodiscard]] std::vector<lang::market::base>
 parse_bases(std::string_view json_str, log::logger& logger)
 {
-	std::vector<lang::base> result;
+	std::vector<lang::market::base> result;
 
 	for_each_item(json_str, logger, [&](const nlohmann::json& item) {
 		const auto& item_influence = item.at("variant");
@@ -205,7 +205,7 @@ parse_bases(std::string_view json_str, log::logger& logger)
 
 void parse_and_fill_uniques(
 	std::string_view uniques_json,
-	lang::unique_item_price_data& uniques,
+	lang::market::unique_item_price_data& uniques,
 	log::logger& logger)
 {
 	for_each_item(uniques_json, logger, [&](const nlohmann::json& item) {
@@ -226,12 +226,12 @@ void parse_and_fill_uniques(
 		// skip uniques which do not drop (eg fated items) - this will reduce ambiguity and
 		// not pollute the filter with items we would not care for
 		const auto& name = item.at("name").get_ref<const nlohmann::json::string_t&>();
-		if (lang::is_undroppable_unique(name)) {
+		if (lang::market::is_undroppable_unique(name)) {
 			return;
 		}
 
 		const auto& base_type = item.at("baseType").get_ref<const nlohmann::json::string_t&>();
-		uniques.add_item(base_type, lang::elementary_item{get_item_price_data(item), name});
+		uniques.add_item(base_type, lang::market::elementary_item{get_item_price_data(item), name});
 	});
 }
 
@@ -240,9 +240,9 @@ void parse_and_fill_uniques(
 namespace fs::network::poe_ninja
 {
 
-lang::item_price_data parse_item_price_data(const api_item_price_data& jsons, log::logger& logger)
+lang::market::item_price_data parse_item_price_data(const api_item_price_data& jsons, log::logger& logger)
 {
-	lang::item_price_data result;
+	lang::market::item_price_data result;
 
 	result.divination_cards = parse_divination_cards(jsons.divination_card, logger);
 

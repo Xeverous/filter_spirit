@@ -3,7 +3,7 @@
 
 #include <fs/version.hpp>
 #include <fs/log/console_logger.hpp>
-#include <fs/lang/item_price_data.hpp>
+#include <fs/lang/market/item_price_data.hpp>
 #include <fs/network/curl/libcurl.hpp>
 
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -199,11 +199,11 @@ int run(int argc, char* argv[])
 			return compare_data_saves(compare_paths, logger);
 		}
 
-		const auto item_price_report = [&]() -> std::optional<fs::lang::item_price_report> {
+		const auto item_price_report = [&]() -> std::optional<fs::lang::market::item_price_report> {
 			if (opt_empty_data) {
 				// user explicitly stated to use empty data, some find it useful
 				// to write SSF filters where price queries are not used
-				return fs::lang::item_price_report();
+				return fs::lang::market::item_price_report();
 			}
 			else {
 				return obtain_item_price_report(

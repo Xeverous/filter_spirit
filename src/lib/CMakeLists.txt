@@ -34,11 +34,11 @@ target_sources(filter_spirit
 		fs/generator/make_filter.cpp
 		fs/lang/loot/item_database.cpp
 		fs/lang/loot/generator.cpp
+		fs/lang/market/item_price_data.cpp
 		fs/lang/action_set.cpp
 		fs/lang/condition_set.cpp
 		fs/lang/item_filter.cpp
 		fs/lang/object.cpp
-		fs/lang/item_price_data.cpp
 		fs/lang/data_source_type.cpp
 		fs/log/logger.cpp
 		fs/utility/file.cpp
@@ -68,6 +68,7 @@ target_sources(filter_spirit
 		fs/generator/settings.hpp
 		fs/lang/loot/item_database.hpp
 		fs/lang/loot/generator.hpp
+		fs/lang/market/item_price_data.hpp
 		fs/lang/action_properties.hpp
 		fs/lang/action_set.hpp
 		fs/lang/condition_properties.hpp
@@ -75,7 +76,6 @@ target_sources(filter_spirit
 		fs/lang/data_source_type.hpp
 		fs/lang/item.hpp
 		fs/lang/item.cpp
-		fs/lang/item_price_data.hpp
 		fs/lang/item_filter.hpp
 		fs/lang/item_classes.hpp
 		fs/lang/keywords.hpp

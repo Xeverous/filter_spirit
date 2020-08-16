@@ -16,7 +16,7 @@ namespace
 {
 
 bool generate_item_filter_impl(
-	const lang::item_price_report& report,
+	const lang::market::item_price_report& report,
 	const std::filesystem::path& source_filepath,
 	const std::filesystem::path& output_filepath,
 	fs::generator::settings st,
@@ -56,7 +56,7 @@ void list_leagues(network::download_settings settings, log::logger& logger)
 		stream << league.name << '\n';
 }
 
-std::optional<lang::item_price_report>
+std::optional<lang::market::item_price_report>
 obtain_item_price_report(
 	const boost::optional<std::string>& download_league_name_ninja,
 	const boost::optional<std::string>& download_league_name_watch,
@@ -74,7 +74,7 @@ obtain_item_price_report(
 	}
 
 	if (data_read_dir) {
-		return lang::load_item_price_report(*data_read_dir, logger);
+		return lang::market::load_item_price_report(*data_read_dir, logger);
 	}
 
 	network::item_price_report_cache cache;
@@ -103,7 +103,7 @@ obtain_item_price_report(
 }
 
 bool generate_item_filter(
-	const std::optional<lang::item_price_report>& report,
+	const std::optional<lang::market::item_price_report>& report,
 	const boost::optional<std::string>& input_path,
 	const boost::optional<std::string>& output_path,
 	fs::generator::settings st,
@@ -131,7 +131,7 @@ int print_item_price_report(
 	const std::string& path,
 	fs::log::logger& logger)
 {
-	std::optional<lang::item_price_report> report = lang::load_item_price_report(path, logger);
+	std::optional<lang::market::item_price_report> report = lang::market::load_item_price_report(path, logger);
 	if (!report) {
 		return EXIT_FAILURE;
 	}
@@ -150,12 +150,12 @@ int compare_data_saves(
 		return EXIT_FAILURE;
 	}
 
-	std::optional<lang::item_price_report> report_lhs = lang::load_item_price_report(paths[0], logger);
+	std::optional<lang::market::item_price_report> report_lhs = lang::market::load_item_price_report(paths[0], logger);
 	if (!report_lhs) {
 		return EXIT_FAILURE;
 	}
 
-	std::optional<lang::item_price_report> report_rhs = lang::load_item_price_report(paths[1], logger);
+	std::optional<lang::market::item_price_report> report_rhs = lang::market::load_item_price_report(paths[1], logger);
 	if (!report_rhs) {
 		return EXIT_FAILURE;
 	}
@@ -163,7 +163,7 @@ int compare_data_saves(
 	(*report_lhs).data.sort();
 	(*report_rhs).data.sort();
 
-	lang::compare_item_price_reports(*report_lhs, *report_rhs, logger);
+	lang::market::compare_item_price_reports(*report_lhs, *report_rhs, logger);
 
 	return EXIT_SUCCESS;
 }

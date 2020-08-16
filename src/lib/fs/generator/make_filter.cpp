@@ -81,10 +81,10 @@ make_strings_condition_basic(
 	return make_strings_condition(
 		first,
 		last,
-		[&](const lang::elementary_item& item) {
+		[&](const lang::market::elementary_item& item) {
 			return price_range.includes(item.price.chaos_value);
 		},
-		[&](const lang::elementary_item& item) {
+		[&](const lang::market::elementary_item& item) {
 			return item.name;
 		},
 		autogen_origin);
@@ -102,7 +102,7 @@ make_strings_condition_uniques_unambiguous(
 		first,
 		last,
 		[price_range](const auto& pair) {
-			const lang::elementary_item& item = pair.second;
+			const lang::market::elementary_item& item = pair.second;
 			return price_range.includes(item.price.chaos_value);
 		},
 		[](const auto& pair) {
@@ -126,7 +126,7 @@ make_strings_condition_uniques_ambiguous(
 			const auto& items = pair.second; // C++20: use concept container
 			BOOST_ASSERT(!items.empty());
 
-			for (const lang::elementary_item& item : items)
+			for (const lang::market::elementary_item& item : items)
 				if (price_range.includes(item.price.chaos_value))
 					return true;
 			return false;
@@ -140,7 +140,7 @@ make_strings_condition_uniques_ambiguous(
 [[nodiscard]] lang::item_filter_block
 make_filter_block(
 	const lang::spirit_item_filter_block& block_template,
-	const lang::item_price_data& item_price_data)
+	const lang::market::item_price_data& item_price_data)
 {
 	if (!block_template.autogen)
 		return block_template.block;
@@ -342,7 +342,7 @@ namespace fs::generator
 lang::item_filter
 make_filter(
 	const lang::spirit_item_filter& filter_template,
-	const lang::item_price_data& item_price_data)
+	const lang::market::item_price_data& item_price_data)
 {
 	std::vector<lang::item_filter_block> blocks;
 	blocks.reserve(filter_template.blocks.size());

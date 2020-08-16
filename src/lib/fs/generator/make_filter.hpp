@@ -1,7 +1,7 @@
 #pragma once
 
 #include <fs/lang/item_filter.hpp>
-#include <fs/lang/item_price_data.hpp>
+#include <fs/lang/market/item_price_data.hpp>
 
 namespace fs::generator
 {
@@ -19,6 +19,6 @@ namespace fs::generator
 [[nodiscard]] lang::item_filter
 make_filter(
 	const lang::spirit_item_filter& filter_template,
-	const lang::item_price_data& item_price_data);
+	const lang::market::item_price_data& item_price_data);
 
 }
