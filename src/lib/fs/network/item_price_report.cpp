@@ -22,7 +22,7 @@ using namespace fs::network;
 
 [[nodiscard]] bool
 matches(
-	const lang::item_price_metadata& metadata,
+	const lang::market::item_price_metadata& metadata,
 	const std::string& league,
 	lang::data_source_type api)
 {
@@ -37,7 +37,7 @@ matches(
 
 [[nodiscard]] bool
 matches(
-	const lang::item_price_metadata& metadata,
+	const lang::market::item_price_metadata& metadata,
 	const std::string& league,
 	lang::data_source_type api,
 	boost::posix_time::time_duration expiration_time)
@@ -96,7 +96,7 @@ std::string make_save_path(lang::data_source_type api, std::string_view league)
 	return path.append("_").append(normalize_league_name(league));
 }
 
-std::future<lang::item_price_report>
+std::future<lang::market::item_price_report>
 async_load_item_price_report(
 	item_price_report_cache& self,
 	item_price_report_cache::metadata_save meta,
@@ -105,7 +105,7 @@ async_load_item_price_report(
 	return std::async(
 		std::launch::async,
 		[](item_price_report_cache& self, item_price_report_cache::metadata_save meta, log::logger& logger) {
-			std::optional<lang::item_price_report> report = lang::load_item_price_report(meta.path, logger);
+			std::optional<lang::market::item_price_report> report = lang::market::load_item_price_report(meta.path, logger);
 			if (!report)
 				throw std::runtime_error("failed to load item price report from disk");
 
@@ -118,7 +118,7 @@ async_load_item_price_report(
 template <typename T>
 void save_api_data(
 	const T& api_data, // T must have save(dir, logger) overload
-	const lang::item_price_metadata& metadata,
+	const lang::market::item_price_metadata& metadata,
 	const std::string& data_save_dir,
 	log::logger& logger)
 {
@@ -135,7 +135,7 @@ void save_api_data(
 	logger.info() << "item price data successfully saved\n";
 }
 
-std::future<lang::item_price_report>
+std::future<lang::market::item_price_report>
 async_download_and_parse_ninja(
 	item_price_report_cache& self,
 	std::string league,
@@ -148,7 +148,7 @@ async_download_and_parse_ninja(
 		[](item_price_report_cache& self, std::string league, download_settings settings, download_info* info, log::logger& logger) {
 			poe_ninja::api_item_price_data api_data = poe_ninja::download_item_price_data(league, settings, info, logger);
 
-			lang::item_price_report report;
+			lang::market::item_price_report report;
 			report.metadata.data_source = lang::data_source_type::poe_ninja;
 			report.metadata.league_name = league;
 			report.metadata.download_date = boost::posix_time::microsec_clock::universal_time();
@@ -166,7 +166,7 @@ async_download_and_parse_ninja(
 		std::ref(self), std::move(league), std::move(settings), info, std::ref(logger));
 }
 
-std::future<lang::item_price_report>
+std::future<lang::market::item_price_report>
 download_and_parse_watch(
 	item_price_report_cache& self,
 	std::string league,
@@ -179,7 +179,7 @@ download_and_parse_watch(
 		[](item_price_report_cache& self, std::string league, download_settings settings, download_info* info, log::logger& logger) {
 			poe_watch::api_item_price_data api_data = poe_watch::download_item_price_data(league, settings, info, logger);
 
-			lang::item_price_report report;
+			lang::market::item_price_report report;
 			report.metadata.data_source = lang::data_source_type::poe_ninja;
 			report.metadata.league_name = league;
 			report.metadata.download_date = boost::posix_time::microsec_clock::universal_time();
@@ -201,7 +201,7 @@ download_and_parse_watch(
 
 namespace fs::network {
 
-std::future<lang::item_price_report>
+std::future<lang::market::item_price_report>
 item_price_report_cache::async_get_report(
 	std::string league,
 	lang::data_source_type api,
@@ -211,11 +211,11 @@ item_price_report_cache::async_get_report(
 	log::logger& logger)
 {
 	if (api == lang::data_source_type::none) {
-		return utility::make_ready_future<lang::item_price_report>(lang::item_price_report());
+		return utility::make_ready_future<lang::market::item_price_report>(lang::market::item_price_report());
 	}
 
-	if (std::optional<lang::item_price_report> report = find_in_memory_cache(league, api, expiration_time); report) {
-		return utility::make_ready_future<lang::item_price_report>(*report);
+	if (std::optional<lang::market::item_price_report> report = find_in_memory_cache(league, api, expiration_time); report) {
+		return utility::make_ready_future<lang::market::item_price_report>(*report);
 	}
 
 	if (std::optional<metadata_save> metadata = find_in_disk_cache(league, api, expiration_time); metadata) {
@@ -231,7 +231,7 @@ item_price_report_cache::async_get_report(
 	}
 }
 
-[[nodiscard]] std::optional<lang::item_price_report>
+[[nodiscard]] std::optional<lang::market::item_price_report>
 item_price_report_cache::find_in_memory_cache(
 	const std::string& league,
 	lang::data_source_type api,
@@ -239,7 +239,7 @@ item_price_report_cache::find_in_memory_cache(
 {
 	auto _ = std::lock_guard<std::mutex>(_memory_cache_mutex);
 
-	for (const lang::item_price_report& rep : _memory_cache) {
+	for (const lang::market::item_price_report& rep : _memory_cache) {
 		if (matches(rep.metadata, league, api, expiration_time))
 			return rep;
 	}
@@ -277,11 +277,11 @@ void item_price_report_cache::update_disk_cache(metadata_save newer)
 	_disk_cache.push_back(std::move(newer));
 }
 
-void item_price_report_cache::update_memory_cache(lang::item_price_report newer)
+void item_price_report_cache::update_memory_cache(lang::market::item_price_report newer)
 {
 	auto _ = std::lock_guard<std::mutex>(_memory_cache_mutex);
 
-	for (lang::item_price_report& rep : _memory_cache) {
+	for (lang::market::item_price_report& rep : _memory_cache) {
 		if (matches(rep.metadata, newer.metadata.league_name, newer.metadata.data_source)) {
 			rep = std::move(newer);
 			return;
@@ -332,7 +332,7 @@ bool item_price_report_cache::load_cache_file_from_disk(log::logger& logger)
 
 	auto json = nlohmann::json::parse(*file);
 	for (const auto& obj : json) {
-		std::optional<lang::item_price_metadata> meta = lang::from_json(obj, logger);
+		std::optional<lang::market::item_price_metadata> meta = lang::market::from_json(obj, logger);
 		if (!meta) {
 			logger.error() << "failed to parse metadata\n";
 			return false;

@@ -14,7 +14,7 @@
 #include <filesystem>
 #include <optional>
 
-namespace fs::lang
+namespace fs::lang::market
 {
 
 struct price_data

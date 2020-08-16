@@ -4,7 +4,7 @@
 
 #include <fs/generator/settings.hpp>
 #include <fs/lang/item_filter.hpp>
-#include <fs/lang/item_price_data.hpp>
+#include <fs/lang/market/item_price_data.hpp>
 #include <fs/log/logger.hpp>
 
 #include <elements/element.hpp>
@@ -25,7 +25,7 @@ public:
 
 	void load_filter_template(fs::log::logger& logger);
 	void parse_filter_template(fs::generator::settings st, fs::log::logger& logger);
-	void recompute_real_filter(const fs::lang::item_price_report& report, fs::log::logger& logger);
+	void recompute_real_filter(const fs::lang::market::item_price_report& report, fs::log::logger& logger);
 
 private:
 	event_inserter _inserter;

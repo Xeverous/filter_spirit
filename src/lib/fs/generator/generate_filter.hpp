@@ -1,6 +1,6 @@
 #pragma once
 
-#include <fs/lang/item_price_data.hpp>
+#include <fs/lang/market/item_price_data.hpp>
 #include <fs/lang/item_filter.hpp>
 #include <fs/generator/settings.hpp>
 
@@ -31,7 +31,7 @@ std::optional<fs::lang::spirit_item_filter> parse_spirit_filter(
 [[nodiscard]]
 std::optional<std::string> generate_filter(
 	std::string_view input,
-	const lang::item_price_report& report,
+	const lang::market::item_price_report& report,
 	settings st,
 	log::logger& logger);
 
@@ -39,7 +39,7 @@ std::optional<std::string> generate_filter(
 [[nodiscard]]
 std::optional<std::string> generate_filter_without_preamble(
 	std::string_view input,
-	const lang::item_price_data& item_price_data,
+	const lang::market::item_price_data& item_price_data,
 	settings st,
 	log::logger& logger);
 

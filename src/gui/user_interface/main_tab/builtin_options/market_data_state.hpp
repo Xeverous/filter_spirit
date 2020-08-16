@@ -2,7 +2,7 @@
 
 #include "event.hpp"
 
-#include <fs/lang/item_price_data.hpp>
+#include <fs/lang/market/item_price_data.hpp>
 #include <fs/network/item_price_report.hpp>
 
 #include <elements/element.hpp>
@@ -36,12 +36,12 @@ private:
 	event_inserter _inserter;
 
 	// actual state
-	fs::lang::item_price_report _price_report;
+	fs::lang::market::item_price_report _price_report;
 
 	// download state
 	bool _download_running = false;
 	fs::network::download_info _download_info;
-	std::future<fs::lang::item_price_report> _price_report_future;
+	std::future<fs::lang::market::item_price_report> _price_report_future;
 	fs::network::item_price_report_cache _price_report_cache;
 
 	// UI

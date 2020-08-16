@@ -64,7 +64,7 @@ void filter_template_state::parse_filter_template(fs::generator::settings st, fs
 	_inserter.push_event(events::spirit_filter_changed{});
 }
 
-void filter_template_state::recompute_real_filter(const fs::lang::item_price_report& report, fs::log::logger& logger)
+void filter_template_state::recompute_real_filter(const fs::lang::market::item_price_report& report, fs::log::logger& logger)
 {
 	if (!_spirit_filter)
 		return;

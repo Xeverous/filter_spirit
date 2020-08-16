@@ -1,4 +1,4 @@
-#include <fs/lang/item_price_data.hpp>
+#include <fs/lang/market/item_price_data.hpp>
 #include <fs/network/poe_ninja/api_data.hpp>
 #include <fs/network/poe_watch/api_data.hpp>
 #include <fs/network/poe_ninja/parse_data.hpp>
@@ -180,6 +180,7 @@ const auto undroppable_uniques = make_undroppable_uniques();
 
 using namespace fs;
 using namespace fs::lang;
+using namespace fs::lang::market;
 
 void compare_item_price_data(
 	const item_price_data& lhs,
@@ -256,7 +257,7 @@ void compare_item_price_data(
 
 } // namespace
 
-namespace fs::lang
+namespace fs::lang::market
 {
 
 bool is_undroppable_unique(std::string_view name) noexcept
@@ -492,7 +493,7 @@ load_item_price_report(
 	const std::filesystem::path& directory,
 	log::logger& logger)
 {
-	lang::item_price_report report;
+	item_price_report report;
 	if (!report.metadata.load(directory, logger)) {
 		logger.error() << "failed to load item price metadata\n";
 		return std::nullopt;

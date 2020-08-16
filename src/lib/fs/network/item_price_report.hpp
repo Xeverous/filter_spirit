@@ -1,6 +1,6 @@
 #pragma once
 
-#include <fs/lang/item_price_data.hpp>
+#include <fs/lang/market/item_price_data.hpp>
 #include <fs/network/download.hpp>
 #include <fs/log/logger.hpp>
 #include <fs/version.hpp>
@@ -17,7 +17,7 @@ namespace fs::network {
 class item_price_report_cache
 {
 public:
-	[[nodiscard]] std::future<lang::item_price_report>
+	[[nodiscard]] std::future<lang::market::item_price_report>
 	async_get_report(
 		std::string league,
 		lang::data_source_type api,
@@ -29,19 +29,19 @@ public:
 
 	struct metadata_save
 	{
-		lang::item_price_metadata metadata;
+		lang::market::item_price_metadata metadata;
 		std::filesystem::path path;
 		version::version_triplet fs_version;
 	};
 
 	void update_disk_cache(metadata_save metadata);
-	void update_memory_cache(lang::item_price_report report);
+	void update_memory_cache(lang::market::item_price_report report);
 
 	bool update_cache_file_on_disk(log::logger& logger) const;
 	bool load_cache_file_from_disk(log::logger& logger);
 
 private:
-	[[nodiscard]] std::optional<lang::item_price_report>
+	[[nodiscard]] std::optional<lang::market::item_price_report>
 	find_in_memory_cache(
 		const std::string& league,
 		lang::data_source_type api,
@@ -56,7 +56,7 @@ private:
 	mutable std::mutex _disk_cache_mutex;
 	mutable std::mutex _memory_cache_mutex;
 	std::vector<metadata_save> _disk_cache;
-	std::vector<lang::item_price_report> _memory_cache;
+	std::vector<lang::market::item_price_report> _memory_cache;
 };
 
 }
