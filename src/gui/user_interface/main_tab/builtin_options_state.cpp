@@ -8,16 +8,16 @@ namespace el = cycfi::elements;
 std::shared_ptr<el::element> builtin_options_state::make_ui()
 {
 	return el::share(make_section("built-in generation options",
-		el::vtile(
+		el::no_hstretch(el::vtile(
 			el::htile(
 				el::vtile(
 					el::align_left_middle(el::label("override opacity in all colors (0 (transparent) - 255 (opaque))")),
 					el::align_left_middle(el::label("override volume in all built-in sounds (0 - 300)"))
 				),
-				el::no_hstretch(el::vtile(
+				el::vtile(
 					el::hold(_override_opacity_option.make_ui()),
 					el::hold(_override_volume_option.make_ui())
-				))
+				)
 			),
 			el::htile(
 				el::vtile(
@@ -31,6 +31,6 @@ std::shared_ptr<el::element> builtin_options_state::make_ui()
 					el::hold(_market_data.make_ui())
 				)
 			)
-		)
+		))
 	));
 }

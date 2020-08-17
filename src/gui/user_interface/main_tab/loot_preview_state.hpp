@@ -1,6 +1,7 @@
 #pragma once
 
 #include "event.hpp"
+#include "user_interface/main_tab/loot_preview/loot_preview_settings_state.hpp"
 
 #include <fs/lang/loot/item_database.hpp>
 #include <fs/lang/loot/generator.hpp>
@@ -15,11 +16,7 @@
 class loot_preview_state
 {
 public:
-	loot_preview_state(event_inserter inserter)
-	: _inserter(inserter)
-	{
-		_inserter.push_event(events::load_item_database{});
-	}
+	loot_preview_state(event_inserter inserter);
 
 	std::shared_ptr<cycfi::elements::element> make_ui();
 	void load_item_database(fs::log::logger& logger);
@@ -41,4 +38,5 @@ private:
 	// UI
 	std::shared_ptr<cycfi::elements::flow_composite> _flow_composite;
 	std::shared_ptr<cycfi::elements::deck_element> _main_element;
+	loot_preview_settings_state _loot_settings;
 };

@@ -20,6 +20,8 @@ target_sources(filter_spirit_gui
 		user_interface.hpp
 		user_interface/generic/integer_input_box.cpp
 		user_interface/generic/integer_input_box.hpp
+		user_interface/generic/slider.cpp
+		user_interface/generic/slider.hpp
 		user_interface/main_tab/builtin_options/api_selection_state.cpp
 		user_interface/main_tab/builtin_options/api_selection_state.hpp
 		user_interface/main_tab/builtin_options/league_selection_state.cpp
@@ -32,6 +34,8 @@ target_sources(filter_spirit_gui
 		user_interface/main_tab/filter_template_state.hpp
 		user_interface/main_tab/gui_logger.cpp
 		user_interface/main_tab/gui_logger.hpp
+		user_interface/main_tab/loot_preview/loot_preview_settings_state.cpp
+		user_interface/main_tab/loot_preview/loot_preview_settings_state.hpp
 		user_interface/main_tab/loot_preview_state.cpp
 		user_interface/main_tab/loot_preview_state.hpp
 		user_interface/main_tab_state.cpp

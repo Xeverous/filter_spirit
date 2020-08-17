@@ -3,10 +3,12 @@
 #include <elements/element.hpp>
 #include <infra/support.hpp> // for remove_cvref_t
 
+#include <boost/date_time/posix_time/posix_time_types.hpp>
+
 #include <functional>
 #include <string>
 #include <utility>
-#include <boost/date_time/posix_time/posix_time_types.hpp>
+
 
 inline std::string to_string(boost::posix_time::time_duration duration)
 {

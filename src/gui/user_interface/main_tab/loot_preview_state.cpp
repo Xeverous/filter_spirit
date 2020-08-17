@@ -4,6 +4,8 @@
 
 #include <fs/utility/file.hpp>
 
+#include <cmath>
+
 namespace el = cycfi::elements;
 
 namespace {
@@ -23,6 +25,12 @@ item_preview make_item_preview(const fs::lang::item& itm, const fs::lang::item_s
 		to_elements_color(style.background_color.c));
 }
 
+}
+
+loot_preview_state::loot_preview_state(event_inserter inserter)
+: _inserter(inserter)
+{
+	_inserter.push_event(events::load_item_database{});
 }
 
 void loot_preview_state::load_item_database(fs::log::logger& logger)
@@ -57,7 +65,10 @@ std::shared_ptr<cycfi::elements::element> loot_preview_state::make_ui()
 		)
 	));
 
-	return el::share(make_section("loot preview", el::hold(_main_element)));
+	return el::share(make_section("loot preview", el::vtile(
+		el::hold(_loot_settings.ui()),
+		el::hold(_main_element)
+	)));
 }
 
 void loot_preview_state::generate_loot_currency_generic()
