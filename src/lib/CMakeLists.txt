@@ -119,6 +119,7 @@ target_sources(filter_spirit
 		fs/parser/error.hpp
 		fs/parser/parser.hpp
 		fs/utility/assert.hpp
+		fs/utility/math.hpp
 		fs/utility/algorithm.hpp
 		fs/utility/better_enum.hpp
 		fs/utility/dump_json.hpp
