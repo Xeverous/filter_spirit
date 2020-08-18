@@ -19,10 +19,15 @@ public:
 	filter_template_state(event_inserter inserter)
 	: _inserter(inserter)
 	{
+		make_ui();
 	}
 
-	std::shared_ptr<cycfi::elements::element> make_ui(cycfi::elements::host_window_handle window);
+	std::shared_ptr<cycfi::elements::element> ui()
+	{
+		return _root_element;
+	}
 
+	void browse_for_filter_template(cycfi::elements::host_window_handle window);
 	void load_filter_template(fs::log::logger& logger);
 	void parse_filter_template(fs::generator::settings st, fs::log::logger& logger);
 	void recompute_real_filter(const fs::lang::market::item_price_report& report, fs::log::logger& logger);
@@ -31,6 +36,8 @@ public:
 	const auto& spirit_filter() const { return _spirit_filter; }
 
 private:
+	void make_ui();
+
 	event_inserter _inserter;
 
 	std::optional<std::string> _filter_template_path;
@@ -38,5 +45,6 @@ private:
 	std::optional<fs::lang::spirit_item_filter> _spirit_filter;
 	std::optional<fs::lang::item_filter> _real_filter;
 
+	std::shared_ptr<cycfi::elements::element> _root_element;
 	std::shared_ptr<cycfi::elements::basic_label> _label_filter_template_path;
 };

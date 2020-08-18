@@ -15,9 +15,13 @@ public:
 	market_data_state(event_inserter inserter)
 	: _inserter(inserter)
 	{
+		make_ui();
 	}
 
-	std::shared_ptr<cycfi::elements::element> make_ui();
+	std::shared_ptr<cycfi::elements::element> ui()
+	{
+		return _root_element;
+	}
 
 	void update();
 
@@ -31,6 +35,7 @@ public:
 	const auto& price_report() const { return _price_report; }
 
 private:
+	void make_ui();
 	void refresh_status_label();
 
 	event_inserter _inserter;
@@ -45,6 +50,7 @@ private:
 	fs::network::item_price_report_cache _price_report_cache;
 
 	// UI
+	std::shared_ptr<cycfi::elements::element> _root_element;
 	std::shared_ptr<cycfi::elements::deck_element> _market_data_refresh_element;
 	std::shared_ptr<cycfi::elements::progress_bar_base> _market_data_refresh_progress_bar;
 	std::shared_ptr<cycfi::elements::label> _market_data_status_label;

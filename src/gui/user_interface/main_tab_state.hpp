@@ -17,10 +17,14 @@ public:
 	: _filter_template(inserter)
 	, _builtin_options(inserter)
 	, _loot_preview(inserter)
+	, _root_element(make_ui())
 	{
 	}
 
-	std::shared_ptr<cycfi::elements::element> make_ui(cycfi::elements::host_window_handle window);
+	std::shared_ptr<cycfi::elements::element> ui()
+	{
+		return _root_element;
+	}
 
 	void update()
 	{
@@ -34,8 +38,12 @@ public:
 	auto& loot_preview() { return _loot_preview; }
 
 private:
+	std::shared_ptr<cycfi::elements::element> make_ui();
+
 	gui_logger _logger;
 	filter_template_state _filter_template;
 	builtin_options_state _builtin_options;
 	loot_preview_state _loot_preview;
+
+	std::shared_ptr<cycfi::elements::element> _root_element;
 };

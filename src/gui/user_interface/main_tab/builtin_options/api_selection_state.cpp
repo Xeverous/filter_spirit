@@ -16,16 +16,12 @@ std::shared_ptr<el::element> api_selection_state::make_ui()
 {
 	return el::share(el::selection_menu(
 		[this](std::string_view selected) {
-			if (selected == poe_ninja) {
+			if (selected == poe_ninja)
 				_selected_api = fs::lang::data_source_type::poe_ninja;
-			}
-			else if (selected == poe_watch) {
+			else if (selected == poe_watch)
 				_selected_api = fs::lang::data_source_type::poe_watch;
-			}
-			else {
+			else
 				_selected_api = fs::lang::data_source_type::none;
-				// _market_data_refresh_element->select(3); // switch to the label TODO
-			}
 
 			_inserter.push_event(events::api_selection_changed{});
 		},

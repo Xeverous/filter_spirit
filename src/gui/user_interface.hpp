@@ -10,7 +10,7 @@
 class user_interface
 {
 public:
-	user_interface(cycfi::elements::host_window_handle window, cycfi::elements::view& v, event_inserter inserter);
+	user_interface(cycfi::elements::view& v, event_inserter inserter);
 
 	void update()
 	{

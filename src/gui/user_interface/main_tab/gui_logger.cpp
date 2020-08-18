@@ -35,7 +35,7 @@ std::string remove_trailing_whitespace(std::string str)
 
 }
 
-std::shared_ptr<el::element> gui_logger::make_ui()
+void gui_logger::make_ui()
 {
 	_composite = el::share(el::vtile_composite());
 	auto scroller = el::share(el::vscroller(el::hold(_composite)));
@@ -44,7 +44,7 @@ std::shared_ptr<el::element> gui_logger::make_ui()
 		scroller->valign(1.0);
 	};
 
-	return el::share(el::top_margin(3.0f, el::vtile(
+	_root_element = el::share(el::top_margin(3.0f, el::vtile(
 		el::layer(
 			el::hold(scroller),
 			el::box(el::colors::black)

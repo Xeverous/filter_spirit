@@ -27,16 +27,16 @@ auto make_page(E&& element)
 
 } // namespace
 
-user_interface::user_interface(el::host_window_handle window, el::view& v, event_inserter inserter)
+user_interface::user_interface(el::view& v, event_inserter inserter)
 : _main_tab(inserter)
 {
 	v.content(
 		el::scale(1.2f, el::vnotebook(
 			v,
 			el::deck(
-				make_page(el::hold(_main_tab.make_ui(window))),
+				make_page(el::hold(_main_tab.ui())),
 				make_page(make_tab_reference()),
-				make_page(el::hold(_settings_tab.make_ui())),
+				make_page(el::hold(_settings_tab.ui())),
 				make_page(make_tab_about())
 			),
 			el::tab("main"),

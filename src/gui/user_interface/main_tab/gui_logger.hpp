@@ -12,7 +12,10 @@
 class gui_logger
 {
 public:
-	std::shared_ptr<cycfi::elements::element> make_ui();
+	gui_logger()
+	{
+		make_ui();
+	}
 
 	void update();
 
@@ -21,8 +24,17 @@ public:
 	      auto& logger()       { return _logger; }
 	const auto& logger() const { return _logger; }
 
+	std::shared_ptr<cycfi::elements::element> ui()
+	{
+		return _root_element;
+	}
+
 private:
+	void make_ui();
+
 	fs::log::thread_safe_logger<fs::log::buffer_logger> _logger;
+
+	std::shared_ptr<cycfi::elements::element> _root_element;
 	std::shared_ptr<cycfi::elements::vtile_composite> _composite;
 	std::function<void()> _scroll_to_bottom;
 };

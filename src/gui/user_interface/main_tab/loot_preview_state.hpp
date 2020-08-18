@@ -18,7 +18,6 @@ class loot_preview_state
 public:
 	loot_preview_state(event_inserter inserter);
 
-	std::shared_ptr<cycfi::elements::element> make_ui();
 	void load_item_database(fs::log::logger& logger);
 
 	void generate_loot_divination_cards();
@@ -26,7 +25,14 @@ public:
 
 	void refresh_loot_preview(const fs::lang::item_filter& filter);
 
+	std::shared_ptr<cycfi::elements::element> ui()
+	{
+		return _root_element;
+	}
+
 private:
+	void make_ui();
+
 	event_inserter _inserter;
 
 	std::optional<fs::lang::loot::item_database> _item_database;
@@ -36,6 +42,7 @@ private:
 	std::vector<fs::lang::item_style> _loot_styles;
 
 	// UI
+	std::shared_ptr<cycfi::elements::element> _root_element;
 	std::shared_ptr<cycfi::elements::flow_composite> _flow_composite;
 	std::shared_ptr<cycfi::elements::deck_element> _main_element;
 	loot_preview_settings_state _loot_settings;

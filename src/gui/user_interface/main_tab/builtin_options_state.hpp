@@ -23,6 +23,7 @@ public:
 	, _override_opacity_option(0, 255)
 	, _override_volume_option(fs::lang::limits::min_filter_volume, fs::lang::limits::max_filter_volume)
 	{
+		make_ui();
 	}
 
 	void update(fs::log::logger& logger)
@@ -31,7 +32,10 @@ public:
 		_market_data.update();
 	}
 
-	std::shared_ptr<cycfi::elements::element> make_ui();
+	std::shared_ptr<cycfi::elements::element> ui()
+	{
+		return _root_element;
+	}
 
 	auto& api_selection() { return _api_selection; }
 	auto& league_selection() { return _league_selection; }
@@ -40,9 +44,13 @@ public:
 	auto& override_volume_option() { return _override_volume_option; }
 
 private:
+	void make_ui();
+
 	api_selection_state _api_selection;
 	league_selection_state _league_selection;
 	market_data_state _market_data;
 	integer_input_box _override_opacity_option;
 	integer_input_box _override_volume_option;
+
+	std::shared_ptr<cycfi::elements::element> _root_element;
 };

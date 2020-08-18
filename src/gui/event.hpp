@@ -8,6 +8,7 @@ namespace events {
 
 struct load_item_database {};
 
+struct filter_template_browse_requested {};
 struct filter_template_path_changed{};
 struct filter_template_changed {};
 
@@ -27,6 +28,7 @@ struct price_report_changed {};
 
 using event_t = std::variant<
 	events::load_item_database,
+	events::filter_template_browse_requested,
 	events::filter_template_path_changed,
 	events::filter_template_changed,
 	events::spirit_filter_changed,

@@ -20,9 +20,13 @@ public:
 	: _inserter(inserter)
 	{
 		_inserter.push_event(events::refresh_available_leagues{});
+		make_ui();
 	}
 
-	std::shared_ptr<cycfi::elements::element> make_ui();
+	std::shared_ptr<cycfi::elements::element> ui()
+	{
+		return _league_selection_main_element;
+	}
 
 	void refresh_available_leagues(fs::network::download_settings ds, fs::log::logger& logger);
 	void update(fs::log::logger& logger);
@@ -40,6 +44,8 @@ public:
 	void api_selection_changed(fs::lang::data_source_type api);
 
 private:
+	void make_ui();
+
 	std::function<void(std::string_view)> make_league_selection_callback();
 
 	event_inserter _inserter;

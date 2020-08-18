@@ -91,11 +91,30 @@ void process_event(events::refresh_available_leagues /* event */, user_interface
 		ui.main().logger().logger());
 }
 
-void process_event(event_t event, user_interface& ui)
+void browse_for_filter_template(user_interface& ui, cycfi::elements::view& view)
 {
-	std::visit([&](auto event) {
-		process_event(std::move(event), ui);
-	}, event);
+	/*
+	 * For some reason, if browsing (which uses modal window) is invoked
+	 * directly, it keeps spawning infinitely many modal windows in a loop
+	 * that seems to be outside of FS code. But if the function is posted
+	 * through elements built-in ASIO queue, the bug does not happen. Perhaps
+	 * it is because how/where elements implements OS-level event handling.
+	 */
+	view.post([&, window = view.host()]() {
+		ui.main().filter_template().browse_for_filter_template(window);
+	});
+}
+
+void process_event(event_t event, cycfi::elements::view& view, user_interface& ui)
+{
+	std::visit(fs::utility::visitor{
+		[&](auto event) {
+			process_event(std::move(event), ui);
+		},
+		[&](events::filter_template_browse_requested) {
+			browse_for_filter_template(ui, view);
+		}
+	}, std::move(event));
 }
 
 } // namespace
@@ -103,7 +122,7 @@ void process_event(event_t event, user_interface& ui)
 void controller::process_events()
 {
 	while (!_event_queue.empty()) {
-		process_event(std::move(_event_queue.front()), _ui);
+		process_event(std::move(_event_queue.front()), *this, _ui);
 		_event_queue.pop();
 	}
 }

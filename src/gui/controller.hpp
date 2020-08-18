@@ -13,7 +13,7 @@ class controller : public cycfi::elements::view
 public:
 	controller(cycfi::elements::window& w)
 	: cycfi::elements::view(w)
-	, _ui(w.host(), *this, event_inserter(_event_queue))
+	, _ui(*this, event_inserter(_event_queue))
 	{
 	}
 

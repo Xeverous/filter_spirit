@@ -72,7 +72,7 @@ void league_selection_state::api_selection_changed(fs::lang::data_source_type ap
 		_league_selection_main_element->select(0); // switch to menu + button
 }
 
-std::shared_ptr<el::element> league_selection_state::make_ui()
+void league_selection_state::make_ui()
 {
 	_league_selection_menu = el::share(make_proxy(make_league_selection_menu(_available_leagues, make_league_selection_callback())));
 	_league_selection_refresh_progress_bar = el::share(make_progress_bar());
@@ -92,6 +92,4 @@ std::shared_ptr<el::element> league_selection_state::make_ui()
 		el::align_middle(el::label("(no leagues to choose from)"))
 	));
 	_league_selection_main_element->select(0); // start with menu + button
-
-	return _league_selection_main_element;
 }

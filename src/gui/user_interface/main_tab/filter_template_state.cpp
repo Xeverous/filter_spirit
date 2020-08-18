@@ -8,26 +8,15 @@
 
 namespace el = cycfi::elements;
 
-std::shared_ptr<el::element> filter_template_state::make_ui(el::host_window_handle window)
+void filter_template_state::make_ui()
 {
 	_label_filter_template_path = el::share(el::label("(no filter template selected)"));
 
-	auto on_filter_template_browse = [window, this](bool) mutable {
-		filesystem_modal_settings settings;
-		open_file_modal_settings of_settings;
-		std::vector<std::string> paths = modal_dialog_open_file(window, settings, of_settings);
-
-		if (paths.empty()) {
-			_label_filter_template_path->set_text("(no filter template selected)");
-		}
-		else {
-			_label_filter_template_path->set_text(paths.front());
-			_filter_template_path = std::move(paths.front());
-			_inserter.push_event(events::filter_template_path_changed{});
-		}
+	auto on_filter_template_browse = [this](bool) mutable {
+		_inserter.push_event(events::filter_template_browse_requested{});
 	};
 
-	return el::share(el::htile(
+	_root_element = el::share(el::htile(
 		el::align_center_middle(el::hold(_label_filter_template_path)),
 		make_button("browse...", on_filter_template_browse),
 		make_button(el::icons::cycle, "reload", [this](bool) {
@@ -37,6 +26,22 @@ std::shared_ptr<el::element> filter_template_state::make_ui(el::host_window_hand
 			_inserter.push_event(events::filter_template_path_changed{});
 		})
 	));
+}
+
+void filter_template_state::browse_for_filter_template(cycfi::elements::host_window_handle window)
+{
+	filesystem_modal_settings settings;
+	open_file_modal_settings of_settings;
+	std::vector<std::string> paths = modal_dialog_open_file(window, settings, of_settings);
+
+	if (paths.empty()) {
+		_label_filter_template_path->set_text("(no filter template selected)");
+	}
+	else {
+		_label_filter_template_path->set_text(paths.front());
+		_filter_template_path = std::move(paths.front());
+		_inserter.push_event(events::filter_template_path_changed{});
+	}
 }
 
 void filter_template_state::load_filter_template(fs::log::logger& logger)

@@ -12,17 +12,17 @@ auto make_filter_supplied_options()
 	));
 }
 
-std::shared_ptr<el::element> main_tab_state::make_ui(el::host_window_handle window)
+std::shared_ptr<el::element> main_tab_state::make_ui()
 {
 	return el::share(el::vtile(
 		el::htile(
 			el::no_hstretch(el::vtile(
-				el::hold(_filter_template.make_ui(window)),
-				el::hold(_builtin_options.make_ui()),
+				el::hold(_filter_template.ui()),
+				el::hold(_builtin_options.ui()),
 				make_filter_supplied_options()
 			)),
-			el::hold(_loot_preview.make_ui())
+			el::hold(_loot_preview.ui())
 		),
-		el::hold(_logger.make_ui())
+		el::hold(_logger.ui())
 	));
 }

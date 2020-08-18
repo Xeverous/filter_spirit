@@ -31,6 +31,7 @@ loot_preview_state::loot_preview_state(event_inserter inserter)
 : _inserter(inserter)
 {
 	_inserter.push_event(events::load_item_database{});
+	make_ui();
 }
 
 void loot_preview_state::load_item_database(fs::log::logger& logger)
@@ -51,7 +52,7 @@ void loot_preview_state::load_item_database(fs::log::logger& logger)
 	logger.info() << "loaded item database";
 }
 
-std::shared_ptr<cycfi::elements::element> loot_preview_state::make_ui()
+void loot_preview_state::make_ui()
 {
 	_flow_composite = el::share(el::flow_composite{});
 	_main_element = el::share(el::deck(
@@ -65,7 +66,7 @@ std::shared_ptr<cycfi::elements::element> loot_preview_state::make_ui()
 		)
 	));
 
-	return el::share(make_section("loot preview", el::vtile(
+	_root_element = el::share(make_section("loot preview", el::vtile(
 		el::hold(_loot_settings.ui()),
 		el::hold(_main_element)
 	)));

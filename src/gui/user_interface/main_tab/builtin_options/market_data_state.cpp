@@ -69,7 +69,7 @@ void market_data_state::refresh_market_data(
 	_market_data_refresh_progress_bar->value(0);
 }
 
-std::shared_ptr<cycfi::elements::element> market_data_state::make_ui()
+void market_data_state::make_ui()
 {
 	_market_data_status_label = el::share(el::label(""));
 	_market_data_refresh_progress_bar = el::share(make_progress_bar());
@@ -83,7 +83,7 @@ std::shared_ptr<cycfi::elements::element> market_data_state::make_ui()
 	));
 	_market_data_refresh_element->select(1);
 
-	return el::share(el::htile(
+	_root_element = el::share(el::htile(
 		el::hold(_market_data_status_label),
 		el::hold(_market_data_refresh_element)
 	));

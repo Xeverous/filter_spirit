@@ -5,9 +5,9 @@
 
 namespace el = cycfi::elements;
 
-std::shared_ptr<el::element> builtin_options_state::make_ui()
+void builtin_options_state::make_ui()
 {
-	return el::share(make_section("built-in generation options",
+	_root_element = el::share(make_section("built-in generation options",
 		el::no_hstretch(el::vtile(
 			el::htile(
 				el::vtile(
@@ -15,8 +15,8 @@ std::shared_ptr<el::element> builtin_options_state::make_ui()
 					el::align_left_middle(el::label("override volume in all built-in sounds (0 - 300)"))
 				),
 				el::vtile(
-					el::hold(_override_opacity_option.make_ui()),
-					el::hold(_override_volume_option.make_ui())
+					el::hold(_override_opacity_option.ui()),
+					el::hold(_override_volume_option.ui())
 				)
 			),
 			el::htile(
@@ -26,9 +26,9 @@ std::shared_ptr<el::element> builtin_options_state::make_ui()
 					el::align_left_middle(el::label("item price data:"))
 				),
 				el::vtile(
-					el::hold(_api_selection.make_ui()),
-					el::hold(_league_selection.make_ui()),
-					el::hold(_market_data.make_ui())
+					el::hold(_api_selection.ui()),
+					el::hold(_league_selection.ui()),
+					el::hold(_market_data.ui())
 				)
 			)
 		))
