@@ -347,8 +347,11 @@ make_filter(
 	std::vector<lang::item_filter_block> blocks;
 	blocks.reserve(filter_template.blocks.size());
 
-	for (const auto& b : filter_template.blocks)
-		blocks.push_back(make_filter_block(b, item_price_data));
+	for (const auto& b : filter_template.blocks) {
+		lang::item_filter_block block = make_filter_block(b, item_price_data);
+		if (block.conditions.is_valid())
+			blocks.push_back(std::move(block));
+	}
 
 	return lang::item_filter{std::move(blocks)};
 }
