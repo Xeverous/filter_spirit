@@ -20,8 +20,6 @@ public:
 
 	void load_item_database(fs::log::logger& logger);
 
-	void generate_loot_divination_cards();
-	void generate_loot_currency_generic();
 
 	void refresh_loot_preview(const fs::lang::item_filter& filter);
 
@@ -32,6 +30,14 @@ public:
 
 private:
 	void make_ui();
+
+	enum class loot_gen {
+		currency_generic,
+		divination_cards,
+		map_monster_pack
+	};
+
+	void generate_loot(loot_gen gen);
 
 	event_inserter _inserter;
 

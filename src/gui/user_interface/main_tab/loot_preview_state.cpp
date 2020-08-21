@@ -19,13 +19,16 @@ item_preview make_item_preview(const fs::lang::item& itm, const fs::lang::item_s
 {
 	return item_preview(
 		itm.base_type,
+		itm.sockets,
+		itm.width,
+		itm.height,
 		style.font_size.size.value,
 		to_elements_color(style.border_color.value_or(style.background_color).c),
 		to_elements_color(style.text_color.c),
 		to_elements_color(style.background_color.c));
 }
 
-}
+} // namespace
 
 loot_preview_state::loot_preview_state(event_inserter inserter)
 : _inserter(inserter)
@@ -59,8 +62,9 @@ void loot_preview_state::make_ui()
 		el::align_center_middle(el::label("load an item filter first")),
 		el::htile(
 			el::no_hstretch(el::vtile(
-				make_button("generic currency", [this](bool) { generate_loot_currency_generic(); }),
-				make_button("divination cards", [this](bool) { generate_loot_divination_cards(); })
+				make_button("generic currency", [this](bool) { generate_loot(loot_gen::currency_generic); }),
+				make_button("divination cards", [this](bool) { generate_loot(loot_gen::divination_cards); }),
+				make_button("T16 monster pack", [this](bool) { generate_loot(loot_gen::map_monster_pack); })
 			)),
 			el::align_top(el::flow(*_flow_composite))
 		)
@@ -72,23 +76,38 @@ void loot_preview_state::make_ui()
 	)));
 }
 
-void loot_preview_state::generate_loot_currency_generic()
+void loot_preview_state::generate_loot(loot_gen gen)
 {
 	if (!_item_database)
 		return;
 
 	_loot.clear();
-	_generator.generate_generic_currency(*_item_database, fs::lang::loot::item_inserter(_loot), 10, fs::lang::loot::stack_param::single);
-	_inserter.push_event(events::refresh_loot_preview{});
-}
 
-void loot_preview_state::generate_loot_divination_cards()
-{
-	if (!_item_database)
-		return;
+	if (gen == loot_gen::currency_generic) {
+		_generator.generate_generic_currency(
+			*_item_database,
+			fs::lang::loot::item_inserter(_loot),
+			10,
+			fs::lang::loot::stack_param::single);
+	}
+	else if (gen == loot_gen::divination_cards) {
+		_generator.generate_cards(
+			*_item_database,
+			fs::lang::loot::item_inserter(_loot),
+			10,
+			fs::lang::loot::stack_param::single);
+	}
+	else if (gen == loot_gen::map_monster_pack) {
+		_generator.generate_monster_pack_loot(
+			*_item_database,
+			fs::lang::loot::item_inserter(_loot),
+			_loot_settings.rarity(),
+			_loot_settings.quantity(),
+			83,
+			true,
+			50, 20, 4, 2);
+	}
 
-	_loot.clear();
-	_generator.generate_cards(*_item_database, fs::lang::loot::item_inserter(_loot), 10, fs::lang::loot::stack_param::single);
 	_inserter.push_event(events::refresh_loot_preview{});
 }
 

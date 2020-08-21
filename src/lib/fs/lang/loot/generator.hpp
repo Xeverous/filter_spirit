@@ -69,6 +69,34 @@ public:
 	void generate_incursion_vials(const item_database& db, item_inserter inserter, int count, stack_param stacking);
 	void generate_bestiary_nets(const item_database& db, item_inserter inserter, int count, stack_param stacking);
 
+	void generate_non_unique_equippable_item(
+		const item_database& db,
+		item_inserter inserter,
+		int item_level,
+		rarity_type rarity_,
+		bool allow_atlas_bases);
+
+	void generate_monster_loot(
+		const item_database& db,
+		item_inserter inserter,
+		double rarity,
+		double quantity,
+		int item_level,
+		bool allow_atlas_bases);
+
+	void generate_monster_pack_loot(
+		const item_database& db,
+		item_inserter inserter,
+		double rarity,
+		double quantity,
+		int area_level,
+		bool allow_atlas_bases,
+		int num_normal_monsters,
+		int num_magic_monsters,
+		int num_rare_monsters,
+		int num_unique_monsters);
+
+
 private:
 	std::seed_seq _seed_seq;
 	std::mt19937 _rng;

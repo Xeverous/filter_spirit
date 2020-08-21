@@ -14,8 +14,13 @@ public:
 		return _root_element;
 	}
 
-	int rarity() const { return _rarity; }
-	int quantity() const { return _quantity; }
+	double rarity() const { return normalize_mf_bonus(_rarity); }
+	double quantity() const { return normalize_mf_bonus(_quantity); }
+
+	static double normalize_mf_bonus(int val)
+	{
+		return val / 100.0;
+	}
 
 private:
 	void make_ui();
