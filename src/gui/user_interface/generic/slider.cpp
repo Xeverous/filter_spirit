@@ -18,5 +18,5 @@ void slider::make_ui(double init_value, std::function<void(double)> on_change)
 	);
 	slider.on_change = std::move(on_change);
 
-	_root_element = el::share(el::yside_margin({3, 3}, std::move(slider)));
+	_root_element = el::share(el::vmargin({3, 3}, std::move(slider)));
 }

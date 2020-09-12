@@ -123,5 +123,6 @@ void loot_preview_state::refresh_loot_preview(const fs::lang::item_filter& filte
 		_flow_composite->push_back(el::share(make_item_preview(_loot[i], _loot_styles[i])));
 	}
 
+	_flow_composite->reflow();
 	_main_element->select(1); // switch to loot display
 }
