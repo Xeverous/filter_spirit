@@ -310,6 +310,12 @@ add_boolean_condition(
 		case lang::boolean_condition_property::blighted_map: {
 			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_blighted_map);
 		}
+		case lang::boolean_condition_property::replica: {
+			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_replica);
+		}
+		case lang::boolean_condition_property::alternate_quality: {
+			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_alternate_quality);
+		}
 	}
 
 	return error(errors::internal_compiler_error{

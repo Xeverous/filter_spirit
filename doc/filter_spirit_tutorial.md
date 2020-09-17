@@ -512,17 +512,19 @@ HasInfluence           [EQ] None | Influence+
 Sockets     [CMP] SS+
 SocketGroup [CMP] SS+
 
-AnyEnchantment  Boolean
-Identified      Boolean
-Corrupted       Boolean
-Mirrored        Boolean
-ElderItem       Boolean
-ShaperItem      Boolean
-FracturedItem   Boolean
-SynthesisedItem Boolean
-ShapedMap       Boolean
-ElderMap        Boolean
-BlightedMap     Boolean
+AnyEnchantment   Boolean
+Identified       Boolean
+Corrupted        Boolean
+Mirrored         Boolean
+ElderItem        Boolean
+ShaperItem       Boolean
+FracturedItem    Boolean
+SynthesisedItem  Boolean
+ShapedMap        Boolean
+ElderMap         Boolean
+BlightedMap      Boolean
+Replica          Boolean
+AlternateQuality Boolean
 
 # FS autogeneration extensions - explained further down this article
 Autogen         Identifier

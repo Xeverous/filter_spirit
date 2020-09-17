@@ -6,6 +6,12 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 
 *newest at the top*
 
+### 3.12 (Heist) - [Item Filter Information](https://www.pathofexile.com/forum/view-thread/2935826)
+
+- [patch notes](https://www.pathofexile.com/forum/view-thread/2935777)
+- Added `AlternateQuality True` parameter that allows you to filter for Alternate Quality Gems.
+- Added `Replica True` parameter that allows you to filter for Replica Unique Items.
+
 ### 3.11.1 (Harvest bugfixes)
 
 - [patch notes](https://www.pathofexile.com/forum/view-thread/2893980) - new seed types.

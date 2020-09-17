@@ -558,6 +558,26 @@ Show
 			BOOST_TEST(compare_strings(expected_filter, actual_filter));
 		}
 
+		BOOST_AUTO_TEST_CASE(heist_new_condtions)
+		{
+			const std::string actual_filter = generate_filter(minimal_input() + R"(
+BaseType "Something"
+Replica True
+AlternateQuality True {
+	Show
+}
+)");
+			const std::string_view expected_filter =
+R"(Show
+	Replica True
+	AlternateQuality True
+	BaseType "Something"
+
+)";
+
+			BOOST_TEST(compare_strings(expected_filter, actual_filter));
+		}
+
 		BOOST_AUTO_TEST_CASE(shaper_voice_lines)
 		{
 			const std::string actual_filter = generate_filter(minimal_input() + R"(

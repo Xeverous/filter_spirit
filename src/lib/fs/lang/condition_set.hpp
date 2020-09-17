@@ -221,6 +221,8 @@ struct condition_set
 	std::optional<boolean_condition> is_shaped_map;
 	std::optional<boolean_condition> is_elder_map;
 	std::optional<boolean_condition> is_blighted_map;
+	std::optional<boolean_condition> is_replica;
+	std::optional<boolean_condition> is_alternate_quality;
 };
 
 // represents an attempt to match specific item against specific filter block
@@ -262,7 +264,9 @@ struct condition_set_match_result
 			&& is_enchanted != false
 			&& is_shaped_map != false
 			&& is_elder_map != false
-			&& is_blighted_map != false;
+			&& is_blighted_map != false
+			&& is_replica != false
+			&& is_alternate_quality != false;
 	}
 
 	std::optional<bool> item_level;
@@ -297,6 +301,8 @@ struct condition_set_match_result
 	std::optional<bool> is_shaped_map;
 	std::optional<bool> is_elder_map;
 	std::optional<bool> is_blighted_map;
+	std::optional<bool> is_replica;
+	std::optional<bool> is_alternate_quality;
 };
 
 struct autogen_condition

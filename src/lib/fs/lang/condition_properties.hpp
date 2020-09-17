@@ -55,7 +55,9 @@ enum class boolean_condition_property
 	any_enchantment,
 	shaped_map,
 	elder_map,
-	blighted_map
+	blighted_map,
+	replica,
+	alternate_quality
 };
 
 } // namespace fs::lang

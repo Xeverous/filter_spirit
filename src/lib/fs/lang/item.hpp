@@ -101,6 +101,7 @@ enum class item_validity
 	unidentified_with_explicit_mods,
 	normal_rarity_with_name,
 	nonnormal_rarity_without_name,
+	non_unique_replica,
 	resonator_or_abyss_socket_linked,
 	more_than_6_sockets,
 	invalid_item_level,
@@ -269,6 +270,9 @@ struct item
 		if (map_tier <= 0)
 			return item_validity::invalid_map_tier;
 
+		if (rarity_ != rarity_type::unique && is_replica)
+			return item_validity::non_unique_replica;
+
 		return item_validity::valid;
 	}
 
@@ -320,6 +324,8 @@ struct item
 	bool is_shaped_map = false;
 	bool is_elder_map = false;
 	bool is_blighted_map = false;
+	bool is_replica = false;
+	bool is_alternate_quality = false;
 	influence_info influence = {};
 
 	// A logic-irrelevant field. Only for the user.

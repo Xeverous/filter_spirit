@@ -204,6 +204,8 @@ namespace rf
 				(lang::keywords::rf::shaped_map,        lang::boolean_condition_property::shaped_map)
 				(lang::keywords::rf::elder_map,         lang::boolean_condition_property::elder_map)
 				(lang::keywords::rf::blighted_map,      lang::boolean_condition_property::blighted_map)
+				(lang::keywords::rf::replica,           lang::boolean_condition_property::replica)
+				(lang::keywords::rf::alternate_quality, lang::boolean_condition_property::alternate_quality)
 			;
 		}
 	};
