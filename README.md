@@ -6,13 +6,22 @@ If you ever worked with web stuff - a perfect analogy is that Filter Spirit is t
 
 ## news
 
-The project is under construction, but a command-line version is already available. Message me ([/u/Xeverous](https://old.reddit.com/user/Xeverous/) on reddit or Xeverous#2151 on Discord) if you are interested in it or have any questions/suggestions/whatever. You can also open an issue.
+All 3 new conditions from Hesit league implemented. Currently FS supports everything except `EnableDropSound` (`DisableDropSound` works) and disabling minimap icons, beam effect and alert sounds (`-1`, `None`, etc) (introduced with `Continue`). Sole `Continue` is supported.
 
-I planned to release first graphical version at the end of Delirium league or a bit earlier but you know, it's my first that large project and I'm also playing the game and working full-time. Also, graduation soon... I should have more time after Harvest launch.
+___
 
-I'm also currently [heavily contributing to elements](https://github.com/cycfi/elements/issues?q=author%3AXeverous) which is planned to be a library behind FS GUI. Obviously I could use something well-known like Qt or wxWidgets but none of them fully satisfy my requirements so I decided to contribute to a new promising project instead. Call it a bit of Shaper's perfection syndrome.
+poe.watch is dead - only poe.ninja generation will work. Original author passed the project to someone else and the website is being revived on [stats.mrk.xyz](https://stats.mrk.xyz).
 
-Thanks to some users, I'm thinking of more program interface opportunities:
+___
+
+FS is under construction, but a command-line version is already available. Message me ([/u/Xeverous](https://old.reddit.com/user/Xeverous/) on reddit or Xeverous#2151 on Discord) if you are interested in it or have any questions/suggestions/whatever. You can also open an issue.
+
+Read existing issues for more detailed information on current state of the work.
+___
+
+I planned to release first graphical version at the end of Delirium league or a bit earlier but you know, it's my first that large project and I'm also playing the game and working full-time. I have [heavily contributed to elements](https://github.com/cycfi/elements/issues?q=author%3AXeverous) and made some own GUI library experiments which were planned to be used for FS GUI. Obviously I could use something well-known like Qt or wxWidgets but none of them fully satisfy my requirements so I decided to contribute to a new promising project instead. Call it a bit of Shaper's perfection syndrome. All of experiments failed and elements project itself is in too early stage to make it work for what I want. Current plan is to use [Magnum](https://magnum.graphics) with [Dear Imgui](https://github.com/ocornut/imgui) which could enable both a web-based port and a native desktop application, both with very rich UI. Expect updates on this topic in the middle (or later) of Heist league.
+
+Thanks to some users, I'm thinking of these program interface opportunities:
 
 - Visual Studio Code plugin that uses FS in the background.
 - WASM-compiled build, hosted on a static GitHub Pages website.
