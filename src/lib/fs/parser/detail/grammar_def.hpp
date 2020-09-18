@@ -47,6 +47,20 @@ namespace common
 	const auto not_alnum_or_underscore_def = !&(x3::alnum | '_');
 	BOOST_SPIRIT_DEFINE(not_alnum_or_underscore)
 
+	/*
+	 * Using just x3::lit("str") for keywords is not enough, because X3 implementes LL parser.
+	 * It does not perform any lookahead by default, so "PlayAlertSoundPositional" is already
+	 * successfully matched at the point of reading "PlayAlertSound" and variable names like
+	 * "Truee" stop on matching keyword "True". Add a simple lookahead to make sure there are
+	 * no more alphanumeric characters or '_' just after the literal. Wrap in lexeme to inhibit
+	 * running skip parser - keywords always need to be written without whitespace between letters.
+	 */
+	template <typename T>
+	auto make_keyword(T grammar)
+	{
+		return x3::lexeme[grammar >> not_alnum_or_underscore];
+	}
+
 	// ---- literal types ----
 
 	const integer_literal_type integer_literal = "number (integer)";
@@ -58,35 +72,35 @@ namespace common
 	BOOST_SPIRIT_DEFINE(string_literal)
 
 	const boolean_literal_type boolean_literal = "boolean literal";
-	const auto boolean_literal_def = x3::lexeme[symbols::rf::booleans >> not_alnum_or_underscore];
+	const auto boolean_literal_def = make_keyword(symbols::rf::booleans);
 	BOOST_SPIRIT_DEFINE(boolean_literal)
 
 	const rarity_literal_type rarity_literal = "rarity literal";
-	const auto rarity_literal_def = x3::lexeme[symbols::rf::rarities >> not_alnum_or_underscore];
+	const auto rarity_literal_def = make_keyword(symbols::rf::rarities);
 	BOOST_SPIRIT_DEFINE(rarity_literal)
 
 	const shape_literal_type shape_literal = "shape literal";
-	const auto shape_literal_def = x3::lexeme[symbols::rf::shapes >> not_alnum_or_underscore];
+	const auto shape_literal_def = make_keyword(symbols::rf::shapes);
 	BOOST_SPIRIT_DEFINE(shape_literal)
 
 	const suit_literal_type suit_literal = "suit literal";
-	const auto suit_literal_def = x3::lexeme[symbols::rf::suits >> not_alnum_or_underscore];
+	const auto suit_literal_def = make_keyword(symbols::rf::suits);
 	BOOST_SPIRIT_DEFINE(suit_literal)
 
 	const influence_literal_type influence_literal = "influence literal";
-	const auto influence_literal_def = x3::lexeme[symbols::rf::influences >> not_alnum_or_underscore];
+	const auto influence_literal_def = make_keyword(symbols::rf::influences);
 	BOOST_SPIRIT_DEFINE(influence_literal)
 
 	const shaper_voice_line_literal_type shaper_voice_line_literal = "shaper voice line literal";
-	const auto shaper_voice_line_literal_def = x3::lexeme[symbols::rf::shaper_voice_lines >> not_alnum_or_underscore];
+	const auto shaper_voice_line_literal_def = make_keyword(symbols::rf::shaper_voice_lines);
 	BOOST_SPIRIT_DEFINE(shaper_voice_line_literal)
 
 	const temp_literal_type temp_literal = "temp literal";
-	const auto temp_literal_def = x3::lexeme[lang::keywords::rf::temp >> not_alnum_or_underscore] > x3::attr(ast::common::temp_literal{});
+	const auto temp_literal_def = make_keyword(lang::keywords::rf::temp) > x3::attr(ast::common::temp_literal{});
 	BOOST_SPIRIT_DEFINE(temp_literal)
 
 	const none_literal_type none_literal = "none literal";
-	const auto none_literal_def = x3::lexeme[lang::keywords::rf::none >> not_alnum_or_underscore] > x3::attr(ast::common::none_literal{});
+	const auto none_literal_def = make_keyword(lang::keywords::rf::none) > x3::attr(ast::common::none_literal{});
 	BOOST_SPIRIT_DEFINE(none_literal)
 
 	// ---- rules ----
@@ -100,12 +114,14 @@ namespace common
 	BOOST_SPIRIT_DEFINE(exact_matching_policy_expression)
 
 	const visibility_statement_type visibility_statement = "visibility statement";
-	const auto visibility_statement_def = x3::lexeme[symbols::rf::visibility_literals >> not_alnum_or_underscore];
+	const auto visibility_statement_def = make_keyword(symbols::rf::visibility_literals);
 	BOOST_SPIRIT_DEFINE(visibility_statement)
 } // namespace common
 
 namespace sf
 {
+	using common::make_keyword;
+
 	// ---- fundamental tokens ----
 
 	const name_type name = "name";
@@ -114,6 +130,11 @@ namespace sf
 
 	// ---- literal types ----
 
+	/*
+	 * Enable strict parsing policy for floating-point expressions. This will cause to fail the match
+	 * if the expression does not contain '.' or exponent. This policy is necessary to avoid parsing
+	 * integer literals as valid floating-point literals.
+	 */
 	const floating_point_literal_type floating_point_literal = "number (fractional)";
 	const auto floating_point_literal_def = x3::real_parser<double, x3::strict_real_policies<double>>{};
 	BOOST_SPIRIT_DEFINE(floating_point_literal)
@@ -157,7 +178,7 @@ namespace sf
 	BOOST_SPIRIT_DEFINE(literal_expression)
 
 	const item_category_expression_type item_category_expression = "item category expression";
-	const auto item_category_expression_def = x3::lexeme[symbols::sf::item_categories >> common::not_alnum_or_underscore];
+	const auto item_category_expression_def = make_keyword(symbols::sf::item_categories);
 	BOOST_SPIRIT_DEFINE(item_category_expression)
 
 	const primitive_value_type primitive_value = "primitive";
@@ -186,56 +207,54 @@ namespace sf
 	// ---- conditions ----
 
 	const autogen_condition_type autogen_condition = "autogen condition";
-	const auto autogen_condition_def =
-		x3::lexeme[lang::keywords::sf::autogen >> common::not_alnum_or_underscore]
-		> item_category_expression;
+	const auto autogen_condition_def = make_keyword(lang::keywords::sf::autogen) > item_category_expression;
 	BOOST_SPIRIT_DEFINE(autogen_condition)
 
 	const price_comparison_condition_type price_comparison_condition = "price comparison condition";
 	const auto price_comparison_condition_def =
-		x3::lexeme[lang::keywords::sf::price >> common::not_alnum_or_underscore]
+		make_keyword(lang::keywords::sf::price)
 		> common::comparison_operator_expression
 		> sequence;
 	BOOST_SPIRIT_DEFINE(price_comparison_condition)
 
 	const rarity_comparison_condition_type rarity_comparison_condition = "rarity comparison condition";
 	const auto rarity_comparison_condition_def =
-		x3::lexeme[lang::keywords::rf::rarity >> common::not_alnum_or_underscore]
+		make_keyword(lang::keywords::rf::rarity)
 		> common::comparison_operator_expression
 		> sequence;
 	BOOST_SPIRIT_DEFINE(rarity_comparison_condition)
 
 	const numeric_comparison_condition_type numeric_comparison_condition = "numeric comparison condition";
 	const auto numeric_comparison_condition_def =
-		x3::lexeme[symbols::rf::numeric_comparison_condition_properties >> common::not_alnum_or_underscore]
+		make_keyword(symbols::rf::numeric_comparison_condition_properties)
 		> common::comparison_operator_expression
 		> sequence;
 	BOOST_SPIRIT_DEFINE(numeric_comparison_condition)
 
 	const string_array_condition_type string_array_condition = "string array condition";
 	const auto string_array_condition_def =
-		x3::lexeme[symbols::rf::string_array_condition_properties >> common::not_alnum_or_underscore]
+		make_keyword(symbols::rf::string_array_condition_properties)
 		> common::exact_matching_policy_expression
 		> sequence;
 	BOOST_SPIRIT_DEFINE(string_array_condition)
 
 	const has_influence_condition_type has_influence_condition = "has influence condition";
 	const auto has_influence_condition_def =
-		x3::lexeme[lang::keywords::rf::has_influence >> common::not_alnum_or_underscore]
+		make_keyword(lang::keywords::rf::has_influence)
 		> common::exact_matching_policy_expression
 		> sequence;
 	BOOST_SPIRIT_DEFINE(has_influence_condition)
 
 	const socket_spec_condition_type socket_spec_condition = "socket spec condition";
 	const auto socket_spec_condition_def =
-		x3::lexeme[symbols::rf::socket_spec_condition_properties >> common::not_alnum_or_underscore]
+		make_keyword(symbols::rf::socket_spec_condition_properties)
 		> common::comparison_operator_expression
 		> sequence;
 	BOOST_SPIRIT_DEFINE(socket_spec_condition)
 
 	const boolean_condition_type boolean_condition = "boolean condition";
 	const auto boolean_condition_def =
-		x3::lexeme[symbols::rf::boolean_condition_properties >> common::not_alnum_or_underscore]
+		make_keyword(symbols::rf::boolean_condition_properties)
 		> sequence;
 	BOOST_SPIRIT_DEFINE(boolean_condition)
 
@@ -254,57 +273,39 @@ namespace sf
 	// ---- actions ----
 
 	const set_color_action_type set_color_action = "set color action";
-	const auto set_color_action_def =
-		x3::lexeme[symbols::rf::color_actions >> common::not_alnum_or_underscore]
-		> sequence;
+	const auto set_color_action_def = make_keyword(symbols::rf::color_actions) > sequence;
 	BOOST_SPIRIT_DEFINE(set_color_action)
 
 	const set_font_size_action_type set_font_size_action = "set font size action";
-	const auto set_font_size_action_def =
-		x3::lexeme[lang::keywords::rf::set_font_size >> common::not_alnum_or_underscore]
-		> sequence;
+	const auto set_font_size_action_def = make_keyword(lang::keywords::rf::set_font_size) > sequence;
 	BOOST_SPIRIT_DEFINE(set_font_size_action)
 
 	const minimap_icon_action_type minimap_icon_action = "minimap icon action";
-	const auto minimap_icon_action_def =
-		x3::lexeme[lang::keywords::rf::minimap_icon >> common::not_alnum_or_underscore]
-		> sequence;
+	const auto minimap_icon_action_def = make_keyword(lang::keywords::rf::minimap_icon) > sequence;
 	BOOST_SPIRIT_DEFINE(minimap_icon_action)
 
 	const play_effect_action_type play_effect_action = "play effect action";
-	const auto play_effect_action_def =
-		x3::lexeme[lang::keywords::rf::play_effect >> common::not_alnum_or_underscore]
-		> sequence;
+	const auto play_effect_action_def = make_keyword(lang::keywords::rf::play_effect) > sequence;
 	BOOST_SPIRIT_DEFINE(play_effect_action)
 
 	const play_alert_sound_action_type play_alert_sound_action = "play alert sound action";
-	const auto play_alert_sound_action_def =
-		x3::lexeme[symbols::rf::play_alert_sound_actions >> common::not_alnum_or_underscore]
-		> sequence;
+	const auto play_alert_sound_action_def = make_keyword(symbols::rf::play_alert_sound_actions) > sequence;
 	BOOST_SPIRIT_DEFINE(play_alert_sound_action)
 
 	const custom_alert_sound_action_type custom_alert_sound_action = "custom alert sound action";
-	const auto custom_alert_sound_action_def =
-		x3::lexeme[lang::keywords::rf::custom_alert_sound >> common::not_alnum_or_underscore]
-		> sequence;
+	const auto custom_alert_sound_action_def = make_keyword(lang::keywords::rf::custom_alert_sound) > sequence;
 	BOOST_SPIRIT_DEFINE(custom_alert_sound_action)
 
 	const set_alert_sound_action_type set_alert_sound_action = "set alert sound action";
-	const auto set_alert_sound_action_def =
-		x3::lexeme[lang::keywords::sf::set_alert_sound >> common::not_alnum_or_underscore]
-		> sequence;
+	const auto set_alert_sound_action_def = make_keyword(lang::keywords::sf::set_alert_sound) > sequence;
 	BOOST_SPIRIT_DEFINE(set_alert_sound_action)
 
 	const disable_drop_sound_action_type disable_drop_sound_action = "disable drop sound action";
-	const auto disable_drop_sound_action_def =
-		x3::lexeme[lang::keywords::rf::disable_drop_sound >> common::not_alnum_or_underscore]
-		> x3::attr(ast::sf::disable_drop_sound_action{});
+	const auto disable_drop_sound_action_def = make_keyword(lang::keywords::rf::disable_drop_sound) > x3::attr(ast::sf::disable_drop_sound_action{});
 	BOOST_SPIRIT_DEFINE(disable_drop_sound_action)
 
 	const compound_action_type compound_action = "compound action";
-	const auto compound_action_def =
-		x3::lexeme["Set" >> common::not_alnum_or_underscore]
-		> sequence;
+	const auto compound_action_def = make_keyword(lang::keywords::sf::set) > sequence;
 	BOOST_SPIRIT_DEFINE(compound_action)
 
 	const auto action_def =
@@ -343,6 +344,8 @@ namespace sf
 
 namespace rf
 {
+	using common::make_keyword;
+
 	// ---- literal types ----
 
 	const color_literal_type color_literal = "color literal";
@@ -354,10 +357,7 @@ namespace rf
 	BOOST_SPIRIT_DEFINE(color_literal)
 
 	const icon_literal_type icon_literal = "icon literal";
-	const auto icon_literal_def =
-		common::integer_literal
-		> x3::lexeme[common::suit_literal >> common::not_alnum_or_underscore]
-		> x3::lexeme[common::shape_literal >> common::not_alnum_or_underscore];
+	const auto icon_literal_def = common::integer_literal > make_keyword(common::suit_literal) > make_keyword(common::shape_literal);
 	BOOST_SPIRIT_DEFINE(icon_literal)
 
 	const string_literal_array_type string_literal_array = "1 or more string literals";
@@ -365,17 +365,18 @@ namespace rf
 	BOOST_SPIRIT_DEFINE(string_literal_array)
 
 	const influence_literal_array_type influence_literal_array = "1 or more influence literals";
-	const auto influence_literal_array_def = +x3::lexeme[common::influence_literal >> common::not_alnum_or_underscore];
+	const auto influence_literal_array_def = +common::influence_literal;
 	BOOST_SPIRIT_DEFINE(influence_literal_array)
 
 	const influence_spec_type influence_spec = "influence spec";
-	const auto influence_spec_def = x3::lexeme[common::none_literal >> common::not_alnum_or_underscore] | influence_literal_array;
+	const auto influence_spec_def = common::none_literal | influence_literal_array;
 	BOOST_SPIRIT_DEFINE(influence_spec)
 
 	const socket_spec_literal_type socket_spec_literal = "socket spec literal";
 	const auto socket_spec_literal_def =
 		x3::lexeme[
-			// TODO what is the position_tag value when x3::attr() is used?
+			// TODO this value-initializes position tags - implement more advanced source location tracking
+			// that will allow custom synthesised/virtual source positions
 			(common::integer_literal >> (common::identifier | x3::attr(ast::rf::identifier{})))
 			| (x3::attr(ast::rf::integer_literal{}) >> common::identifier)
 		];
@@ -384,44 +385,31 @@ namespace rf
 	// ---- conditions ----
 
 	const rarity_condition_type rarity_condition = "rarity condition";
-	const auto rarity_condition_def =
-		x3::lexeme[lang::keywords::rf::rarity >> common::not_alnum_or_underscore]
-		> common::comparison_operator_expression
-		> common::rarity_literal;
+	const auto rarity_condition_def = make_keyword(lang::keywords::rf::rarity) > common::comparison_operator_expression > common::rarity_literal;
 	BOOST_SPIRIT_DEFINE(rarity_condition)
 
 	const numeric_condition_type numeric_condition = "numeric condition";
 	const auto numeric_condition_def =
-		x3::lexeme[symbols::rf::numeric_comparison_condition_properties >> common::not_alnum_or_underscore]
-		> common::comparison_operator_expression
-		> common::integer_literal;
+		make_keyword(symbols::rf::numeric_comparison_condition_properties) > common::comparison_operator_expression > common::integer_literal;
 	BOOST_SPIRIT_DEFINE(numeric_condition)
 
 	const string_array_condition_type string_array_condition = "string array condition";
 	const auto string_array_condition_def =
-		x3::lexeme[symbols::rf::string_array_condition_properties >> common::not_alnum_or_underscore]
-		> common::exact_matching_policy_expression
-		> string_literal_array;
+		make_keyword(symbols::rf::string_array_condition_properties) > common::exact_matching_policy_expression > string_literal_array;
 	BOOST_SPIRIT_DEFINE(string_array_condition)
 
 	const has_influence_condition_type has_influence_condition = "has influence condition";
 	const auto has_influence_condition_def =
-		x3::lexeme[lang::keywords::rf::has_influence >> common::not_alnum_or_underscore]
-		> common::exact_matching_policy_expression
-		> influence_spec;
+		make_keyword(lang::keywords::rf::has_influence) > common::exact_matching_policy_expression > influence_spec;
 	BOOST_SPIRIT_DEFINE(has_influence_condition)
 
 	const socket_spec_condition_type socket_spec_condition = "socket spec condition";
 	const auto socket_spec_condition_def =
-		x3::lexeme[symbols::rf::socket_spec_condition_properties >> common::not_alnum_or_underscore]
-		> common::comparison_operator_expression
-		> +socket_spec_literal;
+		make_keyword(symbols::rf::socket_spec_condition_properties) > common::comparison_operator_expression > +socket_spec_literal;
 	BOOST_SPIRIT_DEFINE(socket_spec_condition)
 
 	const boolean_condition_type boolean_condition = "boolean condition";
-	const auto boolean_condition_def =
-		x3::lexeme[symbols::rf::boolean_condition_properties >> common::not_alnum_or_underscore]
-		> common::boolean_literal;
+	const auto boolean_condition_def = make_keyword(symbols::rf::boolean_condition_properties) > common::boolean_literal;
 	BOOST_SPIRIT_DEFINE(boolean_condition)
 
 	const condition_type condition = "condition";
@@ -437,15 +425,11 @@ namespace rf
 	// ---- actions ----
 
 	const color_action_type color_action = "color action";
-	const auto color_action_def =
-		x3::lexeme[symbols::rf::color_actions >> common::not_alnum_or_underscore]
-		> color_literal;
+	const auto color_action_def = make_keyword(symbols::rf::color_actions) > color_literal;
 	BOOST_SPIRIT_DEFINE(color_action)
 
 	const set_font_size_action_type set_font_size_action = "font size action";
-	const auto set_font_size_action_def =
-		x3::lexeme[lang::keywords::rf::set_font_size >> common::not_alnum_or_underscore]
-		> common::integer_literal;
+	const auto set_font_size_action_def = make_keyword(lang::keywords::rf::set_font_size) > common::integer_literal;
 	BOOST_SPIRIT_DEFINE(set_font_size_action)
 
 	const sound_id_type sound_id = "sound ID";
@@ -454,39 +438,35 @@ namespace rf
 
 	const play_alert_sound_action_type play_alert_sound_action = "alert sound action";
 	const auto play_alert_sound_action_def =
-		x3::lexeme[lang::keywords::rf::play_alert_sound >> common::not_alnum_or_underscore]
+		make_keyword(lang::keywords::rf::play_alert_sound)
 		> sound_id
 		> -common::integer_literal; // volume (optional token)
 	BOOST_SPIRIT_DEFINE(play_alert_sound_action)
 
 	const play_alert_sound_positional_action_type play_alert_sound_positional_action = "positional alert sound action";
 	const auto play_alert_sound_positional_action_def =
-		x3::lexeme[lang::keywords::rf::play_alert_sound_positional >> common::not_alnum_or_underscore]
+		make_keyword(lang::keywords::rf::play_alert_sound_positional)
 		> sound_id
 		> -common::integer_literal; // volume (optional token)
 	BOOST_SPIRIT_DEFINE(play_alert_sound_positional_action)
 
 	const custom_alert_sound_action_type custom_alert_sound_action = "custom alert sound action";
-	const auto custom_alert_sound_action_def =
-		x3::lexeme[lang::keywords::rf::custom_alert_sound >> common::not_alnum_or_underscore]
-		> common::string_literal;
+	const auto custom_alert_sound_action_def = make_keyword(lang::keywords::rf::custom_alert_sound) > common::string_literal;
 	BOOST_SPIRIT_DEFINE(custom_alert_sound_action)
 
 	const disable_drop_sound_action_type disable_drop_sound_action = "disable drop sound action";
-	const auto disable_drop_sound_action_def = x3::lexeme[lang::keywords::rf::disable_drop_sound >> common::not_alnum_or_underscore];
+	const auto disable_drop_sound_action_def = make_keyword(lang::keywords::rf::disable_drop_sound);
 	BOOST_SPIRIT_DEFINE(disable_drop_sound_action)
 
 	const minimap_icon_action_type minimap_icon_action = "minimap icon action";
-	const auto minimap_icon_action_def =
-		x3::lexeme[lang::keywords::rf::minimap_icon >> common::not_alnum_or_underscore]
-		> icon_literal;
+	const auto minimap_icon_action_def = make_keyword(lang::keywords::rf::minimap_icon) > icon_literal;
 	BOOST_SPIRIT_DEFINE(minimap_icon_action)
 
 	const play_effect_action_type play_effect_action = "play effct action";
 	const auto play_effect_action_def =
-		x3::lexeme[lang::keywords::rf::play_effect >> common::not_alnum_or_underscore]
+		make_keyword(lang::keywords::rf::play_effect)
 		> common::suit_literal
-		> ((x3::lexeme[lang::keywords::rf::temp >> common::not_alnum_or_underscore] > x3::attr(true)) | x3::attr(false));
+		> ((make_keyword(lang::keywords::rf::temp) > x3::attr(true)) | x3::attr(false));
 	BOOST_SPIRIT_DEFINE(play_effect_action)
 
 	const action_type action = "action";

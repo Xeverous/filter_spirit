@@ -173,6 +173,7 @@ namespace sf
 	constexpr auto uniques_maps_ambiguous     = "uniques_maps_ambiguous";
 
 	// ---- action extensions ----
+	constexpr auto set             = "Set";
 	constexpr auto set_alert_sound = "SetAlertSound";
 } // namespace sf
 
