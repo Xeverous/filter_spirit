@@ -100,6 +100,10 @@ BOOST_FUSION_ADAPT_STRUCT(
 // ---- filter structure ----
 
 BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::sf::behavior_statement,
+	visibility, continue_)
+
+BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::sf::rule_block,
 	conditions, statements)
 

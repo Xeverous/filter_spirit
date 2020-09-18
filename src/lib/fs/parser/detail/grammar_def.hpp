@@ -120,6 +120,10 @@ namespace common
 	const visibility_statement_type visibility_statement = "visibility statement";
 	const auto visibility_statement_def = make_keyword(symbols::rf::visibility_literals);
 	BOOST_SPIRIT_DEFINE(visibility_statement)
+
+	const continue_statement_type continue_statement = "continue statement";
+	const auto continue_statement_def = make_keyword(lang::keywords::rf::continue_);
+	BOOST_SPIRIT_DEFINE(continue_statement)
 } // namespace common
 
 namespace sf
@@ -332,11 +336,15 @@ namespace sf
 
 	// ---- filter structure ----
 
+	const behavior_statement_type behavior_statement = "behavior statement";
+	const auto behavior_statement_def = common::visibility_statement > -common::continue_statement;
+	BOOST_SPIRIT_DEFINE(behavior_statement)
+
 	// moved here due to circular dependency
 	const rule_block_type rule_block = "rule block";
 
 	const statement_type statement = "statement";
-	const auto statement_def = action | common::visibility_statement | rule_block;
+	const auto statement_def = action | behavior_statement | rule_block;
 	BOOST_SPIRIT_DEFINE(statement)
 
 	const auto rule_block_def = *condition >> x3::lit('{') > *statement > x3::lit('}');

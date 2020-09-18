@@ -17,6 +17,12 @@ struct item_visibility
 	position_tag origin;
 };
 
+struct block_continuation
+{
+	bool continue_;
+	position_tag origin;
+};
+
 struct item_filter_block
 {
 	void generate(std::ostream& output_stream) const;
@@ -24,6 +30,7 @@ struct item_filter_block
 	item_visibility visibility;
 	condition_set conditions;
 	action_set actions;
+	block_continuation continuation;
 };
 
 struct autogen_extension

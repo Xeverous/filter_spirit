@@ -194,6 +194,11 @@ namespace common
 		bool required;
 	};
 
+	struct continue_statement : x3::position_tagged
+	{
+		void get_value() const {}
+	};
+
 	struct visibility_statement : x3::position_tagged
 	{
 		visibility_statement operator=(bool value)
@@ -573,6 +578,13 @@ namespace sf
 	// ---- filter structure ----
 
 	using visibility_statement = common::visibility_statement;
+	using continue_statement = common::continue_statement;
+
+	struct behavior_statement : x3::position_tagged
+	{
+		visibility_statement visibility;
+		boost::optional<continue_statement> continue_;
+	};
 
 	// rule_block defined earlier than statement due to circular dependency
 	// note: we could use x3::forward_ast but it would have a worse memory layout
@@ -584,7 +596,7 @@ namespace sf
 
 	struct statement : x3::variant<
 			action,
-			visibility_statement,
+			behavior_statement,
 			rule_block
 		>, x3::position_tagged
 	{

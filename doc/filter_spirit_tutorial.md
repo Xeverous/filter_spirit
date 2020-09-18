@@ -787,3 +787,82 @@ Rarity Unique
 	Show
 }
 ```
+
+## continuation
+
+As explained in [this GGG's post](https://www.pathofexile.com/forum/view-thread/2771031), you can place `Continue` at the end of the block to cause items to pass through it (with applied style) instead of stopping on first match. If an item matches a `Hide` block that `Continue`s, then later matches a `Show` block, it will use the most recently matched `Show` or `Hide` flag, and thus show. If an item matches and `Continue`s and then never matches any further blocks, it will also show or hide based on the most recently matched block.
+
+<table>
+<tr>
+<th>FS template</th>
+<th>generated filter</th>
+</tr>
+<tr>
+
+<td>
+<pre>
+SetFontSize 30
+<div></div>
+DropLevel >= 10 {
+	SetFontSize 35
+<div></div>
+	ItemLevel < 70 {
+		Hide
+		Continue
+	}
+<div></div>
+	Rarity >= Rare
+	ItemLevel >= 70 {
+		SetFontSize 40
+		Show
+		Continue
+	}
+<div></div>
+	Sockets = 6 {
+		PlayEffect Blue
+		Show
+		Continue
+	}
+<div></div>
+	Show
+	Continue
+}
+<div></div>
+Hide
+</pre>
+</td>
+
+<td>
+<pre>
+Hide
+	ItemLevel < 70
+	DropLevel >= 10
+	SetFontSize 35
+	Continue
+<div></div>
+Show
+	ItemLevel >= 70
+	DropLevel >= 10
+	Rarity >= Rare
+	SetFontSize 40
+	Continue
+<div></div>
+Show
+	DropLevel >= 10
+	Sockets = 6
+	SetFontSize 35
+	PlayEffect Blue
+	Continue
+<div></div>
+Show
+	DropLevel >= 10
+	SetFontSize 35
+	Continue
+<div></div>
+Hide
+	SetFontSize 30
+</pre>
+</td>
+
+</tr>
+</table>

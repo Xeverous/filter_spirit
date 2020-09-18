@@ -512,6 +512,72 @@ Show
 			BOOST_TEST(compare_strings(expected_filter, actual_filter));
 		}
 
+		BOOST_AUTO_TEST_CASE(continue_statement)
+		{
+			const std::string actual_filter = generate_filter(minimal_input() + R"(
+SetFontSize 30
+
+DropLevel >= 10 {
+	SetFontSize 35
+
+	ItemLevel < 70 {
+		Hide
+		Continue
+	}
+
+	Rarity >= Rare
+	ItemLevel >= 70 {
+		SetFontSize 40
+		Show
+		Continue
+	}
+
+	Sockets 6 {
+		PlayEffect Blue
+		Show
+		Continue
+	}
+
+	Show
+	Continue
+}
+
+Hide
+)");
+			const std::string_view expected_filter =
+R"(Hide
+	ItemLevel < 70
+	DropLevel >= 10
+	SetFontSize 35
+	Continue
+
+Show
+	ItemLevel >= 70
+	DropLevel >= 10
+	Rarity >= Rare
+	SetFontSize 40
+	Continue
+
+Show
+	DropLevel >= 10
+	Sockets = 6
+	SetFontSize 35
+	PlayEffect Blue
+	Continue
+
+Show
+	DropLevel >= 10
+	SetFontSize 35
+	Continue
+
+Hide
+	SetFontSize 30
+
+)";
+
+			BOOST_TEST(compare_strings(expected_filter, actual_filter));
+		}
+
 		BOOST_AUTO_TEST_CASE(delirium_new_colors_and_shapes)
 		{
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
