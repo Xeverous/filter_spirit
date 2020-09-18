@@ -155,18 +155,6 @@ namespace sf
 	struct rule_block_class                      : error_on_error, annotate_on_success {};
 	struct filter_structure_class                : error_on_error, annotate_on_success {};
 
-	//
-
-	struct color_expression_class                : error_on_error, annotate_on_success {};
-	struct border_color_action_class             : error_on_error, annotate_on_success {};
-	struct text_color_action_class               : error_on_error, annotate_on_success {};
-	struct background_color_action_class         : error_on_error, annotate_on_success {};
-
-	struct condition_list_class                  : error_on_error, annotate_on_success {};
-	struct action_list_class                     : error_on_error, annotate_on_success {};
-
-	struct rule_block_list_class                 : error_on_error, annotate_on_success {};
-
 	struct grammar_class                         : error_on_error, annotate_on_success {};
 } // namespace sf
 
