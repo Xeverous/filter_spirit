@@ -1,5 +1,12 @@
 # Filter Spirit changelog
 
+## version 0.7.0 (18.09.2020)
+
+- Added support for `Continue` statement. Disabling minimap/beam/sound actions by `-1` or `None` is not yet implemented.
+- Implemented all 3 new conditions from Heist: `Replica`, `AlternateQuality`, `GemQualityType`
+- New FS extension: `None` in string-based conditions. When given directly or through a named constant will represent an empty array of names and therefore discard the block from the output filter.
+- Some internal work preparing project for loot generation/preview/debug feature.
+
 ## version 0.6.0 (18.06.2020)
 
 - Added support for `HasInfluence None`.
