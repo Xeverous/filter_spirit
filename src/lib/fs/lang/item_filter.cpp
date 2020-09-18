@@ -122,6 +122,10 @@ void item_filter_block::generate(std::ostream& output_stream) const
 
 	conditions.generate(output_stream);
 	actions.generate(output_stream);
+
+	if (continuation.continue_)
+		output_stream << '\t' << keywords::rf::continue_ << '\n';
+
 	output_stream << '\n';
 }
 

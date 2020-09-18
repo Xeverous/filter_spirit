@@ -92,6 +92,7 @@ namespace common
 	struct exact_matching_policy_expression_class: error_on_error, annotate_on_success {};
 
 	struct visibility_statement_class            : error_on_error, annotate_on_success {};
+	struct continue_statement_class              : error_on_error, annotate_on_success {};
 }
 
 namespace sf
@@ -151,6 +152,7 @@ namespace sf
 
 	// ---- filter structure ----
 
+	struct behavior_statement_class              : error_on_error, annotate_on_success {};
 	struct statement_class                       : error_on_error, annotate_on_success {};
 	struct rule_block_class                      : error_on_error, annotate_on_success {};
 	struct filter_structure_class                : error_on_error, annotate_on_success {};
@@ -276,6 +278,9 @@ namespace common
 
 	using visibility_statement_type = x3::rule<visibility_statement_class, ast::common::visibility_statement>;
 	BOOST_SPIRIT_DECLARE(visibility_statement_type)
+
+	using continue_statement_type = x3::rule<continue_statement_class, ast::common::continue_statement>;
+	BOOST_SPIRIT_DECLARE(continue_statement_type)
 } // namespace common
 
 namespace sf
@@ -390,6 +395,9 @@ namespace sf
 	BOOST_SPIRIT_DECLARE(compound_action_type)
 
 	// ---- filter structure ----
+
+	using behavior_statement_type = x3::rule<behavior_statement_class, ast::sf::behavior_statement>;
+	BOOST_SPIRIT_DECLARE(behavior_statement_type)
 
 	using statement_type = x3::rule<statement_class, ast::sf::statement>;
 	BOOST_SPIRIT_DECLARE(statement_type)

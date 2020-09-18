@@ -264,7 +264,8 @@ make_spirit_filter_block(
 	settings /* st */,
 	lang::item_visibility visibility,
 	lang::spirit_condition_set conditions,
-	lang::action_set actions)
+	lang::action_set actions,
+	lang::block_continuation continuation)
 {
 	if (conditions.price.has_bound() && !conditions.autogen.has_value()) {
 		std::optional<lang::position_tag> price_first_origin = conditions.price.first_origin();
@@ -284,7 +285,8 @@ make_spirit_filter_block(
 					lang::item_filter_block{
 						visibility,
 						std::move(conditions.conditions),
-						std::move(actions)
+						std::move(actions),
+						continuation
 					},
 					lang::autogen_extension{conditions.price, *conditions.autogen}};
 			});
@@ -294,9 +296,20 @@ make_spirit_filter_block(
 		lang::item_filter_block{
 			visibility,
 			std::move(conditions.conditions),
-			std::move(actions)
+			std::move(actions),
+			continuation
 		},
 		std::nullopt};
+}
+
+lang::block_continuation
+to_block_continuation(
+	boost::optional<ast::common::continue_statement> statement)
+{
+	if (!statement)
+		return lang::block_continuation{false, lang::position_tag{}};
+
+	return lang::block_continuation{true, parser::position_tag_of(*statement)};
 }
 
 outcome<>
@@ -315,12 +328,13 @@ compile_statements_recursively(
 			[&](const ast::sf::action& action) {
 				return detail::spirit_filter_add_action(st, action, symbols, parent_actions);
 			},
-			[&](const ast::sf::visibility_statement& vs) {
+			[&](const ast::sf::behavior_statement& bs) {
 				return make_spirit_filter_block(
 					st,
-					lang::item_visibility{vs.show, parser::position_tag_of(vs)},
+					lang::item_visibility{bs.visibility.show, parser::position_tag_of(bs.visibility)},
 					parent_conditions,
-					parent_actions)
+					parent_actions,
+					to_block_continuation(bs.continue_))
 				.map_result([&](lang::spirit_item_filter_block block) {
 					blocks.push_back(std::move(block));
 				});

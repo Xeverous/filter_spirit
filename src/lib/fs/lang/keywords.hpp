@@ -20,6 +20,7 @@ namespace rf
 	// visibility
 	constexpr auto show = "Show";
 	constexpr auto hide = "Hide";
+	constexpr auto continue_ = "Continue";
 
 	// conditions
 	constexpr auto item_level       = "ItemLevel";
