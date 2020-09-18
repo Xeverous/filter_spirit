@@ -151,6 +151,12 @@ struct boolean_condition
 	position_tag origin;
 };
 
+struct gem_quality_type_condition
+{
+	gem_quality_type value;
+	position_tag origin;
+};
+
 struct socket_spec_condition
 {
 	using container_type = boost::container::small_vector<socket_spec, 6>;
@@ -205,6 +211,7 @@ struct condition_set
 	std::optional<strings_condition> prophecy;
 	std::optional<strings_condition> enchantment_passive_node;
 	std::optional<influences_condition> has_influence;
+	std::optional<gem_quality_type_condition> gem_quality_type;
 	integer_range_condition stack_size;
 	integer_range_condition gem_level;
 	integer_range_condition map_tier;
@@ -249,6 +256,7 @@ struct condition_set_match_result
 			&& prophecy != false
 			&& enchantment_passive_node != false
 			&& has_influence != false
+			&& gem_quality_type != false
 			&& stack_size != false
 			&& gem_level != false
 			&& map_tier != false
@@ -285,6 +293,7 @@ struct condition_set_match_result
 	std::optional<bool> prophecy;
 	std::optional<bool> enchantment_passive_node;
 	std::optional<bool> has_influence;
+	std::optional<bool> gem_quality_type;
 	std::optional<bool> stack_size;
 	std::optional<bool> gem_level;
 	std::optional<bool> map_tier;

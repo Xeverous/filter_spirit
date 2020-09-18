@@ -13,7 +13,7 @@ object_type object_type_of(const object_variant& obj) noexcept
 	return object_type::_from_index(obj.index());
 }
 
-inline bool operator==(const object& lhs, const object& rhs) noexcept
+bool operator==(const object& lhs, const object& rhs) noexcept
 {
 	// we intentionally do not compare origins
 	// this operator is used by tests and potentially in the language

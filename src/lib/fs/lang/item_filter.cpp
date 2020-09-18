@@ -247,7 +247,10 @@ item_filtering_result pass_item_through_filter(const item& itm, const item_filte
 		test_boolean_condition(cs.is_shaped_map, itm.is_shaped_map, match_result.is_shaped_map);
 		test_boolean_condition(cs.is_elder_map, itm.is_elder_map, match_result.is_elder_map);
 		test_boolean_condition(cs.is_blighted_map, itm.is_blighted_map, match_result.is_blighted_map);
+		test_boolean_condition(cs.is_replica, itm.is_replica, match_result.is_replica);
+		test_boolean_condition(cs.is_alternate_quality, itm.is_alternate_quality, match_result.is_alternate_quality);
 
+		// TODO gem quality type matching
 		// TODO sockets matching
 
 		match_history.push_back(match_result);

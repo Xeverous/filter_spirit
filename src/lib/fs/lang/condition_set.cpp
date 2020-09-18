@@ -70,6 +70,34 @@ void output_range_condition(
 	}
 }
 
+void output_gem_quality_type_condition(
+	std::optional<lang::gem_quality_type_condition> condition,
+	std::ostream& output_stream)
+{
+	if (!condition.has_value())
+		return;
+
+	output_stream << '\t' << kw::gem_quality_type << ' ';
+
+	auto& cond = *condition;
+	switch (cond.value.value) {
+		case lang::gem_quality_type_type::superior:
+			output_stream << kw::superior;
+			break;
+		case lang::gem_quality_type_type::divergent:
+			output_stream << kw::divergent;
+			break;
+		case lang::gem_quality_type_type::anomalous:
+			output_stream << kw::anomalous;
+			break;
+		case lang::gem_quality_type_type::phantasmal:
+			output_stream << kw::phantasmal;
+			break;
+	}
+
+	output_stream << '\n';
+}
+
 void output_socket_spec_condition(
 	bool links_matter,
 	std::optional<lang::socket_spec_condition> condition,
@@ -91,7 +119,6 @@ void output_socket_spec_condition(
 	}
 
 	auto& cond = *condition;
-
 	switch (cond.comparison) {
 		case lang::comparison_type::less:
 			output_stream << " <";
@@ -231,6 +258,8 @@ void condition_set::generate(std::ostream& output_stream) const
 	output_range_condition(map_tier,       kw::map_tier,       output_stream);
 	output_range_condition(area_level,     kw::area_level,     output_stream);
 	output_range_condition(corrupted_mods, kw::corrupted_mods, output_stream);
+
+	output_gem_quality_type_condition(gem_quality_type, output_stream);
 
 	output_socket_spec_condition(false, sockets,      output_stream);
 	output_socket_spec_condition(true,  socket_group, output_stream);

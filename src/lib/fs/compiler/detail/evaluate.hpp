@@ -130,6 +130,12 @@ evaluate(parser::ast::rf::shaper_voice_line_literal svll)
 	return {svll.value, parser::position_tag_of(svll)};
 }
 
+[[nodiscard]] inline lang::gem_quality_type
+evaluate(parser::ast::rf::gem_quality_type_literal gqtl)
+{
+	return {gqtl.value, parser::position_tag_of(gqtl)};
+}
+
 [[nodiscard]] inline lang::influence
 evaluate(parser::ast::rf::influence_literal il)
 {

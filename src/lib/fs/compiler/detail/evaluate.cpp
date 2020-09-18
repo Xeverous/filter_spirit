@@ -85,6 +85,9 @@ evaluate_literal(
 		[&](ast::sf::shaper_voice_line_literal literal) -> result_type {
 			return lang::single_object{lang::shaper_voice_line{literal.value, position_tag_of(literal)}, expr_origin};
 		},
+		[&](ast::sf::gem_quality_type_literal literal) -> result_type {
+			return lang::single_object{lang::gem_quality_type{literal.value, position_tag_of(literal)}, expr_origin};
+		},
 		[&](const ast::sf::string_literal& literal) -> result_type {
 			return lang::single_object{lang::string{literal, position_tag_of(literal)}, expr_origin};
 		}

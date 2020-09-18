@@ -149,6 +149,16 @@ struct shaper_voice_line
 inline bool operator==(shaper_voice_line lhs, shaper_voice_line rhs) noexcept { return lhs.value == rhs.value; }
 inline bool operator!=(shaper_voice_line lhs, shaper_voice_line rhs) noexcept { return !(lhs == rhs); }
 
+enum class gem_quality_type_type { superior, divergent, anomalous, phantasmal };
+struct gem_quality_type
+{
+	gem_quality_type_type value;
+	position_tag origin = {};
+};
+
+inline bool operator==(gem_quality_type lhs, gem_quality_type rhs) noexcept { return lhs.value == rhs.value; }
+inline bool operator!=(gem_quality_type lhs, gem_quality_type rhs) noexcept { return !(lhs == rhs); }
+
 struct string
 {
 	std::string value;

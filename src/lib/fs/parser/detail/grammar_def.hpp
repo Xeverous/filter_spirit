@@ -95,6 +95,10 @@ namespace common
 	const auto shaper_voice_line_literal_def = make_keyword(symbols::rf::shaper_voice_lines);
 	BOOST_SPIRIT_DEFINE(shaper_voice_line_literal)
 
+	const gem_quality_type_literal_type gem_quality_type_literal = "gem quality type literal";
+	const auto gem_quality_type_literal_def = make_keyword(symbols::rf::gem_quality_types);
+	BOOST_SPIRIT_DEFINE(gem_quality_type_literal)
+
 	const temp_literal_type temp_literal = "temp literal";
 	const auto temp_literal_def = make_keyword(lang::keywords::rf::temp) > x3::attr(ast::common::temp_literal{});
 	BOOST_SPIRIT_DEFINE(temp_literal)
@@ -163,6 +167,7 @@ namespace sf
 		| common::suit_literal
 		| common::influence_literal
 		| common::shaper_voice_line_literal
+		| common::gem_quality_type_literal
 		| common::temp_literal
 		| common::none_literal
 		// 1. Must be attempted before integer literal, otherwise integer literal for eg "5GGG" would
@@ -245,6 +250,10 @@ namespace sf
 		> sequence;
 	BOOST_SPIRIT_DEFINE(has_influence_condition)
 
+	const gem_quality_type_condition_type gem_quality_type_condition = "gem quality type condition";
+	const auto gem_quality_type_condition_def = make_keyword(lang::keywords::rf::gem_quality_type) > sequence;
+	BOOST_SPIRIT_DEFINE(gem_quality_type_condition)
+
 	const socket_spec_condition_type socket_spec_condition = "socket spec condition";
 	const auto socket_spec_condition_def =
 		make_keyword(symbols::rf::socket_spec_condition_properties)
@@ -266,6 +275,7 @@ namespace sf
 		| numeric_comparison_condition
 		| string_array_condition
 		| has_influence_condition
+		| gem_quality_type_condition
 		| socket_spec_condition
 		| boolean_condition;
 	BOOST_SPIRIT_DEFINE(condition)
@@ -403,6 +413,10 @@ namespace rf
 		make_keyword(lang::keywords::rf::has_influence) > common::exact_matching_policy_expression > influence_spec;
 	BOOST_SPIRIT_DEFINE(has_influence_condition)
 
+	const gem_quality_type_condition_type gem_quality_type_condition = "gem quality type condition";
+	const auto gem_quality_type_condition_def = make_keyword(lang::keywords::rf::gem_quality_type) > common::gem_quality_type_literal;
+	BOOST_SPIRIT_DEFINE(gem_quality_type_condition)
+
 	const socket_spec_condition_type socket_spec_condition = "socket spec condition";
 	const auto socket_spec_condition_def =
 		make_keyword(symbols::rf::socket_spec_condition_properties) > common::comparison_operator_expression > +socket_spec_literal;
@@ -418,6 +432,7 @@ namespace rf
 		| numeric_condition
 		| string_array_condition
 		| has_influence_condition
+		| gem_quality_type_condition
 		| socket_spec_condition
 		| boolean_condition;
 	BOOST_SPIRIT_DEFINE(condition)

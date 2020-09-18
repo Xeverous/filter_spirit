@@ -242,6 +242,19 @@ add_has_influence_condition(
 }
 
 [[nodiscard]] outcome<>
+add_gem_quality_type_condition(
+	lang::gem_quality_type type,
+	lang::position_tag origin,
+	std::optional<lang::gem_quality_type_condition>& target)
+{
+	if (target.has_value())
+		return error(errors::condition_redefinition{origin, (*target).origin});
+
+	target = lang::gem_quality_type_condition{type, origin};
+	return outcome<>::success();
+}
+
+[[nodiscard]] outcome<>
 add_socket_spec_condition(
 	bool links_matter,
 	lang::socket_spec_condition condition,
@@ -477,6 +490,26 @@ spirit_filter_add_has_influence_condition(
 }
 
 [[nodiscard]] outcome<>
+spirit_filter_add_gem_quality_type_condition(
+	settings st,
+	const ast::sf::gem_quality_type_condition& condition,
+	const lang::symbol_table& symbols,
+	lang::condition_set& set)
+{
+	return detail::evaluate_sequence(st, condition.seq, symbols, 1, 1)
+		.map_result<lang::gem_quality_type>([](lang::object obj) {
+			BOOST_ASSERT(obj.values.size() == 1u);
+			return detail::get_as<lang::gem_quality_type>(obj.values[0]);
+		})
+		.map_result([&](lang::gem_quality_type type) {
+			return add_gem_quality_type_condition(
+				type,
+				parser::position_tag_of(condition),
+				set.gem_quality_type);
+		});
+}
+
+[[nodiscard]] outcome<>
 spirit_filter_add_socket_spec_condition(
 	settings st,
 	const ast::sf::socket_spec_condition& condition,
@@ -676,6 +709,9 @@ spirit_filter_add_conditions(
 			[&](const ast::sf::has_influence_condition& cond) {
 				return spirit_filter_add_has_influence_condition(st, cond, symbols, set.conditions);
 			},
+			[&](const ast::sf::gem_quality_type_condition& cond) {
+				return spirit_filter_add_gem_quality_type_condition(st, cond, symbols, set.conditions);
+			},
 			[&](const ast::sf::socket_spec_condition& cond) {
 				return spirit_filter_add_socket_spec_condition(st, cond, symbols, set.conditions);
 			},
@@ -724,6 +760,12 @@ real_filter_add_condition(
 		},
 		[&](const ast::rf::has_influence_condition& cond) {
 			return real_filter_add_has_influence_condition(st, cond, condition_set.has_influence);
+		},
+		[&](const ast::rf::gem_quality_type_condition& cond) {
+			return add_gem_quality_type_condition(
+				evaluate(cond.value),
+				parser::position_tag_of(cond),
+				condition_set.gem_quality_type);
 		},
 		[&](const ast::rf::socket_spec_condition& cond) {
 			return real_filter_add_socket_spec_condition(st, cond, condition_set);

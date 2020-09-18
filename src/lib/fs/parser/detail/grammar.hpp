@@ -84,6 +84,7 @@ namespace common
 	struct suit_literal_class                    : error_on_error, annotate_on_success {};
 	struct influence_literal_class               : error_on_error, annotate_on_success {};
 	struct shaper_voice_line_literal_class       : error_on_error, annotate_on_success {};
+	struct gem_quality_type_literal_class        : error_on_error, annotate_on_success {};
 	struct temp_literal_class                    : error_on_error, annotate_on_success {};
 	struct none_literal_class                    : error_on_error, annotate_on_success {};
 
@@ -130,6 +131,7 @@ namespace sf
 	struct numeric_comparison_condition_class    : error_on_error, annotate_on_success {};
 	struct string_array_condition_class          : error_on_error, annotate_on_success {};
 	struct has_influence_condition_class         : error_on_error, annotate_on_success {};
+	struct gem_quality_type_condition_class      : error_on_error, annotate_on_success {};
 	struct socket_spec_condition_class           : error_on_error, annotate_on_success {};
 	struct boolean_condition_class               : error_on_error, annotate_on_success {};
 	struct condition_class                       : error_on_error, annotate_on_success {};
@@ -185,6 +187,7 @@ namespace rf
 	struct numeric_condition_class               : error_on_error, annotate_on_success {};
 	struct string_array_condition_class          : error_on_error, annotate_on_success {};
 	struct has_influence_condition_class         : error_on_error, annotate_on_success {};
+	struct gem_quality_type_condition_class      : error_on_error, annotate_on_success {};
 	struct socket_spec_condition_class           : error_on_error, annotate_on_success {};
 	struct boolean_condition_class               : error_on_error, annotate_on_success {};
 
@@ -263,6 +266,9 @@ namespace common
 
 	using shaper_voice_line_literal_type = x3::rule<shaper_voice_line_literal_class, ast::common::shaper_voice_line_literal>;
 	BOOST_SPIRIT_DECLARE(shaper_voice_line_literal_type)
+
+	using gem_quality_type_literal_type = x3::rule<gem_quality_type_literal_class, ast::common::gem_quality_type_literal>;
+	BOOST_SPIRIT_DECLARE(gem_quality_type_literal_type)
 
 	using temp_literal_type = x3::rule<temp_literal_class, ast::common::temp_literal>;
 	BOOST_SPIRIT_DECLARE(temp_literal_type)
@@ -351,6 +357,9 @@ namespace sf
 	using has_influence_condition_type = x3::rule<has_influence_condition_class, ast::sf::has_influence_condition>;
 	BOOST_SPIRIT_DECLARE(has_influence_condition_type)
 
+	using gem_quality_type_condition_type = x3::rule<gem_quality_type_condition_class, ast::sf::gem_quality_type_condition>;
+	BOOST_SPIRIT_DECLARE(gem_quality_type_condition_type)
+
 	using socket_spec_condition_type = x3::rule<socket_spec_condition_class, ast::sf::socket_spec_condition>;
 	BOOST_SPIRIT_DECLARE(socket_spec_condition_type)
 
@@ -436,6 +445,7 @@ namespace rf
 	using numeric_condition_type              = x3::rule<numeric_condition_class,           ast::rf::numeric_condition>;
 	using string_array_condition_type         = x3::rule<string_array_condition_class,      ast::rf::string_array_condition>;
 	using has_influence_condition_type        = x3::rule<has_influence_condition_class,     ast::rf::has_influence_condition>;
+	using gem_quality_type_condition_type     = x3::rule<gem_quality_type_condition_class,  ast::rf::gem_quality_type_condition>;
 	using socket_spec_condition_type          = x3::rule<socket_spec_condition_class,       ast::rf::socket_spec_condition>;
 	using boolean_condition_type              = x3::rule<boolean_condition_class,           ast::rf::boolean_condition>;
 	BOOST_SPIRIT_DECLARE(
@@ -443,6 +453,7 @@ namespace rf
 		numeric_condition_type,
 		string_array_condition_type,
 		has_influence_condition_type,
+		gem_quality_type_condition_type,
 		socket_spec_condition_type,
 		boolean_condition_type
 	)

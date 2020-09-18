@@ -134,6 +134,7 @@ expression(s) | type | notes
 `Circle`, `Diamond`, `Hexagon`, `Square`, `Star`, `Triangle`, `Cross`, `Moon`, `Raindrop`, `Kite`, `Pentagon`, `UpsideDownHouse` | Shape |
 `Red`, `Green`, `Blue`, `White`, `Brown`, `Yellow`, `Cyan`, `Grey`, `Orange`, `Pink`, `Purple` | Suit |
 `ShMirror`, `ShExalted`, `ShDivine`, `ShGeneral`, `ShRegal`, `ShChaos`, `ShFusing`, `ShAlchemy`, `ShVaal`, `ShBlessed` | ShaperVoiceLine
+`Superior`, `Divergent`, `Anomalous`, `Phantasmal` | `QualityType` |
 `Shaper`, `Elder`, `Crusader`, `Redeemer`, `Hunter`, `Warlord` | Influence |
 `"abc"` | String | UTF-8 encoding, line breaking characters (LF and CR) not allowed between quotes
 
@@ -508,6 +509,8 @@ HasEnchantment         [EQ] (None | String)+
 Prophecy               [EQ] (None | String)+
 EnchantmentPassiveNode [EQ] (None | String)+
 HasInfluence           [EQ] None | Influence+
+
+GemQualityType QualityType
 
 Sockets     [CMP] SS+
 SocketGroup [CMP] SS+

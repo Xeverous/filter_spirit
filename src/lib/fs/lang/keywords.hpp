@@ -56,6 +56,7 @@ namespace rf
 	constexpr auto enchantment_passive_node = "EnchantmentPassiveNode";
 	constexpr auto replica          = "Replica";
 	constexpr auto alternate_quality = "AlternateQuality";
+	constexpr auto gem_quality_type = "GemQualityType";
 
 	constexpr auto r = 'R';
 	constexpr auto g = 'G';
@@ -84,6 +85,7 @@ namespace rf
 	constexpr auto minimap_icon                = "MinimapIcon";
 	constexpr auto play_effect                 = "PlayEffect";
 
+	// color names - used by BeamEffect and MinimapIcon
 	constexpr auto red    = "Red";
 	constexpr auto green  = "Green";
 	constexpr auto blue   = "Blue";
@@ -97,6 +99,7 @@ namespace rf
 	constexpr auto pink   = "Pink";
 	constexpr auto purple = "Purple";
 
+	// shape names - used by MinimapIcon
 	constexpr auto circle   = "Circle";
 	constexpr auto diamond  = "Diamond";
 	constexpr auto hexagon  = "Hexagon";
@@ -111,6 +114,7 @@ namespace rf
 	constexpr auto pentagon = "Pentagon";
 	constexpr auto upside_down_house = "UpsideDownHouse";
 
+	// Shaper voice lines - used by sound actions
 	constexpr auto sh_mirror  = "ShMirror";
 	constexpr auto sh_exalted = "ShExalted";
 	constexpr auto sh_divine  = "ShDivine";
@@ -128,6 +132,12 @@ namespace rf
 	constexpr auto redeemer    = "Redeemer";
 	constexpr auto hunter      = "Hunter";
 	constexpr auto warlord     = "Warlord";
+
+	// quality type names - used by GemQualityType
+	constexpr auto superior   = "Superior";
+	constexpr auto divergent  = "Divergent";
+	constexpr auto anomalous  = "Anomalous";
+	constexpr auto phantasmal = "Phantasmal";
 
 	constexpr auto temp = "Temp";
 	constexpr auto none = "None";

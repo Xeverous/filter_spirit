@@ -558,7 +558,7 @@ Show
 			BOOST_TEST(compare_strings(expected_filter, actual_filter));
 		}
 
-		BOOST_AUTO_TEST_CASE(heist_new_condtions)
+		BOOST_AUTO_TEST_CASE(heist_new_replica_and_alternate_quality_conditions)
 		{
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
 BaseType "Something"
@@ -571,6 +571,54 @@ AlternateQuality True {
 R"(Show
 	Replica True
 	AlternateQuality True
+	BaseType "Something"
+
+)";
+
+			BOOST_TEST(compare_strings(expected_filter, actual_filter));
+		}
+
+		BOOST_AUTO_TEST_CASE(heist_new_gem_quality_type_condition)
+		{
+			const std::string actual_filter = generate_filter(minimal_input() + R"(
+$q0 = Superior
+$q1 = Divergent
+$q2 = Anomalous
+$q3 = Phantasmal
+
+BaseType "Something" {
+	GemQualityType $q0 {
+		Show
+	}
+
+	GemQualityType $q1 {
+		Show
+	}
+
+	GemQualityType $q2 {
+		Show
+	}
+
+	GemQualityType $q3 {
+		Show
+	}
+}
+)");
+			const std::string_view expected_filter =
+R"(Show
+	GemQualityType Superior
+	BaseType "Something"
+
+Show
+	GemQualityType Divergent
+	BaseType "Something"
+
+Show
+	GemQualityType Anomalous
+	BaseType "Something"
+
+Show
+	GemQualityType Phantasmal
 	BaseType "Something"
 
 )";

@@ -258,6 +258,20 @@ namespace rf
 	};
 	const shaper_voice_lines_ shaper_voice_lines;
 
+	struct gem_quality_types_ : x3::symbols<lang::gem_quality_type_type>
+	{
+		gem_quality_types_()
+		{
+			add
+				(lang::keywords::rf::superior,   lang::gem_quality_type_type::superior)
+				(lang::keywords::rf::divergent,  lang::gem_quality_type_type::divergent)
+				(lang::keywords::rf::anomalous,  lang::gem_quality_type_type::anomalous)
+				(lang::keywords::rf::phantasmal, lang::gem_quality_type_type::phantasmal)
+			;
+		}
+	};
+	const gem_quality_types_ gem_quality_types;
+
 	// ---- filter structure ----
 
 	struct visibility_literals_ : x3::symbols<bool>
