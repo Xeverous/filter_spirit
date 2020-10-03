@@ -54,6 +54,8 @@ $color_fractured_item   = 150 100 158
 $color_synthesised_item = 150 100 200
 $color_veiled_item      = 150 100 158
 $color_harvest          =   0 252 186
+$color_heist            =   0 252 186
+$color_league_item      =   0 252 186
 $color_harbinger        =  64 255 255
 
 $currency_t1 = "Exalted Orb" "Mirror of Kalandra" "Eternal Orb" "Albino Rhoa Feather" "Mirror Shard"
@@ -164,6 +166,7 @@ $alert_fractured_item     = $alert_wow
 $alert_synthesised_item   = $alert_wow
 $alert_veiled_item        = $alert_wow
 $alert_metamorph          = $alert_hitmarker
+$alert_league_item        = 2 300
 
 $alert_error              = "triggered.mp3"
 
@@ -238,6 +241,16 @@ Class "Currency" {
 	}
 
 	BaseType "Catalyst" "Oil" "Delirium Orb" {
+		SetTextColor $color_black
+		SetBackgroundColor $color_currency
+		SetFontSize $font_currency_t2
+		SetAlertSound $alert_currency_t2
+		PlayEffect $beam_currency
+		MinimapIcon $icon_currency_t2
+		Show
+	}
+
+	BaseType "Prime Regrading Lens" "Secondary Regrading Lens" "Tempering Orb" "Tailoring Orb" {
 		SetTextColor $color_black
 		SetBackgroundColor $color_currency
 		SetFontSize $font_currency_t2
@@ -341,6 +354,14 @@ Class "Currency" {
 		Show
 	}
 
+	BaseType "Rogue's Marker" {
+		SetTextColor $color_heist
+		SetBorderColor $color_heist
+		SetFontSize $font_currency_t3
+		SetAlertSound $alert_currency_t3
+		Show
+	}
+
 	BaseType "Prophecy" {
 		SetTextColor $color_black
 		SetBackgroundColor 159 15 213
@@ -410,21 +431,48 @@ Class "Incubator" {
 	Show
 }
 
-Class == "Harvest Seed" {
-	SetTextColor $color_harvest
-	SetBorderColor $color_harvest
+Class "Trinket" "Heist Target" {
+	SetTextColor $color_league_item
+	SetBorderColor $color_league_item
 	SetBackgroundColor $color_black
-	SetAlertSound 2 300
+	SetAlertSound $alert_league_item
+	SetFontSize $font_max
+	Show
+}
+
+Class "Contract" "Blueprint" {
+	SetTextColor $color_league_item
+	SetBorderColor $color_league_item
+	SetBackgroundColor $color_black
+	SetAlertSound $alert_league_item
+	SetFontSize $font_max
+	Show
+}
+
+Class "Heist Cloak" "Heist Brooch" "Heist Tool" "Heist Gear" {
+	SetTextColor $color_league_item
+	SetBorderColor $color_league_item
+	SetBackgroundColor $color_black
+	SetAlertSound $alert_league_item
+	SetFontSize $font_max
+	Show
+}
+
+Class == "Harvest Seed" {
+	SetTextColor $color_league_item
+	SetBorderColor $color_league_item
+	SetBackgroundColor $color_black
+	SetAlertSound $alert_league_item
 	SetFontSize $font_max
 	Show
 }
 
 Class == "Seed Enhancer" {
 	SetTextColor $color_black
-	SetBackgroundColor $color_harvest
-	SetBorderColor $color_harvest
+	SetBackgroundColor $color_league_item
+	SetBorderColor $color_league_item
 	SetFontSize $font_max
-	SetAlertSound 2 300
+	SetAlertSound $alert_league_item
 	MinimapIcon 0 Cyan Raindrop
 	Show
 }
