@@ -1,6 +1,6 @@
 find_package(nlohmann_json 3.0.0 REQUIRED)
 find_package(OpenSSL REQUIRED)
-find_package(Boost 1.68 REQUIRED COMPONENTS filesystem)
+find_package(Boost 1.68 REQUIRED)
 
 # libcurl >=7.17 has no requirements for string argument lifetimes
 # FS relies on this in the implementation, so such version is a must

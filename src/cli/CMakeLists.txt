@@ -1,7 +1,6 @@
 find_package(Boost 1.68 REQUIRED
 	COMPONENTS
 		program_options
-		filesystem
 )
 
 add_executable(filter_spirit_cli)
