@@ -8,7 +8,12 @@ add_subdirectory("${CMAKE_SOURCE_DIR}/external/corrade" corrade EXCLUDE_FROM_ALL
 set(WITH_SDL2APPLICATION ON CACHE BOOL "" FORCE)
 add_subdirectory("${CMAKE_SOURCE_DIR}/external/magnum" magnum EXCLUDE_FROM_ALL)
 
+set(IMGUI_DIR ${CMAKE_SOURCE_DIR}/external/imgui)
+set(WITH_IMGUI ON CACHE BOOL "" FORCE)
+add_subdirectory("${CMAKE_SOURCE_DIR}/external/magnum-integration" magnum-integration EXCLUDE_FROM_ALL)
+
 find_package(Magnum REQUIRED GL Sdl2Application)
+find_package(MagnumIntegration REQUIRED ImGui)
 
 add_executable(filter_spirit_gui)
 
@@ -41,6 +46,7 @@ endif()
 target_link_libraries(filter_spirit_gui
 	PRIVATE
 		filter_spirit
+		MagnumIntegration::ImGui
 		Magnum::Application
 		Magnum::GL
 		Magnum::Magnum
