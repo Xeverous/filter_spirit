@@ -53,3 +53,17 @@ target_link_libraries(filter_spirit_gui
 		Magnum::GL
 		Magnum::Magnum
 )
+
+add_custom_target(copy_data ALL
+	COMMAND ${CMAKE_COMMAND} -E copy_directory
+	${CMAKE_SOURCE_DIR}/data
+	${CMAKE_BINARY_DIR}/bin/data
+)
+
+add_custom_target(copy_assets ALL
+	COMMAND ${CMAKE_COMMAND} -E copy_directory
+	${CMAKE_SOURCE_DIR}/assets
+	${CMAKE_BINARY_DIR}/bin/assets
+)
+
+add_dependencies(filter_spirit_gui copy_data copy_assets)
