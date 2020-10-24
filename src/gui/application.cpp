@@ -10,10 +10,25 @@
 #include <Corrade/Version.h>
 
 #include <initializer_list>
+#include <exception>
+#include <stdexcept>
 
 /**
- * all code in this file - based on Magnum's ImGui example
+ * code in this file - based on Magnum's ImGui example
  */
+
+namespace {
+
+// returns non-owning pointer
+ImFont* load_font_from_file(ImGuiIO& io, const char* path, float size_pixels)
+{
+	ImFont* result = io.Fonts->AddFontFromFileTTF(path, size_pixels);
+	if (result == nullptr)
+		throw std::runtime_error(std::string("can not load font: ") + path);
+	return result;
+}
+
+}
 
 namespace fs::gui {
 
@@ -24,7 +39,15 @@ application::application(const Arguments& arguments)
 		.setTitle("Filter Spirit v" + to_string(fs::version::current()))
 		.setWindowFlags(Configuration::WindowFlag::Resizable)}
 {
-	_imgui = Magnum::ImGuiIntegration::Context(Magnum::Vector2{windowSize()} / dpiScaling(), windowSize(), framebufferSize());
+	ImGui::CreateContext();
+
+	ImGuiIO& io = ImGui::GetIO();
+	_fontin_regular    = load_font_from_file(io, "assets/fonts/Fontin-Regular.otf", 24);
+	_fontin_small_caps = load_font_from_file(io, "assets/fonts/Fontin-SmallCaps.otf", 24);
+	io.FontDefault = _fontin_small_caps;
+
+	_imgui = Magnum::ImGuiIntegration::Context(
+		*ImGui::GetCurrentContext(), Magnum::Vector2{windowSize()} / dpiScaling(), windowSize(), framebufferSize());
 
 	/* Set up proper blending to be used by ImGui. There's a great chance
 	   you'll need this exact behavior for the rest of your scene. If not, set

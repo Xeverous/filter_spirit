@@ -41,6 +41,9 @@ private:
 
 	Magnum::ImGuiIntegration::Context _imgui{Magnum::NoCreate};
 
+	ImFont* _fontin_regular = nullptr;
+	ImFont* _fontin_small_caps = nullptr;
+
 	bool _show_color_picker = false;
 	Magnum::Color4 _color_picker_selected_color = 0xffffffff_rgbaf;
 
