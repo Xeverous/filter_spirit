@@ -19,6 +19,8 @@ add_executable(filter_spirit_gui)
 
 target_sources(filter_spirit_gui
 	PRIVATE
+		application.hpp
+		application.cpp
 		main.cpp
 )
 
