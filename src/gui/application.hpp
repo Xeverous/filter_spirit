@@ -1,6 +1,10 @@
-#include "theming.hpp"
+#pragma once
 
-#include <Magnum/Math/Color.h>
+#include "color_picker_window.hpp"
+#include "single_item_preview_window.hpp"
+#include "common_ui_settings_window.hpp"
+#include "version_info_window.hpp"
+
 #include <Magnum/GL/DefaultFramebuffer.h>
 #include <Magnum/GL/Renderer.h>
 #include <Magnum/ImGuiIntegration/Context.hpp>
@@ -14,8 +18,6 @@
 #endif
 
 namespace fs::gui {
-
-using namespace Magnum::Math::Literals;
 
 class application: public Magnum::Platform::Application
 {
@@ -37,25 +39,19 @@ public:
 
 private:
 	void draw_main_menu_bar();
-	void draw_color_picker();
-	void draw_common_ui_settings();
-	void draw_about_window();
 
 	Magnum::ImGuiIntegration::Context _imgui{Magnum::NoCreate};
 
 	ImFont* _fontin_regular = nullptr;
 	ImFont* _fontin_small_caps = nullptr;
 
-	bool _show_color_picker = false;
-	Magnum::Color4 _color_picker_selected_color = 0xffffffff_rgbaf;
-
 	bool _show_demo_window = false;
-	bool _show_common_ui_settings = false;
-	bool _show_about_window = false;
-	Magnum::Color4 _clear_color = 0x1f1f1fff_rgbaf;
-	int _frame_time_ms = 16;
+	bool _force_focus_demo_window = false;
 
-	theming _theming;
+	color_picker_window _color_picker;
+	single_item_preview_window _single_item_preview;
+	common_ui_settings_window _common_ui_settings;
+	version_info_window _version_info;
 };
 
 }

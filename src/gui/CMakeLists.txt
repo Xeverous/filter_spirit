@@ -19,6 +19,16 @@ add_executable(filter_spirit_gui)
 
 target_sources(filter_spirit_gui
 	PRIVATE
+		imgui_window.hpp
+		ui_utils.hpp
+		color_picker_window.hpp
+		color_picker_window.cpp
+		single_item_preview_window.hpp
+		single_item_preview_window.cpp
+		common_ui_settings_window.hpp
+		common_ui_settings_window.cpp
+		version_info_window.hpp
+		version_info_window.cpp
 		application.hpp
 		application.cpp
 		theming.hpp
