@@ -21,6 +21,8 @@ target_sources(filter_spirit_gui
 	PRIVATE
 		application.hpp
 		application.cpp
+		theming.hpp
+		theming.cpp
 		main.cpp
 )
 

@@ -1,3 +1,5 @@
+#include "theming.hpp"
+
 #include <Magnum/Math/Color.h>
 #include <Magnum/GL/DefaultFramebuffer.h>
 #include <Magnum/GL/Renderer.h>
@@ -50,8 +52,10 @@ private:
 	bool _show_demo_window = false;
 	bool _show_common_ui_settings = false;
 	bool _show_about_window = false;
-	Magnum::Color4 _clear_color = 0x72909aff_rgbaf;
+	Magnum::Color4 _clear_color = 0x1f1f1fff_rgbaf;
 	int _frame_time_ms = 16;
+
+	theming _theming;
 };
 
 }
