@@ -152,16 +152,32 @@ void application::draw_common_ui_settings()
 		return;
 	}
 
-	if (ImGui::ColorEdit3("background color", _clear_color.data()))
-		Magnum::GL::Renderer::setClearColor(_clear_color);
+	if (ImGui::CollapsingHeader("Interface")) {
+		if (ImGui::ColorEdit3("Background color", _clear_color.data()))
+			Magnum::GL::Renderer::setClearColor(_clear_color);
 
-	if (ImGui::SliderInt("min frame time (ms)", &_frame_time_ms, 0, 40))
-		setMinimalLoopPeriod(_frame_time_ms);
+		_theming.draw_theme_selection_ui();
 
-	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
-		1000.0 / Magnum::Double(ImGui::GetIO().Framerate), Magnum::Double(ImGui::GetIO().Framerate));
+		ImGuiIO& io = ImGui::GetIO();
+		ImFont* font_current = ImGui::GetFont();
+		if (ImGui::BeginCombo("Application font", font_current->GetDebugName())) {
+			for (int n = 0; n < io.Fonts->Fonts.Size; n++) {
+				ImFont* font = io.Fonts->Fonts[n];
+				ImGui::PushID(font);
+				if (ImGui::Selectable(font->GetDebugName(), font == font_current))
+					io.FontDefault = font;
+				ImGui::PopID();
+			}
+			ImGui::EndCombo();
+		}
+	}
 
-	// TODO add font and scaling settings here
+	if (ImGui::CollapsingHeader("Rendering")) {
+		if (ImGui::SliderInt("min frame time (ms)", &_frame_time_ms, 0, 40))
+			setMinimalLoopPeriod(_frame_time_ms);
+
+		ImGui::Text("Average %.3f ms/frame (%.1f FPS)", 1000.0 / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+	}
 
 	ImGui::End();
 }
