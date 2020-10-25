@@ -1,3 +1,5 @@
+#pragma once
+
 namespace fs::gui {
 
 class theming
