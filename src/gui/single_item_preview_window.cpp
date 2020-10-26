@@ -6,7 +6,7 @@ namespace fs::gui {
 
 void single_item_preview_window::draw_contents()
 {
-	ImGui::InputText("Item Preview", _item_name_buf.data(), _item_name_buf.size());
+	ImGui::InputText("", _item_name_buf.data(), _item_name_buf.size());
 }
 
 }
