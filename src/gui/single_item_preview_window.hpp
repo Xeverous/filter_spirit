@@ -17,7 +17,7 @@ public:
 	void draw_contents() override;
 
 private:
-	std::array<char, 256> _item_name_buf = {};
+	std::array<char, 64> _item_name_buf = { "Item Preview" };
 };
 
 }
