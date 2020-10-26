@@ -142,7 +142,7 @@ void application::drawEvent()
 			_force_focus_demo_window = false;
 		}
 
-		ImGui::ShowDemoWindow();
+		ImGui::ShowDemoWindow(&_show_demo_window);
 	}
 
 	/* Update application cursor */
