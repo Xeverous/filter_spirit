@@ -13,7 +13,7 @@ public:
 	filter_template_window(std::string path)
 	: imgui_window(std::move(path))
 	{
-		show();
+		open();
 	}
 
 protected:

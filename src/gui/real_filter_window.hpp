@@ -13,7 +13,7 @@ public:
 	real_filter_window(std::string path)
 	: imgui_window(std::move(path))
 	{
-		show();
+		open();
 	}
 
 protected:
