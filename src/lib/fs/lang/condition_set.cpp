@@ -2,6 +2,8 @@
 #include <fs/lang/keywords.hpp>
 #include <fs/utility/assert.hpp>
 
+#include <ostream>
+
 namespace
 {
 
