@@ -21,25 +21,25 @@ add_executable(filter_spirit_gui)
 
 target_sources(filter_spirit_gui
 	PRIVATE
-		imgui_window.hpp
-		ui_utils.hpp
-		filter_template_window.hpp
-		filter_template_window.cpp
-		real_filter_window.hpp
-		real_filter_window.cpp
-		color_picker_window.hpp
-		color_picker_window.cpp
-		single_item_preview_window.hpp
-		single_item_preview_window.cpp
-		common_ui_settings_window.hpp
-		common_ui_settings_window.cpp
-		version_info_window.hpp
-		version_info_window.cpp
-		application.hpp
-		application.cpp
-		theming.hpp
-		theming.cpp
-		main.cpp
+		fs/gui/application.cpp
+		fs/gui/application.hpp
+		fs/gui/imgui_window.hpp
+		fs/gui/theming.cpp
+		fs/gui/theming.hpp
+		fs/gui/ui_utils.hpp
+		fs/gui/windows/color_picker_window.cpp
+		fs/gui/windows/color_picker_window.hpp
+		fs/gui/windows/common_ui_settings_window.cpp
+		fs/gui/windows/common_ui_settings_window.hpp
+		fs/gui/windows/filter_template_window.cpp
+		fs/gui/windows/filter_template_window.hpp
+		fs/gui/windows/real_filter_window.cpp
+		fs/gui/windows/real_filter_window.hpp
+		fs/gui/windows/single_item_preview_window.cpp
+		fs/gui/windows/single_item_preview_window.hpp
+		fs/gui/windows/version_info_window.cpp
+		fs/gui/windows/version_info_window.hpp
+		fs/main.cpp
 )
 
 target_include_directories(filter_spirit_gui

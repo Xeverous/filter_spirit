@@ -1,8 +1,8 @@
 #pragma once
 
-#include "imgui_window.hpp"
-#include "theming.hpp"
-#include "ui_utils.hpp"
+#include <fs/gui/imgui_window.hpp>
+#include <fs/gui/theming.hpp>
+#include <fs/gui/ui_utils.hpp>
 
 #include <Magnum/Math/Color.h>
 #include <Magnum/Magnum.h>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "imgui_window.hpp"
+#include <fs/gui/imgui_window.hpp>
 
 #include <Magnum/Math/Color.h>
 #include <Magnum/Magnum.h>

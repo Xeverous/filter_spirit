@@ -1,4 +1,4 @@
-#include "filter_template_window.hpp"
+#include <fs/gui/windows/filter_template_window.hpp>
 
 #include <imgui.h>
 

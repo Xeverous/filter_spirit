@@ -1,4 +1,4 @@
-#include "version_info_window.hpp"
+#include <fs/gui/windows/version_info_window.hpp>
 
 #include <imgui.h>
 

@@ -1,4 +1,4 @@
-#include "single_item_preview_window.hpp"
+#include <fs/gui/windows/single_item_preview_window.hpp>
 
 #include <imgui.h>
 
