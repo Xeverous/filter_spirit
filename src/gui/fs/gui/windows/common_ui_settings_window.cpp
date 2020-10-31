@@ -1,8 +1,8 @@
 #include <fs/gui/windows/common_ui_settings_window.hpp>
 
-#include <imgui.h>
-
 #include <Magnum/GL/Renderer.h>
+
+#include <imgui.h>
 
 namespace fs::gui {
 

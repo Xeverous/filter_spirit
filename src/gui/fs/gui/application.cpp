@@ -1,10 +1,9 @@
 #include <fs/gui/application.hpp>
+#include <fs/version.hpp>
 
 #include <tinyfiledialogs.h>
 
 #include <Magnum/GL/Context.h>
-
-#include <fs/version.hpp>
 
 #include <initializer_list>
 #include <algorithm>

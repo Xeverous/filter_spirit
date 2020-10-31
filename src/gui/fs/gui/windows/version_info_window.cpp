@@ -1,12 +1,11 @@
 #include <fs/gui/windows/version_info_window.hpp>
-
-#include <imgui.h>
+#include <fs/version.hpp>
 
 #include <Magnum/GL/Context.h>
 #include <Magnum/Version.h>
 #include <Corrade/Version.h>
 
-#include <fs/version.hpp>
+#include <imgui.h>
 
 #include <boost/version.hpp>
 #include <boost/config.hpp>

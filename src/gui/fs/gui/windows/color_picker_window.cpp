@@ -1,9 +1,9 @@
 #include <fs/gui/windows/color_picker_window.hpp>
 #include <fs/gui/ui_utils.hpp>
 
-#include <imgui.h>
-
 #include <Magnum/Math/Packing.h>
+
+#include <imgui.h>
 
 #include <string>
 
