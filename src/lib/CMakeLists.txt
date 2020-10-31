@@ -152,6 +152,14 @@ target_compile_options(filter_spirit
 		$<$<CXX_COMPILER_ID:MSVC>:/W4>
 )
 
+if(FILTER_SPIRIT_PLATFORM STREQUAL "win7")
+	target_compile_definitions(filter_spirit PUBLIC FILTER_SPIRIT_PLATFORM_WINDOWS)
+elseif(FILTER_SPIRIT_PLATFORM STREQUAL "sdl2")
+	target_compile_definitions(filter_spirit PUBLIC FILTER_SPIRIT_PLATFORM_SDL)
+else()
+	message(FATAL_ERROR "missing or invalid FILTER_SPIRIT_PLATFORM")
+endif()
+
 if(FILTER_SPIRIT_ENABLE_ASSERTION_EXCEPTIONS)
 	target_compile_definitions(filter_spirit PRIVATE BOOST_ENABLE_ASSERT_HANDLER)
 endif()

@@ -12,6 +12,8 @@ set(IMGUI_DIR ${CMAKE_SOURCE_DIR}/external/imgui)
 set(WITH_IMGUI ON CACHE BOOL "" FORCE)
 add_subdirectory("${CMAKE_SOURCE_DIR}/external/magnum-integration" magnum-integration EXCLUDE_FROM_ALL)
 
+add_subdirectory("${CMAKE_SOURCE_DIR}/external/tiny_file_dialogs" tiny_file_dialogs EXCLUDE_FROM_ALL)
+
 find_package(Magnum REQUIRED GL Sdl2Application)
 find_package(MagnumIntegration REQUIRED ImGui)
 
@@ -21,6 +23,10 @@ target_sources(filter_spirit_gui
 	PRIVATE
 		imgui_window.hpp
 		ui_utils.hpp
+		filter_template_window.hpp
+		filter_template_window.cpp
+		real_filter_window.hpp
+		real_filter_window.cpp
 		color_picker_window.hpp
 		color_picker_window.cpp
 		single_item_preview_window.hpp
@@ -60,6 +66,7 @@ endif()
 target_link_libraries(filter_spirit_gui
 	PRIVATE
 		filter_spirit
+		tiny_file_dialogs
 		MagnumIntegration::ImGui
 		Magnum::Application
 		Magnum::GL

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "filter_template_window.hpp"
+#include "real_filter_window.hpp"
 #include "color_picker_window.hpp"
 #include "single_item_preview_window.hpp"
 #include "common_ui_settings_window.hpp"
@@ -17,6 +19,8 @@
 #include <Magnum/Platform/Sdl2Application.h>
 #endif
 
+#include <vector>
+
 namespace fs::gui {
 
 class application: public Magnum::Platform::Application
@@ -25,6 +29,7 @@ public:
 	explicit application(const Arguments& arguments);
 
 	void drawEvent() override;
+	void tickEvent() override;
 
 	void viewportEvent(ViewportEvent& event) override;
 
@@ -40,13 +45,28 @@ public:
 private:
 	void draw_main_menu_bar();
 
+	void on_open_filter_template();
+	void on_open_real_filter();
+
 	Magnum::ImGuiIntegration::Context _imgui{Magnum::NoCreate};
 
+	// non-owning
 	ImFont* _fontin_regular = nullptr;
 	ImFont* _fontin_small_caps = nullptr;
 
 	bool _show_demo_window = false;
 	bool _force_focus_demo_window = false;
+
+	enum class modal_dialog_state_type
+	{
+		none,
+		open_filter_template,
+		open_real_filter
+	};
+
+	modal_dialog_state_type _modal_dialog_state = modal_dialog_state_type::none;
+	std::vector<filter_template_window> _filter_templates;
+	std::vector<real_filter_window> _real_filters;
 
 	color_picker_window _color_picker;
 	single_item_preview_window _single_item_preview;
