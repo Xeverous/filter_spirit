@@ -24,8 +24,6 @@ target_sources(filter_spirit_gui
 		fs/gui/application.cpp
 		fs/gui/application.hpp
 		fs/gui/imgui_window.hpp
-		fs/gui/theming.cpp
-		fs/gui/theming.hpp
 		fs/gui/ui_utils.hpp
 		fs/gui/windows/color_picker_window.cpp
 		fs/gui/windows/color_picker_window.hpp
@@ -35,6 +33,10 @@ target_sources(filter_spirit_gui
 		fs/gui/windows/filter_template_window.hpp
 		fs/gui/windows/real_filter_window.cpp
 		fs/gui/windows/real_filter_window.hpp
+		fs/gui/windows/settings/fonting.cpp
+		fs/gui/windows/settings/fonting.hpp
+		fs/gui/windows/settings/theming.cpp
+		fs/gui/windows/settings/theming.hpp
 		fs/gui/windows/single_item_preview_window.cpp
 		fs/gui/windows/single_item_preview_window.hpp
 		fs/gui/windows/version_info_window.cpp

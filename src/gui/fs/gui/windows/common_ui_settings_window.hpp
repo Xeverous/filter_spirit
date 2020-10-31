@@ -1,7 +1,8 @@
 #pragma once
 
 #include <fs/gui/imgui_window.hpp>
-#include <fs/gui/theming.hpp>
+#include <fs/gui/windows/settings/theming.hpp>
+#include <fs/gui/windows/settings/fonting.hpp>
 #include <fs/gui/ui_utils.hpp>
 
 #include <Magnum/Math/Color.h>
@@ -23,7 +24,7 @@ class common_ui_settings_window : public imgui_window
 public:
 	common_ui_settings_window(Magnum::Platform::Application& application)
 	: imgui_window("Common UI settings")
-	, application(application)
+	, _application(application)
 	{
 	}
 
@@ -36,9 +37,10 @@ protected:
 	void draw_contents() override;
 
 private:
-	Magnum::Platform::Application& application;
-	theming _theming;
+	Magnum::Platform::Application& _application;
 	Magnum::Color3 _clear_color = from_rgb(0x1f1f1f);
+	theming _theming;
+	fonting _fonting;
 	int _min_frame_time_ms = 16; // 16ms per frame, roughly 60 FPS
 };
 
