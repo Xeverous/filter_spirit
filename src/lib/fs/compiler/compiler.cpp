@@ -54,7 +54,7 @@ add_constant_from_definition(
 			const bool success = symbols.emplace(
 				wanted_name,
 				lang::named_object{std::move(obj), wanted_name_origin}).second;
-			BOOST_ASSERT_MSG(success, "Insertion should succeed.");
+			FS_ASSERT_MSG(success, "Insertion should succeed.");
 			(void) success; // shut unused variable warning
 		});
 }
@@ -269,7 +269,7 @@ make_spirit_filter_block(
 {
 	if (conditions.price.has_bound() && !conditions.autogen.has_value()) {
 		std::optional<lang::position_tag> price_first_origin = conditions.price.first_origin();
-		BOOST_ASSERT_MSG(
+		FS_ASSERT_MSG(
 			price_first_origin.has_value(),
 			"Price condition has a bound. It must have at least 1 origin.");
 		return error(errors::price_without_autogen{

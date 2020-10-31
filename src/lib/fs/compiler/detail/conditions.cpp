@@ -362,7 +362,7 @@ spirit_filter_add_price_comparison_condition(
 {
 	return detail::evaluate_sequence(st, condition.seq, symbols, 1, 1)
 		.map_result<lang::fractional>([](lang::object obj) {
-			BOOST_ASSERT(obj.values.size() == 1u);
+			FS_ASSERT(obj.values.size() == 1u);
 			return detail::get_as_fractional(obj.values[0]);
 		})
 		.map_result([&](lang::fractional frac) {
@@ -383,7 +383,7 @@ spirit_filter_add_rarity_comparison_condition(
 {
 	return detail::evaluate_sequence(st, condition.seq, symbols, 1, 1)
 		.map_result<lang::rarity>([](lang::object obj) {
-			BOOST_ASSERT(obj.values.size() == 1u);
+			FS_ASSERT(obj.values.size() == 1u);
 			return detail::get_as<lang::rarity>(obj.values[0]);
 		})
 		.map_result([&](lang::rarity rar) {
@@ -404,7 +404,7 @@ spirit_filter_add_numeric_comparison_condition(
 {
 	return detail::evaluate_sequence(st, condition.seq, symbols, 1, 1)
 		.map_result<lang::integer>([](lang::object obj) {
-			BOOST_ASSERT(obj.values.size() == 1u);
+			FS_ASSERT(obj.values.size() == 1u);
 			return detail::get_as<lang::integer>(obj.values[0]);
 		})
 		.map_result([&](lang::integer intgr) {
@@ -498,7 +498,7 @@ spirit_filter_add_gem_quality_type_condition(
 {
 	return detail::evaluate_sequence(st, condition.seq, symbols, 1, 1)
 		.map_result<lang::gem_quality_type>([](lang::object obj) {
-			BOOST_ASSERT(obj.values.size() == 1u);
+			FS_ASSERT(obj.values.size() == 1u);
 			return detail::get_as<lang::gem_quality_type>(obj.values[0]);
 		})
 		.map_result([&](lang::gem_quality_type type) {
@@ -555,7 +555,7 @@ spirit_filter_add_boolean_condition(
 {
 	return detail::evaluate_sequence(st, condition.seq, symbols, 1, 1)
 		.map_result<lang::boolean>([](lang::object obj) {
-			BOOST_ASSERT(obj.values.size() == 1u);
+			FS_ASSERT(obj.values.size() == 1u);
 			return detail::get_as<lang::boolean>(obj.values[0]);
 		})
 		.map_result([&](lang::boolean b) {

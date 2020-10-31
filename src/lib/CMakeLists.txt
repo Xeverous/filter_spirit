@@ -161,7 +161,7 @@ else()
 endif()
 
 if(FILTER_SPIRIT_ENABLE_ASSERTION_EXCEPTIONS)
-	target_compile_definitions(filter_spirit PRIVATE BOOST_ENABLE_ASSERT_HANDLER)
+	target_compile_definitions(filter_spirit PUBLIC BOOST_ENABLE_ASSERT_HANDLER)
 endif()
 
 if(FILTER_SPIRIT_ENABLE_LTO)

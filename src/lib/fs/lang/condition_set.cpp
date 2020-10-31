@@ -144,7 +144,7 @@ void output_socket_spec_condition(
 
 	const lang::socket_spec_condition::container_type& specs = cond.values;
 	for (lang::socket_spec ss : specs) {
-		BOOST_ASSERT(ss.is_valid());
+		FS_ASSERT(ss.is_valid());
 
 		output_stream << ' ';
 

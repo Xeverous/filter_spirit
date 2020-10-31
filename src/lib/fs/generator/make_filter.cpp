@@ -124,7 +124,7 @@ make_strings_condition_uniques_ambiguous(
 		last,
 		[price_range](const auto& pair) {
 			const auto& items = pair.second; // C++20: use concept container
-			BOOST_ASSERT(!items.empty());
+			FS_ASSERT(!items.empty());
 
 			for (const lang::market::elementary_item& item : items)
 				if (price_range.includes(item.price.chaos_value))

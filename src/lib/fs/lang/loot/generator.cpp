@@ -283,8 +283,8 @@ int max_sockets_possible(int item_level)
  */
 int roll_sockets_amount(int max_base_sockets, int item_level, std::mt19937& rng)
 {
-	BOOST_ASSERT(max_base_sockets >= 0);
-	BOOST_ASSERT(max_base_sockets <= 6);
+	FS_ASSERT(max_base_sockets >= 0);
+	FS_ASSERT(max_base_sockets <= 6);
 
 	if (max_base_sockets == 0 || max_base_sockets == 1)
 		return max_base_sockets;

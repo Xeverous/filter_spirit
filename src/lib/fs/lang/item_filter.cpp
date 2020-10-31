@@ -176,7 +176,7 @@ item_filtering_result pass_item_through_filter(const item& itm, const item_filte
 	item_style style = default_item_style(itm);
 
 	for (const item_filter_block& block : filter.blocks) {
-		BOOST_ASSERT(block.conditions.is_valid());
+		FS_ASSERT(block.conditions.is_valid());
 
 		condition_set_match_result match_result;
 		const condition_set& cs = block.conditions;

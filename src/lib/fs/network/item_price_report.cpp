@@ -226,7 +226,7 @@ item_price_report_cache::async_get_report(
 		return async_download_and_parse_ninja(*this, std::move(league), std::move(settings), info, logger);
 	}
 	else /* if (api == lang::data_source_type::poe_watch) */ {
-		BOOST_ASSERT(api == lang::data_source_type::poe_watch);
+		FS_ASSERT(api == lang::data_source_type::poe_watch);
 		return download_and_parse_watch(*this, std::move(league), std::move(settings), info, logger);
 	}
 }

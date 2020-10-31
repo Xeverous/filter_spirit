@@ -18,7 +18,7 @@ public:
 	string(char* str)
 	: _str(str)
 	{
-		BOOST_ASSERT(_str != nullptr);
+		FS_ASSERT(_str != nullptr);
 		_len = std::strlen(_str);
 	}
 
@@ -281,7 +281,7 @@ private:
 	easy_handle(CURL* handle)
 	: _handle(handle)
 	{
-		BOOST_ASSERT(_handle != nullptr);
+		FS_ASSERT(_handle != nullptr);
 	}
 
 	CURL* _handle = nullptr;
