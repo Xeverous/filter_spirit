@@ -378,7 +378,7 @@ EnumType json_to_enum(const nlohmann::json& json)
 template <typename T, typename Arg> [[nodiscard]]
 std::optional<T> get_optional_subelement(const nlohmann::json& obj_json, Arg&& arg)
 {
-	BOOST_ASSERT(obj_json.is_object());
+	FS_ASSERT(obj_json.is_object());
 
 	if (auto it = obj_json.find(std::forward<Arg>(arg)); it != obj_json.end()) {
 		auto& item = *it;
@@ -475,7 +475,7 @@ item_category_variant parse_item_category(const nlohmann::json& entry)
 [[nodiscard]]
 item parse_item(const nlohmann::json& item_json)
 {
-	BOOST_ASSERT(item_json.is_object());
+	FS_ASSERT(item_json.is_object());
 
 	return item{
 		item_json.at("id").get<std::size_t>(),

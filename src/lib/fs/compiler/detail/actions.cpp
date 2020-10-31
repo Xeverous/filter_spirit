@@ -56,7 +56,7 @@ spirit_filter_add_set_color_action(
 	return detail::evaluate_sequence(st, action.seq, symbols, 3, 4)
 		.map_result<lang::color>([&](lang::object obj) {
 			const auto num_values = obj.values.size();
-			BOOST_ASSERT(num_values == 3u || num_values == 4u);
+			FS_ASSERT(num_values == 3u || num_values == 4u);
 
 			auto rgb = detail::get_as<lang::integer>(obj.values[0])
 				.merge_with(detail::get_as<lang::integer>(obj.values[1]))
@@ -95,7 +95,7 @@ spirit_filter_add_set_font_size_action(
 {
 	return detail::evaluate_sequence(st, action.seq, symbols, 1, 1)
 		.map_result<lang::integer>([](lang::object obj) {
-			BOOST_ASSERT(obj.values.size() == 1u);
+			FS_ASSERT(obj.values.size() == 1u);
 			return detail::get_as<lang::integer>(obj.values[0]);
 		})
 		.map_result<lang::font_size_action>([&](lang::integer font_size) {
@@ -123,7 +123,7 @@ spirit_filter_add_minimap_icon_action(
 {
 	return detail::evaluate_sequence(st, action.seq, symbols, 3, 3)
 		.map_result<lang::minimap_icon>([](lang::object obj) {
-			BOOST_ASSERT(obj.values.size() == 3u);
+			FS_ASSERT(obj.values.size() == 3u);
 
 			return detail::get_as<lang::integer>(obj.values[0])
 				.merge_with(detail::get_as<lang::suit>(obj.values[1]))
@@ -146,14 +146,14 @@ spirit_filter_add_play_effect_action(
 	return detail::evaluate_sequence(st, action.seq, symbols, 1, 2)
 		.map_result<lang::play_effect>([](lang::object obj) {
 			const auto num_values = obj.values.size();
-			BOOST_ASSERT(num_values == 1u || num_values == 2u);
+			FS_ASSERT(num_values == 1u || num_values == 2u);
 
 			return detail::get_as<lang::suit>(obj.values[0])
 				.merge_with([&]() -> outcome<bool> {
 					if (num_values != 2)
 						return false; // no "Temp" token, therefore false
 
-					BOOST_ASSERT(num_values == 2u);
+					FS_ASSERT(num_values == 2u);
 
 					// there is an extra token, it must be "Temp"; if successful map to true
 					return detail::get_as<lang::temp>(obj.values[1])
@@ -206,7 +206,7 @@ make_builtin_alert_sound(
 	const lang::object& obj)
 {
 	const auto num_args = obj.values.size();
-	BOOST_ASSERT(num_args == 1u || num_args == 2u);
+	FS_ASSERT(num_args == 1u || num_args == 2u);
 
 	auto sound_id = make_builtin_alert_sound_id(obj.values[0]);
 
@@ -234,7 +234,7 @@ spirit_filter_add_play_alert_sound_action(
 {
 	return detail::evaluate_sequence(st, action.seq, symbols, 1, 2)
 		.map_result<lang::builtin_alert_sound>([&](lang::object obj) {
-			BOOST_ASSERT(obj.values.size() == 1u || obj.values.size() == 2u);
+			FS_ASSERT(obj.values.size() == 1u || obj.values.size() == 2u);
 			return make_builtin_alert_sound(st, action.positional, obj);
 		})
 		.map_result([&](lang::builtin_alert_sound bas) {
@@ -266,7 +266,7 @@ spirit_filter_add_custom_alert_sound_action(
 {
 	return detail::evaluate_sequence(st, action.seq, symbols, 1, 1)
 		.map_result<lang::custom_alert_sound>([&](lang::object obj) {
-			BOOST_ASSERT(obj.values.size() == 1u);
+			FS_ASSERT(obj.values.size() == 1u);
 			return make_custom_alert_sound(st, obj.values[0]);
 		})
 		.map_result([&](lang::custom_alert_sound cas) {
@@ -287,7 +287,7 @@ spirit_filter_add_set_alert_sound_action(
 	return detail::evaluate_sequence(st, action.seq, symbols, 1, 2)
 		.map_result<lang::alert_sound>([&](lang::object obj) -> outcome<lang::alert_sound> {
 			const auto num_values = obj.values.size();
-			BOOST_ASSERT(num_values == 1u || num_values == 2u);
+			FS_ASSERT(num_values == 1u || num_values == 2u);
 
 			// SetAlertSound always generates non-positional sounds, hence the false
 			auto builtin_alert = make_builtin_alert_sound(st, false, obj);
@@ -298,7 +298,7 @@ spirit_filter_add_set_alert_sound_action(
 					});
 				}
 
-				BOOST_ASSERT(num_values == 1u);
+				FS_ASSERT(num_values == 1u);
 				return make_custom_alert_sound(st, obj.values[0]);
 			}();
 
@@ -344,7 +344,7 @@ spirit_filter_add_compound_action(
 {
 	return detail::evaluate_sequence(st, action.seq, symbols, 1, 1)
 		.map_result<lang::action_set>([](lang::object obj) {
-			BOOST_ASSERT(obj.values.size() == 1u);
+			FS_ASSERT(obj.values.size() == 1u);
 			return detail::get_as<lang::action_set>(obj.values[0]);
 		})
 		.map_result([&](lang::action_set as) {

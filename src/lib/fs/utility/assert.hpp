@@ -2,6 +2,9 @@
 
 #include <boost/assert.hpp>
 
+#define FS_ASSERT(expr) BOOST_ASSERT(expr)
+#define FS_ASSERT_MSG(expr, msg) BOOST_ASSERT_MSG(expr, msg)
+
 #ifdef BOOST_ENABLE_ASSERT_HANDLER
 #include <stdexcept>
 #include <string>

@@ -289,7 +289,7 @@ evaluate_sequence(
 	int min_allowed_elements,
 	std::optional<int> max_allowed_elements)
 {
-	BOOST_ASSERT(!sequence.empty());
+	FS_ASSERT(!sequence.empty());
 
 	lang::object::container_type seq_values;
 	seq_values.reserve(sequence.size());

@@ -114,7 +114,7 @@ int count_lines(const char* first, const char* last) noexcept
 
 std::string_view make_string_view(const char* first, const char* last) noexcept
 {
-	BOOST_ASSERT(first <= last);
+	FS_ASSERT(first <= last);
 
 	if (first == last)
 		return std::string_view();
