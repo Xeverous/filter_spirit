@@ -138,13 +138,13 @@ void application::draw_main_menu_bar()
 		}
 
 		if (ImGui::BeginMenu("Tools")) {
-			if (ImGui::MenuItem(_color_picker.name())) {
-				_color_picker.show();
+			if (ImGui::MenuItem(_color_picker.name().c_str())) {
+				_color_picker.open();
 				_color_picker.take_focus();
 			}
 
-			if (ImGui::MenuItem(_single_item_preview.name())) {
-				_single_item_preview.show();
+			if (ImGui::MenuItem(_single_item_preview.name().c_str())) {
+				_single_item_preview.open();
 				_single_item_preview.take_focus();
 			}
 
@@ -157,8 +157,8 @@ void application::draw_main_menu_bar()
 		}
 
 		if (ImGui::BeginMenu("Settings")) {
-			if (ImGui::MenuItem(_common_ui_settings.name())) {
-				_common_ui_settings.show();
+			if (ImGui::MenuItem(_common_ui_settings.name().c_str())) {
+				_common_ui_settings.open();
 				_common_ui_settings.take_focus();
 			}
 
@@ -168,8 +168,8 @@ void application::draw_main_menu_bar()
 		if (ImGui::BeginMenu("About")) {
 			ImGui::MenuItem("About FS", nullptr, false, false);
 
-			if (ImGui::MenuItem(_version_info.name())) {
-				_version_info.show();
+			if (ImGui::MenuItem(_version_info.name().c_str())) {
+				_version_info.open();
 				_version_info.take_focus();
 			}
 
@@ -244,13 +244,13 @@ void application::tickEvent()
 		std::remove_if(
 			_filter_templates.begin(),
 			_filter_templates.end(),
-			[](const filter_template_window& w){ return !w.is_visible(); }),
+			[](const filter_template_window& w){ return !w.is_opened(); }),
 		_filter_templates.end());
 	_real_filters.erase(
 		std::remove_if(
 			_real_filters.begin(),
 			_real_filters.end(),
-			[](const real_filter_window& w){ return !w.is_visible(); }),
+			[](const real_filter_window& w){ return !w.is_opened(); }),
 		_real_filters.end());
 
 	if (_modal_dialog_state == modal_dialog_state_type::open_filter_template)

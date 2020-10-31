@@ -18,10 +18,10 @@ public:
 
 	virtual ~imgui_window() = default;
 
-	bool is_visible() const noexcept { return _show; }
+	bool is_opened() const noexcept { return _is_opened; }
 
-	void show() { _show = true; }
-	void hide() { _show = false; }
+	void open() { _is_opened = true; }
+	void hide() { _is_opened = false; }
 
 	void take_focus()
 	{
@@ -33,14 +33,14 @@ public:
 		_name = str;
 	}
 
-	const char* name() const
+	const std::string& name() const
 	{
-		return _name.c_str();
+		return _name;
 	}
 
 	void draw()
 	{
-		if (!_show)
+		if (!_is_opened)
 			return;
 
 		if (_force_focus) {
@@ -48,7 +48,7 @@ public:
 			_force_focus = false;
 		}
 
-		if (!ImGui::Begin(_name.c_str(), &_show)) {
+		if (!ImGui::Begin(_name.c_str(), &_is_opened)) {
 			ImGui::End();
 			return;
 		}
@@ -63,7 +63,7 @@ protected:
 
 private:
 	std::string _name;
-	bool _show = false;
+	bool _is_opened = false;
 	bool _force_focus = false;
 };
 
