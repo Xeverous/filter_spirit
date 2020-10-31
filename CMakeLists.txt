@@ -14,7 +14,7 @@ endif()
 project(filter_spirit
 	VERSION 0.7.0
 	DESCRIPTION "advanced item filter generator for the game Path of Exile using own DSL and online APIs"
-	LANGUAGES CXX)
+	LANGUAGES C CXX)
 
 set(default_build_type "Release")
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -41,6 +41,7 @@ option(FILTER_SPIRIT_ADD_FILESYSTEM_LINK
 	"add linker command for standard filesystem library (required by earlier GCC and Clang versions)" OFF)
 option(FILTER_SPIRIT_ENABLE_LTO
 	"enable link-time optimization for Filter Spirit targets" ON)
+set(FILTER_SPIRIT_PLATFORM "" CACHE STRING "win7 (Windows 7 or newer) or sdl2 (any platform suppored by SDL2)")
 
 ##############################################################################
 # specify explicitly where to output all binary objects

@@ -18,6 +18,8 @@ public:
 
 	virtual ~imgui_window() = default;
 
+	bool is_visible() const noexcept { return _show; }
+
 	void show() { _show = true; }
 	void hide() { _show = false; }
 
