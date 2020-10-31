@@ -1,4 +1,4 @@
-#include "application.hpp"
+#include <fs/gui/application.hpp>
 
 int main(int argc, char** argv)
 {

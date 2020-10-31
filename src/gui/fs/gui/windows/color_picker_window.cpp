@@ -1,5 +1,5 @@
-#include "color_picker_window.hpp"
-#include "ui_utils.hpp"
+#include <fs/gui/windows/color_picker_window.hpp>
+#include <fs/gui/ui_utils.hpp>
 
 #include <imgui.h>
 

@@ -1,11 +1,11 @@
 #pragma once
 
-#include "filter_template_window.hpp"
-#include "real_filter_window.hpp"
-#include "color_picker_window.hpp"
-#include "single_item_preview_window.hpp"
-#include "common_ui_settings_window.hpp"
-#include "version_info_window.hpp"
+#include <fs/gui/windows/filter_template_window.hpp>
+#include <fs/gui/windows/real_filter_window.hpp>
+#include <fs/gui/windows/color_picker_window.hpp>
+#include <fs/gui/windows/single_item_preview_window.hpp>
+#include <fs/gui/windows/common_ui_settings_window.hpp>
+#include <fs/gui/windows/version_info_window.hpp>
 
 #include <Magnum/GL/DefaultFramebuffer.h>
 #include <Magnum/GL/Renderer.h>
