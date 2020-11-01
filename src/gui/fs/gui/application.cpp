@@ -284,14 +284,14 @@ void application::on_open_filter_template()
 
 void application::on_open_real_filter()
 {
-	auto patterns = { "*.filter" };
+	const auto patterns = { "*.filter" };
 
 	const char* const selected_path = tinyfd_openFileDialog(
 		/* title */ "Select real filter file",
 		/* default path */ nullptr,
 		/* number of filter patterns */ patterns.size(),
 		/* filters array */ patterns.begin(),
-		/* filter pattern description */ "Path of Exile Item Filters",
+		/* filter pattern description */ "Path of Exile Item Filters (*.filter)",
 		/* multiselect allowed? */ 0);
 
 	if (selected_path != nullptr)
