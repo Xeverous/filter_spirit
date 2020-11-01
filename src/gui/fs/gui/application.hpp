@@ -48,11 +48,11 @@ private:
 	void on_open_filter_template();
 	void on_open_real_filter();
 
-	Magnum::ImGuiIntegration::Context _imgui{Magnum::NoCreate};
+	void remove_closed_windows();
+	void open_pending_modals();
+	void rebuild_pending_fonts();
 
-	// non-owning
-	ImFont* _fontin_regular = nullptr;
-	ImFont* _fontin_small_caps = nullptr;
+	Magnum::ImGuiIntegration::Context _imgui{Magnum::NoCreate};
 
 	bool _show_demo_window = false;
 	bool _force_focus_demo_window = false;

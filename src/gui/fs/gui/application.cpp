@@ -14,19 +14,6 @@
  * code in this file - based on Magnum's ImGui example
  */
 
-namespace {
-
-// returns non-owning pointer
-ImFont* load_font_from_file(ImGuiIO& io, const char* path, float size_pixels)
-{
-	ImFont* result = io.Fonts->AddFontFromFileTTF(path, size_pixels);
-	if (result == nullptr)
-		throw std::runtime_error(std::string("can not load font: ") + path);
-	return result;
-}
-
-}
-
 namespace fs::gui {
 
 application::application(const Arguments& arguments)
@@ -39,10 +26,13 @@ application::application(const Arguments& arguments)
 {
 	ImGui::CreateContext();
 
-	ImGuiIO& io = ImGui::GetIO();
-	_fontin_regular    = load_font_from_file(io, "assets/fonts/Fontin-Regular.otf", 24);
-	_fontin_small_caps = load_font_from_file(io, "assets/fonts/Fontin-SmallCaps.otf", 24);
-	io.FontDefault = _fontin_small_caps;
+	/*
+	 * note: this has to be done in exactly this place:
+	 * - after Dear ImGui's context has been constructed
+	 * - before Magnum's Dear ImGui integration is constructed
+	 * for more details, see documentation of Magnum::ImGuiIntegration::Context
+	 */
+	_common_ui_settings.font_settings().build_default_fonts();
 
 	_imgui = Magnum::ImGuiIntegration::Context(
 		*ImGui::GetCurrentContext(), Magnum::Vector2{windowSize()} / dpiScaling(), windowSize(), framebufferSize());
@@ -237,6 +227,13 @@ void application::drawEvent()
 
 void application::tickEvent()
 {
+	remove_closed_windows();
+	open_pending_modals();
+	rebuild_pending_fonts();
+}
+
+void application::remove_closed_windows()
+{
 	// remove dynamically created windows that have been closed
 	// (with a pretty 1-statement STL erase-remove idiom)
 	_filter_templates.erase(
@@ -251,13 +248,24 @@ void application::tickEvent()
 			_real_filters.end(),
 			[](const real_filter_window& w){ return !w.is_opened(); }),
 		_real_filters.end());
+}
 
+void application::open_pending_modals()
+{
 	if (_modal_dialog_state == modal_dialog_state_type::open_filter_template)
 		on_open_filter_template();
 	else if (_modal_dialog_state == modal_dialog_state_type::open_real_filter)
 		on_open_real_filter();
 
 	_modal_dialog_state = modal_dialog_state_type::none;
+}
+
+void application::rebuild_pending_fonts()
+{
+	if (_common_ui_settings.font_settings().is_rebuild_needed()) {
+		_common_ui_settings.font_settings().rebuild();
+		_imgui.relayout(windowSize());
+	}
 }
 
 void application::on_open_filter_template()
