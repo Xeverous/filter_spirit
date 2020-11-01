@@ -33,6 +33,11 @@ public:
 		return _min_frame_time_ms;
 	}
 
+	fonting& font_settings()
+	{
+		return _fonting;
+	}
+
 protected:
 	void draw_contents() override;
 
