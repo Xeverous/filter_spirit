@@ -9,6 +9,8 @@
 
 #include <SDL_version.h>
 
+#include <curl/curl.h>
+
 #include <boost/version.hpp>
 #include <boost/config.hpp>
 
@@ -51,7 +53,7 @@ version_info_window::version_info_window()
 
 void version_info_window::draw_contents()
 {
-	constexpr auto line_width = 300;
+	const auto line_width = ImGui::GetFontSize() * 15.0f;
 	// __DATE__ has ugly "Mmm dd yyyy" format for legacy reasons, reorder it to ISO 8601
 	const auto build_date = {
 		__DATE__[7], __DATE__[8], __DATE__[9], __DATE__[10], ' ',
@@ -88,6 +90,10 @@ void version_info_window::draw_contents()
 	ImGui::Text("SDL version:");
 	ImGui::SameLine(line_width);
 	ImGui::Text(_sdl_version.c_str());
+
+	ImGui::Text("libcurl version:");
+	ImGui::SameLine(line_width);
+	ImGui::Text(curl_version());
 
 	ImGui::Dummy({0.0f, ImGui::GetFontSize() * 2.0f});
 
