@@ -262,10 +262,17 @@ void application::open_pending_modals()
 
 void application::rebuild_pending_fonts()
 {
-	if (_common_ui_settings.font_settings().is_rebuild_needed()) {
-		_common_ui_settings.font_settings().rebuild();
+	auto& font_settings = _common_ui_settings.font_settings();
+
+	// note: all of code below in this function has significant order requirements
+	// otherwise the program crashes due to font/rendering dependency shenanigans
+	// care when changing this function, for more - see implementation of fonting
+	if (font_settings.is_rebuild_needed()) {
+		font_settings.rebuild();
 		_imgui.relayout(windowSize());
 	}
+
+	font_settings.update();
 }
 
 void application::on_open_filter_template()
