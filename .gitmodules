@@ -1,0 +1,15 @@
+[submodule "external/magnum-integration"]
+	path = external/magnum-integration
+	url = https://github.com/mosra/magnum-integration.git
+[submodule "external/tiny_file_dialogs/tinyfiledialogs-code"]
+	path = external/tiny_file_dialogs/tinyfiledialogs-code
+	url = git://git.code.sf.net/p/tinyfiledialogs/code
+[submodule "external/magnum"]
+	path = external/magnum
+	url = https://github.com/mosra/magnum.git
+[submodule "external/corrade"]
+	path = external/corrade
+	url = https://github.com/mosra/corrade.git
+[submodule "external/imgui"]
+	path = external/imgui
+	url = https://github.com/ocornut/imgui.git
