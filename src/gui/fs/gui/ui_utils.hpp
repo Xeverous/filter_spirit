@@ -4,7 +4,10 @@
 #include <Magnum/Math/Packing.h>
 #include <Magnum/Magnum.h>
 
+#include <imgui.h>
+
 #include <cstdint>
+#include <utility>
 
 namespace fs::gui {
 
@@ -47,4 +50,76 @@ inline Magnum::Color4ub to_rgba(Magnum::Color4 color)
 	return Magnum::Math::pack<Magnum::Color4ub>(color);
 }
 
-}
+/*
+ * wrappers for managing Dear ImGui state
+ */
+
+template <typename Impl>
+class [[nodiscard]] scoped_override
+{
+public:
+	using value_type = typename Impl::value_type;
+
+	scoped_override(value_type val)
+	{
+		Impl::push(val);
+	}
+
+	~scoped_override()
+	{
+		if (_cleanup_required)
+			Impl::pop();
+	}
+
+	scoped_override(const scoped_override&) = delete;
+
+	scoped_override(scoped_override&& other)
+	: _cleanup_required(std::exchange(other._cleanup_required, false))
+	{
+	}
+
+	scoped_override& operator=(scoped_override other)
+	{
+		std::swap(_cleanup_required, other._cleanup_required);
+		return *this;
+	}
+
+private:
+	bool _cleanup_required = true;
+};
+
+struct scoped_font_override_impl
+{
+	using value_type = ImFont*;
+
+	static void push(ImFont* font)
+	{
+		ImGui::PushFont(font);
+	}
+
+	static void pop()
+	{
+		ImGui::PopFont();
+	}
+};
+
+using scoped_font_override = scoped_override<scoped_font_override_impl>;
+
+struct scoped_text_color_override_impl
+{
+	using value_type = ImU32;
+
+	static void push(value_type color)
+	{
+		ImGui::PushStyleColor(ImGuiCol_Text, color);
+	}
+
+	static void pop()
+	{
+		ImGui::PopStyleColor();
+	}
+};
+
+using scoped_text_color_override = scoped_override<scoped_text_color_override_impl>;
+
+} // namespace fs::gui
