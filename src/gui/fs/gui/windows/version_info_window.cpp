@@ -55,10 +55,11 @@ void version_info_window::draw_contents()
 {
 	const auto line_width = ImGui::GetFontSize() * 15.0f;
 	// __DATE__ has ugly "Mmm dd yyyy" format for legacy reasons, reorder it to ISO 8601
+	// also when dd < 10 change space to 0 to avoid ugly double space
 	const auto build_date = {
 		__DATE__[7], __DATE__[8], __DATE__[9], __DATE__[10], ' ',
 		__DATE__[0], __DATE__[1], __DATE__[2], ' ',
-		__DATE__[4], __DATE__[5], '\0'
+		__DATE__[4] == ' ' ? '0' : __DATE__[4], __DATE__[5], '\0'
 	};
 
 	ImGui::Text("Version information of FS and its dependencies:");
@@ -91,7 +92,7 @@ void version_info_window::draw_contents()
 	ImGui::SameLine(line_width);
 	ImGui::Text(_sdl_version.c_str());
 
-	ImGui::Text("libcurl version:");
+	ImGui::Text("libraries for networking:");
 	ImGui::SameLine(line_width);
 	ImGui::Text(curl_version());
 
