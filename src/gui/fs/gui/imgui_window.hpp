@@ -21,7 +21,7 @@ public:
 	bool is_opened() const noexcept { return _is_opened; }
 
 	void open() { _is_opened = true; }
-	void hide() { _is_opened = false; }
+	void close() { _is_opened = false; }
 
 	void take_focus()
 	{
