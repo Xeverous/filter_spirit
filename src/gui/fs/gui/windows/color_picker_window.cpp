@@ -1,7 +1,6 @@
 #include <fs/gui/windows/color_picker_window.hpp>
 #include <fs/gui/ui_utils.hpp>
-
-#include <Magnum/Math/Packing.h>
+#include <fs/gui/application.hpp>
 
 #include <imgui.h>
 
@@ -22,26 +21,32 @@ namespace fs::gui {
 void color_picker_window::draw_contents()
 {
 	const ImGuiColorEditFlags flags = ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_AlphaBar;
-	ImVec4 button_col = {
+	const ImVec4 button_color = {
 		_selected_color.x(),
 		_selected_color.y(),
 		_selected_color.z(),
 		_selected_color.w()
 	};
-	ImGui::ColorButton("", button_col, flags, ImVec2(100, 100));
+	const auto button_size = _application.font_settings().monospaced_font_size() * 4; // * 4 because we draw 4 lines of text
+	ImGui::ColorButton("", button_color, flags, ImVec2(button_size, button_size));
 	ImGui::SameLine();
 	ImGui::Text("click to copy\nthese strings");
 	ImGui::SameLine();
-	ImGui::BeginGroup();
 
-	const auto rgba = to_rgba(_selected_color);
-	const auto rgba_str = std::to_string(rgba.r()) + " " + std::to_string(rgba.g()) + " " + std::to_string(rgba.b()) + " " + std::to_string(rgba.a());
-	button_click_to_copy(rgba_str.c_str());
-	button_click_to_copy(("SetBorderColor " + rgba_str).c_str());
-	button_click_to_copy(("SetTextColor " + rgba_str).c_str());
-	button_click_to_copy(("SetBackgroundColor " + rgba_str).c_str());
+	{
+		auto _ = _application.font_settings().scoped_monospaced_font();
+		ImGui::BeginGroup();
 
-	ImGui::EndGroup();
+		const auto rgba = to_rgba(_selected_color);
+		const auto rgba_str = std::to_string(rgba.r()) + " " + std::to_string(rgba.g()) + " " + std::to_string(rgba.b()) + " " + std::to_string(rgba.a());
+		button_click_to_copy(rgba_str.c_str());
+		button_click_to_copy(("SetBorderColor " + rgba_str).c_str());
+		button_click_to_copy(("SetTextColor " + rgba_str).c_str());
+		button_click_to_copy(("SetBackgroundColor " + rgba_str).c_str());
+
+		ImGui::EndGroup();
+	}
+
 	ImGui::ColorPicker4("", _selected_color.data(), flags);
 }
 

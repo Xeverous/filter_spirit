@@ -7,8 +7,6 @@
 #include <fs/gui/windows/common_ui_settings_window.hpp>
 #include <fs/gui/windows/version_info_window.hpp>
 
-#include <Magnum/GL/DefaultFramebuffer.h>
-#include <Magnum/GL/Renderer.h>
 #include <Magnum/ImGuiIntegration/Context.hpp>
 
 #ifdef CORRADE_TARGET_ANDROID
@@ -41,6 +39,11 @@ public:
 	void mouseMoveEvent(MouseMoveEvent& event) override;
 	void mouseScrollEvent(MouseScrollEvent& event) override;
 	void textInputEvent(TextInputEvent& event) override;
+
+	fonting& font_settings()
+	{
+		return _common_ui_settings.font_settings();
+	}
 
 private:
 	void draw_main_menu_bar();

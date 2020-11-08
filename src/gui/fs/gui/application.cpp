@@ -4,6 +4,8 @@
 #include <tinyfiledialogs.h>
 
 #include <Magnum/GL/Context.h>
+#include <Magnum/GL/DefaultFramebuffer.h>
+#include <Magnum/GL/Renderer.h>
 
 #include <initializer_list>
 #include <algorithm>
@@ -22,6 +24,7 @@ application::application(const Arguments& arguments)
 	Configuration{}
 		.setTitle("Filter Spirit v" + to_string(fs::version::current()))
 		.setWindowFlags(Configuration::WindowFlag::Resizable)}
+, _color_picker(*this)
 , _common_ui_settings(*this)
 {
 	ImGui::CreateContext();

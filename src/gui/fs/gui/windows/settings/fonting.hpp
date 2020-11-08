@@ -1,6 +1,7 @@
 #pragma once
 
 #include <fs/utility/assert.hpp>
+#include <fs/gui/ui_utils.hpp>
 
 #include <imgui.h>
 
@@ -76,6 +77,33 @@ public:
 	bool is_rebuild_needed() const
 	{
 		return _rebuild_needed;
+	}
+
+	auto text_font() const
+	{
+		FS_ASSERT(_text_font != nullptr);
+		return _text_font;
+	}
+
+	int text_font_size() const
+	{
+		return _text_font_size;
+	}
+
+	int monospaced_font_size() const
+	{
+		return _monospaced_font_size;
+	}
+
+	auto monospaced_font() const
+	{
+		FS_ASSERT(_monospaced_font != nullptr);
+		return _monospaced_font;
+	}
+
+	scoped_font_override scoped_monospaced_font() const
+	{
+		return { monospaced_font() };
 	}
 
 private:
