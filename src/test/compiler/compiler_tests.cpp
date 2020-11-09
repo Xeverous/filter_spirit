@@ -4,7 +4,7 @@
 
 #include <fs/compiler/compiler.hpp>
 #include <fs/compiler/outcome.hpp>
-#include <fs/generator/make_filter.hpp>
+#include <fs/generator/make_item_filter.hpp>
 #include <fs/lang/position_tag.hpp>
 #include <fs/log/string_logger.hpp>
 #include <fs/utility/visitor.hpp>
@@ -99,7 +99,7 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 			}
 
 			BOOST_TEST_REQUIRE(sf_outcome.has_result());
-			return generator::make_filter(sf_outcome.result(), /* empty item price data */ {});
+			return generator::make_item_filter(sf_outcome.result(), /* empty item price data */ {});
 		}
 	};
 

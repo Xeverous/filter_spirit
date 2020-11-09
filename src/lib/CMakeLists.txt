@@ -31,7 +31,7 @@ target_sources(filter_spirit
 		fs/compiler/detail/evaluate.cpp
 		fs/generator/generate_filter.cpp
 		fs/generator/generator.cpp
-		fs/generator/make_filter.cpp
+		fs/generator/make_item_filter.cpp
 		fs/lang/loot/item_database.cpp
 		fs/lang/loot/generator.cpp
 		fs/lang/market/item_price_data.cpp
@@ -62,7 +62,7 @@ target_sources(filter_spirit
 		fs/compiler/detail/evaluate.hpp
 		fs/compiler/compiler.hpp
 		fs/compiler/outcome.hpp
-		fs/generator/make_filter.hpp
+		fs/generator/make_item_filter.hpp
 		fs/generator/generate_filter.hpp
 		fs/generator/generator.hpp
 		fs/generator/settings.hpp
