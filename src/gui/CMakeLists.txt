@@ -23,6 +23,10 @@ target_sources(filter_spirit_gui
 	PRIVATE
 		fs/gui/application.cpp
 		fs/gui/application.hpp
+		fs/gui/filter_state.cpp
+		fs/gui/filter_state.hpp
+		fs/gui/gui_logger.cpp
+		fs/gui/gui_logger.hpp
 		fs/gui/imgui_window.hpp
 		fs/gui/ui_utils.hpp
 		fs/gui/windows/color_picker_window.cpp
