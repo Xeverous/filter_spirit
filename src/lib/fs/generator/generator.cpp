@@ -13,7 +13,7 @@
 namespace fs::generator
 {
 
-std::string to_string(const lang::item_filter& filter)
+std::string item_filter_to_string(const lang::item_filter& filter)
 {
 	std::stringstream ss;
 

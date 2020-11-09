@@ -85,7 +85,7 @@ std::optional<std::string> generate_filter_without_preamble(
 	lang::item_filter filter = make_item_filter(*spirit_filter, item_price_data);
 	logger.info() << "compilation successful\n";
 
-	return to_string(filter);
+	return item_filter_to_string(filter);
 }
 
 }
