@@ -1,6 +1,6 @@
 #include <fs/generator/generate_filter.hpp>
 #include <fs/generator/generator.hpp>
-#include <fs/generator/make_filter.hpp>
+#include <fs/generator/make_item_filter.hpp>
 #include <fs/lang/symbol_table.hpp>
 #include <fs/parser/parser.hpp>
 #include <fs/parser/ast_adapted.hpp> // required adaptation info for fs::log::structure_printer
@@ -82,7 +82,7 @@ std::optional<std::string> generate_filter_without_preamble(
 	if (!spirit_filter)
 		return std::nullopt;
 
-	lang::item_filter filter = make_filter(*spirit_filter, item_price_data);
+	lang::item_filter filter = make_item_filter(*spirit_filter, item_price_data);
 	logger.info() << "compilation successful\n";
 
 	return to_string(filter);

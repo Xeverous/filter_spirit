@@ -1,6 +1,6 @@
 #include <fs/gui/filter_state.hpp>
 #include <fs/generator/generate_filter.hpp>
-#include <fs/generator/make_filter.hpp>
+#include <fs/generator/make_item_filter.hpp>
 
 #include <utility>
 
@@ -26,7 +26,7 @@ bool filter_template_state::recompute_real_filter(fs::log::logger& /* logger */)
 	if (!_spirit_filter)
 		return false;
 
-	_real_filter = fs::generator::make_filter(*_spirit_filter, {});
+	_real_filter = fs::generator::make_item_filter(*_spirit_filter, {});
 	return _real_filter.has_value();
 }
 

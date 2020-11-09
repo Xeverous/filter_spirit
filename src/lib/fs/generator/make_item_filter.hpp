@@ -17,7 +17,7 @@ namespace fs::generator
  * @return
  */
 [[nodiscard]] lang::item_filter
-make_filter(
+make_item_filter(
 	const lang::spirit_item_filter& filter_template,
 	const lang::market::item_price_data& item_price_data);
 
