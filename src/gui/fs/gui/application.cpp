@@ -289,7 +289,7 @@ void application::on_open_filter_template()
 		/* multiselect allowed? */ 0);
 
 	if (selected_path != nullptr)
-		_filter_templates.emplace_back(selected_path);
+		_filter_templates.emplace_back(*this, selected_path);
 }
 
 void application::on_open_real_filter()
