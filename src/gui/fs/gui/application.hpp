@@ -5,6 +5,10 @@
 #include <fs/gui/windows/single_item_preview_window.hpp>
 #include <fs/gui/windows/common_ui_settings_window.hpp>
 #include <fs/gui/windows/version_info_window.hpp>
+#include <fs/gui/windows/application_log_window.hpp>
+#include <fs/gui/settings/theming.hpp>
+#include <fs/gui/settings/fonting.hpp>
+#include <fs/lang/loot/item_database.hpp>
 
 #include <Magnum/ImGuiIntegration/Context.hpp>
 
@@ -17,6 +21,7 @@
 #endif
 
 #include <vector>
+#include <optional>
 
 namespace fs::gui {
 
@@ -41,7 +46,12 @@ public:
 
 	fonting& font_settings()
 	{
-		return _common_ui_settings.font_settings();
+		return _fonting;
+	}
+
+	theming& theme_settings()
+	{
+		return _theming;
 	}
 
 private:
@@ -55,6 +65,17 @@ private:
 	void rebuild_pending_fonts();
 
 	Magnum::ImGuiIntegration::Context _imgui{Magnum::NoCreate};
+
+	theming _theming;
+	fonting _fonting;
+
+	// Application-global logger instance.
+	// If errors appear in it, something went horribly wrong.
+	application_log_window _application_log;
+
+	// Holds a lot of data that is not being changed during lifetime of the application.
+	// This should be the only (application-global) instance for use by filter/loot debugger.
+	std::optional<lang::loot::item_database> _item_database;
 
 	bool _show_demo_window = false;
 	bool _force_focus_demo_window = false;

@@ -1,4 +1,4 @@
-#include <fs/gui/windows/settings/theming.hpp>
+#include <fs/gui/settings/theming.hpp>
 
 #include <imgui.h>
 
