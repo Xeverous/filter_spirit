@@ -1,4 +1,4 @@
-#include <fs/generator/generate_filter.hpp>
+#include <fs/generator/common.hpp>
 #include <fs/generator/generator.hpp>
 #include <fs/generator/make_item_filter.hpp>
 #include <fs/lang/symbol_table.hpp>
