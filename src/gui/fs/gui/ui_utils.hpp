@@ -88,11 +88,28 @@ private:
 	bool _cleanup_required = true;
 };
 
+struct scoped_pointer_id_impl
+{
+	using value_type = const void*;
+
+	static void push(value_type id)
+	{
+		ImGui::PushID(id);
+	}
+
+	static void pop()
+	{
+		ImGui::PopID();
+	}
+};
+
+using scoped_pointer_id = scoped_override<scoped_pointer_id_impl>;
+
 struct scoped_font_override_impl
 {
 	using value_type = ImFont*;
 
-	static void push(ImFont* font)
+	static void push(value_type font)
 	{
 		ImGui::PushFont(font);
 	}

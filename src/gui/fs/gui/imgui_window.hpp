@@ -1,5 +1,7 @@
 #pragma once
 
+#include <fs/gui/ui_utils.hpp>
+
 #include <imgui.h>
 
 #include <string>
@@ -48,12 +50,10 @@ public:
 			_force_focus = false;
 		}
 
-		if (!ImGui::Begin(_name.c_str(), &_is_opened)) {
-			ImGui::End();
-			return;
-		}
+		const auto _ = scoped_pointer_id(this);
 
-		draw_contents();
+		if (ImGui::Begin(_name.c_str(), &_is_opened))
+			draw_contents();
 
 		ImGui::End();
 	}
