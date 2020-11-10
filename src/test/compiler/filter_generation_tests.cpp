@@ -20,7 +20,7 @@ std::string generate_filter(
 	const fs::lang::market::item_price_data& ipd = {})
 {
 	fs::log::string_logger logger;
-	std::optional<std::string> filter = fs::generator::sf::generate_filter_without_preamble(
+	std::optional<std::string> filter = fs::generator::parse_compile_generate_spirit_filter_no_preamble(
 		input, ipd, fs::generator::settings{}, logger);
 	BOOST_TEST_REQUIRE(filter.has_value(), "filter generation failed:\n" << logger.str());
 	return *filter;
