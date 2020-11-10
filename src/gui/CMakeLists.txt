@@ -23,8 +23,6 @@ target_sources(filter_spirit_gui
 	PRIVATE
 		fs/gui/application.cpp
 		fs/gui/application.hpp
-		fs/gui/filter_state.cpp
-		fs/gui/filter_state.hpp
 		fs/gui/gui_logger.cpp
 		fs/gui/gui_logger.hpp
 		fs/gui/imgui_window.hpp
@@ -35,6 +33,8 @@ target_sources(filter_spirit_gui
 		fs/gui/windows/common_ui_settings_window.hpp
 		fs/gui/windows/filter_windows.cpp
 		fs/gui/windows/filter_windows.hpp
+		fs/gui/windows/filter/filter_state.cpp
+		fs/gui/windows/filter/filter_state.hpp
 		fs/gui/windows/settings/fonting.cpp
 		fs/gui/windows/settings/fonting.hpp
 		fs/gui/windows/settings/theming.cpp
