@@ -1,4 +1,4 @@
-#include <fs/gui/filter_state.hpp>
+#include <fs/gui/windows/filter/filter_state.hpp>
 #include <fs/parser/parser.hpp>
 #include <fs/compiler/compiler.hpp>
 #include <fs/generator/make_item_filter.hpp>

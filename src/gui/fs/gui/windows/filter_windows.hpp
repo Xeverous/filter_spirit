@@ -1,7 +1,7 @@
 #pragma once
 
 #include <fs/gui/imgui_window.hpp>
-#include <fs/gui/filter_state.hpp>
+#include <fs/gui/windows/filter/filter_state.hpp>
 #include <fs/gui/gui_logger.hpp>
 
 #include <string>
