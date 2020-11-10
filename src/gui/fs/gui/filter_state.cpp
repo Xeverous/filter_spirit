@@ -7,6 +7,50 @@
 
 namespace fs::gui {
 
+void real_filter_state::new_source(std::string source, log::logger& logger)
+{
+	_source = std::move(source);
+	parse_real_filter(logger);
+}
+
+void real_filter_state::parse_real_filter(log::logger& logger)
+{
+	if (_source) {
+		std::variant<parser::parsed_real_filter, parser::parse_failure_data> result = parser::parse_real_filter(*_source);
+
+		if (std::holds_alternative<parser::parse_failure_data>(result)) {
+			parser::print_parse_errors(std::get<parser::parse_failure_data>(result), logger);
+			_parsed_real_filter = std::nullopt;
+		}
+		else {
+			_parsed_real_filter = std::move(std::get<parser::parsed_real_filter>(result));
+		}
+	}
+	else {
+		_parsed_real_filter = std::nullopt;
+	}
+
+	recompute_filter_representation(logger);
+}
+
+void real_filter_state::recompute_filter_representation(log::logger& logger)
+{
+	if (_parsed_real_filter) {
+		compiler::outcome<lang::item_filter> result = compiler::compile_real_filter({}, (*_parsed_real_filter).ast);
+		compiler::output_logs(result.logs(), (*_parsed_real_filter).lookup, logger);
+
+		if (result.has_result()) {
+			_filter_representation = std::move(result.result());
+		}
+		else {
+			_filter_representation = std::nullopt;
+		}
+	}
+	else {
+		_filter_representation = std::nullopt;
+	}
+}
+
 void spirit_filter_state::new_source(std::string source, log::logger& logger)
 {
 	_source = std::move(source);
@@ -77,50 +121,6 @@ void spirit_filter_state::recompute_filter_representation(log::logger& /* logger
 {
 	if (_spirit_filter) {
 		_filter_representation = generator::make_item_filter(*_spirit_filter, {});
-	}
-	else {
-		_filter_representation = std::nullopt;
-	}
-}
-
-void real_filter_state::new_source(std::string source, log::logger& logger)
-{
-	_source = std::move(source);
-	parse_real_filter(logger);
-}
-
-void real_filter_state::parse_real_filter(log::logger& logger)
-{
-	if (_source) {
-		std::variant<parser::parsed_real_filter, parser::parse_failure_data> result = parser::parse_real_filter(*_source);
-
-		if (std::holds_alternative<parser::parse_failure_data>(result)) {
-			parser::print_parse_errors(std::get<parser::parse_failure_data>(result), logger);
-			_parsed_real_filter = std::nullopt;
-		}
-		else {
-			_parsed_real_filter = std::move(std::get<parser::parsed_real_filter>(result));
-		}
-	}
-	else {
-		_parsed_real_filter = std::nullopt;
-	}
-
-	recompute_filter_representation(logger);
-}
-
-void real_filter_state::recompute_filter_representation(log::logger& logger)
-{
-	if (_parsed_real_filter) {
-		compiler::outcome<lang::item_filter> result = compiler::compile_real_filter({}, (*_parsed_real_filter).ast);
-		compiler::output_logs(result.logs(), (*_parsed_real_filter).lookup, logger);
-
-		if (result.has_result()) {
-			_filter_representation = std::move(result.result());
-		}
-		else {
-			_filter_representation = std::nullopt;
-		}
 	}
 	else {
 		_filter_representation = std::nullopt;

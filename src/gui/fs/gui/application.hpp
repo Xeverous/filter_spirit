@@ -1,7 +1,6 @@
 #pragma once
 
-#include <fs/gui/windows/filter_template_window.hpp>
-#include <fs/gui/windows/real_filter_window.hpp>
+#include <fs/gui/windows/filter_windows.hpp>
 #include <fs/gui/windows/color_picker_window.hpp>
 #include <fs/gui/windows/single_item_preview_window.hpp>
 #include <fs/gui/windows/common_ui_settings_window.hpp>
@@ -48,7 +47,7 @@ public:
 private:
 	void draw_main_menu_bar();
 
-	void on_open_filter_template();
+	void on_open_spirit_filter();
 	void on_open_real_filter();
 
 	void remove_closed_windows();
@@ -63,12 +62,12 @@ private:
 	enum class modal_dialog_state_type
 	{
 		none,
-		open_filter_template,
+		open_spirit_filter,
 		open_real_filter
 	};
 
 	modal_dialog_state_type _modal_dialog_state = modal_dialog_state_type::none;
-	std::vector<filter_template_window> _filter_templates;
+	std::vector<spirit_filter_window> _spirit_filters;
 	std::vector<real_filter_window> _real_filters;
 
 	color_picker_window _color_picker;

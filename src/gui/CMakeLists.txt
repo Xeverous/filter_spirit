@@ -33,10 +33,8 @@ target_sources(filter_spirit_gui
 		fs/gui/windows/color_picker_window.hpp
 		fs/gui/windows/common_ui_settings_window.cpp
 		fs/gui/windows/common_ui_settings_window.hpp
-		fs/gui/windows/filter_template_window.cpp
-		fs/gui/windows/filter_template_window.hpp
-		fs/gui/windows/real_filter_window.cpp
-		fs/gui/windows/real_filter_window.hpp
+		fs/gui/windows/filter_windows.cpp
+		fs/gui/windows/filter_windows.hpp
 		fs/gui/windows/settings/fonting.cpp
 		fs/gui/windows/settings/fonting.hpp
 		fs/gui/windows/settings/theming.cpp

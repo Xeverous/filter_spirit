@@ -110,8 +110,8 @@ void application::draw_main_menu_bar()
 {
 	if (ImGui::BeginMainMenuBar()) {
 		if (ImGui::BeginMenu("File")) {
-			if (ImGui::MenuItem("Open filter template file..."))
-				_modal_dialog_state = modal_dialog_state_type::open_filter_template;
+			if (ImGui::MenuItem("Open spirit filter template file..."))
+				_modal_dialog_state = modal_dialog_state_type::open_spirit_filter;
 			if (ImGui::MenuItem("Open real filter file..."))
 				_modal_dialog_state = modal_dialog_state_type::open_real_filter;
 
@@ -186,7 +186,7 @@ void application::drawEvent()
 
 	draw_main_menu_bar();
 
-	for (auto& window : _filter_templates)
+	for (auto& window : _spirit_filters)
 		window.draw();
 	for (auto& window : _real_filters)
 		window.draw();
@@ -239,12 +239,12 @@ void application::remove_closed_windows()
 {
 	// remove dynamically created windows that have been closed
 	// (with a pretty 1-statement STL erase-remove idiom)
-	_filter_templates.erase(
+	_spirit_filters.erase(
 		std::remove_if(
-			_filter_templates.begin(),
-			_filter_templates.end(),
-			[](const filter_template_window& w){ return !w.is_opened(); }),
-		_filter_templates.end());
+			_spirit_filters.begin(),
+			_spirit_filters.end(),
+			[](const spirit_filter_window& w){ return !w.is_opened(); }),
+		_spirit_filters.end());
 	_real_filters.erase(
 		std::remove_if(
 			_real_filters.begin(),
@@ -255,8 +255,8 @@ void application::remove_closed_windows()
 
 void application::open_pending_modals()
 {
-	if (_modal_dialog_state == modal_dialog_state_type::open_filter_template)
-		on_open_filter_template();
+	if (_modal_dialog_state == modal_dialog_state_type::open_spirit_filter)
+		on_open_spirit_filter();
 	else if (_modal_dialog_state == modal_dialog_state_type::open_real_filter)
 		on_open_real_filter();
 
@@ -278,7 +278,7 @@ void application::rebuild_pending_fonts()
 	font_settings.update();
 }
 
-void application::on_open_filter_template()
+void application::on_open_spirit_filter()
 {
 	const char* const selected_path = tinyfd_openFileDialog(
 		/* title */ "Select filter template file",
@@ -289,7 +289,7 @@ void application::on_open_filter_template()
 		/* multiselect allowed? */ 0);
 
 	if (selected_path != nullptr)
-		_filter_templates.emplace_back(*this, selected_path);
+		_spirit_filters.emplace_back(*this, selected_path);
 }
 
 void application::on_open_real_filter()

@@ -13,12 +13,28 @@ namespace fs::gui {
 
 class application;
 
-class filter_template_window : public imgui_window
+class real_filter_window : public imgui_window
 {
 public:
-	filter_template_window(application& app, std::string path);
+	real_filter_window(std::string path)
+	: imgui_window(std::move(path))
+	{
+		open();
+	}
 
-	const std::string& filter_template_path() const
+protected:
+	void draw_contents() override;
+
+private:
+
+};
+
+class spirit_filter_window : public imgui_window
+{
+public:
+	spirit_filter_window(application& app, std::string path);
+
+	const std::string& spirit_filter_path() const
 	{
 		return name();
 	}
@@ -28,7 +44,7 @@ protected:
 
 private:
 	// use string instead of string_view because filesystem wants C-strings
-	void reload_filter_template_file(const std::string& path);
+	void reload_spirit_filter_file(const std::string& path);
 
 	std::reference_wrapper<application> _application; // plain reference type would make this class non-moveable
 	gui_logger _logger;
