@@ -33,7 +33,7 @@ private:
 	std::reference_wrapper<application> _application; // plain reference type would make this class non-moveable
 	gui_logger _logger;
 	std::string _status;
-	std::optional<filter_template_state> _state; // empty if loading file failed
+	std::optional<spirit_filter_state> _state; // empty if loading file failed
 };
 
 }
