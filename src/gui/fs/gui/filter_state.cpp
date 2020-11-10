@@ -1,33 +1,130 @@
 #include <fs/gui/filter_state.hpp>
-#include <fs/generator/common.hpp>
+#include <fs/parser/parser.hpp>
+#include <fs/compiler/compiler.hpp>
 #include <fs/generator/make_item_filter.hpp>
 
 #include <utility>
 
 namespace fs::gui {
 
-bool filter_template_state::new_source(std::string source, fs::log::logger& logger)
+void spirit_filter_state::new_source(std::string source, log::logger& logger)
 {
-	_template_source = std::move(source);
-	return parse_filter_template(logger);
+	_source = std::move(source);
+	parse_spirit_filter(logger);
 }
 
-bool filter_template_state::parse_filter_template(fs::log::logger& logger)
+void spirit_filter_state::parse_spirit_filter(log::logger& logger)
 {
-	if (!_template_source)
-		return false;
+	if (_source) {
+		std::variant<parser::parsed_spirit_filter, parser::parse_failure_data> result = parser::parse_spirit_filter(*_source);
 
-	// _spirit_filter = fs::generator::parse_spirit_filter(*_template_source, {}, logger);
-	return recompute_real_filter(logger);
+		if (std::holds_alternative<parser::parse_failure_data>(result)) {
+			parser::print_parse_errors(std::get<parser::parse_failure_data>(result), logger);
+			_parsed_spirit_filter = std::nullopt;
+		}
+		else {
+			_parsed_spirit_filter = std::move(std::get<parser::parsed_spirit_filter>(result));
+		}
+	}
+	else {
+		_parsed_spirit_filter = std::nullopt;
+	}
+
+	resolve_spirit_filter_symbols(logger);
 }
 
-bool filter_template_state::recompute_real_filter(fs::log::logger& /* logger */)
+void spirit_filter_state::resolve_spirit_filter_symbols(log::logger& logger)
 {
-	if (!_spirit_filter)
-		return false;
+	if (_parsed_spirit_filter) {
+		compiler::outcome<lang::symbol_table> result = compiler::resolve_spirit_filter_symbols(
+			{}, (*_parsed_spirit_filter).ast.definitions);
 
-	_real_filter = fs::generator::make_item_filter(*_spirit_filter, {});
-	return _real_filter.has_value();
+		compiler::output_logs(result.logs(), (*_parsed_spirit_filter).lookup, logger);
+
+		if (result.has_result())
+			_spirit_filter_symbols = std::move(result.result());
+		else
+			_spirit_filter_symbols = std::nullopt;
+	}
+	else {
+		_spirit_filter_symbols = std::nullopt;
+	}
+
+	compile_spirit_filter(logger);
+}
+
+void spirit_filter_state::compile_spirit_filter(log::logger& logger)
+{
+	if (_spirit_filter_symbols && _parsed_spirit_filter) {
+		compiler::outcome<lang::spirit_item_filter> result = compiler::compile_spirit_filter_statements(
+			{}, (*_parsed_spirit_filter).ast.statements, *_spirit_filter_symbols);
+
+		compiler::output_logs(result.logs(), (*_parsed_spirit_filter).lookup, logger);
+
+		if (result.has_result())
+			_spirit_filter = std::move(result.result());
+		else
+			_spirit_filter = std::nullopt;
+	}
+	else {
+		_spirit_filter = std::nullopt;
+	}
+
+	recompute_filter_representation(logger);
+}
+
+void spirit_filter_state::recompute_filter_representation(log::logger& /* logger */)
+{
+	if (_spirit_filter) {
+		_filter_representation = generator::make_item_filter(*_spirit_filter, {});
+	}
+	else {
+		_filter_representation = std::nullopt;
+	}
+}
+
+void real_filter_state::new_source(std::string source, log::logger& logger)
+{
+	_source = std::move(source);
+	parse_real_filter(logger);
+}
+
+void real_filter_state::parse_real_filter(log::logger& logger)
+{
+	if (_source) {
+		std::variant<parser::parsed_real_filter, parser::parse_failure_data> result = parser::parse_real_filter(*_source);
+
+		if (std::holds_alternative<parser::parse_failure_data>(result)) {
+			parser::print_parse_errors(std::get<parser::parse_failure_data>(result), logger);
+			_parsed_real_filter = std::nullopt;
+		}
+		else {
+			_parsed_real_filter = std::move(std::get<parser::parsed_real_filter>(result));
+		}
+	}
+	else {
+		_parsed_real_filter = std::nullopt;
+	}
+
+	recompute_filter_representation(logger);
+}
+
+void real_filter_state::recompute_filter_representation(log::logger& logger)
+{
+	if (_parsed_real_filter) {
+		compiler::outcome<lang::item_filter> result = compiler::compile_real_filter({}, (*_parsed_real_filter).ast);
+		compiler::output_logs(result.logs(), (*_parsed_real_filter).lookup, logger);
+
+		if (result.has_result()) {
+			_filter_representation = std::move(result.result());
+		}
+		else {
+			_filter_representation = std::nullopt;
+		}
+	}
+	else {
+		_filter_representation = std::nullopt;
+	}
 }
 
 }
