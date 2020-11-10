@@ -62,55 +62,55 @@ void version_info_window::draw_contents()
 		__DATE__[4] == ' ' ? '0' : __DATE__[4], __DATE__[5], '\0'
 	};
 
-	ImGui::Text("Version information of FS and its dependencies:");
+	ImGui::TextUnformatted("Version information of FS and its dependencies:");
 
-	ImGui::Text("Filter Spirit version:");
+	ImGui::TextUnformatted("Filter Spirit version:");
 	ImGui::SameLine(line_width);
-	ImGui::Text(_fs_version.c_str());
+	ImGui::TextUnformatted(_fs_version.c_str());
 
-	ImGui::Text("Boost version:");
+	ImGui::TextUnformatted("Boost version:");
 	ImGui::SameLine(line_width);
-	ImGui::Text(_boost_version.c_str());
+	ImGui::TextUnformatted(_boost_version.c_str());
 
-	ImGui::Text("Magnum version:");
+	ImGui::TextUnformatted("Magnum version:");
 	ImGui::SameLine(line_width);
-	ImGui::Text(MAGNUM_VERSION_STRING);
+	ImGui::TextUnformatted(MAGNUM_VERSION_STRING);
 
-	ImGui::Text("Corrade version:");
+	ImGui::TextUnformatted("Corrade version:");
 	ImGui::SameLine(line_width);
-	ImGui::Text(CORRADE_VERSION_STRING);
+	ImGui::TextUnformatted(CORRADE_VERSION_STRING);
 
-	ImGui::Text("Dear ImGui version:");
+	ImGui::TextUnformatted("Dear ImGui version:");
 	ImGui::SameLine(line_width);
 	ImGui::Text("%s (%d)", IMGUI_VERSION, IMGUI_VERSION_NUM);
 
-	ImGui::Text("OpenGL version:");
+	ImGui::TextUnformatted("OpenGL version:");
 	ImGui::SameLine(line_width);
-	ImGui::Text(_opengl_version.c_str());
+	ImGui::TextUnformatted(_opengl_version.c_str());
 
-	ImGui::Text("SDL version:");
+	ImGui::TextUnformatted("SDL version:");
 	ImGui::SameLine(line_width);
-	ImGui::Text(_sdl_version.c_str());
+	ImGui::TextUnformatted(_sdl_version.c_str());
 
-	ImGui::Text("libraries for networking:");
+	ImGui::TextUnformatted("libraries for networking:");
 	ImGui::SameLine(line_width);
-	ImGui::Text(curl_version());
+	ImGui::TextUnformatted(curl_version());
 
 	ImGui::Dummy({0.0f, ImGui::GetFontSize() * 2.0f});
 
-	ImGui::Text("Build information:");
+	ImGui::TextUnformatted("Build information:");
 
-	ImGui::Text("build date:");
+	ImGui::TextUnformatted("build date:");
 	ImGui::SameLine(line_width);
-	ImGui::Text(build_date.begin());
+	ImGui::TextUnformatted(build_date.begin());
 
-	ImGui::Text("C++ standard:");
+	ImGui::TextUnformatted("C++ standard:");
 	ImGui::SameLine(line_width);
-	ImGui::Text(_cpp_version.c_str());
+	ImGui::TextUnformatted(_cpp_version.c_str());
 
-	ImGui::Text("C++ compiler:");
+	ImGui::TextUnformatted("C++ compiler:");
 	ImGui::SameLine(line_width);
-	ImGui::Text(BOOST_COMPILER);
+	ImGui::TextUnformatted(BOOST_COMPILER);
 }
 
 }

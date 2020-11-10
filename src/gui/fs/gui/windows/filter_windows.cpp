@@ -54,7 +54,7 @@ void real_filter_window::draw_contents()
 		reload_real_filter_file(real_filter_path());
 
 	ImGui::SameLine();
-	ImGui::Text(_status.c_str());
+	ImGui::TextUnformatted(_status.c_str());
 
 	_logger.draw();
 
@@ -86,7 +86,7 @@ void spirit_filter_window::draw_contents()
 		reload_spirit_filter_file(spirit_filter_path());
 
 	ImGui::SameLine();
-	ImGui::Text(_status.c_str());
+	ImGui::TextUnformatted(_status.c_str());
 
 	_logger.draw();
 
