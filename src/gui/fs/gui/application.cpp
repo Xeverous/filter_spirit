@@ -305,7 +305,7 @@ void application::on_open_real_filter()
 		/* multiselect allowed? */ 0);
 
 	if (selected_path != nullptr)
-		_real_filters.emplace_back(selected_path);
+		_real_filters.emplace_back(*this, selected_path);
 }
 
 } // namespace fs::gui
