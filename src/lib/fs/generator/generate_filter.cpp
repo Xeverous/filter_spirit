@@ -10,8 +10,10 @@
 #include <fs/log/logger.hpp>
 #include <fs/log/structure_printer.hpp>
 
-namespace fs::generator::sf
-{
+namespace {
+
+using namespace fs;
+using namespace fs::generator;
 
 std::optional<fs::lang::spirit_item_filter> parse_spirit_filter(
 	std::string_view input,
@@ -19,7 +21,7 @@ std::optional<fs::lang::spirit_item_filter> parse_spirit_filter(
 	log::logger& logger)
 {
 	logger.info() << "parsing filter template\n";
-	std::variant<parser::sf::parse_success_data, parser::parse_failure_data> parse_result = parser::sf::parse(input);
+	std::variant<parser::parsed_spirit_filter, parser::parse_failure_data> parse_result = parser::parse_spirit_filter(input);
 
 	if (std::holds_alternative<parser::parse_failure_data>(parse_result)) {
 		parser::print_parse_errors(std::get<parser::parse_failure_data>(parse_result), logger);
@@ -27,7 +29,7 @@ std::optional<fs::lang::spirit_item_filter> parse_spirit_filter(
 	}
 
 	logger.info() << "parse successful\n";
-	const auto& parse_data = std::get<parser::sf::parse_success_data>(parse_result);
+	const auto& parse_data = std::get<parser::parsed_spirit_filter>(parse_result);
 
 	if (st.print_ast)
 		fs::log::structure_printer()(parse_data.ast);
@@ -52,6 +54,11 @@ std::optional<fs::lang::spirit_item_filter> parse_spirit_filter(
 
 	return std::move(spirit_filter_outcome).result();
 }
+
+} // namespace
+
+namespace fs::generator::sf
+{
 
 std::optional<std::string> generate_filter(
 	std::string_view input,

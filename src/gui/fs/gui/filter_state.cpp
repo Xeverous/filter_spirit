@@ -17,7 +17,7 @@ bool filter_template_state::parse_filter_template(fs::log::logger& logger)
 	if (!_template_source)
 		return false;
 
-	_spirit_filter = fs::generator::sf::parse_spirit_filter(*_template_source, {}, logger);
+	// _spirit_filter = fs::generator::parse_spirit_filter(*_template_source, {}, logger);
 	return recompute_real_filter(logger);
 }
 

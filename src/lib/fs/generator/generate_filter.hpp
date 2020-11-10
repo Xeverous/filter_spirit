@@ -7,17 +7,10 @@
 #include <optional>
 #include <string_view>
 
-// wrapper functions for applications
-// TODO resign of "sf" namespace? more explicit function names?
+// common wrapper functions for end-to-end all-in-one applications - mostly for tests and CLI
+// these do nothing special - they only call main interfaces of parser, compiler and generator
 
-namespace fs::generator::sf
-{
-
-[[nodiscard]]
-std::optional<fs::lang::spirit_item_filter> parse_spirit_filter(
-	std::string_view input,
-	settings st,
-	log::logger& logger);
+namespace fs::generator::sf {
 
 /**
  * @brief end-to-end filter generation function
@@ -35,7 +28,6 @@ std::optional<std::string> generate_filter(
 	settings st,
 	log::logger& logger);
 
-// mostly for tests
 [[nodiscard]]
 std::optional<std::string> generate_filter_without_preamble(
 	std::string_view input,

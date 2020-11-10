@@ -9,12 +9,12 @@ namespace parser = fs::parser;
 namespace x3 = boost::spirit::x3;
 
 template <
-	typename ParseSuccessData,
+	typename ParsedFilterType,
 	typename Ast,
 	typename Grammar,
 	typename Skipper
 >
-std::variant<ParseSuccessData, parser::parse_failure_data>
+std::variant<ParsedFilterType, parser::parse_failure_data>
 parse_impl(
 	std::string_view input,
 	Grammar grammar,
@@ -47,7 +47,7 @@ parse_impl(
 		};
 	}
 
-	return ParseSuccessData{std::move(ast), parser::lookup_data(std::move(position_cache))};
+	return ParsedFilterType{std::move(ast), parser::lookup_data(std::move(position_cache))};
 }
 
 void print_error(
@@ -74,14 +74,14 @@ void print_error(
 namespace fs::parser
 {
 
-std::variant<sf::parse_success_data, parse_failure_data> sf::parse(std::string_view input)
+std::variant<parsed_spirit_filter, parse_failure_data> parse_spirit_filter(std::string_view input)
 {
-	return parse_impl<sf::parse_success_data, ast::sf::ast_type>(input, detail::sf_grammar(), detail::sf_skipper());
+	return parse_impl<parsed_spirit_filter, ast::sf::ast_type>(input, detail::sf_grammar(), detail::sf_skipper());
 }
 
-std::variant<rf::parse_success_data, parse_failure_data> rf::parse(std::string_view input)
+std::variant<parsed_real_filter, parse_failure_data> parse_real_filter(std::string_view input)
 {
-	return parse_impl<rf::parse_success_data, ast::rf::ast_type>(input, detail::rf_grammar(), detail::rf_skipper());
+	return parse_impl<parsed_real_filter, ast::rf::ast_type>(input, detail::rf_grammar(), detail::rf_skipper());
 }
 
 void print_parse_errors(const parse_failure_data& parse_data, log::logger& logger)
