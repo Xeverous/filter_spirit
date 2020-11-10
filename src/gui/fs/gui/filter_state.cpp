@@ -1,5 +1,5 @@
 #include <fs/gui/filter_state.hpp>
-#include <fs/generator/generate_filter.hpp>
+#include <fs/generator/common.hpp>
 #include <fs/generator/make_item_filter.hpp>
 
 #include <utility>

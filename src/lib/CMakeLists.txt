@@ -29,7 +29,7 @@ target_sources(filter_spirit
 		fs/compiler/detail/actions.cpp
 		fs/compiler/detail/conditions.cpp
 		fs/compiler/detail/evaluate.cpp
-		fs/generator/generate_filter.cpp
+		fs/generator/common.cpp
 		fs/generator/generator.cpp
 		fs/generator/make_item_filter.cpp
 		fs/lang/loot/item_database.cpp
@@ -63,7 +63,7 @@ target_sources(filter_spirit
 		fs/compiler/compiler.hpp
 		fs/compiler/outcome.hpp
 		fs/generator/make_item_filter.hpp
-		fs/generator/generate_filter.hpp
+		fs/generator/common.hpp
 		fs/generator/generator.hpp
 		fs/generator/settings.hpp
 		fs/lang/loot/item_database.hpp

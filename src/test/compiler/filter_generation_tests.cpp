@@ -1,7 +1,7 @@
 #include "common/test_fixtures.hpp"
 #include "common/string_operations.hpp"
 
-#include <fs/generator/generate_filter.hpp>
+#include <fs/generator/common.hpp>
 #include <fs/log/string_logger.hpp>
 #include <fs/lang/market/item_price_data.hpp>
 

@@ -1,6 +1,6 @@
 #include "core.hpp"
 
-#include <fs/generator/generate_filter.hpp>
+#include <fs/generator/common.hpp>
 #include <fs/network/item_price_report.hpp>
 #include <fs/network/ggg/download_data.hpp>
 #include <fs/network/ggg/parse_data.hpp>
