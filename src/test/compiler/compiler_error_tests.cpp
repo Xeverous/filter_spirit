@@ -41,7 +41,7 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 
 	BOOST_AUTO_TEST_CASE(minimal_input_resolve_constants)
 	{
-		const parser::sf::parse_success_data parse_data = parse(minimal_input());
+		const parser::parsed_spirit_filter parse_data = parse(minimal_input());
 		const compiler::outcome<lang::symbol_table> symbols_outcome =
 			resolve_symbols(parse_data.ast.definitions);
 		BOOST_TEST_REQUIRE(symbols_outcome.has_result());
@@ -124,7 +124,7 @@ $some_other_var = 2
 $xyz = 3
 )";
 			const std::string_view input = input_str;
-			const parser::sf::parse_success_data parse_data = parse(input);
+			const parser::parsed_spirit_filter parse_data = parse(input);
 			const log_container logs = expect_error_when_resolving_symbols(parse_data.ast.definitions);
 			const auto& error_desc = expect_error_of_type<errors::name_already_exists>(logs, parse_data.lookup);
 
@@ -145,7 +145,7 @@ $abc = 0
 $xyz = $non_existent_obj
 )";
 			const std::string_view input = input_str;
-			const parser::sf::parse_success_data parse_data = parse(input);
+			const parser::parsed_spirit_filter parse_data = parse(input);
 			const log_container logs = expect_error_when_resolving_symbols(parse_data.ast.definitions);
 			const auto& error_desc = expect_error_of_type<errors::no_such_name>(logs, parse_data.lookup);
 
@@ -158,7 +158,7 @@ $xyz = $non_existent_obj
 		{
 			const std::string input_str = minimal_input() + R"(PlayAlertSound 11 22 33)";
 			const std::string_view input = input_str;
-			const parser::sf::parse_success_data parse_data = parse(input);
+			const parser::parsed_spirit_filter parse_data = parse(input);
 			const log_container logs = expect_error_when_compiling(parse_data.ast);
 			const auto& error_desc = expect_error_of_type<errors::invalid_amount_of_arguments>(logs, parse_data.lookup);
 
@@ -175,7 +175,7 @@ $xyz = $non_existent_obj
 		{
 			const std::string input_str = minimal_input() + R"(MinimapIcon 3 Brown Circle)";
 			const std::string_view input = input_str;
-			const parser::sf::parse_success_data parse_data = parse(input);
+			const parser::parsed_spirit_filter parse_data = parse(input);
 			const log_container logs = expect_error_when_compiling(parse_data.ast);
 			const auto& error_desc = expect_error_of_type<errors::invalid_integer_value>(logs, parse_data.lookup);
 
@@ -192,7 +192,7 @@ $xyz = $non_existent_obj
 		{
 			const std::string input_str = minimal_input() + R"(BaseType 123 {})";
 			const std::string_view input = input_str;
-			const parser::sf::parse_success_data parse_data = parse(input);
+			const parser::parsed_spirit_filter parse_data = parse(input);
 			const log_container logs = expect_error_when_compiling(parse_data.ast);
 			const auto& error_desc = expect_error_of_type<errors::type_mismatch>(logs, parse_data.lookup);
 
@@ -208,7 +208,7 @@ $xyz = $non_existent_obj
 		{
 			const std::string input_str = minimal_input() + R"(HasInfluence Shaper Shaper {})";
 			const std::string_view input = input_str;
-			const parser::sf::parse_success_data parse_data = parse(input);
+			const parser::parsed_spirit_filter parse_data = parse(input);
 			const log_container logs = expect_error_when_compiling(parse_data.ast);
 			const auto& error_desc = expect_error_of_type<errors::duplicate_influence>(logs, parse_data.lookup);
 
@@ -230,7 +230,7 @@ Class "Gloves"
 {}
 )";
 			const std::string_view input = input_str;
-			const parser::sf::parse_success_data parse_data = parse(input);
+			const parser::parsed_spirit_filter parse_data = parse(input);
 			const log_container logs = expect_error_when_compiling(parse_data.ast);
 			const auto& error_desc = expect_error_of_type<errors::condition_redefinition>(logs, parse_data.lookup);
 
@@ -251,7 +251,7 @@ Quality > 0
 {}
 )";
 			const std::string_view input = input_str;
-			const parser::sf::parse_success_data parse_data = parse(input);
+			const parser::parsed_spirit_filter parse_data = parse(input);
 			const log_container logs = expect_error_when_compiling(parse_data.ast);
 			const auto& error_desc = expect_error_of_type<errors::lower_bound_redefinition>(logs, parse_data.lookup);
 
@@ -270,7 +270,7 @@ Quality > 0
 PlayAlertSound 17
 )";
 			const std::string_view input = input_str;
-			const parser::sf::parse_success_data parse_data = parse(input);
+			const parser::parsed_spirit_filter parse_data = parse(input);
 			const log_container logs = expect_error_when_compiling(parse_data.ast);
 			const auto& error_desc = expect_error_of_type<errors::invalid_integer_value>(logs, parse_data.lookup);
 

@@ -124,7 +124,7 @@ $shaper_voice   = ShChaos
 $string         = "Leather Belt"
 )";
 			const std::string_view input = input_str;
-			const parser::sf::parse_success_data parse_data = parse(input);
+			const parser::parsed_spirit_filter parse_data = parse(input);
 			const parser::lookup_data& lookup_data = parse_data.lookup;
 			const lang::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.definitions, lookup_data);
 
@@ -175,7 +175,7 @@ $y = 3 4 5
 $z = 6 7 8 9
 )";
 			const std::string_view input = input_str;
-			const parser::sf::parse_success_data parse_data = parse(input);
+			const parser::parsed_spirit_filter parse_data = parse(input);
 			const parser::lookup_data& lookup_data = parse_data.lookup;
 			const lang::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.definitions, lookup_data);
 
@@ -210,7 +210,7 @@ $y = 3GGG 2
 $z = 4W 0 6 RGB
 )";
 			const std::string_view input = input_str;
-			const parser::sf::parse_success_data parse_data = parse(input);
+			const parser::parsed_spirit_filter parse_data = parse(input);
 			const parser::lookup_data& lookup_data = parse_data.lookup;
 			const lang::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.definitions, lookup_data);
 
@@ -273,7 +273,7 @@ $z = 4W 0 6 RGB
 			{
 				const std::string input_str = minimal_input() + action + "\nShow";
 				const std::string_view input = input_str;
-				const parser::sf::parse_success_data parse_data = parse(input);
+				const parser::parsed_spirit_filter parse_data = parse(input);
 				const parser::lookup_data& lookup_data = parse_data.lookup;
 				const lang::symbol_table symbols =
 					expect_success_when_resolving_symbols(parse_data.ast.definitions, lookup_data);

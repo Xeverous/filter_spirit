@@ -65,33 +65,27 @@ struct parse_failure_data
 {
 	lookup_data lookup;
 	error_holder_type errors;
-	const char* parser_stop_position;
+	const char* parser_stop_position; // not a C string but a string iterator
 };
 
-namespace sf
-{
-	struct parse_success_data
-	{
-		ast::sf::ast_type ast;
-		lookup_data lookup;
-	};
-
-	[[nodiscard]]
-	std::variant<parse_success_data, parse_failure_data> parse(std::string_view input);
-}
-
-namespace rf
-{
-	struct parse_success_data
-	{
-		ast::rf::ast_type ast;
-		lookup_data lookup;
-	};
-
-	[[nodiscard]]
-	std::variant<parse_success_data, parse_failure_data> parse(std::string_view input);
-}
-
 void print_parse_errors(const parse_failure_data& parse_data, log::logger& logger);
+
+struct parsed_spirit_filter
+{
+	ast::sf::ast_type ast;
+	lookup_data lookup;
+};
+
+[[nodiscard]]
+std::variant<parsed_spirit_filter, parse_failure_data> parse_spirit_filter(std::string_view input);
+
+struct parsed_real_filter
+{
+	ast::rf::ast_type ast;
+	lookup_data lookup;
+};
+
+[[nodiscard]]
+std::variant<parsed_real_filter, parse_failure_data> parse_real_filter(std::string_view input);
 
 } // namespace fs::parser

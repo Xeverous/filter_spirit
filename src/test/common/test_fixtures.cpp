@@ -21,9 +21,9 @@ const std::string& minimal_input()
 
 namespace pr = fs::parser;
 
-pr::sf::parse_success_data parser_fixture::parse(std::string_view input)
+pr::parsed_spirit_filter parser_fixture::parse(std::string_view input)
 {
-	std::variant<pr::sf::parse_success_data, pr::parse_failure_data> parse_result = pr::sf::parse(input);
+	std::variant<pr::parsed_spirit_filter, pr::parse_failure_data> parse_result = pr::parse_spirit_filter(input);
 
 	if (std::holds_alternative<pr::parse_failure_data>(parse_result)) {
 		const auto& errors = std::get<pr::parse_failure_data>(parse_result);
@@ -32,7 +32,7 @@ pr::sf::parse_success_data parser_fixture::parse(std::string_view input)
 		BOOST_FAIL("parse of:\n" << input << "\nfailed:\n" << logger.str());
 	}
 
-	return std::get<pr::sf::parse_success_data>(std::move(parse_result));
+	return std::get<pr::parsed_spirit_filter>(std::move(parse_result));
 }
 
 }
