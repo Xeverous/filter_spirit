@@ -7,16 +7,20 @@
 
 namespace fs::gui {
 
-void real_filter_state::new_source(std::string source, log::logger& logger)
+namespace detail {
+
+void filter_state_base::new_source(std::string source, log::logger& logger)
 {
 	_source = std::move(source);
-	parse_real_filter(logger);
+	parse_source(logger);
+}
+
 }
 
 void real_filter_state::parse_real_filter(log::logger& logger)
 {
-	if (_source) {
-		std::variant<parser::parsed_real_filter, parser::parse_failure_data> result = parser::parse_real_filter(*_source);
+	if (source()) {
+		std::variant<parser::parsed_real_filter, parser::parse_failure_data> result = parser::parse_real_filter(*source());
 
 		if (std::holds_alternative<parser::parse_failure_data>(result)) {
 			parser::print_parse_errors(std::get<parser::parse_failure_data>(result), logger);
@@ -40,27 +44,21 @@ void real_filter_state::recompute_filter_representation(log::logger& logger)
 		compiler::output_logs(result.logs(), (*_parsed_real_filter).lookup, logger);
 
 		if (result.has_result()) {
-			_filter_representation = std::move(result.result());
+			filter_representation() = std::move(result.result());
 		}
 		else {
-			_filter_representation = std::nullopt;
+			filter_representation() = std::nullopt;
 		}
 	}
 	else {
-		_filter_representation = std::nullopt;
+		filter_representation() = std::nullopt;
 	}
-}
-
-void spirit_filter_state::new_source(std::string source, log::logger& logger)
-{
-	_source = std::move(source);
-	parse_spirit_filter(logger);
 }
 
 void spirit_filter_state::parse_spirit_filter(log::logger& logger)
 {
-	if (_source) {
-		std::variant<parser::parsed_spirit_filter, parser::parse_failure_data> result = parser::parse_spirit_filter(*_source);
+	if (source()) {
+		std::variant<parser::parsed_spirit_filter, parser::parse_failure_data> result = parser::parse_spirit_filter(*source());
 
 		if (std::holds_alternative<parser::parse_failure_data>(result)) {
 			parser::print_parse_errors(std::get<parser::parse_failure_data>(result), logger);
@@ -120,10 +118,10 @@ void spirit_filter_state::compile_spirit_filter(log::logger& logger)
 void spirit_filter_state::recompute_filter_representation(log::logger& /* logger */)
 {
 	if (_spirit_filter) {
-		_filter_representation = generator::make_item_filter(*_spirit_filter, {});
+		filter_representation() = generator::make_item_filter(*_spirit_filter, {});
 	}
 	else {
-		_filter_representation = std::nullopt;
+		filter_representation() = std::nullopt;
 	}
 }
 
