@@ -30,7 +30,7 @@ void color_picker_window::draw_contents()
 	const auto button_size = _application.font_settings().monospaced_font_size() * 4; // * 4 because we draw 4 lines of text
 	ImGui::ColorButton("", button_color, flags, ImVec2(button_size, button_size));
 	ImGui::SameLine();
-	ImGui::Text("click to copy\nthese strings");
+	ImGui::TextUnformatted("click to copy\nthese strings");
 	ImGui::SameLine();
 
 	{
