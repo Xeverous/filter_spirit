@@ -10,7 +10,7 @@
 // common wrapper functions for end-to-end all-in-one applications - mostly for tests and CLI
 // these do nothing special - they only call main interfaces of parser, compiler and generator
 
-namespace fs::generator::sf {
+namespace fs::generator {
 
 /**
  * @brief end-to-end filter generation function
@@ -22,14 +22,14 @@ namespace fs::generator::sf {
  * @return filter file content or nothing if error occured
  */
 [[nodiscard]]
-std::optional<std::string> generate_filter(
+std::optional<std::string> parse_compile_generate_spirit_filter(
 	std::string_view input,
 	const lang::market::item_price_report& report,
 	settings st,
 	log::logger& logger);
 
 [[nodiscard]]
-std::optional<std::string> generate_filter_without_preamble(
+std::optional<std::string> parse_compile_generate_spirit_filter_no_preamble(
 	std::string_view input,
 	const lang::market::item_price_data& item_price_data,
 	settings st,

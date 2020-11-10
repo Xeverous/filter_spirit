@@ -15,7 +15,7 @@ namespace {
 using namespace fs;
 using namespace fs::generator;
 
-std::optional<fs::lang::spirit_item_filter> parse_spirit_filter(
+std::optional<fs::lang::spirit_item_filter> parse_and_compile_spirit_filter(
 	std::string_view input,
 	settings st,
 	log::logger& logger)
@@ -57,16 +57,16 @@ std::optional<fs::lang::spirit_item_filter> parse_spirit_filter(
 
 } // namespace
 
-namespace fs::generator::sf
+namespace fs::generator
 {
 
-std::optional<std::string> generate_filter(
+std::optional<std::string> parse_compile_generate_spirit_filter(
 	std::string_view input,
 	const lang::market::item_price_report& report,
 	settings st,
 	log::logger& logger)
 {
-	std::optional<std::string> maybe_filter = generate_filter_without_preamble(input, report.data, st, logger);
+	std::optional<std::string> maybe_filter = parse_compile_generate_spirit_filter_no_preamble(input, report.data, st, logger);
 
 	if (!maybe_filter)
 		return std::nullopt;
@@ -76,7 +76,7 @@ std::optional<std::string> generate_filter(
 	return filter;
 }
 
-std::optional<std::string> generate_filter_without_preamble(
+std::optional<std::string> parse_compile_generate_spirit_filter_no_preamble(
 	std::string_view input,
 	const lang::market::item_price_data& item_price_data,
 	settings st,
@@ -84,7 +84,7 @@ std::optional<std::string> generate_filter_without_preamble(
 {
 	logger.info() << "" << item_price_data; // add << "" to workaround calling <<(rvalue, item_price_data)
 
-	std::optional<fs::lang::spirit_item_filter> spirit_filter = parse_spirit_filter(input, st, logger);
+	std::optional<fs::lang::spirit_item_filter> spirit_filter = parse_and_compile_spirit_filter(input, st, logger);
 
 	if (!spirit_filter)
 		return std::nullopt;

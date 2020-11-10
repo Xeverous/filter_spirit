@@ -27,7 +27,7 @@ bool generate_item_filter_impl(
 	if (!source_file_content)
 		return false;
 
-	std::optional<std::string> filter_content = generator::sf::generate_filter(
+	std::optional<std::string> filter_content = generator::parse_compile_generate_spirit_filter(
 		*source_file_content, report, st, logger);
 
 	if (!filter_content)
