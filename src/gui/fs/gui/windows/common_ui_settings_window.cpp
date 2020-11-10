@@ -1,4 +1,5 @@
 #include <fs/gui/windows/common_ui_settings_window.hpp>
+#include <fs/gui/application.hpp>
 
 #include <Magnum/GL/Renderer.h>
 
@@ -12,8 +13,8 @@ void common_ui_settings_window::draw_contents()
 		if (ImGui::ColorEdit3("Background color", _clear_color.data()))
 			Magnum::GL::Renderer::setClearColor(_clear_color);
 
-		_theming.draw_theme_selection_ui();
-		_fonting.draw_font_selection_ui();
+		_application.theme_settings().draw_theme_selection_ui();
+		_application.font_settings().draw_font_selection_ui();
 	}
 
 	if (ImGui::CollapsingHeader("Rendering")) {

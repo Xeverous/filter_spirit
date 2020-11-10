@@ -1,4 +1,4 @@
-#include <fs/gui/windows/settings/fonting.hpp>
+#include <fs/gui/settings/fonting.hpp>
 #include <fs/utility/assert.hpp>
 #include <fs/utility/file.hpp>
 

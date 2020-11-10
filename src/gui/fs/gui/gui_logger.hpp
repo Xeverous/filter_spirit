@@ -2,7 +2,7 @@
 
 #include <fs/log/logger.hpp>
 #include <fs/log/buffer_logger.hpp>
-#include <fs/gui/windows/settings/fonting.hpp>
+#include <fs/gui/settings/fonting.hpp>
 
 #include <functional>
 
@@ -26,7 +26,7 @@ public:
 		return _logger;
 	}
 
-	void draw();
+	void draw(float lines_of_text = 8.0f); // use 0 to occupy whole space
 
 private:
 	std::reference_wrapper<const fonting> _fonting; // plain reference type would make this class non-moveable

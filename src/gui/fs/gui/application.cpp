@@ -1,4 +1,5 @@
 #include <fs/gui/application.hpp>
+#include <fs/utility/file.hpp>
 #include <fs/version.hpp>
 
 #include <tinyfiledialogs.h>
@@ -11,10 +12,38 @@
 #include <algorithm>
 #include <exception>
 #include <stdexcept>
+#include <string>
 
 /**
  * code in this file - based on Magnum's ImGui example
  */
+
+namespace {
+
+using namespace fs;
+
+void load_item_database(std::optional<lang::loot::item_database>& database, log::logger& logger)
+{
+	logger.info() << "loading item database...\n";
+
+	std::optional<std::string> item_metadata_json = fs::utility::load_file("data/base_items.json", logger);
+	if (!item_metadata_json) {
+		logger.error() << "failed to load item metadata, loot preview will be disabled";
+		return;
+	}
+
+	database.emplace();
+
+	if (!(*database).parse(*item_metadata_json, logger)) {
+		logger.error() << "failed to parse item metadata, loot preview will be disabled";
+		database = std::nullopt;
+		return;
+	}
+
+	logger.info() << "item database loaded";
+}
+
+}
 
 namespace fs::gui {
 
@@ -24,10 +53,13 @@ application::application(const Arguments& arguments)
 	Configuration{}
 		.setTitle("Filter Spirit v" + to_string(fs::version::current()))
 		.setWindowFlags(Configuration::WindowFlag::Resizable)}
+, _application_log(font_settings())
 , _color_picker(*this)
 , _common_ui_settings(*this)
 {
-	ImGui::CreateContext();
+	if (auto ctx = ImGui::CreateContext(); ctx == nullptr) {
+		throw std::runtime_error("Failed to initialize Dear ImGui library!");
+	}
 
 	/*
 	 * note: this has to be done in exactly this place:
@@ -35,8 +67,10 @@ application::application(const Arguments& arguments)
 	 * - before Magnum's Dear ImGui integration is constructed
 	 * for more details, see documentation of Magnum::ImGuiIntegration::Context
 	 */
-	_common_ui_settings.font_settings().build_default_fonts();
+	_application_log.logger().info() << "loading and building fonts...\n";
+	_fonting.build_default_fonts();
 
+	_application_log.logger().info() << "creating Magnum library context...\n";
 	_imgui = Magnum::ImGuiIntegration::Context(
 		*ImGui::GetCurrentContext(), Magnum::Vector2{windowSize()} / dpiScaling(), windowSize(), framebufferSize());
 
@@ -53,6 +87,10 @@ application::application(const Arguments& arguments)
 #if !defined(MAGNUM_TARGET_WEBGL) && !defined(CORRADE_TARGET_ANDROID)
 	setMinimalLoopPeriod(_common_ui_settings.min_frame_time_ms());
 #endif
+
+	load_item_database(_item_database, _application_log.logger());
+
+	_application_log.logger().info() << "application initialized\n";
 }
 
 void application::viewportEvent(ViewportEvent& event)
@@ -140,9 +178,18 @@ void application::draw_main_menu_bar()
 				_single_item_preview.take_focus();
 			}
 
+			ImGui::Separator();
+
 			if (ImGui::MenuItem("Dear ImGui library demo window")) {
 				_show_demo_window = true;
 				_force_focus_demo_window = true;
+			}
+
+			ImGui::Separator();
+
+			if (ImGui::MenuItem(_application_log.name().c_str())) {
+				_application_log.open();
+				_application_log.take_focus();
 			}
 
 			ImGui::EndMenu();
@@ -185,6 +232,8 @@ void application::drawEvent()
 		stopTextInput();
 
 	draw_main_menu_bar();
+
+	_application_log.draw();
 
 	for (auto& window : _spirit_filters)
 		window.draw();
@@ -265,17 +314,15 @@ void application::open_pending_modals()
 
 void application::rebuild_pending_fonts()
 {
-	auto& font_settings = _common_ui_settings.font_settings();
-
 	// note: all of code below in this function has significant order requirements
 	// otherwise the program crashes due to font/rendering dependency shenanigans
 	// care when changing this function, for more - see implementation of fonting
-	if (font_settings.is_rebuild_needed()) {
-		font_settings.rebuild();
+	if (_fonting.is_rebuild_needed()) {
+		_fonting.rebuild();
 		_imgui.relayout(windowSize());
 	}
 
-	font_settings.update();
+	_fonting.update();
 }
 
 void application::on_open_spirit_filter()
