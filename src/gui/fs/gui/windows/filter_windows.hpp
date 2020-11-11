@@ -33,7 +33,7 @@ private:
 	std::reference_wrapper<application> _application; // plain reference type would make this class non-moveable
 	gui_logger _logger;
 	std::string _status;
-	std::optional<real_filter_state> _state; // empty if loading file failed
+	real_filter_state _state;
 };
 
 class spirit_filter_window : public imgui_window
@@ -56,7 +56,7 @@ private:
 	std::reference_wrapper<application> _application; // plain reference type would make this class non-moveable
 	gui_logger _logger;
 	std::string _status;
-	std::optional<spirit_filter_state> _state; // empty if loading file failed
+	spirit_filter_state _state;
 };
 
 }

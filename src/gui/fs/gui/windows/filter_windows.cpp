@@ -1,4 +1,5 @@
 #include <fs/gui/windows/filter_windows.hpp>
+#include <fs/gui/windows/filter/filter_state.hpp>
 #include <fs/gui/application.hpp>
 #include <fs/utility/file.hpp>
 
@@ -9,24 +10,20 @@ namespace {
 using namespace fs;
 using namespace fs::gui;
 
-template <typename State>
-void reload_filter_helper(const std::string& path, gui_logger& logger, std::string& status, std::optional<State>& state)
+void reload_filter_helper(const std::string& path, gui_logger& logger, std::string& status, detail::filter_state_base& state)
 {
 	std::optional<std::string> file_content = utility::load_file(path, logger.logger());
 	if (!file_content) {
 		status = "loading failed";
-		state = std::nullopt;
+		state.new_source(std::nullopt, logger.logger());
 		return;
 	}
 
 	status = "filter loaded, ";
 
-	if (state)
-		(*state).new_source(std::move(*file_content), logger.logger());
-	else
-		state.emplace(std::move(*file_content), logger.logger());
+	state.new_source(std::move(file_content), logger.logger());
 
-	if (const auto& rep = (*state).filter_representation(); rep.has_value()) {
+	if (const auto& rep = state.filter_representation(); rep.has_value()) {
 		status += std::to_string((*rep).blocks.size());
 		status += " blocks";
 	}
@@ -58,11 +55,8 @@ void real_filter_window::draw_contents()
 
 	_logger.draw();
 
-	if (_state) {
-		real_filter_state& state = *_state;
-		if (state.filter_representation()) {
-			// draw debug functionality
-		}
+	if (_state.filter_representation()) {
+		// draw debug functionality
 	}
 }
 
@@ -90,11 +84,8 @@ void spirit_filter_window::draw_contents()
 
 	_logger.draw();
 
-	if (_state) {
-		spirit_filter_state& state = *_state;
-		if (state.filter_representation()) {
-			// draw debug functionality
-		}
+	if (_state.filter_representation()) {
+		// draw debug functionality
 	}
 }
 
