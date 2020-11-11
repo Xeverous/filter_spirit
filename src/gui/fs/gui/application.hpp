@@ -9,6 +9,7 @@
 #include <fs/gui/settings/theming.hpp>
 #include <fs/gui/settings/fonting.hpp>
 #include <fs/lang/loot/item_database.hpp>
+#include <fs/lang/loot/generator.hpp>
 
 #include <Magnum/ImGuiIntegration/Context.hpp>
 
@@ -54,6 +55,16 @@ public:
 		return _theming;
 	}
 
+	auto& item_database()
+	{
+		return _item_database;
+	}
+
+	auto& loot_generator()
+	{
+		return _loot_generator;
+	}
+
 private:
 	void draw_main_menu_bar();
 
@@ -76,6 +87,7 @@ private:
 	// Holds a lot of data that is not being changed during lifetime of the application.
 	// This should be the only (application-global) instance for use by filter/loot debugger.
 	std::optional<lang::loot::item_database> _item_database;
+	lang::loot::generator _loot_generator;
 
 	bool _show_demo_window = false;
 	bool _force_focus_demo_window = false;
