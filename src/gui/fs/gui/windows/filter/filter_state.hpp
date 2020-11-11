@@ -15,9 +15,20 @@ namespace detail {
 
 /**
  * @class base class for filter editor/debugger functionality
- * @details This class holds only source (first step) and filter representation (last step).
- * Descentant classes are supposed to hold their data for intermediate steps and modify
- * filter representation here when needed.
+ * @details This class implements 2 design patterns:
+ * - facade: This class holds a lot of state (source, parsed source, filter, debug info, ...)
+ *   that needs to be managed in specific order (ususally transforming previous-step data to next-step data).
+ *   Accessors of private fields return by const reference to preserve invariants. Modification of private
+ *   fields is only possible through new_* functions which trigger a chain reaction to update next fields
+ *   that depend on the modified one and then further next ones until last field is reached.
+ * - template method: Some of the update steps are pure virtual functions because real and spirit filters
+ *   have different state to manage. Thus, the implementation of some intermediate steps is expected in derived types.
+ *
+ * Class invariants:
+ * - There are fields A, B, C, ... X, Y, Z. Some of them are being stored in descendants of this class.
+ * - If B is changed, C needs to be recomputed and then D and then ... up to Z.
+ * - (N+1)th field may be dependent on any of (0...N)th fields, thus if Nth field is a null optional,
+ *   all further fields should also be null optionals.
  */
 class filter_state_base
 {
@@ -30,17 +41,15 @@ public:
 
 	virtual ~filter_state_base() = default;
 
-	void new_source(std::string source, log::logger& logger);
-	virtual void parse_source(log::logger& logger) = 0;
+	void new_source(std::optional<std::string> source, log::logger& logger);
+	virtual void on_source_change(const std::optional<std::string>& source, log::logger& logger) = 0;
+
+	void new_filter_representation(std::optional<lang::item_filter> filter_representation, log::logger& logger);
+	void on_filter_representation_change(const std::optional<lang::item_filter>& filter_representation, log::logger& logger);
 
 	const auto& source() const
 	{
 		return _source;
-	}
-
-	auto& filter_representation()
-	{
-		return _filter_representation;
 	}
 
 	const auto& filter_representation() const
@@ -49,8 +58,9 @@ public:
 	}
 
 private:
-	std::optional<std::string> _source; // first step: source code
-	std::optional<lang::item_filter> _filter_representation; // last step: debuggable filter representation
+	std::optional<std::string> _source; // first step
+	// << possible intermediate data in derived types >>
+	std::optional<lang::item_filter> _filter_representation;
 };
 
 }
@@ -64,13 +74,10 @@ public:
 	{
 	}
 
-	void parse_source(log::logger& logger) override
-	{
-		parse_real_filter(logger);
-	}
+	void on_source_change(const std::optional<std::string>& source, log::logger& logger) override;
 
-	void parse_real_filter(log::logger& logger);
-	void recompute_filter_representation(log::logger& logger);
+	void new_parsed_real_filter(std::optional<parser::parsed_real_filter> parsed_real_filter, log::logger& logger);
+	void on_parsed_real_filter_change(const std::optional<parser::parsed_real_filter>& parsed_real_filter, log::logger& logger);
 
 	const auto& parsed_real_filter() const
 	{
@@ -90,15 +97,19 @@ public:
 	{
 	}
 
-	void parse_source(log::logger& logger) override
-	{
-		parse_spirit_filter(logger);
-	}
+	void on_source_change(const std::optional<std::string>& source, log::logger& logger) override;
 
-	void parse_spirit_filter(log::logger& logger);
-	void resolve_spirit_filter_symbols(log::logger& logger);
-	void compile_spirit_filter(log::logger& logger);
-	void recompute_filter_representation(log::logger& logger);
+	void new_parsed_spirit_filter(std::optional<parser::parsed_spirit_filter> parsed_spirit_filter, log::logger& logger);
+	void on_parsed_spirit_filter_change(const std::optional<parser::parsed_spirit_filter>& parsed_spirit_filter, log::logger& logger);
+
+	void new_spirit_filter_symbols(std::optional<lang::symbol_table> spirit_filter_symbols, log::logger& logger);
+	void on_spirit_filter_symbols_change(
+		const std::optional<parser::parsed_spirit_filter>& parsed_spirit_filter,
+		const std::optional<lang::symbol_table>& spirit_filter_symbols,
+		log::logger& logger);
+
+	void new_spirit_filter(std::optional<lang::spirit_item_filter> spirit_filter, log::logger& logger);
+	void on_spirit_filter_change(const std::optional<lang::spirit_item_filter>& spirit_filter, log::logger& logger);
 
 	const auto& parsed_spirit_filter() const
 	{
