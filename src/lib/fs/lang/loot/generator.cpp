@@ -78,7 +78,7 @@ void indexes_of_matching_equippable_items(
 
 // ---- rarity-related utilities ----
 
-std::pair<const std::vector<equippable_item>&, std::string_view> // set of bases + theirclass name
+std::pair<const std::vector<equippable_item>&, std::string_view> // set of bases + their class name
 select_equipment_kind(
 	const equippable_item_database& db,
 	std::mt19937& rng)
@@ -318,13 +318,13 @@ socket_info roll_links_and_colors(int sockets, std::mt19937& rng)
 	const std::array<int, 6> weights = { 178184223, 348177081, 267663189, 196718817, 8256689, 1000000 };
 
 	while (sockets > 0) {
-		std::size_t idx = roll_index_using_weights(weights.begin(), weights.begin() + sockets, rng);
-		const int linked_together = static_cast<int>(idx) + 1;
+		const auto idx = roll_index_using_weights(weights.begin(), weights.begin() + sockets, rng);
+		const auto linked_together = static_cast<int>(idx) + 1;
 		sockets -= linked_together;
 
 		linked_sockets ls;
 		for (int i = 0; i < linked_together; ++i)
-			ls.sockets.push_back(socket_color::r);
+			ls.sockets.push_back(socket_color::r); // TODO implement color rolling (based on attribute requirements)
 
 		result.groups.push_back(ls);
 	}
@@ -386,7 +386,7 @@ item equippable_item_to_item(
 
 void generate_currency_items(
 	const std::vector<currency_item>& source,
-	item_inserter inserter,
+	item_receiver& receiver,
 	int count,
 	stack_param stacking,
 	std::mt19937& rng)
@@ -395,7 +395,7 @@ void generate_currency_items(
 		const currency_item& curr_item = select_one_element(source, rng);
 		item itm = elementary_item_to_item(curr_item, item_class_names::currency_stackable);
 		itm.stack_size = roll_stack_size(stacking, curr_item.max_stack_size, rng);
-		inserter.insert(std::move(itm));
+		receiver.on_item(std::move(itm));
 	}
 }
 
@@ -409,40 +409,40 @@ generator::generator()
 {
 }
 
-void generator::generate_cards(const item_database& db, item_inserter inserter, int count, stack_param stacking)
+void generator::generate_cards(const item_database& db, item_receiver& receiver, int count, stack_param stacking)
 {
 	for (int i = 0; i < count; ++i) {
 		const currency_item& card = select_one_element(db.divination_cards, _rng);
 		item itm = divination_card_to_item(card);
 		itm.stack_size = roll_stack_size(stacking, card.max_stack_size, _rng);
-		inserter.insert(std::move(itm));
+		receiver.on_item(std::move(itm));
 	}
 }
 
-void generator::generate_incubators(const item_database& db, item_inserter inserter, int count, int item_level)
+void generator::generate_incubators(const item_database& db, item_receiver& receiver, int count, int item_level)
 {
 	for (int i = 0; i < count; ++i) {
 		item itm = elementary_item_to_item(select_one_element(db.incubators, _rng), item_class_names::incubator);
 		itm.item_level = item_level;
-		inserter.insert(std::move(itm));
+		receiver.on_item(std::move(itm));
 	}
 }
 
-void generator::generate_quest_items(const item_database& db, item_inserter inserter, int count)
+void generator::generate_quest_items(const item_database& db, item_receiver& receiver, int count)
 {
 	for (int i = 0; i < count; ++i) {
-		inserter.insert(elementary_item_to_item(select_one_element(db.quest_items, _rng), item_class_names::quest_item));
+		receiver.on_item(elementary_item_to_item(select_one_element(db.quest_items, _rng), item_class_names::quest_item));
 	}
 }
 
-void generator::generate_resonators(const item_database& db, item_inserter inserter, int count)
+void generator::generate_resonators(const item_database& db, item_receiver& receiver, int count)
 {
 	for (int i = 0; i < count; ++i) {
-		inserter.insert(resonator_to_item(select_one_element(db.resonators, _rng)));
+		receiver.on_item(resonator_to_item(select_one_element(db.resonators, _rng)));
 	}
 }
 
-void generator::generate_metamorph_parts(const item_database& db, item_inserter inserter, int count)
+void generator::generate_metamorph_parts(const item_database& db, item_receiver& receiver, int count)
 {
 	for (int i = 0; i < count; ++i) {
 		item itm = elementary_item_to_item(select_one_element(db.metamorph_parts, _rng), item_class_names::metamorph_sample);
@@ -450,114 +450,114 @@ void generator::generate_metamorph_parts(const item_database& db, item_inserter 
 		itm.rarity_ = rarity_type::unique;
 		// TODO do meamorph have names?
 		// TODO are metamorph IDed?
-		inserter.insert(std::move(itm));
+		receiver.on_item(std::move(itm));
 	}
 }
 
-void generator::generate_unique_pieces(const item_database& db, item_inserter inserter, int count, int item_level)
+void generator::generate_unique_pieces(const item_database& db, item_receiver& receiver, int count, int item_level)
 {
 	for (int i = 0; i < count; ++i) {
 		item itm = elementary_item_to_item(select_one_element(db.unique_pieces, _rng), item_class_names::piece);
 		itm.item_level = item_level;
 		itm.rarity_ = rarity_type::unique;
-		inserter.insert(std::move(itm));
+		receiver.on_item(std::move(itm));
 	}
 }
 
-void generator::generate_labyrinth_keys(const item_database& db, item_inserter inserter, int count)
+void generator::generate_labyrinth_keys(const item_database& db, item_receiver& receiver, int count)
 {
 	for (int i = 0; i < count; ++i) {
 		item itm = elementary_item_to_item(select_one_element(db.labyrinth_keys, _rng), item_class_names::labyrinth_item);
 		// TODO do lab keys have ilvl?
-		inserter.insert(std::move(itm));
+		receiver.on_item(std::move(itm));
 	}
 }
 
-void generator::generate_labyrinth_trinkets(const item_database& db, item_inserter inserter, int count)
+void generator::generate_labyrinth_trinkets(const item_database& db, item_receiver& receiver, int count)
 {
 	for (int i = 0; i < count; ++i) {
 		item itm = elementary_item_to_item(select_one_element(db.labyrinth_trinkets, _rng), item_class_names::labyrinth_trinket);
 		// TODO do lab trinkets have ilvl?
-		inserter.insert(std::move(itm));
+		receiver.on_item(std::move(itm));
 	}
 }
 
 // currency
 
-void generator::generate_generic_currency(const item_database& db, item_inserter inserter, int count, stack_param stacking)
+void generator::generate_generic_currency(const item_database& db, item_receiver& receiver, int count, stack_param stacking)
 {
-	return generate_currency_items(db.currency.generic, inserter, count, stacking, _rng);
+	return generate_currency_items(db.currency.generic, receiver, count, stacking, _rng);
 }
 
-void generator::generate_generic_currency_shards(const item_database& db, item_inserter inserter, int count, stack_param stacking)
+void generator::generate_generic_currency_shards(const item_database& db, item_receiver& receiver, int count, stack_param stacking)
 {
 	// TODO shards can not be full stack
-	return generate_currency_items(db.currency.generic_shards, inserter, count, stacking, _rng);
+	return generate_currency_items(db.currency.generic_shards, receiver, count, stacking, _rng);
 }
 
-void generator::generate_conqueror_orbs(const item_database& db, item_inserter inserter, int count, stack_param stacking)
+void generator::generate_conqueror_orbs(const item_database& db, item_receiver& receiver, int count, stack_param stacking)
 {
-	return generate_currency_items(db.currency.conqueror_orbs, inserter, count, stacking, _rng);
+	return generate_currency_items(db.currency.conqueror_orbs, receiver, count, stacking, _rng);
 }
 
-void generator::generate_breach_blessings(const item_database& db, item_inserter inserter, int count, stack_param stacking)
+void generator::generate_breach_blessings(const item_database& db, item_receiver& receiver, int count, stack_param stacking)
 {
-	return generate_currency_items(db.currency.breach_blessings, inserter, count, stacking, _rng);
+	return generate_currency_items(db.currency.breach_blessings, receiver, count, stacking, _rng);
 }
 
-void generator::generate_breach_splinters(const item_database& db, item_inserter inserter, int count, stack_param stacking)
+void generator::generate_breach_splinters(const item_database& db, item_receiver& receiver, int count, stack_param stacking)
 {
-	return generate_currency_items(db.currency.breach_splinters, inserter, count, stacking, _rng);
+	return generate_currency_items(db.currency.breach_splinters, receiver, count, stacking, _rng);
 }
 
-void generator::generate_legion_splinters(const item_database& db, item_inserter inserter, int count, stack_param stacking)
+void generator::generate_legion_splinters(const item_database& db, item_receiver& receiver, int count, stack_param stacking)
 {
-	return generate_currency_items(db.currency.legion_splinters, inserter, count, stacking, _rng);
+	return generate_currency_items(db.currency.legion_splinters, receiver, count, stacking, _rng);
 }
 
-void generator::generate_essences(const item_database& db, item_inserter inserter, int count, stack_param stacking)
+void generator::generate_essences(const item_database& db, item_receiver& receiver, int count, stack_param stacking)
 {
-	return generate_currency_items(db.currency.essences, inserter, count, stacking, _rng);
+	return generate_currency_items(db.currency.essences, receiver, count, stacking, _rng);
 }
 
-void generator::generate_fossils(const item_database& db, item_inserter inserter, int count, stack_param stacking)
+void generator::generate_fossils(const item_database& db, item_receiver& receiver, int count, stack_param stacking)
 {
-	return generate_currency_items(db.currency.fossils, inserter, count, stacking, _rng);
+	return generate_currency_items(db.currency.fossils, receiver, count, stacking, _rng);
 }
 
-void generator::generate_catalysts(const item_database& db, item_inserter inserter, int count, stack_param stacking)
+void generator::generate_catalysts(const item_database& db, item_receiver& receiver, int count, stack_param stacking)
 {
-	return generate_currency_items(db.currency.catalysts, inserter, count, stacking, _rng);
+	return generate_currency_items(db.currency.catalysts, receiver, count, stacking, _rng);
 }
 
-void generator::generate_oils(const item_database& db, item_inserter inserter, int count, stack_param stacking)
+void generator::generate_oils(const item_database& db, item_receiver& receiver, int count, stack_param stacking)
 {
-	return generate_currency_items(db.currency.oils, inserter, count, stacking, _rng);
+	return generate_currency_items(db.currency.oils, receiver, count, stacking, _rng);
 }
 
-void generator::generate_delirium_orbs(const item_database& db, item_inserter inserter, int count, stack_param stacking)
+void generator::generate_delirium_orbs(const item_database& db, item_receiver& receiver, int count, stack_param stacking)
 {
-	return generate_currency_items(db.currency.delirium_orbs, inserter, count, stacking, _rng);
+	return generate_currency_items(db.currency.delirium_orbs, receiver, count, stacking, _rng);
 }
 
-void generator::generate_harbinger_scrolls(const item_database& db, item_inserter inserter, int count, stack_param stacking)
+void generator::generate_harbinger_scrolls(const item_database& db, item_receiver& receiver, int count, stack_param stacking)
 {
-	return generate_currency_items(db.currency.harbinger_scrolls, inserter, count, stacking, _rng);
+	return generate_currency_items(db.currency.harbinger_scrolls, receiver, count, stacking, _rng);
 }
 
-void generator::generate_incursion_vials(const item_database& db, item_inserter inserter, int count, stack_param stacking)
+void generator::generate_incursion_vials(const item_database& db, item_receiver& receiver, int count, stack_param stacking)
 {
-	return generate_currency_items(db.currency.incursion_vials, inserter, count, stacking, _rng);
+	return generate_currency_items(db.currency.incursion_vials, receiver, count, stacking, _rng);
 }
 
-void generator::generate_bestiary_nets(const item_database& db, item_inserter inserter, int count, stack_param stacking)
+void generator::generate_bestiary_nets(const item_database& db, item_receiver& receiver, int count, stack_param stacking)
 {
-	return generate_currency_items(db.currency.bestiary_nets, inserter, count, stacking, _rng);
+	return generate_currency_items(db.currency.bestiary_nets, receiver, count, stacking, _rng);
 }
 
 void generator::generate_non_unique_equippable_item(
 	const item_database& db,
-	item_inserter inserter,
+	item_receiver& receiver,
 	int item_level,
 	rarity_type rarity_,
 	bool allow_atlas_bases)
@@ -576,14 +576,14 @@ void generator::generate_non_unique_equippable_item(
 			continue;
 
 		const equippable_item& eq_item = select_one_element_by_index(bases, _sp_indexes, _rng);
-		inserter.insert(equippable_item_to_item(eq_item, class_, item_level, rarity_, _rng));
+		receiver.on_item(equippable_item_to_item(eq_item, class_, item_level, rarity_, _rng));
 		return;
 	}
 }
 
 void generator::generate_monster_loot(
 	const item_database& db,
-	item_inserter inserter,
+	item_receiver& receiver,
 	double rarity,
 	double quantity,
 	int item_level,
@@ -595,20 +595,20 @@ void generator::generate_monster_loot(
 	for (int r = 0; r < num_full_rolls; ++r) {
 		if (std::bernoulli_distribution(base_chance)(_rng)) {
 			rarity_type rar = roll_non_unique_rarity(rarity, _rng);
-			generate_non_unique_equippable_item(db, inserter, item_level, rar, allow_atlas_bases);
+			generate_non_unique_equippable_item(db, receiver, item_level, rar, allow_atlas_bases);
 		}
 	}
 
 	const auto last_roll_coefficient = quantity - num_full_rolls;
 	if (std::bernoulli_distribution(base_chance * last_roll_coefficient)(_rng)) {
 		rarity_type rar = roll_non_unique_rarity(rarity, _rng);
-		generate_non_unique_equippable_item(db, inserter, item_level, rar, allow_atlas_bases);
+		generate_non_unique_equippable_item(db, receiver, item_level, rar, allow_atlas_bases);
 	}
 }
 
 void generator::generate_monster_pack_loot(
 	const item_database& db,
-	item_inserter inserter,
+	item_receiver& receiver,
 	double rarity,
 	double quantity,
 	int area_level,
@@ -629,16 +629,16 @@ void generator::generate_monster_pack_loot(
 	 * number of items every time. Numbers of bonus rarity/quantity per monster from wiki.
 	 */
 	for (int n = 0; n < num_normal_monsters; ++n)
-		generate_monster_loot(db, inserter, rarity, quantity, area_level, allow_atlas_bases);
+		generate_monster_loot(db, receiver, rarity, quantity, area_level, allow_atlas_bases);
 
 	for (int n = 0; n < num_magic_monsters; ++n)
-		generate_monster_loot(db, inserter, rarity * 3.0, quantity * 7.0, area_level + 1, allow_atlas_bases);
+		generate_monster_loot(db, receiver, rarity * 3.0, quantity * 7.0, area_level + 1, allow_atlas_bases);
 
 	for (int n = 0; n < num_rare_monsters; ++n)
-		generate_monster_loot(db, inserter, rarity * 11.0, quantity * 15.0, area_level + 2, allow_atlas_bases);
+		generate_monster_loot(db, receiver, rarity * 11.0, quantity * 15.0, area_level + 2, allow_atlas_bases);
 
 	for (int n = 0; n < num_unique_monsters; ++n)
-		generate_monster_loot(db, inserter, rarity * 11.0, quantity * 29.5, area_level + 2, allow_atlas_bases);
+		generate_monster_loot(db, receiver, rarity * 11.0, quantity * 29.5, area_level + 2, allow_atlas_bases);
 }
 
 }
