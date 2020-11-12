@@ -17,8 +17,13 @@ class lookup_data
 {
 public:
 	lookup_data(detail::position_cache_type position_cache)
-	: position_cache(std::move(position_cache))
+	: _position_cache(std::move(position_cache))
 	{
+	}
+
+	std::size_t size() const
+	{
+		return _position_cache.get_positions().size();
 	}
 
 	[[nodiscard]]
@@ -48,17 +53,17 @@ private:
 	[[nodiscard]]
 	detail::range_type range_of(const x3::position_tagged& ast) const
 	{
-		return position_cache.position_of(ast);
+		return _position_cache.position_of(ast);
 	}
 
 	[[nodiscard]]
 	detail::range_type get_range_of_whole_content() const
 	{
-		FS_ASSERT(!position_cache.get_positions().empty());
-		return detail::range_type(position_cache.first(), position_cache.last());
+		FS_ASSERT(!_position_cache.get_positions().empty());
+		return detail::range_type(_position_cache.first(), _position_cache.last());
 	}
 
-	detail::position_cache_type position_cache;
+	detail::position_cache_type _position_cache;
 };
 
 struct parse_failure_data
