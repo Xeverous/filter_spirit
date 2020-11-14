@@ -38,19 +38,15 @@ void copy_to_clipboard(const std::vector<fs::log::buffer_logger::message>& messa
 
 namespace fs::gui {
 
-void gui_logger::draw(float lines_of_text)
+void gui_logger::draw()
 {
-	const auto size_y = [&]() -> float {
-		// if size is positive, then that much space is occupied
-		// if size is negative, then all possible space except size space is occupied
-		// (occupied space uses monospaced font)
-		if (lines_of_text >= 0.0f)
-			return _fonting.get().monospaced_font_size() * lines_of_text;
-		else
-			return ImGui::GetFontSize() * lines_of_text;
-	}();
+	if (ImGui::Button("clear logs"))
+		logger().clear();
+	ImGui::SameLine();
+	if (ImGui::Button("copy logs"))
+		copy_to_clipboard(logger().messages());
 
-	if (ImGui::BeginChild("logs", ImVec2(0.0f, size_y), true, ImGuiWindowFlags_HorizontalScrollbar)) {
+	if (ImGui::BeginChild("logs", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar)) {
 		const auto _1 = _fonting.get().scoped_monospaced_font();
 		const auto _2 = scoped_text_color_override(IM_COL32(255, 255, 255, 255));
 
@@ -68,12 +64,6 @@ void gui_logger::draw(float lines_of_text)
 	}
 
 	ImGui::EndChild();
-
-	if (ImGui::Button("clear logs"))
-		logger().clear();
-	ImGui::SameLine();
-	if (ImGui::Button("copy logs"))
-		copy_to_clipboard(logger().messages());
 }
 
 }

@@ -26,7 +26,7 @@ public:
 		return _logger;
 	}
 
-	void draw(float lines_of_text = 8.0f); // use 0 to occupy whole space
+	void draw();
 
 private:
 	std::reference_wrapper<const fonting> _fonting; // plain reference type would make this class non-moveable
