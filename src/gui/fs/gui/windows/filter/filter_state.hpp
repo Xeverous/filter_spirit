@@ -1,10 +1,10 @@
 #pragma once
 
 #include <fs/gui/windows/filter/loot_state.hpp>
+#include <fs/gui/gui_logger.hpp>
 #include <fs/parser/parser.hpp>
 #include <fs/lang/item_filter.hpp>
 #include <fs/lang/symbol_table.hpp>
-#include <fs/log/logger.hpp>
 
 #include <optional>
 #include <string>
@@ -36,19 +36,18 @@ namespace detail {
 class filter_state_base
 {
 public:
-	filter_state_base() = default;
-	filter_state_base(std::string source, log::logger& logger)
-	{
-		new_source(std::move(source), logger);
-	}
+	filter_state_base(application& app);
 
 	virtual ~filter_state_base() = default;
 
-	void new_source(std::optional<std::string> source, log::logger& logger);
-	virtual void on_source_change(const std::optional<std::string>& source, log::logger& logger) = 0;
+	// use string instead of string_view because filesystem wants C-strings
+	void reload_source_file(const std::string& path);
 
-	void new_filter_representation(std::optional<lang::item_filter> filter_representation, log::logger& logger);
-	void on_filter_representation_change(const std::optional<lang::item_filter>& filter_representation, log::logger& logger);
+	void new_source(std::optional<std::string> source);
+	virtual void on_source_change(const std::optional<std::string>& source) = 0;
+
+	void new_filter_representation(std::optional<lang::item_filter> filter_representation);
+	void on_filter_representation_change(const std::optional<lang::item_filter>& filter_representation);
 
 	const auto& source() const
 	{
@@ -60,20 +59,28 @@ public:
 		return _filter_representation;
 	}
 
-	void draw_interface(application& app);
+	log::logger& logger()
+	{
+		return _logger.logger();
+	}
+
+	void draw_interface(const std::string& source_path, application& app);
 
 protected:
 	virtual void draw_interface_derived() = 0;
 
 private:
-	void draw_interface_source();
+	void draw_interface_source(const std::string& source_path);
 	void draw_interface_filter_representation();
+	void draw_interface_logs();
 	void draw_interface_loot(application& app);
 
 	std::optional<std::string> _source; // first step
 	// << possible intermediate data in derived types >>
 	std::optional<lang::item_filter> _filter_representation;
 	loot_state _loot_state;
+
+	gui_logger _logger;
 };
 
 }
@@ -81,16 +88,15 @@ private:
 class real_filter_state : public detail::filter_state_base
 {
 public:
-	real_filter_state() = default;
-	real_filter_state(std::string source, log::logger& logger)
-	: detail::filter_state_base(std::move(source), logger)
+	real_filter_state(application& app)
+	: detail::filter_state_base(app)
 	{
 	}
 
-	void on_source_change(const std::optional<std::string>& source, log::logger& logger) override;
+	void on_source_change(const std::optional<std::string>& source) override;
 
-	void new_parsed_real_filter(std::optional<parser::parsed_real_filter> parsed_real_filter, log::logger& logger);
-	void on_parsed_real_filter_change(const std::optional<parser::parsed_real_filter>& parsed_real_filter, log::logger& logger);
+	void new_parsed_real_filter(std::optional<parser::parsed_real_filter> parsed_real_filter);
+	void on_parsed_real_filter_change(const std::optional<parser::parsed_real_filter>& parsed_real_filter);
 
 	const auto& parsed_real_filter() const
 	{
@@ -106,25 +112,23 @@ private:
 class spirit_filter_state : public detail::filter_state_base
 {
 public:
-	spirit_filter_state() = default;
-	spirit_filter_state(std::string source, log::logger& logger)
-	: detail::filter_state_base(std::move(source), logger)
+	spirit_filter_state(application& app)
+	: detail::filter_state_base(app)
 	{
 	}
 
-	void on_source_change(const std::optional<std::string>& source, log::logger& logger) override;
+	void on_source_change(const std::optional<std::string>& source) override;
 
-	void new_parsed_spirit_filter(std::optional<parser::parsed_spirit_filter> parsed_spirit_filter, log::logger& logger);
-	void on_parsed_spirit_filter_change(const std::optional<parser::parsed_spirit_filter>& parsed_spirit_filter, log::logger& logger);
+	void new_parsed_spirit_filter(std::optional<parser::parsed_spirit_filter> parsed_spirit_filter);
+	void on_parsed_spirit_filter_change(const std::optional<parser::parsed_spirit_filter>& parsed_spirit_filter);
 
-	void new_spirit_filter_symbols(std::optional<lang::symbol_table> spirit_filter_symbols, log::logger& logger);
+	void new_spirit_filter_symbols(std::optional<lang::symbol_table> spirit_filter_symbols);
 	void on_spirit_filter_symbols_change(
 		const std::optional<parser::parsed_spirit_filter>& parsed_spirit_filter,
-		const std::optional<lang::symbol_table>& spirit_filter_symbols,
-		log::logger& logger);
+		const std::optional<lang::symbol_table>& spirit_filter_symbols);
 
-	void new_spirit_filter(std::optional<lang::spirit_item_filter> spirit_filter, log::logger& logger);
-	void on_spirit_filter_change(const std::optional<lang::spirit_item_filter>& spirit_filter, log::logger& logger);
+	void new_spirit_filter(std::optional<lang::spirit_item_filter> spirit_filter);
+	void on_spirit_filter_change(const std::optional<lang::spirit_item_filter>& spirit_filter);
 
 	const auto& parsed_spirit_filter() const
 	{
