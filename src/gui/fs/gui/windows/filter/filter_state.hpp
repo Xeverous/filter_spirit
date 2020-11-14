@@ -1,5 +1,6 @@
 #pragma once
 
+#include <fs/gui/windows/filter/loot_state.hpp>
 #include <fs/parser/parser.hpp>
 #include <fs/lang/item_filter.hpp>
 #include <fs/lang/symbol_table.hpp>
@@ -10,6 +11,8 @@
 #include <utility>
 
 namespace fs::gui {
+
+class application;
 
 namespace detail {
 
@@ -57,10 +60,20 @@ public:
 		return _filter_representation;
 	}
 
+	void draw_interface(application& app);
+
+protected:
+	virtual void draw_interface_derived() = 0;
+
 private:
+	void draw_interface_source();
+	void draw_interface_filter_representation();
+	void draw_interface_loot(application& app);
+
 	std::optional<std::string> _source; // first step
 	// << possible intermediate data in derived types >>
 	std::optional<lang::item_filter> _filter_representation;
+	loot_state _loot_state;
 };
 
 }
@@ -85,6 +98,8 @@ public:
 	}
 
 private:
+	void draw_interface_derived() override;
+
 	std::optional<parser::parsed_real_filter> _parsed_real_filter;
 };
 
@@ -127,6 +142,12 @@ public:
 	}
 
 private:
+	void draw_interface_derived() override;
+
+	void draw_interface_parsed_spirit_filter();
+	void draw_interface_spirit_filter_symbols();
+	void draw_interface_spirit_filter();
+
 	std::optional<parser::parsed_spirit_filter> _parsed_spirit_filter;
 	std::optional<lang::symbol_table> _spirit_filter_symbols;
 	std::optional<lang::spirit_item_filter> _spirit_filter;
