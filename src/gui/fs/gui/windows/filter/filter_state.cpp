@@ -1,7 +1,10 @@
 #include <fs/gui/windows/filter/filter_state.hpp>
+#include <fs/gui/ui_utils.hpp>
 #include <fs/parser/parser.hpp>
 #include <fs/compiler/compiler.hpp>
 #include <fs/generator/make_item_filter.hpp>
+
+#include <imgui.h>
 
 #include <utility>
 
@@ -21,12 +24,60 @@ void filter_state_base::new_filter_representation(std::optional<lang::item_filte
 	on_filter_representation_change(_filter_representation, logger);
 }
 
-void filter_state_base::on_filter_representation_change(const std::optional<lang::item_filter>& /* filter_representation */, log::logger& /* logger */)
+void filter_state_base::on_filter_representation_change(const std::optional<lang::item_filter>& filter_representation, log::logger& /* logger */)
 {
-	// nothing for now
+	if (filter_representation)
+		_loot_state.refilter_items(*filter_representation);
+	else
+		_loot_state.clear_filter_results();
 }
 
+void filter_state_base::draw_interface(application& app)
+{
+	ImGui::Columns(2, nullptr, false);
+
+	draw_interface_source();
+	draw_interface_derived();
+	draw_interface_filter_representation();
+
+	ImGui::NextColumn();
+
+	draw_interface_loot(app);
 }
+
+void filter_state_base::draw_interface_source()
+{
+	if (ImGui::CollapsingHeader("Source", ImGuiTreeNodeFlags_DefaultOpen)) {
+		if (_source)
+			ImGui::TextWrapped("Source loaded, %zu bytes", (*_source).size());
+		else
+			ImGui::TextWrapped("Source not loaded.");
+	}
+}
+
+void filter_state_base::draw_interface_filter_representation()
+{
+	if (ImGui::CollapsingHeader("Filter representation", ImGuiTreeNodeFlags_DefaultOpen)) {
+		if (_filter_representation)
+			ImGui::TextWrapped("Ready, %zu blocks", (*_filter_representation).blocks.size());
+		else
+			ImGui::TextWrapped("Not available.");
+	}
+}
+
+void filter_state_base::draw_interface_loot(application& app)
+{
+	if (ImGui::CollapsingHeader("Loot preview & filter debug", ImGuiTreeNodeFlags_DefaultOpen)) {
+		if (!_filter_representation) {
+			ImGui::TextWrapped("No filter representation available.");
+			return;
+		}
+
+		_loot_state.draw_interface(app);
+	}
+}
+
+} // namespace detail
 
 void real_filter_state::on_source_change(const std::optional<std::string>& source, log::logger& logger)
 {
@@ -67,6 +118,21 @@ void real_filter_state::on_parsed_real_filter_change(const std::optional<parser:
 		new_filter_representation(std::move(result.result()), logger);
 	else
 		new_filter_representation(std::nullopt, logger);
+}
+
+void real_filter_state::draw_interface_derived()
+{
+	if (ImGui::CollapsingHeader("Real filter abstract syntax tree", ImGuiTreeNodeFlags_DefaultOpen)) {
+		if (_parsed_real_filter) {
+			ImGui::TextWrapped(
+				"Parse successful, %zu blocks, %zu recorded AST nodes",
+				(*_parsed_real_filter).ast.size(),
+				(*_parsed_real_filter).lookup.size());
+		}
+		else {
+			ImGui::TextUnformatted("Not available.");
+		}
+	}
 }
 
 void spirit_filter_state::on_source_change(const std::optional<std::string>& source, log::logger& logger)
@@ -152,6 +218,53 @@ void spirit_filter_state::on_spirit_filter_change(const std::optional<lang::spir
 	}
 
 	new_filter_representation(generator::make_item_filter(*_spirit_filter, {}), logger);
+}
+
+void spirit_filter_state::draw_interface_derived()
+{
+	draw_interface_parsed_spirit_filter();
+	draw_interface_spirit_filter_symbols();
+	draw_interface_spirit_filter();
+}
+
+void spirit_filter_state::draw_interface_parsed_spirit_filter()
+{
+	if (ImGui::CollapsingHeader("Spirit filter abstract syntax tree", ImGuiTreeNodeFlags_DefaultOpen)) {
+		if (_parsed_spirit_filter) {
+			ImGui::TextWrapped(
+				"Parse successful, %zu definitions, %zu root level blocks, %zu recorded AST nodes",
+				(*_parsed_spirit_filter).ast.definitions.size(),
+				(*_parsed_spirit_filter).ast.statements.size(),
+				(*_parsed_spirit_filter).lookup.size());
+		}
+		else {
+			ImGui::TextUnformatted("Not available.");
+		}
+	}
+}
+
+void spirit_filter_state::draw_interface_spirit_filter_symbols()
+{
+	if (ImGui::CollapsingHeader("Spirit filter definitions", ImGuiTreeNodeFlags_DefaultOpen)) {
+		if (_spirit_filter_symbols) {
+			ImGui::TextWrapped("Resolving definitions successful, %zu definitions", (*_spirit_filter_symbols).size());
+		}
+		else {
+			ImGui::TextWrapped("Not available.");
+		}
+	}
+}
+
+void spirit_filter_state::draw_interface_spirit_filter()
+{
+	if (ImGui::CollapsingHeader("Spirit filter representation", ImGuiTreeNodeFlags_DefaultOpen)) {
+		if (_spirit_filter) {
+			ImGui::TextWrapped("Building representation successful, %zu total blocks", (*_spirit_filter).blocks.size());
+		}
+		else {
+			ImGui::TextWrapped("Not available.");
+		}
+	}
 }
 
 }

@@ -54,10 +54,7 @@ void real_filter_window::draw_contents()
 	ImGui::TextUnformatted(_status.c_str());
 
 	_logger.draw();
-
-	if (_state.filter_representation()) {
-		// draw debug functionality
-	}
+	_state.draw_interface(_application.get());
 }
 
 void real_filter_window::reload_real_filter_file(const std::string& path)
@@ -83,10 +80,7 @@ void spirit_filter_window::draw_contents()
 	ImGui::TextUnformatted(_status.c_str());
 
 	_logger.draw();
-
-	if (_state.filter_representation()) {
-		// draw debug functionality
-	}
+	_state.draw_interface(_application.get());
 }
 
 void spirit_filter_window::reload_spirit_filter_file(const std::string& path)

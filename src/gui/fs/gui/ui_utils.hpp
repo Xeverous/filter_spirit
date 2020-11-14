@@ -54,16 +54,36 @@ inline Magnum::Color4ub to_rgba(Magnum::Color4 color)
  * wrappers for managing Dear ImGui state
  */
 
-template <typename Impl>
-class [[nodiscard]] scoped_override
+template <typename Impl, typename T>
+struct scoped_override_base
 {
-public:
 	using value_type = typename Impl::value_type;
 
-	scoped_override(value_type val)
+	scoped_override_base(value_type val)
 	{
 		Impl::push(val);
 	}
+};
+
+template <typename Impl>
+struct scoped_override_base<Impl, void>
+{
+	using value_type = typename Impl::value_type;
+
+	scoped_override_base()
+	{
+		Impl::push();
+	}
+};
+
+template <typename Impl>
+class [[nodiscard]] scoped_override : public scoped_override_base<Impl, typename Impl::value_type>
+{
+public:
+	using value_type = typename Impl::value_type;
+	using base_type = scoped_override_base<Impl, value_type>;
+
+	using base_type::base_type;
 
 	~scoped_override()
 	{
@@ -104,6 +124,23 @@ struct scoped_pointer_id_impl
 };
 
 using scoped_pointer_id = scoped_override<scoped_pointer_id_impl>;
+
+struct scoped_group_impl
+{
+	using value_type = void;
+
+	static void push()
+	{
+		ImGui::BeginGroup();
+	}
+
+	static void pop()
+	{
+		ImGui::EndGroup();
+	}
+};
+
+using scoped_group = scoped_override<scoped_group_impl>;
 
 struct scoped_font_override_impl
 {

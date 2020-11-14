@@ -41,6 +41,8 @@ target_sources(filter_spirit_gui
 		fs/gui/windows/filter_windows.hpp
 		fs/gui/windows/filter/filter_state.cpp
 		fs/gui/windows/filter/filter_state.hpp
+		fs/gui/windows/filter/loot_state.cpp
+		fs/gui/windows/filter/loot_state.hpp
 		fs/gui/windows/single_item_preview_window.cpp
 		fs/gui/windows/single_item_preview_window.hpp
 		fs/gui/windows/version_info_window.cpp
