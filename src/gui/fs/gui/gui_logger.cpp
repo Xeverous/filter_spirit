@@ -38,10 +38,16 @@ void copy_to_clipboard(const std::vector<fs::log::buffer_logger::message>& messa
 
 namespace fs::gui {
 
+void gui_logger::clear_logs()
+{
+	logger().clear();
+	_last_log_size = 0;
+}
+
 void gui_logger::draw()
 {
 	if (ImGui::Button("clear logs"))
-		logger().clear();
+		clear_logs();
 	ImGui::SameLine();
 	if (ImGui::Button("copy logs"))
 		copy_to_clipboard(logger().messages());
@@ -50,7 +56,7 @@ void gui_logger::draw()
 		const auto _1 = _fonting.get().scoped_monospaced_font();
 		const auto _2 = scoped_text_color_override(IM_COL32(255, 255, 255, 255));
 
-		auto last_severity = fs::log::severity::info;
+		auto last_severity = log::severity::info;
 
 		for (const auto& message : logger().messages()) {
 			if (message.s != last_severity) {
@@ -60,6 +66,12 @@ void gui_logger::draw()
 			}
 
 			ImGui::TextUnformatted(message.text.c_str());
+		}
+
+		// auto-scroll to bottom if logs size changed
+		if (_last_log_size < logger().messages().size()) {
+			ImGui::SetScrollHereY(1.0f);
+			_last_log_size = logger().messages().size();
 		}
 	}
 

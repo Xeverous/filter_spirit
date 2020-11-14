@@ -1,8 +1,7 @@
 #pragma once
 
-#include <fs/log/logger.hpp>
-#include <fs/log/buffer_logger.hpp>
 #include <fs/gui/settings/fonting.hpp>
+#include <fs/log/buffer_logger.hpp>
 
 #include <functional>
 
@@ -27,10 +26,12 @@ public:
 	}
 
 	void draw();
+	void clear_logs();
 
 private:
 	std::reference_wrapper<const fonting> _fonting; // plain reference type would make this class non-moveable
-	fs::log::buffer_logger _logger;
+	log::buffer_logger _logger;
+	std::size_t _last_log_size = 0;
 };
 
 }
