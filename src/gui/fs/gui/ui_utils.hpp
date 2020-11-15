@@ -50,6 +50,21 @@ inline Magnum::Color4ub to_rgba(Magnum::Color4 color)
 	return Magnum::Math::pack<Magnum::Color4ub>(color);
 }
 
+struct rect
+{
+	ImVec2 top_left;
+	ImVec2 size;
+
+	bool contains(ImVec2 point) const
+	{
+		return top_left.x <= point.x
+			&& point.x < top_left.x + size.x
+			&& top_left.y <= point.y
+			&& point.y < top_left.y + size.y;
+	}
+};
+
+
 /*
  * wrappers for managing Dear ImGui state
  */

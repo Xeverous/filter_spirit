@@ -1,10 +1,12 @@
 #pragma once
 
-#include <fs/utility/assert.hpp>
 #include <fs/gui/ui_utils.hpp>
+#include <fs/lang/limits.hpp>
+#include <fs/utility/assert.hpp>
 
 #include <imgui.h>
 
+#include <array>
 #include <string>
 #include <vector>
 #include <utility>
@@ -50,6 +52,12 @@ private:
 	std::string _path;
 	std::string _font_data; // TTF or OTF file content
 };
+
+constexpr int num_item_preview_fonts()
+{
+	// +1 because both range ends are inclusive
+	return lang::limits::max_filter_font_size - lang::limits::min_filter_font_size + 1;
+}
 
 class fonting
 {
@@ -106,6 +114,8 @@ public:
 		return { monospaced_font() };
 	}
 
+	ImFont* filter_preview_font(int size) const;
+
 private:
 	std::vector<font> _text_fonts;
 	std::vector<font> _monospaced_fonts;
@@ -113,6 +123,7 @@ private:
 	std::size_t _selected_monospaced_font_index = 0;
 	ImFont* _text_font = nullptr;
 	ImFont* _monospaced_font = nullptr;
+	std::array<ImFont*, num_item_preview_fonts()> _filter_preview_fonts = {};
 	int _text_font_size = 24;
 	int _monospaced_font_size = 24;
 	bool _monospaced_interface_font = false;

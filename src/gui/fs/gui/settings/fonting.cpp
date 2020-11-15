@@ -128,6 +128,15 @@ void fonting::draw_font_selection_ui()
 		_update_needed = true;
 }
 
+ImFont* fonting::filter_preview_font(int size) const
+{
+	const std::size_t index = size - lang::limits::min_filter_font_size;
+	FS_ASSERT(index < _filter_preview_fonts.size());
+	const auto result = _filter_preview_fonts[index];
+	FS_ASSERT(result != nullptr);
+	return result;
+}
+
 void fonting::update()
 {
 	if (!_update_needed)
@@ -150,8 +159,16 @@ void fonting::rebuild()
 
 	FS_ASSERT(_selected_text_font_index < _text_fonts.size());
 	_text_font = build_font(atlas, _text_fonts[_selected_text_font_index], _text_font_size);
+	FS_ASSERT(_text_font != nullptr);
 	FS_ASSERT(_selected_monospaced_font_index < _monospaced_fonts.size());
 	_monospaced_font = build_font(atlas, _monospaced_fonts[_selected_monospaced_font_index], _monospaced_font_size);
+	FS_ASSERT(_monospaced_font != nullptr);
+
+	FS_ASSERT(_text_fonts.size() >= 2u); // loop below relies on preview font in [1]
+	for (std::size_t i = 0; i < _filter_preview_fonts.size(); ++i) {
+		_filter_preview_fonts[i] = build_font(atlas, _text_fonts[1], i + lang::limits::min_filter_font_size);
+		FS_ASSERT(_filter_preview_fonts != nullptr);
+	}
 
 	_rebuild_needed = false;
 	_update_needed = true;

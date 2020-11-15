@@ -98,6 +98,7 @@ void filter_state_base::draw_interface_loot(application& app)
 			return;
 		}
 
+		_loot_state.update_items(*_filter_representation);
 		_loot_state.draw_interface(app);
 	}
 }

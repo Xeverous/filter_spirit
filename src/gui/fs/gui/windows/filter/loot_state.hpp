@@ -1,8 +1,11 @@
 #pragma once
 
+#include <fs/gui/ui_utils.hpp>
 #include <fs/lang/item.hpp>
 #include <fs/lang/item_filter.hpp>
 #include <fs/lang/loot/generator.hpp>
+
+#include <imgui.h>
 
 #include <string>
 #include <vector>
@@ -16,16 +19,19 @@ struct looted_item
 {
 	lang::item itm;
 	std::optional<lang::item_filtering_result> filtering_result;
+	std::optional<rect> drawing;
 };
 
 class application;
+class fonting;
 
 class loot_state : public lang::loot::item_receiver
 {
 public:
 	void draw_interface(application& app);
 
-	void refilter_items(const lang::item_filter& filter);
+	void update_items(const lang::item_filter& filter); // apply filter to items without style
+	void refilter_items(const lang::item_filter& filter); // apply filter to every item
 
 	void clear_items()
 	{
@@ -40,18 +46,23 @@ public:
 
 	void on_item(const lang::item& itm) override
 	{
-		_items.push_back(looted_item{itm, std::nullopt});
+		_items.push_back(looted_item{itm, std::nullopt, std::nullopt});
 	}
 
 	void on_item(lang::item&& itm) override
 	{
-		_items.push_back(looted_item{std::move(itm), std::nullopt});
+		_items.push_back(looted_item{std::move(itm), std::nullopt, std::nullopt});
 	}
 
 private:
+	void draw_loot_canvas(const fonting& f);
+	void draw_item_labels(ImVec2 canvas_begin, ImVec2 canvas_end, const fonting& f);
+	void on_canvas_hover(ImVec2 mouse_position);
+
 	int _area_level = 1;
 	std::vector<looted_item> _items;
-	std::optional<std::size_t> _selected_item_index;
+
+	float _canvas_offset_y = 0;
 };
 
 }
