@@ -36,6 +36,8 @@ public:
 	void clear_items()
 	{
 		_items.clear();
+		_last_items_size = 0;
+		_canvas_offset_y = 0.0f;
 	}
 
 	void clear_filter_results()
@@ -54,6 +56,11 @@ public:
 		_items.push_back(looted_item{std::move(itm), std::nullopt, std::nullopt});
 	}
 
+	std::size_t num_items() const
+	{
+		return _items.size();
+	}
+
 private:
 	void draw_loot_canvas(const fonting& f);
 	void draw_item_labels(ImVec2 canvas_begin, ImVec2 canvas_end, const fonting& f);
@@ -69,6 +76,7 @@ private:
 	int _map_iiq = 0;
 	int _map_iir = 0;
 	std::vector<looted_item> _items;
+	std::size_t _last_items_size = 0;
 
 	float _canvas_offset_y = 0;
 };
