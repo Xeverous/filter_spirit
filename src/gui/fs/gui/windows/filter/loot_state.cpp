@@ -257,7 +257,11 @@ void loot_state::draw_interface(application& app)
 		return;
 	}
 
-	ImGui::TextWrapped("Hover items for info, right click items for debug, drag to move");
+	if (ImGui::Button("Clear"))
+		clear_items();
+
+	ImGui::SameLine();
+	ImGui::TextWrapped("Hover items for info, right click items for debug, drag or scroll to move");
 
 	draw_loot_canvas(app.font_settings());
 
@@ -266,12 +270,20 @@ void loot_state::draw_interface(application& app)
 	lang::loot::item_database& db = *database;
 
 	if (ImGui::Button("random currency")) {
-		clear_items();
 		app.loot_generator().generate_generic_currency(db, *this, 10, lang::loot::stack_param::single);
 	}
 	if (ImGui::Button("single currency")) {
-		clear_items();
 		app.loot_generator().generate_generic_currency(db, *this, 1, lang::loot::stack_param::single);
+	}
+
+	if (_last_items_size != _items.size()) {
+		if (_last_items_size < _items.size() && !_append_loot)
+			_items.erase(_items.begin(), _items.begin() + _last_items_size);
+
+		if (_shuffle_loot)
+			std::shuffle(_items.begin(), _items.end(), app.loot_generator().rng());
+
+		_last_items_size = _items.size();
 	}
 }
 
@@ -320,16 +332,18 @@ void loot_state::draw_loot_canvas(const fonting& f)
 		const auto& io = ImGui::GetIO();
 		// right now only vertical scrolling
 		_canvas_offset_y += io.MouseDelta.y;
-
-		// block from top because items are being rendered top-to-bottom
-		if (_canvas_offset_y > 0.0f)
-			_canvas_offset_y = 0.0f;
 	}
 
 	if (ImGui::IsItemHovered()) {
 		const auto& io = ImGui::GetIO();
+		_canvas_offset_y += io.MouseWheel * ImGui::GetFontSize();
 		on_canvas_hover(io.MousePos, f);
 	}
+
+	// block from top because items are being rendered top-to-bottom
+	// there is no reason to scroll upwards of top elements
+	if (_canvas_offset_y > 0.0f)
+		_canvas_offset_y = 0.0f;
 }
 
 void loot_state::draw_item_labels(ImVec2 canvas_begin, ImVec2 canvas_end, const fonting& f)

@@ -83,6 +83,10 @@ public:
 		int num_rare_monsters,
 		int num_unique_monsters);
 
+	auto& rng()
+	{
+		return _rng;
+	}
 
 private:
 	std::seed_seq _seed_seq;

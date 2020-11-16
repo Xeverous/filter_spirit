@@ -9,6 +9,7 @@
 #include <imgui.h>
 
 #include <utility>
+#include <cstdio>
 
 namespace fs::gui {
 
@@ -92,7 +93,23 @@ void filter_state_base::draw_interface_logs()
 
 void filter_state_base::draw_interface_loot(application& app)
 {
-	if (ImGui::CollapsingHeader("Loot preview & filter debug", ImGuiTreeNodeFlags_DefaultOpen)) {
+	if (const auto& str = "Loot preview & filter debug"; _loot_state.num_items() > 0u) {
+		std::snprintf(
+			_loot_status_str_buf.data(),
+			_loot_status_str_buf.size(),
+			"%s (%zu items)",
+			str,
+			_loot_state.num_items());
+	}
+	else {
+		constexpr auto str_size = std::size(str);
+		// can not use std::array::size because it is a non-static member and this is not constexpr
+		constexpr auto buf_size = std::tuple_size_v<decltype(_loot_status_str_buf)>;
+		static_assert(buf_size >= str_size);
+		std::memcpy(_loot_status_str_buf.data(), str, str_size);
+	}
+
+	if (ImGui::CollapsingHeader(_loot_status_str_buf.data(), ImGuiTreeNodeFlags_DefaultOpen)) {
 		if (!_filter_representation) {
 			ImGui::TextWrapped("No filter representation available.");
 			return;
