@@ -67,8 +67,6 @@ fonting::fonting()
 	_text_fonts.emplace_back(FONTS_PATH "/fontin/Fontin-SmallCaps.otf", "Fontin SmallCaps");
 
 	_monospaced_fonts.emplace_back(FONTS_PATH "/monoid/Monoid-Regular-NoCalt.ttf", "Monoid Regular");
-	_monospaced_fonts.emplace_back(FONTS_PATH "/monoid/Monoid-Bold-NoCalt.ttf",    "Monoid Bold");
-	_monospaced_fonts.emplace_back(FONTS_PATH "/monoid/Monoid-Italic-NoCalt.ttf",  "Monoid Italic");
 	_monospaced_fonts.emplace_back(FONTS_PATH "/monoid/Monoid-Retina-NoCalt.ttf",  "Monoid Retina");
 
 	_monospaced_fonts.emplace_back(FONTS_PATH "/fira_code/ttf/FiraCode-Light.ttf",    "Fira Code Light");
@@ -80,9 +78,6 @@ fonting::fonting()
 
 	_monospaced_fonts.emplace_back(FONTS_PATH "/inconsolata/Inconsolata.otf", "Inconsolata");
 
-	_monospaced_fonts.emplace_back(FONTS_PATH "/jet_brains_mono/ttf/JetBrainsMono-ExtraLight.ttf", "Jet Brains Mono ExtraLight");
-	_monospaced_fonts.emplace_back(FONTS_PATH "/jet_brains_mono/ttf/JetBrainsMono-Light.ttf",      "Jet Brains Mono Light");
-	_monospaced_fonts.emplace_back(FONTS_PATH "/jet_brains_mono/ttf/JetBrainsMono-SemiLight.ttf",  "Jet Brains Mono SemiLight");
 	_monospaced_fonts.emplace_back(FONTS_PATH "/jet_brains_mono/ttf/JetBrainsMono-Regular.ttf",    "Jet Brains Mono Regular");
 	_monospaced_fonts.emplace_back(FONTS_PATH "/jet_brains_mono/ttf/JetBrainsMono-Medium.ttf",     "Jet Brains Mono Medium");
 	_monospaced_fonts.emplace_back(FONTS_PATH "/jet_brains_mono/ttf/JetBrainsMono-Bold.ttf",       "Jet Brains Mono Bold");
@@ -90,21 +85,14 @@ fonting::fonting()
 
 	_monospaced_fonts.emplace_back(FONTS_PATH "/hack/Hack-Regular.ttf",    "Hack Regular");
 	_monospaced_fonts.emplace_back(FONTS_PATH "/hack/Hack-Bold.ttf",       "Hack Bold");
-	_monospaced_fonts.emplace_back(FONTS_PATH "/hack/Hack-BoldItalic.ttf", "Hack Bold Italic");
-	_monospaced_fonts.emplace_back(FONTS_PATH "/hack/Hack-Italic.ttf",     "Hack Italic");
 
-	_monospaced_fonts.emplace_back(FONTS_PATH "/roboto_mono/static/RobotoMono-Thin.ttf",       "Roboto Mono Thin");
-	_monospaced_fonts.emplace_back(FONTS_PATH "/roboto_mono/static/RobotoMono-Bold.ttf",       "Roboto Mono Bold");
-	_monospaced_fonts.emplace_back(FONTS_PATH "/roboto_mono/static/RobotoMono-ExtraLight.ttf", "Roboto Mono ExtraLight");
-	_monospaced_fonts.emplace_back(FONTS_PATH "/roboto_mono/static/RobotoMono-Light.ttf",      "Roboto Mono Light");
 	_monospaced_fonts.emplace_back(FONTS_PATH "/roboto_mono/static/RobotoMono-Medium.ttf",     "Roboto Mono Medium");
 	_monospaced_fonts.emplace_back(FONTS_PATH "/roboto_mono/static/RobotoMono-Regular.ttf",    "Roboto Mono Regular");
 	_monospaced_fonts.emplace_back(FONTS_PATH "/roboto_mono/static/RobotoMono-SemiBold.ttf",   "Roboto Mono SemiBold");
+	_monospaced_fonts.emplace_back(FONTS_PATH "/roboto_mono/static/RobotoMono-Bold.ttf",       "Roboto Mono Bold");
 
 	_monospaced_fonts.emplace_back(FONTS_PATH "/ubuntu_mono/UbuntuMono-Regular.ttf",    "Ubuntu Mono Regular");
 	_monospaced_fonts.emplace_back(FONTS_PATH "/ubuntu_mono/UbuntuMono-Bold.ttf",       "Ubuntu Mono Bold");
-	_monospaced_fonts.emplace_back(FONTS_PATH "/ubuntu_mono/UbuntuMono-BoldItalic.ttf", "Ubuntu Mono Bold Italic");
-	_monospaced_fonts.emplace_back(FONTS_PATH "/ubuntu_mono/UbuntuMono-Italic.ttf",     "Ubuntu Mono Italic");
 #undef FONTS_PATH
 }
 
@@ -113,7 +101,7 @@ void fonting::build_default_fonts()
 	FS_ASSERT(_text_fonts.size() >= 2u);
 	_selected_text_font_index = 1;
 	FS_ASSERT(_text_fonts.size() >= 11u);
-	_selected_monospaced_font_index = 10;
+	_selected_monospaced_font_index = 19;
 	rebuild();
 }
 
