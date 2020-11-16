@@ -59,7 +59,15 @@ private:
 	void draw_item_labels(ImVec2 canvas_begin, ImVec2 canvas_end, const fonting& f);
 	void on_canvas_hover(ImVec2 mouse_position, const fonting& f);
 
-	int _area_level = 1;
+	void draw_loot_settings_global();
+
+	bool _append_loot = false;
+	bool _shuffle_loot = false;
+	int _area_level = 83;
+	int _player_iiq = 0;
+	int _player_iir = 0;
+	int _map_iiq = 0;
+	int _map_iir = 0;
 	std::vector<looted_item> _items;
 
 	float _canvas_offset_y = 0;

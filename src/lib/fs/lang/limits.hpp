@@ -25,5 +25,8 @@ namespace fs::lang::limits
 	constexpr auto min_filter_volume = 0;
 	constexpr auto max_filter_volume = 300;
 
+	constexpr auto min_item_level = 0;
+	constexpr auto max_item_level = 100;
+
 	constexpr auto default_filter_opacity = 240;
 }
