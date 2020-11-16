@@ -2,11 +2,13 @@
 
 #include <fs/lang/limits.hpp>
 #include <fs/lang/position_tag.hpp>
+#include <fs/lang/keywords.hpp>
 
 #include <tuple>
 #include <string>
 #include <optional>
 #include <variant>
+#include <string_view>
 
 namespace fs::lang
 {
@@ -110,6 +112,22 @@ struct rarity
 	rarity_type value;
 	position_tag origin = {};
 };
+
+inline std::string_view to_string_view(rarity_type rarity_)
+{
+	namespace kw = keywords::rf;
+
+	if (rarity_ == rarity_type::normal)
+		return kw::normal;
+	else if (rarity_ == rarity_type::magic)
+		return kw::magic;
+	else if (rarity_ == rarity_type::rare)
+		return kw::rare;
+	else if (rarity_ == rarity_type::unique)
+		return kw::unique;
+	else
+		return "?";
+}
 
 inline bool operator==(rarity lhs, rarity rhs) noexcept { return lhs.value == rhs.value; }
 inline bool operator!=(rarity lhs, rarity rhs) noexcept { return !(lhs == rhs); }

@@ -19,7 +19,7 @@ struct looted_item
 {
 	lang::item itm;
 	std::optional<lang::item_filtering_result> filtering_result;
-	std::optional<rect> drawing;
+	std::optional<rect> drawing; // in screen coordinates
 };
 
 class application;
@@ -57,7 +57,7 @@ public:
 private:
 	void draw_loot_canvas(const fonting& f);
 	void draw_item_labels(ImVec2 canvas_begin, ImVec2 canvas_end, const fonting& f);
-	void on_canvas_hover(ImVec2 mouse_position);
+	void on_canvas_hover(ImVec2 mouse_position, const fonting& f);
 
 	int _area_level = 1;
 	std::vector<looted_item> _items;
