@@ -3,7 +3,7 @@
 #include <fs/gui/windows/filter_windows.hpp>
 #include <fs/gui/windows/color_picker_window.hpp>
 #include <fs/gui/windows/single_item_preview_window.hpp>
-#include <fs/gui/windows/common_ui_settings_window.hpp>
+#include <fs/gui/windows/settings_window.hpp>
 #include <fs/gui/windows/version_info_window.hpp>
 #include <fs/gui/windows/application_log_window.hpp>
 #include <fs/gui/settings/theming.hpp>
@@ -105,7 +105,7 @@ private:
 
 	color_picker_window _color_picker;
 	single_item_preview_window _single_item_preview;
-	common_ui_settings_window _common_ui_settings;
+	settings_window _settings;
 	version_info_window _version_info;
 };
 

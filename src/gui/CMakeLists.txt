@@ -35,8 +35,8 @@ target_sources(filter_spirit_gui
 		fs/gui/windows/application_log_window.hpp
 		fs/gui/windows/color_picker_window.cpp
 		fs/gui/windows/color_picker_window.hpp
-		fs/gui/windows/common_ui_settings_window.cpp
-		fs/gui/windows/common_ui_settings_window.hpp
+		fs/gui/windows/settings_window.cpp
+		fs/gui/windows/settings_window.hpp
 		fs/gui/windows/filter_windows.cpp
 		fs/gui/windows/filter_windows.hpp
 		fs/gui/windows/filter/filter_state.cpp
