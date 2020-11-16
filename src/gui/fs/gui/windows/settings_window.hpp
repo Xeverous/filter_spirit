@@ -9,12 +9,12 @@ namespace fs::gui {
 
 class application;
 
-class common_ui_settings_window : public imgui_window
+class settings_window : public imgui_window
 {
 
 public:
-	common_ui_settings_window(application& app)
-	: imgui_window("Common UI settings")
+	settings_window(application& app)
+	: imgui_window("Settings")
 	, _application(app)
 	{
 	}

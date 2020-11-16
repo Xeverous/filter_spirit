@@ -55,7 +55,7 @@ application::application(const Arguments& arguments)
 		.setWindowFlags(Configuration::WindowFlag::Resizable)}
 , _application_log(font_settings())
 , _color_picker(*this)
-, _common_ui_settings(*this)
+, _settings(*this)
 {
 	if (auto ctx = ImGui::CreateContext(); ctx == nullptr) {
 		throw std::runtime_error("Failed to initialize Dear ImGui library!");
@@ -85,7 +85,7 @@ application::application(const Arguments& arguments)
 		Magnum::GL::Renderer::BlendFunction::OneMinusSourceAlpha);
 
 #if !defined(MAGNUM_TARGET_WEBGL) && !defined(CORRADE_TARGET_ANDROID)
-	setMinimalLoopPeriod(_common_ui_settings.min_frame_time_ms());
+	setMinimalLoopPeriod(_settings.min_frame_time_ms());
 #endif
 
 	load_item_database(_item_database, _application_log.logger());
@@ -197,9 +197,9 @@ void application::draw_main_menu_bar()
 		}
 
 		if (ImGui::BeginMenu("Settings")) {
-			if (ImGui::MenuItem(_common_ui_settings.name().c_str())) {
-				_common_ui_settings.open();
-				_common_ui_settings.take_focus();
+			if (ImGui::MenuItem(_settings.name().c_str())) {
+				_settings.open();
+				_settings.take_focus();
 			}
 
 			ImGui::EndMenu();
@@ -243,7 +243,7 @@ void application::drawEvent()
 
 	_color_picker.draw();
 	_single_item_preview.draw();
-	_common_ui_settings.draw();
+	_settings.draw();
 	_version_info.draw();
 
 	if (_show_demo_window) {
