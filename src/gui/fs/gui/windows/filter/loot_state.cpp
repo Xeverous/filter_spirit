@@ -3,6 +3,7 @@
 #include <fs/gui/settings/fonting.hpp>
 #include <fs/gui/ui_utils.hpp>
 #include <fs/lang/keywords.hpp>
+#include <fs/lang/limits.hpp>
 
 #include <imgui.h>
 
@@ -260,6 +261,8 @@ void loot_state::draw_interface(application& app)
 
 	draw_loot_canvas(app.font_settings());
 
+	draw_loot_settings_global();
+
 	lang::loot::item_database& db = *database;
 
 	if (ImGui::Button("random currency")) {
@@ -269,6 +272,25 @@ void loot_state::draw_interface(application& app)
 	if (ImGui::Button("single currency")) {
 		clear_items();
 		app.loot_generator().generate_generic_currency(db, *this, 1, lang::loot::stack_param::single);
+	}
+}
+
+void loot_state::draw_loot_settings_global()
+{
+	if (ImGui::CollapsingHeader("Global settings", ImGuiTreeNodeFlags_DefaultOpen)) {
+		ImGui::Checkbox("Append new items instead of replacing", &_append_loot);
+		if (_append_loot)
+			ImGui::Checkbox("Shuffle items when new ones are generated", &_shuffle_loot);
+
+		ImGui::SliderInt("Area level", &_area_level, 1, lang::limits::max_item_level);
+
+		constexpr auto mf_min = -100;
+		constexpr auto mf_max = 400;
+		constexpr auto mf_format = "%+d%%";
+		ImGui::SliderInt("Player IIQ", &_player_iiq, mf_min, mf_max, mf_format);
+		ImGui::SliderInt("Player IIR", &_player_iir, mf_min, mf_max, mf_format);
+		ImGui::SliderInt("Map IIQ",    &_map_iiq,    mf_min, mf_max, mf_format);
+		ImGui::SliderInt("Map IIR",    &_map_iir,    mf_min, mf_max, mf_format);
 	}
 }
 
