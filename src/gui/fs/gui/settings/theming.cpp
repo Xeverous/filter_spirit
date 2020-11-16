@@ -17,11 +17,6 @@ void set_dark_theme()
 	ImGui::StyleColorsDark(nullptr);
 }
 
-void set_light_theme()
-{
-	ImGui::StyleColorsLight(nullptr);
-}
-
 void set_ue4_theme()
 {
 	// https://github.com/ocornut/imgui/issues/707#issuecomment-415097227
@@ -444,10 +439,9 @@ struct theme_data
 	theme_func_type* theme_func;
 };
 
-const std::array<theme_data, 9> themes = {
+const std::array<theme_data, 8> themes = {
 	theme_data{ "Classic",         &set_classic_theme       },
 	theme_data{ "Dark",            &set_dark_theme          },
-	theme_data{ "Light",           &set_light_theme         },
 	theme_data{ "Unreal Engine 4", &set_ue4_theme           },
 	theme_data{ "Dark Gray",       &set_dark_gray_theme     },
 	theme_data{ "Photoshop",       &set_photoshop_theme     },
@@ -467,8 +461,8 @@ void theming::draw_theme_selection_ui()
 			const theme_data& theme = themes[i];
 			ImGui::PushID(&theme);
 			if (ImGui::Selectable(theme.name, i == current_theme_index())) {
-				theme.theme_func();
 				_current_theme_index = i;
+				apply_current_theme();
 			}
 			ImGui::PopID();
 		}
@@ -479,6 +473,11 @@ void theming::draw_theme_selection_ui()
 int theming::num_themes() const noexcept
 {
 	return static_cast<int>(themes.size());
+}
+
+void theming::apply_current_theme() const
+{
+	themes[_current_theme_index].theme_func();
 }
 
 const char* theming::current_theme_name() const noexcept

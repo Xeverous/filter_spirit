@@ -89,6 +89,7 @@ application::application(const Arguments& arguments)
 #endif
 
 	load_item_database(_item_database, _application_log.logger());
+	_theming.apply_current_theme();
 
 	_application_log.logger().info() << "application initialized\n";
 }
