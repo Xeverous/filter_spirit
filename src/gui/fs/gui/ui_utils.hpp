@@ -64,6 +64,8 @@ struct rect
 	}
 };
 
+constexpr ImU32 color_true  = IM_COL32(  0, 255,   0, 255);
+constexpr ImU32 color_false = IM_COL32(255,   0,   0, 255);
 
 /*
  * wrappers for managing Dear ImGui state
@@ -156,6 +158,23 @@ struct scoped_group_impl
 };
 
 using scoped_group = scoped_override<scoped_group_impl>;
+
+struct scoped_tooltip_impl
+{
+	using value_type = void;
+
+	static void push()
+	{
+		ImGui::BeginTooltip();
+	}
+
+	static void pop()
+	{
+		ImGui::EndTooltip();
+	}
+};
+
+using scoped_tooltip = scoped_override<scoped_tooltip_impl>;
 
 struct scoped_font_override_impl
 {

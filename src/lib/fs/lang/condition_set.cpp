@@ -12,22 +12,7 @@ namespace kw = lang::keywords::rf;
 
 std::ostream& operator<<(std::ostream& os, lang::rarity_type r)
 {
-	switch (r) {
-		case lang::rarity_type::normal:
-			os << kw::normal;
-			break;
-		case lang::rarity_type::magic:
-			os << kw::magic;
-			break;
-		case lang::rarity_type::rare:
-			os << kw::rare;
-			break;
-		case lang::rarity_type::unique:
-			os << kw::unique;
-			break;
-	}
-
-	return os;
+	return os << to_string_view(r);
 }
 
 template <typename T>

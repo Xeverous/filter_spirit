@@ -2,6 +2,7 @@
 #include <fs/gui/application.hpp>
 #include <fs/gui/settings/fonting.hpp>
 #include <fs/gui/ui_utils.hpp>
+#include <fs/lang/keywords.hpp>
 
 #include <imgui.h>
 
@@ -37,6 +38,16 @@ public:
 		return _first_line_size.x != 0.0f && _first_line_size.y != 0.0f;
 	}
 
+	ImVec2 first_line_size() const
+	{
+		return _first_line_size;
+	}
+
+	ImVec2 second_line_size() const
+	{
+		return _second_line_size;
+	}
+
 	// use floats instead of Dear ImGui types because the library has no constexpr support
 	static constexpr auto padding_x = 10.0f;
 	static constexpr auto padding_y = 5.0f;
@@ -57,6 +68,180 @@ ImU32 to_imgui_color(lang::color c)
 		return IM_COL32(c.r.value, c.g.value, c.b.value, (*c.a).value);
 	else
 		return IM_COL32(c.r.value, c.g.value, c.b.value, lang::limits::default_filter_opacity);
+}
+
+void draw_item_tooltip(const lang::item& itm, const lang::item_filtering_result& result, const gui::fonting& f)
+{
+	const auto _1 = f.scoped_monospaced_font();
+	ImGui::SetNextWindowSize(ImVec2(ImGui::GetFontSize() * 30.0f, 0));
+	gui::scoped_tooltip _2;
+
+	ImGui::Columns(2);
+
+	{
+		namespace kw = lang::keywords::rf;
+
+		ImGui::TextDisabled("name:");
+		ImGui::Text("%s:", kw::base_type);
+		ImGui::Text("%s:", kw::class_);
+		ImGui::Text("%s:", kw::rarity);
+		ImGui::Text("%s:", kw::sockets);
+		ImGui::Text("%s:", kw::item_level);
+		ImGui::Text("%s:", kw::drop_level);
+		ImGui::Text("%s:", kw::width);
+		ImGui::Text("%s:", kw::height);
+		ImGui::Text("%s:", kw::quality);
+		ImGui::Text("%s:", kw::stack_size);
+		ImGui::Text("%s:", kw::gem_level);
+		ImGui::Text("%s:", kw::map_tier);
+		ImGui::Text("%s:", kw::corrupted_mods);
+
+		ImGui::Text("%s:", kw::has_influence);
+		ImGui::Text("%s:", kw::has_explicit_mod);
+		ImGui::Text("%s:", kw::has_enchantment);
+		ImGui::Text("%s:", kw::enchantment_passive_node);
+		ImGui::TextDisabled("annointments:");
+
+		ImGui::Text("%s:", kw::prophecy);
+		ImGui::Text("%s:", kw::identified);
+		ImGui::Text("%s:", kw::corrupted);
+		ImGui::Text("%s:", kw::mirrored);
+		ImGui::Text("%s:", kw::fractured_item);
+		ImGui::Text("%s:", kw::synthesised_item);
+		ImGui::Text("%s:", kw::shaped_map);
+		ImGui::Text("%s:", kw::elder_map);
+		ImGui::Text("%s:", kw::blighted_map);
+		ImGui::Text("%s:", kw::replica);
+		ImGui::Text("%s:", kw::alternate_quality);
+	}
+
+	ImGui::NextColumn();
+
+	{
+		if (itm.name)
+			ImGui::TextUnformatted((*itm.name).c_str());
+		else
+			ImGui::TextUnformatted("-");
+
+		ImGui::TextUnformatted(itm.base_type.c_str());
+		ImGui::TextUnformatted(itm.class_.c_str());
+
+		const auto rarity = to_string_view(itm.rarity_);
+		ImGui::TextUnformatted(rarity.data(), rarity.data() + rarity.size()); // TODO add colors
+
+		ImGui::TextUnformatted(to_string(itm.sockets).c_str()); // TODO add colors
+		ImGui::Text("%d", itm.item_level);
+		ImGui::Text("%d", itm.drop_level);
+		ImGui::Text("%d", itm.width);
+		ImGui::Text("%d", itm.height);
+		ImGui::Text("%d", itm.quality);
+		ImGui::Text("%d", itm.stack_size);
+		ImGui::Text("%d", itm.gem_level);
+		ImGui::Text("%d", itm.map_tier);
+		ImGui::Text("%d", itm.corrupted_mods);
+
+		if (itm.influence.is_none()) {
+			ImGui::TextUnformatted("None");
+		}
+		else {
+			bool first_influence_text = true;
+			const auto output_influence = [&](bool condition, const char* name){
+				if (!condition)
+					return;
+
+				if (!first_influence_text) {
+					ImGui::SameLine(0, 0);
+				}
+
+				ImGui::Text("%s ", name);
+				first_influence_text = false;
+			};
+
+			// TODO colors?
+			namespace kw = lang::keywords::rf;
+			output_influence(itm.influence.shaper, kw::shaper);
+			output_influence(itm.influence.elder, kw::elder);
+			output_influence(itm.influence.crusader, kw::crusader);
+			output_influence(itm.influence.redeemer, kw::redeemer);
+			output_influence(itm.influence.hunter, kw::hunter);
+			output_influence(itm.influence.warlord, kw::warlord);
+		}
+
+		ImGui::TextUnformatted("TODO");
+		ImGui::TextUnformatted("TODO");
+		ImGui::TextUnformatted("TODO");
+		ImGui::TextUnformatted("TODO");
+
+		if (itm.is_prophecy) {
+			// string here because filters expect this string
+			// for unknown reason, Prophecy is not a boolean condition
+			ImGui::TextUnformatted(itm.base_type.c_str());
+		}
+		else {
+			ImGui::TextUnformatted("-");
+		}
+
+		const auto output_boolean = [](bool value) {
+			namespace kw = lang::keywords::rf;
+
+			if (value)
+				ImGui::TextColored(ImGui::ColorConvertU32ToFloat4(gui::color_true), kw::true_);
+			else
+				ImGui::TextColored(ImGui::ColorConvertU32ToFloat4(gui::color_false), kw::false_);
+		};
+
+		output_boolean(itm.is_identified);
+		output_boolean(itm.is_corrupted);
+		output_boolean(itm.is_mirrored);
+		output_boolean(itm.is_fractured_item);
+		output_boolean(itm.is_synthesised_item);
+		output_boolean(itm.is_shaped_map);
+		output_boolean(itm.is_elder_map);
+		output_boolean(itm.is_blighted_map);
+		output_boolean(itm.is_replica);
+		output_boolean(itm.is_alternate_quality);
+	}
+
+	ImGui::Columns(1); // reset back to single column
+
+	ImGui::Dummy({0.0f, ImGui::GetFontSize() * 1.0f});
+	ImGui::TextUnformatted("filter conditions");
+	ImGui::TextDisabled("properties unsupported by filters");
+}
+
+void draw_item_label(
+	ImVec2 item_begin,
+	ImVec2 item_size,
+	item_preview_measurement ipm,
+	const lang::item& itm,
+	const lang::item_filtering_result& result,
+	const gui::fonting& f)
+{
+	ImDrawList* draw_list = ImGui::GetWindowDrawList();
+
+	const ImVec2 item_end(item_begin.x + item_size.x, item_begin.y + item_size.y);
+	draw_list->AddRectFilled(item_begin, item_end, to_imgui_color(result.style.background_color.c));
+
+	if (result.style.border_color)
+		draw_list->AddRect(item_begin, item_end, to_imgui_color((*result.style.border_color).c));
+
+	const auto font_size = result.style.font_size.size.value;
+	const auto fnt = f.filter_preview_font(font_size);
+
+	if (itm.name) {
+		const auto x1 = item_begin.x + (item_size.x - ipm.first_line_size().x) / 2.0f;
+		const auto y1 = item_begin.y;
+		draw_list->AddText(fnt, font_size, ImVec2(x1, y1), to_imgui_color(result.style.text_color.c), (*itm.name).c_str());
+
+		const auto x2 = item_begin.x + (item_size.x - ipm.second_line_size().x) / 2.0f;
+		const auto y2 = item_begin.y + item_preview_measurement::padding_y;
+		draw_list->AddText(fnt, font_size, ImVec2(x2, y2), to_imgui_color(result.style.text_color.c), itm.base_type.c_str());
+	}
+	else {
+		const auto x2 = item_begin.x + (item_size.x - ipm.second_line_size().x) / 2.0f;
+		const auto y2 = item_begin.y;
+		draw_list->AddText(fnt, font_size, ImVec2(x2, y2), to_imgui_color(result.style.text_color.c), itm.base_type.c_str());
+	}
 }
 
 }
@@ -103,20 +288,25 @@ void loot_state::draw_loot_canvas(const fonting& f)
 	 * The line below has multiple purposes:
 	 * - Tells Dear ImGui to catch user interactions which allows to use IsItemHovered(), IsItemActive() etc
 	 * - Advances Dear ImGui's drawing position for further elements.
+	 *
+	 * Note: IsItem* functions below apply to the last drawn item, if there is any further code that draws more items
+	 * then IsItem* functions should be called immediately after InvisibleButton with results saved to local variables.
 	 */
 	ImGui::InvisibleButton("canvas", canvas_size, ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
-
-	if (ImGui::IsItemHovered()) {
-		const auto& io = ImGui::GetIO();
-		const ImVec2 origin(canvas_begin.x, canvas_begin.y + _canvas_offset_y);
-		const ImVec2 mouse_pos_in_canvas(io.MousePos.x - origin.x, io.MousePos.y - origin.y);
-		on_canvas_hover(mouse_pos_in_canvas);
-	}
 
 	if (ImGui::IsItemActive() && ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
 		const auto& io = ImGui::GetIO();
 		// right now only vertical scrolling
 		_canvas_offset_y += io.MouseDelta.y;
+
+		// block from top because items are being rendered top-to-bottom
+		if (_canvas_offset_y > 0.0f)
+			_canvas_offset_y = 0.0f;
+	}
+
+	if (ImGui::IsItemHovered()) {
+		const auto& io = ImGui::GetIO();
+		on_canvas_hover(io.MousePos, f);
 	}
 }
 
@@ -134,8 +324,12 @@ void loot_state::draw_item_labels(ImVec2 canvas_begin, ImVec2 canvas_end, const 
 			item_preview_measurement ipm(itm.itm, style.style.font_size.size.value, f);
 			const ImVec2 item_size = ipm.whole_size();
 
+			// If the item does not fit in the current row...
 			if (current_position.x + item_size.x > canvas_end.x) {
-				// move to the next row, if the item drawn is first in its raw this code is no-op
+				// ...move to the next row.
+				// In case the item drawn is first in the row this code is no-op and the item is drawn anyway.
+				// This is desired because in case even a single item does not fit in a row then the best
+				// possible thing to do is to render it clipped.
 				current_position.x = canvas_begin.x;
 				current_position.y += row_height;
 				row_height = 0.0f;
@@ -146,11 +340,7 @@ void loot_state::draw_item_labels(ImVec2 canvas_begin, ImVec2 canvas_end, const 
 			if (item_begin.y > canvas_end.y)
 				break; // stop the loop - no more items in visible canvas area
 
-			const ImVec2 item_end(item_begin.x + item_size.x, item_begin.y + item_size.y);
-			draw_list->AddRectFilled(item_begin, item_end, to_imgui_color(style.style.background_color.c));
-			if (style.style.border_color) {
-				draw_list->AddRect(item_begin, item_end, to_imgui_color((*style.style.border_color).c));
-			}
+			draw_item_label(item_begin, item_size, ipm, itm.itm, *itm.filtering_result, f);
 
 			itm.drawing = rect{item_begin, item_size};
 
@@ -162,13 +352,13 @@ void loot_state::draw_item_labels(ImVec2 canvas_begin, ImVec2 canvas_end, const 
 	draw_list->PopClipRect();
 }
 
-void loot_state::on_canvas_hover(ImVec2 mouse_position)
+void loot_state::on_canvas_hover(ImVec2 mouse_position, const fonting& f)
 {
 	for (looted_item& itm : _items) {
 		if (itm.drawing) {
 			if ((*itm.drawing).contains(mouse_position)) {
-				// TODO
-
+				FS_ASSERT(itm.filtering_result.has_value());
+				draw_item_tooltip(itm.itm, *itm.filtering_result, f);
 				break;
 			}
 		}
