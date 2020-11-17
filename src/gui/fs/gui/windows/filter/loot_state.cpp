@@ -8,30 +8,39 @@
 #include <imgui.h>
 
 #include <algorithm>
+#include <array>
+#include <cstdio>
 
 namespace {
 
 using namespace fs;
 
-class item_preview_measurement
+class item_label_data
 {
 public:
-	item_preview_measurement(const lang::item& itm, int font_size, const gui::fonting& f)
+	item_label_data(const lang::item& itm, int font_size, const gui::fonting& f)
 	{
 		if (itm.name)
 			_first_line_size = measure_text_line(*itm.name, font_size, f.filter_preview_font(font_size));
 
-		_second_line_size = measure_text_line(itm.base_type, font_size, f.filter_preview_font(font_size));
-	}
+		if (itm.stack_size == 1)
+			std::snprintf(_second_line_buf.data(), _second_line_buf.size(), "%s", itm.base_type.c_str());
+		else
+			std::snprintf(_second_line_buf.data(), _second_line_buf.size(), "%dx %s", itm.stack_size, itm.base_type.c_str());
 
-	ImVec2 whole_size() const
-	{
-		return {
+		_second_line_size = measure_text_line(_second_line_buf.data(), font_size, f.filter_preview_font(font_size));
+
+		_whole_size = {
 			std::max(_first_line_size.x, _second_line_size.x) + 2.0f * padding_x,
 			has_first_line() ?
 				_first_line_size.y + _second_line_size.y + 3.0f * padding_y :
 				_second_line_size.y + 2.0f * padding_y
 		};
+	}
+
+	ImVec2 whole_size() const
+	{
+		return _whole_size;
 	}
 
 	bool has_first_line() const
@@ -49,6 +58,11 @@ public:
 		return _second_line_size;
 	}
 
+	const char* second_line() const
+	{
+		return _second_line_buf.data();
+	}
+
 	// use floats instead of Dear ImGui types because the library has no constexpr support
 	static constexpr auto padding_x = 10.0f;
 	static constexpr auto padding_y = 5.0f;
@@ -59,8 +73,10 @@ private:
 		return fnt->CalcTextSizeA(font_size, FLT_MAX, 0.0f, line.data(), line.data() + line.size());
 	}
 
+	std::array<char, 40> _second_line_buf;
 	ImVec2 _first_line_size;
 	ImVec2 _second_line_size;
+	ImVec2 _whole_size;
 };
 
 ImU32 to_imgui_color(lang::color c)
@@ -212,15 +228,15 @@ void draw_item_tooltip(const lang::item& itm, const lang::item_filtering_result&
 
 void draw_item_label(
 	ImVec2 item_begin,
-	ImVec2 item_size,
-	item_preview_measurement ipm,
+	const item_label_data& ild,
 	const lang::item& itm,
 	const lang::item_filtering_result& result,
 	const gui::fonting& f)
 {
-	ImDrawList* draw_list = ImGui::GetWindowDrawList();
-
+	const ImVec2 item_size = ild.whole_size();
 	const ImVec2 item_end(item_begin.x + item_size.x, item_begin.y + item_size.y);
+
+	ImDrawList* draw_list = ImGui::GetWindowDrawList();
 	draw_list->AddRectFilled(item_begin, item_end, to_imgui_color(result.style.background_color.c));
 
 	if (result.style.border_color)
@@ -229,20 +245,16 @@ void draw_item_label(
 	const auto font_size = result.style.font_size.size.value;
 	const auto fnt = f.filter_preview_font(font_size);
 
-	if (itm.name) {
-		const auto x1 = item_begin.x + (item_size.x - ipm.first_line_size().x) / 2.0f;
-		const auto y1 = item_begin.y;
-		draw_list->AddText(fnt, font_size, ImVec2(x1, y1), to_imgui_color(result.style.text_color.c), (*itm.name).c_str());
+	auto y = item_begin.y;
 
-		const auto x2 = item_begin.x + (item_size.x - ipm.second_line_size().x) / 2.0f;
-		const auto y2 = item_begin.y + item_preview_measurement::padding_y;
-		draw_list->AddText(fnt, font_size, ImVec2(x2, y2), to_imgui_color(result.style.text_color.c), itm.base_type.c_str());
+	if (itm.name) {
+		const auto x = item_begin.x + (item_size.x - ild.first_line_size().x) / 2.0f;
+		draw_list->AddText(fnt, font_size, ImVec2(x, y), to_imgui_color(result.style.text_color.c), (*itm.name).c_str());
+		y += item_label_data::padding_y + font_size;
 	}
-	else {
-		const auto x2 = item_begin.x + (item_size.x - ipm.second_line_size().x) / 2.0f;
-		const auto y2 = item_begin.y;
-		draw_list->AddText(fnt, font_size, ImVec2(x2, y2), to_imgui_color(result.style.text_color.c), itm.base_type.c_str());
-	}
+
+	const auto x = item_begin.x + (item_size.x - ild.second_line_size().x) / 2.0f;
+	draw_list->AddText(fnt, font_size, ImVec2(x, y), to_imgui_color(result.style.text_color.c), ild.second_line());
 }
 
 } // namespace
@@ -251,6 +263,7 @@ namespace fs::gui {
 
 bool loot_button_with_drags::draw(const char* str)
 {
+	scoped_pointer_id _(this);
 	const bool result = ImGui::Button(str);
 	ImGui::SameLine();
 	ImGui::DragInt2("min | max", _min_max, 0.25f, 0, INT_MAX);
@@ -320,8 +333,34 @@ void loot_state::draw_loot_buttons_currency(const lang::loot::item_database& db,
 	if (!ImGui::CollapsingHeader("Currency", ImGuiTreeNodeFlags_DefaultOpen))
 		return;
 
-	if (_currency_generic.draw("generic currency"))
+	if (_currency_generic.draw("generic"))
 		gen.generate_generic_currency(db, *this, _currency_generic.max(), lang::loot::stack_param::single);
+	if (_currency_generic_shards.draw("shards"))
+		gen.generate_generic_currency_shards(db, *this, _currency_generic_shards.max(), lang::loot::stack_param::any);
+	if (_currency_conqueror_orbs.draw("conqueror"))
+		gen.generate_conqueror_orbs(db, *this, _currency_conqueror_orbs.max(), lang::loot::stack_param::single);
+	if (_currency_breach_blessings.draw("breach blessings"))
+		gen.generate_breach_blessings(db, *this, _currency_breach_blessings.max(), lang::loot::stack_param::single);
+	if (_currency_breach_splinters.draw("breach splinters"))
+		gen.generate_breach_splinters(db, *this, _currency_breach_splinters.max(), lang::loot::stack_param::single);
+	if (_currency_legion_splinters.draw("legion splinters"))
+		gen.generate_legion_splinters(db, *this, _currency_legion_splinters.max(), lang::loot::stack_param::single);
+	if (_currency_essences.draw("essences"))
+		gen.generate_essences(db, *this, _currency_essences.max(), lang::loot::stack_param::single);
+	if (_currency_fossils.draw("fossils"))
+		gen.generate_fossils(db, *this, _currency_fossils.max(), lang::loot::stack_param::single);
+	if (_currency_catalysts.draw("catalysts"))
+		gen.generate_catalysts(db, *this, _currency_catalysts.max(), lang::loot::stack_param::any);
+	if (_currency_oils.draw("blight oils"))
+		gen.generate_oils(db, *this, _currency_oils.max(), lang::loot::stack_param::single);
+	if (_currency_delirium_orbs.draw("delirium orbs"))
+		gen.generate_delirium_orbs(db, *this, _currency_delirium_orbs.max(), lang::loot::stack_param::single);
+	if (_currency_harbinger_scrolls.draw("harbinger scrolls"))
+		gen.generate_harbinger_scrolls(db, *this, _currency_harbinger_scrolls.max(), lang::loot::stack_param::single);
+	if (_currency_incursion_vials.draw("incursion vials"))
+		gen.generate_incursion_vials(db, *this, _currency_incursion_vials.max(), lang::loot::stack_param::single);
+	if (_currency_bestiary_nets.draw("bestiary nets"))
+		gen.generate_bestiary_nets(db, *this, _currency_bestiary_nets.max(), lang::loot::stack_param::single);
 }
 
 void loot_state::draw_loot_canvas(const fonting& f)
@@ -375,8 +414,8 @@ void loot_state::draw_item_labels(ImVec2 canvas_begin, ImVec2 canvas_end, const 
 		if (itm.filtering_result) {
 			const auto& style = *itm.filtering_result;
 
-			item_preview_measurement ipm(itm.itm, style.style.font_size.size.value, f);
-			const ImVec2 item_size = ipm.whole_size();
+			const item_label_data ild(itm.itm, style.style.font_size.size.value, f);
+			const ImVec2 item_size = ild.whole_size();
 
 			// If the item does not fit in the current row...
 			if (current_position.x + item_size.x > canvas_end.x) {
@@ -394,7 +433,7 @@ void loot_state::draw_item_labels(ImVec2 canvas_begin, ImVec2 canvas_end, const 
 			if (item_begin.y > canvas_end.y)
 				break; // stop the loop - no more items in visible canvas area
 
-			draw_item_label(item_begin, item_size, ipm, itm.itm, *itm.filtering_result, f);
+			draw_item_label(item_begin, ild, itm.itm, *itm.filtering_result, f);
 
 			itm.drawing = rect{item_begin, item_size};
 
