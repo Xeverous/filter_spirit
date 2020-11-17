@@ -105,6 +105,19 @@ private:
 
 	// currency
 	loot_button_with_drags _currency_generic;
+	loot_button_with_drags _currency_generic_shards;
+	loot_button_with_drags _currency_conqueror_orbs;
+	loot_button_with_drags _currency_breach_blessings;
+	loot_button_with_drags _currency_breach_splinters;
+	loot_button_with_drags _currency_legion_splinters;
+	loot_button_with_drags _currency_essences;
+	loot_button_with_drags _currency_fossils;
+	loot_button_with_drags _currency_catalysts;
+	loot_button_with_drags _currency_oils;
+	loot_button_with_drags _currency_delirium_orbs;
+	loot_button_with_drags _currency_harbinger_scrolls;
+	loot_button_with_drags _currency_incursion_vials;
+	loot_button_with_drags _currency_bestiary_nets;
 };
 
 }
