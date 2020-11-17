@@ -18,11 +18,31 @@ public:
 	virtual void on_item(item&& i) = 0;
 };
 
-enum class stack_param
+struct range
 {
-	single, // always 1
-	any,    // 1 - N
-	full    // always N
+	static range one()
+	{
+		return { 1, 1 };
+	}
+
+	static range one_to(int val)
+	{
+		return { 1, val };
+	}
+
+	int min = 0;
+	int max = 0;
+};
+
+struct plurality
+{
+	static plurality only_quantity(range quantity)
+	{
+		return plurality{quantity, range::one()};
+	}
+
+	range quantity;
+	range stack_size;
 };
 
 class generator
@@ -32,29 +52,30 @@ public:
 
 	// low-level generation functions - use these to compose more complex loots
 
-	void generate_cards(const item_database& db, item_receiver& receiver, int count, stack_param stacking);
-	void generate_incubators(const item_database& db, item_receiver& receiver, int count, int item_level);
-	void generate_quest_items(const item_database& db, item_receiver& receiver, int count);
-	void generate_resonators(const item_database& db, item_receiver& receiver, int count);
-	void generate_metamorph_parts(const item_database& db, item_receiver& receiver, int count);
-	void generate_unique_pieces(const item_database& db, item_receiver& receiver, int count, int item_level);
-	void generate_labyrinth_keys(const item_database& db, item_receiver& receiver, int count);
-	void generate_labyrinth_trinkets(const item_database& db, item_receiver& receiver, int count);
+	void generate_cards             (const item_database& db, item_receiver& receiver, plurality p);
+	void generate_incubators        (const item_database& db, item_receiver& receiver, range quantity, int item_level);
+	void generate_quest_items       (const item_database& db, item_receiver& receiver, range quantity);
+	void generate_resonators        (const item_database& db, item_receiver& receiver, range quantity);
+	void generate_metamorph_parts   (const item_database& db, item_receiver& receiver, range quantity, int item_level);
+	void generate_unique_pieces     (const item_database& db, item_receiver& receiver, range quantity, int item_level);
+	void generate_labyrinth_keys    (const item_database& db, item_receiver& receiver, range quantity);
+	void generate_labyrinth_trinkets(const item_database& db, item_receiver& receiver, range quantity);
 
-	void generate_generic_currency(const item_database& db, item_receiver& receiver, int count, stack_param stacking);
-	void generate_generic_currency_shards(const item_database& db, item_receiver& receiver, int count, stack_param stacking);
-	void generate_conqueror_orbs(const item_database& db, item_receiver& receiver, int count, stack_param stacking);
-	void generate_breach_blessings(const item_database& db, item_receiver& receiver, int count, stack_param stacking);
-	void generate_breach_splinters(const item_database& db, item_receiver& receiver, int count, stack_param stacking);
-	void generate_legion_splinters(const item_database& db, item_receiver& receiver, int count, stack_param stacking);
-	void generate_essences(const item_database& db, item_receiver& receiver, int count, stack_param stacking);
-	void generate_fossils(const item_database& db, item_receiver& receiver, int count, stack_param stacking);
-	void generate_catalysts(const item_database& db, item_receiver& receiver, int count, stack_param stacking);
-	void generate_oils(const item_database& db, item_receiver& receiver, int count, stack_param stacking);
-	void generate_delirium_orbs(const item_database& db, item_receiver& receiver, int count, stack_param stacking);
-	void generate_harbinger_scrolls(const item_database& db, item_receiver& receiver, int count, stack_param stacking);
-	void generate_incursion_vials(const item_database& db, item_receiver& receiver, int count, stack_param stacking);
-	void generate_bestiary_nets(const item_database& db, item_receiver& receiver, int count, stack_param stacking);
+	// currency
+	void generate_generic_currency       (const item_database& db, item_receiver& receiver, plurality p, int area_level);
+	void generate_generic_currency_shards(const item_database& db, item_receiver& receiver, plurality p, int area_level);
+	void generate_conqueror_orbs         (const item_database& db, item_receiver& receiver, plurality p, int area_level);
+	void generate_breach_blessings       (const item_database& db, item_receiver& receiver, plurality p, int area_level);
+	void generate_breach_splinters       (const item_database& db, item_receiver& receiver, plurality p, int area_level);
+	void generate_legion_splinters       (const item_database& db, item_receiver& receiver, plurality p, int area_level);
+	void generate_essences               (const item_database& db, item_receiver& receiver, plurality p, int area_level);
+	void generate_fossils                (const item_database& db, item_receiver& receiver, plurality p, int area_level);
+	void generate_catalysts              (const item_database& db, item_receiver& receiver, plurality p, int area_level);
+	void generate_oils                   (const item_database& db, item_receiver& receiver, plurality p, int area_level);
+	void generate_delirium_orbs          (const item_database& db, item_receiver& receiver, plurality p, int area_level);
+	void generate_harbinger_scrolls      (const item_database& db, item_receiver& receiver, plurality p, int area_level);
+	void generate_incursion_vials        (const item_database& db, item_receiver& receiver, plurality p, int area_level);
+	void generate_bestiary_nets          (const item_database& db, item_receiver& receiver, plurality p, int area_level);
 
 	void generate_non_unique_equippable_item(
 		const item_database& db,

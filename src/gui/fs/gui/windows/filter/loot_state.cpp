@@ -333,34 +333,36 @@ void loot_state::draw_loot_buttons_currency(const lang::loot::item_database& db,
 	if (!ImGui::CollapsingHeader("Currency", ImGuiTreeNodeFlags_DefaultOpen))
 		return;
 
+	using lang::loot::plurality;
+
 	if (_currency_generic.draw("generic"))
-		gen.generate_generic_currency(db, *this, _currency_generic.max(), lang::loot::stack_param::single);
+		gen.generate_generic_currency(db, *this, plurality::only_quantity(_currency_generic.range()), _area_level);
 	if (_currency_generic_shards.draw("shards"))
-		gen.generate_generic_currency_shards(db, *this, _currency_generic_shards.max(), lang::loot::stack_param::any);
+		gen.generate_generic_currency_shards(db, *this, plurality{_currency_generic_shards.range(), { 1, 19 }}, _area_level);
 	if (_currency_conqueror_orbs.draw("conqueror"))
-		gen.generate_conqueror_orbs(db, *this, _currency_conqueror_orbs.max(), lang::loot::stack_param::single);
+		gen.generate_conqueror_orbs(db, *this, plurality::only_quantity(_currency_conqueror_orbs.range()), _area_level);
 	if (_currency_breach_blessings.draw("breach blessings"))
-		gen.generate_breach_blessings(db, *this, _currency_breach_blessings.max(), lang::loot::stack_param::single);
+		gen.generate_breach_blessings(db, *this, plurality::only_quantity(_currency_breach_blessings.range()), _area_level);
 	if (_currency_breach_splinters.draw("breach splinters"))
-		gen.generate_breach_splinters(db, *this, _currency_breach_splinters.max(), lang::loot::stack_param::single);
+		gen.generate_breach_splinters(db, *this, plurality::only_quantity(_currency_breach_splinters.range()), _area_level);
 	if (_currency_legion_splinters.draw("legion splinters"))
-		gen.generate_legion_splinters(db, *this, _currency_legion_splinters.max(), lang::loot::stack_param::single);
+		gen.generate_legion_splinters(db, *this, plurality::only_quantity(_currency_legion_splinters.range()), _area_level);
 	if (_currency_essences.draw("essences"))
-		gen.generate_essences(db, *this, _currency_essences.max(), lang::loot::stack_param::single);
+		gen.generate_essences(db, *this,plurality::only_quantity(_currency_essences.range()), _area_level);
 	if (_currency_fossils.draw("fossils"))
-		gen.generate_fossils(db, *this, _currency_fossils.max(), lang::loot::stack_param::single);
+		gen.generate_fossils(db, *this, plurality::only_quantity(_currency_fossils.range()), _area_level);
 	if (_currency_catalysts.draw("catalysts"))
-		gen.generate_catalysts(db, *this, _currency_catalysts.max(), lang::loot::stack_param::any);
+		gen.generate_catalysts(db, *this, plurality{_currency_catalysts.range(), { 1, 9 }}, _area_level);
 	if (_currency_oils.draw("blight oils"))
-		gen.generate_oils(db, *this, _currency_oils.max(), lang::loot::stack_param::single);
+		gen.generate_oils(db, *this, plurality::only_quantity(_currency_oils.range()), _area_level);
 	if (_currency_delirium_orbs.draw("delirium orbs"))
-		gen.generate_delirium_orbs(db, *this, _currency_delirium_orbs.max(), lang::loot::stack_param::single);
+		gen.generate_delirium_orbs(db, *this, plurality::only_quantity(_currency_delirium_orbs.range()), _area_level);
 	if (_currency_harbinger_scrolls.draw("harbinger scrolls"))
-		gen.generate_harbinger_scrolls(db, *this, _currency_harbinger_scrolls.max(), lang::loot::stack_param::single);
+		gen.generate_harbinger_scrolls(db, *this, plurality::only_quantity(_currency_harbinger_scrolls.range()), _area_level);
 	if (_currency_incursion_vials.draw("incursion vials"))
-		gen.generate_incursion_vials(db, *this, _currency_incursion_vials.max(), lang::loot::stack_param::single);
+		gen.generate_incursion_vials(db, *this, plurality::only_quantity(_currency_incursion_vials.range()), _area_level);
 	if (_currency_bestiary_nets.draw("bestiary nets"))
-		gen.generate_bestiary_nets(db, *this, _currency_bestiary_nets.max(), lang::loot::stack_param::single);
+		gen.generate_bestiary_nets(db, *this, plurality{_currency_bestiary_nets.range(), { 1, 9 }}, _area_level);
 }
 
 void loot_state::draw_loot_canvas(const fonting& f)

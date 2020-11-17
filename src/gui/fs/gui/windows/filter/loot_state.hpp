@@ -4,6 +4,7 @@
 #include <fs/lang/item.hpp>
 #include <fs/lang/item_filter.hpp>
 #include <fs/lang/loot/generator.hpp>
+#include <fs/utility/assert.hpp>
 
 #include <imgui.h>
 
@@ -25,6 +26,12 @@ struct looted_item
 // very specific behavior - designed for loot buttons
 struct loot_button_with_drags
 {
+	loot_button_with_drags(int min, int max)
+	: _min_max{min, max}
+	{
+		FS_ASSERT(min <= max);
+	}
+
 	[[nodiscard]] bool draw(const char* str); // str must not be null
 
 	int min() const
@@ -37,7 +44,12 @@ struct loot_button_with_drags
 		return _min_max[1];
 	}
 
-	int _min_max[2] = { 0, 10 };
+	lang::loot::range range() const
+	{
+		return { min(), max() };
+	}
+
+	int _min_max[2];
 };
 
 class application;
@@ -104,20 +116,20 @@ private:
 	int _map_iir = 0;
 
 	// currency
-	loot_button_with_drags _currency_generic;
-	loot_button_with_drags _currency_generic_shards;
-	loot_button_with_drags _currency_conqueror_orbs;
-	loot_button_with_drags _currency_breach_blessings;
-	loot_button_with_drags _currency_breach_splinters;
-	loot_button_with_drags _currency_legion_splinters;
-	loot_button_with_drags _currency_essences;
-	loot_button_with_drags _currency_fossils;
-	loot_button_with_drags _currency_catalysts;
-	loot_button_with_drags _currency_oils;
-	loot_button_with_drags _currency_delirium_orbs;
-	loot_button_with_drags _currency_harbinger_scrolls;
-	loot_button_with_drags _currency_incursion_vials;
-	loot_button_with_drags _currency_bestiary_nets;
+	loot_button_with_drags _currency_generic           = loot_button_with_drags(1, 10);
+	loot_button_with_drags _currency_generic_shards    = loot_button_with_drags(1,  5);
+	loot_button_with_drags _currency_conqueror_orbs    = loot_button_with_drags(1,  2);
+	loot_button_with_drags _currency_breach_blessings  = loot_button_with_drags(1,  2);
+	loot_button_with_drags _currency_breach_splinters  = loot_button_with_drags(1, 10);
+	loot_button_with_drags _currency_legion_splinters  = loot_button_with_drags(1, 10);
+	loot_button_with_drags _currency_essences          = loot_button_with_drags(2,  5);
+	loot_button_with_drags _currency_fossils           = loot_button_with_drags(1,  5);
+	loot_button_with_drags _currency_catalysts         = loot_button_with_drags(2,  5);
+	loot_button_with_drags _currency_oils              = loot_button_with_drags(3, 10);
+	loot_button_with_drags _currency_delirium_orbs     = loot_button_with_drags(1,  3);
+	loot_button_with_drags _currency_harbinger_scrolls = loot_button_with_drags(1,  2);
+	loot_button_with_drags _currency_incursion_vials   = loot_button_with_drags(1,  1);
+	loot_button_with_drags _currency_bestiary_nets     = loot_button_with_drags(1,  2);
 };
 
 }
