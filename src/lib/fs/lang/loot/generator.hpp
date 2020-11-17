@@ -50,16 +50,15 @@ class generator
 public:
 	generator();
 
-	// low-level generation functions - use these to compose more complex loots
-
-	void generate_cards             (const item_database& db, item_receiver& receiver, plurality p);
+	// specific item classes
+	void generate_divination_cards  (const item_database& db, item_receiver& receiver, plurality p);
+	void generate_resonators        (const item_database& db, item_receiver& receiver, plurality p, int area_level);
 	void generate_incubators        (const item_database& db, item_receiver& receiver, range quantity, int item_level);
-	void generate_quest_items       (const item_database& db, item_receiver& receiver, range quantity);
-	void generate_resonators        (const item_database& db, item_receiver& receiver, range quantity);
 	void generate_metamorph_parts   (const item_database& db, item_receiver& receiver, range quantity, int item_level);
 	void generate_unique_pieces     (const item_database& db, item_receiver& receiver, range quantity, int item_level);
 	void generate_labyrinth_keys    (const item_database& db, item_receiver& receiver, range quantity);
 	void generate_labyrinth_trinkets(const item_database& db, item_receiver& receiver, range quantity);
+	void generate_quest_items       (const item_database& db, item_receiver& receiver, range quantity);
 
 	// currency
 	void generate_generic_currency       (const item_database& db, item_receiver& receiver, plurality p, int area_level);

@@ -452,7 +452,7 @@ generator::generator()
 {
 }
 
-void generator::generate_cards(const item_database& db, item_receiver& receiver, plurality p)
+void generator::generate_divination_cards(const item_database& db, item_receiver& receiver, plurality p)
 {
 	const int count = roll_in_range(p.quantity, _rng);
 	for (int i = 0; i < count; ++i) {
@@ -492,15 +492,19 @@ void generator::generate_quest_items(const item_database& db, item_receiver& rec
 	}
 }
 
-void generator::generate_resonators(const item_database& db, item_receiver& receiver, range quantity)
+void generator::generate_resonators(const item_database& db, item_receiver& receiver, plurality p, int area_level)
 {
-	const int count = roll_in_range(quantity, _rng);
+	const int count = roll_in_range(p.quantity, _rng);
+	fill_with_indexes_of_matching_drop_level_items(area_level, db.resonators, _sp_indexes);
+
 	for (int i = 0; i < count; ++i) {
-		const resonator* const reso = select_one_element(db.resonators, _rng);
+		const resonator* const reso = select_one_element_by_index(db.resonators, _sp_indexes, _rng);
 		if (reso == nullptr)
 			return;
 
-		receiver.on_item(resonator_to_item(*reso));
+		item itm = resonator_to_item(*reso);
+		itm.stack_size = roll_in_range({p.stack_size.min, std::min(p.stack_size.max, reso->max_stack_size)}, _rng);
+		receiver.on_item(std::move(itm));
 	}
 }
 
