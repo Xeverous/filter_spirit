@@ -9,7 +9,6 @@
 #include <optional>
 #include <string>
 #include <utility>
-#include <array>
 
 namespace fs::gui {
 
@@ -75,8 +74,6 @@ private:
 	void draw_interface_filter_representation();
 	void draw_interface_logs();
 	void draw_interface_loot(application& app);
-
-	std::array<char, 48> _loot_status_str_buf;
 
 	std::optional<std::string> _source; // first step
 	// << possible intermediate data in derived types >>
