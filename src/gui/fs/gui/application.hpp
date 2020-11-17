@@ -50,12 +50,27 @@ public:
 		return _fonting;
 	}
 
+	const fonting& font_settings() const
+	{
+		return _fonting;
+	}
+
 	theming& theme_settings()
 	{
 		return _theming;
 	}
 
+	const theming& theme_settings() const
+	{
+		return _theming;
+	}
+
 	auto& item_database()
+	{
+		return _item_database;
+	}
+
+	const auto& item_database() const
 	{
 		return _item_database;
 	}
