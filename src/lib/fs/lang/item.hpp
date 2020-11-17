@@ -261,7 +261,7 @@ struct item
 		if (!explicit_mods.empty() && is_identified == false)
 			return item_validity::unidentified_with_explicit_mods;
 
-		if (stack_size <= 0)
+		if (stack_size <= 0 || stack_size > max_stack_size)
 			return item_validity::invalid_stack_size;
 
 		if (gem_level <= 0)
@@ -314,6 +314,7 @@ struct item
 	std::vector<std::string> annointments = {};
 	int corrupted_mods = 0;
 	int stack_size = 1;
+	int max_stack_size = 1; // filters do not support this property
 	int gem_level = 0;
 	int map_tier = 0;
 	bool is_identified = false;
