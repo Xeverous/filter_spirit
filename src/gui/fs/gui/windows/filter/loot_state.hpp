@@ -154,6 +154,7 @@ private:
 	int _player_iir = 0;
 	int _map_iiq = 0;
 	int _map_iir = 0;
+	lang::loot::percent _chance_to_corrupt;
 
 	// currency
 	loot_button_plurality _currency_generic           = loot_button_plurality(lang::loot::plurality::only_quantity({1, 10}));

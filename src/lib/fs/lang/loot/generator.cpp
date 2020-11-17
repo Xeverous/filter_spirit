@@ -224,6 +224,11 @@ int roll_in_range(range r, std::mt19937& rng)
 	return std::uniform_int_distribution<int>(r.min, r.max)(rng);
 }
 
+bool roll_percent(percent chance_to_happen, std::mt19937& rng)
+{
+	return roll_in_range({percent::min().value + 1, percent::max().value}, rng) <= chance_to_happen.value;
+}
+
 rarity_type roll_non_unique_rarity(double rarity, std::mt19937& rng)
 {
 	if (std::bernoulli_distribution(chance_for_rare(rarity))(rng))
@@ -531,7 +536,7 @@ void generator::generate_metamorph_parts(const item_database& db, item_receiver&
 	}
 }
 
-void generator::generate_unique_pieces(const item_database& db, item_receiver& receiver, range quantity, int item_level)
+void generator::generate_unique_pieces(const item_database& db, item_receiver& receiver, range quantity, int item_level, percent chance_to_corrupt)
 {
 	const int count = roll_in_range(quantity, _rng);
 	for (int i = 0; i < count; ++i) {
@@ -542,6 +547,7 @@ void generator::generate_unique_pieces(const item_database& db, item_receiver& r
 		item itm = elementary_item_to_item(*piece, item_class_names::piece);
 		itm.item_level = item_level;
 		itm.rarity_ = rarity_type::unique;
+		itm.is_corrupted = roll_percent(chance_to_corrupt, _rng);
 		receiver.on_item(std::move(itm));
 	}
 }
