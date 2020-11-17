@@ -146,7 +146,7 @@ void draw_item_tooltip(const lang::item& itm, const lang::item_filtering_result&
 		}
 		else {
 			bool first_influence_text = true;
-			const auto output_influence = [&](bool condition, const char* name){
+			const auto output_influence = [&](bool condition, const char* name) {
 				if (!condition)
 					return;
 
@@ -245,9 +245,21 @@ void draw_item_label(
 	}
 }
 
-}
+} // namespace
 
 namespace fs::gui {
+
+bool loot_button_with_drags::draw(const char* str)
+{
+	const bool result = ImGui::Button(str);
+	ImGui::SameLine();
+	ImGui::DragInt2("min | max", _min_max, 0.25f, 0, INT_MAX);
+
+	if (!ImGui::IsItemActive() && min() > max())
+		std::swap(_min_max[0], _min_max[1]);
+
+	return result;
+}
 
 void loot_state::draw_interface(application& app)
 {
@@ -265,16 +277,10 @@ void loot_state::draw_interface(application& app)
 
 	draw_loot_canvas(app.font_settings());
 
+	const lang::loot::item_database& db = *database;
+
 	draw_loot_settings_global();
-
-	lang::loot::item_database& db = *database;
-
-	if (ImGui::Button("random currency")) {
-		app.loot_generator().generate_generic_currency(db, *this, 10, lang::loot::stack_param::single);
-	}
-	if (ImGui::Button("single currency")) {
-		app.loot_generator().generate_generic_currency(db, *this, 1, lang::loot::stack_param::single);
-	}
+	draw_loot_buttons_currency(db, app.loot_generator());
 
 	if (_last_items_size != _items.size()) {
 		if (_last_items_size < _items.size() && !_append_loot)
@@ -289,21 +295,31 @@ void loot_state::draw_interface(application& app)
 
 void loot_state::draw_loot_settings_global()
 {
-	if (ImGui::CollapsingHeader("Global settings", ImGuiTreeNodeFlags_DefaultOpen)) {
-		ImGui::Checkbox("Append new items instead of replacing", &_append_loot);
-		if (_append_loot)
-			ImGui::Checkbox("Shuffle items when new ones are generated", &_shuffle_loot);
+	if (!ImGui::CollapsingHeader("Global settings", ImGuiTreeNodeFlags_DefaultOpen))
+		return;
 
-		ImGui::SliderInt("Area level", &_area_level, 1, lang::limits::max_item_level);
+	ImGui::Checkbox("Append new items instead of replacing", &_append_loot);
+	if (_append_loot)
+		ImGui::Checkbox("Shuffle items when new ones are generated", &_shuffle_loot);
 
-		constexpr auto mf_min = -100;
-		constexpr auto mf_max = 400;
-		constexpr auto mf_format = "%+d%%";
-		ImGui::SliderInt("Player IIQ", &_player_iiq, mf_min, mf_max, mf_format);
-		ImGui::SliderInt("Player IIR", &_player_iir, mf_min, mf_max, mf_format);
-		ImGui::SliderInt("Map IIQ",    &_map_iiq,    mf_min, mf_max, mf_format);
-		ImGui::SliderInt("Map IIR",    &_map_iir,    mf_min, mf_max, mf_format);
-	}
+	ImGui::SliderInt("Area level", &_area_level, 1, lang::limits::max_item_level);
+
+	constexpr auto mf_min = -100;
+	constexpr auto mf_max = 400;
+	constexpr auto mf_format = "%+d%%";
+	ImGui::SliderInt("Player IIQ", &_player_iiq, mf_min, mf_max, mf_format);
+	ImGui::SliderInt("Player IIR", &_player_iir, mf_min, mf_max, mf_format);
+	ImGui::SliderInt("Map IIQ",    &_map_iiq,    mf_min, mf_max, mf_format);
+	ImGui::SliderInt("Map IIR",    &_map_iir,    mf_min, mf_max, mf_format);
+}
+
+void loot_state::draw_loot_buttons_currency(const lang::loot::item_database& db, lang::loot::generator& gen)
+{
+	if (!ImGui::CollapsingHeader("Currency", ImGuiTreeNodeFlags_DefaultOpen))
+		return;
+
+	if (_currency_generic.draw("generic currency"))
+		gen.generate_generic_currency(db, *this, _currency_generic.max(), lang::loot::stack_param::single);
 }
 
 void loot_state::draw_loot_canvas(const fonting& f)

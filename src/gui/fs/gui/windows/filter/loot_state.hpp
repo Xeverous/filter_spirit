@@ -22,6 +22,24 @@ struct looted_item
 	std::optional<rect> drawing; // in screen coordinates
 };
 
+// very specific behavior - designed for loot buttons
+struct loot_button_with_drags
+{
+	[[nodiscard]] bool draw(const char* str); // str must not be null
+
+	int min() const
+	{
+		return _min_max[0];
+	}
+
+	int max() const
+	{
+		return _min_max[1];
+	}
+
+	int _min_max[2] = { 0, 10 };
+};
+
 class application;
 class fonting;
 
@@ -67,7 +85,16 @@ private:
 	void on_canvas_hover(ImVec2 mouse_position, const fonting& f);
 
 	void draw_loot_settings_global();
+	void draw_loot_buttons_currency(const lang::loot::item_database& db, lang::loot::generator& gen);
 
+	// render state
+	float _canvas_offset_y = 0;
+
+	// loot state
+	std::vector<looted_item> _items;
+	std::size_t _last_items_size = 0;
+
+	// global loot settings
 	bool _append_loot = false;
 	bool _shuffle_loot = false;
 	int _area_level = 83;
@@ -75,10 +102,9 @@ private:
 	int _player_iir = 0;
 	int _map_iiq = 0;
 	int _map_iir = 0;
-	std::vector<looted_item> _items;
-	std::size_t _last_items_size = 0;
 
-	float _canvas_offset_y = 0;
+	// currency
+	loot_button_with_drags _currency_generic;
 };
 
 }
