@@ -263,7 +263,7 @@ bool loot_button_with_drags::draw(const char* str)
 
 void loot_state::draw_interface(application& app)
 {
-	std::optional<lang::loot::item_database>& database = app.item_database();
+	const std::optional<lang::loot::item_database>& database = app.item_database();
 	if (!database) {
 		ImGui::TextWrapped("Item database failed to load. Loot generation not available.");
 		return;
