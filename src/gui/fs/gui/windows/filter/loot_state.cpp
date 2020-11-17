@@ -283,8 +283,10 @@ void loot_state::draw_interface(application& app)
 	draw_loot_buttons_currency(db, app.loot_generator());
 
 	if (_last_items_size != _items.size()) {
-		if (_last_items_size < _items.size() && !_append_loot)
+		if (_last_items_size < _items.size() && !_append_loot) {
 			_items.erase(_items.begin(), _items.begin() + _last_items_size);
+			_canvas_offset_y = 0.0f;
+		}
 
 		if (_shuffle_loot)
 			std::shuffle(_items.begin(), _items.end(), app.loot_generator().rng());
