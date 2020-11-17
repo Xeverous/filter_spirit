@@ -90,7 +90,7 @@ ImU32 to_imgui_color(lang::color c)
 void draw_item_tooltip(const lang::item& itm, const lang::item_filtering_result& result, const gui::fonting& f)
 {
 	const auto _1 = f.scoped_monospaced_font();
-	ImGui::SetNextWindowSize(ImVec2(ImGui::GetFontSize() * 30.0f, 0));
+	ImGui::SetNextWindowSize(ImVec2(ImGui::GetFontSize() * 40.0f, 0));
 	gui::scoped_tooltip _2;
 
 	ImGui::Columns(2);
@@ -263,7 +263,7 @@ void draw_item_label(
 
 namespace fs::gui {
 
-bool loot_button_with_drags::draw(const char* str)
+bool loot_button_plurality::draw(const char* str)
 {
 	scoped_pointer_id _(this);
 	const bool result = ImGui::Button(str);
@@ -277,6 +277,19 @@ bool loot_button_with_drags::draw(const char* str)
 		if (min_stack_size() > max_stack_size())
 			std::swap(min_stack_size(), max_stack_size());
 	}
+
+	return result;
+}
+
+bool loot_button_range::draw(const char* str)
+{
+	scoped_pointer_id _(this);
+	const bool result = ImGui::Button(str);
+	ImGui::SameLine();
+	ImGui::DragInt2("", _min_max, 0.25f, 0, INT_MAX);
+
+	if (!ImGui::IsItemActive() && min() > max())
+		std::swap(min(), max());
 
 	return result;
 }
@@ -301,6 +314,7 @@ void loot_state::draw_interface(application& app)
 
 	draw_loot_settings_global();
 	draw_loot_buttons_currency(db, app.loot_generator());
+	draw_loot_buttons_specific_classes(db, app.loot_generator());
 
 	if (_last_items_size != _items.size()) {
 		if (_last_items_size < _items.size() && !_append_loot) {
@@ -368,6 +382,29 @@ void loot_state::draw_loot_buttons_currency(const lang::loot::item_database& db,
 		gen.generate_incursion_vials(db, *this, _currency_incursion_vials.plurality(), _area_level);
 	if (_currency_bestiary_nets.draw("bestiary nets"))
 		gen.generate_bestiary_nets(db, *this, _currency_bestiary_nets.plurality(), _area_level);
+}
+
+void loot_state::draw_loot_buttons_specific_classes(const lang::loot::item_database& db, lang::loot::generator& gen)
+{
+	if (!ImGui::CollapsingHeader("Items of specific class", ImGuiTreeNodeFlags_DefaultOpen))
+		return;
+
+	if (_class_cards.draw("divination cards"))
+		gen.generate_divination_cards(db, *this, _class_cards.plurality());
+	if (_class_resonators.draw("resonators"))
+		gen.generate_resonators(db, *this, _class_resonators.plurality(), _area_level);
+	if (_class_incubators.draw("incubators"))
+		gen.generate_incubators(db, *this, _class_incubators.range(), _area_level);
+	if (_class_metamorphs.draw("metamorph parts"))
+		gen.generate_metamorph_parts(db, *this, _class_metamorphs.range(), _area_level);
+	if (_class_unique_pieces.draw("unique pieces"))
+		gen.generate_unique_pieces(db, *this, _class_unique_pieces.range(), _area_level);
+	if (_class_lab_keys.draw("lab keys"))
+		gen.generate_labyrinth_keys(db, *this, _class_lab_keys.range());
+	if (_class_lab_trinkets.draw("lab trinkets"))
+		gen.generate_labyrinth_trinkets(db, *this, _class_lab_trinkets.range());
+	if (_class_quest_items.draw("quest items"))
+		gen.generate_quest_items(db, *this, _class_quest_items.range());
 }
 
 void loot_state::draw_loot_canvas(const fonting& f)
