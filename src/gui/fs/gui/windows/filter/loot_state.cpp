@@ -109,6 +109,7 @@ void draw_item_tooltip(const lang::item& itm, const lang::item_filtering_result&
 		ImGui::Text("%s:", kw::height);
 		ImGui::Text("%s:", kw::quality);
 		ImGui::Text("%s:", kw::stack_size);
+		ImGui::TextDisabled("max stack size:");
 		ImGui::Text("%s:", kw::gem_level);
 		ImGui::Text("%s:", kw::map_tier);
 		ImGui::Text("%s:", kw::corrupted_mods);
@@ -153,6 +154,7 @@ void draw_item_tooltip(const lang::item& itm, const lang::item_filtering_result&
 		ImGui::Text("%d", itm.height);
 		ImGui::Text("%d", itm.quality);
 		ImGui::Text("%d", itm.stack_size);
+		ImGui::Text("%d", itm.max_stack_size);
 		ImGui::Text("%d", itm.gem_level);
 		ImGui::Text("%d", itm.map_tier);
 		ImGui::Text("%d", itm.corrupted_mods);

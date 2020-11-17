@@ -367,6 +367,7 @@ int roll_random_quality(std::mt19937& rng)
 
 // ---- to_item converters ----
 
+item elementary_item_to_item(const currency_item& itm, std::string_view class_) = delete; // prevent overload misuse
 item elementary_item_to_item(const elementary_item& itm, std::string_view class_)
 {
 	item result;
@@ -380,14 +381,21 @@ item elementary_item_to_item(const elementary_item& itm, std::string_view class_
 	return result;
 }
 
+item currency_item_to_item(const currency_item& itm, std::string_view class_)
+{
+	item result = elementary_item_to_item(static_cast<const elementary_item&>(itm), class_);
+	result.max_stack_size = itm.max_stack_size;
+	return result;
+}
+
 item divination_card_to_item(const currency_item& card)
 {
-	return elementary_item_to_item(card, item_class_names::divination_card);
+	return currency_item_to_item(card, item_class_names::divination_card);
 }
 
 item resonator_to_item(const resonator& reso)
 {
-	item result = elementary_item_to_item(reso, item_class_names::currency_delve);
+	item result = currency_item_to_item(reso, item_class_names::currency_delve);
 
 	for (int i = 0; i < reso.delve_sockets; ++i)
 		result.sockets.groups.push_back(linked_sockets{socket_color::d});
@@ -428,7 +436,7 @@ void generate_currency_items(
 		if (curr_item == nullptr)
 			return;
 
-		item itm = elementary_item_to_item(*curr_item, item_class_names::currency_stackable);
+		item itm = currency_item_to_item(*curr_item, item_class_names::currency_stackable);
 		itm.stack_size = roll_in_range({p.stack_size.min, std::min(p.stack_size.max, curr_item->max_stack_size)}, rng);
 		receiver.on_item(std::move(itm));
 	}
