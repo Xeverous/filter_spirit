@@ -347,6 +347,8 @@ void loot_state::draw_loot_settings_global()
 	ImGui::SliderInt("Player IIR", &_player_iir, mf_min, mf_max, mf_format);
 	ImGui::SliderInt("Map IIQ",    &_map_iiq,    mf_min, mf_max, mf_format);
 	ImGui::SliderInt("Map IIR",    &_map_iir,    mf_min, mf_max, mf_format);
+	ImGui::SliderInt("Chance to corrupt", &_chance_to_corrupt.value,
+		lang::loot::percent::min().value, lang::loot::percent::max().value, "%d%%", ImGuiSliderFlags_AlwaysClamp);
 }
 
 void loot_state::draw_loot_buttons_currency(const lang::loot::item_database& db, lang::loot::generator& gen)
@@ -398,7 +400,7 @@ void loot_state::draw_loot_buttons_specific_classes(const lang::loot::item_datab
 	if (_class_metamorphs.draw("metamorph parts"))
 		gen.generate_metamorph_parts(db, *this, _class_metamorphs.range(), _area_level);
 	if (_class_unique_pieces.draw("unique pieces"))
-		gen.generate_unique_pieces(db, *this, _class_unique_pieces.range(), _area_level);
+		gen.generate_unique_pieces(db, *this, _class_unique_pieces.range(), _area_level, _chance_to_corrupt);
 	if (_class_lab_keys.draw("lab keys"))
 		gen.generate_labyrinth_keys(db, *this, _class_lab_keys.range());
 	if (_class_lab_trinkets.draw("lab trinkets"))

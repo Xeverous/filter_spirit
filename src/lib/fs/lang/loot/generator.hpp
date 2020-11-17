@@ -45,6 +45,19 @@ struct plurality
 	range stack_size;
 };
 
+struct percent
+{
+	static constexpr percent min() { return {0}; }
+	static constexpr percent max() { return {100}; }
+
+	constexpr bool is_valid() const
+	{
+		return min().value <= value && value <= max().value;
+	}
+
+	int value = 0;
+};
+
 class generator
 {
 public:
@@ -55,7 +68,7 @@ public:
 	void generate_resonators        (const item_database& db, item_receiver& receiver, plurality p, int area_level);
 	void generate_incubators        (const item_database& db, item_receiver& receiver, range quantity, int item_level);
 	void generate_metamorph_parts   (const item_database& db, item_receiver& receiver, range quantity, int item_level);
-	void generate_unique_pieces     (const item_database& db, item_receiver& receiver, range quantity, int item_level);
+	void generate_unique_pieces     (const item_database& db, item_receiver& receiver, range quantity, int item_level, percent chance_to_corrupt);
 	void generate_labyrinth_keys    (const item_database& db, item_receiver& receiver, range quantity);
 	void generate_labyrinth_trinkets(const item_database& db, item_receiver& receiver, range quantity);
 	void generate_quest_items       (const item_database& db, item_receiver& receiver, range quantity);
