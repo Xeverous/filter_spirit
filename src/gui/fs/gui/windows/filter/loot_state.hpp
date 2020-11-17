@@ -24,32 +24,45 @@ struct looted_item
 };
 
 // very specific behavior - designed for loot buttons
-struct loot_button_with_drags
+class loot_button_with_drags
 {
-	loot_button_with_drags(int min, int max)
-	: _min_max{min, max}
+public:
+	loot_button_with_drags(lang::loot::plurality p)
+	: _min_max{p.quantity.min, p.quantity.max, p.stack_size.min, p.stack_size.max}
 	{
-		FS_ASSERT(min <= max);
+		FS_ASSERT(min_quantity() <= max_quantity());
+		FS_ASSERT(min_stack_size() <= max_stack_size());
 	}
 
 	[[nodiscard]] bool draw(const char* str); // str must not be null
 
-	int min() const
+	lang::loot::range quantity() const
 	{
-		return _min_max[0];
+		return { min_quantity(), max_quantity() };
 	}
 
-	int max() const
+	lang::loot::range stack_size() const
 	{
-		return _min_max[1];
+		return { min_stack_size(), max_stack_size() };
 	}
 
-	lang::loot::range range() const
+	lang::loot::plurality plurality() const
 	{
-		return { min(), max() };
+		return { quantity(), stack_size() };
 	}
 
-	int _min_max[2];
+	int min_quantity()   const { return _min_max[0]; }
+	int max_quantity()   const { return _min_max[1]; }
+	int min_stack_size() const { return _min_max[2]; }
+	int max_stack_size() const { return _min_max[3]; }
+
+private:
+	int& min_quantity()   { return _min_max[0]; }
+	int& max_quantity()   { return _min_max[1]; }
+	int& min_stack_size() { return _min_max[2]; }
+	int& max_stack_size() { return _min_max[3]; }
+
+	int _min_max[4];
 };
 
 class application;
@@ -116,20 +129,20 @@ private:
 	int _map_iir = 0;
 
 	// currency
-	loot_button_with_drags _currency_generic           = loot_button_with_drags(1, 10);
-	loot_button_with_drags _currency_generic_shards    = loot_button_with_drags(1,  5);
-	loot_button_with_drags _currency_conqueror_orbs    = loot_button_with_drags(1,  2);
-	loot_button_with_drags _currency_breach_blessings  = loot_button_with_drags(1,  2);
-	loot_button_with_drags _currency_breach_splinters  = loot_button_with_drags(1, 10);
-	loot_button_with_drags _currency_legion_splinters  = loot_button_with_drags(1, 10);
-	loot_button_with_drags _currency_essences          = loot_button_with_drags(2,  5);
-	loot_button_with_drags _currency_fossils           = loot_button_with_drags(1,  5);
-	loot_button_with_drags _currency_catalysts         = loot_button_with_drags(2,  5);
-	loot_button_with_drags _currency_oils              = loot_button_with_drags(3, 10);
-	loot_button_with_drags _currency_delirium_orbs     = loot_button_with_drags(1,  3);
-	loot_button_with_drags _currency_harbinger_scrolls = loot_button_with_drags(1,  2);
-	loot_button_with_drags _currency_incursion_vials   = loot_button_with_drags(1,  1);
-	loot_button_with_drags _currency_bestiary_nets     = loot_button_with_drags(1,  2);
+	loot_button_with_drags _currency_generic           = loot_button_with_drags(lang::loot::plurality::only_quantity({1, 10}));
+	loot_button_with_drags _currency_generic_shards    = loot_button_with_drags(lang::loot::plurality{{1, 5}, {1, 19}});
+	loot_button_with_drags _currency_conqueror_orbs    = loot_button_with_drags(lang::loot::plurality::only_quantity({1,  2}));
+	loot_button_with_drags _currency_breach_blessings  = loot_button_with_drags(lang::loot::plurality::only_quantity({1,  2}));
+	loot_button_with_drags _currency_breach_splinters  = loot_button_with_drags(lang::loot::plurality::only_quantity({1, 10}));
+	loot_button_with_drags _currency_legion_splinters  = loot_button_with_drags(lang::loot::plurality::only_quantity({1, 10}));
+	loot_button_with_drags _currency_essences          = loot_button_with_drags(lang::loot::plurality::only_quantity({2,  5}));
+	loot_button_with_drags _currency_fossils           = loot_button_with_drags(lang::loot::plurality::only_quantity({1,  5}));
+	loot_button_with_drags _currency_catalysts         = loot_button_with_drags(lang::loot::plurality{{2, 5}, {1, 9}});
+	loot_button_with_drags _currency_oils              = loot_button_with_drags(lang::loot::plurality::only_quantity({3, 10}));
+	loot_button_with_drags _currency_delirium_orbs     = loot_button_with_drags(lang::loot::plurality::only_quantity({1,  3}));
+	loot_button_with_drags _currency_harbinger_scrolls = loot_button_with_drags(lang::loot::plurality::only_quantity({1,  2}));
+	loot_button_with_drags _currency_incursion_vials   = loot_button_with_drags(lang::loot::plurality::only_quantity({1,  1}));
+	loot_button_with_drags _currency_bestiary_nets     = loot_button_with_drags(lang::loot::plurality{{1, 2}, {1, 9}});
 };
 
 }
