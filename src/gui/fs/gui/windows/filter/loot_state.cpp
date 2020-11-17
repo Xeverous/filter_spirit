@@ -87,7 +87,8 @@ ImU32 to_imgui_color(lang::color c)
 		return IM_COL32(c.r.value, c.g.value, c.b.value, lang::limits::default_filter_opacity);
 }
 
-void draw_item_tooltip(const lang::item& itm, const lang::item_filtering_result& result, const gui::fonting& f)
+// TODO draw also applied filter rules
+void draw_item_tooltip(const lang::item& itm, const lang::item_filtering_result& /* result */, const gui::fonting& f)
 {
 	const auto _1 = f.scoped_monospaced_font();
 	ImGui::SetNextWindowSize(ImVec2(ImGui::GetFontSize() * 40.0f, 0));
@@ -186,10 +187,10 @@ void draw_item_tooltip(const lang::item& itm, const lang::item_filtering_result&
 			output_influence(itm.influence.warlord, kw::warlord);
 		}
 
-		ImGui::TextUnformatted("TODO");
-		ImGui::TextUnformatted("TODO");
-		ImGui::TextUnformatted("TODO");
-		ImGui::TextUnformatted("TODO");
+		ImGui::TextDisabled("NOT IMPLEMENTED");
+		ImGui::TextDisabled("NOT IMPLEMENTED");
+		ImGui::TextDisabled("NOT IMPLEMENTED");
+		ImGui::TextDisabled("NOT IMPLEMENTED");
 
 		if (itm.is_prophecy) {
 			// string here because filters expect this string
