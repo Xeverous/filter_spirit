@@ -21,12 +21,12 @@ public:
 	item_label_data(const lang::item& itm, int font_size, const gui::fonting& f)
 	{
 		if (itm.name)
-			_first_line_size = measure_text_line(*itm.name, font_size, f.filter_preview_font(font_size));
+			_first_line_size = gui::measure_text_line(*itm.name, font_size, f.filter_preview_font(font_size));
 
 		const int sz = lang::snprintf_dropped_item_label(_second_line_buf.data(), _second_line_buf.size(), itm);
 		FS_ASSERT_MSG(sz >= 0, "snprintf should not return an error");
 		(void) sz; // shut warning if assert does not use variable
-		_second_line_size = measure_text_line(_second_line_buf.data(), font_size, f.filter_preview_font(font_size));
+		_second_line_size = gui::measure_text_line(_second_line_buf.data(), font_size, f.filter_preview_font(font_size));
 
 		_whole_size = {
 			std::max(_first_line_size.x, _second_line_size.x) + 2.0f * padding_x,
@@ -66,11 +66,6 @@ public:
 	static constexpr auto padding_y = 5.0f;
 
 private:
-	static ImVec2 measure_text_line(std::string_view line, int font_size, const ImFont* fnt)
-	{
-		return fnt->CalcTextSizeA(font_size, FLT_MAX, 0.0f, line.data(), line.data() + line.size());
-	}
-
 	std::array<char, 104> _second_line_buf;
 	ImVec2 _first_line_size;
 	ImVec2 _second_line_size;
@@ -96,6 +91,10 @@ void draw_item_tooltip(const lang::item& itm, const lang::item_filtering_result&
 
 	{
 		namespace kw = lang::keywords::rf;
+
+		// use length of the longest string as the column width
+		const auto width = gui::measure_text_line(kw::enchantment_passive_node, f.monospaced_font_size(), f.monospaced_font()).x;
+		ImGui::SetColumnWidth(-1, width + f.monospaced_font_size() * 2.0f);
 
 		ImGui::TextDisabled("Name:");
 		ImGui::Text("%s:", kw::base_type);

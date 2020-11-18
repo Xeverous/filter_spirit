@@ -8,6 +8,7 @@
 
 #include <cstdint>
 #include <utility>
+#include <string_view>
 
 namespace fs::gui {
 
@@ -48,6 +49,11 @@ inline Magnum::Color3ub to_rgb(Magnum::Color3 color)
 inline Magnum::Color4ub to_rgba(Magnum::Color4 color)
 {
 	return Magnum::Math::pack<Magnum::Color4ub>(color);
+}
+
+inline ImVec2 measure_text_line(std::string_view line, int font_size, const ImFont* fnt)
+{
+	return fnt->CalcTextSizeA(font_size, FLT_MAX, 0.0f, line.data(), line.data() + line.size());
 }
 
 struct rect
