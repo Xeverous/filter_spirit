@@ -23,7 +23,7 @@ struct looted_item
 	std::optional<rect> drawing; // in screen coordinates
 };
 
-// very specific behavior - designed for loot buttons
+// [drag] [drag] [drag] [drag] [button<str>]
 class loot_button_plurality
 {
 public:
@@ -65,16 +65,14 @@ private:
 	int _min_max[4];
 };
 
-class loot_button_range
+class loot_widget_range_base
 {
 public:
-	loot_button_range(lang::loot::range r)
+	loot_widget_range_base(lang::loot::range r)
 	: _min_max{r.min, r.max}
 	{
 		FS_ASSERT(min() <= max());
 	}
-
-	[[nodiscard]] bool draw(const char* str); // str must not be null
 
 	lang::loot::range range() const
 	{
@@ -84,11 +82,57 @@ public:
 	int min() const { return _min_max[0]; }
 	int max() const { return _min_max[1]; }
 
-private:
+protected:
 	int& min() { return _min_max[0]; }
 	int& max() { return _min_max[1]; }
 
 	int _min_max[2];
+};
+
+// [drag] [drag] [button<str>]
+class loot_button_drag_range : public loot_widget_range_base
+{
+public:
+	loot_button_drag_range(lang::loot::range r)
+	: loot_widget_range_base(r)
+	{
+	}
+
+	[[nodiscard]] bool draw(const char* str); // str must not be null
+};
+
+// [drag] [drag] [label<str>]
+class loot_drag_range : public loot_widget_range_base
+{
+public:
+	loot_drag_range(lang::loot::range current)
+	: loot_widget_range_base(current)
+	{
+	}
+
+	void draw(const char* str); // str must not be null
+};
+
+// [slider] [slider] [label<str>]
+class loot_slider_range : public loot_widget_range_base
+{
+public:
+	loot_slider_range(lang::loot::range current, lang::loot::range limit)
+	: loot_widget_range_base(current)
+	, _limit(limit)
+	{
+	}
+
+	loot_slider_range(lang::loot::range current)
+	: loot_widget_range_base(current)
+	, _limit(current)
+	{
+	}
+
+	void draw(const char* str); // str must not be null
+
+private:
+	lang::loot::range _limit;
 };
 
 class application;
@@ -136,8 +180,9 @@ private:
 	void on_canvas_hover(ImVec2 mouse_position, const fonting& f);
 
 	void draw_loot_settings_global();
-	void draw_loot_buttons_currency(const lang::loot::item_database& db, lang::loot::generator& gen);
+	void draw_loot_buttons_currency        (const lang::loot::item_database& db, lang::loot::generator& gen);
 	void draw_loot_buttons_specific_classes(const lang::loot::item_database& db, lang::loot::generator& gen);
+	void draw_loot_buttons_gems            (const lang::loot::item_database& db, lang::loot::generator& gen);
 
 	// render state
 	float _canvas_offset_y = 0;
@@ -173,14 +218,20 @@ private:
 	loot_button_plurality _currency_bestiary_nets     = loot_button_plurality(lang::loot::plurality{{1, 2}, {1, 9}});
 
 	// specific classes
-	loot_button_plurality _class_cards                = loot_button_plurality(lang::loot::plurality::only_quantity({1, 10}));
-	loot_button_plurality _class_resonators           = loot_button_plurality(lang::loot::plurality{{1, 5}, {1, 2}});
-	loot_button_range     _class_incubators           = loot_button_range({2, 5});
-	loot_button_range     _class_metamorphs           = loot_button_range({1, 2});
-	loot_button_range     _class_unique_pieces        = loot_button_range({1, 2});
-	loot_button_range     _class_lab_keys             = loot_button_range({1, 2});
-	loot_button_range     _class_lab_trinkets         = loot_button_range({1, 1});
-	loot_button_range     _class_quest_items          = loot_button_range({1, 2});
+	loot_button_plurality  _class_cards               = loot_button_plurality(lang::loot::plurality::only_quantity({1, 10}));
+	loot_button_plurality  _class_resonators          = loot_button_plurality(lang::loot::plurality{{1, 5}, {1, 2}});
+	loot_button_drag_range _class_incubators          = loot_button_drag_range({2, 5});
+	loot_button_drag_range _class_metamorphs          = loot_button_drag_range({1, 2});
+	loot_button_drag_range _class_unique_pieces       = loot_button_drag_range({1, 2});
+	loot_button_drag_range _class_lab_keys            = loot_button_drag_range({1, 2});
+	loot_button_drag_range _class_lab_trinkets        = loot_button_drag_range({1, 1});
+	loot_button_drag_range _class_quest_items         = loot_button_drag_range({1, 2});
+
+	// gems
+	lang::loot::gem_types _gems_gem_types;
+	loot_drag_range   _gems_quantity                  = loot_drag_range({1, 10});
+	loot_slider_range _gems_level                     = loot_slider_range({1, 20});
+	loot_slider_range _gems_quality                   = loot_slider_range({0, 20});
 };
 
 }

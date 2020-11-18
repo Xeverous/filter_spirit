@@ -50,12 +50,23 @@ struct percent
 	static constexpr percent min() { return {0}; }
 	static constexpr percent max() { return {100}; }
 
+	static constexpr percent never()  { return min(); }
+	static constexpr percent always() { return max(); }
+
 	constexpr bool is_valid() const
 	{
 		return min().value <= value && value <= max().value;
 	}
 
 	int value = 0;
+};
+
+struct gem_types
+{
+	bool active = true;
+	bool vaal_active = false;
+	bool support = true;
+	bool awakened_suport = false;
 };
 
 class generator
@@ -88,6 +99,18 @@ public:
 	void generate_harbinger_scrolls      (const item_database& db, item_receiver& receiver, plurality p, int area_level);
 	void generate_incursion_vials        (const item_database& db, item_receiver& receiver, plurality p, int area_level);
 	void generate_bestiary_nets          (const item_database& db, item_receiver& receiver, plurality p, int area_level);
+
+	void generate_gems(
+		const item_database& db,
+		item_receiver& receiver,
+		range quantity,
+		range level,
+		range quality,
+		int area_level,
+		percent chance_to_corrupt,
+		gem_types types);
+
+	// fucntions below are old and likely need to be rewritten
 
 	void generate_non_unique_equippable_item(
 		const item_database& db,
