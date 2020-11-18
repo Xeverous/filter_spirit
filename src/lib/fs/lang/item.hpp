@@ -283,6 +283,7 @@ struct item
 	std::string class_;
 	std::optional<std::string> name; // only for IDed items with non-normal rarity
 	std::string base_type;
+	// these 2 should be overwritten whenever an item is created - size 0x0 makes no sense
 	int height = 0;
 	int width  = 0;
 	bool is_prophecy = false; // if true, base type has an additional meaning (Prophecy condition)
@@ -298,26 +299,34 @@ struct item
 	 *
 	 * This was all unintentional, see
 	 * https://old.reddit.com/r/pathofexile/comments/f2t4tz/inconsistencies_in_new_filter_syntaxes/fjxf1mx
-	 * for disscussion about it. Since then, every item has some default values (usually 0)
+	 * for disscussion about it. Since then, every item has some default sentinel values (usually 0)
 	 * from item filter's point of view.
 	 *
-	 * Default values below are values which filter considers when an item has no such properties.
+	 * Sentinel values below are values which filter considers when an item has no such properties.
 	 */
-	int item_level = 0;
-	int drop_level = 1;
-	int quality = 0;
-	rarity_type rarity_ = rarity_type::normal;
+	static constexpr auto sentinel_item_level = 0;
+	static constexpr auto sentinel_drop_level = 1;
+	static constexpr auto sentinel_quality    = 0;
+	static constexpr auto sentinel_rarity     = rarity_type::normal;
+	static constexpr auto sentinel_stack_size = 1;
+	static constexpr auto sentinel_gem_level  = 0;
+	static constexpr auto sentinel_map_tier   = 0;
+
+	int item_level = sentinel_item_level;
+	int drop_level = sentinel_drop_level;
+	int quality = sentinel_quality;
+	rarity_type rarity_ = sentinel_rarity;
 	socket_info sockets = {};
 	std::vector<std::string> explicit_mods = {};
 	std::vector<std::string> enchantments_labirynth = {};
 	std::vector<std::string> enchantments_passive_nodes = {};
 	std::vector<std::string> annointments = {};
 	int corrupted_mods = 0;
-	int stack_size = 1;
-	int max_stack_size = 1; // filters do not support this property
-	int gem_level = 0;
-	int max_gem_level = 0; // filters do not support this property
-	int map_tier = 0;
+	int stack_size = sentinel_stack_size;
+	int max_stack_size = sentinel_stack_size; // filters do not support this property
+	int gem_level = sentinel_gem_level;
+	int max_gem_level = sentinel_gem_level; // filters do not support this property
+	int map_tier = sentinel_map_tier;
 	bool is_identified = false;
 	bool is_corrupted = false;
 	bool is_mirrored = false;
@@ -333,5 +342,7 @@ struct item
 	// A logic-irrelevant field. Only for the user.
 	std::string description;
 };
+
+int snprintf_dropped_item_label(char* buf, std::size_t buf_size, const item& itm);
 
 }

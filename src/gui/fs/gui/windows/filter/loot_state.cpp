@@ -4,12 +4,12 @@
 #include <fs/gui/ui_utils.hpp>
 #include <fs/lang/keywords.hpp>
 #include <fs/lang/limits.hpp>
+#include <fs/utility/assert.hpp>
 
 #include <imgui.h>
 
 #include <algorithm>
 #include <array>
-#include <cstdio>
 
 namespace {
 
@@ -23,11 +23,9 @@ public:
 		if (itm.name)
 			_first_line_size = measure_text_line(*itm.name, font_size, f.filter_preview_font(font_size));
 
-		if (itm.stack_size == 1)
-			std::snprintf(_second_line_buf.data(), _second_line_buf.size(), "%s", itm.base_type.c_str());
-		else
-			std::snprintf(_second_line_buf.data(), _second_line_buf.size(), "%dx %s", itm.stack_size, itm.base_type.c_str());
-
+		const int sz = lang::snprintf_dropped_item_label(_second_line_buf.data(), _second_line_buf.size(), itm);
+		FS_ASSERT_MSG(sz >= 0, "snprintf should not return an error");
+		(void) sz; // shut warning if assert does not use variable
 		_second_line_size = measure_text_line(_second_line_buf.data(), font_size, f.filter_preview_font(font_size));
 
 		_whole_size = {
@@ -73,7 +71,7 @@ private:
 		return fnt->CalcTextSizeA(font_size, FLT_MAX, 0.0f, line.data(), line.data() + line.size());
 	}
 
-	std::array<char, 40> _second_line_buf;
+	std::array<char, 104> _second_line_buf;
 	ImVec2 _first_line_size;
 	ImVec2 _second_line_size;
 	ImVec2 _whole_size;
