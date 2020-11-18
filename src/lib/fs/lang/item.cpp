@@ -3,6 +3,7 @@
 #include <fs/utility/string_helpers.hpp>
 
 #include <utility>
+#include <cstdio>
 
 namespace fs::lang {
 
@@ -100,6 +101,28 @@ std::string to_string(socket_info info)
 	}
 
 	return result;
+}
+
+int snprintf_dropped_item_label(char* buf, std::size_t buf_size, const item& itm)
+{
+	if (itm.stack_size != lang::item::sentinel_stack_size) {
+		// dropped stacked items display their stack size
+		return std::snprintf(buf, buf_size, "%dx %s", itm.stack_size, itm.base_type.c_str());
+	}
+	else if (itm.gem_level != lang::item::sentinel_gem_level) {
+		// dropped gems display their quality type name (if non-zero or alternate) and level (if not 1)
+		if (itm.quality != lang::item::sentinel_quality && itm.gem_level != 1)
+			return std::snprintf(buf, buf_size, "Superior %s (Level %d)", itm.base_type.c_str(), itm.gem_level);
+		else if (itm.quality != lang::item::sentinel_quality)
+			return std::snprintf(buf, buf_size, "Superior %s", itm.base_type.c_str());
+		else if (itm.gem_level != 1)
+			return std::snprintf(buf, buf_size, "%s (Level %d)", itm.base_type.c_str(), itm.gem_level);
+		else
+			return std::snprintf(buf, buf_size, "%s", itm.base_type.c_str());
+	}
+	else {
+		return std::snprintf(buf, buf_size, "%s", itm.base_type.c_str());
+	}
 }
 
 }
