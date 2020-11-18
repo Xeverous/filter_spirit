@@ -99,7 +99,7 @@ void draw_item_tooltip(const lang::item& itm, const lang::item_filtering_result&
 	{
 		namespace kw = lang::keywords::rf;
 
-		ImGui::TextDisabled("name:");
+		ImGui::TextDisabled("Name:");
 		ImGui::Text("%s:", kw::base_type);
 		ImGui::Text("%s:", kw::class_);
 		ImGui::Text("%s:", kw::rarity);
@@ -110,8 +110,9 @@ void draw_item_tooltip(const lang::item& itm, const lang::item_filtering_result&
 		ImGui::Text("%s:", kw::height);
 		ImGui::Text("%s:", kw::quality);
 		ImGui::Text("%s:", kw::stack_size);
-		ImGui::TextDisabled("max stack size:");
+		ImGui::TextDisabled("MaxStackSize:");
 		ImGui::Text("%s:", kw::gem_level);
+		ImGui::TextDisabled("MaxGemLevel:");
 		ImGui::Text("%s:", kw::map_tier);
 		ImGui::Text("%s:", kw::corrupted_mods);
 
@@ -119,7 +120,7 @@ void draw_item_tooltip(const lang::item& itm, const lang::item_filtering_result&
 		ImGui::Text("%s:", kw::has_explicit_mod);
 		ImGui::Text("%s:", kw::has_enchantment);
 		ImGui::Text("%s:", kw::enchantment_passive_node);
-		ImGui::TextDisabled("annointments:");
+		ImGui::TextDisabled("HasAnnointment:");
 
 		ImGui::Text("%s:", kw::prophecy);
 		ImGui::Text("%s:", kw::identified);
@@ -157,6 +158,7 @@ void draw_item_tooltip(const lang::item& itm, const lang::item_filtering_result&
 		ImGui::Text("%d", itm.stack_size);
 		ImGui::Text("%d", itm.max_stack_size);
 		ImGui::Text("%d", itm.gem_level);
+		ImGui::Text("%d", itm.max_gem_level);
 		ImGui::Text("%d", itm.map_tier);
 		ImGui::Text("%d", itm.corrupted_mods);
 
@@ -267,8 +269,6 @@ namespace fs::gui {
 bool loot_button_plurality::draw(const char* str)
 {
 	scoped_pointer_id _(this);
-	const bool result = ImGui::Button(str);
-	ImGui::SameLine();
 	ImGui::DragInt4("", _min_max, 0.25f, 0, INT_MAX);
 
 	if (!ImGui::IsItemActive()) {
@@ -279,20 +279,38 @@ bool loot_button_plurality::draw(const char* str)
 			std::swap(min_stack_size(), max_stack_size());
 	}
 
-	return result;
+	ImGui::SameLine();
+	return ImGui::Button(str);
 }
 
-bool loot_button_range::draw(const char* str)
+bool loot_button_drag_range::draw(const char* str)
 {
 	scoped_pointer_id _(this);
-	const bool result = ImGui::Button(str);
-	ImGui::SameLine();
 	ImGui::DragInt2("", _min_max, 0.25f, 0, INT_MAX);
 
 	if (!ImGui::IsItemActive() && min() > max())
 		std::swap(min(), max());
 
-	return result;
+	ImGui::SameLine();
+	return ImGui::Button(str);
+}
+
+void loot_drag_range::draw(const char* str)
+{
+	scoped_pointer_id _(this);
+	ImGui::DragInt2(str, _min_max, 0.25f, 0, INT_MAX);
+
+	if (!ImGui::IsItemActive() && min() > max())
+		std::swap(min(), max());
+}
+
+void loot_slider_range::draw(const char* str)
+{
+	scoped_pointer_id _(this);
+	ImGui::SliderInt2(str, _min_max, _limit.min, _limit.max);
+
+	if (!ImGui::IsItemActive() && min() > max())
+		std::swap(min(), max());
 }
 
 void loot_state::draw_interface(application& app)
@@ -314,8 +332,9 @@ void loot_state::draw_interface(application& app)
 	const lang::loot::item_database& db = *database;
 
 	draw_loot_settings_global();
-	draw_loot_buttons_currency(db, app.loot_generator());
+	draw_loot_buttons_currency        (db, app.loot_generator());
 	draw_loot_buttons_specific_classes(db, app.loot_generator());
+	draw_loot_buttons_gems            (db, app.loot_generator());
 
 	if (_last_items_size != _items.size()) {
 		if (_last_items_size < _items.size() && !_append_loot) {
@@ -408,6 +427,29 @@ void loot_state::draw_loot_buttons_specific_classes(const lang::loot::item_datab
 		gen.generate_labyrinth_trinkets(db, *this, _class_lab_trinkets.range());
 	if (_class_quest_items.draw("quest items"))
 		gen.generate_quest_items(db, *this, _class_quest_items.range());
+}
+
+void loot_state::draw_loot_buttons_gems(const lang::loot::item_database& db, lang::loot::generator& gen)
+{
+	if (!ImGui::CollapsingHeader("Gems", ImGuiTreeNodeFlags_DefaultOpen))
+		return;
+
+	if (ImGui::Button("generate")) {
+		gen.generate_gems(db, *this, _gems_quantity.range(), _gems_level.range(), _gems_quality.range(),
+			_area_level, _chance_to_corrupt, _gems_gem_types);
+	}
+
+	ImGui::SameLine();
+	ImGui::Checkbox("Active", &_gems_gem_types.active);
+	ImGui::SameLine();
+	ImGui::Checkbox("Vaal active", &_gems_gem_types.vaal_active);
+	ImGui::SameLine();
+	ImGui::Checkbox("Support", &_gems_gem_types.support);
+	ImGui::SameLine();
+	ImGui::Checkbox("Awakened support", &_gems_gem_types.awakened_suport);
+	_gems_quantity.draw("quantity");
+	_gems_level.draw("level");
+	_gems_quality.draw("quality");
 }
 
 void loot_state::draw_loot_canvas(const fonting& f)

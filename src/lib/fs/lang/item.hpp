@@ -264,7 +264,7 @@ struct item
 		if (stack_size <= 0 || stack_size > max_stack_size)
 			return item_validity::invalid_stack_size;
 
-		if (gem_level <= 0)
+		if (gem_level <= 0) // do not test gem_level > max_gem_level because corruption can bypass it
 			return item_validity::invalid_gem_level;
 
 		if (map_tier <= 0)
@@ -316,6 +316,7 @@ struct item
 	int stack_size = 1;
 	int max_stack_size = 1; // filters do not support this property
 	int gem_level = 0;
+	int max_gem_level = 0; // filters do not support this property
 	int map_tier = 0;
 	bool is_identified = false;
 	bool is_corrupted = false;

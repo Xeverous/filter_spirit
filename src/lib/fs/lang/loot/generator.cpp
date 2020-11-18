@@ -3,6 +3,7 @@
 #include <fs/utility/assert.hpp>
 
 #include <boost/container/small_vector.hpp>
+#include <boost/container/static_vector.hpp>
 
 #include <ctime>
 #include <random>
@@ -39,8 +40,8 @@ auto make_index_dist(const Container& c)
 	return std::uniform_int_distribution<typename Container::size_type>(0, c.size() - 1);
 }
 
-template <typename T, typename RandomNumberGenerator>
-const T* select_one_element(const std::vector<T>& elements, RandomNumberGenerator& rng)
+template <typename Container, typename RandomNumberGenerator>
+auto select_one_element(const Container& elements, RandomNumberGenerator& rng) -> typename Container::const_pointer
 {
 	if (elements.empty())
 		return nullptr;
@@ -408,6 +409,13 @@ item resonator_to_item(const resonator& reso)
 	return result;
 }
 
+item gem_to_item(const gem& gm, bool is_active)
+{
+	item result = elementary_item_to_item(gm, is_active ? item_class_names::gem_active : item_class_names::gem_support);
+	result.max_gem_level = gm.max_level;
+	return result;
+}
+
 item equippable_item_to_item(
 	const equippable_item& itm,
 	std::string_view class_,
@@ -447,7 +455,66 @@ void generate_currency_items(
 	}
 }
 
+void corrupt_gem(item& itm, std::mt19937& rng)
+{
+	itm.is_corrupted = true;
+	// see generator::generate_gems why it supports only 3 of 4 corruption variants
+	const int roll = roll_in_range({0, 2}, rng);
+
+	// roll == 0 (do nothing)
+	if (roll == 1) { // +/- 1 level
+		const int add_or_substract = roll_in_range({0, 1}, rng);
+		if (add_or_substract == 0) {
+			++itm.gem_level; // no checking: this corruption is allowed to bypass max_gem_level
+		}
+		else {
+			if (itm.gem_level > 1) // prevent vaaling lvl 1 into lvl 0
+				--itm.gem_level;
+		}
+	}
+	else if (roll == 2) { // +/- 1-20 quality, clamp to 0-23
+		const int value = roll_in_range({1, 20}, rng);
+		const int sign = roll_in_range({0, 1}, rng);
+
+		if (sign == 0)
+			itm.quality += value;
+		else
+			itm.quality -= value;
+
+		itm.quality = std::clamp(itm.quality, 0, 23);
+	}
 }
+
+void generate_gem(
+	const std::vector<gem>& gems,
+	std::vector<std::size_t>& indexes,
+	item_receiver& receiver,
+	range level,
+	range quality,
+	int area_level,
+	percent chance_to_corrupt,
+	bool is_vaal_gem,
+	bool is_active,
+	std::mt19937& rng)
+{
+	fill_with_indexes_of_matching_drop_level_items(area_level, gems, indexes);
+	const gem* const gm = select_one_element_by_index(gems, indexes, rng);
+	if (gm == nullptr)
+		return;
+
+	item itm = gem_to_item(*gm, is_active);
+	itm.gem_level = roll_in_range({level.min, std::min(level.max, gm->max_level)}, rng);
+	itm.quality = roll_in_range(quality, rng);
+	if (is_vaal_gem) // vaal gems are always corrupted
+		itm.is_corrupted = true;
+
+	if (roll_percent(chance_to_corrupt, rng))
+		corrupt_gem(itm, rng);
+
+	receiver.on_item(std::move(itm));
+}
+
+} // namespace
 
 namespace fs::lang::loot {
 
@@ -648,6 +715,76 @@ void generator::generate_incursion_vials(const item_database& db, item_receiver&
 void generator::generate_bestiary_nets(const item_database& db, item_receiver& receiver, plurality p, int area_level)
 {
 	return generate_currency_items(db.currency.bestiary_nets, _sp_indexes, receiver, p, area_level, _rng);
+}
+
+void generator::generate_gems(
+	const item_database& db,
+	item_receiver& receiver,
+	range quantity,
+	range level,
+	range quality,
+	int area_level,
+	percent chance_to_corrupt,
+	gem_types types)
+{
+	constexpr int id_gems_active           = 0;
+	constexpr int id_gems_vaal_active      = 1;
+	constexpr int id_gems_support          = 2;
+	constexpr int id_gems_awakened_support = 3;
+	boost::container::static_vector<int, 4> gem_type_ids;
+
+	if (types.active)
+		gem_type_ids.push_back(id_gems_active);
+	if (types.support)
+		gem_type_ids.push_back(id_gems_support);
+	if (types.vaal_active)
+		gem_type_ids.push_back(id_gems_vaal_active);
+	if (types.awakened_suport)
+		gem_type_ids.push_back(id_gems_awakened_support);
+
+	const int count = roll_in_range(quantity, _rng);
+	for (int i = 0; i < count; ++i) {
+		const int* const id = select_one_element(gem_type_ids, _rng);
+		if (id == nullptr)
+			return;
+
+		/*
+		 * Gem corruption:
+		 * 25% chance to do nothing (only setting corrupted property)
+		 * 25% chance for +/- 1 level
+		 * 25% chance for +/- 1-20 quality, result clamped to (0-23)%
+		 * 25% chance to turn active skill gem into vaal skill gem
+		 *
+		 * The last outcome is tricky. FS does not have mapping of active-to-vaal so instead:
+		 * - generate_gem function only implements 3 of 4 corruption variants.
+		 * - (1) If the gem to be generated is an active skill gem:
+		 *   - (2) roll corruption chance immediately
+		 *     - (3a) If corruption rolled true, roll 25% chance active-to-vaal
+		 *       - If roll in step (3a) succeeded, generate vaal   skill gem instead, never corrupt it further
+		 *       - If roll in step (3a) failed,    generate active skill gem but always corrupt it
+		 *     - (3b) If corruption rolled false,  generate active skill gem but never corrupt it
+		 */
+		if (*id == id_gems_active) { // (1)
+			if (roll_percent(chance_to_corrupt, _rng)) { // (2)
+				if (roll_percent({25}, _rng)) // (3a)
+					generate_gem(db.gems.vaal_active_gems, _sp_indexes, receiver, level, quality, area_level, percent::never(),  true,  true,  _rng);
+				else
+					generate_gem(db.gems.active_gems,      _sp_indexes, receiver, level, quality, area_level, percent::always(), false, true,  _rng);
+			}
+			else { // (3b)
+				generate_gem(db.gems.active_gems,   _sp_indexes, receiver, level, quality, area_level, percent::never(),  false, true,  _rng);
+			}
+		}
+		else if (*id == id_gems_vaal_active) {
+			generate_gem(db.gems.vaal_active_gems,      _sp_indexes, receiver, level, quality, area_level, chance_to_corrupt, true,  true,  _rng);
+		}
+		else if (*id == id_gems_support) {
+			generate_gem(db.gems.support_gems,          _sp_indexes, receiver, level, quality, area_level, chance_to_corrupt, false, false, _rng);
+		}
+		else if (*id == id_gems_awakened_support) {
+			generate_gem(db.gems.awakened_support_gems, _sp_indexes, receiver, level, quality, area_level, chance_to_corrupt, false, false, _rng);
+		}
+	}
 }
 
 void generator::generate_non_unique_equippable_item(
