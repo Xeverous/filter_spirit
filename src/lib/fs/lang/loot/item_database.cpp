@@ -192,6 +192,60 @@ parse_gem(
 	return result;
 }
 
+[[nodiscard]] std::optional<loot::unique_piece>
+parse_unique_piece(
+	std::string_view metadata_path,
+	const nlohmann::json& metadata_entry)
+{
+	std::optional<loot::elementary_item> elem_item = parse_elementary_item(metadata_path, metadata_entry);
+	if (!elem_item)
+		return std::nullopt;
+
+	loot::unique_piece result;
+	static_cast<loot::elementary_item&>(result) = std::move(*elem_item);
+
+	if (utility::ends_with(metadata_path, "Belt1_1"))
+		result.piece_name = "First Piece of Time";
+	else if (utility::ends_with(metadata_path, "Belt1_2"))
+		result.piece_name = "Second Piece of Time";
+	else if (utility::ends_with(metadata_path, "Helmet1_1"))
+		result.piece_name = "First Piece of Storms";
+	else if (utility::ends_with(metadata_path, "Helmet1_2"))
+		result.piece_name = "Second Piece of Storms";
+	else if (utility::ends_with(metadata_path, "Helmet1_3"))
+		result.piece_name = "Third Piece of Storms";
+	else if (utility::ends_with(metadata_path, "Quiver1_1"))
+		result.piece_name = "First Piece of Directions";
+	else if (utility::ends_with(metadata_path, "Quiver1_2"))
+		result.piece_name = "Second Piece of Directions";
+	else if (utility::ends_with(metadata_path, "Quiver1_3"))
+		result.piece_name = "Third Piece of Directions";
+	else if (utility::ends_with(metadata_path, "Shield1_1"))
+		result.piece_name = "First Piece of Focus";
+	else if (utility::ends_with(metadata_path, "Shield1_2"))
+		result.piece_name = "Second Piece of Focus";
+	else if (utility::ends_with(metadata_path, "Shield1_3"))
+		result.piece_name = "Third Piece of Focus";
+	else if (utility::ends_with(metadata_path, "Shield1_4"))
+		result.piece_name = "Fourth Piece of Focus";
+	else if (utility::ends_with(metadata_path, "Staff1_1"))
+		result.piece_name = "First Piece of Brutality";
+	else if (utility::ends_with(metadata_path, "Staff1_2"))
+		result.piece_name = "Second Piece of Brutality";
+	else if (utility::ends_with(metadata_path, "Staff1_3"))
+		result.piece_name = "Third Piece of Brutality";
+	else if (utility::ends_with(metadata_path, "Sword1_1"))
+		result.piece_name = "First Piece of the Arcane";
+	else if (utility::ends_with(metadata_path, "Sword1_2"))
+		result.piece_name = "Second Piece of the Arcane";
+	else if (utility::ends_with(metadata_path, "Sword1_3"))
+		result.piece_name = "Third Piece of the Arcane";
+	else
+		result.piece_name = "[UNKNOWN PIECE NAME]";
+
+	return result;
+}
+
 [[nodiscard]] int
 get_resonator_socket_count(std::string_view resonator_name)
 {
@@ -779,7 +833,7 @@ bool item_database::parse(std::string_view items_metadata_json, log::logger& log
 					map_fragments.ordinary_scarabs.push_back(std::move(*elem_item));
 			}
 			else if (dir == "UniqueFragments") {
-				std::optional<elementary_item> piece = parse_elementary_item(path, item_entry);
+				std::optional<unique_piece> piece = parse_unique_piece(path, item_entry);
 				if (!piece)
 					continue;
 

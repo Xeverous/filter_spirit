@@ -44,6 +44,11 @@ struct resonator : currency_item
 	int delve_sockets = 1;
 };
 
+struct unique_piece : elementary_item
+{
+	std::string piece_name; // "Nth Piece of X"
+};
+
 struct currency_item_database
 {
 	std::vector<currency_item> generic;
@@ -177,7 +182,7 @@ struct item_database
 	std::vector<resonator> resonators;
 	std::vector<currency_item> divination_cards;
 	std::vector<elementary_item> metamorph_parts;
-	std::vector<elementary_item> unique_pieces;
+	std::vector<unique_piece> unique_pieces;
 
 	std::optional<elementary_item> incursion_key;
 	std::optional<elementary_item> incursion_bomb;

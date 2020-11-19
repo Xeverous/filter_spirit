@@ -431,29 +431,7 @@ item equippable_item_to_item(
 	return result;
 }
 
-// ---- other ----
-
-void generate_currency_items(
-	const std::vector<currency_item>& source,
-	std::vector<std::size_t>& indexes,
-	item_receiver& receiver,
-	plurality p,
-	int area_level,
-	std::mt19937& rng)
-{
-	const int count = roll_in_range(p.quantity, rng);
-	fill_with_indexes_of_matching_drop_level_items(area_level, source, indexes);
-
-	for (int i = 0; i < count; ++i) {
-		const currency_item* const curr_item = select_one_element_by_index(source, indexes, rng);
-		if (curr_item == nullptr)
-			return;
-
-		item itm = currency_item_to_item(*curr_item, item_class_names::currency_stackable);
-		itm.stack_size = roll_in_range({p.stack_size.min, std::min(p.stack_size.max, curr_item->max_stack_size)}, rng);
-		receiver.on_item(std::move(itm));
-	}
-}
+// ---- item modifiers ----
 
 void corrupt_gem(item& itm, std::mt19937& rng)
 {
@@ -482,6 +460,42 @@ void corrupt_gem(item& itm, std::mt19937& rng)
 			itm.quality -= value;
 
 		itm.quality = std::clamp(itm.quality, 0, 23);
+	}
+}
+
+void identify_unique_piece(item& itm, const unique_piece& piece)
+{
+	itm.is_identified = true;
+	itm.name = piece.piece_name;
+}
+
+void corrupt_unique_piece(item& itm, const unique_piece& piece)
+{
+	itm.is_corrupted = true;
+	identify_unique_piece(itm, piece);
+}
+
+// ---- item generators ----
+
+void generate_currency_items(
+	const std::vector<currency_item>& source,
+	std::vector<std::size_t>& indexes,
+	item_receiver& receiver,
+	plurality p,
+	int area_level,
+	std::mt19937& rng)
+{
+	const int count = roll_in_range(p.quantity, rng);
+	fill_with_indexes_of_matching_drop_level_items(area_level, source, indexes);
+
+	for (int i = 0; i < count; ++i) {
+		const currency_item* const curr_item = select_one_element_by_index(source, indexes, rng);
+		if (curr_item == nullptr)
+			return;
+
+		item itm = currency_item_to_item(*curr_item, item_class_names::currency_stackable);
+		itm.stack_size = roll_in_range({p.stack_size.min, std::min(p.stack_size.max, curr_item->max_stack_size)}, rng);
+		receiver.on_item(std::move(itm));
 	}
 }
 
@@ -607,14 +621,15 @@ void generator::generate_unique_pieces(const item_database& db, item_receiver& r
 {
 	const int count = roll_in_range(quantity, _rng);
 	for (int i = 0; i < count; ++i) {
-		const elementary_item* const piece = select_one_element(db.unique_pieces, _rng);
+		const unique_piece* const piece = select_one_element(db.unique_pieces, _rng);
 		if (piece == nullptr)
 			return;
 
 		item itm = elementary_item_to_item(*piece, item_class_names::piece);
 		itm.item_level = item_level;
 		itm.rarity_ = rarity_type::unique;
-		itm.is_corrupted = roll_percent(chance_to_corrupt, _rng);
+		if (roll_percent(chance_to_corrupt, _rng))
+			corrupt_unique_piece(itm, *piece);
 		receiver.on_item(std::move(itm));
 	}
 }
