@@ -225,6 +225,26 @@ int roll_in_range(range r, std::mt19937& rng)
 	return std::uniform_int_distribution<int>(r.min, r.max)(rng);
 }
 
+int roll_in_limited_range(range r, range limit, std::mt19937& rng)
+{
+	return roll_in_range({std::clamp(r.min, limit.min, limit.max), std::clamp(r.max, limit.min, limit.max)}, rng);
+}
+
+int roll_stack_size(range r, int max_stack_size, std::mt19937& rng)
+{
+	return roll_in_limited_range(r, {1, max_stack_size}, rng);
+}
+
+int roll_gem_level(range r, int max_gem_level, std::mt19937& rng)
+{
+	return roll_in_limited_range(r, {1, max_gem_level}, rng);
+}
+
+int roll_quality(range r, std::mt19937& rng)
+{
+	return roll_in_limited_range(r, {0, 20}, rng);
+}
+
 bool roll_percent(percent chance_to_happen, std::mt19937& rng)
 {
 	return roll_in_range({percent::min().value + 1, percent::max().value}, rng) <= chance_to_happen.value;
@@ -494,7 +514,7 @@ void generate_currency_items(
 			return;
 
 		item itm = currency_item_to_item(*curr_item, item_class_names::currency_stackable);
-		itm.stack_size = roll_in_range({p.stack_size.min, std::min(p.stack_size.max, curr_item->max_stack_size)}, rng);
+		itm.stack_size = roll_stack_size(p.stack_size, curr_item->max_stack_size, rng);
 		receiver.on_item(std::move(itm));
 	}
 }
@@ -517,8 +537,8 @@ void generate_gem(
 		return;
 
 	item itm = gem_to_item(*gm, is_active);
-	itm.gem_level = roll_in_range({level.min, std::min(level.max, gm->max_level)}, rng);
-	itm.quality = roll_in_range(quality, rng);
+	itm.gem_level = roll_gem_level(level, gm->max_level, rng);
+	itm.quality = roll_quality(quality, rng);
 	if (is_vaal_gem) // vaal gems are always corrupted
 		itm.is_corrupted = true;
 
@@ -547,7 +567,7 @@ void generator::generate_divination_cards(const item_database& db, item_receiver
 			return;
 
 		item itm = divination_card_to_item(*card);
-		itm.stack_size = roll_in_range({p.stack_size.min, std::min(p.stack_size.max, card->max_stack_size)}, _rng);
+		itm.stack_size = roll_stack_size(p.stack_size, card->max_stack_size, _rng);
 		receiver.on_item(std::move(itm));
 	}
 }
@@ -589,7 +609,7 @@ void generator::generate_resonators(const item_database& db, item_receiver& rece
 			return;
 
 		item itm = resonator_to_item(*reso);
-		itm.stack_size = roll_in_range({p.stack_size.min, std::min(p.stack_size.max, reso->max_stack_size)}, _rng);
+		itm.stack_size = roll_stack_size(p.stack_size, reso->max_stack_size, _rng);
 		receiver.on_item(std::move(itm));
 	}
 }
