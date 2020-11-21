@@ -831,10 +831,10 @@ void generator::generate_quest_items(const item_database& db, item_receiver& rec
 void generator::generate_resonators(const item_database& db, item_receiver& receiver, plurality p, int area_level)
 {
 	const int count = roll_in_range(p.quantity, _rng);
-	fill_with_indexes_of_matching_drop_level_items(area_level, db.resonators, _sp_indexes);
+	fill_with_indexes_of_matching_drop_level_items(area_level, db.resonators, _temp_indexes);
 
 	for (int i = 0; i < count; ++i) {
-		const resonator* const reso = select_one_element_by_index(db.resonators, _sp_indexes, _rng);
+		const resonator* const reso = select_one_element_by_index(db.resonators, _temp_indexes, _rng);
 		if (reso == nullptr)
 			return;
 
@@ -914,72 +914,72 @@ void generator::generate_labyrinth_trinkets(const item_database& db, item_receiv
 
 void generator::generate_generic_currency(const item_database& db, item_receiver& receiver, plurality p, int area_level)
 {
-	return generate_currency_items(db.currency.generic, _sp_indexes, receiver, p, area_level, _rng);
+	generate_currency_items(db.currency.generic, _temp_indexes, receiver, p, area_level, _rng);
 }
 
 void generator::generate_generic_currency_shards(const item_database& db, item_receiver& receiver, plurality p, int area_level)
 {
-	return generate_currency_items(db.currency.generic_shards, _sp_indexes, receiver, p, area_level, _rng);
+	generate_currency_items(db.currency.generic_shards, _temp_indexes, receiver, p, area_level, _rng);
 }
 
 void generator::generate_conqueror_orbs(const item_database& db, item_receiver& receiver, plurality p, int area_level)
 {
-	return generate_currency_items(db.currency.conqueror_orbs, _sp_indexes, receiver, p, area_level, _rng);
+	generate_currency_items(db.currency.conqueror_orbs, _temp_indexes, receiver, p, area_level, _rng);
 }
 
 void generator::generate_breach_blessings(const item_database& db, item_receiver& receiver, plurality p, int area_level)
 {
-	return generate_currency_items(db.currency.breach_blessings, _sp_indexes, receiver, p, area_level, _rng);
+	generate_currency_items(db.currency.breach_blessings, _temp_indexes, receiver, p, area_level, _rng);
 }
 
 void generator::generate_breach_splinters(const item_database& db, item_receiver& receiver, plurality p, int area_level)
 {
-	return generate_currency_items(db.currency.breach_splinters, _sp_indexes, receiver, p, area_level, _rng);
+	generate_currency_items(db.currency.breach_splinters, _temp_indexes, receiver, p, area_level, _rng);
 }
 
 void generator::generate_legion_splinters(const item_database& db, item_receiver& receiver, plurality p, int area_level)
 {
-	return generate_currency_items(db.currency.legion_splinters, _sp_indexes, receiver, p, area_level, _rng);
+	generate_currency_items(db.currency.legion_splinters, _temp_indexes, receiver, p, area_level, _rng);
 }
 
 void generator::generate_essences(const item_database& db, item_receiver& receiver, plurality p, int area_level)
 {
-	return generate_currency_items(db.currency.essences, _sp_indexes, receiver, p, area_level, _rng);
+	generate_currency_items(db.currency.essences, _temp_indexes, receiver, p, area_level, _rng);
 }
 
 void generator::generate_fossils(const item_database& db, item_receiver& receiver, plurality p, int area_level)
 {
-	return generate_currency_items(db.currency.fossils, _sp_indexes, receiver, p, area_level, _rng);
+	generate_currency_items(db.currency.fossils, _temp_indexes, receiver, p, area_level, _rng);
 }
 
 void generator::generate_catalysts(const item_database& db, item_receiver& receiver, plurality p, int area_level)
 {
-	return generate_currency_items(db.currency.catalysts, _sp_indexes, receiver, p, area_level, _rng);
+	generate_currency_items(db.currency.catalysts, _temp_indexes, receiver, p, area_level, _rng);
 }
 
 void generator::generate_oils(const item_database& db, item_receiver& receiver, plurality p, int area_level)
 {
-	return generate_currency_items(db.currency.oils, _sp_indexes, receiver, p, area_level, _rng);
+	generate_currency_items(db.currency.oils, _temp_indexes, receiver, p, area_level, _rng);
 }
 
 void generator::generate_delirium_orbs(const item_database& db, item_receiver& receiver, plurality p, int area_level)
 {
-	return generate_currency_items(db.currency.delirium_orbs, _sp_indexes, receiver, p, area_level, _rng);
+	generate_currency_items(db.currency.delirium_orbs, _temp_indexes, receiver, p, area_level, _rng);
 }
 
 void generator::generate_harbinger_scrolls(const item_database& db, item_receiver& receiver, plurality p, int area_level)
 {
-	return generate_currency_items(db.currency.harbinger_scrolls, _sp_indexes, receiver, p, area_level, _rng);
+	generate_currency_items(db.currency.harbinger_scrolls, _temp_indexes, receiver, p, area_level, _rng);
 }
 
 void generator::generate_incursion_vials(const item_database& db, item_receiver& receiver, plurality p, int area_level)
 {
-	return generate_currency_items(db.currency.incursion_vials, _sp_indexes, receiver, p, area_level, _rng);
+	generate_currency_items(db.currency.incursion_vials, _temp_indexes, receiver, p, area_level, _rng);
 }
 
 void generator::generate_bestiary_nets(const item_database& db, item_receiver& receiver, plurality p, int area_level)
 {
-	return generate_currency_items(db.currency.bestiary_nets, _sp_indexes, receiver, p, area_level, _rng);
+	generate_currency_items(db.currency.bestiary_nets, _temp_indexes, receiver, p, area_level, _rng);
 }
 
 void generator::generate_gems(
@@ -1032,22 +1032,22 @@ void generator::generate_gems(
 		if (*id == id_gems_active) { // (1)
 			if (roll_percent(chance_to_corrupt, _rng)) { // (2)
 				if (roll_percent({25}, _rng)) // (3a)
-					generate_gem(db.gems.vaal_active_gems, _sp_indexes, receiver, level, quality, area_level, percent::never(),  true,  true,  _rng);
+					generate_gem(db.gems.vaal_active_gems, _temp_indexes, receiver, level, quality, area_level, percent::never(),  true,  true,  _rng);
 				else
-					generate_gem(db.gems.active_gems,      _sp_indexes, receiver, level, quality, area_level, percent::always(), false, true,  _rng);
+					generate_gem(db.gems.active_gems,      _temp_indexes, receiver, level, quality, area_level, percent::always(), false, true,  _rng);
 			}
 			else { // (3b)
-				generate_gem(db.gems.active_gems,   _sp_indexes, receiver, level, quality, area_level, percent::never(),  false, true,  _rng);
+				generate_gem(db.gems.active_gems,   _temp_indexes, receiver, level, quality, area_level, percent::never(),  false, true,  _rng);
 			}
 		}
 		else if (*id == id_gems_vaal_active) {
-			generate_gem(db.gems.vaal_active_gems,      _sp_indexes, receiver, level, quality, area_level, chance_to_corrupt, true,  true,  _rng);
+			generate_gem(db.gems.vaal_active_gems,      _temp_indexes, receiver, level, quality, area_level, chance_to_corrupt, true,  true,  _rng);
 		}
 		else if (*id == id_gems_support) {
-			generate_gem(db.gems.support_gems,          _sp_indexes, receiver, level, quality, area_level, chance_to_corrupt, false, false, _rng);
+			generate_gem(db.gems.support_gems,          _temp_indexes, receiver, level, quality, area_level, chance_to_corrupt, false, false, _rng);
 		}
 		else if (*id == id_gems_awakened_support) {
-			generate_gem(db.gems.awakened_support_gems, _sp_indexes, receiver, level, quality, area_level, chance_to_corrupt, false, false, _rng);
+			generate_gem(db.gems.awakened_support_gems, _temp_indexes, receiver, level, quality, area_level, chance_to_corrupt, false, false, _rng);
 		}
 	}
 }
@@ -1067,8 +1067,8 @@ void generator::generate_equippable_item(
 	const equipment_class_selection selection = roll_equipment_class(db.equipment, class_weights, _rng);
 	const std::optional<lang::influence_type> influence = roll_influence(infl_weights, _rng);
 
-	fill_with_indexes_of_matching_drop_level_items(item_level, selection.bases.get(), _sp_indexes);
-	const equippable_item* const eq_item = select_one_element_by_index(selection.bases.get(), _sp_indexes, _rng);
+	fill_with_indexes_of_matching_drop_level_items(item_level, selection.bases.get(), _temp_indexes);
+	const equippable_item* const eq_item = select_one_element_by_index(selection.bases.get(), _temp_indexes, _rng);
 	if (eq_item == nullptr)
 		return;
 
