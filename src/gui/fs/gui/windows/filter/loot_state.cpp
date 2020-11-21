@@ -687,7 +687,7 @@ void loot_state::draw_item_labels(ImVec2 canvas_begin, ImVec2 canvas_end, const 
 
 void loot_state::on_canvas_hover(ImVec2 mouse_position, const fonting& f)
 {
-	for (looted_item& itm : _items) {
+	for (const looted_item& itm : _items) {
 		if (itm.drawing) {
 			if ((*itm.drawing).contains(mouse_position)) {
 				FS_ASSERT(itm.filtering_result.has_value());
