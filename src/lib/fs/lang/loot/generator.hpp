@@ -245,12 +245,12 @@ private:
 	std::mt19937 _rng;
 
 	/*
-	 * Scratch pads. These are not supposed to hold any meaningful data nor
+	 * Temporaries. These are not supposed to hold any meaningful data nor
 	 * to have any invariants other than imposed by the vector class template.
 	 * Their only purpose is to avoid repetitive allocations when items are being
 	 * generated. Free to use for any member function.
 	 */
-	std::vector<std::size_t> _sp_indexes;
+	std::vector<std::size_t> _temp_indexes;
 	std::vector<std::pair<int, rarity_type>> _temp_ilvl_rarity;
 };
 
