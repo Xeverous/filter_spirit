@@ -84,17 +84,41 @@ ImU32 to_imgui_color(lang::color c)
 void draw_item_tooltip(const lang::item& itm, const lang::item_filtering_result& /* result */, const gui::fonting& f)
 {
 	const auto _1 = f.scoped_monospaced_font();
-	ImGui::SetNextWindowSize(ImVec2(ImGui::GetFontSize() * 40.0f, 0));
+
+	// use lengths of the longest strings as column widths
+	const auto first_column_width = gui::measure_text_line(
+			lang::keywords::rf::enchantment_passive_node,
+			f.monospaced_font_size(),
+			f.monospaced_font()
+		).x + f.monospaced_font_size() * 2.0f;
+
+	constexpr auto str_not_implemented = "NOT IMPLEMENTED";
+	const char* longest_second_column_str = str_not_implemented;
+	std::size_t largest_second_column_str_size = std::strlen(str_not_implemented);
+	if (itm.base_type.size() > largest_second_column_str_size) {
+		longest_second_column_str = itm.base_type.c_str();
+		largest_second_column_str_size = itm.base_type.size();
+	}
+	if (itm.class_.size() > largest_second_column_str_size) {
+		longest_second_column_str = itm.class_.c_str();
+		largest_second_column_str_size = itm.class_.size();
+	}
+
+	const auto second_column_width = gui::measure_text_line(
+			longest_second_column_str,
+			f.monospaced_font_size(),
+			f.monospaced_font()
+		).x + f.monospaced_font_size() * 2.0f;
+
+	ImGui::SetNextWindowSize(ImVec2(first_column_width + second_column_width, 0));
 	gui::scoped_tooltip _2;
 
 	ImGui::Columns(2);
 
 	{
-		namespace kw = lang::keywords::rf;
+		ImGui::SetColumnWidth(-1, first_column_width);
 
-		// use length of the longest string as the column width
-		const auto width = gui::measure_text_line(kw::enchantment_passive_node, f.monospaced_font_size(), f.monospaced_font()).x;
-		ImGui::SetColumnWidth(-1, width + f.monospaced_font_size() * 2.0f);
+		namespace kw = lang::keywords::rf;
 
 		ImGui::TextDisabled("Name:");
 		ImGui::Text("%s:", kw::base_type);
@@ -186,10 +210,10 @@ void draw_item_tooltip(const lang::item& itm, const lang::item_filtering_result&
 			output_influence(itm.influence.warlord, kw::warlord);
 		}
 
-		ImGui::TextDisabled("NOT IMPLEMENTED");
-		ImGui::TextDisabled("NOT IMPLEMENTED");
-		ImGui::TextDisabled("NOT IMPLEMENTED");
-		ImGui::TextDisabled("NOT IMPLEMENTED");
+		ImGui::TextDisabled(str_not_implemented);
+		ImGui::TextDisabled(str_not_implemented);
+		ImGui::TextDisabled(str_not_implemented);
+		ImGui::TextDisabled(str_not_implemented);
 
 		if (itm.is_prophecy) {
 			// string here because filters expect this string
