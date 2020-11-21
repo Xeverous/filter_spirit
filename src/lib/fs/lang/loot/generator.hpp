@@ -69,6 +69,89 @@ struct gem_types
 	bool awakened_suport = false;
 };
 
+struct equippable_item_weights
+{
+	int sum() const
+	{
+		return body_armours + helmets + gloves + boots
+			+ axes_1h + maces_1h + swords_1h + thrusting_swords + claws + daggers + rune_daggers + wands
+			+ axes_2h + maces_2h + swords_2h + staves + warstaves + bows
+			+ shields + quivers
+			+ amulets + rings + belts
+			+ fishing_rods;
+	}
+
+	int body_armours = 1000;
+	int helmets = 1000;
+	int gloves = 1000;
+	int boots = 1000;
+
+	// 1-handed
+	int axes_1h = 125;
+	int maces_1h = 125;
+	int swords_1h = 125;
+	int thrusting_swords = 125;
+	int claws = 125;
+	int daggers = 125;
+	int rune_daggers = 125;
+	int wands = 125;
+
+	// 2-handed
+	int axes_2h = 150;
+	int maces_2h = 150;
+	int swords_2h = 150;
+	int staves = 150;
+	int warstaves = 150;
+	int bows = 150;
+
+	// off-hand
+	int shields = 500;
+	int quivers = 150;
+
+	// jewellery
+	int amulets = 100;
+	int rings = 100;
+	int belts = 100;
+
+	// other
+	int fishing_rods = 0;
+};
+
+struct rarity_weights
+{
+	int sum() const
+	{
+		return normal + magic + rare;
+	}
+
+	int normal = 1000;
+	int magic = 1000;
+	int rare = 1000;
+};
+
+struct item_level_weights
+{
+	int base = 3000;
+	int plus_one = 2000;
+	int plus_two = 1000;
+};
+
+struct influence_weights
+{
+	int sum() const
+	{
+		return none + shaper + elder + crusader + redeemer + hunter + warlord;
+	}
+
+	int none     = 10000;
+	int shaper   =   200;
+	int elder    =   200;
+	int crusader =   200;
+	int redeemer =   200;
+	int hunter   =   200;
+	int warlord  =   200;
+};
+
 class generator
 {
 public:
@@ -110,34 +193,47 @@ public:
 		percent chance_to_corrupt,
 		gem_types types);
 
-	// fucntions below are old and likely need to be rewritten
-
-	void generate_non_unique_equippable_item(
+	void generate_equippable_item(
 		const item_database& db,
 		item_receiver& receiver,
+		range quality,
 		int item_level,
-		rarity_type rarity_,
-		bool allow_atlas_bases);
+		percent chance_to_identify,
+		percent chance_to_corrupt,
+		percent chance_to_mirror,
+		equippable_item_weights class_weights,
+		influence_weights infl_weights,
+		rarity_type rarity_);
 
-	void generate_monster_loot(
+	void generate_equippable_items_fixed_weights(
 		const item_database& db,
 		item_receiver& receiver,
-		double rarity,
-		double quantity,
-		int item_level,
-		bool allow_atlas_bases);
-
-	void generate_monster_pack_loot(
-		const item_database& db,
-		item_receiver& receiver,
-		double rarity,
-		double quantity,
+		range quality,
+		range quantity,
 		int area_level,
-		bool allow_atlas_bases,
-		int num_normal_monsters,
-		int num_magic_monsters,
-		int num_rare_monsters,
-		int num_unique_monsters);
+		percent chance_to_identify,
+		percent chance_to_corrupt,
+		percent chance_to_mirror,
+		equippable_item_weights class_weights,
+		influence_weights infl_weights,
+		rarity_weights r_weights,
+		item_level_weights ilvl_weights);
+
+	void generate_equippable_items_monster_pack(
+		const item_database& db,
+		item_receiver& receiver,
+		range quality,
+		range normal_monsters,
+		range magic_monsters,
+		range rare_monsters,
+		range unique_monsters,
+		int area_level,
+		double rarity,
+		percent chance_to_identify,
+		percent chance_to_corrupt,
+		percent chance_to_mirror,
+		equippable_item_weights class_weights,
+		influence_weights infl_weights);
 
 	auto& rng()
 	{
@@ -155,6 +251,7 @@ private:
 	 * generated. Free to use for any member function.
 	 */
 	std::vector<std::size_t> _sp_indexes;
+	std::vector<std::pair<int, rarity_type>> _temp_ilvl_rarity;
 };
 
 }
