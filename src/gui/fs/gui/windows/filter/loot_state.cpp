@@ -294,6 +294,16 @@ void draw_weight_drag(const char* str, int& value)
 	ImGui::DragInt(str, &value, 1.0f, 0, INT_MAX, "%d", ImGuiSliderFlags_AlwaysClamp);
 }
 
+const gui::looted_item* find_item_by_mouse_position(const std::vector<gui::looted_item>& items, ImVec2 mouse_position)
+{
+	for (const auto& itm : items) {
+		if (itm.drawing && (*itm.drawing).contains(mouse_position))
+			return &itm;
+	}
+
+	return nullptr;
+}
+
 /**
  * @brief convert IIQ/IIR to normalized value
  * @param player player's stat value (200% increased = 200)
@@ -306,6 +316,8 @@ void draw_weight_drag(const char* str, int& value)
 {
 	return ((player + 100) / 100.0) * ((map + 100) / 100.0);
 }
+
+constexpr auto debug_popup_title = "Item debug";
 
 } // namespace
 
@@ -392,7 +404,13 @@ void loot_state::draw_interface(application& app)
 			std::shuffle(_items.begin(), _items.end(), app.loot_generator().rng());
 
 		_last_items_size = _items.size();
+
+		// item's address has been invalidated, close debug
+		_debug_enabled = false;
+		_debug_selected_item = nullptr;
 	}
+
+	draw_debug_interface();
 }
 
 void loot_state::draw_loot_settings_global()
@@ -625,14 +643,19 @@ void loot_state::draw_loot_canvas(const fonting& f)
 	 */
 	ImGui::InvisibleButton("canvas", canvas_size, ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
 
+	const auto& io = ImGui::GetIO();
 	if (ImGui::IsItemActive() && ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
-		const auto& io = ImGui::GetIO();
 		// right now only vertical scrolling
 		_canvas_offset_y += io.MouseDelta.y;
 	}
 
-	if (ImGui::IsItemHovered()) {
-		const auto& io = ImGui::GetIO();
+	const bool is_canvas_hovered = ImGui::IsItemHovered();
+
+	if (ImGui::IsItemClicked(ImGuiMouseButton_Right)) {
+		on_canvas_right_click(io.MousePos);
+	}
+
+	if (is_canvas_hovered && !_debug_enabled) {
 		_canvas_offset_y += io.MouseWheel * ImGui::GetFontSize();
 		on_canvas_hover(io.MousePos, f);
 	}
@@ -685,17 +708,34 @@ void loot_state::draw_item_labels(ImVec2 canvas_begin, ImVec2 canvas_end, const 
 	draw_list->PopClipRect();
 }
 
+void loot_state::draw_debug_interface()
+{
+	if (ImGui::BeginPopupModal(debug_popup_title, &_debug_enabled)) {
+		ImGui::Text("Hello from popup!");
+		ImGui::EndPopup();
+	}
+}
+
 void loot_state::on_canvas_hover(ImVec2 mouse_position, const fonting& f)
 {
-	for (const looted_item& itm : _items) {
-		if (itm.drawing) {
-			if ((*itm.drawing).contains(mouse_position)) {
-				FS_ASSERT(itm.filtering_result.has_value());
-				draw_item_tooltip(itm.itm, *itm.filtering_result, f);
-				break;
-			}
-		}
-	}
+	const looted_item* const ptr = find_item_by_mouse_position(_items, mouse_position);
+	if (ptr == nullptr)
+		return;
+
+	const auto& itm = *ptr;
+	if (itm.filtering_result)
+		draw_item_tooltip(itm.itm, *itm.filtering_result, f);
+}
+
+void loot_state::on_canvas_right_click(ImVec2 mouse_position)
+{
+	const looted_item* const ptr = find_item_by_mouse_position(_items, mouse_position);
+	if (ptr == nullptr)
+		return;
+
+	ImGui::OpenPopup(debug_popup_title);
+	_debug_enabled = true;
+	_debug_selected_item = ptr;
 }
 
 void loot_state::update_items(const lang::item_filter& filter)
