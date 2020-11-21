@@ -80,19 +80,19 @@ ImU32 to_imgui_color(lang::color c)
 		return IM_COL32(c.r.value, c.g.value, c.b.value, lang::limits::default_filter_opacity);
 }
 
-// TODO draw also applied filter rules
-void draw_item_tooltip(const lang::item& itm, const lang::item_filtering_result& /* result */, const gui::fonting& f)
+float get_item_tooltip_first_column_width(const gui::fonting& f)
 {
-	const auto _1 = f.scoped_monospaced_font();
-
-	// use lengths of the longest strings as column widths
-	const auto first_column_width = gui::measure_text_line(
+	return gui::measure_text_line(
 			lang::keywords::rf::enchantment_passive_node,
 			f.monospaced_font_size(),
 			f.monospaced_font()
 		).x + f.monospaced_font_size() * 2.0f;
+}
 
-	constexpr auto str_not_implemented = "NOT IMPLEMENTED";
+constexpr auto str_not_implemented = "NOT IMPLEMENTED";
+
+float get_item_tooltip_second_column_width(const lang::item& itm, const gui::fonting& f)
+{
 	const char* longest_second_column_str = str_not_implemented;
 	std::size_t largest_second_column_str_size = std::strlen(str_not_implemented);
 	if (itm.base_type.size() > largest_second_column_str_size) {
@@ -104,152 +104,196 @@ void draw_item_tooltip(const lang::item& itm, const lang::item_filtering_result&
 		largest_second_column_str_size = itm.class_.size();
 	}
 
-	const auto second_column_width = gui::measure_text_line(
+	return gui::measure_text_line(
 			longest_second_column_str,
 			f.monospaced_font_size(),
 			f.monospaced_font()
 		).x + f.monospaced_font_size() * 2.0f;
+}
+
+void draw_item_tooltip_first_column()
+{
+	namespace kw = lang::keywords::rf;
+
+	ImGui::TextDisabled("Name:");
+	ImGui::Text("%s:", kw::base_type);
+	ImGui::Text("%s:", kw::class_);
+	ImGui::Text("%s:", kw::rarity);
+	ImGui::Text("%s:", kw::sockets);
+	ImGui::Text("%s:", kw::item_level);
+	ImGui::Text("%s:", kw::drop_level);
+	ImGui::Text("%s:", kw::width);
+	ImGui::Text("%s:", kw::height);
+	ImGui::Text("%s:", kw::quality);
+	ImGui::Text("%s:", kw::stack_size);
+	ImGui::TextDisabled("MaxStackSize:");
+	ImGui::Text("%s:", kw::gem_level);
+	ImGui::TextDisabled("MaxGemLevel:");
+	ImGui::Text("%s:", kw::map_tier);
+	ImGui::Text("%s:", kw::corrupted_mods);
+
+	ImGui::Text("%s:", kw::has_influence);
+	ImGui::Text("%s:", kw::has_explicit_mod);
+	ImGui::Text("%s:", kw::has_enchantment);
+	ImGui::Text("%s:", kw::enchantment_passive_node);
+	ImGui::TextDisabled("HasAnnointment:");
+
+	ImGui::Text("%s:", kw::prophecy);
+	ImGui::Text("%s:", kw::identified);
+	ImGui::Text("%s:", kw::corrupted);
+	ImGui::Text("%s:", kw::mirrored);
+	ImGui::Text("%s:", kw::fractured_item);
+	ImGui::Text("%s:", kw::synthesised_item);
+	ImGui::Text("%s:", kw::shaped_map);
+	ImGui::Text("%s:", kw::elder_map);
+	ImGui::Text("%s:", kw::blighted_map);
+	ImGui::Text("%s:", kw::replica);
+	ImGui::Text("%s:", kw::alternate_quality);
+}
+
+void draw_item_tooltip_second_column(const lang::item& itm)
+{
+	if (itm.name)
+		ImGui::TextUnformatted((*itm.name).c_str());
+	else
+		ImGui::TextUnformatted("-");
+
+	ImGui::TextUnformatted(itm.base_type.c_str());
+	ImGui::TextUnformatted(itm.class_.c_str());
+
+	const auto rarity = to_string_view(itm.rarity_);
+	ImGui::TextUnformatted(rarity.data(), rarity.data() + rarity.size()); // TODO add colors
+
+	ImGui::TextUnformatted(to_string(itm.sockets).c_str()); // TODO add colors
+	ImGui::Text("%d", itm.item_level);
+	ImGui::Text("%d", itm.drop_level);
+	ImGui::Text("%d", itm.width);
+	ImGui::Text("%d", itm.height);
+	ImGui::Text("%d", itm.quality);
+	ImGui::Text("%d", itm.stack_size);
+	ImGui::Text("%d", itm.max_stack_size);
+	ImGui::Text("%d", itm.gem_level);
+	ImGui::Text("%d", itm.max_gem_level);
+	ImGui::Text("%d", itm.map_tier);
+	ImGui::Text("%d", itm.corrupted_mods);
+
+	if (itm.influence.is_none()) {
+		ImGui::TextUnformatted("None");
+	}
+	else {
+		bool first_influence_text = true;
+		const auto output_influence = [&](bool condition, const char* name) {
+			if (!condition)
+				return;
+
+			if (!first_influence_text) {
+				ImGui::SameLine(0, 0);
+			}
+
+			ImGui::Text("%s ", name);
+			first_influence_text = false;
+		};
+
+		// TODO colors?
+		namespace kw = lang::keywords::rf;
+		output_influence(itm.influence.shaper, kw::shaper);
+		output_influence(itm.influence.elder, kw::elder);
+		output_influence(itm.influence.crusader, kw::crusader);
+		output_influence(itm.influence.redeemer, kw::redeemer);
+		output_influence(itm.influence.hunter, kw::hunter);
+		output_influence(itm.influence.warlord, kw::warlord);
+	}
+
+	ImGui::TextDisabled(str_not_implemented);
+	ImGui::TextDisabled(str_not_implemented);
+	ImGui::TextDisabled(str_not_implemented);
+	ImGui::TextDisabled(str_not_implemented);
+
+	if (itm.is_prophecy) {
+		// string here because filters expect this string
+		// for unknown reason, Prophecy is not a boolean condition
+		ImGui::TextUnformatted(itm.base_type.c_str());
+	}
+	else {
+		ImGui::TextUnformatted("-");
+	}
+
+	const auto output_boolean = [](bool value) {
+		namespace kw = lang::keywords::rf;
+
+		if (value)
+			ImGui::TextColored(ImGui::ColorConvertU32ToFloat4(gui::color_true), kw::true_);
+		else
+			ImGui::TextColored(ImGui::ColorConvertU32ToFloat4(gui::color_false), kw::false_);
+	};
+
+	output_boolean(itm.is_identified);
+	output_boolean(itm.is_corrupted);
+	output_boolean(itm.is_mirrored);
+	output_boolean(itm.is_fractured_item);
+	output_boolean(itm.is_synthesised_item);
+	output_boolean(itm.is_shaped_map);
+	output_boolean(itm.is_elder_map);
+	output_boolean(itm.is_blighted_map);
+	output_boolean(itm.is_replica);
+	output_boolean(itm.is_alternate_quality);
+}
+
+// TODO draw also applied filter rules
+void draw_item_tooltip(const lang::item& itm, const lang::item_filtering_result& /* result */, const gui::fonting& f)
+{
+	const auto _1 = f.scoped_monospaced_font();
+
+	const auto first_column_width = get_item_tooltip_first_column_width(f);
+	const auto second_column_width = get_item_tooltip_second_column_width(itm, f);
 
 	ImGui::SetNextWindowSize(ImVec2(first_column_width + second_column_width, 0));
 	gui::scoped_tooltip _2;
 
 	ImGui::Columns(2);
 
-	{
-		ImGui::SetColumnWidth(-1, first_column_width);
-
-		namespace kw = lang::keywords::rf;
-
-		ImGui::TextDisabled("Name:");
-		ImGui::Text("%s:", kw::base_type);
-		ImGui::Text("%s:", kw::class_);
-		ImGui::Text("%s:", kw::rarity);
-		ImGui::Text("%s:", kw::sockets);
-		ImGui::Text("%s:", kw::item_level);
-		ImGui::Text("%s:", kw::drop_level);
-		ImGui::Text("%s:", kw::width);
-		ImGui::Text("%s:", kw::height);
-		ImGui::Text("%s:", kw::quality);
-		ImGui::Text("%s:", kw::stack_size);
-		ImGui::TextDisabled("MaxStackSize:");
-		ImGui::Text("%s:", kw::gem_level);
-		ImGui::TextDisabled("MaxGemLevel:");
-		ImGui::Text("%s:", kw::map_tier);
-		ImGui::Text("%s:", kw::corrupted_mods);
-
-		ImGui::Text("%s:", kw::has_influence);
-		ImGui::Text("%s:", kw::has_explicit_mod);
-		ImGui::Text("%s:", kw::has_enchantment);
-		ImGui::Text("%s:", kw::enchantment_passive_node);
-		ImGui::TextDisabled("HasAnnointment:");
-
-		ImGui::Text("%s:", kw::prophecy);
-		ImGui::Text("%s:", kw::identified);
-		ImGui::Text("%s:", kw::corrupted);
-		ImGui::Text("%s:", kw::mirrored);
-		ImGui::Text("%s:", kw::fractured_item);
-		ImGui::Text("%s:", kw::synthesised_item);
-		ImGui::Text("%s:", kw::shaped_map);
-		ImGui::Text("%s:", kw::elder_map);
-		ImGui::Text("%s:", kw::blighted_map);
-		ImGui::Text("%s:", kw::replica);
-		ImGui::Text("%s:", kw::alternate_quality);
-	}
+	ImGui::SetColumnWidth(-1, first_column_width);
+	draw_item_tooltip_first_column();
 
 	ImGui::NextColumn();
-
-	{
-		if (itm.name)
-			ImGui::TextUnformatted((*itm.name).c_str());
-		else
-			ImGui::TextUnformatted("-");
-
-		ImGui::TextUnformatted(itm.base_type.c_str());
-		ImGui::TextUnformatted(itm.class_.c_str());
-
-		const auto rarity = to_string_view(itm.rarity_);
-		ImGui::TextUnformatted(rarity.data(), rarity.data() + rarity.size()); // TODO add colors
-
-		ImGui::TextUnformatted(to_string(itm.sockets).c_str()); // TODO add colors
-		ImGui::Text("%d", itm.item_level);
-		ImGui::Text("%d", itm.drop_level);
-		ImGui::Text("%d", itm.width);
-		ImGui::Text("%d", itm.height);
-		ImGui::Text("%d", itm.quality);
-		ImGui::Text("%d", itm.stack_size);
-		ImGui::Text("%d", itm.max_stack_size);
-		ImGui::Text("%d", itm.gem_level);
-		ImGui::Text("%d", itm.max_gem_level);
-		ImGui::Text("%d", itm.map_tier);
-		ImGui::Text("%d", itm.corrupted_mods);
-
-		if (itm.influence.is_none()) {
-			ImGui::TextUnformatted("None");
-		}
-		else {
-			bool first_influence_text = true;
-			const auto output_influence = [&](bool condition, const char* name) {
-				if (!condition)
-					return;
-
-				if (!first_influence_text) {
-					ImGui::SameLine(0, 0);
-				}
-
-				ImGui::Text("%s ", name);
-				first_influence_text = false;
-			};
-
-			// TODO colors?
-			namespace kw = lang::keywords::rf;
-			output_influence(itm.influence.shaper, kw::shaper);
-			output_influence(itm.influence.elder, kw::elder);
-			output_influence(itm.influence.crusader, kw::crusader);
-			output_influence(itm.influence.redeemer, kw::redeemer);
-			output_influence(itm.influence.hunter, kw::hunter);
-			output_influence(itm.influence.warlord, kw::warlord);
-		}
-
-		ImGui::TextDisabled(str_not_implemented);
-		ImGui::TextDisabled(str_not_implemented);
-		ImGui::TextDisabled(str_not_implemented);
-		ImGui::TextDisabled(str_not_implemented);
-
-		if (itm.is_prophecy) {
-			// string here because filters expect this string
-			// for unknown reason, Prophecy is not a boolean condition
-			ImGui::TextUnformatted(itm.base_type.c_str());
-		}
-		else {
-			ImGui::TextUnformatted("-");
-		}
-
-		const auto output_boolean = [](bool value) {
-			namespace kw = lang::keywords::rf;
-
-			if (value)
-				ImGui::TextColored(ImGui::ColorConvertU32ToFloat4(gui::color_true), kw::true_);
-			else
-				ImGui::TextColored(ImGui::ColorConvertU32ToFloat4(gui::color_false), kw::false_);
-		};
-
-		output_boolean(itm.is_identified);
-		output_boolean(itm.is_corrupted);
-		output_boolean(itm.is_mirrored);
-		output_boolean(itm.is_fractured_item);
-		output_boolean(itm.is_synthesised_item);
-		output_boolean(itm.is_shaped_map);
-		output_boolean(itm.is_elder_map);
-		output_boolean(itm.is_blighted_map);
-		output_boolean(itm.is_replica);
-		output_boolean(itm.is_alternate_quality);
-	}
+	draw_item_tooltip_second_column(itm);
 
 	ImGui::Columns(1); // reset back to single column
 
 	ImGui::Dummy({0.0f, ImGui::GetFontSize() * 1.0f});
 	ImGui::TextUnformatted("filter conditions");
 	ImGui::TextDisabled("properties unsupported by filters");
+}
+
+void draw_debug_interface_impl(
+	std::string_view source,
+	const lang::item& itm,
+	const lang::item_filtering_result& /* result */,
+	const gui::fonting& f)
+{
+	const auto _1 = f.scoped_monospaced_font();
+
+	const auto first_column_width = get_item_tooltip_first_column_width(f);
+	const auto second_column_width = get_item_tooltip_second_column_width(itm, f);
+
+	ImGui::Columns(3);
+
+	ImGui::SetColumnWidth(-1, first_column_width);
+	draw_item_tooltip_first_column();
+
+	ImGui::NextColumn();
+
+	ImGui::SetColumnWidth(-1, second_column_width);
+	draw_item_tooltip_second_column(itm);
+
+	ImGui::NextColumn();
+
+	if (ImGui::BeginChild("source")) {
+		ImGui::TextUnformatted(source.data(), source.data() + source.size());
+	}
+	ImGui::EndChild();
+
+	ImGui::Columns(1); // reset back to single column
 }
 
 void draw_item_label(
@@ -370,7 +414,7 @@ void loot_slider_range::draw(const char* str)
 		std::swap(min(), max());
 }
 
-void loot_state::draw_interface(application& app)
+void loot_state::draw_interface(std::string_view source, application& app)
 {
 	const std::optional<lang::loot::item_database>& database = app.item_database();
 	if (!database) {
@@ -410,7 +454,7 @@ void loot_state::draw_interface(application& app)
 		_debug_selected_item = nullptr;
 	}
 
-	draw_debug_interface();
+	draw_debug_interface(source, app.font_settings());
 }
 
 void loot_state::draw_loot_settings_global()
@@ -708,10 +752,13 @@ void loot_state::draw_item_labels(ImVec2 canvas_begin, ImVec2 canvas_end, const 
 	draw_list->PopClipRect();
 }
 
-void loot_state::draw_debug_interface()
+void loot_state::draw_debug_interface(std::string_view source, const fonting& f)
 {
+	ImGui::SetNextWindowSize({f.monospaced_font_size() * 60.0f, 0.0f});
 	if (ImGui::BeginPopupModal(debug_popup_title, &_debug_enabled)) {
-		ImGui::Text("Hello from popup!");
+		FS_ASSERT(_debug_selected_item != nullptr);
+		FS_ASSERT(_debug_selected_item->filtering_result.has_value());
+		draw_debug_interface_impl(source, _debug_selected_item->itm, *_debug_selected_item->filtering_result, f);
 		ImGui::EndPopup();
 	}
 }

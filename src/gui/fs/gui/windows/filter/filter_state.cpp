@@ -5,6 +5,7 @@
 #include <fs/compiler/compiler.hpp>
 #include <fs/generator/make_item_filter.hpp>
 #include <fs/utility/file.hpp>
+#include <fs/utility/assert.hpp>
 
 #include <imgui.h>
 
@@ -116,8 +117,10 @@ void filter_state_base::draw_interface_loot(application& app)
 			return;
 		}
 
+		FS_ASSERT(_source.has_value());
+
 		_loot_state.update_items(*_filter_representation);
-		_loot_state.draw_interface(app);
+		_loot_state.draw_interface(*_source, app);
 	}
 }
 
