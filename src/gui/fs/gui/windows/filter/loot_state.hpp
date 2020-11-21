@@ -141,7 +141,7 @@ class fonting;
 class loot_state : public lang::loot::item_receiver
 {
 public:
-	void draw_interface(application& app);
+	void draw_interface(std::string_view source, application& app);
 
 	void update_items(const lang::item_filter& filter); // apply filter to items without style
 	void refilter_items(const lang::item_filter& filter); // apply filter to every item
@@ -188,7 +188,7 @@ private:
 	void draw_loot_buttons_gems            (const lang::loot::item_database& db, lang::loot::generator& gen);
 	void draw_loot_buttons_equipment       (const lang::loot::item_database& db, lang::loot::generator& gen);
 
-	void draw_debug_interface();
+	void draw_debug_interface(std::string_view source, const fonting& f);
 
 	// render state
 	float _canvas_offset_y = 0;
