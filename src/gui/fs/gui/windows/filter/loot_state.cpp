@@ -405,6 +405,10 @@ void loot_state::draw_loot_settings_global()
 		ImGui::Checkbox("Shuffle items when new ones are generated", &_shuffle_loot);
 
 	ImGui::SliderInt("area level", &_area_level, 1, lang::limits::max_item_level);
+	if (_area_level > 67) {
+		ImGui::SameLine(0, 0);
+		ImGui::Text(" (tier %d)", _area_level - 67);
+	}
 
 	constexpr auto mf_min = -100;
 	constexpr auto mf_max = 400;
