@@ -151,6 +151,8 @@ public:
 		_items.clear();
 		_last_items_size = 0;
 		_canvas_offset_y = 0.0f;
+		_debug_enabled = false;
+		_debug_selected_item = nullptr;
 	}
 
 	void clear_filter_results()
@@ -178,6 +180,7 @@ private:
 	void draw_loot_canvas(const fonting& f);
 	void draw_item_labels(ImVec2 canvas_begin, ImVec2 canvas_end, const fonting& f);
 	void on_canvas_hover(ImVec2 mouse_position, const fonting& f);
+	void on_canvas_right_click(ImVec2 mouse_position);
 
 	void draw_loot_settings_global();
 	void draw_loot_buttons_currency        (const lang::loot::item_database& db, lang::loot::generator& gen);
@@ -185,12 +188,18 @@ private:
 	void draw_loot_buttons_gems            (const lang::loot::item_database& db, lang::loot::generator& gen);
 	void draw_loot_buttons_equipment       (const lang::loot::item_database& db, lang::loot::generator& gen);
 
+	void draw_debug_interface();
+
 	// render state
 	float _canvas_offset_y = 0;
 
 	// loot state
 	std::vector<looted_item> _items;
 	std::size_t _last_items_size = 0;
+
+	// debug state
+	bool _debug_enabled = false; // item pointer alone is not enough: Dear ImGui wants bool*
+	const looted_item* _debug_selected_item = nullptr; // this can be invalided by modifying looted items
 
 	// global loot settings
 	bool _append_loot = false;
