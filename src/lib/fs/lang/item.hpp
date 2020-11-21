@@ -12,6 +12,7 @@
 #include <vector>
 #include <string_view>
 #include <string>
+#include <stdexcept>
 #include <initializer_list>
 
 namespace fs::lang
@@ -87,6 +88,145 @@ namespace item_class_names {
 	constexpr auto flask_utility = "Utility Flasks";
 	constexpr auto flask_utility_critical = "Critical Utility Flasks";
 
+}
+
+// https://pathofexile.gamepedia.com/Rare_Item_Name_Index
+// rare items are named using random prefix + suffix strings
+// but wiki has no data on Fishing Rod class
+namespace rare_item_names {
+
+	/*
+	 * keyword inline is present due to:
+	 * - https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80351
+	 * - Clang's behavior to warn about any unused non-inline constexpr object
+	 */
+
+	// all rare items use the same pool of prefixes...
+	inline constexpr auto prefixes = {
+		"Agony", "Apocalypse", "Armageddon", "Beast", "Behemoth", "Blight", "Blood", "Bramble", "Brimstone",
+		"Brood", "Carrion", "Cataclysm", "Chimeric", "Corpse", "Corruption", "Damnation", "Death", "Demon",
+		"Dire", "Dragon", "Dread", "Doom", "Dusk", "Eagle", "Empyrean", "Fate", "Foe", "Gale", "Ghoul",
+		"Gloom", "Glyph", "Golem", "Grim", "Hate", "Havoc", "Honour", "Horror", "Hypnotic", "Kraken", "Loath",
+		"Maelstrom", "Mind", "Miracle", "Morbid", "Oblivion", "Onslaught", "Pain", "Pandemonium", "Phoenix",
+		"Plague", "Rage", "Rapture", "Rune", "Skull", "Sol", "Soul", "Sorrow", "Spirit", "Storm", "Tempest",
+		"Torment", "Vengeance", "Victory", "Viper", "Vortex", "Woe", "Wrath"
+	};
+
+	// ...except fishing rods, which can draw from this pool instead
+	// /u/poorFishwife: For dataminers: This is from Words.dat with WordslistKey == 1 || 2.
+	// The special words seem to have SpawnWeight_TagKeys set to [80, 0].
+	inline constexpr auto prefixes_eq_fishing_rods = {
+		"Wet", "Cast", "Line", "Tackle", "Lure", "Bait", "Fish", "Breach", "Angler", "Sinker", "Chum", "Gill", "Jig"
+	};
+
+	inline constexpr auto suffixes_eq_body_armours = {
+		"Carapace", "Cloak", "Coat", "Curtain", "Guardian", "Hide", "Jack", "Keep", "Mantle", "Pelt",
+		"Salvation", "Sanctuary", "Shell", "Shelter", "Shroud", "Skin", "Suit", "Veil", "Ward", "Wrap"
+	};
+
+	inline constexpr auto suffixes_eq_helmets = {
+		"Brow", "Corona", "Cowl", "Crest", "Crown", "Dome", "Glance", "Guardian", "Halo", "Horn", "Keep",
+		"Peak", "Salvation", "Shelter", "Star", "Veil", "Visage", "Visor", "Ward"
+	};
+
+	inline constexpr auto suffixes_eq_gloves = {
+		"Caress", "Claw", "Clutches", "Fingers", "Fist", "Grasp", "Grip", "Hand", "Hold", "Knuckle", "Mitts",
+		"Nails", "Palm", "Paw", "Talons", "Touch", "Vise"
+	};
+
+	inline constexpr auto suffixes_eq_boots = {
+		"Dash", "Goad", "Hoof", "League", "March", "Pace", "Road", "Slippers", "Sole", "Span", "Spark",
+		"Spur", "Stride", "Track", "Trail", "Tread", "Urge"
+	};
+
+	inline constexpr auto suffixes_eq_axes = {
+		"Bane", "Beak", "Bite", "Butcher", "Edge", "Etcher", "Gnash", "Hunger", "Mangler", "Rend", "Roar",
+		"Sever", "Slayer", "Song", "Spawn", "Splitter", "Sunder", "Thirst"
+	};
+
+	inline constexpr auto suffixes_eq_maces = {
+		"Bane", "Mangler", "Roar", "Batter", "Blast", "Blow", "Blunt", "Brand", "Breaker", "Burst", "Crack",
+		"Crusher", "Grinder", "Knell", "Ram", "Ruin", "Shatter", "Smasher", "Star", "Thresher", "Wreck"
+	};
+
+	inline constexpr auto suffixes_eq_sceptres = {
+		"Bane", "Roar", "Blow", "Breaker", "Crack", "Crusher", "Grinder", "Knell", "Ram", "Smasher", "Star",
+		"Song", "Call", "Chant", "Cry", "Gnarl", "Spell", "Weaver",
+	};
+
+	inline constexpr auto suffixes_eq_staves = {
+		"Bane", "Roar", "Song", "Call", "Chant", "Cry", "Gnarl", "Spell", "Weaver", "Beam", "Branch", "Goad",
+		"Mast", "Pile", "Pillar", "Pole", "Post", "Spire"
+	};
+
+	inline constexpr auto suffixes_eq_swords = {
+		"Bane", "Song", "Beak", "Bite", "Edge", "Hunger", "Sever", "Thirst", "Barb", "Fang", "Gutter", "Impaler",
+		"Needle", "Razor", "Saw", "Scalpel", "Scratch", "Skewer", "Slicer", "Spike", "Spiker", "Stinger"
+	};
+
+	inline constexpr auto suffixes_eq_daggers = {
+		"Bane", "Song", "Bite", "Edge", "Hunger", "Sever", "Thirst", "Barb", "Fang", "Gutter", "Impaler",
+		"Needle", "Razor", "Scalpel", "Scratch", "Skewer", "Slicer", "Spike", "Stinger", "Etcher"
+	};
+
+	inline constexpr auto suffixes_eq_claws = {
+		"Bane", "Song", "Bite", "Edge", "Hunger", "Thirst", "Fang", "Gutter", "Impaler", "Needle", "Razor",
+		"Scratch", "Skewer", "Slicer", "Spike", "Stinger", "Roar", "Fist", "Talons"
+	};
+
+	inline constexpr auto suffixes_eq_bows = {
+		"Bane", "Song", "Thirst", "Stinger", "Branch", "Blast", "Arch", "Barrage", "Breeze", "Fletch", "Guide",
+		"Horn", "Mark", "Nock", "Rain", "Reach", "Siege", "Strike", "Thunder", "Twine", "Volley", "Wind", "Wing"
+	};
+
+	inline constexpr auto suffixes_eq_wands = {
+		"Bane", "Song", "Thirst", "Branch", "Bite", "Edge", "Needle", "Scratch", "Barb", "Call", "Chant",
+		"Cry", "Gnarl", "Spell", "Weaver", "Goad", "Spire", "Charm"
+	};
+
+	inline constexpr auto suffixes_eq_spirit_shields = {
+		"Ancient", "Anthem", "Call", "Chant", "Charm", "Emblem", "Guard", "Mark", "Pith", "Sanctuary",
+		"Song", "Spell", "Star", "Ward", "Weaver", "Wish"
+	};
+
+	inline constexpr auto suffixes_eq_other_shields = {
+		"Aegis", "Badge", "Barrier", "Bastion", "Bulwark", "Duty", "Emblem", "Fend", "Guard", "Mark",
+		"Refuge", "Rock", "Rook", "Sanctuary", "Span", "Tower", "Watch", "Wing"
+	};
+
+	inline constexpr auto suffixes_eq_quivers = {
+		"Arrow", "Barb", "Bite", "Bolt", "Brand", "Dart", "Flight", "Hail", "Impaler", "Nails", "Needle",
+		"Quill", "Rod", "Shot", "Skewer", "Spear", "Spike", "Spire", "Stinger"
+	};
+
+	inline constexpr auto suffixes_eq_amulets = {
+		"Beads", "Braid", "Charm", "Choker", "Clasp", "Collar", "Idol", "Gorget", "Heart", "Locket",
+		"Medallion", "Noose", "Pendant", "Rosary", "Scarab", "Talisman", "Torc"
+	};
+
+	inline constexpr auto suffixes_eq_rings = {
+		"Band", "Circle", "Coil", "Eye", "Finger", "Grasp", "Grip", "Gyre", "Hold", "Knot", "Knuckle", "Loop",
+		"Nail", "Spiral", "Turn", "Twirl", "Whorl"
+	};
+
+	inline constexpr auto suffixes_eq_belts = {
+		"Bind", "Bond", "Buckle", "Clasp", "Cord", "Girdle", "Harness", "Lash", "Leash", "Lock", "Locket",
+		"Shackle", "Snare", "Strap", "Tether", "Thread", "Trap", "Twine"
+	};
+
+	inline constexpr auto suffixes_eq_fishing_rods = {
+		// first line same as fishing rod prefixes
+		"Wet", "Cast", "Line", "Tackle", "Lure", "Bait", "Fish", "Breach", "Angler", "Sinker", "Chum", "Gill", "Jig",
+		"Barb", "Pole", "Snare", "Doom", "Fate", "Gloom", "Havoc", "Miracle", "Onslaught", "Rage", "Rift", "Rune",
+		"Sorrow", "Storm", "Tempest", "Torment", "Vengeance", "Victory", "Woe", "Wrath"
+	};
+
+	constexpr auto suffixes_maps = {
+		"Abode", "Bind", "Chambers", "Coffers", "Core", "Cradle", "Cramp", "Crest", "Depths", "Dregs",
+		"Dwelling", "Frontier", "Haven", "Keep", "Oubliette", "Panorama", "Pit", "Point", "Precinct",
+		"Quarters", "Reaches", "Refuge", "Refuse", "Remains", "Roost", "Sanctum", "Scum", "Secrets",
+		"Sepulcher", "Shadows", "Solitude", "Trap", "Vault", "View", "Vine", "Waste", "Ziggurat", "Zone"
+	};
 }
 
 template <typename T, std::size_t N>
@@ -197,6 +337,30 @@ struct socket_info
 				return status;
 
 		return item_validity::valid;
+	}
+
+	socket_color& operator[](std::size_t n)
+	{
+		for (linked_sockets& gr : groups) {
+			if (n < gr.sockets.size())
+				return gr.sockets[n];
+			else
+				n -= gr.sockets.size();
+		}
+
+		throw std::invalid_argument("invalid socket index: " + std::to_string(n));
+	}
+
+	socket_color operator[](std::size_t n) const
+	{
+		for (const linked_sockets& gr : groups) {
+			if (n < gr.sockets.size())
+				return gr.sockets[n];
+			else
+				n -= gr.sockets.size();
+		}
+
+		throw std::invalid_argument("invalid socket index: " + std::to_string(n));
 	}
 
 	// any item has at most 6 distinct socket groups

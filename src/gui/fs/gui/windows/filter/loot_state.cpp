@@ -259,6 +259,30 @@ void draw_item_label(
 	draw_list->AddText(fnt, font_size, ImVec2(x, y), to_imgui_color(result.style.text_color.c), ild.second_line());
 }
 
+void draw_percent_slider(const char* str, lang::loot::percent& value)
+{
+	ImGui::SliderInt(str, &value.value, lang::loot::percent::min().value, lang::loot::percent::max().value, "%d%%", ImGuiSliderFlags_AlwaysClamp);
+}
+
+void draw_weight_drag(const char* str, int& value)
+{
+	gui::scoped_pointer_id _(&value);
+	ImGui::DragInt(str, &value, 1.0f, 0, INT_MAX, "%d", ImGuiSliderFlags_AlwaysClamp);
+}
+
+/**
+ * @brief convert IIQ/IIR to normalized value
+ * @param player player's stat value (200% increased = 200)
+ * @param map map's stat value (200% increased = 200)
+ * @return value in normalized format (1.0 meaning no difference)
+ * @details example:
+ * for player's +200% (3x more) and map's +200% (3x more) the result is 9.0 (9x normal stat)
+ */
+[[nodiscard]] double increased_item_stats_normalized(int player, int map)
+{
+	return ((player + 100) / 100.0) * ((map + 100) / 100.0);
+}
+
 } // namespace
 
 namespace fs::gui {
@@ -332,6 +356,7 @@ void loot_state::draw_interface(application& app)
 	draw_loot_buttons_currency        (db, app.loot_generator());
 	draw_loot_buttons_specific_classes(db, app.loot_generator());
 	draw_loot_buttons_gems            (db, app.loot_generator());
+	draw_loot_buttons_equipment       (db, app.loot_generator());
 
 	if (_last_items_size != _items.size()) {
 		if (_last_items_size < _items.size() && !_append_loot) {
@@ -355,17 +380,16 @@ void loot_state::draw_loot_settings_global()
 	if (_append_loot)
 		ImGui::Checkbox("Shuffle items when new ones are generated", &_shuffle_loot);
 
-	ImGui::SliderInt("Area level", &_area_level, 1, lang::limits::max_item_level);
+	ImGui::SliderInt("area level", &_area_level, 1, lang::limits::max_item_level);
 
 	constexpr auto mf_min = -100;
 	constexpr auto mf_max = 400;
 	constexpr auto mf_format = "%+d%%";
-	ImGui::SliderInt("Player IIQ", &_player_iiq, mf_min, mf_max, mf_format);
-	ImGui::SliderInt("Player IIR", &_player_iir, mf_min, mf_max, mf_format);
-	ImGui::SliderInt("Map IIQ",    &_map_iiq,    mf_min, mf_max, mf_format);
-	ImGui::SliderInt("Map IIR",    &_map_iir,    mf_min, mf_max, mf_format);
-	ImGui::SliderInt("Chance to corrupt", &_chance_to_corrupt.value,
-		lang::loot::percent::min().value, lang::loot::percent::max().value, "%d%%", ImGuiSliderFlags_AlwaysClamp);
+	ImGui::SliderInt("player IIR", &_player_iir, mf_min, mf_max, mf_format);
+	ImGui::SliderInt("map IIR",    &_map_iir,    mf_min, mf_max, mf_format);
+	draw_percent_slider("chance to identify", _chance_to_identify);
+	draw_percent_slider("chance to corrupt",  _chance_to_corrupt);
+	draw_percent_slider("chance to mirror",   _chance_to_mirror);
 }
 
 void loot_state::draw_loot_buttons_currency(const lang::loot::item_database& db, lang::loot::generator& gen)
@@ -447,6 +471,108 @@ void loot_state::draw_loot_buttons_gems(const lang::loot::item_database& db, lan
 	_gems_quantity.draw("quantity");
 	_gems_level.draw("level");
 	_gems_quality.draw("quality");
+}
+
+void loot_state::draw_loot_buttons_equipment(const lang::loot::item_database& db, lang::loot::generator& gen)
+{
+	if (!ImGui::CollapsingHeader("Equipment (aka rare garbage)", ImGuiTreeNodeFlags_DefaultOpen))
+		return;
+
+	constexpr auto class_weights_popup_str = "class weights";
+	if (ImGui::Button(class_weights_popup_str))
+		ImGui::OpenPopup(class_weights_popup_str);
+
+	if (ImGui::BeginPopup(class_weights_popup_str)) {
+		ImGui::TextUnformatted("main parts");
+		draw_weight_drag("body armours", _eq_class_weights.body_armours);
+		draw_weight_drag("helmets", _eq_class_weights.helmets);
+		draw_weight_drag("gloves", _eq_class_weights.gloves);
+		draw_weight_drag("boots", _eq_class_weights.boots);
+		ImGui::TextUnformatted("jewellery");
+		draw_weight_drag("amulets", _eq_class_weights.amulets);
+		draw_weight_drag("rings", _eq_class_weights.rings);
+		draw_weight_drag("belts", _eq_class_weights.belts);
+		ImGui::TextUnformatted("1-handed");
+		draw_weight_drag("axes", _eq_class_weights.axes_1h);
+		draw_weight_drag("maces", _eq_class_weights.maces_1h);
+		draw_weight_drag("swords", _eq_class_weights.swords_1h);
+		draw_weight_drag("thrusting swords", _eq_class_weights.thrusting_swords);
+		draw_weight_drag("claws", _eq_class_weights.claws);
+		draw_weight_drag("daggers", _eq_class_weights.daggers);
+		draw_weight_drag("rune daggers", _eq_class_weights.rune_daggers);
+		draw_weight_drag("wands", _eq_class_weights.wands);
+		ImGui::TextUnformatted("2-handed");
+		draw_weight_drag("axes", _eq_class_weights.axes_2h);
+		draw_weight_drag("maces", _eq_class_weights.maces_2h);
+		draw_weight_drag("swords", _eq_class_weights.swords_2h);
+		draw_weight_drag("staves", _eq_class_weights.staves);
+		draw_weight_drag("warstaves", _eq_class_weights.warstaves);
+		draw_weight_drag("bows", _eq_class_weights.bows);
+		draw_weight_drag("fishing rods", _eq_class_weights.fishing_rods);
+		ImGui::TextUnformatted("offhand");
+		draw_weight_drag("shields", _eq_class_weights.shields);
+		draw_weight_drag("quivers", _eq_class_weights.quivers);
+		ImGui::EndPopup();
+	}
+
+	ImGui::SameLine();
+
+	constexpr auto influence_weights_popup_str = "influence weights";
+	if (ImGui::Button(influence_weights_popup_str))
+		ImGui::OpenPopup(influence_weights_popup_str);
+
+	if (ImGui::BeginPopup(influence_weights_popup_str)) {
+		draw_weight_drag("None",     _eq_influence_weights.none);
+		draw_weight_drag("Shaper",   _eq_influence_weights.shaper);
+		draw_weight_drag("Elder",    _eq_influence_weights.elder);
+		draw_weight_drag("Crusader", _eq_influence_weights.crusader);
+		draw_weight_drag("Redeemer", _eq_influence_weights.redeemer);
+		draw_weight_drag("Hunter",   _eq_influence_weights.hunter);
+		draw_weight_drag("Warlord",  _eq_influence_weights.warlord);
+		ImGui::EndPopup();
+	}
+
+	_eq_quality.draw("quality");
+
+	if (ImGui::BeginChild("equipment generation")) {
+		ImGui::Columns(2);
+
+		if (ImGui::Button("generate - fixed weights")) {
+			gen.generate_equippable_items_fixed_weights(
+				db, *this, _eq_quality.range(), _eq_fixed_weights_quantity.range(),
+				_area_level, _chance_to_identify, _chance_to_corrupt, _chance_to_mirror,
+				_eq_class_weights, _eq_influence_weights,
+				_eq_fixed_weights_rarity, _eq_fixed_weights_item_level);
+		}
+
+		// fixed weights generation
+		_eq_fixed_weights_quantity.draw("quantity");
+		draw_weight_drag("Rarity: Normal", _eq_fixed_weights_rarity.normal);
+		draw_weight_drag("Rarity: Magic",  _eq_fixed_weights_rarity.magic);
+		draw_weight_drag("Rarity: Rare ",  _eq_fixed_weights_rarity.rare);
+		draw_weight_drag("ilvl = area", _eq_fixed_weights_item_level.base);
+		draw_weight_drag("ilvl +1",     _eq_fixed_weights_item_level.plus_one);
+		draw_weight_drag("ilvl +2",     _eq_fixed_weights_item_level.plus_two);
+
+		ImGui::NextColumn();
+
+		if (ImGui::Button("generate - simulated monster pack")) {
+			gen.generate_equippable_items_monster_pack(
+				db, *this, _eq_quality.range(),
+				_eq_monster_pack_normal.range(), _eq_monster_pack_magic.range(), _eq_monster_pack_rare.range(), _eq_monster_pack_unique.range(),
+				_area_level, increased_item_stats_normalized(_player_iir, _map_iir),
+				_chance_to_identify, _chance_to_corrupt, _chance_to_mirror,
+				_eq_class_weights, _eq_influence_weights);
+		}
+
+		// monster pack generation
+		_eq_monster_pack_normal.draw("normal monsters");
+		_eq_monster_pack_magic.draw("magic monsters");
+		_eq_monster_pack_rare.draw("rare monsters");
+		_eq_monster_pack_unique.draw("unique monsters");
+		ImGui::Columns(1);
+	}
+	ImGui::EndChild();
 }
 
 void loot_state::draw_loot_canvas(const fonting& f)

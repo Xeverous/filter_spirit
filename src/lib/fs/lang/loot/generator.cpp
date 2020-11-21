@@ -33,10 +33,12 @@ std::seed_seq make_seed_seq()
 	return std::seed_seq{static_cast<std::random_device::result_type>(std::time(nullptr)), rd(), rd(), rd(), rd(), rd(), rd(), rd()};
 }
 
+// in some functions .size() == 0 is used instead of .empty()
+// because std::initializer_list does not have .empty()
 template <typename Container>
 auto make_index_dist(const Container& c)
 {
-	FS_ASSERT_MSG(!c.empty(), "to form a distribution container must not be empty");
+	FS_ASSERT_MSG(c.size() > 0u, "to form a distribution container must not be empty");
 	return std::uniform_int_distribution<typename Container::size_type>(0, c.size() - 1);
 }
 
@@ -48,6 +50,16 @@ auto select_one_element(const Container& elements, RandomNumberGenerator& rng) -
 
 	auto dist = make_index_dist(elements);
 	return &elements[dist(rng)];
+}
+
+template <typename T, typename RandomNumberGenerator>
+auto select_one_element(const std::initializer_list<T>& elements, RandomNumberGenerator& rng) -> const T*
+{
+	if (elements.size() == 0u)
+		return nullptr;
+
+	auto dist = make_index_dist(elements);
+	return elements.begin() + dist(rng);
 }
 
 template <typename T, typename RandomNumberGenerator>
@@ -77,23 +89,6 @@ void fill_with_indexes_of_matching_items(
 			result.push_back(i);
 }
 
-void fill_with_indexes_of_matching_equippable_items(
-	int item_level,
-	bool allow_atlas_bases,
-	const std::vector<equippable_item>& items,
-	std::vector<std::size_t>& result)
-{
-	fill_with_indexes_of_matching_items(items, result, [&](const equippable_item& itm) {
-		if (itm.drop_level > item_level)
-			return false;
-
-		if (!allow_atlas_bases && itm.is_atlas_base_type)
-			return false;
-
-		return true;
-	});
-}
-
 template <typename T>
 void fill_with_indexes_of_matching_drop_level_items(
 	int area_level,
@@ -106,50 +101,6 @@ void fill_with_indexes_of_matching_drop_level_items(
 }
 
 // ---- rarity-related utilities ----
-
-std::pair<const std::vector<equippable_item>&, std::string_view> // set of bases + their class name
-select_equipment_kind(
-	const equippable_item_database& db,
-	std::mt19937& rng)
-{
-	const std::initializer_list<std::pair<
-		std::reference_wrapper<const std::vector<equippable_item>>,
-		std::string_view
-	>>
-	list = {
-		{ std::ref(db.body_armours), item_class_names::eq_body },
-		{ std::ref(db.helmets),      item_class_names::eq_helmet },
-		{ std::ref(db.gloves),       item_class_names::eq_gloves },
-		{ std::ref(db.boots),        item_class_names::eq_boots },
-
-		{ std::ref(db.axes_1h),          item_class_names::eq_axe_1h },
-		{ std::ref(db.maces_1h),         item_class_names::eq_mace_1h },
-		{ std::ref(db.swords_1h),        item_class_names::eq_sword_1h },
-		{ std::ref(db.thrusting_swords), item_class_names::eq_sword_thrusting },
-		{ std::ref(db.claws),            item_class_names::eq_claw },
-		{ std::ref(db.daggers),          item_class_names::eq_dagger },
-		{ std::ref(db.rune_daggers),     item_class_names::eq_rune_dagger },
-		{ std::ref(db.wands),            item_class_names::eq_wand },
-
-		{ std::ref(db.axes_2h),   item_class_names::eq_axe_2h },
-		{ std::ref(db.maces_2h),  item_class_names::eq_mace_2h },
-		{ std::ref(db.swords_2h), item_class_names::eq_sword_2h },
-		{ std::ref(db.staves),    item_class_names::eq_staff },
-		{ std::ref(db.warstaves), item_class_names::eq_warstaff },
-		{ std::ref(db.bows),      item_class_names::eq_bow },
-
-		{ std::ref(db.shields), item_class_names::eq_shield },
-		{ std::ref(db.quivers), item_class_names::eq_quiver },
-
-		{ std::ref(db.amulets), item_class_names::eq_amulet },
-		{ std::ref(db.rings),   item_class_names::eq_ring },
-		{ std::ref(db.belts),   item_class_names::eq_belt }
-	};
-
-	std::uniform_int_distribution<std::size_t> dist(0, list.size() - 1);
-	const auto& selected = list.begin()[dist(rng)];
-	return { selected.first.get(), selected.second };
-}
 
 /*
  * Rarity and quantity related code based on
@@ -225,6 +176,11 @@ int roll_in_range(range r, std::mt19937& rng)
 	return std::uniform_int_distribution<int>(r.min, r.max)(rng);
 }
 
+bool roll_one_in_n(int n, std::mt19937& rng)
+{
+	return roll_in_range({1, n}, rng) == 1;
+}
+
 int roll_in_limited_range(range r, range limit, std::mt19937& rng)
 {
 	return roll_in_range({std::clamp(r.min, limit.min, limit.max), std::clamp(r.max, limit.min, limit.max)}, rng);
@@ -267,13 +223,16 @@ std::size_t roll_index_using_weights(Iterator weights_first, Iterator weights_la
 	using weight_t = typename std::iterator_traits<Iterator>::value_type;
 	static_assert(std::is_integral_v<weight_t>);
 
-	boost::container::small_vector<weight_t, 6> sums;
+	boost::container::small_vector<weight_t, 24> sums;
 	std::partial_sum(weights_first, weights_last, std::back_inserter(sums));
 
-	std::size_t result = 0;
 	if (sums.empty())
-		return result;
+		return 0;
 
+	if (sums.back() == 0)
+		return 0;
+
+	std::size_t result = 0;
 	const weight_t roll = std::uniform_int_distribution<weight_t>(static_cast<weight_t>(1), sums.back())(rng);
 	for (weight_t sub_sum : sums) {
 		if (roll <= sub_sum)
@@ -283,6 +242,76 @@ std::size_t roll_index_using_weights(Iterator weights_first, Iterator weights_la
 	}
 
 	return result;
+}
+
+struct equipment_class_selection
+{
+	std::reference_wrapper<const std::vector<equippable_item>> bases;
+	std::string_view class_name;
+	std::initializer_list<const char*> name_suffix_strings;
+};
+
+equipment_class_selection roll_equipment_class(const equippable_item_database& db, equippable_item_weights weights, std::mt19937& rng)
+{
+	const std::initializer_list<equipment_class_selection> list = {
+		{ std::ref(db.body_armours), item_class_names::eq_body,   rare_item_names::suffixes_eq_body_armours },
+		{ std::ref(db.helmets),      item_class_names::eq_helmet, rare_item_names::suffixes_eq_helmets },
+		{ std::ref(db.gloves),       item_class_names::eq_gloves, rare_item_names::suffixes_eq_gloves },
+		{ std::ref(db.boots),        item_class_names::eq_boots,  rare_item_names::suffixes_eq_boots },
+
+		{ std::ref(db.axes_1h),          item_class_names::eq_axe_1h,          rare_item_names::suffixes_eq_axes },
+		{ std::ref(db.maces_1h),         item_class_names::eq_mace_1h,         rare_item_names::suffixes_eq_maces },
+		{ std::ref(db.swords_1h),        item_class_names::eq_sword_1h,        rare_item_names::suffixes_eq_swords },
+		{ std::ref(db.thrusting_swords), item_class_names::eq_sword_thrusting, rare_item_names::suffixes_eq_swords },
+		{ std::ref(db.claws),            item_class_names::eq_claw,            rare_item_names::suffixes_eq_claws },
+		{ std::ref(db.daggers),          item_class_names::eq_dagger,          rare_item_names::suffixes_eq_daggers },
+		{ std::ref(db.rune_daggers),     item_class_names::eq_rune_dagger,     rare_item_names::suffixes_eq_daggers },
+		{ std::ref(db.wands),            item_class_names::eq_wand,            rare_item_names::suffixes_eq_wands },
+
+		{ std::ref(db.axes_2h),   item_class_names::eq_axe_2h,   rare_item_names::suffixes_eq_axes },
+		{ std::ref(db.maces_2h),  item_class_names::eq_mace_2h,  rare_item_names::suffixes_eq_maces },
+		{ std::ref(db.swords_2h), item_class_names::eq_sword_2h, rare_item_names::suffixes_eq_swords },
+		{ std::ref(db.staves),    item_class_names::eq_staff,    rare_item_names::suffixes_eq_staves },
+		{ std::ref(db.warstaves), item_class_names::eq_warstaff, rare_item_names::suffixes_eq_staves },
+		{ std::ref(db.bows),      item_class_names::eq_bow,      rare_item_names::suffixes_eq_bows },
+
+		// spirit shields have a separate suffix name pool, code elsewhere needs to check and adjust it
+		{ std::ref(db.shields), item_class_names::eq_shield, rare_item_names::suffixes_eq_other_shields },
+		{ std::ref(db.quivers), item_class_names::eq_quiver, rare_item_names::suffixes_eq_quivers },
+
+		{ std::ref(db.amulets), item_class_names::eq_amulet, rare_item_names::suffixes_eq_amulets },
+		{ std::ref(db.rings),   item_class_names::eq_ring,   rare_item_names::suffixes_eq_rings },
+		{ std::ref(db.belts),   item_class_names::eq_belt,   rare_item_names::suffixes_eq_belts },
+
+		{ std::ref(db.fishing_rods), item_class_names::eq_fishing_rod, rare_item_names::suffixes_eq_fishing_rods }
+	};
+
+	const std::array<int, 24> weights_array = {
+		weights.body_armours, weights.helmets, weights.gloves, weights.boots,
+		weights.axes_1h, weights.maces_1h, weights.swords_1h, weights.thrusting_swords, weights.claws, weights.daggers, weights.rune_daggers, weights.wands,
+		weights.axes_2h, weights.maces_2h, weights.swords_2h, weights.staves, weights.warstaves, weights.body_armours,
+		weights.shields, weights.quivers,
+		weights.amulets, weights.rings, weights.belts,
+		weights.fishing_rods
+	};
+
+	const std::size_t index = roll_index_using_weights(weights_array.begin(), weights_array.end(), rng);
+	return list.begin()[index];
+}
+
+std::optional<lang::influence_type> roll_influence(influence_weights weights, std::mt19937& rng)
+{
+	const std::array<int, 7> weights_array = {
+		weights.none, weights.shaper, weights.elder,
+		weights.crusader, weights.redeemer, weights.hunter, weights.warlord
+	};
+
+	const std::size_t index = roll_index_using_weights(weights_array.begin(), weights_array.end(), rng);
+
+	if (index == 0)
+		return std::nullopt;
+	else
+		return static_cast<lang::influence_type>(index - 1);
 }
 
 int max_sockets_possible(int item_level)
@@ -358,7 +387,35 @@ int roll_sockets_amount(int max_base_sockets, int item_level, std::mt19937& rng)
 	}
 }
 
-socket_info roll_links_and_colors(int sockets, std::mt19937& rng)
+socket_color roll_socket_color(int req_str, int req_dex, int req_int, std::mt19937& rng)
+{
+	/*
+	 * Rolling colors has been studied many times, but no one was very sure on their results.
+	 * All we know for sure is that colors are *somewhat* proportional to stat requirements.
+	 *
+	 * Most popular theory is that each socket's color is rolled independently and each
+	 * color has its weight equal to respective stat requirement + a fixed constant value.
+	 *
+	 * Some people also mentioned that the constant might depend on item's item level, but
+	 * there is no significant data to support this theory. If it does, the impact is low.
+	 *
+	 * Some sources:
+	 * https://www.pathofexile.com/forum/view-thread/761831
+	 * https://siveran.github.io/calc.html
+	 */
+	constexpr int c = 14;
+	const std::array<int, 3> weights = { req_str + c, req_dex + c, req_int + c };
+	const int roll = roll_index_using_weights(weights.begin(), weights.end(), rng);
+
+	if (roll == 0)
+		return socket_color::r;
+	else if (roll == 1)
+		return socket_color::g;
+	else
+		return socket_color::b;
+}
+
+socket_info roll_links_and_colors(int sockets, int req_str, int req_dex, int req_int, std::mt19937& rng)
 {
 	socket_info result;
 	/*
@@ -378,7 +435,7 @@ socket_info roll_links_and_colors(int sockets, std::mt19937& rng)
 
 		linked_sockets ls;
 		for (int i = 0; i < linked_together; ++i)
-			ls.sockets.push_back(socket_color::r); // TODO implement color rolling (based on attribute requirements)
+			ls.sockets.push_back(roll_socket_color(req_str, req_dex, req_int, rng));
 
 		result.groups.push_back(ls);
 	}
@@ -386,9 +443,90 @@ socket_info roll_links_and_colors(int sockets, std::mt19937& rng)
 	return result;
 }
 
-int roll_random_quality(std::mt19937& rng)
+std::string roll_rare_item_name(
+	std::string_view base_type,
+	std::initializer_list<const char*> suffix_name_pool,
+	std::mt19937& rng)
 {
-	return std::uniform_int_distribution<int>(0, 20)(rng);
+	std::initializer_list<const char*> prefix_name_pool = rare_item_names::prefixes;
+
+	// spirit shields have their specific suffix name pool
+	if (utility::ends_with(base_type, "Spirit Shield"))
+		suffix_name_pool = rare_item_names::suffixes_eq_spirit_shields;
+	// and fishing rods can draw from their own prefix pool
+	else if (base_type == "Fishing Rod" && roll_one_in_n(2, rng))
+		prefix_name_pool = rare_item_names::prefixes_eq_fishing_rods;
+
+	const auto* const prefix = select_one_element(prefix_name_pool, rng);
+	FS_ASSERT(prefix != nullptr);
+	const auto* const suffix = select_one_element(suffix_name_pool, rng);
+	FS_ASSERT(suffix != nullptr);
+
+	std::string result = *prefix;
+	result.append(" ");
+	result.append(*suffix);
+	return result;
+}
+
+std::vector<std::string> roll_explicit_mods_impl(int num_mods)
+{
+	// not very realistic but correctly generating rare item mods can be a separate project on its own...
+	std::vector<std::string> result;
+	result.reserve(num_mods);
+
+	for (int i = 0; i < num_mods; ++i)
+		result.push_back("explicit item mod #" + std::to_string(i + 1));
+
+	return result;
+}
+
+std::vector<std::string> roll_explicit_mods_magic(std::mt19937& rng)
+{
+	// magic items have 50/50 chance for 1 or 2 mods
+	if (roll_one_in_n(2, rng))
+		return roll_explicit_mods_impl(1);
+	else
+		return roll_explicit_mods_impl(2);
+}
+
+std::vector<std::string> roll_explicit_mods_rare_6(std::mt19937& rng)
+{
+	// well known data that chances for 4/5/6 mods are: 8/12, 3/12, and 1/12
+	const std::array<int, 3> weights = { 8, 3, 1 };
+	const std::size_t roll = roll_index_using_weights(weights.begin(), weights.end(), rng);
+	return roll_explicit_mods_impl(roll + 4);
+}
+
+// the input quantity to this function should already be a result of multiplication
+// of quantity bonuses from all sources (player, map, monster rarity, etc)
+int roll_number_of_items(double quantity, std::mt19937& rng)
+{
+	/*
+	 * Higher rarity monsters drop more items with higher chance of high rarity. There
+	 * is no official data how it actually works. We only know monster bonuses and that
+	 * by default normal monsters have 16% chance to drop anything. We can not just
+	 * multiply this chance by quantity bonus because there is no good interpretation
+	 * if result is higher than 100%. Instead, for each 100% of the bonus we roll
+	 * this chance again and for the last remaining X% we roll the chance multiplied by
+	 * this X%. This approximates well multiple chances while also not producing the same
+	 * number of items every time.
+	 */
+	constexpr auto base_chance = 0.16;
+
+	int result = 0;
+	const auto num_full_rolls = static_cast<int>(quantity);
+
+	for (int i = 0; i < num_full_rolls; ++i)
+		if (std::bernoulli_distribution(base_chance)(rng))
+			++result;
+
+	const auto last_roll_coefficient = quantity - static_cast<double>(num_full_rolls);
+	FS_ASSERT(last_roll_coefficient >= 0.0);
+	FS_ASSERT(last_roll_coefficient <  1.0);
+	if (std::bernoulli_distribution(base_chance * last_roll_coefficient)(rng))
+		++result;
+
+	return result;
 }
 
 // ---- to_item converters ----
@@ -445,9 +583,9 @@ item equippable_item_to_item(
 {
 	item result = elementary_item_to_item(itm, class_);
 	result.item_level = item_level;
-	result.quality = roll_random_quality(rng);
 	result.rarity_ = rarity_;
-	result.sockets = roll_links_and_colors(roll_sockets_amount(itm.max_sockets, item_level, rng), rng);
+	// TODO implement color rolling (based on attribute requirements)
+	result.sockets = roll_links_and_colors(roll_sockets_amount(itm.max_sockets, item_level, rng), 0, 0, 0, rng);
 	return result;
 }
 
@@ -459,10 +597,11 @@ void corrupt_gem(item& itm, std::mt19937& rng)
 	// see generator::generate_gems why it supports only 3 of 4 corruption variants
 	const int roll = roll_in_range({0, 2}, rng);
 
-	// roll == 0 (do nothing)
+	if (roll == 0) // do nothing
+		return;
+
 	if (roll == 1) { // +/- 1 level
-		const int add_or_substract = roll_in_range({0, 1}, rng);
-		if (add_or_substract == 0) {
+		if (roll_one_in_n(2, rng)) {
 			++itm.gem_level; // no checking: this corruption is allowed to bypass max_gem_level
 		}
 		else {
@@ -472,9 +611,8 @@ void corrupt_gem(item& itm, std::mt19937& rng)
 	}
 	else if (roll == 2) { // +/- 1-20 quality, clamp to 0-23
 		const int value = roll_in_range({1, 20}, rng);
-		const int sign = roll_in_range({0, 1}, rng);
 
-		if (sign == 0)
+		if (roll_one_in_n(2, rng))
 			itm.quality += value;
 		else
 			itm.quality -= value;
@@ -493,6 +631,98 @@ void corrupt_unique_piece(item& itm, const unique_piece& piece)
 {
 	itm.is_corrupted = true;
 	identify_unique_piece(itm, piece);
+}
+
+void identify_equippable_item(item& itm, std::initializer_list<const char*> suffix_name_pool, std::mt19937& rng)
+{
+	itm.is_identified = true;
+	if (itm.rarity_ == rarity_type::magic) {
+		itm.explicit_mods = roll_explicit_mods_magic(rng);
+	}
+	else if (itm.rarity_ == rarity_type::rare) {
+		itm.name = roll_rare_item_name(itm.base_type, suffix_name_pool, rng);
+		itm.explicit_mods = roll_explicit_mods_rare_6(rng);
+	}
+}
+
+void corrupt_equippable_item(
+	item& itm, std::initializer_list<const char*> suffix_name_pool, int max_item_sockets, std::mt19937& rng)
+{
+	// corruption of equipment identifies it
+	if (!itm.is_identified)
+		identify_equippable_item(itm, suffix_name_pool, rng);
+
+	itm.is_corrupted = true;
+
+	/*
+	 * Corruption implementation assumptions:
+	 * 25% chance to do nothing (other than adding corrupted property)
+	 * 25% chance to add an implicit
+	 * 25% chance to turn into 6-mod rare with 1/36 chance to make it 6L
+	 * 25% chance to color random non-abyss socket white, with 1/10 chance to repeat
+	 */
+	const int roll = roll_in_range({0, 3}, rng);
+	if (roll == 0) // nothing
+		return;
+
+	if (roll == 1) { // adding an implicit
+		itm.corrupted_mods = 1;
+	}
+	else if (roll == 2) { // white sockets
+		if (itm.sockets.sockets() == 0)
+			return; // do nothing, no sockets to change to white
+
+		boost::container::static_vector<int, 6> socket_indexes;
+		for (int i = 0; i < itm.sockets.sockets(); ++i) {
+			const socket_color color = itm.sockets[i];
+			FS_ASSERT_MSG(color != socket_color::d, "equipment should never have delve sockets");
+
+			if (color != socket_color::a)
+				socket_indexes.push_back(i);
+		}
+
+		if (socket_indexes.empty())
+			return; // no non-abyss sockets to change to white
+
+		// change random socket to white (even if it is white already)
+		std::shuffle(socket_indexes.begin(), socket_indexes.end(), rng);
+		itm.sockets[socket_indexes.back()] = socket_color::w;
+		socket_indexes.pop_back();
+
+		// and continue changing more with 1/10 chance
+		while (!socket_indexes.empty() && roll_one_in_n(10, rng)) {
+			socket_color& color = itm.sockets[socket_indexes.back()];
+			FS_ASSERT(color != socket_color::a);
+			FS_ASSERT(color != socket_color::d);
+			color = socket_color::w;
+			socket_indexes.pop_back();
+		}
+	}
+	else if (roll == 3) {
+		// turning into 6-mod rare + rerolling links and colors
+		// corruption intentionally ignores stat requirements for colors and item level for sockets
+		itm.rarity_ = rarity_type::rare;
+		itm.explicit_mods = roll_explicit_mods_impl(6);
+
+		if (max_item_sockets == 6 && roll_one_in_n(36, rng)) { // 6L
+			itm.sockets.groups.clear();
+			lang::linked_sockets ls;
+			for (int i = 0; i < 6; ++i)
+				ls.sockets.push_back(roll_socket_color(0, 0, 0, rng));
+			itm.sockets.groups.push_back(ls);
+		}
+		else {
+			itm.sockets = roll_links_and_colors(
+				roll_sockets_amount(max_item_sockets, lang::limits::max_item_level, rng),
+				0, 0, 0, rng);
+		}
+	}
+}
+
+[[nodiscard]] item mirror_item(item itm)
+{
+	itm.is_mirrored = true;
+	return itm;
 }
 
 // ---- item generators ----
@@ -822,93 +1052,127 @@ void generator::generate_gems(
 	}
 }
 
-void generator::generate_non_unique_equippable_item(
+void generator::generate_equippable_item(
 	const item_database& db,
 	item_receiver& receiver,
+	range quality,
 	int item_level,
-	rarity_type rarity_,
-	bool allow_atlas_bases)
+	percent chance_to_identify,
+	percent chance_to_corrupt,
+	percent chance_to_mirror,
+	equippable_item_weights class_weights,
+	influence_weights infl_weights,
+	rarity_type rarity_)
 {
-	/*
-	 * Kind selection always succeeds but sometimes there might be no valid items
-	 * of selected kind for the given item level. Attempt to roll kind again and
-	 * give up after a couple of tries. Such implementation is unlikely to match how
-	 * the game works but it seems to be a good approximation given no official data.
-	 */
-	for (int i = 0; i < 10; ++i) {
-		const auto [bases, class_] = select_equipment_kind(db.equipment, _rng);
-		fill_with_indexes_of_matching_equippable_items(item_level, allow_atlas_bases, bases, _sp_indexes);
+	const equipment_class_selection selection = roll_equipment_class(db.equipment, class_weights, _rng);
+	const std::optional<lang::influence_type> influence = roll_influence(infl_weights, _rng);
 
-		if (_sp_indexes.empty())
-			continue;
-
-		const equippable_item* const eq_item = select_one_element_by_index(bases, _sp_indexes, _rng);
-		if (eq_item == nullptr)
-			continue;
-
-		receiver.on_item(equippable_item_to_item(*eq_item, class_, item_level, rarity_, _rng));
+	fill_with_indexes_of_matching_drop_level_items(item_level, selection.bases.get(), _sp_indexes);
+	const equippable_item* const eq_item = select_one_element_by_index(selection.bases.get(), _sp_indexes, _rng);
+	if (eq_item == nullptr)
 		return;
+
+	item itm = equippable_item_to_item(*eq_item, selection.class_name, item_level, rarity_, _rng);
+	itm.quality = roll_quality(quality, _rng);
+	if (influence) {
+		if (*influence == lang::influence_type::shaper)
+			itm.influence.shaper = true;
+		else if (*influence == lang::influence_type::elder)
+			itm.influence.elder = true;
+		else if (*influence == lang::influence_type::crusader)
+			itm.influence.crusader = true;
+		else if (*influence == lang::influence_type::redeemer)
+			itm.influence.redeemer = true;
+		else if (*influence == lang::influence_type::hunter)
+			itm.influence.hunter = true;
+		else if (*influence == lang::influence_type::warlord)
+			itm.influence.warlord = true;
 	}
+
+	if (roll_percent(chance_to_identify, _rng))
+		identify_equippable_item(itm, selection.name_suffix_strings, _rng);
+
+	if (roll_percent(chance_to_corrupt, _rng))
+		corrupt_equippable_item(itm, selection.name_suffix_strings, eq_item->max_sockets, _rng);
+
+	if (roll_percent(chance_to_mirror, _rng))
+		receiver.on_item(mirror_item(itm));
+
+	receiver.on_item(std::move(itm));
 }
 
-void generator::generate_monster_loot(
+void generator::generate_equippable_items_fixed_weights(
 	const item_database& db,
 	item_receiver& receiver,
-	double rarity,
-	double quantity,
-	int item_level,
-	bool allow_atlas_bases)
-{
-	constexpr auto base_chance = 0.16;
-
-	const auto num_full_rolls = static_cast<int>(quantity);
-	for (int r = 0; r < num_full_rolls; ++r) {
-		if (std::bernoulli_distribution(base_chance)(_rng)) {
-			rarity_type rar = roll_non_unique_rarity(rarity, _rng);
-			generate_non_unique_equippable_item(db, receiver, item_level, rar, allow_atlas_bases);
-		}
-	}
-
-	const auto last_roll_coefficient = quantity - num_full_rolls;
-	if (std::bernoulli_distribution(base_chance * last_roll_coefficient)(_rng)) {
-		rarity_type rar = roll_non_unique_rarity(rarity, _rng);
-		generate_non_unique_equippable_item(db, receiver, item_level, rar, allow_atlas_bases);
-	}
-}
-
-void generator::generate_monster_pack_loot(
-	const item_database& db,
-	item_receiver& receiver,
-	double rarity,
-	double quantity,
+	range quality,
+	range quantity,
 	int area_level,
-	bool allow_atlas_bases,
-	int num_normal_monsters,
-	int num_magic_monsters,
-	int num_rare_monsters,
-	int num_unique_monsters)
+	percent chance_to_identify,
+	percent chance_to_corrupt,
+	percent chance_to_mirror,
+	equippable_item_weights class_weights,
+	influence_weights infl_weights,
+	rarity_weights r_weights,
+	item_level_weights ilvl_weights)
 {
-	/*
-	 * Higher rarity monsters drop more items with higher chance of high rarity. There
-	 * is no official data how it actually works. We only know monster bonuses and that
-	 * by default normal monsters have 16% chance to drop anything. We can not just
-	 * multiply this chance by quantity bonus because there is no good interpretation
-	 * if result is higher than 100%. Instead, for each 100% of the bonus we roll
-	 * this chance again and for the last remaining X% we roll the chance multiplied by
-	 * this X%. This approximates well multiple chances while also not producing the same
-	 * number of items every time. Numbers of bonus rarity/quantity per monster from wiki.
-	 */
-	for (int n = 0; n < num_normal_monsters; ++n)
-		generate_monster_loot(db, receiver, rarity, quantity, area_level, allow_atlas_bases);
+	const int count = roll_in_range(quantity, _rng);
+	for (int i = 0; i < count; ++i) {
+		const std::array<int, 3> weights_rarity = { r_weights.normal, r_weights.magic, r_weights.rare };
+		const auto rarity_ = static_cast<rarity_type>(roll_index_using_weights(weights_rarity.begin(), weights_rarity.end(), _rng));
 
-	for (int n = 0; n < num_magic_monsters; ++n)
-		generate_monster_loot(db, receiver, rarity * 3.0, quantity * 7.0, area_level + 1, allow_atlas_bases);
+		const std::array<int, 3> weights_ilvl = { ilvl_weights.base, ilvl_weights.plus_one, ilvl_weights.plus_two };
+		const int item_level = roll_index_using_weights(weights_ilvl.begin(), weights_ilvl.end(), _rng) + area_level;
 
-	for (int n = 0; n < num_rare_monsters; ++n)
-		generate_monster_loot(db, receiver, rarity * 11.0, quantity * 15.0, area_level + 2, allow_atlas_bases);
+		generate_equippable_item(
+			db, receiver, quality, item_level,
+			chance_to_identify, chance_to_corrupt, chance_to_mirror,
+			class_weights, infl_weights, rarity_);
+	}
+}
 
-	for (int n = 0; n < num_unique_monsters; ++n)
-		generate_monster_loot(db, receiver, rarity * 11.0, quantity * 29.5, area_level + 2, allow_atlas_bases);
+void generator::generate_equippable_items_monster_pack(
+	const item_database& db,
+	item_receiver& receiver,
+	range quality,
+	range normal_monsters,
+	range magic_monsters,
+	range rare_monsters,
+	range unique_monsters,
+	int area_level,
+	double rarity,
+	percent chance_to_identify,
+	percent chance_to_corrupt,
+	percent chance_to_mirror,
+	equippable_item_weights class_weights,
+	influence_weights infl_weights)
+{
+	_temp_ilvl_rarity.clear();
+
+	const auto roll_ilvl_rarity = [&](range monsters, double quantity, double rarity, int item_level) {
+		const int num_monsters = roll_in_range(monsters, _rng);
+		for (int i = 0; i < num_monsters; ++i) {
+			const int num_items = roll_number_of_items(quantity, _rng);
+			for (int j = 0; j < num_items; j++)
+				_temp_ilvl_rarity.emplace_back(item_level, roll_non_unique_rarity(rarity, _rng));
+		}
+	};
+
+	// data on monster IIQ and IIR bonuses from https://pathofexile.gamepedia.com/Rarity#Monsters
+	roll_ilvl_rarity(normal_monsters,  1.0, rarity,        area_level);
+	roll_ilvl_rarity(magic_monsters,   7.0, rarity *  3.0, area_level + 1);
+	roll_ilvl_rarity(rare_monsters,   15.0, rarity * 11.0, area_level + 2);
+	roll_ilvl_rarity(unique_monsters, 29.5, rarity * 11.0, area_level + 2);
+
+	// shuffle rolled ilvl and rarity to avoid generating items
+	// in increasing order of these 2 properties
+	std::shuffle(_temp_ilvl_rarity.begin(), _temp_ilvl_rarity.end(), _rng);
+
+	for (const auto [ilvl, rar] : _temp_ilvl_rarity) {
+		generate_equippable_item(
+			db, receiver, quality, ilvl,
+			chance_to_identify, chance_to_corrupt, chance_to_mirror,
+			class_weights, infl_weights, rar);
+	}
 }
 
 }

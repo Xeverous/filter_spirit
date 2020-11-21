@@ -183,6 +183,7 @@ private:
 	void draw_loot_buttons_currency        (const lang::loot::item_database& db, lang::loot::generator& gen);
 	void draw_loot_buttons_specific_classes(const lang::loot::item_database& db, lang::loot::generator& gen);
 	void draw_loot_buttons_gems            (const lang::loot::item_database& db, lang::loot::generator& gen);
+	void draw_loot_buttons_equipment       (const lang::loot::item_database& db, lang::loot::generator& gen);
 
 	// render state
 	float _canvas_offset_y = 0;
@@ -195,11 +196,11 @@ private:
 	bool _append_loot = false;
 	bool _shuffle_loot = false;
 	int _area_level = 83;
-	int _player_iiq = 0;
 	int _player_iir = 0;
-	int _map_iiq = 0;
 	int _map_iir = 0;
+	lang::loot::percent _chance_to_identify;
 	lang::loot::percent _chance_to_corrupt;
+	lang::loot::percent _chance_to_mirror;
 
 	// currency
 	loot_button_plurality _currency_generic           = loot_button_plurality(lang::loot::plurality::only_quantity({1, 10}));
@@ -232,6 +233,20 @@ private:
 	loot_drag_range   _gems_quantity                  = loot_drag_range({1, 10});
 	loot_slider_range _gems_level                     = loot_slider_range({1, 20});
 	loot_slider_range _gems_quality                   = loot_slider_range({0, 20});
+
+	// equipment - main
+	lang::loot::equippable_item_weights _eq_class_weights;
+	lang::loot::influence_weights       _eq_influence_weights;
+	loot_slider_range                   _eq_quality  = loot_slider_range({0, 20});
+	// equipment - fixed weights generation
+	loot_drag_range                _eq_fixed_weights_quantity = loot_drag_range({25, 40});
+	lang::loot::rarity_weights     _eq_fixed_weights_rarity;
+	lang::loot::item_level_weights _eq_fixed_weights_item_level;
+	// equipment - monster pack generation
+	loot_drag_range                _eq_monster_pack_normal = loot_drag_range({30, 50});
+	loot_drag_range                _eq_monster_pack_magic  = loot_drag_range({ 5, 15});
+	loot_drag_range                _eq_monster_pack_rare   = loot_drag_range({ 1,  4});
+	loot_drag_range                _eq_monster_pack_unique = loot_drag_range({ 1,  2});
 };
 
 }
