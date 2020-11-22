@@ -199,14 +199,14 @@ private:
 
 	// behavior state
 	bool _show_hidden_items = false;
+	bool _append_loot = false;
+	bool _shuffle_loot = false;
 
 	// debug state
 	bool _debug_enabled = false; // item pointer alone is not enough: Dear ImGui wants bool*
 	const looted_item* _debug_selected_item = nullptr; // this can be invalided by modifying looted items
 
 	// global loot settings
-	bool _append_loot = false;
-	bool _shuffle_loot = false;
 	int _area_level = 83;
 	int _player_iir = 0;
 	int _map_iir = 0;
