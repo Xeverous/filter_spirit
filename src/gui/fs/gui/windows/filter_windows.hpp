@@ -1,7 +1,8 @@
 #pragma once
 
 #include <fs/gui/imgui_window.hpp>
-#include <fs/gui/windows/filter/filter_state.hpp>
+#include <fs/gui/windows/filter/real_filter_state_mediator.hpp>
+#include <fs/gui/windows/filter/spirit_filter_state_mediator.hpp>
 
 #include <string>
 #include <utility>
@@ -27,7 +28,7 @@ protected:
 
 private:
 	std::reference_wrapper<application> _application; // plain reference type would make this class non-moveable
-	real_filter_state _state;
+	real_filter_state_mediator _state;
 };
 
 class spirit_filter_window : public imgui_window
@@ -45,7 +46,7 @@ protected:
 
 private:
 	std::reference_wrapper<application> _application; // plain reference type would make this class non-moveable
-	spirit_filter_state _state;
+	spirit_filter_state_mediator _state;
 };
 
 }
