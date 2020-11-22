@@ -161,8 +161,16 @@ void draw_item_tooltip_second_column(const lang::item& itm)
 	ImGui::TextUnformatted(itm.base_type.c_str());
 	ImGui::TextUnformatted(itm.class_.c_str());
 
-	const auto rarity = to_string_view(itm.rarity_);
-	ImGui::TextUnformatted(rarity.data(), rarity.data() + rarity.size()); // TODO add colors
+	{
+		const auto rarity = to_string_view(itm.rarity_);
+		const auto rarity_text_color =
+			itm.rarity_ == lang::rarity_type::unique ? gui::color_unique_item :
+			itm.rarity_ == lang::rarity_type::rare   ? gui::color_rare_item   :
+			itm.rarity_ == lang::rarity_type::magic  ? gui::color_magic_item  : gui::color_normal_item;
+		ImGui::PushStyleColor(ImGuiCol_Text, rarity_text_color);
+		ImGui::TextUnformatted(rarity.data(), rarity.data() + rarity.size());
+		ImGui::PopStyleColor();
+	}
 
 	ImGui::TextUnformatted(to_string(itm.sockets).c_str()); // TODO add colors
 	ImGui::Text("%d", itm.item_level);
