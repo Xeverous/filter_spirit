@@ -10,12 +10,12 @@
 
 namespace fs::gui {
 
-class application;
+class fonting;
 
 class filter_state_mediator : public virtual filter_state_mediator_base
 {
 public:
-	filter_state_mediator(application& app);
+	filter_state_mediator(const fonting& f);
 
 	// use string instead of string_view because filesystem wants C-strings
 	void reload_source_file(const std::string& path);
