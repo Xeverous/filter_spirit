@@ -10,8 +10,8 @@ class spirit_filter_state_mediator
 	, public filter_state_mediator
 {
 public:
-	spirit_filter_state_mediator(application& app)
-	: filter_state_mediator(app)
+	spirit_filter_state_mediator(const fonting& f)
+	: filter_state_mediator(f)
 	{
 	}
 

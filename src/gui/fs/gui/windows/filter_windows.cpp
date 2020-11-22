@@ -8,7 +8,7 @@ namespace fs::gui {
 real_filter_window::real_filter_window(application& app, std::string path)
 : imgui_window(std::move(path))
 , _application(std::ref(app))
-, _state(app)
+, _state(app.font_settings())
 {
 	open();
 	_state.reload_source_file(real_filter_path());
@@ -22,7 +22,7 @@ void real_filter_window::draw_contents()
 spirit_filter_window::spirit_filter_window(application& app, std::string path)
 : imgui_window(std::move(path))
 , _application(std::ref(app))
-, _state(app)
+, _state(app.font_settings())
 {
 	open();
 	_state.reload_source_file(spirit_filter_path());

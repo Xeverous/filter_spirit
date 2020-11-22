@@ -10,8 +10,8 @@ class real_filter_state_mediator
 	, public filter_state_mediator
 {
 public:
-	real_filter_state_mediator(application& app)
-	: filter_state_mediator(app)
+	real_filter_state_mediator(const fonting& f)
+	: filter_state_mediator(f)
 	{
 	}
 

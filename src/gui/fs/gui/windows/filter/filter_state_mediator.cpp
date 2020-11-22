@@ -1,11 +1,10 @@
 #include <fs/gui/windows/filter/filter_state_mediator.hpp>
-#include <fs/gui/application.hpp>
 #include <fs/utility/file.hpp>
 
 namespace fs::gui {
 
-filter_state_mediator::filter_state_mediator(application& app)
-: _logger(app.font_settings())
+filter_state_mediator::filter_state_mediator(const fonting& f)
+: _logger(f)
 {
 }
 
