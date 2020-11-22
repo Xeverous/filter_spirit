@@ -1,5 +1,4 @@
 #include <fs/gui/windows/filter_windows.hpp>
-#include <fs/gui/windows/filter/filter_state.hpp>
 #include <fs/gui/application.hpp>
 
 #include <imgui.h>
