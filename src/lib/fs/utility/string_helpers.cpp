@@ -1,6 +1,8 @@
 #include <fs/utility/string_helpers.hpp>
 #include <fs/utility/assert.hpp>
 
+#include <algorithm>
+
 namespace
 {
 
@@ -22,21 +24,6 @@ const char* find_line_beginning_backward(const char* first, const char* last) no
 
 	return it;
 }
-/**
- * @brief find line break in range [@p first, @p last)
- * @return iterator pointing to '\n' or '\r' or last if no line break was found
- * @details supports any line break format
- */
-[[nodiscard]]
-const char* find_line_end(const char* first, const char* last) noexcept
-{
-	for (; first != last; ++first) {
-		if (*first == '\n' || *first == '\r')
-			return first;
-	}
-
-	return last;
-}
 
 /**
  * @brief skip characters as long as one of Chars... is encountered or until @p last is reached
@@ -55,13 +42,32 @@ const char* skip(const char* first, const char* last) noexcept
 	return first;
 }
 
-[[nodiscard]] const char* skip_lf_cr (const char* first, const char* last) noexcept { return skip<'\n', '\r'>(first, last); }
-[[nodiscard]] const char* skip_indent(const char* first, const char* last) noexcept { return skip<'\t', ' '> (first, last); }
-
 } // namespace
 
 namespace fs::utility
 {
+
+const char* find_line_end(const char* first, const char* last) noexcept
+{
+	for (; first != last; ++first) {
+		if (*first == '\n' || *first == '\r')
+			return first;
+	}
+
+	return last;
+}
+
+const char* skip_eol(const char* first, const char* last) noexcept
+{
+	first = std::find(first, last, '\n');
+	if (first != last)
+		++first;
+
+	return first;
+}
+
+const char* skip_lf_cr (const char* first, const char* last) noexcept { return skip<'\n', '\r'>(first, last); }
+const char* skip_indent(const char* first, const char* last) noexcept { return skip<'\t', ' '> (first, last); }
 
 std::string ptime_to_pretty_string(boost::posix_time::ptime time)
 {
