@@ -261,8 +261,8 @@ void draw_item_tooltip(const lang::item& itm, const lang::item_filtering_result&
 	ImGui::Columns(1); // reset back to single column
 
 	ImGui::Dummy({0.0f, ImGui::GetFontSize() * 1.0f});
-	ImGui::TextUnformatted("filter conditions");
-	ImGui::TextDisabled("properties unsupported by filters");
+	ImGui::TextUnformatted("(right-click to debug this item)");
+	ImGui::TextDisabled("(filters do not support these properties)");
 }
 
 void draw_debug_interface_impl(
