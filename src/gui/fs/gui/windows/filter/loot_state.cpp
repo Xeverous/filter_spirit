@@ -426,7 +426,7 @@ void loot_state::draw_interface(std::string_view source, application& app)
 		clear_items();
 
 	ImGui::SameLine();
-	ImGui::TextWrapped("Hover items for info, right click items for debug, drag or scroll to move");
+	ImGui::Checkbox("Show hidden items", &_show_hidden_items);
 
 	draw_loot_canvas(app.font_settings());
 
@@ -721,6 +721,11 @@ void loot_state::draw_item_labels(ImVec2 canvas_begin, ImVec2 canvas_end, const 
 	for (looted_item& itm : _items) {
 		if (itm.filtering_result) {
 			const auto& style = *itm.filtering_result;
+
+			if (!_show_hidden_items && !style.style.visibility.show) {
+				itm.drawing = std::nullopt;
+				continue;
+			}
 
 			const item_label_data ild(itm.itm, style.style.font_size.size.value, f);
 			const ImVec2 item_size = ild.whole_size();

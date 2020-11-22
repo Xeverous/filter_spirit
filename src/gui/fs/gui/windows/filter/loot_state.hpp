@@ -197,6 +197,9 @@ private:
 	std::vector<looted_item> _items;
 	std::size_t _last_items_size = 0;
 
+	// behavior state
+	bool _show_hidden_items = false;
+
 	// debug state
 	bool _debug_enabled = false; // item pointer alone is not enough: Dear ImGui wants bool*
 	const looted_item* _debug_selected_item = nullptr; // this can be invalided by modifying looted items
