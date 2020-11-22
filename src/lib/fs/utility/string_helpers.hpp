@@ -39,6 +39,17 @@ inline bool contains(std::string_view source, std::string_view fragment) noexcep
 	return source.find(fragment) != std::string_view::npos;
 }
 
+/**
+ * @brief find line break in range [@p first, @p last)
+ * @return iterator pointing to '\n' or '\r' or last if no line break was found
+ * @details supports any line break format
+ */
+[[nodiscard]] const char* find_line_end(const char* first, const char* last) noexcept;
+
+[[nodiscard]] const char* skip_eol   (const char* first, const char* last) noexcept; // skip single line end
+[[nodiscard]] const char* skip_lf_cr (const char* first, const char* last) noexcept;
+[[nodiscard]] const char* skip_indent(const char* first, const char* last) noexcept;
+
 // supports any line break style
 [[nodiscard]] int count_lines(const char* first, const char* last) noexcept;
 

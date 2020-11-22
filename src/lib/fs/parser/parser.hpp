@@ -8,10 +8,67 @@
 
 #include <string_view>
 #include <variant>
+#include <vector>
 #include <utility>
 
 namespace fs::parser
 {
+
+/*
+ * All code related to text lines uses 0-based numbering.
+ * First line (from user's perspective) is 0
+ * First character in line (from user's perspective) is column 0
+ */
+
+struct text_position
+{
+	std::size_t line_number = 0;
+	std::size_t pos = 0; // should be >= 0 and <= line.size()
+};
+
+struct text_range
+{
+	text_position first;
+	text_position last;
+};
+
+std::vector<detail::range_type> find_lines(detail::iterator_type first, detail::iterator_type last);
+
+class line_lookup
+{
+public:
+	line_lookup(detail::iterator_type first, detail::iterator_type last)
+	: _lines(find_lines(first, last))
+	{
+	}
+
+	text_position text_position_for(const char* pos) const;
+
+	text_range text_range_for(std::string_view range) const
+	{
+		return text_range{
+			text_position_for(range.data()),
+			text_position_for(range.data() + range.size())
+		};
+	}
+
+	std::string_view get_line(std::size_t n) const
+	{
+		if (n >= _lines.size())
+			return {};
+
+		const detail::range_type range = _lines[n];
+		return utility::make_string_view(range.begin(), range.end());
+	}
+
+	std::size_t num_lines() const
+	{
+		return _lines.size();
+	}
+
+private:
+	std::vector<detail::range_type> _lines;
+};
 
 class lookup_data
 {

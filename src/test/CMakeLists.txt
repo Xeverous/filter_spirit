@@ -10,6 +10,7 @@ add_executable(filter_spirit_test)
 target_sources(filter_spirit_test
 	PRIVATE
 		main.cpp
+		parser/lookup.cpp
 		parser/parser_tests.cpp
 		parser/parser_error_tests.cpp
 		compiler/compiler_error_tests.cpp

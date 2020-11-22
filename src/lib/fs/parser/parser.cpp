@@ -2,6 +2,8 @@
 #include <fs/parser/detail/grammar.hpp>
 #include <fs/log/logger.hpp>
 
+#include <algorithm>
+
 namespace
 {
 
@@ -73,6 +75,34 @@ void print_error(
 
 namespace fs::parser
 {
+
+std::vector<detail::range_type> find_lines(detail::iterator_type first, detail::iterator_type last)
+{
+	std::vector<detail::range_type> result;
+	result.reserve((last - first) / 64u); // text length divided by average line length
+
+	while (first != last) {
+		const auto line_first = first;
+		const auto line_last = utility::find_line_end(line_first, last);
+		result.emplace_back(line_first, line_last);
+		first = utility::skip_eol(line_last, last);
+	}
+
+	return result;
+}
+
+text_position line_lookup::text_position_for(const char* pos) const
+{
+	const auto it = std::lower_bound(_lines.begin(), _lines.end(), pos,
+		[](detail::range_type line, const char* pos) { return line.end() < pos; });
+
+	if (it == _lines.end())
+		return text_position{_lines.size(), 0u};
+
+	const std::size_t line_number = it - _lines.begin();
+	const std::size_t column = pos - it->begin();
+	return text_position{line_number, column};
+}
 
 std::variant<parsed_spirit_filter, parse_failure_data> parse_spirit_filter(std::string_view input)
 {
