@@ -427,6 +427,14 @@ void loot_state::draw_interface(std::string_view source, application& app)
 
 	ImGui::SameLine();
 	ImGui::Checkbox("Show hidden items", &_show_hidden_items);
+	ImGui::SameLine();
+	ImGui::Checkbox("Append mode", &_append_loot);
+	on_hover_text_tooltip("By default, new items replace existing ones.\nEnable this to append new items instead.");
+	if (_append_loot) {
+		ImGui::SameLine();
+		ImGui::Checkbox("Shuffle", &_shuffle_loot);
+		on_hover_text_tooltip("Shuffle items when new ones are generated.");
+	}
 
 	draw_loot_canvas(app.font_settings());
 
@@ -461,10 +469,6 @@ void loot_state::draw_loot_settings_global()
 {
 	if (!ImGui::CollapsingHeader("Global settings", ImGuiTreeNodeFlags_DefaultOpen))
 		return;
-
-	ImGui::Checkbox("Append new items instead of replacing", &_append_loot);
-	if (_append_loot)
-		ImGui::Checkbox("Shuffle items when new ones are generated", &_shuffle_loot);
 
 	ImGui::SliderInt("area level", &_area_level, 1, lang::limits::max_item_level);
 	if (_area_level > 67) {

@@ -216,4 +216,15 @@ struct scoped_text_color_override_impl
 
 using scoped_text_color_override = scoped_override<scoped_text_color_override_impl>;
 
+inline void on_hover_text_tooltip(const char* text)
+{
+	if (ImGui::IsItemHovered())
+	{
+		scoped_tooltip _;
+		ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+		ImGui::TextUnformatted(text);
+		ImGui::PopTextWrapPos();
+	}
+}
+
 } // namespace fs::gui
