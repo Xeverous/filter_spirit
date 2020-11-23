@@ -176,6 +176,11 @@ public:
 		return _items.size();
 	}
 
+	std::size_t num_hidden_items() const
+	{
+		return _num_hidden_items;
+	}
+
 private:
 	void draw_loot_canvas(const fonting& f);
 	void draw_item_labels(ImVec2 canvas_begin, ImVec2 canvas_end, const fonting& f);
@@ -196,6 +201,7 @@ private:
 	// loot state
 	std::vector<looted_item> _items;
 	std::size_t _last_items_size = 0;
+	std::size_t _num_hidden_items = 0;
 
 	// behavior state
 	bool _show_hidden_items = false;
