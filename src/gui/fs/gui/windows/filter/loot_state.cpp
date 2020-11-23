@@ -726,7 +726,10 @@ void loot_state::draw_loot_canvas(const fonting& f)
 
 	if (is_canvas_hovered && !_debug_enabled) {
 		_canvas_offset_y += io.MouseWheel * ImGui::GetFontSize();
-		ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeAll);
+
+		if (!_items.empty())
+			ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeAll); // this lasts only 1 frame
+
 		on_canvas_hover(io.MousePos, f);
 	}
 
