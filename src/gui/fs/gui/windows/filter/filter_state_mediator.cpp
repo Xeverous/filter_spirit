@@ -16,6 +16,11 @@ void filter_state_mediator::load_source_file(std::string path)
 	_source.load_source_file(std::move(path), *this);
 }
 
+void filter_state_mediator::open_text_input()
+{
+	_source.open_text_input();
+}
+
 void filter_state_mediator::new_filter_representation(std::optional<lang::item_filter> filter_representation)
 {
 	_filter_representation = std::move(filter_representation);

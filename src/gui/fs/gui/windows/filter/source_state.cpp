@@ -22,12 +22,6 @@ void source_state::draw_interface(const fonting& f, filter_state_mediator_base& 
 			ImGui::SameLine();
 		}
 
-		if (ImGui::Button("From file...")) {
-
-		}
-
-		ImGui::SameLine();
-
 		if (ImGui::Button("From text input"))
 			open_text_input();
 
@@ -37,6 +31,19 @@ void source_state::draw_interface(const fonting& f, filter_state_mediator_base& 
 			ImGui::TextWrapped("Source present, %zu bytes", (*_source).size());
 		else
 			ImGui::TextWrapped("Source not present.");
+	}
+
+	/*
+	 * The boolean flag is necessary to delay invokation of opening popup
+	 * because Dear ImGui expects begin/open/close calls at same levels
+	 * of the ID stack.
+	 */
+	if (_popup_pending) {
+		if (_source)
+			_text_input.set_text(*_source);
+
+		_popup_pending = false;
+		ImGui::OpenPopup(popup_text_input_title);
 	}
 
 	if (ImGui::BeginPopupModal(popup_text_input_title)) {
@@ -65,10 +72,7 @@ void source_state::draw_interface(const fonting& f, filter_state_mediator_base& 
 
 void source_state::open_text_input()
 {
-	if (_source)
-		_text_input.set_text(*_source);
-
-	ImGui::OpenPopup(popup_text_input_title);
+	_popup_pending = true;
 }
 
 void source_state::on_text_input_done(filter_state_mediator_base& mediator)

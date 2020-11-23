@@ -156,6 +156,13 @@ void application::draw_main_menu_bar()
 
 			ImGui::Separator();
 
+			if (ImGui::MenuItem("Spirit filter - from text input"))
+				_spirit_filters.emplace_back(*this);
+			if (ImGui::MenuItem("Real filter - from text input"))
+				_real_filters.emplace_back(*this);
+
+			ImGui::Separator();
+
 #ifdef FILTER_SPIRIT_PLATFORM_WINDOWS
 			if (ImGui::MenuItem("Exit", "Alt+F4"))
 #else

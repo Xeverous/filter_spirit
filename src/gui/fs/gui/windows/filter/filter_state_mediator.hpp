@@ -19,6 +19,7 @@ public:
 	filter_state_mediator(const fonting& f);
 
 	void load_source_file(std::string path);
+	void open_text_input();
 
 	void on_filter_representation_change(
 		const std::optional<lang::item_filter>& filter_representation) override;

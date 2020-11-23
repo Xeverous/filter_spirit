@@ -16,6 +16,7 @@ class real_filter_window : public imgui_window
 {
 public:
 	real_filter_window(application& app, std::string path);
+	real_filter_window(application& app);
 
 protected:
 	void draw_contents() override;
@@ -29,6 +30,7 @@ class spirit_filter_window : public imgui_window
 {
 public:
 	spirit_filter_window(application& app, std::string path);
+	spirit_filter_window(application& app);
 
 protected:
 	void draw_contents() override;
