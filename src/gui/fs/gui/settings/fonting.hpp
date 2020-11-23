@@ -1,6 +1,6 @@
 #pragma once
 
-#include <fs/gui/ui_utils.hpp>
+#include <fs/gui/auxiliary/raii.hpp>
 #include <fs/lang/limits.hpp>
 #include <fs/utility/assert.hpp>
 
@@ -109,7 +109,7 @@ public:
 		return _monospaced_font;
 	}
 
-	scoped_font_override scoped_monospaced_font() const
+	aux::scoped_font_override scoped_monospaced_font() const
 	{
 		return { monospaced_font() };
 	}

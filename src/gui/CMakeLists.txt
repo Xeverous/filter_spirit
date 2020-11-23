@@ -26,7 +26,12 @@ target_sources(filter_spirit_gui
 		fs/gui/gui_logger.cpp
 		fs/gui/gui_logger.hpp
 		fs/gui/imgui_window.hpp
-		fs/gui/ui_utils.hpp
+		fs/gui/auxiliary/color_convert.hpp
+		fs/gui/auxiliary/colors.hpp
+		fs/gui/auxiliary/raii.hpp
+		fs/gui/auxiliary/rect.hpp
+		fs/gui/auxiliary/widgets.cpp
+		fs/gui/auxiliary/widgets.hpp
 		fs/gui/settings/fonting.cpp
 		fs/gui/settings/fonting.hpp
 		fs/gui/settings/theming.cpp

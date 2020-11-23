@@ -1,6 +1,6 @@
 #pragma once
 
-#include <fs/gui/ui_utils.hpp>
+#include <fs/gui/auxiliary/rect.hpp>
 #include <fs/lang/item.hpp>
 #include <fs/lang/item_filter.hpp>
 #include <fs/lang/loot/generator.hpp>
@@ -20,7 +20,7 @@ struct looted_item
 {
 	lang::item itm;
 	std::optional<lang::item_filtering_result> filtering_result;
-	std::optional<rect> drawing; // in screen coordinates
+	std::optional<aux::rect> drawing; // in screen coordinates
 };
 
 // [drag] [drag] [drag] [drag] [button<str>]
