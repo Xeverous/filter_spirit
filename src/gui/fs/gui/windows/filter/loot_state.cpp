@@ -446,13 +446,16 @@ void loot_state::draw_interface(std::string_view source, application& app)
 
 	draw_loot_canvas(app.font_settings());
 
-	const lang::loot::item_database& db = *database;
+	ImGui::BeginChild("loot buttons");
 
+	const lang::loot::item_database& db = *database;
 	draw_loot_settings_global();
 	draw_loot_buttons_currency        (db, app.loot_generator());
 	draw_loot_buttons_specific_classes(db, app.loot_generator());
 	draw_loot_buttons_gems            (db, app.loot_generator());
 	draw_loot_buttons_equipment       (db, app.loot_generator());
+
+	ImGui::EndChild();
 
 	if (_last_items_size != _items.size()) {
 		if (_last_items_size < _items.size() && !_append_loot) {
@@ -636,7 +639,15 @@ void loot_state::draw_loot_buttons_equipment(const lang::loot::item_database& db
 
 	_eq_quality.draw("quality");
 
-	if (ImGui::BeginChild("equipment generation")) {
+	/*
+	 * This manual sizing is ugly but Dear ImGui has no support for "allocating just enough space"
+	 * for child windows. Child window here is needed because columns are global-per-window
+	 * which artificially limits library users to create subcolumns due to single global state.
+	 * Everything through global functions and singletons. Good design, isn't it?
+	 */
+	const auto& style = ImGui::GetStyle();
+	const auto child_height = 10.0f * (style.ItemSpacing.y + style.FramePadding.y + ImGui::GetFontSize());
+	if (ImGui::BeginChild("equipment generation", ImVec2(0.0f, child_height))) {
 		ImGui::Columns(2);
 
 		if (ImGui::Button("generate - fixed weights")) {
