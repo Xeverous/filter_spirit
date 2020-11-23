@@ -13,8 +13,15 @@ namespace fs::gui {
 class imgui_window
 {
 public:
-	imgui_window(std::string name = {})
-	: _name(std::move(name))
+	imgui_window(std::string title, std::string id)
+	: _id(std::move(id))
+	, _title(std::move(title))
+	{
+		recompute_window_str();
+	}
+
+	imgui_window(std::string title = {})
+	: imgui_window(title, title)
 	{
 	}
 
@@ -32,12 +39,13 @@ public:
 
 	void name(std::string_view str)
 	{
-		_name = str;
+		_title = str;
+		recompute_window_str();
 	}
 
 	const std::string& name() const
 	{
-		return _name;
+		return _title;
 	}
 
 	void draw()
@@ -52,7 +60,7 @@ public:
 
 		const auto _ = aux::scoped_pointer_id(this);
 
-		if (ImGui::Begin(_name.c_str(), &_is_opened))
+		if (ImGui::Begin(_imgui_window_str.c_str(), &_is_opened))
 			draw_contents();
 
 		ImGui::End();
@@ -62,7 +70,18 @@ protected:
 	virtual void draw_contents() = 0;
 
 private:
-	std::string _name;
+	void recompute_window_str()
+	{
+		// "###" prevents Dear ImGui from considering full string as the window's ID
+		// ...which allows to change displayed window title without losing any state
+		_imgui_window_str = _title;
+		_imgui_window_str.append("###");
+		_imgui_window_str.append(_id);
+	}
+
+	std::string _id;
+	std::string _title;
+	std::string _imgui_window_str;
 	bool _is_opened = false;
 	bool _force_focus = false;
 };
