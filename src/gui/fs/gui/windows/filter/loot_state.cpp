@@ -12,6 +12,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cmath>
 
 namespace {
 
@@ -64,7 +65,7 @@ public:
 	}
 
 	// use floats instead of Dear ImGui types because the library has no constexpr support
-	static constexpr auto padding_x = 10.0f;
+	static constexpr auto padding_x = 20.0f;
 	static constexpr auto padding_y = 5.0f;
 
 private:
@@ -80,6 +81,25 @@ ImU32 to_imgui_color(lang::color c)
 		return IM_COL32(c.r.value, c.g.value, c.b.value, (*c.a).value);
 	else
 		return IM_COL32(c.r.value, c.g.value, c.b.value, lang::limits::default_filter_opacity);
+}
+
+ImU32 to_imgui_color(lang::socket_color color)
+{
+	if (color == lang::socket_color::r)
+		return IM_COL32(202,  13,  50, 255);
+	else if (color == lang::socket_color::g)
+		return IM_COL32(158, 203,  13, 255);
+	else if (color == lang::socket_color::b)
+		return IM_COL32( 88, 130, 254, 255);
+	else if (color == lang::socket_color::w)
+		return IM_COL32(200, 200, 200, 255);
+	else if (color == lang::socket_color::a)
+		return IM_COL32( 59,  59,  59, 255);
+	else if (color == lang::socket_color::d)
+		return IM_COL32(  0,   0,   0,   0); // resonators do not render sockets on ground labels
+
+	FS_ASSERT(false);
+	return IM_COL32(0, 0, 0, 255);
 }
 
 float get_item_tooltip_first_column_width(const gui::fonting& f)
@@ -306,6 +326,106 @@ void draw_debug_interface_impl(
 	ImGui::Columns(1); // reset back to single column
 }
 
+void draw_item_sockets(gui::aux::rect r, const lang::item& itm)
+{
+	const int num_sockets = itm.sockets.sockets();
+
+	if (num_sockets == 0)
+		return;
+
+	FS_ASSERT(num_sockets <= 6);
+
+	const ImVec2 link_horizontal_size(3.0f, 2.0f);
+	const ImVec2 link_vertical_size(2.0f, 3.0f);
+	const ImVec2 socket_size(4.0f, 4.0f);
+	ImDrawList* const draw_list = ImGui::GetWindowDrawList();
+	const ImU32 link_color = IM_COL32(195, 195, 195, 255);
+
+	if (itm.width == 1 || num_sockets == 1) { // vertical drawing
+		// floor calls are added to perform pixel-perfect drawing
+		const float socket_begin_x = std::floor(r.top_left.x + (r.size.x - socket_size.x) / 2.0f);
+		      float socket_begin_y = std::floor(r.top_left.y +
+			(r.size.y - num_sockets * socket_size.y - (num_sockets - 1) * link_vertical_size.y) / 2.0f);
+
+		lang::traverse_sockets(
+			itm.sockets,
+			[&](lang::socket_color color) {
+				if (color != lang::socket_color::d) {
+					draw_list->AddRectFilled(
+						{socket_begin_x                , socket_begin_y                },
+						{socket_begin_x + socket_size.x, socket_begin_y + socket_size.y},
+						to_imgui_color(color));
+				}
+				socket_begin_y += socket_size.y;
+			},
+			[&](bool link) {
+				if (link) {
+					draw_list->AddRectFilled(
+						{socket_begin_x + 1.0f                       , socket_begin_y                       },
+						{socket_begin_x + 1.0f + link_vertical_size.x, socket_begin_y + link_vertical_size.y},
+						link_color);
+				}
+				socket_begin_y += link_vertical_size.y;
+			});
+	}
+	else { // drawing in "2" shape
+		FS_ASSERT(num_sockets >= 2);
+		/*
+		 * 0 - 1
+		 *     |
+		 * 3 - 2
+		 * |
+		 * 4 - 5
+		 */
+		const ImVec2 socket_offsets[] = {
+			/* 0 */ {                                  0.0f,                                         0.0f},
+			/* 1 */ {socket_size.x + link_horizontal_size.x,                                         0.0f},
+			/* 2 */ {socket_size.x + link_horizontal_size.x,         socket_size.y + link_vertical_size.y},
+			/* 3 */ {                                  0.0f,         socket_size.y + link_vertical_size.y},
+			/* 4 */ {                                  0.0f, 2.0f * (socket_size.y + link_vertical_size.y)},
+			/* 5 */ {socket_size.x + link_horizontal_size.x, 2.0f * (socket_size.y + link_vertical_size.y)}
+		};
+		const ImVec2 link_offsets[] = {
+			/* 0 */ {socket_size.x                                ,                                                 1.0f},
+			/* 1 */ {socket_size.x + link_horizontal_size.x + 1.0f,                         link_vertical_size.y        },
+			/* 2 */ {socket_size.x                                ,         socket_size.y + link_vertical_size.y  + 1.0f},
+			/* 3 */ {                                         1.0f, 2.0f *  socket_size.y + link_vertical_size.y        },
+			/* 4 */ {socket_size.x                                , 2.0f * (socket_size.y + link_vertical_size.y) + 1.0f},
+		};
+
+		const int num_rows = (num_sockets + 1) / 2;
+
+		const float begin_x = std::floor(r.top_left.x +
+			(r.size.x - 2.0f * socket_size.x - link_horizontal_size.x) / 2.0f);
+		const float begin_y = std::floor(r.top_left.y +
+			(r.size.y - num_rows * socket_size.y - (num_rows - 1) * link_vertical_size.y) / 2.0f);
+
+		int index = 0;
+		lang::traverse_sockets(
+			itm.sockets,
+			[&](lang::socket_color color) {
+				if (color == lang::socket_color::d)
+					return;
+
+				const auto x = begin_x + socket_offsets[index].x;
+				const auto y = begin_y + socket_offsets[index].y;
+				draw_list->AddRectFilled({x, y}, {x + socket_size.x, y + socket_size.y}, to_imgui_color(color));
+			},
+			[&](bool link) {
+				if (link) {
+					const auto x = begin_x + link_offsets[index].x;
+					const auto y = begin_y + link_offsets[index].y;
+
+					const bool is_horizontal = index % 2 == 0;
+					const ImVec2 size = is_horizontal ? link_horizontal_size : link_vertical_size;
+
+					draw_list->AddRectFilled({x, y}, {x + size.x, y + size.y}, link_color);
+				}
+				++index;
+			});
+	}
+}
+
 void draw_item_label(
 	ImVec2 item_begin,
 	const item_label_data& ild,
@@ -316,7 +436,7 @@ void draw_item_label(
 	const ImVec2 item_size = ild.whole_size();
 	const ImVec2 item_end(item_begin.x + item_size.x, item_begin.y + item_size.y);
 
-	ImDrawList* draw_list = ImGui::GetWindowDrawList();
+	ImDrawList* const draw_list = ImGui::GetWindowDrawList();
 	draw_list->AddRectFilled(item_begin, item_end, to_imgui_color(result.style.background_color.c));
 
 	if (result.style.border_color)
@@ -335,6 +455,13 @@ void draw_item_label(
 
 	const auto x = item_begin.x + (item_size.x - ild.second_line_size().x) / 2.0f;
 	draw_list->AddText(fnt, font_size, ImVec2(x, y), to_imgui_color(result.style.text_color.c), ild.second_line());
+
+	draw_item_sockets(
+		gui::aux::rect{
+			ImVec2(item_end.x - item_label_data::padding_x, item_begin.y),
+			ImVec2(item_label_data::padding_x, item_size.y)},
+		itm
+	);
 }
 
 void draw_percent_slider(const char* str, lang::loot::percent& value)
