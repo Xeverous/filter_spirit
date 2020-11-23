@@ -1,5 +1,5 @@
 #include <fs/gui/windows/color_picker_window.hpp>
-#include <fs/gui/ui_utils.hpp>
+#include <fs/gui/auxiliary/color_convert.hpp>
 #include <fs/gui/application.hpp>
 
 #include <imgui.h>
@@ -37,7 +37,7 @@ void color_picker_window::draw_contents()
 		auto _ = _application.font_settings().scoped_monospaced_font();
 		ImGui::BeginGroup();
 
-		const auto rgba = to_rgba(_selected_color);
+		const auto rgba = aux::to_rgba(_selected_color);
 		const auto rgba_str = std::to_string(rgba.r()) + " " + std::to_string(rgba.g()) + " " + std::to_string(rgba.b()) + " " + std::to_string(rgba.a());
 		button_click_to_copy(rgba_str.c_str());
 		button_click_to_copy(("SetBorderColor " + rgba_str).c_str());

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <fs/gui/ui_utils.hpp>
+#include <fs/gui/auxiliary/raii.hpp>
 
 #include <imgui.h>
 
@@ -50,7 +50,7 @@ public:
 			_force_focus = false;
 		}
 
-		const auto _ = scoped_pointer_id(this);
+		const auto _ = aux::scoped_pointer_id(this);
 
 		if (ImGui::Begin(_name.c_str(), &_is_opened))
 			draw_contents();

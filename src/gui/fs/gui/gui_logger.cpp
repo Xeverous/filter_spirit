@@ -1,4 +1,5 @@
 #include <fs/gui/gui_logger.hpp>
+#include <fs/gui/auxiliary/raii.hpp>
 
 #include <imgui.h>
 
@@ -54,7 +55,7 @@ void gui_logger::draw()
 
 	if (ImGui::BeginChild("logs", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar)) {
 		const auto _1 = _fonting.get().scoped_monospaced_font();
-		const auto _2 = scoped_text_color_override(IM_COL32(255, 255, 255, 255));
+		const auto _2 = aux::scoped_text_color_override(IM_COL32(255, 255, 255, 255));
 
 		auto last_severity = log::severity::info;
 

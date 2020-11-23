@@ -1,7 +1,9 @@
 #include <fs/gui/windows/filter/loot_state.hpp>
 #include <fs/gui/application.hpp>
 #include <fs/gui/settings/fonting.hpp>
-#include <fs/gui/ui_utils.hpp>
+#include <fs/gui/auxiliary/widgets.hpp>
+#include <fs/gui/auxiliary/raii.hpp>
+#include <fs/gui/auxiliary/colors.hpp>
 #include <fs/lang/keywords.hpp>
 #include <fs/lang/limits.hpp>
 #include <fs/utility/assert.hpp>
@@ -21,12 +23,12 @@ public:
 	item_label_data(const lang::item& itm, int font_size, const gui::fonting& f)
 	{
 		if (itm.name)
-			_first_line_size = gui::measure_text_line(*itm.name, font_size, f.filter_preview_font(font_size));
+			_first_line_size = gui::aux::measure_text_line(*itm.name, font_size, f.filter_preview_font(font_size));
 
 		const int sz = lang::snprintf_dropped_item_label(_second_line_buf.data(), _second_line_buf.size(), itm);
 		FS_ASSERT_MSG(sz >= 0, "snprintf should not return an error");
 		(void) sz; // shut warning if assert does not use variable
-		_second_line_size = gui::measure_text_line(_second_line_buf.data(), font_size, f.filter_preview_font(font_size));
+		_second_line_size = gui::aux::measure_text_line(_second_line_buf.data(), font_size, f.filter_preview_font(font_size));
 
 		_whole_size = {
 			std::max(_first_line_size.x, _second_line_size.x) + 2.0f * padding_x,
@@ -82,7 +84,7 @@ ImU32 to_imgui_color(lang::color c)
 
 float get_item_tooltip_first_column_width(const gui::fonting& f)
 {
-	return gui::measure_text_line(
+	return gui::aux::measure_text_line(
 			lang::keywords::rf::enchantment_passive_node,
 			f.monospaced_font_size(),
 			f.monospaced_font()
@@ -104,7 +106,7 @@ float get_item_tooltip_second_column_width(const lang::item& itm, const gui::fon
 		largest_second_column_str_size = itm.class_.size();
 	}
 
-	return gui::measure_text_line(
+	return gui::aux::measure_text_line(
 			longest_second_column_str,
 			f.monospaced_font_size(),
 			f.monospaced_font()
@@ -164,9 +166,9 @@ void draw_item_tooltip_second_column(const lang::item& itm)
 	{
 		const auto rarity = to_string_view(itm.rarity_);
 		const auto rarity_text_color =
-			itm.rarity_ == lang::rarity_type::unique ? gui::color_unique_item :
-			itm.rarity_ == lang::rarity_type::rare   ? gui::color_rare_item   :
-			itm.rarity_ == lang::rarity_type::magic  ? gui::color_magic_item  : gui::color_normal_item;
+			itm.rarity_ == lang::rarity_type::unique ? gui::aux::color_unique_item :
+			itm.rarity_ == lang::rarity_type::rare   ? gui::aux::color_rare_item   :
+			itm.rarity_ == lang::rarity_type::magic  ? gui::aux::color_magic_item  : gui::aux::color_normal_item;
 		ImGui::PushStyleColor(ImGuiCol_Text, rarity_text_color);
 		ImGui::TextUnformatted(rarity.data(), rarity.data() + rarity.size());
 		ImGui::PopStyleColor();
@@ -230,9 +232,9 @@ void draw_item_tooltip_second_column(const lang::item& itm)
 		namespace kw = lang::keywords::rf;
 
 		if (value)
-			ImGui::TextColored(ImGui::ColorConvertU32ToFloat4(gui::color_true), kw::true_);
+			ImGui::TextColored(ImGui::ColorConvertU32ToFloat4(gui::aux::color_true), kw::true_);
 		else
-			ImGui::TextColored(ImGui::ColorConvertU32ToFloat4(gui::color_false), kw::false_);
+			ImGui::TextColored(ImGui::ColorConvertU32ToFloat4(gui::aux::color_false), kw::false_);
 	};
 
 	output_boolean(itm.is_identified);
@@ -256,7 +258,7 @@ void draw_item_tooltip(const lang::item& itm, const lang::item_filtering_result&
 	const auto second_column_width = get_item_tooltip_second_column_width(itm, f);
 
 	ImGui::SetNextWindowSize(ImVec2(first_column_width + second_column_width, 0));
-	gui::scoped_tooltip _2;
+	gui::aux::scoped_tooltip _2;
 
 	ImGui::Columns(2);
 
@@ -342,7 +344,7 @@ void draw_percent_slider(const char* str, lang::loot::percent& value)
 
 void draw_weight_drag(const char* str, int& value)
 {
-	gui::scoped_pointer_id _(&value);
+	gui::aux::scoped_pointer_id _(&value);
 	ImGui::DragInt(str, &value, 1.0f, 0, INT_MAX, "%d", ImGuiSliderFlags_AlwaysClamp);
 }
 
@@ -377,7 +379,7 @@ namespace fs::gui {
 
 bool loot_button_plurality::draw(const char* str)
 {
-	scoped_pointer_id _(this);
+	aux::scoped_pointer_id _(this);
 	ImGui::DragInt4("", _min_max, 0.25f, 0, INT_MAX);
 
 	if (!ImGui::IsItemActive()) {
@@ -394,7 +396,7 @@ bool loot_button_plurality::draw(const char* str)
 
 bool loot_button_drag_range::draw(const char* str)
 {
-	scoped_pointer_id _(this);
+	aux::scoped_pointer_id _(this);
 	ImGui::DragInt2("", _min_max, 0.25f, 0, INT_MAX);
 
 	if (!ImGui::IsItemActive() && min() > max())
@@ -406,7 +408,7 @@ bool loot_button_drag_range::draw(const char* str)
 
 void loot_drag_range::draw(const char* str)
 {
-	scoped_pointer_id _(this);
+	aux::scoped_pointer_id _(this);
 	ImGui::DragInt2(str, _min_max, 0.25f, 0, INT_MAX);
 
 	if (!ImGui::IsItemActive() && min() > max())
@@ -415,7 +417,7 @@ void loot_drag_range::draw(const char* str)
 
 void loot_slider_range::draw(const char* str)
 {
-	scoped_pointer_id _(this);
+	aux::scoped_pointer_id _(this);
 	ImGui::SliderInt2(str, _min_max, _limit.min, _limit.max);
 
 	if (!ImGui::IsItemActive() && min() > max())
@@ -437,11 +439,11 @@ void loot_state::draw_interface(std::string_view source, application& app)
 	ImGui::Checkbox("Show hidden items", &_show_hidden_items);
 	ImGui::SameLine();
 	ImGui::Checkbox("Append mode", &_append_loot);
-	on_hover_text_tooltip("By default, new items replace existing ones.\nEnable this to append new items instead.");
+	aux::on_hover_text_tooltip("By default, new items replace existing ones.\nEnable this to append new items instead.");
 	if (_append_loot) {
 		ImGui::SameLine();
 		ImGui::Checkbox("Shuffle", &_shuffle_loot);
-		on_hover_text_tooltip("Shuffle items when new ones are generated.");
+		aux::on_hover_text_tooltip("Shuffle items when new ones are generated.");
 	}
 
 	draw_loot_canvas(app.font_settings());
@@ -771,7 +773,7 @@ void loot_state::draw_item_labels(ImVec2 canvas_begin, ImVec2 canvas_end, const 
 
 			draw_item_label(item_begin, ild, itm.itm, *itm.filtering_result, f);
 
-			itm.drawing = rect{item_begin, item_size};
+			itm.drawing = aux::rect{item_begin, item_size};
 
 			row_height = std::max(row_height, item_size.y);
 			current_position.x += item_size.x;
