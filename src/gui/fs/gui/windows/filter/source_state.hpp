@@ -49,6 +49,7 @@ private:
 	std::optional<std::string> _source;
 	std::optional<std::string> _file_path;
 	aux::multiline_text_input _text_input;
+	bool _popup_pending = false;
 };
 
 }
