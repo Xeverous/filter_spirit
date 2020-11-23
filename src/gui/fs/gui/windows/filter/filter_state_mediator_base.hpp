@@ -19,11 +19,12 @@ public:
 	virtual void on_filter_representation_change(const std::optional<lang::item_filter>& filter_representation) = 0;
 
 	virtual const std::optional<std::string>& source() const = 0;
+	virtual const std::optional<std::string>& source_path() const = 0;
 	virtual const std::optional<lang::item_filter>& filter_representation() const = 0;
 
 	virtual log::logger& logger() = 0;
 
-	virtual void draw_interface(const std::string& source_path, application& app) = 0;
+	virtual void draw_interface(application& app) = 0;
 };
 
 }

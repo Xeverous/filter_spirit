@@ -5,7 +5,6 @@
 #include <fs/gui/windows/filter/spirit_filter_state_mediator.hpp>
 
 #include <string>
-#include <utility>
 #include <optional>
 #include <functional>
 
@@ -17,11 +16,6 @@ class real_filter_window : public imgui_window
 {
 public:
 	real_filter_window(application& app, std::string path);
-
-	const std::string& real_filter_path() const
-	{
-		return name();
-	}
 
 protected:
 	void draw_contents() override;
@@ -35,11 +29,6 @@ class spirit_filter_window : public imgui_window
 {
 public:
 	spirit_filter_window(application& app, std::string path);
-
-	const std::string& spirit_filter_path() const
-	{
-		return name();
-	}
 
 protected:
 	void draw_contents() override;
