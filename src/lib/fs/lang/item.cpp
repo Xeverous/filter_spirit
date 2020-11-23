@@ -80,25 +80,10 @@ std::string to_string(socket_info info)
 	std::string result;
 	result.reserve(11); // longest possible outcome
 
-	bool first_time_group = true;
-
-	for (linked_sockets group : info.groups) {
-		if (first_time_group)
-			first_time_group = false;
-		else
-			result.push_back(' ');
-
-		bool first_time_color = true;
-
-		for (socket_color color : group.sockets) {
-			if (first_time_color)
-				first_time_color = false;
-			else
-				result.push_back('-');
-
-			result.push_back(to_char(color));
-		}
-	}
+	traverse_sockets(
+		info,
+		[&](socket_color color) { result.push_back(to_char(color)); },
+		[&](bool link) { result.push_back(link ? '-' : ' '); });
 
 	return result;
 }
