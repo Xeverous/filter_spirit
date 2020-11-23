@@ -372,6 +372,33 @@ struct socket_info
 [[nodiscard]] char to_char(socket_color color);
 [[nodiscard]] std::string to_string(socket_info info);
 
+// traverse sockets and call provided functors
+// on_socket should accept (socket_color)
+// on_link   should accept (bool)
+template <typename OnSocket, typename OnLink>
+void traverse_sockets(socket_info info, OnSocket on_socket, OnLink on_link)
+{
+	bool first_time_group = true;
+
+	for (linked_sockets group : info.groups) {
+		if (first_time_group)
+			first_time_group = false;
+		else
+			on_link(false);
+
+		bool first_time_color = true;
+
+		for (socket_color color : group.sockets) {
+			if (first_time_color)
+				first_time_color = false;
+			else
+				on_link(true);
+
+			on_socket(color);
+		}
+	}
+}
+
 /**
  * @class describes properties of a dropped item
  */
