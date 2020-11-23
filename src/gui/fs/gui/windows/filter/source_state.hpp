@@ -1,11 +1,14 @@
 #pragma once
 
+#include <fs/gui/auxiliary/widgets.hpp>
+
 #include <string>
 #include <optional>
 
 namespace fs::gui {
 
 class filter_state_mediator_base;
+class fonting;
 
 /**
  * @class represents text input to the program
@@ -20,7 +23,9 @@ public:
 		return _file_path.has_value();
 	}
 
-	void draw_interface(filter_state_mediator_base& mediator);
+	void open_text_input();
+
+	void draw_interface(const fonting& f, filter_state_mediator_base& mediator);
 
 	const std::optional<std::string>& source() const
 	{
@@ -38,9 +43,12 @@ public:
 
 private:
 	void new_source(std::optional<std::string> source, filter_state_mediator_base& mediator);
+	void on_text_input_done(filter_state_mediator_base& mediator);
+	void on_text_input_cancel();
 
 	std::optional<std::string> _source;
 	std::optional<std::string> _file_path;
+	aux::multiline_text_input _text_input;
 };
 
 }

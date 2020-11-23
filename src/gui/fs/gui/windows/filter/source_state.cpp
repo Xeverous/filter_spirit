@@ -1,6 +1,8 @@
 #include <fs/gui/windows/filter/filter_state_mediator_base.hpp>
 #include <fs/gui/windows/filter/source_state.hpp>
+#include <fs/gui/settings/fonting.hpp>
 #include <fs/utility/file.hpp>
+#include <fs/utility/assert.hpp>
 
 #include <imgui.h>
 
@@ -10,7 +12,7 @@ constexpr auto popup_text_input_title = "Filter source - text edit";
 
 namespace fs::gui {
 
-void source_state::draw_interface(filter_state_mediator_base& mediator)
+void source_state::draw_interface(const fonting& f, filter_state_mediator_base& mediator)
 {
 	if (ImGui::CollapsingHeader("Source", ImGuiTreeNodeFlags_DefaultOpen)) {
 		if (is_from_file()) {
@@ -26,9 +28,8 @@ void source_state::draw_interface(filter_state_mediator_base& mediator)
 
 		ImGui::SameLine();
 
-		if (ImGui::Button("From text input")) {
-			ImGui::OpenPopup(popup_text_input_title);
-		}
+		if (ImGui::Button("From text input"))
+			open_text_input();
 
 		ImGui::SameLine();
 
@@ -39,12 +40,56 @@ void source_state::draw_interface(filter_state_mediator_base& mediator)
 	}
 
 	if (ImGui::BeginPopupModal(popup_text_input_title)) {
-		if (ImGui::Button("Done")) {
-			ImGui::CloseCurrentPopup();
+		if (aux::button_negative("Cancel"))
+			on_text_input_cancel();
+
+		ImGui::SameLine();
+
+		if (aux::button_positive("Done"))
+			on_text_input_done(mediator);
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Paste from clipboard")) {
+			_text_input.set_text(ImGui::GetClipboardText());
+		}
+
+		{
+			auto _ = f.scoped_monospaced_font();
+			_text_input.draw({-1.0f, -1.0f}); // fill remaining space
 		}
 
 		ImGui::EndPopup();
 	}
+}
+
+void source_state::open_text_input()
+{
+	if (_source)
+		_text_input.set_text(*_source);
+
+	ImGui::OpenPopup(popup_text_input_title);
+}
+
+void source_state::on_text_input_done(filter_state_mediator_base& mediator)
+{
+	FS_ASSERT(ImGui::IsPopupOpen(popup_text_input_title));
+	ImGui::CloseCurrentPopup();
+
+	if (_source)
+		(*_source) = _text_input.c_str();
+	else
+		_source.emplace(_text_input.c_str());
+
+	_file_path = std::nullopt;
+
+	mediator.on_source_change(_source);
+}
+
+void source_state::on_text_input_cancel()
+{
+	FS_ASSERT(ImGui::IsPopupOpen(popup_text_input_title));
+	ImGui::CloseCurrentPopup();
 }
 
 void source_state::load_source_file(std::string path, filter_state_mediator_base& mediator)
