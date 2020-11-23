@@ -68,14 +68,15 @@ void filter_state_mediator::draw_interface_logs()
 
 void filter_state_mediator::draw_interface_loot(application& app)
 {
-	std::array<char, 48> loot_status_str_buf;
+	std::array<char, 64> loot_status_str_buf;
 	if (const auto& str = "Loot preview & filter debug"; _loot_state.num_items() > 0u) {
 		std::snprintf(
 			loot_status_str_buf.data(),
 			loot_status_str_buf.size(),
-			"%s (%zu items)",
+			"%s (%zu items, %zu hidden)",
 			str,
-			_loot_state.num_items());
+			_loot_state.num_items(),
+			_loot_state.num_hidden_items());
 	}
 	else {
 		constexpr auto str_size = std::size(str);

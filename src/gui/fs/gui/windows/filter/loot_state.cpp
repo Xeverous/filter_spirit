@@ -948,15 +948,26 @@ void loot_state::on_canvas_right_click(ImVec2 mouse_position)
 
 void loot_state::update_items(const lang::item_filter& filter)
 {
-	for (looted_item& itm : _items)
-		if (!itm.filtering_result)
+	for (looted_item& itm : _items) {
+		if (!itm.filtering_result) {
 			itm.filtering_result = lang::pass_item_through_filter(itm.itm, filter, _area_level);
+
+			if (!(*itm.filtering_result).style.visibility.show)
+				++_num_hidden_items;
+		}
+	}
 }
 
 void loot_state::refilter_items(const lang::item_filter& filter)
 {
-	for (looted_item& itm : _items)
+	_num_hidden_items = 0;
+
+	for (looted_item& itm : _items) {
 		itm.filtering_result = lang::pass_item_through_filter(itm.itm, filter, _area_level);
+
+		if (!(*itm.filtering_result).style.visibility.show)
+			++_num_hidden_items;
+	}
 }
 
 }
