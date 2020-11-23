@@ -1,4 +1,5 @@
 #include <fs/gui/windows/filter/filter_state_mediator.hpp>
+#include <fs/gui/application.hpp>
 #include <fs/utility/file.hpp>
 
 #include <utility>
@@ -33,7 +34,7 @@ void filter_state_mediator::draw_interface(application& app)
 {
 	ImGui::Columns(2, nullptr, false);
 
-	_source.draw_interface(*this);
+	_source.draw_interface(app.font_settings(), *this);
 	draw_interface_derived();
 	draw_interface_filter_representation();
 	draw_interface_logs();
