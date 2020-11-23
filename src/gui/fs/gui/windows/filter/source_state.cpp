@@ -6,13 +6,29 @@
 
 #include <utility>
 
+constexpr auto popup_text_input_title = "Filter source - text edit";
+
 namespace fs::gui {
 
 void source_state::draw_interface(filter_state_mediator_base& mediator)
 {
 	if (ImGui::CollapsingHeader("Source", ImGuiTreeNodeFlags_DefaultOpen)) {
-		if (ImGui::Button("Reload"))
-			reload_source_file(mediator);
+		if (is_from_file()) {
+			if (ImGui::Button("Reload"))
+				reload_source_file(mediator);
+
+			ImGui::SameLine();
+		}
+
+		if (ImGui::Button("From file...")) {
+
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("From text input")) {
+			ImGui::OpenPopup(popup_text_input_title);
+		}
 
 		ImGui::SameLine();
 
@@ -20,6 +36,14 @@ void source_state::draw_interface(filter_state_mediator_base& mediator)
 			ImGui::TextWrapped("Source present, %zu bytes", (*_source).size());
 		else
 			ImGui::TextWrapped("Source not present.");
+	}
+
+	if (ImGui::BeginPopupModal(popup_text_input_title)) {
+		if (ImGui::Button("Done")) {
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::EndPopup();
 	}
 }
 
