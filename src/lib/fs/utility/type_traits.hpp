@@ -207,4 +207,15 @@ struct has_origin_member<T, std::void_t<decltype(std::declval<T>().origin)>> : s
 template <typename T>
 constexpr bool has_origin_member_v = has_origin_member<T>::value;
 
+
+
+template <typename T>
+struct remove_cvref
+{
+	using type = std::remove_cv_t<std::remove_reference_t<T>>;
+};
+
+template <typename T>
+using remove_cvref_t = typename remove_cvref<T>::type;
+
 }
