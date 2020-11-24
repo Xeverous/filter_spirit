@@ -94,12 +94,30 @@ bool influences_condition_test(influences_condition condition, influence_info it
 	}
 }
 
-item_style default_item_style(const item& /* itm */)
+item_style default_item_style(const item& itm)
 {
 	item_style result;
 
-	// TODO change colors depending on item rarity and class
-	// ...
+	if (itm.rarity_ == rarity_type::magic)
+		result.text_color = color_action{color{integer{136}, integer{136}, integer{255}, integer{255}}, {}};
+	else if (itm.rarity_ == rarity_type::rare)
+		result.text_color = color_action{color{integer{255}, integer{255}, integer{119}, integer{255}}, {}};
+	else if (itm.rarity_ == rarity_type::unique)
+		result.text_color = color_action{color{integer{175}, integer{ 95}, integer{ 28}, integer{255}}, {}};
+
+	if (itm.class_ == item_class_names::currency_stackable || itm.class_ == item_class_names::currency_delve)
+		result.text_color = color_action{color{integer{170}, integer{158}, integer{129}, integer{255}}, {}};
+	else if (itm.class_ == item_class_names::divination_card)
+		result.text_color = color_action{color{integer{  0}, integer{186}, integer{255}, integer{255}}, {}};
+	else if (itm.class_ == item_class_names::gem_active || itm.class_ == item_class_names::gem_support)
+		result.text_color = color_action{color{integer{ 13}, integer{162}, integer{155}, integer{255}}, {}};
+	else if (itm.is_prophecy)
+		result.text_color = color_action{color{integer{181}, integer{ 75}, integer{255}, integer{255}}, {}};
+	else if (itm.class_ == item_class_names::quest_item)
+		result.text_color = color_action{color{integer{ 71}, integer{230}, integer{ 53}, integer{255}}, {}};
+	// maps are both in these class names and in rarities - border color is the same as text color
+	else if (itm.class_ == item_class_names::map || itm.class_ == item_class_names::map_fragment)
+		result.border_color = result.text_color;
 
 	return result;
 }
