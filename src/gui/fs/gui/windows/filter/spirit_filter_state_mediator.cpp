@@ -6,6 +6,22 @@
 
 namespace fs::gui {
 
+const parser::lookup_data* spirit_filter_state_mediator::lookup_data() const
+{
+	if (_parsed_spirit_filter)
+		return &((*_parsed_spirit_filter).lookup);
+	else
+		return nullptr;
+}
+
+const parser::line_lookup* spirit_filter_state_mediator::line_lookup() const
+{
+	if (_parsed_spirit_filter)
+		return &((*_parsed_spirit_filter).lines);
+	else
+		return nullptr;
+}
+
 void spirit_filter_state_mediator::on_source_change(const std::optional<std::string>& source)
 {
 	if (!source) {

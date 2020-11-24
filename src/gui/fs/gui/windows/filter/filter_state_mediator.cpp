@@ -30,9 +30,37 @@ void filter_state_mediator::new_filter_representation(std::optional<lang::item_f
 void filter_state_mediator::on_filter_representation_change(const std::optional<lang::item_filter>& filter_representation)
 {
 	if (filter_representation)
-		_loot_state.refilter_items(*filter_representation);
+		_loot_state.refilter_items(*filter_representation, *this);
 	else
-		_loot_state.clear_filter_results();
+		_loot_state.clear_filter_results(*this);
+}
+
+void filter_state_mediator::on_debug_open(const lang::item& itm, const lang::item_filtering_result& result)
+{
+	const parser::lookup_data* lookup = lookup_data();
+	if (lookup == nullptr)
+		return;
+
+	const parser::line_lookup* lines = line_lookup();
+	if (lines == nullptr)
+		return;
+
+	_debug_state.open_debug(*lookup, *lines, itm, result);
+}
+
+void filter_state_mediator::on_loot_change()
+{
+	_debug_state.invalidate();
+}
+
+void filter_state_mediator::on_filter_results_change()
+{
+	_debug_state.recompute();
+}
+
+void filter_state_mediator::on_filter_results_clear()
+{
+	_debug_state.invalidate();
 }
 
 void filter_state_mediator::draw_interface(application& app)
@@ -47,6 +75,7 @@ void filter_state_mediator::draw_interface(application& app)
 	ImGui::NextColumn();
 
 	draw_interface_loot(app);
+	_debug_state.draw_interface(app.font_settings());
 }
 
 void filter_state_mediator::draw_interface_filter_representation()
@@ -94,7 +123,7 @@ void filter_state_mediator::draw_interface_loot(application& app)
 		FS_ASSERT(_source.source().has_value());
 
 		_loot_state.update_items(*_filter_representation);
-		_loot_state.draw_interface(*_source.source(), app);
+		_loot_state.draw_interface(app, *this);
 	}
 }
 

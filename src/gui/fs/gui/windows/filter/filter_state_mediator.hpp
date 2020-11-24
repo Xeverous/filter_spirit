@@ -3,6 +3,7 @@
 #include <fs/gui/windows/filter/filter_state_mediator_base.hpp>
 #include <fs/gui/windows/filter/source_state.hpp>
 #include <fs/gui/windows/filter/loot_state.hpp>
+#include <fs/gui/windows/filter/debug_state.hpp>
 #include <fs/gui/gui_logger.hpp>
 #include <fs/lang/item_filter.hpp>
 
@@ -23,6 +24,10 @@ public:
 
 	void on_filter_representation_change(
 		const std::optional<lang::item_filter>& filter_representation) override;
+	void on_debug_open(const lang::item& itm, const lang::item_filtering_result& result) override;
+	void on_loot_change() override;
+	void on_filter_results_change() override;
+	void on_filter_results_clear() override;
 
 	const std::optional<std::string>& source() const override
 	{
@@ -60,6 +65,7 @@ private:
 	// << possible intermediate data in derived types >>
 	std::optional<lang::item_filter> _filter_representation;
 	loot_state _loot_state;
+	debug_state _debug_state;
 	gui_logger _logger;
 };
 
