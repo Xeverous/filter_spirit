@@ -21,13 +21,13 @@ void filter_state_mediator::open_text_input()
 	_source.open_text_input();
 }
 
-void filter_state_mediator::new_filter_representation(std::optional<lang::item_filter> filter_representation)
+void filter_state_mediator::new_filter_representation(std::optional<lang::item_filter> representation)
 {
-	_filter_representation = std::move(filter_representation);
-	on_filter_representation_change(_filter_representation);
+	_filter_representation = std::move(representation);
+	on_filter_representation_change(filter_representation());
 }
 
-void filter_state_mediator::on_filter_representation_change(const std::optional<lang::item_filter>& filter_representation)
+void filter_state_mediator::on_filter_representation_change(const lang::item_filter* filter_representation)
 {
 	if (filter_representation)
 		_loot_state.refilter_items(*filter_representation, *this);
@@ -120,7 +120,7 @@ void filter_state_mediator::draw_interface_loot(application& app)
 			return;
 		}
 
-		FS_ASSERT(_source.source().has_value());
+		FS_ASSERT(_source.source() != nullptr);
 
 		_loot_state.update_items(*_filter_representation);
 		_loot_state.draw_interface(app, *this);

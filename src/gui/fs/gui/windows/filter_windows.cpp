@@ -34,7 +34,7 @@ real_filter_window::real_filter_window(application& app)
 
 void real_filter_window::draw_contents()
 {
-	if (const auto& path = _state.source_path(); path.has_value())
+	if (const auto* path = _state.source_path(); path)
 		name(*path);
 	else
 		name(str_real_filter_text_input);
@@ -62,7 +62,7 @@ spirit_filter_window::spirit_filter_window(application& app)
 
 void spirit_filter_window::draw_contents()
 {
-	if (const auto& path = _state.source_path(); path.has_value())
+	if (const auto* path = _state.source_path(); path)
 		name(*path);
 	else
 		name(str_spirit_filter_text_input);

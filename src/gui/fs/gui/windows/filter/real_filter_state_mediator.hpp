@@ -2,6 +2,9 @@
 
 #include <fs/gui/windows/filter/real_filter_state_mediator_base.hpp>
 #include <fs/gui/windows/filter/filter_state_mediator.hpp>
+#include <fs/parser/parser.hpp>
+
+#include <optional>
 
 namespace fs::gui {
 
@@ -15,13 +18,12 @@ public:
 	{
 	}
 
-	void on_source_change(const std::optional<std::string>& source) override;
-	void on_parsed_real_filter_change(
-		const std::optional<parser::parsed_real_filter>& parsed_real_filter) override;
+	void on_source_change(const std::string* source) override;
+	void on_parsed_real_filter_change(const parser::parsed_real_filter* parsed_real_filter) override;
 
-	const std::optional<parser::parsed_real_filter>& parsed_real_filter() const override
+	const parser::parsed_real_filter* parsed_real_filter() const override
 	{
-		return _parsed_real_filter;
+		return _parsed_real_filter.has_value() ? &*_parsed_real_filter : nullptr;
 	}
 
 	const parser::lookup_data* lookup_data() const override;

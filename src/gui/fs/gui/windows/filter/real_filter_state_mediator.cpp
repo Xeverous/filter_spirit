@@ -19,7 +19,7 @@ const parser::line_lookup* real_filter_state_mediator::line_lookup() const
 		return nullptr;
 }
 
-void real_filter_state_mediator::on_source_change(const std::optional<std::string>& source)
+void real_filter_state_mediator::on_source_change(const std::string* source)
 {
 	if (!source) {
 		new_parsed_real_filter(std::nullopt);
@@ -30,7 +30,6 @@ void real_filter_state_mediator::on_source_change(const std::optional<std::strin
 
 	if (std::holds_alternative<parser::parse_failure_data>(result)) {
 		parser::print_parse_errors(std::get<parser::parse_failure_data>(result), logger());
-		_parsed_real_filter = std::nullopt;
 		new_parsed_real_filter(std::nullopt);
 	}
 	else {
@@ -38,21 +37,21 @@ void real_filter_state_mediator::on_source_change(const std::optional<std::strin
 	}
 }
 
-void real_filter_state_mediator::new_parsed_real_filter(std::optional<parser::parsed_real_filter> parsed_real_filter)
+void real_filter_state_mediator::new_parsed_real_filter(std::optional<parser::parsed_real_filter> filter)
 {
-	_parsed_real_filter = std::move(parsed_real_filter);
-	on_parsed_real_filter_change(_parsed_real_filter);
+	_parsed_real_filter = std::move(filter);
+	on_parsed_real_filter_change(parsed_real_filter());
 }
 
-void real_filter_state_mediator::on_parsed_real_filter_change(const std::optional<parser::parsed_real_filter>& parsed_real_filter)
+void real_filter_state_mediator::on_parsed_real_filter_change(const parser::parsed_real_filter* parsed_real_filter)
 {
 	if (!parsed_real_filter) {
 		new_filter_representation(std::nullopt);
 		return;
 	}
 
-	compiler::outcome<lang::item_filter> result = compiler::compile_real_filter({}, (*_parsed_real_filter).ast);
-	compiler::output_logs(result.logs(), (*_parsed_real_filter).lookup, logger());
+	compiler::outcome<lang::item_filter> result = compiler::compile_real_filter({}, parsed_real_filter->ast);
+	compiler::output_logs(result.logs(), parsed_real_filter->lookup, logger());
 
 	if (result.has_result())
 		new_filter_representation(std::move(result.result()));

@@ -27,14 +27,14 @@ public:
 
 	void draw_interface(const fonting& f, filter_state_mediator_base& mediator);
 
-	const std::optional<std::string>& source() const
+	const std::string* source() const
 	{
-		return _source;
+		return _source.has_value() ? &*_source : nullptr;
 	}
 
-	const std::optional<std::string>& source_path() const
+	const std::string* source_path() const
 	{
-		return _file_path;
+		return _file_path.has_value() ? &*_file_path : nullptr;
 	}
 
 	// use string instead of string_view because filesystem wants C-strings

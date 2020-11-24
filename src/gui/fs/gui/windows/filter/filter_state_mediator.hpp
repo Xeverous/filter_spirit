@@ -22,26 +22,25 @@ public:
 	void load_source_file(std::string path);
 	void open_text_input();
 
-	void on_filter_representation_change(
-		const std::optional<lang::item_filter>& filter_representation) override;
+	void on_filter_representation_change(const lang::item_filter* filter_representation) override;
 	void on_debug_open(const lang::item& itm, const lang::item_filtering_result& result) override;
 	void on_loot_change() override;
 	void on_filter_results_change() override;
 	void on_filter_results_clear() override;
 
-	const std::optional<std::string>& source() const override
+	const std::string* source() const override
 	{
 		return _source.source();
 	}
 
-	const std::optional<std::string>& source_path() const override
+	const std::string* source_path() const override
 	{
 		return _source.source_path();
 	}
 
-	const std::optional<lang::item_filter>& filter_representation() const override
+	const lang::item_filter* filter_representation() const override
 	{
-		return _filter_representation;
+		return _filter_representation.has_value() ? &*_filter_representation : nullptr;
 	}
 
 	log::logger& logger() override
