@@ -1,5 +1,6 @@
 #pragma once
 
+#include <fs/gui/windows/filter/filter_state_mediator_base.hpp>
 #include <fs/gui/auxiliary/rect.hpp>
 #include <fs/lang/item.hpp>
 #include <fs/lang/item_filter.hpp>
@@ -141,24 +142,25 @@ class fonting;
 class loot_state : public lang::loot::item_receiver
 {
 public:
-	void draw_interface(std::string_view source, application& app);
+	void draw_interface(application& app, filter_state_mediator_base& mediator);
 
 	void update_items(const lang::item_filter& filter); // apply filter to items without style
-	void refilter_items(const lang::item_filter& filter); // apply filter to every item
+	void refilter_items(const lang::item_filter& filter, filter_state_mediator_base& mediator); // apply filter to every item
 
-	void clear_items()
+	void clear_items(filter_state_mediator_base& mediator)
 	{
 		_items.clear();
 		_last_items_size = 0;
 		_canvas_offset_y = 0.0f;
-		_debug_enabled = false;
-		_debug_selected_item = nullptr;
+		mediator.on_loot_change();
 	}
 
-	void clear_filter_results()
+	void clear_filter_results(filter_state_mediator_base& mediator)
 	{
 		for (looted_item& itm : _items)
 			itm.filtering_result = std::nullopt;
+
+		mediator.on_filter_results_clear();
 	}
 
 	void on_item(const lang::item& itm) override
@@ -182,18 +184,16 @@ public:
 	}
 
 private:
-	void draw_loot_canvas(const fonting& f);
+	void draw_loot_canvas(const fonting& f, filter_state_mediator_base& mediator);
 	void draw_item_labels(ImVec2 canvas_begin, ImVec2 canvas_end, const fonting& f);
 	void on_canvas_hover(ImVec2 mouse_position, const fonting& f);
-	void on_canvas_right_click(ImVec2 mouse_position);
+	void on_canvas_right_click(ImVec2 mouse_position, filter_state_mediator_base& mediator);
 
 	void draw_loot_settings_global();
 	void draw_loot_buttons_currency        (const lang::loot::item_database& db, lang::loot::generator& gen);
 	void draw_loot_buttons_specific_classes(const lang::loot::item_database& db, lang::loot::generator& gen);
 	void draw_loot_buttons_gems            (const lang::loot::item_database& db, lang::loot::generator& gen);
 	void draw_loot_buttons_equipment       (const lang::loot::item_database& db, lang::loot::generator& gen);
-
-	void draw_debug_interface(std::string_view source, const fonting& f);
 
 	// render state
 	float _canvas_offset_y = 0;
@@ -207,10 +207,6 @@ private:
 	bool _show_hidden_items = false;
 	bool _append_loot = false;
 	bool _shuffle_loot = false;
-
-	// debug state
-	bool _debug_enabled = false; // item pointer alone is not enough: Dear ImGui wants bool*
-	const looted_item* _debug_selected_item = nullptr; // this can be invalided by modifying looted items
 
 	// global loot settings
 	int _area_level = 83;

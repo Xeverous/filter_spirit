@@ -6,6 +6,13 @@
 #include <string>
 #include <optional>
 
+namespace fs::parser {
+
+class lookup_data;
+class line_lookup;
+
+}
+
 namespace fs::gui {
 
 class application;
@@ -17,9 +24,15 @@ public:
 
 	virtual void on_source_change(const std::optional<std::string>& source) = 0;
 	virtual void on_filter_representation_change(const std::optional<lang::item_filter>& filter_representation) = 0;
+	virtual void on_debug_open(const lang::item& itm, const lang::item_filtering_result& result) = 0;
+	virtual void on_loot_change() = 0;
+	virtual void on_filter_results_change() = 0;
+	virtual void on_filter_results_clear() = 0;
 
 	virtual const std::optional<std::string>& source() const = 0;
 	virtual const std::optional<std::string>& source_path() const = 0;
+	virtual const parser::lookup_data* lookup_data() const = 0;
+	virtual const parser::line_lookup* line_lookup() const = 0;
 	virtual const std::optional<lang::item_filter>& filter_representation() const = 0;
 
 	virtual log::logger& logger() = 0;

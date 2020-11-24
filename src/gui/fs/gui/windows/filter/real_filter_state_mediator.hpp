@@ -24,6 +24,9 @@ public:
 		return _parsed_real_filter;
 	}
 
+	const parser::lookup_data* lookup_data() const override;
+	const parser::line_lookup* line_lookup() const override;
+
 private:
 	void new_parsed_real_filter(std::optional<parser::parsed_real_filter> parsed_real_filter);
 

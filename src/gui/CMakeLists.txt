@@ -44,6 +44,10 @@ target_sources(filter_spirit_gui
 		fs/gui/windows/settings_window.hpp
 		fs/gui/windows/filter_windows.cpp
 		fs/gui/windows/filter_windows.hpp
+		fs/gui/windows/filter/debug_state.cpp
+		fs/gui/windows/filter/debug_state.cpp
+		fs/gui/windows/filter/item_tooltip.cpp
+		fs/gui/windows/filter/item_tooltip.hpp
 		fs/gui/windows/filter/filter_state_mediator.cpp
 		fs/gui/windows/filter/filter_state_mediator.hpp
 		fs/gui/windows/filter/filter_state_mediator_base.hpp

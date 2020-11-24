@@ -126,6 +126,7 @@ private:
 struct parse_failure_data
 {
 	lookup_data lookup;
+	line_lookup lines;
 	error_holder_type errors;
 	const char* parser_stop_position; // not a C string but a string iterator
 };
@@ -136,6 +137,7 @@ struct parsed_spirit_filter
 {
 	ast::sf::ast_type ast;
 	lookup_data lookup;
+	line_lookup lines;
 };
 
 [[nodiscard]]
@@ -145,6 +147,7 @@ struct parsed_real_filter
 {
 	ast::rf::ast_type ast;
 	lookup_data lookup;
+	line_lookup lines;
 };
 
 [[nodiscard]]

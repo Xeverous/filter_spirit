@@ -29,6 +29,9 @@ public:
 		return _parsed_spirit_filter;
 	}
 
+	const parser::lookup_data* lookup_data() const override;
+	const parser::line_lookup* line_lookup() const override;
+
 	const std::optional<lang::symbol_table>& spirit_filter_symbols() const override
 	{
 		return _spirit_filter_symbols;

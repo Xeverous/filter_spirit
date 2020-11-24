@@ -34,22 +34,22 @@ parse_impl(
 
 	Ast ast;
 	const char* it = first;
-	const bool result = x3::phrase_parse(
-		it,
-		last,
-		parser,
-		skipper,
-		ast);
+	const bool result = x3::phrase_parse(it, last, parser, skipper, ast);
 
 	if (it != last || !result) {
 		return parser::parse_failure_data{
 			parser::lookup_data(std::move(position_cache)),
+			parser::line_lookup(first, last),
 			std::move(error_holder),
 			it
 		};
 	}
 
-	return ParsedFilterType{std::move(ast), parser::lookup_data(std::move(position_cache))};
+	return ParsedFilterType{
+		std::move(ast),
+		parser::lookup_data(std::move(position_cache)),
+		parser::line_lookup(first, last)
+	};
 }
 
 void print_error(
