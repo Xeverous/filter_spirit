@@ -70,7 +70,7 @@ void debug_state::draw_interface(const fonting& f)
 	if (ImGui::BeginPopupModal(debug_popup_title, &_popup_open)) {
 		// TODO implement actual debug
 		const debug_info& info = *_info;
-		draw_debug_interface_impl(info.lookup->get_view_of_whole_content(), *info.itm, *info.result, f);
+		draw_debug_interface_impl(info.lookup.get().get_view_of_whole_content(), info.itm.get(), info.result.get(), f);
 		ImGui::EndPopup();
 	}
 }

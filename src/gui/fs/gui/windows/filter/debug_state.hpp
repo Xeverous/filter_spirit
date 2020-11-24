@@ -1,6 +1,7 @@
 #pragma once
 
 #include <optional>
+#include <functional>
 
 namespace fs::parser {
 
@@ -22,10 +23,10 @@ class fonting;
 
 struct debug_info
 {
-	const parser::lookup_data* lookup = nullptr;
-	const parser::line_lookup* lines = nullptr;
-	const lang::item* itm = nullptr;
-	const lang::item_filtering_result* result = nullptr;
+	std::reference_wrapper<const parser::lookup_data> lookup;
+	std::reference_wrapper<const parser::line_lookup> lines;
+	std::reference_wrapper<const lang::item> itm;
+	std::reference_wrapper<const lang::item_filtering_result> result;
 };
 
 class debug_state
@@ -37,7 +38,7 @@ public:
 		const lang::item& itm,
 		const lang::item_filtering_result& result)
 	{
-		_info = debug_info{&lookup, &lines, &itm, &result};
+		_info = debug_info{std::ref(lookup), std::ref(lines), std::ref(itm), std::ref(result)};
 		recompute();
 		open_popup();
 	}
