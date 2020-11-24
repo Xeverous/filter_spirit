@@ -20,7 +20,7 @@ real_filter_window::real_filter_window(application& app, std::string path)
 , _state(app.font_settings())
 {
 	open();
-	_state.load_source_file(name());
+	_state.load_source_file(title());
 }
 
 real_filter_window::real_filter_window(application& app)
@@ -35,9 +35,9 @@ real_filter_window::real_filter_window(application& app)
 void real_filter_window::draw_contents()
 {
 	if (const auto* path = _state.source_path(); path)
-		name(*path);
+		title(*path);
 	else
-		name(str_real_filter_text_input);
+		title(str_real_filter_text_input);
 
 	_state.draw_interface(_application.get());
 }
@@ -48,7 +48,7 @@ spirit_filter_window::spirit_filter_window(application& app, std::string path)
 , _state(app.font_settings())
 {
 	open();
-	_state.load_source_file(name());
+	_state.load_source_file(title());
 }
 
 spirit_filter_window::spirit_filter_window(application& app)
@@ -63,9 +63,9 @@ spirit_filter_window::spirit_filter_window(application& app)
 void spirit_filter_window::draw_contents()
 {
 	if (const auto* path = _state.source_path(); path)
-		name(*path);
+		title(*path);
 	else
-		name(str_spirit_filter_text_input);
+		title(str_spirit_filter_text_input);
 
 	_state.draw_interface(_application.get());
 }

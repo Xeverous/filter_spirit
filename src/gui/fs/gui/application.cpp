@@ -176,12 +176,12 @@ void application::draw_main_menu_bar()
 		}
 
 		if (ImGui::BeginMenu("Tools")) {
-			if (ImGui::MenuItem(_color_picker.name().c_str())) {
+			if (ImGui::MenuItem(_color_picker.title().c_str())) {
 				_color_picker.open();
 				_color_picker.take_focus();
 			}
 
-			if (ImGui::MenuItem(_single_item_preview.name().c_str())) {
+			if (ImGui::MenuItem(_single_item_preview.title().c_str())) {
 				_single_item_preview.open();
 				_single_item_preview.take_focus();
 			}
@@ -195,7 +195,7 @@ void application::draw_main_menu_bar()
 
 			ImGui::Separator();
 
-			if (ImGui::MenuItem(_application_log.name().c_str())) {
+			if (ImGui::MenuItem(_application_log.title().c_str())) {
 				_application_log.open();
 				_application_log.take_focus();
 			}
@@ -204,7 +204,7 @@ void application::draw_main_menu_bar()
 		}
 
 		if (ImGui::BeginMenu("Settings")) {
-			if (ImGui::MenuItem(_settings.name().c_str())) {
+			if (ImGui::MenuItem(_settings.title().c_str())) {
 				_settings.open();
 				_settings.take_focus();
 			}
@@ -215,7 +215,7 @@ void application::draw_main_menu_bar()
 		if (ImGui::BeginMenu("About")) {
 			ImGui::MenuItem("About FS", nullptr, false, false);
 
-			if (ImGui::MenuItem(_version_info.name().c_str())) {
+			if (ImGui::MenuItem(_version_info.title().c_str())) {
 				_version_info.open();
 				_version_info.take_focus();
 			}
