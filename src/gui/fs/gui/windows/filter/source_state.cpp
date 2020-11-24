@@ -87,7 +87,7 @@ void source_state::on_text_input_done(filter_state_mediator_base& mediator)
 
 	_file_path = std::nullopt;
 
-	mediator.on_source_change(_source);
+	mediator.on_source_change(source());
 }
 
 void source_state::on_text_input_cancel()
@@ -108,10 +108,10 @@ void source_state::reload_source_file(filter_state_mediator_base& mediator)
 		new_source(utility::load_file(*_file_path, mediator.logger()), mediator);
 }
 
-void source_state::new_source(std::optional<std::string> source, filter_state_mediator_base& mediator)
+void source_state::new_source(std::optional<std::string> src, filter_state_mediator_base& mediator)
 {
-	_source = std::move(source);
-	mediator.on_source_change(_source);
+	_source = std::move(src);
+	mediator.on_source_change(source());
 }
 
 }
