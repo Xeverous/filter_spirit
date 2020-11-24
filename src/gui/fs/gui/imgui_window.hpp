@@ -37,13 +37,13 @@ public:
 		_force_focus = true;
 	}
 
-	void name(std::string_view str)
+	void title(std::string_view str)
 	{
 		_title = str;
 		recompute_window_str();
 	}
 
-	const std::string& name() const
+	const std::string& title() const
 	{
 		return _title;
 	}
