@@ -387,7 +387,7 @@ void draw_item_sockets(gui::aux::rect r, const lang::item& itm)
 		};
 		const ImVec2 link_offsets[] = {
 			/* 0 */ {socket_size.x                                ,                                                 1.0f},
-			/* 1 */ {socket_size.x + link_horizontal_size.x + 1.0f,                         link_vertical_size.y        },
+			/* 1 */ {socket_size.x + link_horizontal_size.x + 1.0f,         socket_size.y                               },
 			/* 2 */ {socket_size.x                                ,         socket_size.y + link_vertical_size.y  + 1.0f},
 			/* 3 */ {                                         1.0f, 2.0f *  socket_size.y + link_vertical_size.y        },
 			/* 4 */ {socket_size.x                                , 2.0f * (socket_size.y + link_vertical_size.y) + 1.0f},
