@@ -23,4 +23,9 @@ constexpr int compare(position_tag lhs, position_tag rhs) noexcept
 	return 0;
 }
 
+constexpr bool is_valid(position_tag tag) noexcept
+{
+	return tag.id_first != -1 && tag.id_last != -1;
+}
+
 }

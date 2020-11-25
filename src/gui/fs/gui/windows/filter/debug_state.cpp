@@ -8,15 +8,146 @@
 
 #include <imgui.h>
 
+#include <string_view>
+
 namespace {
 
 using namespace fs;
 
-void draw_debug_interface_impl(
-	std::string_view source,
+constexpr ImU32 color_text                          = IM_COL32(255, 255, 255, 255);
+constexpr ImU32 color_background_default            = IM_COL32(  0,   0,   0, 255);
+constexpr ImU32 color_background_condition_success  = IM_COL32(  0, 127,   0, 255);
+constexpr ImU32 color_background_condition_failure  = IM_COL32(127,   0,   0, 255);
+constexpr ImU32 color_background_matched_continue   = IM_COL32(  0, 127, 255, 255);
+constexpr ImU32 color_background_matched_visibility = IM_COL32(  0, 127, 255, 255);
+constexpr ImU32 color_background_matched_action     = IM_COL32(127,  63, 192, 255);
+
+std::size_t origins_line_number(
+	const parser::lookup_data& lookup,
+	const parser::line_lookup& lines,
+	const lang::position_tag origin)
+{
+	const std::string_view sv = lookup.position_of(origin);
+	const parser::text_range r = lines.text_range_for(sv);
+	return r.first.line_number;
+}
+
+void color_line_by_condition_result(
+	const std::optional<lang::condition_match_result>& opt_result,
+	const parser::lookup_data& lookup,
+	const parser::line_lookup& lines,
+	std::vector<ImU32>& line_colors)
+{
+	if (!opt_result)
+		return;
+
+	const lang::condition_match_result& result = *opt_result;
+	const lang::position_tag origin = result.condition_origin();
+
+	if (!lang::is_valid(origin))
+		return;
+
+	const std::size_t line_number = origins_line_number(lookup, lines, origin);
+	FS_ASSERT(line_number < line_colors.size());
+
+	if (result.is_successful())
+		line_colors[line_number] = color_background_condition_success;
+	else
+		line_colors[line_number] = color_background_condition_failure;
+}
+
+template <typename T>
+void color_line_by_origin(
+	const T& t,
+	const parser::lookup_data& lookup,
+	const parser::line_lookup& lines,
+	std::vector<ImU32>& line_colors,
+	ImU32 color)
+{
+	const lang::position_tag origin = t.origin;
+
+	if (!lang::is_valid(origin))
+		return;
+
+	const std::size_t line_number = origins_line_number(lookup, lines, origin);
+	FS_ASSERT(line_number < line_colors.size());
+	line_colors[line_number] = color;
+}
+
+template <typename Action>
+void color_line_by_action_origin(
+	const Action& action,
+	const parser::lookup_data& lookup,
+	const parser::line_lookup& lines,
+	std::vector<ImU32>& line_colors)
+{
+	color_line_by_origin(action, lookup, lines, line_colors, color_background_matched_action);
+}
+
+template <typename Action>
+void color_line_by_action_origin(
+	const std::optional<Action>& opt_action,
+	const parser::lookup_data& lookup,
+	const parser::line_lookup& lines,
+	std::vector<ImU32>& line_colors)
+{
+	if (!opt_action)
+		return;
+
+	color_line_by_action_origin(*opt_action, lookup, lines, line_colors);
+}
+
+float draw_colored_source(
+	const parser::line_lookup& lines,
+	const std::vector<ImU32>& line_colors,
+	float offset_y)
+{
+	FS_ASSERT(lines.num_lines() == line_colors.size());
+
+	if (ImGui::BeginChild("source")) {
+		const ImVec2 begin = ImGui::GetCursorScreenPos();
+		const ImVec2 free_space = ImGui::GetContentRegionAvail();
+		const ImVec2 end(begin.x + free_space.x, begin.y + free_space.y);
+		ImDrawList* const draw_list = ImGui::GetWindowDrawList();
+
+		const float line_size_x = free_space.x;
+		const float line_size_y = ImGui::GetTextLineHeight();
+
+		ImVec2 pos(begin.x /* + offset_x */, begin.y + offset_y);
+		for (std::size_t i = 0; i < lines.num_lines(); ++i) {
+			draw_list->AddRectFilled(pos, {pos.x + line_size_x, pos.y + line_size_y}, line_colors[i]);
+			const std::string_view line = lines.get_line(i);
+
+			if (!line.empty())
+				draw_list->AddText(pos, color_text, line.data(), line.data() + line.size());
+
+			pos.y += line_size_y;
+
+			if (pos.y >= end.y)
+				break;
+		}
+
+		ImGui::InvisibleButton("debug", free_space);
+
+		if (ImGui::IsItemHovered()) {
+			offset_y += ImGui::GetIO().MouseWheel * line_size_y * 5.0f;
+
+			if (offset_y > 0.0f)
+				offset_y = 0.0f;
+		}
+	}
+	ImGui::EndChild();
+
+	return offset_y;
+}
+
+float draw_debug_interface_impl(
 	const lang::item& itm,
 	const lang::item_filtering_result& /* result */,
-	const gui::fonting& f)
+	const parser::line_lookup& lines,
+	const std::vector<ImU32>& line_colors,
+	const gui::fonting& f,
+	float offset_y)
 {
 	const auto _1 = f.scoped_monospaced_font();
 
@@ -35,12 +166,11 @@ void draw_debug_interface_impl(
 
 	ImGui::NextColumn();
 
-	if (ImGui::BeginChild("source")) {
-		ImGui::TextUnformatted(source.data(), source.data() + source.size());
-	}
-	ImGui::EndChild();
+	float offset = draw_colored_source(lines, line_colors, offset_y);
 
 	ImGui::Columns(1); // reset back to single column
+
+	return offset;
 }
 
 constexpr auto debug_popup_title = "Item debug";
@@ -51,8 +181,81 @@ namespace fs::gui {
 
 void debug_state::recompute()
 {
-	// TODO implement actual debug
-	FS_ASSERT(_info.has_value());
+	if (!_info)
+		return;
+
+	const debug_info& info = *_info;
+	const parser::lookup_data& lookup = info.lookup;
+	const parser::line_lookup& lines = info.lines;
+
+	_line_colors.clear();
+	_line_colors.resize(lines.num_lines(), color_background_default);
+
+	// uncomment if item_filter is actually used within debug_state class
+	// FS_ASSERT(info.result.get().match_history.size() <= info.filter.get().blocks.size());
+
+	const lang::item_filtering_result& result = info.result.get();
+	for (const lang::block_match_result& block : result.match_history) {
+		/*
+		 * Right not every condition is colored in the same way.
+		 * Might want to do more precise coloring later
+		 * (then specific condition results will have specific types).
+		*/
+		const lang::condition_set_match_result& cs = block.condition_set_result;
+		color_line_by_condition_result(cs.item_level,               lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.drop_level,               lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.quality,                  lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.rarity,                   lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.class_,                   lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.base_type,                lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.linked_sockets,           lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.sockets,                  lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.socket_group,             lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.height,                   lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.width,                    lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.has_explicit_mod,         lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.has_enchantment,          lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.prophecy,                 lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.enchantment_passive_node, lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.has_influence,            lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.gem_quality_type,         lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.stack_size,               lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.gem_level,                lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.map_tier,                 lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.area_level,               lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.corrupted_mods,           lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.is_identified,            lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.is_corrupted,             lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.is_mirrored,              lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.is_elder_item,            lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.is_shaper_item,           lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.is_fractured_item,        lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.is_synthesised_item,      lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.is_enchanted,             lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.is_shaped_map,            lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.is_elder_map,             lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.is_blighted_map,          lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.is_replica,               lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.is_alternate_quality,     lookup, lines, _line_colors);
+
+		if (block.continue_origin) {
+			const std::size_t line_number = origins_line_number(lookup, lines, *block.continue_origin);
+			FS_ASSERT(line_number < _line_colors.size());
+			_line_colors[line_number] = color_background_matched_continue;
+		}
+	}
+
+	const lang::item_style& style = result.style;
+	color_line_by_action_origin(style.border_color,       lookup, lines, _line_colors);
+	color_line_by_action_origin(style.text_color,         lookup, lines, _line_colors);
+	color_line_by_action_origin(style.background_color,   lookup, lines, _line_colors);
+	color_line_by_action_origin(style.font_size,          lookup, lines, _line_colors);
+	color_line_by_action_origin(style.play_alert_sound,   lookup, lines, _line_colors);
+	color_line_by_action_origin(style.disable_drop_sound, lookup, lines, _line_colors);
+	color_line_by_action_origin(style.minimap_icon,       lookup, lines, _line_colors);
+	color_line_by_action_origin(style.play_effect,        lookup, lines, _line_colors);
+
+	color_line_by_origin(style.visibility, lookup, lines, _line_colors, color_background_matched_visibility);
 }
 
 void debug_state::draw_interface(const fonting& f)
@@ -66,11 +269,10 @@ void debug_state::draw_interface(const fonting& f)
 	if (!_info)
 		return;
 
-	ImGui::SetNextWindowSize({f.monospaced_font_size() * 60.0f, 0.0f});
-	if (ImGui::BeginPopupModal(debug_popup_title, &_popup_open)) {
-		// TODO implement actual debug
+	ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize); // take whole space
+	if (ImGui::BeginPopupModal(debug_popup_title, &_popup_open, ImGuiWindowFlags_NoResize)) {
 		const debug_info& info = *_info;
-		draw_debug_interface_impl(info.lookup.get().get_view_of_whole_content(), info.itm.get(), info.result.get(), f);
+		_drawing_offset_y = draw_debug_interface_impl(info.itm.get(), info.result.get(), info.lines.get(), _line_colors, f, _drawing_offset_y);
 		ImGui::EndPopup();
 	}
 }

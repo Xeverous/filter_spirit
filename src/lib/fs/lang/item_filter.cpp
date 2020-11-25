@@ -2,97 +2,202 @@
 #include <fs/lang/keywords.hpp>
 #include <fs/utility/string_helpers.hpp>
 #include <fs/utility/assert.hpp>
+#include <fs/utility/type_traits.hpp>
 
+#include <utility>
 #include <ostream>
+#include <type_traits>
 
 namespace {
 
 using namespace fs;
 using namespace fs::lang;
 
-// return whether a given property satisfies strings_condition
-bool strings_condition_test(const strings_condition& condition, const std::string& property)
+template <typename T, typename U> [[nodiscard]]
+std::optional<condition_match_result> test_range_condition(range_condition<T> condition, U item_property_value)
+{
+	static_assert(std::is_same_v<decltype(T::value), traits::remove_cvref_t<U>>);
+
+	if (!condition.has_bound()) // condition not present => mathing not happening
+		return std::nullopt;
+
+	FS_ASSERT(condition.first_origin().has_value());
+
+	/*
+	 * This needs to be improved:
+	 * - Range condition needs more data - here condition's keyword origin is wanted.
+	 *   Right now bound's origin is given just to make it compile (in reality both
+	 *   origins are practically always next to each other so it is not that bad).
+	 * - The comparison below always uses first_origin which might not be the range bound
+	 *   that the item's property is failing against. Basically rewrite to do 2
+	 *   comparisons and report the origin of the one that actually fails.
+	 */
+	if (condition.includes(item_property_value))
+		return condition_match_result::success(*condition.first_origin(), *condition.first_origin());
+	else
+		return condition_match_result::failure(*condition.first_origin());
+};
+
+[[nodiscard]] condition_match_result
+test_strings_condition_impl(
+	const strings_condition& condition,
+	const std::string& property)
 {
 	for (const auto& str : condition.strings) {
-		// TODO in-game filters ignore diacritics,
-		// here 2 UTF-8 strings are compared strictly
+		/*
+		 * TODO
+		 * 1. In-game filters ignore diacritics, here 2 UTF-8 strings are compared strictly.
+		 * 2. strings_condition stores std::string, not lang::string which means there is
+		 *    no access to the string's origin here. Right now just duplicate condition's
+		 *    origin to make it compile.
+		 */
 		if (condition.exact_match_required) {
 			if (property == str)
-				return true;
+				return condition_match_result::success(condition.origin, condition.origin);
 		}
 		else {
 			if (utility::contains(property, str))
-				return true;
+				return condition_match_result::success(condition.origin, condition.origin);
 		}
 	}
 
-	return false;
+	return condition_match_result::failure(condition.origin);
 }
 
-bool strings_condition_test(const strings_condition& condition, const std::vector<std::string>& properties)
+[[nodiscard]] std::optional<condition_match_result>
+test_strings_condition(
+	const std::optional<strings_condition>& opt_condition,
+	const std::string& property)
 {
+	if (!opt_condition)
+		return std::nullopt;
+
+	return test_strings_condition_impl(*opt_condition, property);
+}
+
+[[nodiscard]] std::optional<condition_match_result>
+test_strings_condition(
+	const std::optional<strings_condition>& opt_condition,
+	const std::vector<std::string>& properties)
+{
+	if (!opt_condition)
+		return std::nullopt;
+
+	const strings_condition& condition = *opt_condition;
+
 	for (const auto& prop : properties) {
-		if (strings_condition_test(condition, prop))
-			return true;
+		condition_match_result result = test_strings_condition_impl(condition, prop);
+		if (result.is_successful())
+			return result;
 	}
 
-	return false;
+	return condition_match_result::failure(condition.origin);
 }
 
-bool influences_condition_test(influences_condition condition, influence_info item_influence)
+[[nodiscard]] std::optional<condition_match_result>
+test_prophecy_condition(
+	const std::optional<strings_condition>& opt_condition,
+	const item& itm)
 {
-	// HasInfluence condition is a bit different.
-	// 1) HasInfluence None is an official feature and will match items with exactly no influence
-	// 2) It behaves differently with ==:
-	//    - If there is == (exact matching), it will only match items with all specified influences.
-	//    - If there is nothing or =, it will match an item with at least one of specified influences.
+	if (!opt_condition)
+		return std::nullopt;
+	/*
+	 * Prophecy condition is a bit different. It is not a boolean condition nor does it check
+	 * for "Prophecy" class. Instead it treats the item base type name as the prophecy name.
+	 * If the item is an itemised prophecy, then the base type is compared (as if in BaseType
+	 * condition), otherwise condition fails.
+	 */
+	const strings_condition& condition = *opt_condition;
+
+	if (!itm.is_prophecy)
+		return condition_match_result::failure(condition.origin);
+
+	return test_strings_condition_impl(condition, itm.base_type);
+}
+
+[[nodiscard]] std::optional<condition_match_result>
+test_influences_condition(
+	const std::optional<influences_condition>& opt_condition,
+	influence_info item_influence)
+{
+	if (!opt_condition)
+		return std::nullopt;
+	/*
+	 * HasInfluence condition is a bit different.
+	 * 1) HasInfluence None is an official feature and will match items with exactly no influence
+	 * 2) It behaves differently with ==:
+	 *    - If there is == (exact matching), it will only match items with all specified influences.
+	 *    - If there is nothing or =, it will match an item with at least one of specified influences.
+	 */
+	const influences_condition& condition = *opt_condition;
+
 	if (condition.influence.is_none()) {
-		return item_influence.is_none();
+		if (item_influence.is_none()) // TODO for positive case, return origin of "None"
+			return condition_match_result::success(condition.origin, condition.origin);
+		else
+			return condition_match_result::failure(condition.origin);
 	}
 
+	// TODO return better origins on successful paths
 	if (condition.exact_match_required) {
-		if (condition.influence.shaper && !item_influence.shaper)
-			return false;
+		if (condition.influence.shaper   && !item_influence.shaper)
+			return condition_match_result::failure(condition.origin);
 
-		if (condition.influence.elder && !item_influence.elder)
-			return false;
+		if (condition.influence.elder    && !item_influence.elder)
+			return condition_match_result::failure(condition.origin);
 
 		if (condition.influence.crusader && !item_influence.crusader)
-			return false;
+			return condition_match_result::failure(condition.origin);
 
 		if (condition.influence.redeemer && !item_influence.redeemer)
-			return false;
+			return condition_match_result::failure(condition.origin);
 
-		if (condition.influence.hunter && !item_influence.hunter)
-			return false;
+		if (condition.influence.hunter   && !item_influence.hunter)
+			return condition_match_result::failure(condition.origin);
 
-		if (condition.influence.warlord && !item_influence.warlord)
-			return false;
+		if (condition.influence.warlord  && !item_influence.warlord)
+			return condition_match_result::failure(condition.origin);
 
-		return true;
+		return condition_match_result::success(condition.origin, condition.origin);
 	}
 	else {
-		if (condition.influence.shaper && item_influence.shaper)
-			return true;
+		if (condition.influence.shaper   && item_influence.shaper)
+			return condition_match_result::success(condition.origin, condition.origin);
 
-		if (condition.influence.elder && item_influence.elder)
-			return true;
+		if (condition.influence.elder    && item_influence.elder)
+			return condition_match_result::success(condition.origin, condition.origin);
 
 		if (condition.influence.crusader && item_influence.crusader)
-			return true;
+			return condition_match_result::success(condition.origin, condition.origin);
 
 		if (condition.influence.redeemer && item_influence.redeemer)
-			return true;
+			return condition_match_result::success(condition.origin, condition.origin);
 
-		if (condition.influence.hunter && item_influence.hunter)
-			return true;
+		if (condition.influence.hunter   && item_influence.hunter)
+			return condition_match_result::success(condition.origin, condition.origin);
 
-		if (condition.influence.warlord && item_influence.warlord)
-			return true;
+		if (condition.influence.warlord  && item_influence.warlord)
+			return condition_match_result::success(condition.origin, condition.origin);
 
-		return false;
+		return condition_match_result::failure(condition.origin);
 	}
 }
+
+[[nodiscard]] std::optional<condition_match_result>
+test_boolean_condition(
+	std::optional<boolean_condition> opt_condition,
+	bool item_property_value)
+{
+	if (!opt_condition)
+		return std::nullopt;
+
+	const boolean_condition& condition = *opt_condition;
+
+	if (condition.value.value == item_property_value)
+		return condition_match_result::success(condition.origin, condition.value.origin);
+	else
+		return condition_match_result::failure(condition.origin);
+};
 
 item_style default_item_style(const item& itm)
 {
@@ -187,7 +292,7 @@ void item_style::override_with(const action_set& actions)
 
 item_filtering_result pass_item_through_filter(const item& itm, const item_filter& filter, int area_level)
 {
-	std::vector<condition_set_match_result> match_history;
+	std::vector<block_match_result> match_history;
 	// each item is expected to traverse half of the filter on average
 	match_history.reserve(filter.blocks.size() / 2);
 
@@ -196,93 +301,68 @@ item_filtering_result pass_item_through_filter(const item& itm, const item_filte
 	for (const item_filter_block& block : filter.blocks) {
 		FS_ASSERT(block.conditions.is_valid());
 
-		condition_set_match_result match_result;
 		const condition_set& cs = block.conditions;
+		condition_set_match_result cs_result;
 
-		const auto test_range_condition = [](auto range_condition, auto item_property_value, std::optional<bool>& match_result) {
-			if (!range_condition.has_bound())
-				return;
+		cs_result.item_level     = test_range_condition(cs.item_level,     itm.item_level);
+		cs_result.drop_level     = test_range_condition(cs.drop_level,     itm.drop_level);
+		cs_result.quality        = test_range_condition(cs.quality,        itm.quality);
+		cs_result.rarity         = test_range_condition(cs.rarity,         itm.rarity_);
+		cs_result.linked_sockets = test_range_condition(cs.linked_sockets, itm.sockets.links());
+		cs_result.height         = test_range_condition(cs.height,         itm.height);
+		cs_result.width          = test_range_condition(cs.width,          itm.width);
+		cs_result.stack_size     = test_range_condition(cs.stack_size,     itm.stack_size);
+		cs_result.gem_level      = test_range_condition(cs.gem_level,      itm.gem_level);
+		cs_result.map_tier       = test_range_condition(cs.map_tier,       itm.map_tier);
+		cs_result.area_level     = test_range_condition(cs.area_level,     area_level);
+		cs_result.corrupted_mods = test_range_condition(cs.corrupted_mods, itm.corrupted_mods);
 
-			match_result = range_condition.includes(item_property_value);
-		};
+		cs_result.class_                   = test_strings_condition(cs.class_,                   itm.class_);
+		cs_result.base_type                = test_strings_condition(cs.base_type,                itm.base_type);
+		cs_result.has_explicit_mod         = test_strings_condition(cs.has_explicit_mod,         itm.explicit_mods);
+		cs_result.has_enchantment          = test_strings_condition(cs.has_enchantment,          itm.enchantments_labirynth);
+		cs_result.enchantment_passive_node = test_strings_condition(cs.enchantment_passive_node, itm.enchantments_passive_nodes);
 
-		test_range_condition(cs.item_level,     itm.item_level,      match_result.item_level);
-		test_range_condition(cs.drop_level,     itm.drop_level,      match_result.drop_level);
-		test_range_condition(cs.quality,        itm.quality,         match_result.quality);
-		test_range_condition(cs.rarity,         itm.rarity_,         match_result.rarity);
-		test_range_condition(cs.linked_sockets, itm.sockets.links(), match_result.linked_sockets);
-		test_range_condition(cs.height,         itm.height,          match_result.height);
-		test_range_condition(cs.width,          itm.width,           match_result.width);
-		test_range_condition(cs.stack_size,     itm.stack_size,      match_result.stack_size);
-		test_range_condition(cs.gem_level,      itm.gem_level,       match_result.gem_level);
-		test_range_condition(cs.map_tier,       itm.map_tier,        match_result.map_tier);
-		test_range_condition(cs.area_level,     area_level,          match_result.area_level);
-		test_range_condition(cs.corrupted_mods, itm.corrupted_mods,  match_result.corrupted_mods);
+		cs_result.prophecy = test_prophecy_condition(cs.prophecy, itm);
 
-		const auto test_strings_condition = [](
-			const std::optional<strings_condition>& condition,
-			const auto& item_property_value,
-			std::optional<bool>& match_result)
-		{
-			if (!condition)
-				return;
+		cs_result.has_influence = test_influences_condition(cs.has_influence, itm.influence);
 
-			match_result = strings_condition_test(*condition, item_property_value);
-		};
-
-		test_strings_condition(cs.class_, itm.class_, match_result.class_);
-		test_strings_condition(cs.base_type, itm.base_type, match_result.base_type);
-		test_strings_condition(cs.has_explicit_mod, itm.explicit_mods, match_result.has_explicit_mod);
-		test_strings_condition(cs.has_enchantment, itm.enchantments_labirynth, match_result.has_enchantment);
-		test_strings_condition(cs.enchantment_passive_node, itm.enchantments_passive_nodes, match_result.enchantment_passive_node);
-
-		// Prophecy condition is a bit different. It does not use "Prophecy" class but instead treats
-		// the item base type name as the prophecy name. If the item is an itemised prophecy, then
-		// the base type is compared, otherwise item can not match Prophecy condition.
-		if (cs.prophecy) {
-			match_result.prophecy = itm.is_prophecy && strings_condition_test(*cs.prophecy, itm.base_type);
-		}
-
-		if (cs.has_influence) {
-			match_result.has_influence = influences_condition_test(*cs.has_influence, itm.influence);
-		}
-
-		const auto test_boolean_condition = [](
-			std::optional<boolean_condition> condition,
-			bool item_property_value,
-			std::optional<bool>& match_result)
-		{
-			if (!condition)
-				return;
-
-			match_result = (*condition).value.value == item_property_value;
-		};
-
-		test_boolean_condition(cs.is_identified, itm.is_identified, match_result.is_identified);
-		test_boolean_condition(cs.is_corrupted, itm.is_corrupted, match_result.is_corrupted);
-		test_boolean_condition(cs.is_mirrored, itm.is_mirrored, match_result.is_mirrored);
-		test_boolean_condition(cs.is_elder_item, itm.influence.elder, match_result.is_elder_item);
-		test_boolean_condition(cs.is_shaper_item, itm.influence.shaper, match_result.is_shaper_item);
-		test_boolean_condition(cs.is_fractured_item, itm.is_fractured_item, match_result.is_fractured_item);
-		test_boolean_condition(cs.is_synthesised_item, itm.is_synthesised_item, match_result.is_synthesised_item);
-		test_boolean_condition(cs.is_enchanted, !itm.enchantments_labirynth.empty() || !itm.enchantments_passive_nodes.empty() || !itm.annointments.empty(), match_result.is_enchanted);
-		test_boolean_condition(cs.is_shaped_map, itm.is_shaped_map, match_result.is_shaped_map);
-		test_boolean_condition(cs.is_elder_map, itm.is_elder_map, match_result.is_elder_map);
-		test_boolean_condition(cs.is_blighted_map, itm.is_blighted_map, match_result.is_blighted_map);
-		test_boolean_condition(cs.is_replica, itm.is_replica, match_result.is_replica);
-		test_boolean_condition(cs.is_alternate_quality, itm.is_alternate_quality, match_result.is_alternate_quality);
+		cs_result.is_identified        = test_boolean_condition(cs.is_identified,        itm.is_identified);
+		cs_result.is_corrupted         = test_boolean_condition(cs.is_corrupted,         itm.is_corrupted);
+		cs_result.is_mirrored          = test_boolean_condition(cs.is_mirrored,          itm.is_mirrored);
+		cs_result.is_elder_item        = test_boolean_condition(cs.is_elder_item,        itm.influence.elder);
+		cs_result.is_shaper_item       = test_boolean_condition(cs.is_shaper_item,       itm.influence.shaper);
+		cs_result.is_fractured_item    = test_boolean_condition(cs.is_fractured_item,    itm.is_fractured_item);
+		cs_result.is_synthesised_item  = test_boolean_condition(cs.is_synthesised_item,  itm.is_synthesised_item);
+		cs_result.is_enchanted         = test_boolean_condition(cs.is_enchanted, // yes, this one reacts to any of these
+			!itm.enchantments_labirynth.empty() || !itm.enchantments_passive_nodes.empty() || !itm.annointments.empty());
+		cs_result.is_shaped_map        = test_boolean_condition(cs.is_shaped_map,        itm.is_shaped_map);
+		cs_result.is_elder_map         = test_boolean_condition(cs.is_elder_map,         itm.is_elder_map);
+		cs_result.is_blighted_map      = test_boolean_condition(cs.is_blighted_map,      itm.is_blighted_map);
+		cs_result.is_replica           = test_boolean_condition(cs.is_replica,           itm.is_replica);
+		cs_result.is_alternate_quality = test_boolean_condition(cs.is_alternate_quality, itm.is_alternate_quality);
 
 		// TODO gem quality type matching
 		// TODO sockets matching
 
-		match_history.push_back(match_result);
+		block_match_result block_result;
+		block_result.condition_set_result = std::move(cs_result);
 
-		if (match_result.is_successful()) {
+		bool stop_filtering = false;
+		if (block_result.condition_set_result.is_successful()) {
 			style.override_with(block.actions);
 			style.visibility = block.visibility;
 
-			break;
+			if (block.continuation.continue_)
+				block_result.continue_origin = block.continuation.origin;
+			else
+				stop_filtering = true;
 		}
+
+		match_history.push_back(std::move(block_result));
+
+		if (stop_filtering)
+			break;
 	}
 
 	return item_filtering_result{style, std::move(match_history)};

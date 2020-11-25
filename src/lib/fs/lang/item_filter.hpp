@@ -82,13 +82,19 @@ struct item_style
 	std::optional<play_effect_action> play_effect;
 };
 
+struct block_match_result
+{
+	std::optional<lang::position_tag> continue_origin;
+	condition_set_match_result condition_set_result;
+};
+
 struct item_filtering_result
 {
 	// final style applied to the item
 	item_style style;
 
 	// each element represents a match attempt against next filter block
-	std::vector<condition_set_match_result> match_history;
+	std::vector<block_match_result> match_history;
 };
 
 item_filtering_result pass_item_through_filter(const item& itm, const item_filter& filter, int area_level);

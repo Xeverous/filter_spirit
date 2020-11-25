@@ -1,7 +1,10 @@
 #pragma once
 
+#include <imgui.h>
+
 #include <optional>
 #include <functional>
+#include <vector>
 
 namespace fs::parser {
 
@@ -69,9 +72,14 @@ public:
 	void draw_interface(const fonting& f);
 
 private:
-	std::optional<debug_info> _info;
+	// popup state
 	bool _popup_pending = false;
 	bool _popup_open = false;
+
+	// debug state
+	std::optional<debug_info> _info;
+	std::vector<ImU32> _line_colors;
+	float _drawing_offset_y = 0.0f;
 };
 
 }
