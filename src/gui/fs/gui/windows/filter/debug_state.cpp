@@ -1,6 +1,7 @@
 #include <fs/gui/windows/filter/debug_state.hpp>
 #include <fs/gui/windows/filter/item_tooltip.hpp>
 #include <fs/gui/settings/fonting.hpp>
+#include <fs/gui/auxiliary/widgets.hpp>
 #include <fs/parser/parser.hpp>
 #include <fs/lang/item.hpp>
 #include <fs/lang/item_filter.hpp>
@@ -9,12 +10,14 @@
 #include <imgui.h>
 
 #include <string_view>
+#include <string>
 
 namespace {
 
 using namespace fs;
 
 constexpr ImU32 color_text                          = IM_COL32(255, 255, 255, 255);
+constexpr ImU32 color_line_number                   = IM_COL32(200, 200, 200, 255);
 constexpr ImU32 color_background_default            = IM_COL32(  0,   0,   0, 255);
 constexpr ImU32 color_background_condition_success  = IM_COL32(  0, 127,   0, 255);
 constexpr ImU32 color_background_condition_failure  = IM_COL32(127,   0,   0, 255);
@@ -97,6 +100,59 @@ void color_line_by_action_origin(
 	color_line_by_action_origin(*opt_action, lookup, lines, line_colors);
 }
 
+float calculate_line_number_column_width(std::size_t num_lines)
+{
+	return gui::aux::measure_text_line(
+		std::to_string(num_lines),
+		ImGui::GetFontSize(),
+		ImGui::GetFont()).x;
+}
+
+void draw_line_numbers(ImVec2 begin, ImVec2 end, float offset_y, std::size_t num_lines)
+{
+	ImDrawList* const draw_list = ImGui::GetWindowDrawList();
+	const float line_height = ImGui::GetTextLineHeight();
+	const int min_str_width = std::to_string(num_lines).length();
+
+	ImVec2 pos(begin.x, begin.y + offset_y);
+	std::array<char, 10> buf;
+
+	for (std::size_t i = 0; i < num_lines; ++i) {
+		std::snprintf(buf.data(), buf.size(), "%*zu", min_str_width, i + 1);
+		draw_list->AddText(pos, color_line_number, buf.data());
+		pos.y += line_height;
+
+		if (pos.y >= end.y)
+			break;
+	}
+}
+
+void draw_text(
+	ImVec2 begin,
+	ImVec2 end,
+	ImVec2 offset,
+	const parser::line_lookup& lines,
+	const std::vector<ImU32>& line_colors)
+{
+	const float line_width = end.x - begin.x;
+	const float line_height = ImGui::GetTextLineHeight();
+	ImVec2 pos(begin.x + offset.x, begin.y + offset.y);
+	ImDrawList* const draw_list = ImGui::GetWindowDrawList();
+
+	for (std::size_t i = 0; i < lines.num_lines(); ++i) {
+		draw_list->AddRectFilled(pos, {pos.x + line_width, pos.y + line_height}, line_colors[i]);
+		const std::string_view line = lines.get_line(i);
+
+		if (!line.empty()) // Dear ImGui does not work with empty ranges
+			draw_list->AddText(pos, color_text, line.data(), line.data() + line.size());
+
+		pos.y += line_height;
+
+		if (pos.y >= end.y)
+			break;
+	}
+}
+
 float draw_colored_source(
 	const parser::line_lookup& lines,
 	const std::vector<ImU32>& line_colors,
@@ -108,29 +164,16 @@ float draw_colored_source(
 		const ImVec2 begin = ImGui::GetCursorScreenPos();
 		const ImVec2 free_space = ImGui::GetContentRegionAvail();
 		const ImVec2 end(begin.x + free_space.x, begin.y + free_space.y);
-		ImDrawList* const draw_list = ImGui::GetWindowDrawList();
 
-		const float line_size_x = free_space.x;
-		const float line_size_y = ImGui::GetTextLineHeight();
-
-		ImVec2 pos(begin.x /* + offset_x */, begin.y + offset_y);
-		for (std::size_t i = 0; i < lines.num_lines(); ++i) {
-			draw_list->AddRectFilled(pos, {pos.x + line_size_x, pos.y + line_size_y}, line_colors[i]);
-			const std::string_view line = lines.get_line(i);
-
-			if (!line.empty())
-				draw_list->AddText(pos, color_text, line.data(), line.data() + line.size());
-
-			pos.y += line_size_y;
-
-			if (pos.y >= end.y)
-				break;
-		}
+		const float line_number_column_width =
+			calculate_line_number_column_width(lines.num_lines()) + ImGui::GetFontSize() / 2.0f;
+		draw_line_numbers(begin, end, offset_y, lines.num_lines());
+		draw_text({begin.x + line_number_column_width, begin.y}, end, {0.0f, offset_y}, lines, line_colors);
 
 		ImGui::InvisibleButton("debug", free_space);
 
 		if (ImGui::IsItemHovered()) {
-			offset_y += ImGui::GetIO().MouseWheel * line_size_y * 5.0f;
+			offset_y += ImGui::GetIO().MouseWheel * ImGui::GetTextLineHeight() * 5.0f;
 
 			if (offset_y > 0.0f)
 				offset_y = 0.0f;
