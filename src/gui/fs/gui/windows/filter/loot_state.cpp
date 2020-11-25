@@ -363,7 +363,15 @@ void loot_state::draw_interface(application& app, filter_state_mediator_base& me
 
 	if (_last_items_size != _items.size()) {
 		if (_last_items_size < _items.size() && !_append_loot) {
-			_items.erase(_items.begin(), _items.begin() + _last_items_size);
+			const auto first = _items.begin();
+			const auto last  = _items.begin() + _last_items_size;
+
+			for (auto it = first; it != last; ++it) {
+				if (it->filtering_result && !(*it->filtering_result).style.visibility.show)
+					--_num_hidden_items;
+			}
+
+			_items.erase(first, last);
 			_canvas_offset_y = 0.0f;
 		}
 
