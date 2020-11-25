@@ -151,6 +151,7 @@ public:
 	{
 		_items.clear();
 		_last_items_size = 0;
+		_num_hidden_items = 0;
 		_canvas_offset_y = 0.0f;
 		mediator.on_loot_change();
 	}
