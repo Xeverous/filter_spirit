@@ -44,6 +44,8 @@ bool operator!=(range_bound<T> left, range_bound<T> right) noexcept
 template <typename T>
 struct range_condition
 {
+	using value_type = T;
+
 	constexpr range_condition() = default;
 	constexpr range_condition(T val, position_tag origin)
 	{
@@ -232,86 +234,133 @@ struct condition_set
 	std::optional<boolean_condition> is_alternate_quality;
 };
 
-// represents an attempt to match specific item against specific filter block
-// true    => condition     satisfied
-// false   => condition not satisfied
-// (empty) => condition not present
+class condition_match_result
+{
+public:
+	static condition_match_result success(
+		lang::position_tag condition_origin,
+		lang::position_tag matched_value_origin)
+	{
+		return condition_match_result(condition_origin, matched_value_origin);
+	}
+
+	static condition_match_result failure(
+		lang::position_tag condition_origin)
+	{
+		return condition_match_result(condition_origin, std::nullopt);
+	}
+
+	bool is_successful() const
+	{
+		return _matched_value_origin.has_value();
+	}
+
+	lang::position_tag condition_origin() const
+	{
+		return _condition_origin;
+	}
+
+	std::optional<lang::position_tag> matched_value_origin() const
+	{
+		return _matched_value_origin;
+	}
+
+private:
+	condition_match_result(
+		lang::position_tag condition_origin,
+		std::optional<lang::position_tag> matched_value_origin)
+	: _condition_origin(condition_origin)
+	, _matched_value_origin(matched_value_origin)
+	{
+	}
+
+	lang::position_tag _condition_origin;
+	std::optional<lang::position_tag> _matched_value_origin;
+};
+
 struct condition_set_match_result
 {
 	bool is_successful() const
 	{
-		return item_level != false
-			&& drop_level != false
-			&& quality != false
-			&& rarity != false
-			&& class_ != false
-			&& base_type != false
-			&& linked_sockets != false
-			&& sockets != false
-			&& socket_group != false
-			&& height != false
-			&& width != false
-			&& has_explicit_mod != false
-			&& has_enchantment != false
-			&& prophecy != false
-			&& enchantment_passive_node != false
-			&& has_influence != false
-			&& gem_quality_type != false
-			&& stack_size != false
-			&& gem_level != false
-			&& map_tier != false
-			&& area_level != false
-			&& corrupted_mods != false
-			&& is_identified != false
-			&& is_corrupted != false
-			&& is_mirrored != false
-			&& is_elder_item != false
-			&& is_shaper_item != false
-			&& is_fractured_item != false
-			&& is_synthesised_item != false
-			&& is_enchanted != false
-			&& is_shaped_map != false
-			&& is_elder_map != false
-			&& is_blighted_map != false
-			&& is_replica != false
-			&& is_alternate_quality != false;
+		const auto is_not_failure = [](const std::optional<condition_match_result>& result) {
+			if (result)
+				return (*result).is_successful();
+			else
+				return true; // match not attempted => not considered as failure
+		};
+
+		return is_not_failure(item_level)
+			&& is_not_failure(drop_level)
+			&& is_not_failure(quality)
+			&& is_not_failure(rarity)
+			&& is_not_failure(class_)
+			&& is_not_failure(base_type)
+			&& is_not_failure(linked_sockets)
+			&& is_not_failure(sockets)
+			&& is_not_failure(socket_group)
+			&& is_not_failure(height)
+			&& is_not_failure(width)
+			&& is_not_failure(has_explicit_mod)
+			&& is_not_failure(has_enchantment)
+			&& is_not_failure(prophecy)
+			&& is_not_failure(enchantment_passive_node)
+			&& is_not_failure(has_influence)
+			&& is_not_failure(gem_quality_type)
+			&& is_not_failure(stack_size)
+			&& is_not_failure(gem_level)
+			&& is_not_failure(map_tier)
+			&& is_not_failure(area_level)
+			&& is_not_failure(corrupted_mods)
+			&& is_not_failure(is_identified)
+			&& is_not_failure(is_corrupted)
+			&& is_not_failure(is_mirrored)
+			&& is_not_failure(is_elder_item)
+			&& is_not_failure(is_shaper_item)
+			&& is_not_failure(is_fractured_item)
+			&& is_not_failure(is_synthesised_item)
+			&& is_not_failure(is_enchanted)
+			&& is_not_failure(is_shaped_map)
+			&& is_not_failure(is_elder_map)
+			&& is_not_failure(is_blighted_map)
+			&& is_not_failure(is_replica)
+			&& is_not_failure(is_alternate_quality);
 	}
 
-	std::optional<bool> item_level;
-	std::optional<bool> drop_level;
-	std::optional<bool> quality;
-	std::optional<bool> rarity;
-	std::optional<bool> class_;
-	std::optional<bool> base_type;
-	std::optional<bool> linked_sockets;
-	std::optional<bool> sockets;
-	std::optional<bool> socket_group;
-	std::optional<bool> height;
-	std::optional<bool> width;
-	std::optional<bool> has_explicit_mod;
-	std::optional<bool> has_enchantment;
-	std::optional<bool> prophecy;
-	std::optional<bool> enchantment_passive_node;
-	std::optional<bool> has_influence;
-	std::optional<bool> gem_quality_type;
-	std::optional<bool> stack_size;
-	std::optional<bool> gem_level;
-	std::optional<bool> map_tier;
-	std::optional<bool> area_level;
-	std::optional<bool> corrupted_mods;
-	std::optional<bool> is_identified;
-	std::optional<bool> is_corrupted;
-	std::optional<bool> is_mirrored;
-	std::optional<bool> is_elder_item;
-	std::optional<bool> is_shaper_item;
-	std::optional<bool> is_fractured_item;
-	std::optional<bool> is_synthesised_item;
-	std::optional<bool> is_enchanted;
-	std::optional<bool> is_shaped_map;
-	std::optional<bool> is_elder_map;
-	std::optional<bool> is_blighted_map;
-	std::optional<bool> is_replica;
-	std::optional<bool> is_alternate_quality;
+	std::optional<condition_match_result> item_level;
+	std::optional<condition_match_result> drop_level;
+	std::optional<condition_match_result> quality;
+	std::optional<condition_match_result> rarity;
+	std::optional<condition_match_result> class_;
+	std::optional<condition_match_result> base_type;
+	std::optional<condition_match_result> linked_sockets;
+	std::optional<condition_match_result> sockets;
+	std::optional<condition_match_result> socket_group;
+	std::optional<condition_match_result> height;
+	std::optional<condition_match_result> width;
+	std::optional<condition_match_result> has_explicit_mod;
+	std::optional<condition_match_result> has_enchantment;
+	std::optional<condition_match_result> prophecy;
+	std::optional<condition_match_result> enchantment_passive_node;
+	std::optional<condition_match_result> has_influence;
+	std::optional<condition_match_result> gem_quality_type;
+	std::optional<condition_match_result> stack_size;
+	std::optional<condition_match_result> gem_level;
+	std::optional<condition_match_result> map_tier;
+	std::optional<condition_match_result> area_level;
+	std::optional<condition_match_result> corrupted_mods;
+	std::optional<condition_match_result> is_identified;
+	std::optional<condition_match_result> is_corrupted;
+	std::optional<condition_match_result> is_mirrored;
+	std::optional<condition_match_result> is_elder_item;
+	std::optional<condition_match_result> is_shaper_item;
+	std::optional<condition_match_result> is_fractured_item;
+	std::optional<condition_match_result> is_synthesised_item;
+	std::optional<condition_match_result> is_enchanted;
+	std::optional<condition_match_result> is_shaped_map;
+	std::optional<condition_match_result> is_elder_map;
+	std::optional<condition_match_result> is_blighted_map;
+	std::optional<condition_match_result> is_replica;
+	std::optional<condition_match_result> is_alternate_quality;
 };
 
 struct autogen_condition
