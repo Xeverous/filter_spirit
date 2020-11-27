@@ -8,8 +8,17 @@
 #include <string_view>
 #include <vector>
 
-namespace fs::network
-{
+namespace fs::network {
+
+namespace strings {
+
+constexpr auto ca_bundle_desc =
+	"Use specified Certificate Authority bundle for SSL/TLS connections. "
+	"By default FS uses a built-in bundle which is a copy of "
+	"the certificates that are delivered with Mozilla Firefox. "
+	"This option has no effect when you opt out of SSL verification.";
+
+}
 
 struct request_result
 {

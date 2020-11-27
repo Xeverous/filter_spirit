@@ -92,10 +92,7 @@ int run(int argc, char* argv[])
 					" see https://curl.haxx.se/libcurl/c/CURLOPT_PROXY.html for"
 					" more examples, documentation and environmental variables"))
 			("ca-bundle,b", po::value(&opt_ca_bundle)->value_name("FILEPATH"),
-				("Use specified Certificate Authority bundle for SSL/TLS connections."
-					" By default FS uses a built-in bundle which is a copy of"
-					" the certificates that are delivered with Mozilla Firefox."
-					" This option has no effect when you opt out of SSL verification."))
+				(fs::network::strings::ca_bundle_desc))
 			("no-ssl-peer", po::bool_switch(&no_ssl_verify_peer),
 				("do not verify the authenticity of the peer's certificate"))
 			("no-ssl-host", po::bool_switch(&no_ssl_verify_host),
