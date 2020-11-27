@@ -12,7 +12,7 @@ constexpr auto none_str      = "(none)";
 namespace fs::lang
 {
 
-std::string_view to_string(data_source_type data_source) noexcept
+const char* to_string(data_source_type data_source) noexcept
 {
 	if (data_source == data_source_type::poe_ninja)
 		return poe_ninja_str;
