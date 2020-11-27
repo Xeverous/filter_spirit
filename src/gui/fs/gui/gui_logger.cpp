@@ -39,27 +39,25 @@ void copy_to_clipboard(const std::vector<fs::log::buffer_logger::message>& messa
 
 namespace fs::gui {
 
-void gui_logger::clear_logs()
+void gui_logger::draw(const fonting& f, log::buffer_logger& logger)
 {
-	logger().clear();
-	_last_log_size = 0;
-}
+	if (ImGui::Button("clear logs")) {
+		logger.clear();
+		_last_log_size = 0;
+	}
 
-void gui_logger::draw()
-{
-	if (ImGui::Button("clear logs"))
-		clear_logs();
 	ImGui::SameLine();
+
 	if (ImGui::Button("copy logs"))
-		copy_to_clipboard(logger().messages());
+		copy_to_clipboard(logger.messages());
 
 	if (ImGui::BeginChild("logs", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar)) {
-		const auto _1 = _fonting.get().scoped_monospaced_font();
+		const auto _1 = f.scoped_monospaced_font();
 		const auto _2 = aux::scoped_text_color_override(IM_COL32(255, 255, 255, 255));
 
 		auto last_severity = log::severity::info;
 
-		for (const auto& message : logger().messages()) {
+		for (const auto& message : logger.messages()) {
 			if (message.s != last_severity) {
 				ImGui::PopStyleColor();
 				ImGui::PushStyleColor(ImGuiCol_Text, severity_to_color(message.s));
@@ -70,9 +68,9 @@ void gui_logger::draw()
 		}
 
 		// auto-scroll to bottom if logs size changed
-		if (_last_log_size < logger().messages().size()) {
+		if (_last_log_size < logger.messages().size()) {
 			ImGui::SetScrollHereY(1.0f);
-			_last_log_size = logger().messages().size();
+			_last_log_size = logger.messages().size();
 		}
 	}
 

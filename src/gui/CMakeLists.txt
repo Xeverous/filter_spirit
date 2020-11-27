@@ -36,6 +36,8 @@ target_sources(filter_spirit_gui
 		fs/gui/settings/fonting.hpp
 		fs/gui/settings/theming.cpp
 		fs/gui/settings/theming.hpp
+		fs/gui/settings/networking.cpp
+		fs/gui/settings/networking.hpp
 		fs/gui/windows/application_log_window.cpp
 		fs/gui/windows/application_log_window.hpp
 		fs/gui/windows/color_picker_window.cpp
@@ -48,6 +50,8 @@ target_sources(filter_spirit_gui
 		fs/gui/windows/filter/debug_state.cpp
 		fs/gui/windows/filter/item_tooltip.cpp
 		fs/gui/windows/filter/item_tooltip.hpp
+		fs/gui/windows/filter/market_data_state.cpp
+		fs/gui/windows/filter/market_data_state.hpp
 		fs/gui/windows/filter/filter_state_mediator.cpp
 		fs/gui/windows/filter/filter_state_mediator.hpp
 		fs/gui/windows/filter/filter_state_mediator_base.hpp

@@ -3,6 +3,7 @@
 #include <fs/gui/windows/filter/real_filter_state_mediator_base.hpp>
 #include <fs/gui/windows/filter/filter_state_mediator.hpp>
 #include <fs/parser/parser.hpp>
+#include <fs/log/buffer_logger.hpp>
 
 #include <optional>
 
@@ -13,9 +14,9 @@ class real_filter_state_mediator
 	, public filter_state_mediator
 {
 public:
-	real_filter_state_mediator(const fonting& f)
-	: filter_state_mediator(f)
+	log::buffer_logger& logger() override
 	{
+		return _logger;
 	}
 
 	void on_source_change(const std::string* source) override;
@@ -32,9 +33,11 @@ public:
 private:
 	void new_parsed_real_filter(std::optional<parser::parsed_real_filter> parsed_real_filter);
 
-	void draw_interface_derived() override;
+	void draw_interface_derived(application& app) override;
+	void draw_interface_logs_derived(gui_logger& gl, const fonting& f) override;
 
 	std::optional<parser::parsed_real_filter> _parsed_real_filter;
+	log::buffer_logger _logger;
 };
 
 }

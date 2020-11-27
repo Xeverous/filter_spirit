@@ -6,11 +6,6 @@
 
 namespace fs::gui {
 
-filter_state_mediator::filter_state_mediator(const fonting& f)
-: _logger(f)
-{
-}
-
 void filter_state_mediator::load_source_file(std::string path)
 {
 	_source.load_source_file(std::move(path), *this);
@@ -68,9 +63,9 @@ void filter_state_mediator::draw_interface(application& app)
 	ImGui::Columns(2, nullptr, false);
 
 	_source.draw_interface(app.font_settings(), *this);
-	draw_interface_derived();
+	draw_interface_derived(app);
 	draw_interface_filter_representation();
-	draw_interface_logs();
+	draw_interface_logs(app);
 
 	ImGui::NextColumn();
 
@@ -88,10 +83,10 @@ void filter_state_mediator::draw_interface_filter_representation()
 	}
 }
 
-void filter_state_mediator::draw_interface_logs()
+void filter_state_mediator::draw_interface_logs(application& app)
 {
 	if (ImGui::CollapsingHeader("Logs", ImGuiTreeNodeFlags_DefaultOpen)) {
-		_logger.draw();
+		draw_interface_logs_derived(_logger, app.font_settings());
 	}
 }
 

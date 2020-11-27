@@ -59,7 +59,7 @@ void real_filter_state_mediator::on_parsed_real_filter_change(const parser::pars
 		new_filter_representation(std::nullopt);
 }
 
-void real_filter_state_mediator::draw_interface_derived()
+void real_filter_state_mediator::draw_interface_derived(application& /* app */)
 {
 	if (ImGui::CollapsingHeader("Real filter abstract syntax tree", ImGuiTreeNodeFlags_DefaultOpen)) {
 		if (_parsed_real_filter) {
@@ -72,6 +72,11 @@ void real_filter_state_mediator::draw_interface_derived()
 			ImGui::TextUnformatted("Not available.");
 		}
 	}
+}
+
+void real_filter_state_mediator::draw_interface_logs_derived(gui_logger& gl, const fonting& f)
+{
+	gl.draw(f, _logger);
 }
 
 }

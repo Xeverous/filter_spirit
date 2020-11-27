@@ -8,8 +8,10 @@
 #include <fs/gui/windows/application_log_window.hpp>
 #include <fs/gui/settings/theming.hpp>
 #include <fs/gui/settings/fonting.hpp>
+#include <fs/gui/settings/networking.hpp>
 #include <fs/lang/loot/item_database.hpp>
 #include <fs/lang/loot/generator.hpp>
+#include <fs/network/item_price_report.hpp>
 
 #include <Magnum/ImGuiIntegration/Context.hpp>
 
@@ -45,40 +47,25 @@ public:
 	void mouseScrollEvent(MouseScrollEvent& event) override;
 	void textInputEvent(TextInputEvent& event) override;
 
-	fonting& font_settings()
-	{
-		return _fonting;
-	}
+	      fonting& font_settings()       { return _fonting; }
+	const fonting& font_settings() const { return _fonting; }
 
-	const fonting& font_settings() const
-	{
-		return _fonting;
-	}
+	      theming& theme_settings()       { return _theming; }
+	const theming& theme_settings() const { return _theming; }
 
-	theming& theme_settings()
-	{
-		return _theming;
-	}
+	      networking& network_settings()       { return _networking; }
+	const networking& network_settings() const { return _networking; }
 
-	const theming& theme_settings() const
-	{
-		return _theming;
-	}
+	      auto& available_leagues()       { return _available_leagues; }
+	const auto& available_leagues() const { return _available_leagues; }
 
-	auto& item_database()
-	{
-		return _item_database;
-	}
+	      auto& price_report_cache()       { return _price_report_cache; }
+	const auto& price_report_cache() const { return _price_report_cache; }
 
-	const auto& item_database() const
-	{
-		return _item_database;
-	}
+	      auto& item_database()       { return _item_database; }
+	const auto& item_database() const { return _item_database; }
 
-	auto& loot_generator()
-	{
-		return _loot_generator;
-	}
+	auto& loot_generator() { return _loot_generator; }
 
 private:
 	void draw_main_menu_bar();
@@ -94,6 +81,7 @@ private:
 
 	theming _theming;
 	fonting _fonting;
+	networking _networking;
 
 	// Application-global logger instance.
 	// If errors appear in it, something went horribly wrong.
@@ -103,6 +91,9 @@ private:
 	// This should be the only (application-global) instance for use by filter/loot debugger.
 	std::optional<lang::loot::item_database> _item_database;
 	lang::loot::generator _loot_generator;
+
+	std::vector<std::string> _available_leagues;
+	network::item_price_report_cache _price_report_cache;
 
 	bool _show_demo_window = false;
 	bool _force_focus_demo_window = false;

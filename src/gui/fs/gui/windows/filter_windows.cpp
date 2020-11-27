@@ -24,7 +24,6 @@ namespace fs::gui {
 real_filter_window::real_filter_window(application& app, std::string path)
 : imgui_window(std::move(path), drawable_area_size())
 , _application(std::ref(app))
-, _state(app.font_settings())
 {
 	open();
 	_state.load_source_file(title());
@@ -33,7 +32,6 @@ real_filter_window::real_filter_window(application& app, std::string path)
 real_filter_window::real_filter_window(application& app)
 : imgui_window(str_real_filter_text_input, drawable_area_size())
 , _application(std::ref(app))
-, _state(app.font_settings())
 {
 	open();
 	_state.open_text_input();
@@ -52,7 +50,6 @@ void real_filter_window::draw_contents()
 spirit_filter_window::spirit_filter_window(application& app, std::string path)
 : imgui_window(std::move(path), drawable_area_size())
 , _application(std::ref(app))
-, _state(app.font_settings())
 {
 	open();
 	_state.load_source_file(title());
@@ -61,7 +58,6 @@ spirit_filter_window::spirit_filter_window(application& app, std::string path)
 spirit_filter_window::spirit_filter_window(application& app)
 : imgui_window(str_real_filter_text_input, drawable_area_size())
 , _application(std::ref(app))
-, _state(app.font_settings())
 {
 	open();
 	_state.open_text_input();

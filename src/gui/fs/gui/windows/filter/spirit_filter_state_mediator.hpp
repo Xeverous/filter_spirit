@@ -2,11 +2,14 @@
 
 #include <fs/gui/windows/filter/spirit_filter_state_mediator_base.hpp>
 #include <fs/gui/windows/filter/filter_state_mediator.hpp>
+#include <fs/gui/windows/filter/market_data_state.hpp>
 #include <fs/parser/parser.hpp>
 #include <fs/lang/item_filter.hpp>
 #include <fs/lang/symbol_table.hpp>
+#include <fs/log/thread_safe_logger.hpp>
 
 #include <optional>
+#include <memory>
 
 namespace fs::gui {
 
@@ -15,9 +18,15 @@ class spirit_filter_state_mediator
 	, public filter_state_mediator
 {
 public:
-	spirit_filter_state_mediator(const fonting& f)
-	: filter_state_mediator(f)
+	spirit_filter_state_mediator()
+	: _logger_ptr(std::make_shared<log::thread_safe_logger<log::buffer_logger>>())
 	{
+	}
+
+	log::logger& logger() override;
+	std::shared_ptr<log::thread_safe_logger<log::buffer_logger>> share_logger() override
+	{
+		return _logger_ptr;
 	}
 
 	void on_source_change(const std::string* source) override;
@@ -28,6 +37,8 @@ public:
 		const lang::symbol_table* spirit_filter_symbols) override;
 	void on_spirit_filter_change(
 		const lang::spirit_item_filter* spirit_filter) override;
+	void on_price_report_change(
+		const lang::market::item_price_report& report) override;
 
 	const parser::parsed_spirit_filter* parsed_spirit_filter() const override
 	{
@@ -47,12 +58,23 @@ public:
 		return _spirit_filter.has_value() ? &*_spirit_filter : nullptr;
 	}
 
+	const lang::market::item_price_report& price_report() const override
+	{
+		return _market_data.price_report();
+	}
+
 private:
 	void new_parsed_spirit_filter(std::optional<parser::parsed_spirit_filter> parsed_spirit_filter);
 	void new_spirit_filter_symbols(std::optional<lang::symbol_table> spirit_filter_symbols);
 	void new_spirit_filter(std::optional<lang::spirit_item_filter> spirit_filter);
 
-	void draw_interface_derived() override;
+	void refresh_filter_representation(
+		const lang::spirit_item_filter* spirit_filter,
+		const lang::market::item_price_data& item_price_data);
+
+	void draw_interface_derived(application& app) override;
+	void draw_interface_logs_derived(gui_logger& gl, const fonting& f) override;
+
 	void draw_interface_parsed_spirit_filter();
 	void draw_interface_spirit_filter_symbols();
 	void draw_interface_spirit_filter();
@@ -60,6 +82,8 @@ private:
 	std::optional<parser::parsed_spirit_filter> _parsed_spirit_filter;
 	std::optional<lang::symbol_table> _spirit_filter_symbols;
 	std::optional<lang::spirit_item_filter> _spirit_filter;
+	market_data_state _market_data;
+	std::shared_ptr<log::thread_safe_logger<log::buffer_logger>> _logger_ptr;
 };
 
 }

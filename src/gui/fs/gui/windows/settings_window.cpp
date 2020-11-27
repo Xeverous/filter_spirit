@@ -26,6 +26,10 @@ void settings_window::draw_contents()
 
 		ImGui::Text("Average %.3f ms/frame (%.1f FPS)", 1000.0 / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	}
+
+	if (ImGui::CollapsingHeader("Networking", ImGuiTreeNodeFlags_DefaultOpen)) {
+		_application.network_settings().draw_interface();
+	}
 }
 
 }

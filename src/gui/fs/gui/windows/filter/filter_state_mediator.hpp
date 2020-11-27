@@ -17,8 +17,6 @@ class fonting;
 class filter_state_mediator : public virtual filter_state_mediator_base
 {
 public:
-	filter_state_mediator(const fonting& f);
-
 	void load_source_file(std::string path);
 	void open_text_input();
 
@@ -43,21 +41,18 @@ public:
 		return _filter_representation.has_value() ? &*_filter_representation : nullptr;
 	}
 
-	log::logger& logger() override
-	{
-		return _logger.logger();
-	}
-
 	void draw_interface(application& app) override;
 
 protected:
-	virtual void draw_interface_derived() = 0; // template method pattern
+	// template method pattern
+	virtual void draw_interface_logs_derived(gui_logger& gl, const fonting& f) = 0;
+	virtual void draw_interface_derived(application& app) = 0;
 
 	void new_filter_representation(std::optional<lang::item_filter> filter_representation);
 
 private:
 	void draw_interface_filter_representation();
-	void draw_interface_logs();
+	void draw_interface_logs(application& app);
 	void draw_interface_loot(application& app);
 
 	source_state _source; // first step

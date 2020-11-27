@@ -1,10 +1,17 @@
 #include <fs/gui/windows/filter/spirit_filter_state_mediator.hpp>
 #include <fs/compiler/compiler.hpp>
 #include <fs/generator/make_item_filter.hpp>
+#include <fs/utility/assert.hpp>
 
 #include <imgui.h>
 
 namespace fs::gui {
+
+log::logger& spirit_filter_state_mediator::logger()
+{
+	FS_ASSERT(_logger_ptr != nullptr);
+	return *_logger_ptr;
+}
 
 const parser::lookup_data* spirit_filter_state_mediator::lookup_data() const
 {
@@ -98,19 +105,40 @@ void spirit_filter_state_mediator::new_spirit_filter(std::optional<lang::spirit_
 
 void spirit_filter_state_mediator::on_spirit_filter_change(const lang::spirit_item_filter* spirit_filter)
 {
+	refresh_filter_representation(spirit_filter, price_report().data);
+}
+
+void spirit_filter_state_mediator::on_price_report_change(const lang::market::item_price_report& report)
+{
+	refresh_filter_representation(spirit_filter(), report.data);
+}
+
+void spirit_filter_state_mediator::refresh_filter_representation(
+	const lang::spirit_item_filter* spirit_filter,
+	const lang::market::item_price_data& item_price_data)
+{
 	if (!spirit_filter) {
 		new_filter_representation(std::nullopt);
 		return;
 	}
 
-	new_filter_representation(generator::make_item_filter(*spirit_filter, {}));
+	new_filter_representation(generator::make_item_filter(*spirit_filter, item_price_data));
 }
 
-void spirit_filter_state_mediator::draw_interface_derived()
+void spirit_filter_state_mediator::draw_interface_derived(application& app)
 {
 	draw_interface_parsed_spirit_filter();
 	draw_interface_spirit_filter_symbols();
 	draw_interface_spirit_filter();
+	_market_data.draw_interface(app, *this);
+}
+
+void spirit_filter_state_mediator::draw_interface_logs_derived(gui_logger& gl, const fonting& f)
+{
+	FS_ASSERT(_logger_ptr != nullptr);
+	(*_logger_ptr)([&](log::buffer_logger& bl) {
+		gl.draw(f, bl);
+	});
 }
 
 void spirit_filter_state_mediator::draw_interface_parsed_spirit_filter()
