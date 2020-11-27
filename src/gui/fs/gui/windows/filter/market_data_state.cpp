@@ -1,10 +1,51 @@
 #include <fs/gui/windows/filter/market_data_state.hpp>
 #include <fs/gui/auxiliary/widgets.hpp>
 #include <fs/gui/application.hpp>
+#include <fs/network/ggg/download_data.hpp>
+#include <fs/network/ggg/parse_data.hpp>
+#include <fs/utility/assert.hpp>
+#include <fs/utility/async.hpp>
 
 #include <imgui.h>
 
+#include <array>
 #include <initializer_list>
+#include <cstdio>
+#include <exception>
+
+namespace {
+
+std::string to_string(boost::posix_time::time_duration duration)
+{
+	std::string result;
+
+	if (auto d = duration.hours() / 24; d != 0)
+		result.append(std::to_string(d)).append("d ");
+
+	if (auto h = duration.hours() % 24; h != 0)
+		result.append(std::to_string(h)).append("h ");
+
+	if (auto m = duration.minutes(); m != 0)
+		result.append(std::to_string(m)).append("m ");
+
+	if (auto s = duration.seconds(); s != 0)
+		result.append(std::to_string(s)).append("s ");
+
+	if (!result.empty())
+		result.pop_back(); // remove trailing space
+
+	return result;
+}
+
+float calculate_progress(std::size_t done, std::size_t size)
+{
+	if (size == 0)
+		return 0.0f; // avoid division by 0, report no progress instead
+
+	return static_cast<float>(done) / size;
+}
+
+}
 
 namespace fs::gui {
 
@@ -26,6 +67,9 @@ void market_data_state::refresh_item_price_report(application& app, spirit_filte
 		return;
 	}
 
+	if (_price_report_download_running)
+		return;
+
 	if (!_price_report_download_info)
 		_price_report_download_info = std::make_shared<network::download_info>();
 
@@ -45,8 +89,64 @@ void market_data_state::refresh_item_price_report(application& app, spirit_filte
 	_price_report_download_running = true;
 }
 
+void market_data_state::refresh_available_leagues(application& app, spirit_filter_state_mediator_base& mediator)
+{
+	if (_leagues_download_running)
+		return;
+
+	if (!_leagues_download_info)
+		_leagues_download_info = std::make_shared<network::download_info>();
+
+	_leagues_future = std::async(
+		std::launch::async, [
+			settings = app.network_settings().download_settings(),
+			download_info = _price_report_download_info,
+			logger = mediator.share_logger()]()
+		{
+			network::ggg::api_league_data api_data =
+				network::ggg::download_leagues(settings, download_info.get(), *logger);
+
+			network::update_leagues_on_disk(api_data, *logger);
+			return network::ggg::parse_league_info(api_data);
+		}
+	);
+	_leagues_download_running = true;
+}
+
+void market_data_state::check_downloads(application& app, log::logger& logger)
+{
+	if (_leagues_download_running) {
+		if (utility::is_ready(_leagues_future)) {
+			try {
+				_available_leagues = _leagues_future.get();
+				app.leagues_cache().set_leagues(_available_leagues);
+				logger.info() << "League data download complete.\n";
+			}
+			catch (const std::exception& e) {
+				logger.error() << "League download failed: " << e.what() << "\n";
+			}
+			_leagues_download_running = false;
+		}
+	}
+
+	if (_price_report_download_running) {
+		if (utility::is_ready(_price_report_future)) {
+			try {
+				_price_report = _price_report_future.get();
+				logger.info() << "Market data download and parsing complete.\n";
+			}
+			catch (const std::exception& e) {
+				logger.error() << "Market data download failed: " << e.what() << "\n";
+			}
+			_price_report_download_running = false;
+		}
+	}
+}
+
 void market_data_state::draw_interface(application& app, spirit_filter_state_mediator_base& mediator)
 {
+	check_downloads(app, mediator.logger());
+
 	if (!ImGui::CollapsingHeader("Market data", ImGuiTreeNodeFlags_DefaultOpen))
 		return;
 
@@ -73,16 +173,53 @@ void market_data_state::draw_interface(application& app, spirit_filter_state_med
 	}
 
 	if (ImGui::BeginCombo("League", _selected_league.value_or("").c_str())) {
-		const auto& available_leagues = app.available_leagues();
-
-		for (const auto& league : available_leagues) {
-			if (ImGui::Selectable(league.c_str(), league == _selected_league)) {
-				_selected_league = league;
+		for (const auto& league : _available_leagues) {
+			if (ImGui::Selectable(league.name.c_str(), league.name == _selected_league)) {
+				_selected_league = league.name;
 				on_league_change(app, mediator);
 			}
 		}
 
 		ImGui::EndCombo();
+	}
+
+	ImGui::SameLine();
+
+	if (_leagues_download_running) {
+		ImGui::Text("downloading...");
+	}
+	else {
+		if (ImGui::Button("Refresh"))
+			refresh_available_leagues(app, mediator);
+	}
+
+	ImGui::Text("Status: ");
+	ImGui::SameLine(0, 0); // (0, 0) to merge text
+
+	if (_price_report_download_running) {
+		ImGui::Text("downloading...");
+		FS_ASSERT(_price_report_download_info != nullptr);
+		std::array<char, 32> buf;
+		ImGui::SameLine();
+
+		const std::size_t requests_complete = _price_report_download_info->requests_complete.load(std::memory_order::memory_order_relaxed);
+		const std::size_t requests_total    = _price_report_download_info->requests_total   .load(std::memory_order::memory_order_relaxed);
+		const std::size_t bytes_downloaded  = _price_report_download_info->xfer_info.load(std::memory_order::memory_order_relaxed).bytes_downloaded_so_far;
+		std::snprintf(buf.data(), buf.size(), "%zu/%zu (%zu bytes)", requests_complete, requests_total, bytes_downloaded);
+		ImGui::ProgressBar(calculate_progress(requests_complete, requests_total), ImVec2(-1.0f, 0.0f), buf.data());
+	}
+	else {
+		if (auto source = _price_report.metadata.data_source; source == lang::data_source_type::none) {
+			ImGui::Text("using no market data");
+		}
+		else {
+			const auto now = boost::posix_time::microsec_clock::universal_time();
+			const auto time_diff = now - _price_report.metadata.download_date;
+			ImGui::Text(
+				"using cached market data from %s from %s ago",
+				lang::to_string(source),
+				to_string(time_diff).c_str());
+		}
 	}
 }
 

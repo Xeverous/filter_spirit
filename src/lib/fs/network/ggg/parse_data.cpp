@@ -32,8 +32,7 @@ bool is_ssf(const nlohmann::json& league_entry)
 namespace fs::network::ggg
 {
 
-// https://api.poe.watch/leagues
-std::vector<lang::league> parse_league_info(api_league_data leagues)
+std::vector<lang::league> parse_league_info(const api_league_data& leagues)
 {
 	nlohmann::json json = nlohmann::json::parse(leagues.leagues_json);
 

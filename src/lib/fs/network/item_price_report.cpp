@@ -3,6 +3,7 @@
 #include <fs/network/poe_ninja/parse_data.hpp>
 #include <fs/network/poe_watch/download_data.hpp>
 #include <fs/network/poe_watch/parse_data.hpp>
+#include <fs/network/ggg/parse_data.hpp>
 #include <fs/utility/assert.hpp>
 #include <fs/utility/async.hpp>
 #include <fs/utility/string_helpers.hpp>
@@ -16,6 +17,9 @@
 #include <filesystem>
 
 namespace {
+
+constexpr auto cache_dir_path = "cache";
+constexpr auto leagues_file_name = "leagues.json";
 
 using namespace fs;
 using namespace fs::network;
@@ -84,7 +88,9 @@ std::string normalize_league_name(std::string_view league_name)
 
 std::string make_save_path(lang::data_source_type api, std::string_view league)
 {
-	std::string path = "cache/";
+	std::string path = cache_dir_path;
+	path.append("/");
+
 	if (api == lang::data_source_type::poe_ninja)
 		path += "ninja";
 	else if (api == lang::data_source_type::poe_watch)
@@ -187,6 +193,32 @@ download_and_parse_watch(
 } // namespace
 
 namespace fs::network {
+
+std::vector<lang::league> load_leagues_from_disk(log::logger& logger)
+{
+	const auto path = std::filesystem::path(cache_dir_path) / leagues_file_name;
+	std::error_code ec;
+	std::string file_content = utility::load_file(path, ec);
+	if (ec)
+		return {}; // missing cache file => not an error => return empty vector
+
+	try {
+		return ggg::parse_league_info({std::move(file_content)});
+	}
+	catch (const std::exception& e) {
+		logger.error() << "While loading " << path.generic_string() << ": " << e.what()
+			<< ". Cache is probably corrupted, removing leagues cache file\n";
+		std::filesystem::remove(path);
+		return {};
+	}
+}
+
+void update_leagues_on_disk(const ggg::api_league_data& api_data, log::logger& logger)
+{
+	const auto path = std::filesystem::path(cache_dir_path) / leagues_file_name;
+	if (!utility::save_file(path, api_data.leagues_json, logger))
+		logger.error() << "failed to save leagues cache file\n";
+}
 
 lang::market::item_price_report
 item_price_report_cache::get_report(

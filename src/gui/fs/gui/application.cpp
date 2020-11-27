@@ -89,6 +89,8 @@ application::application(const Arguments& arguments)
 #endif
 
 	load_item_database(_item_database, _application_log.logger());
+	_leagues_cache.set_leagues(network::load_leagues_from_disk(_application_log.logger()));
+	_price_report_cache.load_cache_file_from_disk(_application_log.logger());
 	_theming.apply_current_theme();
 
 	_application_log.logger().info() << "application initialized\n";

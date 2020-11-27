@@ -56,8 +56,8 @@ public:
 	      networking& network_settings()       { return _networking; }
 	const networking& network_settings() const { return _networking; }
 
-	      auto& available_leagues()       { return _available_leagues; }
-	const auto& available_leagues() const { return _available_leagues; }
+	      auto& leagues_cache()       { return _leagues_cache; }
+	const auto& leagues_cache() const { return _leagues_cache; }
 
 	      auto& price_report_cache()       { return _price_report_cache; }
 	const auto& price_report_cache() const { return _price_report_cache; }
@@ -92,7 +92,7 @@ private:
 	std::optional<lang::loot::item_database> _item_database;
 	lang::loot::generator _loot_generator;
 
-	std::vector<std::string> _available_leagues;
+	network::leagues_cache _leagues_cache;
 	network::item_price_report_cache _price_report_cache;
 
 	bool _show_demo_window = false;

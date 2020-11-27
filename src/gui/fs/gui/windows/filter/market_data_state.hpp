@@ -2,9 +2,10 @@
 
 #include <fs/gui/windows/filter/spirit_filter_state_mediator_base.hpp>
 #include <fs/lang/market/item_price_data.hpp>
+#include <fs/lang/league.hpp>
 #include <fs/network/download.hpp>
-#include <fs/network/ggg/api_data.hpp>
 
+#include <utility>
 #include <future>
 #include <memory>
 
@@ -15,6 +16,11 @@ class application;
 class market_data_state
 {
 public:
+	market_data_state(std::vector<lang::league> available_leagues)
+	: _available_leagues(std::move(available_leagues))
+	{
+	}
+
 	void draw_interface(application& app, spirit_filter_state_mediator_base& mediator);
 
 	const lang::market::item_price_report& price_report() const
@@ -27,15 +33,19 @@ private:
 	void on_api_change   (application& app, spirit_filter_state_mediator_base& mediator) { refresh_item_price_report(app, mediator); }
 
 	void refresh_item_price_report(application& app, spirit_filter_state_mediator_base& mediator);
+	void refresh_available_leagues(application& app, spirit_filter_state_mediator_base& mediator);
+
+	void check_downloads(application& app, log::logger& logger);
 
 	lang::data_source_type _selected_api = lang::data_source_type::poe_ninja;
 
 	std::optional<std::string> _selected_league;
+	std::vector<lang::league> _available_leagues;
 	lang::market::item_price_report _price_report;
 
-	bool _league_download_running = false;
-	std::shared_ptr<network::download_info> _league_download_info;
-	std::future<network::ggg::api_league_data> _leagues_future;
+	bool _leagues_download_running = false;
+	std::shared_ptr<network::download_info> _leagues_download_info;
+	std::future<std::vector<lang::league>> _leagues_future;
 
 	bool _price_report_download_running = false;
 	std::shared_ptr<network::download_info> _price_report_download_info;

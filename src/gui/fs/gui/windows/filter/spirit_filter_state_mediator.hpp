@@ -8,6 +8,7 @@
 #include <fs/lang/symbol_table.hpp>
 #include <fs/log/thread_safe_logger.hpp>
 
+#include <utility>
 #include <optional>
 #include <memory>
 
@@ -18,8 +19,9 @@ class spirit_filter_state_mediator
 	, public filter_state_mediator
 {
 public:
-	spirit_filter_state_mediator()
-	: _logger_ptr(std::make_shared<log::thread_safe_logger<log::buffer_logger>>())
+	spirit_filter_state_mediator(std::vector<lang::league> available_leagues)
+	: _market_data(std::move(available_leagues))
+	, _logger_ptr(std::make_shared<log::thread_safe_logger<log::buffer_logger>>())
 	{
 	}
 

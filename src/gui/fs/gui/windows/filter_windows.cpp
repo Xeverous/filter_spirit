@@ -50,6 +50,7 @@ void real_filter_window::draw_contents()
 spirit_filter_window::spirit_filter_window(application& app, std::string path)
 : imgui_window(std::move(path), drawable_area_size())
 , _application(std::ref(app))
+, _state(app.leagues_cache().get_leagues())
 {
 	open();
 	_state.load_source_file(title());
@@ -58,6 +59,7 @@ spirit_filter_window::spirit_filter_window(application& app, std::string path)
 spirit_filter_window::spirit_filter_window(application& app)
 : imgui_window(str_real_filter_text_input, drawable_area_size())
 , _application(std::ref(app))
+, _state(app.leagues_cache().get_leagues())
 {
 	open();
 	_state.open_text_input();

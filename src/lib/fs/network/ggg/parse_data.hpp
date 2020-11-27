@@ -9,7 +9,6 @@ namespace fs::network::ggg
 {
 
 [[nodiscard]] std::vector<lang::league>
-parse_league_info(
-	api_league_data leagues);
+parse_league_info(const api_league_data& leagues);
 
 }

@@ -46,7 +46,7 @@ bool generate_item_filter_impl(
 
 void list_leagues(network::download_settings settings, log::logger& logger)
 {
-	const auto league_data = network::ggg::async_download_leagues(std::move(settings), nullptr, logger).get();
+	const auto league_data = network::ggg::download_leagues(std::move(settings), nullptr, logger);
 	const std::vector<lang::league> leagues = network::ggg::parse_league_info(league_data);
 
 	auto stream = logger.info();

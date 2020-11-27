@@ -1,7 +1,9 @@
 #pragma once
 
 #include <fs/lang/market/item_price_data.hpp>
+#include <fs/lang/league.hpp>
 #include <fs/network/download.hpp>
+#include <fs/network/ggg/api_data.hpp>
 #include <fs/log/logger.hpp>
 #include <fs/version.hpp>
 
@@ -12,6 +14,35 @@
 #include <optional>
 
 namespace fs::network {
+
+std::vector<lang::league> load_leagues_from_disk(log::logger& logger);
+void update_leagues_on_disk(const ggg::api_league_data& api_data, log::logger& logger);
+
+class leagues_cache
+{
+public:
+	std::vector<lang::league> get_leagues() const
+	{
+		auto _ = std::lock_guard<std::mutex>(_mutex);
+		return _leagues;
+	}
+
+	void set_leagues(const std::vector<lang::league>& leagues)
+	{
+		auto _ = std::lock_guard<std::mutex>(_mutex);
+		_leagues = leagues;
+	}
+
+	void set_leagues(std::vector<lang::league>&& leagues)
+	{
+		auto _ = std::lock_guard<std::mutex>(_mutex);
+		_leagues = std::move(leagues);
+	}
+
+private:
+	std::vector<lang::league> _leagues;
+	mutable std::mutex _mutex;
+};
 
 class item_price_report_cache
 {
