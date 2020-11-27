@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string_view>
+#include <string>
 #include <vector>
 
 #include <imgui.h>
@@ -39,5 +40,7 @@ private:
 	// optimization is more code complexity than benefit
 	std::vector<char> _buf;
 };
+
+bool input_string(const char* label, std::string& str);
 
 }

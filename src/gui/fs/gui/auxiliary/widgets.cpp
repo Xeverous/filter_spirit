@@ -19,6 +19,18 @@ int input_text_callback(ImGuiInputTextCallbackData* data)
 	return 0;
 }
 
+int input_string_callback(ImGuiInputTextCallbackData* data)
+{
+	if (data->EventFlag == ImGuiInputTextFlags_CallbackResize)
+	{
+		auto& buf = *reinterpret_cast<std::string*>(data->UserData);
+		buf.resize(data->BufTextLen * 2);
+		data->Buf = buf.data(); // this is necessary: resize could invalidate data pointer
+	}
+
+	return 0;
+}
+
 bool button_colored(const char* str, ImU32 color, ImU32 color_hovered, ImU32 color_active)
 {
 	ImGui::PushStyleColor(ImGuiCol_Button, ImGui::ColorConvertU32ToFloat4(color));
@@ -68,6 +80,18 @@ void multiline_text_input::set_text(std::string_view text)
 
 	std::memcpy(_buf.data(), text.data(), text.size());
 	_buf[text.size()] = '\0';
+}
+
+bool input_string(const char* label, std::string& str)
+{
+	str.resize(str.capacity()); // add extra space filled with '\0' bytes
+
+	bool result = ImGui::InputText(
+		label, str.data(), str.size(),
+		ImGuiInputTextFlags_CallbackResize, &input_string_callback, &str);
+
+	str.resize(std::strlen(str.c_str())); // remove extra '\0' bytes
+	return result;
 }
 
 }
