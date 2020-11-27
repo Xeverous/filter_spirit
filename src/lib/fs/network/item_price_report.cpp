@@ -96,23 +96,19 @@ std::string make_save_path(lang::data_source_type api, std::string_view league)
 	return path.append("_").append(normalize_league_name(league));
 }
 
-std::future<lang::market::item_price_report>
-async_load_item_price_report(
+lang::market::item_price_report
+load_item_price_report(
 	item_price_report_cache& self,
 	item_price_report_cache::metadata_save meta,
 	log::logger& logger)
 {
-	return std::async(
-		std::launch::async,
-		[](item_price_report_cache& self, item_price_report_cache::metadata_save meta, log::logger& logger) {
-			std::optional<lang::market::item_price_report> report = lang::market::load_item_price_report(meta.path, logger);
-			if (!report)
-				throw std::runtime_error("failed to load item price report from disk");
+	std::optional<lang::market::item_price_report> report = lang::market::load_item_price_report(meta.path, logger);
+	if (!report)
+		throw std::runtime_error("failed to load item price report from disk");
 
-			self.update_memory_cache(*report);
-			return *report;
-		},
-		std::ref(self), std::move(meta), std::ref(logger));
+	self.update_memory_cache(*report);
+	return *report;
+
 }
 
 template <typename T>
@@ -135,38 +131,34 @@ void save_api_data(
 	logger.info() << "item price data successfully saved\n";
 }
 
-std::future<lang::market::item_price_report>
-async_download_and_parse_ninja(
+lang::market::item_price_report
+download_and_parse_ninja(
 	item_price_report_cache& self,
 	std::string league,
 	download_settings settings,
 	download_info* info,
 	log::logger& logger)
 {
-	return std::async(
-		std::launch::async,
-		[](item_price_report_cache& self, std::string league, download_settings settings, download_info* info, log::logger& logger) {
-			poe_ninja::api_item_price_data api_data = poe_ninja::download_item_price_data(league, settings, info, logger);
+	poe_ninja::api_item_price_data api_data = poe_ninja::download_item_price_data(league, settings, info, logger);
 
-			lang::market::item_price_report report;
-			report.metadata.data_source = lang::data_source_type::poe_ninja;
-			report.metadata.league_name = league;
-			report.metadata.download_date = boost::posix_time::microsec_clock::universal_time();
+	lang::market::item_price_report report;
+	report.metadata.data_source = lang::data_source_type::poe_ninja;
+	report.metadata.league_name = league;
+	report.metadata.download_date = boost::posix_time::microsec_clock::universal_time();
 
-			std::string save_path = make_save_path(lang::data_source_type::poe_ninja, league);
-			save_api_data(api_data, report.metadata, save_path, logger);
+	std::string save_path = make_save_path(lang::data_source_type::poe_ninja, league);
+	save_api_data(api_data, report.metadata, save_path, logger);
 
-			report.data = poe_ninja::parse_item_price_data(api_data, logger);
+	report.data = poe_ninja::parse_item_price_data(api_data, logger);
 
-			self.update_memory_cache(report);
-			self.update_disk_cache({report.metadata, save_path, version::current()});
-			self.update_cache_file_on_disk(logger);
-			return report;
-		},
-		std::ref(self), std::move(league), std::move(settings), info, std::ref(logger));
+	self.update_memory_cache(report);
+	self.update_disk_cache({report.metadata, save_path, version::current()});
+	self.update_cache_file_on_disk(logger);
+	return report;
+
 }
 
-std::future<lang::market::item_price_report>
+lang::market::item_price_report
 download_and_parse_watch(
 	item_price_report_cache& self,
 	std::string league,
@@ -174,35 +166,30 @@ download_and_parse_watch(
 	download_info* info,
 	log::logger& logger)
 {
-	return std::async(
-		std::launch::async,
-		[](item_price_report_cache& self, std::string league, download_settings settings, download_info* info, log::logger& logger) {
-			poe_watch::api_item_price_data api_data = poe_watch::download_item_price_data(league, settings, info, logger);
+	poe_watch::api_item_price_data api_data = poe_watch::download_item_price_data(league, settings, info, logger);
 
-			lang::market::item_price_report report;
-			report.metadata.data_source = lang::data_source_type::poe_ninja;
-			report.metadata.league_name = league;
-			report.metadata.download_date = boost::posix_time::microsec_clock::universal_time();
+	lang::market::item_price_report report;
+	report.metadata.data_source = lang::data_source_type::poe_ninja;
+	report.metadata.league_name = league;
+	report.metadata.download_date = boost::posix_time::microsec_clock::universal_time();
 
-			std::string save_path = make_save_path(lang::data_source_type::poe_watch, league);
-			save_api_data(api_data, report.metadata, save_path, logger);
+	std::string save_path = make_save_path(lang::data_source_type::poe_watch, league);
+	save_api_data(api_data, report.metadata, save_path, logger);
 
-			report.data = poe_watch::parse_item_price_data(api_data, logger);
+	report.data = poe_watch::parse_item_price_data(api_data, logger);
 
-			self.update_memory_cache(report);
-			self.update_disk_cache({report.metadata, save_path, version::current()});
-			self.update_cache_file_on_disk(logger);
-			return report;
-		},
-		std::ref(self), std::move(league), std::move(settings), info, std::ref(logger));
+	self.update_memory_cache(report);
+	self.update_disk_cache({report.metadata, save_path, version::current()});
+	self.update_cache_file_on_disk(logger);
+	return report;
 }
 
 } // namespace
 
 namespace fs::network {
 
-std::future<lang::market::item_price_report>
-item_price_report_cache::async_get_report(
+lang::market::item_price_report
+item_price_report_cache::get_report(
 	std::string league,
 	lang::data_source_type api,
 	boost::posix_time::time_duration expiration_time,
@@ -211,19 +198,19 @@ item_price_report_cache::async_get_report(
 	log::logger& logger)
 {
 	if (api == lang::data_source_type::none) {
-		return utility::make_ready_future<lang::market::item_price_report>(lang::market::item_price_report());
+		return lang::market::item_price_report();
 	}
 
 	if (std::optional<lang::market::item_price_report> report = find_in_memory_cache(league, api, expiration_time); report) {
-		return utility::make_ready_future<lang::market::item_price_report>(*report);
+		return *report;
 	}
 
 	if (std::optional<metadata_save> metadata = find_in_disk_cache(league, api, expiration_time); metadata) {
-		return async_load_item_price_report(*this, std::move(*metadata), logger);
+		return load_item_price_report(*this, std::move(*metadata), logger);
 	}
 
 	if (api == lang::data_source_type::poe_ninja) {
-		return async_download_and_parse_ninja(*this, std::move(league), std::move(settings), info, logger);
+		return download_and_parse_ninja(*this, std::move(league), std::move(settings), info, logger);
 	}
 	else /* if (api == lang::data_source_type::poe_watch) */ {
 		FS_ASSERT(api == lang::data_source_type::poe_watch);

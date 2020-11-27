@@ -7,7 +7,6 @@
 
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
-#include <future>
 #include <string>
 #include <filesystem>
 #include <optional>
@@ -17,15 +16,18 @@ namespace fs::network {
 class item_price_report_cache
 {
 public:
-	[[nodiscard]] std::future<lang::market::item_price_report>
-	async_get_report(
+	/*
+	 * This function may run a long time
+	 * logger and info (if non-null) must live for the call duration.
+	 */
+	[[nodiscard]] lang::market::item_price_report
+	get_report(
 		std::string league,
 		lang::data_source_type api,
 		boost::posix_time::time_duration expiration_time,
 		download_settings settings,
 		download_info* info,
 		log::logger& logger);
-
 
 	struct metadata_save
 	{
@@ -40,13 +42,13 @@ public:
 	bool update_cache_file_on_disk(log::logger& logger) const;
 	bool load_cache_file_from_disk(log::logger& logger);
 
-private:
 	[[nodiscard]] std::optional<lang::market::item_price_report>
 	find_in_memory_cache(
 		const std::string& league,
 		lang::data_source_type api,
 		boost::posix_time::time_duration expiration_time) const;
 
+private:
 	[[nodiscard]] std::optional<metadata_save>
 	find_in_disk_cache(
 		const std::string& league,

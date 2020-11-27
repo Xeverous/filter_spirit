@@ -80,22 +80,22 @@ obtain_item_price_report(
 	network::item_price_report_cache cache;
 	cache.load_cache_file_from_disk(logger);
 	if (download_league_name_ninja) {
-		return cache.async_get_report(
+		return cache.get_report(
 			std::move(*download_league_name_ninja),
 			lang::data_source_type::poe_ninja,
 			expiration_time,
 			std::move(settings),
 			nullptr,
-			logger).get();
+			logger);
 	}
 	else if (download_league_name_watch) {
-		return cache.async_get_report(
+		return cache.get_report(
 			std::move(*download_league_name_watch),
 			lang::data_source_type::poe_watch,
 			expiration_time,
 			std::move(settings),
 			nullptr,
-			logger).get();
+			logger);
 	}
 
 	logger.error() << "no option specified how to obtain item price data\n";
