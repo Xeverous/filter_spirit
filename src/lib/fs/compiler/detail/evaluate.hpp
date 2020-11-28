@@ -145,11 +145,7 @@ evaluate(parser::ast::rf::influence_literal il)
 [[nodiscard]] inline outcome<lang::minimap_icon>
 evaluate(parser::ast::rf::icon_literal il)
 {
-	return make_minimap_icon(
-		detail::evaluate(il.size),
-		detail::evaluate(il.suit),
-		detail::evaluate(il.shape)
-	);
+	return make_minimap_icon(evaluate(il.size), evaluate(il.suit), evaluate(il.shape));
 }
 
 template <typename T>
