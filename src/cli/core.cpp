@@ -34,7 +34,7 @@ bool generate_item_filter_impl(
 		return false;
 
 	if (utility::save_file(output_filepath, *filter_content, logger)) {
-		logger.info() << "item filter successfully saved as " << output_filepath.generic_string() << '\n';
+		logger.info() << "Item filter successfully saved as " << output_filepath.generic_string() << ".\n";
 		return true;
 	}
 	else {
@@ -50,7 +50,7 @@ void list_leagues(network::download_settings settings, log::logger& logger)
 	const std::vector<lang::league> leagues = network::ggg::parse_league_info(league_data);
 
 	auto stream = logger.info();
-	stream << "available leagues:\n";
+	stream << "Available leagues:\n";
 
 	for (const lang::league& league : leagues)
 		stream << league.name << '\n';
@@ -69,7 +69,7 @@ obtain_item_price_report(
 		|| (download_league_name_ninja && data_read_dir)
 		|| (download_league_name_ninja && download_league_name_watch))
 	{
-		logger.error() << "more than 1 data obtaining option specified\n";
+		logger.error() << "More than 1 data obtaining option specified.\n";
 		return std::nullopt;
 	}
 
@@ -98,7 +98,7 @@ obtain_item_price_report(
 			logger);
 	}
 
-	logger.error() << "no option specified how to obtain item price data\n";
+	logger.error() << "No option specified how to obtain item price data.\n";
 	return std::nullopt;
 }
 
@@ -110,17 +110,17 @@ bool generate_item_filter(
 	fs::log::logger& logger)
 {
 	if (!report) {
-		logger.error() << "no item price data, giving up on filter generation\n";
+		logger.error() << "No item price data, giving up on filter generation.\n";
 		return false;
 	}
 
 	if (!input_path) {
-		logger.error() << "no input path given\n";
+		logger.error() << "No input path given.\n";
 		return false;
 	}
 
 	if (!output_path) {
-		logger.error() << "no output path given\n";
+		logger.error() << "No output path given.\n";
 		return false;
 	}
 
@@ -146,7 +146,7 @@ int compare_data_saves(
 	fs::log::logger& logger)
 {
 	if (paths.size() != 2u) {
-		logger.error() << "for comparing data saves exactly 2 paths should be given\n";
+		logger.error() << "For comparing data saves exactly 2 paths should be given.\n";
 		return EXIT_FAILURE;
 	}
 

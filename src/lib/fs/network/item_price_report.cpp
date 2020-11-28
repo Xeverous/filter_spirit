@@ -125,16 +125,16 @@ void save_api_data(
 	log::logger& logger)
 {
 	if (!metadata.save(data_save_dir, logger)) {
-		logger.error() << "failed to save item price metadata\n";
+		logger.error() << "Failed to save item price metadata.\n";
 		return;
 	}
 
 	if (!api_data.save(data_save_dir, logger)) {
-		logger.error() << "failed to save item price data\n";
+		logger.error() << "Failed to save item price data.\n";
 		return;
 	}
 
-	logger.info() << "item price data successfully saved\n";
+	logger.info() << "Item price data successfully saved.\n";
 }
 
 lang::market::item_price_report
@@ -207,7 +207,7 @@ std::vector<lang::league> load_leagues_from_disk(log::logger& logger)
 	}
 	catch (const std::exception& e) {
 		logger.error() << "While loading " << path.generic_string() << ": " << e.what()
-			<< ". Cache is probably corrupted, removing leagues cache file\n";
+			<< ". Cache is probably corrupted, removing leagues cache file.\n";
 		std::filesystem::remove(path);
 		return {};
 	}
@@ -217,7 +217,7 @@ void update_leagues_on_disk(const ggg::api_league_data& api_data, log::logger& l
 {
 	const auto path = std::filesystem::path(cache_dir_path) / leagues_file_name;
 	if (!utility::save_file(path, api_data.leagues_json, logger))
-		logger.error() << "failed to save leagues cache file\n";
+		logger.error() << "Failed to save leagues cache file.\n";
 }
 
 lang::market::item_price_report
@@ -353,7 +353,7 @@ bool item_price_report_cache::load_cache_file_from_disk(log::logger& logger)
 	for (const auto& obj : json) {
 		std::optional<lang::market::item_price_metadata> meta = lang::market::from_json(obj, logger);
 		if (!meta) {
-			logger.error() << "failed to parse metadata\n";
+			logger.error() << "Failed to parse metadata.\n";
 			return false;
 		}
 

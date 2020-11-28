@@ -28,19 +28,19 @@ void load_item_database(std::optional<lang::loot::item_database>& database, log:
 
 	std::optional<std::string> item_metadata_json = fs::utility::load_file("data/base_items.json", logger);
 	if (!item_metadata_json) {
-		logger.error() << "failed to load item metadata, loot preview will be disabled";
+		logger.error() << "Failed to load item metadata, loot preview will be disabled.\n";
 		return;
 	}
 
 	database.emplace();
 
 	if (!(*database).parse(*item_metadata_json, logger)) {
-		logger.error() << "failed to parse item metadata, loot preview will be disabled";
+		logger.error() << "Failed to parse item metadata, loot preview will be disabled.\n";
 		database = std::nullopt;
 		return;
 	}
 
-	logger.info() << "item database loaded";
+	logger.info() << "Item database loaded.";
 }
 
 }
@@ -67,12 +67,14 @@ application::application(const Arguments& arguments)
 	 * - before Magnum's Dear ImGui integration is constructed
 	 * for more details, see documentation of Magnum::ImGuiIntegration::Context
 	 */
-	_application_log.logger().info() << "loading and building fonts...\n";
+	_application_log.logger().info() << "Loading and building fonts...\n";
 	_fonting.build_default_fonts();
+	_application_log.logger().info() << "Fonts ready.\n";
 
-	_application_log.logger().info() << "creating Magnum library context...\n";
+	_application_log.logger().info() << "Creating rendering context...\n";
 	_imgui = Magnum::ImGuiIntegration::Context(
 		*ImGui::GetCurrentContext(), Magnum::Vector2{windowSize()} / dpiScaling(), windowSize(), framebufferSize());
+	_application_log.logger().info() << "Context created.\n";
 
 	/* Set up proper blending to be used by ImGui. There's a great chance
 	   you'll need this exact behavior for the rest of your scene. If not, set
@@ -93,7 +95,7 @@ application::application(const Arguments& arguments)
 	_price_report_cache.load_cache_file_from_disk(_application_log.logger());
 	_theming.apply_current_theme();
 
-	_application_log.logger().info() << "application initialized\n";
+	_application_log.logger().info() << "Application initialized.\n";
 }
 
 void application::viewportEvent(ViewportEvent& event)

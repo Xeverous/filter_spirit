@@ -317,7 +317,7 @@ parse_compact(std::string_view compact_json, log::logger& logger)
 		// max used memory by a single compact query to ~400 MB.
 		if (id > (1 << 24)) {
 			logger.warning() << "A price data entry has abnormally big ID: "
-				<< id << ", skipping this entry\n";
+				<< id << ", skipping this entry.\n";
 			continue;
 		}
 
@@ -329,7 +329,7 @@ parse_compact(std::string_view compact_json, log::logger& logger)
 
 		if (item_prices[id].has_value()) { // C++20: [[unlikely]]
 			logger.warning() << "A price data entry with duplicated ID has been found, ID = "
-				<< id << ", skipping this entry\n";
+				<< id << ", skipping this entry.\n";
 			continue;
 		}
 
@@ -501,7 +501,7 @@ parse_itemdata(std::string_view itemdata_json, log::logger& logger)
 	items.reserve(32768); // expect about 30 000 items
 	for (const auto& item_entry : json) {
 		const auto log_exception = [&](const auto& e) {
-			logger.warning() << "failed to parse item entry in itemdata JSON: " << e.what()
+			logger.warning() << "Failed to parse item entry in itemdata JSON: " << e.what()
 				<< ", skipping the following item: " << utility::dump_json(item_entry) << '\n';
 		};
 
@@ -573,17 +573,17 @@ parse_item_price_data(
 	const api_item_price_data& ipd,
 	log::logger& logger)
 {
-	logger.info() << "parsing item prices\n";
+	logger.info() << "Parsing item prices...\n";
 	std::vector<std::optional<lang::market::price_data>> item_prices = parse_compact(ipd.compact_json, logger);
 	if (item_prices.empty())
 		throw network::json_parse_error("parsed empty list of item prices");
 
-	logger.info() << "parsing item data\n";
+	logger.info() << "Parsing item data...\n";
 	std::vector<item> itemdata = parse_itemdata(ipd.itemdata_json, logger);
 	if (itemdata.empty())
 		throw network::json_parse_error("parsed empty list of item data");
 
-	logger.info() << "item entries: " << itemdata.size() << '\n';
+	logger.info() << "Item entries: " << itemdata.size() << '\n';
 
 	lang::market::item_price_data result;
 	for (item& itm : itemdata) {

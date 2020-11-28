@@ -20,7 +20,7 @@ std::optional<fs::lang::spirit_item_filter> parse_and_compile_spirit_filter(
 	settings st,
 	log::logger& logger)
 {
-	logger.info() << "parsing filter template\n";
+	logger.info() << "Parsing filter template...\n";
 	std::variant<parser::parsed_spirit_filter, parser::parse_failure_data> parse_result = parser::parse_spirit_filter(input);
 
 	if (std::holds_alternative<parser::parse_failure_data>(parse_result)) {
@@ -28,13 +28,13 @@ std::optional<fs::lang::spirit_item_filter> parse_and_compile_spirit_filter(
 		return std::nullopt;
 	}
 
-	logger.info() << "parse successful\n";
+	logger.info() << "Parse successful.\n";
 	const auto& parse_data = std::get<parser::parsed_spirit_filter>(parse_result);
 
 	if (st.print_ast)
 		fs::log::structure_printer()(parse_data.ast);
 
-	logger.info() << "resolving filter template symbols\n";
+	logger.info() << "Resolving filter template symbols...\n";
 
 	const compiler::outcome<lang::symbol_table> symbols_outcome =
 		compiler::resolve_spirit_filter_symbols(st.compile_settings, parse_data.ast.definitions);
@@ -43,7 +43,8 @@ std::optional<fs::lang::spirit_item_filter> parse_and_compile_spirit_filter(
 	if (!symbols_outcome.has_result())
 		return std::nullopt;
 
-	logger.info() << "compiling filter template\n";
+	logger.info() << "Symbols resolved.\n";
+	logger.info() << "Compiling filter template...\n";
 
 	compiler::outcome<lang::spirit_item_filter> spirit_filter_outcome =
 		compiler::compile_spirit_filter_statements(st.compile_settings, parse_data.ast.statements, symbols_outcome.result());
@@ -90,7 +91,7 @@ std::optional<std::string> parse_compile_generate_spirit_filter_no_preamble(
 		return std::nullopt;
 
 	lang::item_filter filter = make_item_filter(*spirit_filter, item_price_data);
-	logger.info() << "compilation successful\n";
+	logger.info() << "Compilation successful.\n";
 
 	return item_filter_to_string(filter);
 }

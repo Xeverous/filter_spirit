@@ -41,7 +41,7 @@ std::optional<std::string> load_file(const std::filesystem::path& path, log::log
 	std::string file_contents = load_file(path, ec);
 
 	if (ec) {
-		logger.error() << "failed to load file " << path.generic_string() << ": " << ec.message() << '\n';
+		logger.error() << "Failed to load file " << path.generic_string() << ": " << ec.message() << ".\n";
 		return std::nullopt;
 	}
 
@@ -65,7 +65,7 @@ std::error_code save_file(const std::filesystem::path& path, std::string_view fi
 bool save_file(const std::filesystem::path& path, std::string_view file_contents, log::logger& logger)
 {
 	if (auto ec = save_file(path, file_contents); ec) {
-		logger.error() << "failed to save file " << path.generic_string() << ": " << ec.message() << '\n';
+		logger.error() << "Failed to save file " << path.generic_string() << ": " << ec.message() << ".\n";
 		return false;
 	}
 
@@ -78,7 +78,7 @@ bool create_directories(const std::filesystem::path& dirpath, log::logger& logge
 	// but reports no error. Therefore, only error code is checked.
 	std::error_code ec;
 	if (std::filesystem::create_directories(dirpath, ec); ec) {
-		logger.error() << "failed to create " << dirpath.generic_string() << ": " << ec.message() << '\n';
+		logger.error() << "Failed to create " << dirpath.generic_string() << ": " << ec.message() << ".\n";
 		return false;
 	}
 

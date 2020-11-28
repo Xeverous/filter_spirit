@@ -309,7 +309,7 @@ bool item_database::parse(std::string_view items_metadata_json, log::logger& log
 	const auto json = nlohmann::json::parse(items_metadata_json);
 
 	if (!json.is_object()) {
-		logger.error() << "items metadata JSON expected to be an object but is not!\n";
+		logger.error() << "Items metadata JSON expected to be an object but is not!\n";
 		return false;
 	}
 

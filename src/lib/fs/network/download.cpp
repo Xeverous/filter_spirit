@@ -127,7 +127,7 @@ log_download(
 	fs::log::logger& logger,
 	std::string_view target_url)
 {
-	logger.info() << "downloading from " << target_url << '\n';
+	logger.info() << "GET " << target_url << '\n';
 }
 
 } // namespace

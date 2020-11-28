@@ -215,7 +215,7 @@ int run(int argc, char* argv[])
 
 		if (opt_generate) {
 			if (!generate_item_filter(item_price_report, input_path, output_path, st, logger)) {
-				logger.info() << "filter generation failed\n";
+				logger.info() << "Filter generation failed.\n";
 				return EXIT_FAILURE;
 			}
 		}
@@ -225,7 +225,7 @@ int run(int argc, char* argv[])
 		return EXIT_FAILURE;
 	}
 	catch (...) {
-		logger.error() << "unknown error\n" << fs::log::strings::request_bug_report;
+		logger.error() << "Unknown error.\n" << fs::log::strings::request_bug_report;
 		return EXIT_FAILURE;
 	}
 
