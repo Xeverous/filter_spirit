@@ -14,28 +14,27 @@ using namespace fs;
 using namespace fs::lang;
 
 template <typename T, typename U> [[nodiscard]]
-std::optional<condition_match_result> test_range_condition(range_condition<T> condition, U item_property_value)
+range_condition_match_result test_range_condition(range_condition<T> condition, U item_property_value)
 {
 	static_assert(std::is_same_v<decltype(T::value), traits::remove_cvref_t<U>>);
 
-	if (!condition.has_bound()) // condition not present => mathing not happening
-		return std::nullopt;
+	range_condition_match_result result;
 
-	FS_ASSERT(condition.first_origin().has_value());
+	if (condition.lower_bound) {
+		result.lower_bound = condition_match_result(
+			condition.test_lower_bound(item_property_value),
+			(*condition.lower_bound).origin,
+			(*condition.lower_bound).value.origin);
+	}
 
-	/*
-	 * This needs to be improved:
-	 * - Range condition needs more data - here condition's keyword origin is wanted.
-	 *   Right now bound's origin is given just to make it compile (in reality both
-	 *   origins are practically always next to each other so it is not that bad).
-	 * - The comparison below always uses first_origin which might not be the range bound
-	 *   that the item's property is failing against. Basically rewrite to do 2
-	 *   comparisons and report the origin of the one that actually fails.
-	 */
-	if (condition.includes(item_property_value))
-		return condition_match_result::success(*condition.first_origin(), *condition.first_origin());
-	else
-		return condition_match_result::failure(*condition.first_origin());
+	if (condition.upper_bound) {
+		result.upper_bound = condition_match_result(
+			condition.test_upper_bound(item_property_value),
+			(*condition.upper_bound).origin,
+			(*condition.upper_bound).value.origin);
+	}
+
+	return result;
 }
 
 [[nodiscard]] condition_match_result

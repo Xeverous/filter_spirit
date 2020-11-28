@@ -59,6 +59,16 @@ void color_line_by_condition_result(
 		line_colors[line_number] = color_background_condition_failure;
 }
 
+void color_line_by_condition_result(
+	const lang::range_condition_match_result& result,
+	const parser::lookup_data& lookup,
+	const parser::line_lookup& lines,
+	std::vector<ImU32>& line_colors)
+{
+	color_line_by_condition_result(result.lower_bound, lookup, lines, line_colors);
+	color_line_by_condition_result(result.upper_bound, lookup, lines, line_colors);
+}
+
 template <typename T>
 void color_line_by_origin(
 	const T& t,
@@ -249,24 +259,24 @@ void debug_state::recompute()
 		color_line_by_condition_result(cs.drop_level,               lookup, lines, _line_colors);
 		color_line_by_condition_result(cs.quality,                  lookup, lines, _line_colors);
 		color_line_by_condition_result(cs.rarity,                   lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.class_,                   lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.base_type,                lookup, lines, _line_colors);
 		color_line_by_condition_result(cs.linked_sockets,           lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.sockets,                  lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.socket_group,             lookup, lines, _line_colors);
 		color_line_by_condition_result(cs.height,                   lookup, lines, _line_colors);
 		color_line_by_condition_result(cs.width,                    lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.stack_size,               lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.gem_level,                lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.map_tier,                 lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.area_level,               lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.corrupted_mods,           lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.class_,                   lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.base_type,                lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.sockets,                  lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.socket_group,             lookup, lines, _line_colors);
 		color_line_by_condition_result(cs.has_explicit_mod,         lookup, lines, _line_colors);
 		color_line_by_condition_result(cs.has_enchantment,          lookup, lines, _line_colors);
 		color_line_by_condition_result(cs.prophecy,                 lookup, lines, _line_colors);
 		color_line_by_condition_result(cs.enchantment_passive_node, lookup, lines, _line_colors);
 		color_line_by_condition_result(cs.has_influence,            lookup, lines, _line_colors);
 		color_line_by_condition_result(cs.gem_quality_type,         lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.stack_size,               lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.gem_level,                lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.map_tier,                 lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.area_level,               lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.corrupted_mods,           lookup, lines, _line_colors);
 		color_line_by_condition_result(cs.is_identified,            lookup, lines, _line_colors);
 		color_line_by_condition_result(cs.is_corrupted,             lookup, lines, _line_colors);
 		color_line_by_condition_result(cs.is_mirrored,              lookup, lines, _line_colors);

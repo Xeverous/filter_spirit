@@ -60,14 +60,12 @@ struct range_condition
 		return false;
 	}
 
-	// check whether 'value' can fit into currently specified range
 	template <typename V>
-	constexpr bool includes(V value) const noexcept
+	constexpr bool test_lower_bound(V value) const noexcept
 	{
 		static_assert(std::is_same_v<V, decltype(T::value)>);
 
-		if (lower_bound.has_value())
-		{
+		if (lower_bound.has_value()) {
 			if ((*lower_bound).value.value > value)
 				return false;
 
@@ -75,8 +73,15 @@ struct range_condition
 				return false;
 		}
 
-		if (upper_bound.has_value())
-		{
+		return true;
+	}
+
+	template <typename V>
+	constexpr bool test_upper_bound(V value) const noexcept
+	{
+		static_assert(std::is_same_v<V, decltype(T::value)>);
+
+		if (upper_bound.has_value()) {
 			if ((*upper_bound).value.value < value)
 				return false;
 
@@ -85,6 +90,13 @@ struct range_condition
 		}
 
 		return true;
+	}
+
+	// check whether 'value' can fit into currently specified range
+	template <typename V>
+	constexpr bool includes(V value) const noexcept
+	{
+		return test_lower_bound(value) && test_upper_bound(value);
 	}
 
 	constexpr bool has_bound() const noexcept
@@ -237,17 +249,28 @@ struct condition_set
 class condition_match_result
 {
 public:
+	condition_match_result(
+		bool is_successful,
+		lang::position_tag condition_origin,
+		std::optional<lang::position_tag> value_origin)
+	: _is_successful(is_successful)
+	, _condition_origin(condition_origin)
+	, _value_origin(value_origin)
+	{
+	}
+
 	static condition_match_result success(
 		lang::position_tag condition_origin,
-		lang::position_tag value_origin)
+		std::optional<lang::position_tag> value_origin = std::nullopt)
 	{
 		return condition_match_result(true, condition_origin, value_origin);
 	}
 
 	static condition_match_result failure(
-		lang::position_tag condition_origin)
+		lang::position_tag condition_origin,
+		std::optional<lang::position_tag> value_origin = std::nullopt)
 	{
-		return condition_match_result(false, condition_origin, std::nullopt);
+		return condition_match_result(false, condition_origin, value_origin);
 	}
 
 	bool is_successful() const
@@ -266,19 +289,15 @@ public:
 	}
 
 private:
-	condition_match_result(
-		bool is_successful,
-		lang::position_tag condition_origin,
-		std::optional<lang::position_tag> value_origin)
-	: _is_successful(is_successful)
-	, _condition_origin(condition_origin)
-	, _value_origin(value_origin)
-	{
-	}
-
 	bool _is_successful;
 	lang::position_tag _condition_origin;
 	std::optional<lang::position_tag> _value_origin;
+};
+
+struct range_condition_match_result
+{
+	std::optional<condition_match_result> lower_bound;
+	std::optional<condition_match_result> upper_bound;
 };
 
 struct condition_set_match_result
@@ -292,28 +311,32 @@ struct condition_set_match_result
 				return true; // match not attempted => not considered as failure
 		};
 
-		return is_not_failure(item_level)
-			&& is_not_failure(drop_level)
-			&& is_not_failure(quality)
-			&& is_not_failure(rarity)
+		const auto is_not_failure_range = [&](const range_condition_match_result& result) {
+			return is_not_failure(result.lower_bound) && is_not_failure(result.upper_bound);
+		};
+
+		return is_not_failure_range(item_level)
+			&& is_not_failure_range(drop_level)
+			&& is_not_failure_range(quality)
+			&& is_not_failure_range(rarity)
+			&& is_not_failure_range(linked_sockets)
+			&& is_not_failure_range(height)
+			&& is_not_failure_range(width)
+			&& is_not_failure_range(stack_size)
+			&& is_not_failure_range(gem_level)
+			&& is_not_failure_range(map_tier)
+			&& is_not_failure_range(area_level)
+			&& is_not_failure_range(corrupted_mods)
 			&& is_not_failure(class_)
 			&& is_not_failure(base_type)
-			&& is_not_failure(linked_sockets)
 			&& is_not_failure(sockets)
 			&& is_not_failure(socket_group)
-			&& is_not_failure(height)
-			&& is_not_failure(width)
 			&& is_not_failure(has_explicit_mod)
 			&& is_not_failure(has_enchantment)
 			&& is_not_failure(prophecy)
 			&& is_not_failure(enchantment_passive_node)
 			&& is_not_failure(has_influence)
 			&& is_not_failure(gem_quality_type)
-			&& is_not_failure(stack_size)
-			&& is_not_failure(gem_level)
-			&& is_not_failure(map_tier)
-			&& is_not_failure(area_level)
-			&& is_not_failure(corrupted_mods)
 			&& is_not_failure(is_identified)
 			&& is_not_failure(is_corrupted)
 			&& is_not_failure(is_mirrored)
@@ -329,28 +352,28 @@ struct condition_set_match_result
 			&& is_not_failure(is_alternate_quality);
 	}
 
-	std::optional<condition_match_result> item_level;
-	std::optional<condition_match_result> drop_level;
-	std::optional<condition_match_result> quality;
-	std::optional<condition_match_result> rarity;
+	range_condition_match_result item_level;
+	range_condition_match_result drop_level;
+	range_condition_match_result quality;
+	range_condition_match_result rarity;
+	range_condition_match_result linked_sockets;
+	range_condition_match_result height;
+	range_condition_match_result width;
+	range_condition_match_result stack_size;
+	range_condition_match_result gem_level;
+	range_condition_match_result map_tier;
+	range_condition_match_result area_level;
+	range_condition_match_result corrupted_mods;
 	std::optional<condition_match_result> class_;
 	std::optional<condition_match_result> base_type;
-	std::optional<condition_match_result> linked_sockets;
 	std::optional<condition_match_result> sockets;
 	std::optional<condition_match_result> socket_group;
-	std::optional<condition_match_result> height;
-	std::optional<condition_match_result> width;
 	std::optional<condition_match_result> has_explicit_mod;
 	std::optional<condition_match_result> has_enchantment;
 	std::optional<condition_match_result> prophecy;
 	std::optional<condition_match_result> enchantment_passive_node;
 	std::optional<condition_match_result> has_influence;
 	std::optional<condition_match_result> gem_quality_type;
-	std::optional<condition_match_result> stack_size;
-	std::optional<condition_match_result> gem_level;
-	std::optional<condition_match_result> map_tier;
-	std::optional<condition_match_result> area_level;
-	std::optional<condition_match_result> corrupted_mods;
 	std::optional<condition_match_result> is_identified;
 	std::optional<condition_match_result> is_corrupted;
 	std::optional<condition_match_result> is_mirrored;
