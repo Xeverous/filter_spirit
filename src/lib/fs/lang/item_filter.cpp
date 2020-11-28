@@ -36,7 +36,7 @@ std::optional<condition_match_result> test_range_condition(range_condition<T> co
 		return condition_match_result::success(*condition.first_origin(), *condition.first_origin());
 	else
 		return condition_match_result::failure(*condition.first_origin());
-};
+}
 
 [[nodiscard]] condition_match_result
 test_strings_condition_impl(
@@ -197,7 +197,7 @@ test_boolean_condition(
 		return condition_match_result::success(condition.origin, condition.value.origin);
 	else
 		return condition_match_result::failure(condition.origin);
-};
+}
 
 item_style default_item_style(const item& itm)
 {
