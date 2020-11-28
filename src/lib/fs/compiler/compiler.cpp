@@ -64,7 +64,7 @@ add_constant_from_definition(
 bool condition_contains(const lang::strings_condition& condition, std::string_view fragment)
 {
 	for (const auto& str : condition.strings) {
-		if (utility::contains(str, fragment))
+		if (utility::contains(str.value, fragment))
 			return true;
 	}
 

@@ -182,7 +182,7 @@ struct socket_spec_condition
 
 struct strings_condition
 {
-	std::vector<std::string> strings;
+	std::vector<lang::string> strings;
 	bool exact_match_required;
 	position_tag origin;
 };

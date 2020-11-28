@@ -17,8 +17,8 @@ using namespace fs;
 template <
 	typename ForwardIterator,
 	typename Predicate, // bool (ForwardIterator), decides whether item matches
-	typename NameExtractor> // std::string (ForwardIerator), returns item name
-[[nodiscard]] std::vector<std::string>
+	typename NameExtractor> // std::string (ForwardIterator), returns item name
+[[nodiscard]] std::vector<lang::string>
 get_matching_items(
 	ForwardIterator first,
 	ForwardIterator last,
@@ -32,11 +32,11 @@ get_matching_items(
 		std::is_same_v<std::string, std::invoke_result_t<NameExtractor, decltype(*first)>>,
 		"NameExtractor should accept iterator and return std::string");
 
-	std::vector<std::string> result;
+	std::vector<lang::string> result;
 
 	for (auto it = first; it != last; ++it) {
 		if (pred(*it))
-			result.push_back(name(*it));
+			result.push_back(lang::string{name(*it), {}}); // TODO add autogen origin when supported
 	}
 
 	return result;
@@ -147,6 +147,7 @@ make_filter_block(
 
 	lang::item_filter_block result_block = block_template.block;
 
+	// TODO when better origins are supported, add autogen origin
 	const lang::autogen_extension& autogen = *block_template.autogen;
 	switch (autogen.condition.category) {
 		case lang::item_category::cards:
@@ -156,7 +157,7 @@ make_filter_block(
 				autogen.price_range,
 				autogen.condition.origin);
 			result_block.conditions.class_ = lang::strings_condition{
-				{fs::lang::classes::cards},
+				{lang::string{lang::classes::cards, {}}},
 				true,
 				autogen.condition.origin};
 			break;
@@ -167,7 +168,7 @@ make_filter_block(
 				autogen.price_range,
 				autogen.condition.origin);
 			result_block.conditions.class_ = lang::strings_condition{
-				{fs::lang::classes::prophecies},
+				{lang::string{lang::classes::prophecies, {}}},
 				true,
 				autogen.condition.origin};
 			break;
@@ -178,7 +179,7 @@ make_filter_block(
 				autogen.price_range,
 				autogen.condition.origin);
 			result_block.conditions.class_ = lang::strings_condition{
-				{fs::lang::classes::essences},
+				{lang::string{lang::classes::essences, {}}},
 				true,
 				autogen.condition.origin};
 			break;
@@ -189,7 +190,7 @@ make_filter_block(
 				autogen.price_range,
 				autogen.condition.origin);
 			result_block.conditions.class_ = lang::strings_condition{
-				{fs::lang::classes::fossils},
+				{lang::string{lang::classes::fossils, {}}},
 				true,
 				autogen.condition.origin};
 			break;
@@ -200,7 +201,7 @@ make_filter_block(
 				autogen.price_range,
 				autogen.condition.origin);
 			result_block.conditions.class_ = lang::strings_condition{
-				{fs::lang::classes::resonators},
+				{lang::string{lang::classes::resonators, {}}},
 				true,
 				autogen.condition.origin};
 			break;
@@ -211,7 +212,7 @@ make_filter_block(
 				autogen.price_range,
 				autogen.condition.origin);
 			result_block.conditions.class_ = lang::strings_condition{
-				{fs::lang::classes::scarabs},
+				{lang::string{lang::classes::scarabs, {}}},
 				true,
 				autogen.condition.origin};
 			break;
@@ -222,7 +223,7 @@ make_filter_block(
 				autogen.price_range,
 				autogen.condition.origin);
 			result_block.conditions.class_ = lang::strings_condition{
-				{fs::lang::classes::incubators},
+				{lang::string{lang::classes::incubators, {}}},
 				true,
 				autogen.condition.origin};
 			break;
@@ -233,7 +234,7 @@ make_filter_block(
 				autogen.price_range,
 				autogen.condition.origin);
 			result_block.conditions.class_ = lang::strings_condition{
-				{fs::lang::classes::oils},
+				{lang::string{lang::classes::oils, {}}},
 				true,
 				autogen.condition.origin};
 			break;
@@ -244,7 +245,7 @@ make_filter_block(
 				autogen.price_range,
 				autogen.condition.origin);
 			result_block.conditions.class_ = lang::strings_condition{
-				{fs::lang::classes::catalysts},
+				{lang::string{lang::classes::catalysts, {}}},
 				true,
 				autogen.condition.origin};
 			break;

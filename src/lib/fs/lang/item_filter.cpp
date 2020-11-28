@@ -43,20 +43,14 @@ test_strings_condition_impl(
 	const std::string& property)
 {
 	for (const auto& str : condition.strings) {
-		/*
-		 * TODO
-		 * 1. In-game filters ignore diacritics, here 2 UTF-8 strings are compared strictly.
-		 * 2. strings_condition stores std::string, not lang::string which means there is
-		 *    no access to the string's origin here. Right now just duplicate condition's
-		 *    origin to make it compile.
-		 */
+		// In-game filters ignore diacritics, here 2 UTF-8 strings are compared strictly.
 		if (condition.exact_match_required) {
-			if (property == str)
-				return condition_match_result::success(condition.origin, condition.origin);
+			if (property == str.value)
+				return condition_match_result::success(condition.origin, str.origin);
 		}
 		else {
-			if (utility::contains(property, str))
-				return condition_match_result::success(condition.origin, condition.origin);
+			if (utility::contains(property, str.value))
+				return condition_match_result::success(condition.origin, str.origin);
 		}
 	}
 

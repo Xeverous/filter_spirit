@@ -161,8 +161,8 @@ void output_strings_condition(
 	if (cond.exact_match_required)
 		output_stream << " ==";
 
-	for (const std::string& str : cond.strings)
-		output_stream << " \"" << str << '"';
+	for (const lang::string& str : cond.strings)
+		output_stream << " \"" << str.value << '"';
 
 	output_stream << '\n';
 }

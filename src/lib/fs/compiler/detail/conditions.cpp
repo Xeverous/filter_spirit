@@ -130,7 +130,7 @@ add_numeric_comparison_condition(
 
 [[nodiscard]] outcome<>
 add_string_array_condition_impl(
-	std::vector<std::string> strings,
+	std::vector<lang::string> strings,
 	bool is_exact_match,
 	lang::position_tag condition_origin,
 	std::optional<lang::strings_condition>& target)
@@ -145,7 +145,7 @@ add_string_array_condition_impl(
 [[nodiscard]] outcome<>
 add_string_array_condition(
 	lang::string_array_condition_property property,
-	std::vector<std::string> strings,
+	std::vector<lang::string> strings,
 	bool exact_match,
 	lang::position_tag condition_origin,
 	lang::condition_set& set)
@@ -421,9 +421,10 @@ spirit_filter_add_string_array_condition(
 	const lang::symbol_table& symbols,
 	lang::condition_set& set)
 {
+	using vec_t = std::vector<lang::string>;
 	return detail::evaluate_sequence(st, condition.seq, symbols)
-		.map_result<std::vector<std::string>>([&](lang::object obj) -> outcome<std::vector<std::string>> {
-			std::vector<std::string> strings;
+		.map_result<vec_t>([&](lang::object obj) -> outcome<vec_t> {
+			vec_t strings;
 			log_container logs;
 
 			for (auto& sobj : obj.values) {
@@ -431,7 +432,7 @@ spirit_filter_add_string_array_condition(
 					continue;
 
 				detail::get_as<lang::string>(sobj)
-					.map_result([&](lang::string str) { strings.push_back(std::move(str.value)); })
+					.map_result([&](lang::string str) { strings.push_back(std::move(str)); })
 					.move_logs_to(logs);
 
 				if (!should_continue(st.error_handling, logs))
@@ -440,7 +441,7 @@ spirit_filter_add_string_array_condition(
 
 			return {std::move(strings), std::move(logs)};
 		})
-		.map_result([&](std::vector<std::string> strings) {
+		.map_result([&](vec_t strings) {
 			return add_string_array_condition(
 				condition.property,
 				std::move(strings),
@@ -585,10 +586,10 @@ real_filter_add_string_array_condition(
 	const parser::ast::rf::string_array_condition& condition,
 	lang::condition_set& set)
 {
-	std::vector<std::string> strings;
+	std::vector<lang::string> strings;
 	strings.reserve(condition.string_literals.size());
 	for (const auto& str : condition.string_literals) {
-		strings.push_back(detail::evaluate(str).value);
+		strings.push_back(detail::evaluate(str));
 	}
 
 	const auto origin = parser::position_tag_of(condition);
