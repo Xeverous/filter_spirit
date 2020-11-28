@@ -108,7 +108,7 @@ evaluate_name(
 	/*
 	 * Named objects should have origin pointing to the name;
 	 * this is much better for any error messages than pointing to
-	 * the origin of the value, which could be defined may assignments upwards.
+	 * the origin of the value, which could be defined many assignments upwards.
 	 */
 	return lang::object{it->second.object_instance.values, name_origin};
 }
