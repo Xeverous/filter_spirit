@@ -239,20 +239,20 @@ class condition_match_result
 public:
 	static condition_match_result success(
 		lang::position_tag condition_origin,
-		lang::position_tag matched_value_origin)
+		lang::position_tag value_origin)
 	{
-		return condition_match_result(condition_origin, matched_value_origin);
+		return condition_match_result(true, condition_origin, value_origin);
 	}
 
 	static condition_match_result failure(
 		lang::position_tag condition_origin)
 	{
-		return condition_match_result(condition_origin, std::nullopt);
+		return condition_match_result(false, condition_origin, std::nullopt);
 	}
 
 	bool is_successful() const
 	{
-		return _matched_value_origin.has_value();
+		return _is_successful;
 	}
 
 	lang::position_tag condition_origin() const
@@ -260,22 +260,25 @@ public:
 		return _condition_origin;
 	}
 
-	std::optional<lang::position_tag> matched_value_origin() const
+	std::optional<lang::position_tag> value_origin() const
 	{
-		return _matched_value_origin;
+		return _value_origin;
 	}
 
 private:
 	condition_match_result(
+		bool is_successful,
 		lang::position_tag condition_origin,
-		std::optional<lang::position_tag> matched_value_origin)
-	: _condition_origin(condition_origin)
-	, _matched_value_origin(matched_value_origin)
+		std::optional<lang::position_tag> value_origin)
+	: _is_successful(is_successful)
+	, _condition_origin(condition_origin)
+	, _value_origin(value_origin)
 	{
 	}
 
+	bool _is_successful;
 	lang::position_tag _condition_origin;
-	std::optional<lang::position_tag> _matched_value_origin;
+	std::optional<lang::position_tag> _value_origin;
 };
 
 struct condition_set_match_result
