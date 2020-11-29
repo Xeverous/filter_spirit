@@ -100,7 +100,7 @@ void fonting::build_default_fonts()
 {
 	FS_ASSERT(_text_fonts.size() >= 2u);
 	_selected_text_font_index = 1;
-	FS_ASSERT(_text_fonts.size() >= 11u);
+	FS_ASSERT(_monospaced_fonts.size() >= 20u);
 	_selected_monospaced_font_index = 19;
 	rebuild();
 }
