@@ -118,18 +118,6 @@ void output_error_impl(
 }
 
 void output_error_impl(
-	errors::empty_socket_spec error,
-	const parser::lookup_data& lookup_data,
-	log::message_stream& stream)
-{
-	stream.print_line_number_with_description_and_underlined_code(
-		lookup_data.get_view_of_whole_content(),
-		lookup_data.position_of(error.origin),
-		log::strings::error,
-		"socket group can not be empty");
-}
-
-void output_error_impl(
 	errors::illegal_character_in_socket_spec error,
 	const parser::lookup_data& lookup_data,
 	log::message_stream& stream)

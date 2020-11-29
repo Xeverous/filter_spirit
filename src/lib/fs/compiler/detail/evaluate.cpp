@@ -172,55 +172,6 @@ make_color(
 	}
 }
 
-// TODO this does not make a full socket_spec, only the RGBWAD subset
-// either make a subtype representing number-less socket specs or refactor this function
-outcome<lang::socket_spec>
-make_socket_spec(
-	settings st,
-	const std::string& raw,
-	lang::position_tag origin)
-{
-	if (raw.empty()) {
-		// nothing more to do at this point, return failure immediately
-		return error(errors::empty_socket_spec{origin});
-	}
-
-	lang::socket_spec ss;
-	log_container logs;
-
-	for (std::size_t i = 0; i < raw.size(); ++i) {
-		namespace kw = lang::keywords::rf;
-		const auto c = raw[i];
-
-		if (c == kw::r)
-			++ss.r;
-		else if (c == kw::g)
-			++ss.g;
-		else if (c == kw::b)
-			++ss.b;
-		else if (c == kw::w)
-			++ss.w;
-		else if (c == kw::a)
-			++ss.a;
-		else if (c == kw::d)
-			++ss.d;
-		else
-			logs.emplace_back(error(errors::illegal_character_in_socket_spec{origin, static_cast<int>(i)}));
-
-		if (!should_continue(st.error_handling, logs))
-			return logs;
-	}
-
-	if (!ss.is_valid()) {
-		// return failure now, can not work go further with invalid socket spec
-		logs.emplace_back(error(errors::invalid_socket_spec{origin}));
-		return logs;
-	}
-
-	ss.origin = origin;
-	return {ss, std::move(logs)};
-}
-
 outcome<lang::builtin_alert_sound_id>
 make_builtin_alert_sound_id(
 	lang::integer sound_id)
@@ -249,36 +200,85 @@ make_builtin_alert_sound(
 	}
 }
 
-// TODO improve error handling in this function
-// refactor so that int_lit is checked once
 outcome<lang::socket_spec>
 evaluate_socket_spec_literal(
 	settings st,
 	boost::optional<ast::common::integer_literal> int_lit,
 	const parser::ast::common::identifier& iden)
 {
+	log_container logs;
+	lang::socket_spec ss;
+	ss.origin = parser::position_tag_of(iden);
+
 	if (int_lit) {
-		auto& socket_count = *int_lit;
+		const auto& socket_count = *int_lit;
 
 		if (socket_count.value < lang::limits::min_item_sockets
 			|| socket_count.value > lang::limits::max_item_sockets)
 		{
-			return error{errors::invalid_integer_value{
+			logs.emplace_back(error{errors::invalid_integer_value{
 				lang::limits::min_item_sockets,
 				lang::limits::max_item_sockets,
 				socket_count.value,
-				parser::position_tag_of(socket_count)}};
+				parser::position_tag_of(socket_count)}});
+
+			if (!should_continue(st.error_handling, logs))
+				return logs;
+		}
+
+		ss.num = socket_count.value;
+		ss.origin = lang::merge_origins(parser::position_tag_of(socket_count), ss.origin);
+	}
+
+	const std::string& raw_letters = iden.value;
+	if (raw_letters.empty()) {
+		/*
+		 * This should be considered internal error because:
+		 * 1. If integer literal is present, the sole integer should be parsed
+		 *    as integer literal instead and should not reach this evaluate function.
+		 * 2. If integer literal is not present, then both tokens are empty so
+		 *    something must have gone really bad with whitespace grammar.
+		 */
+		logs.emplace_back(error(errors::internal_compiler_error{
+			errors::internal_compiler_error_cause::evaluate_socket_spec_literal,
+			parser::position_tag_of(iden)
+		}));
+		return logs;
+	}
+
+	for (std::size_t i = 0; i < raw_letters.size(); ++i) {
+		namespace kw = lang::keywords::rf;
+		const auto c = raw_letters[i];
+
+		if (c == kw::r)
+			++ss.r;
+		else if (c == kw::g)
+			++ss.g;
+		else if (c == kw::b)
+			++ss.b;
+		else if (c == kw::w)
+			++ss.w;
+		else if (c == kw::a)
+			++ss.a;
+		else if (c == kw::d)
+			++ss.d;
+		else {
+			logs.emplace_back(error(errors::illegal_character_in_socket_spec{
+				parser::position_tag_of(iden), static_cast<int>(i)
+			}));
+
+			if (!should_continue(st.error_handling, logs))
+				return logs;
 		}
 	}
 
-	return detail::make_socket_spec(st, iden.value, parser::position_tag_of(iden))
-		.map_result<lang::socket_spec>([&](lang::socket_spec ss) {
-			// TODO adjust origin to also contain the integer literal
-			if (int_lit)
-				ss.num = (*int_lit).value;
+	if (!ss.is_valid()) {
+		// return failure now, can not go further with invalid socket spec
+		logs.emplace_back(error(errors::invalid_socket_spec{ss.origin}));
+		return logs;
+	}
 
-			return ss;
-		});
+	return {ss, std::move(logs)};
 }
 
 outcome<lang::object>

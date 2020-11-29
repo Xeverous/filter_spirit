@@ -48,11 +48,6 @@ struct type_mismatch
 	lang::position_tag expression;
 };
 
-struct empty_socket_spec
-{
-	lang::position_tag origin;
-};
-
 struct illegal_character_in_socket_spec
 {
 	lang::position_tag origin;
@@ -132,6 +127,8 @@ struct autogen_error
 };
 
 BETTER_ENUM(internal_compiler_error_cause, int,
+	evaluate_socket_spec_literal,
+
 	add_boolean_condition,
 	add_range_condition,
 	add_numeric_comparison_condition,
@@ -186,7 +183,6 @@ using error = std::variant<
 	errors::invalid_amount_of_arguments,
 	errors::invalid_integer_value,
 	errors::type_mismatch,
-	errors::empty_socket_spec,
 	errors::illegal_character_in_socket_spec,
 	errors::invalid_socket_spec,
 	errors::duplicate_influence,
