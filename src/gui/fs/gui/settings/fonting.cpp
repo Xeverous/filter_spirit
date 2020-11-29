@@ -155,7 +155,7 @@ void fonting::rebuild()
 	FS_ASSERT(_text_fonts.size() >= 2u); // loop below relies on preview font in [1]
 	for (std::size_t i = 0; i < _filter_preview_fonts.size(); ++i) {
 		_filter_preview_fonts[i] = build_font(atlas, _text_fonts[1], i + lang::limits::min_filter_font_size);
-		FS_ASSERT(_filter_preview_fonts != nullptr);
+		FS_ASSERT(_filter_preview_fonts[i] != nullptr);
 	}
 
 	_rebuild_needed = false;
