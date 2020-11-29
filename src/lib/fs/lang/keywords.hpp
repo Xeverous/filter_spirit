@@ -81,6 +81,7 @@ namespace rf
 	constexpr auto set_font_size               = "SetFontSize";
 	constexpr auto play_alert_sound            = "PlayAlertSound";
 	constexpr auto play_alert_sound_positional = "PlayAlertSoundPositional";
+	constexpr auto enable_drop_sound           = "EnableDropSound";
 	constexpr auto disable_drop_sound          = "DisableDropSound";
 	constexpr auto custom_alert_sound          = "CustomAlertSound";
 	constexpr auto minimap_icon                = "MinimapIcon";

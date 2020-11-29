@@ -541,9 +541,17 @@ namespace sf
 		sequence seq;
 	};
 
-	struct disable_drop_sound_action : x3::position_tagged
+	struct switch_drop_sound_action : x3::position_tagged
 	{
-		void get_value() const {}
+		auto& operator=(bool value)
+		{
+			enable = value;
+			return *this;
+		}
+
+		bool get_value() const { return enable; }
+
+		bool enable;
 	};
 
 	struct compound_action : x3::position_tagged
@@ -567,7 +575,7 @@ namespace sf
 			play_alert_sound_action,
 			custom_alert_sound_action,
 			set_alert_sound_action,
-			disable_drop_sound_action,
+			switch_drop_sound_action,
 			compound_action
 		>, x3::position_tagged
 	{
@@ -785,7 +793,18 @@ namespace rf
 		string_literal path;
 	};
 
-	struct disable_drop_sound_action : x3::position_tagged {};
+	struct switch_drop_sound_action : x3::position_tagged
+	{
+		auto& operator=(bool value)
+		{
+			enable = value;
+			return *this;
+		}
+
+		bool get_value() const { return enable; }
+
+		bool enable;
+	};
 
 	struct minimap_icon_action : x3::position_tagged
 	{
@@ -812,7 +831,7 @@ namespace rf
 		play_alert_sound_action,
 		play_alert_sound_positional_action,
 		custom_alert_sound_action,
-		disable_drop_sound_action,
+		switch_drop_sound_action,
 		minimap_icon_action,
 		play_effect_action
 	>, x3::position_tagged

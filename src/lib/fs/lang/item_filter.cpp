@@ -273,8 +273,8 @@ void item_style::override_with(const action_set& actions)
 	if (actions.play_alert_sound)
 		play_alert_sound = *actions.play_alert_sound;
 
-	if (actions.disable_drop_sound)
-		disable_drop_sound = *actions.disable_drop_sound;
+	if (actions.switch_drop_sound)
+		switch_drop_sound = *actions.switch_drop_sound;
 
 	if (actions.minimap_icon)
 		minimap_icon = *actions.minimap_icon;

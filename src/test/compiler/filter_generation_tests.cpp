@@ -738,6 +738,72 @@ Show
 			BOOST_TEST(compare_strings(expected_filter, actual_filter));
 		}
 
+		BOOST_AUTO_TEST_CASE(switch_drop_sound)
+		{
+			const std::string actual_filter = generate_filter(minimal_input() + R"(
+SetFontSize 30
+
+DropLevel >= 10 {
+	SetFontSize 35
+
+	ItemLevel < 70 {
+		EnableDropSound
+		Hide
+	}
+
+	Rarity >= Rare
+	ItemLevel >= 70 {
+		SetFontSize 40
+		DisableDropSound
+		Show
+	}
+
+	Sockets 6 {
+		PlayEffect Blue
+		Show
+		Continue
+	}
+
+	EnableDropSound
+	Show
+}
+
+Hide
+)");
+			const std::string_view expected_filter =
+R"(Hide
+	ItemLevel < 70
+	DropLevel >= 10
+	SetFontSize 35
+	EnableDropSound
+
+Show
+	ItemLevel >= 70
+	DropLevel >= 10
+	Rarity >= Rare
+	SetFontSize 40
+	DisableDropSound
+
+Show
+	DropLevel >= 10
+	Sockets = 6
+	SetFontSize 35
+	PlayEffect Blue
+	Continue
+
+Show
+	DropLevel >= 10
+	SetFontSize 35
+	EnableDropSound
+
+Hide
+	SetFontSize 30
+
+)";
+
+			BOOST_TEST(compare_strings(expected_filter, actual_filter));
+		}
+
 		BOOST_AUTO_TEST_CASE(simple_price_queries)
 		{
 			using lang::market::divination_card;

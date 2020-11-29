@@ -77,7 +77,7 @@ struct item_style
 	color_action background_color;
 	font_size_action font_size;
 	std::optional<alert_sound_action> play_alert_sound;
-	std::optional<disable_drop_sound_action> disable_drop_sound;
+	std::optional<switch_drop_sound_action> switch_drop_sound;
 	std::optional<minimap_icon_action> minimap_icon;
 	std::optional<play_effect_action> play_effect;
 };

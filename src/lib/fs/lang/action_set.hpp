@@ -143,19 +143,18 @@ inline bool operator!=(alert_sound_action lhs, alert_sound_action rhs)
 	return !(lhs == rhs);
 }
 
-// this action has no state - it either exists (we disabled default drop sound)
-// or does not exist (empty optional, no emmiting of this action in the filter)
-struct disable_drop_sound_action
+struct switch_drop_sound_action
 {
+	bool enable; // this is not a lang type because it is implied by keyword, not by value
 	position_tag origin;
 };
 
-inline bool operator==(disable_drop_sound_action /* lhs */, disable_drop_sound_action /* rhs */)
+inline bool operator==(switch_drop_sound_action lhs, switch_drop_sound_action rhs)
 {
-	return true;
+	return lhs.enable == rhs.enable;
 }
 
-inline bool operator!=(disable_drop_sound_action lhs, disable_drop_sound_action rhs)
+inline bool operator!=(switch_drop_sound_action lhs, switch_drop_sound_action rhs)
 {
 	return !(lhs == rhs);
 }
@@ -241,7 +240,7 @@ struct action_set
 	std::optional<color_action> set_background_color;
 	std::optional<font_size_action> set_font_size;
 	std::optional<alert_sound_action> play_alert_sound;
-	std::optional<disable_drop_sound_action> disable_drop_sound;
+	std::optional<switch_drop_sound_action> switch_drop_sound;
 	std::optional<minimap_icon_action> minimap_icon;
 	std::optional<play_effect_action> play_effect;
 };

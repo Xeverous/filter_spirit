@@ -146,7 +146,7 @@ namespace sf
 	struct play_alert_sound_action_class         : error_on_error, annotate_on_success {};
 	struct custom_alert_sound_action_class       : error_on_error, annotate_on_success {};
 	struct set_alert_sound_action_class          : error_on_error, annotate_on_success {};
-	struct disable_drop_sound_action_class       : error_on_error, annotate_on_success {};
+	struct switch_drop_sound_action_class        : error_on_error, annotate_on_success {};
 	struct compound_action_class                 : error_on_error, annotate_on_success {};
 	struct action_class                          : error_on_error, annotate_on_success {};
 
@@ -189,7 +189,7 @@ namespace rf
 	struct play_alert_sound_action_class         : error_on_error, annotate_on_success {};
 	struct play_alert_sound_positional_action_class : error_on_error, annotate_on_success {};
 	struct custom_alert_sound_action_class       : error_on_error, annotate_on_success {};
-	struct disable_drop_sound_action_class       : error_on_error, annotate_on_success {};
+	struct switch_drop_sound_action_class        : error_on_error, annotate_on_success {};
 	struct minimap_icon_action_class             : error_on_error, annotate_on_success {};
 	struct play_effect_action_class              : error_on_error, annotate_on_success {};
 
@@ -385,8 +385,8 @@ namespace sf
 	using set_alert_sound_action_type = x3::rule<set_alert_sound_action_class, ast::sf::set_alert_sound_action>;
 	BOOST_SPIRIT_DECLARE(set_alert_sound_action_type)
 
-	using disable_drop_sound_action_type = x3::rule<disable_drop_sound_action_class, ast::sf::disable_drop_sound_action>;
-	BOOST_SPIRIT_DECLARE(disable_drop_sound_action_type)
+	using switch_drop_sound_action_type = x3::rule<switch_drop_sound_action_class, ast::sf::switch_drop_sound_action>;
+	BOOST_SPIRIT_DECLARE(switch_drop_sound_action_type)
 
 	using action_type = x3::rule<action_class, ast::sf::action>;
 	BOOST_SPIRIT_DECLARE(action_type)
@@ -462,7 +462,7 @@ namespace rf
 	using play_alert_sound_action_type               = x3::rule<play_alert_sound_action_class,            ast::rf::play_alert_sound_action>;
 	using play_alert_sound_positional_action_type    = x3::rule<play_alert_sound_positional_action_class, ast::rf::play_alert_sound_positional_action>;
 	using custom_alert_sound_action_type             = x3::rule<custom_alert_sound_action_class,          ast::rf::custom_alert_sound_action>;
-	using disable_drop_sound_action_type             = x3::rule<disable_drop_sound_action_class,          ast::rf::disable_drop_sound_action>;
+	using switch_drop_sound_action_type              = x3::rule<switch_drop_sound_action_class,           ast::rf::switch_drop_sound_action>;
 	using minimap_icon_action_type                   = x3::rule<minimap_icon_action_class,                ast::rf::minimap_icon_action>;
 	using play_effect_action_type                    = x3::rule<play_effect_action_class,                 ast::rf::play_effect_action>;
 	BOOST_SPIRIT_DECLARE(
@@ -472,7 +472,7 @@ namespace rf
 		play_alert_sound_action_type,
 		play_alert_sound_positional_action_type,
 		custom_alert_sound_action_type,
-		disable_drop_sound_action_type,
+		switch_drop_sound_action_type,
 		minimap_icon_action_type,
 		play_effect_action_type
 	)

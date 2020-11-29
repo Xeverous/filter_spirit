@@ -128,14 +128,17 @@ void output_alert_sound(
 	}, as.sound);
 }
 
-void output_disabled_drop_sound(
-	std::optional<lang::disable_drop_sound_action> action,
+void output_switch_drop_sound(
+	std::optional<lang::switch_drop_sound_action> action,
 	std::ostream& output_stream)
 {
 	if (!action)
 		return;
 
-	output_stream << '\t' << kw::disable_drop_sound << '\n';
+	output_stream
+		<< '\t'
+		<< ((*action).enable ? kw::enable_drop_sound : kw::disable_drop_sound)
+		<< '\n';
 }
 
 void output_suit(lang::suit_type s, std::ostream& output_stream)
@@ -264,7 +267,7 @@ void action_set::generate(std::ostream& output_stream) const
 
 	output_font_size(set_font_size, output_stream);
 	output_alert_sound(play_alert_sound, output_stream);
-	output_disabled_drop_sound(disable_drop_sound, output_stream);
+	output_switch_drop_sound(switch_drop_sound, output_stream);
 	output_minimap_icon(minimap_icon, output_stream);
 	output_beam_effect(play_effect, output_stream);
 }
@@ -286,8 +289,8 @@ void action_set::override_with(const action_set& other)
 	if (other.play_alert_sound)
 		play_alert_sound = *other.play_alert_sound;
 
-	if (other.disable_drop_sound)
-		disable_drop_sound = *other.disable_drop_sound;
+	if (other.switch_drop_sound)
+		switch_drop_sound = *other.switch_drop_sound;
 
 	if (other.minimap_icon)
 		minimap_icon = *other.minimap_icon;
@@ -303,7 +306,7 @@ bool operator==(const action_set& lhs, const action_set& rhs)
 		&& lhs.set_background_color == rhs.set_background_color
 		&& lhs.set_font_size == rhs.set_font_size
 		&& lhs.play_alert_sound == rhs.play_alert_sound
-		&& lhs.disable_drop_sound == rhs.disable_drop_sound
+		&& lhs.switch_drop_sound == rhs.switch_drop_sound
 		&& lhs.minimap_icon == rhs.minimap_icon
 		&& lhs.play_effect == rhs.play_effect;
 }

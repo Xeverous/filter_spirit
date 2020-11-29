@@ -304,7 +304,7 @@ void debug_state::recompute()
 	color_line_by_action_origin(style.background_color,   lookup, lines, _line_colors);
 	color_line_by_action_origin(style.font_size,          lookup, lines, _line_colors);
 	color_line_by_action_origin(style.play_alert_sound,   lookup, lines, _line_colors);
-	color_line_by_action_origin(style.disable_drop_sound, lookup, lines, _line_colors);
+	color_line_by_action_origin(style.switch_drop_sound,  lookup, lines, _line_colors);
 	color_line_by_action_origin(style.minimap_icon,       lookup, lines, _line_colors);
 	color_line_by_action_origin(style.play_effect,        lookup, lines, _line_colors);
 
