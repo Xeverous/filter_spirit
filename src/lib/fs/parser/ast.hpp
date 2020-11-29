@@ -335,7 +335,7 @@ namespace sf
 	* GCC 6.4 - 9.0-: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=89381
 	* Using declarations for base_type's operator= and base_type's ctor in types
 	* inheritted from base_type which was a class template did not actually
-	* created copy/move ctor/operators - ending in very unexpected compiler errors.
+	* created copy/move ctor/operators - ending in very unexpected compiler errors
 	* that an object can not be copied/moved or copy/move assigned.
 	*
 	* Workaround: place these usings after each problematic type T definition,
