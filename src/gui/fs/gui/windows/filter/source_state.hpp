@@ -23,7 +23,7 @@ public:
 		return _file_path.has_value();
 	}
 
-	void open_text_input();
+	void open_source_edit();
 
 	void draw_interface(const fonting& f, filter_state_mediator_base& mediator);
 

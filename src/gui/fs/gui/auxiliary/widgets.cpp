@@ -1,5 +1,6 @@
 #include <fs/gui/auxiliary/widgets.hpp>
 #include <fs/gui/auxiliary/raii.hpp>
+#include <fs/utility/assert.hpp>
 
 #include <imgui.h>
 
@@ -47,6 +48,8 @@ namespace fs::gui::aux {
 
 void on_hover_text_tooltip(std::string_view text)
 {
+	FS_ASSERT(!text.empty()); // Dear ImGui does not work with empty ranges
+
 	if (ImGui::IsItemHovered())
 	{
 		scoped_tooltip _;
@@ -69,8 +72,9 @@ bool button_negative(const char* str)
 bool multiline_text_input::draw(ImVec2 size)
 {
 	return ImGui::InputTextMultiline(
-		"", _buf.data(), _buf.size(),
-		size, ImGuiInputTextFlags_CallbackResize, &input_text_callback, &_buf);
+		"", _buf.data(), _buf.size(), size,
+		ImGuiInputTextFlags_AllowTabInput | ImGuiInputTextFlags_CallbackResize,
+		&input_text_callback, &_buf);
 }
 
 void multiline_text_input::set_text(std::string_view text)

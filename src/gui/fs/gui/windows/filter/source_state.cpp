@@ -1,6 +1,7 @@
 #include <fs/gui/windows/filter/filter_state_mediator_base.hpp>
 #include <fs/gui/windows/filter/source_state.hpp>
 #include <fs/gui/settings/fonting.hpp>
+#include <fs/gui/auxiliary/widgets.hpp>
 #include <fs/utility/file.hpp>
 #include <fs/utility/assert.hpp>
 
@@ -22,8 +23,10 @@ void source_state::draw_interface(const fonting& f, filter_state_mediator_base& 
 			ImGui::SameLine();
 		}
 
-		if (ImGui::Button("From text input"))
-			open_text_input();
+		if (ImGui::Button("Edit filter source"))
+			open_source_edit();
+
+		aux::on_hover_text_tooltip("Any changes here are temporary and do not change the file.");
 
 		ImGui::SameLine();
 
@@ -70,7 +73,7 @@ void source_state::draw_interface(const fonting& f, filter_state_mediator_base& 
 	}
 }
 
-void source_state::open_text_input()
+void source_state::open_source_edit()
 {
 	_popup_pending = true;
 }
