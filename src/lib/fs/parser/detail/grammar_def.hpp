@@ -519,7 +519,7 @@ namespace rf
 	BOOST_SPIRIT_DEFINE(filter_block)
 
 	const grammar_type grammar = "code";
-	const auto grammar_def = *filter_block;
+	const auto grammar_def = *filter_block > x3::eoi;
 	BOOST_SPIRIT_DEFINE(grammar)
 } // namespace rf
 
