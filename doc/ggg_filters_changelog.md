@@ -11,6 +11,7 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 - [patch notes](https://www.pathofexile.com/forum/view-thread/2935777)
 - Added `AlternateQuality True` parameter that allows you to filter for Alternate Quality Gems.
 - Added `Replica True` parameter that allows you to filter for Replica Unique Items.
+- (edit after posting) You can now filter for specific quality types (`GemQualityType`).
 
 ### 3.11.1 (Harvest bugfixes)
 
