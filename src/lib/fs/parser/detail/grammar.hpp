@@ -274,7 +274,7 @@ namespace common
 
 	// ---- expressions ----
 
-	using literal_expression_type = x3::rule<literal_expression_class, ast::sf::literal_expression>;
+	using literal_expression_type = x3::rule<literal_expression_class, ast::common::literal_expression>;
 	BOOST_SPIRIT_DECLARE(literal_expression_type)
 
 	using comparison_operator_expression_type = x3::rule<comparison_operator_expression_class, ast::common::comparison_operator_expression>;

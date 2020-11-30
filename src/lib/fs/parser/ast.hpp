@@ -277,21 +277,7 @@ namespace sf
 
 	// ---- literal types ----
 
-	using integer_literal = common::integer_literal;
-	using floating_point_literal = common::floating_point_literal;
-	using string_literal = common::string_literal;
-	using socket_spec_literal = common::socket_spec_literal;
-	using boolean_literal = common::boolean_literal;
-	using rarity_literal = common::rarity_literal;
-	using shape_literal = common::shape_literal;
-	using suit_literal = common::suit_literal;
-	using influence_literal = common::influence_literal;
-	using shaper_voice_line_literal = common::shaper_voice_line_literal;
-	using gem_quality_type_literal = common::gem_quality_type_literal;
-	using temp_literal = common::temp_literal;
-	using none_literal = common::none_literal;
-
-	using literal_expression = common::literal_expression;
+	// (all in common)
 
 	// ---- expressions ----
 
@@ -308,7 +294,7 @@ namespace sf
 		lang::item_category category;
 	};
 
-	struct primitive_value : x3::variant<name, literal_expression>, x3::position_tagged
+	struct primitive_value : x3::variant<name, common::literal_expression>, x3::position_tagged
 	{
 		using base_type::base_type;
 		using base_type::operator=;

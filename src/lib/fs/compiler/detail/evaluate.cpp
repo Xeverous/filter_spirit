@@ -42,53 +42,53 @@ make_integer_in_range(
 [[nodiscard]] outcome<lang::single_object>
 evaluate_literal(
 	settings st,
-	const ast::sf::literal_expression& expression)
+	const ast::common::literal_expression& expression)
 {
 	using result_type = outcome<lang::single_object>;
 	using parser::position_tag_of;
 	const auto expr_origin = position_tag_of(expression);
 
 	return expression.apply_visitor(x3::make_lambda_visitor<result_type>(
-		[&](ast::sf::temp_literal literal) -> result_type {
+		[&](ast::common::temp_literal literal) -> result_type {
 			return lang::single_object{lang::temp{position_tag_of(literal)}, expr_origin};
 		},
-		[&](ast::sf::none_literal literal) -> result_type {
+		[&](ast::common::none_literal literal) -> result_type {
 			return lang::single_object{lang::none{position_tag_of(literal)}, expr_origin};
 		},
-		[&](ast::sf::socket_spec_literal literal) -> result_type {
+		[&](ast::common::socket_spec_literal literal) -> result_type {
 			return detail::evaluate_socket_spec_literal(st, literal)
 				.map_result<lang::single_object>([&](lang::socket_spec ss) {
 					return lang::single_object{ss, expr_origin};
 				});
 		},
-		[&](ast::sf::boolean_literal literal) -> result_type {
+		[&](ast::common::boolean_literal literal) -> result_type {
 			return lang::single_object{lang::boolean{literal.value, position_tag_of(literal)}, expr_origin};
 		},
-		[&](ast::sf::integer_literal literal) -> result_type {
+		[&](ast::common::integer_literal literal) -> result_type {
 			return lang::single_object{lang::integer{literal.value, position_tag_of(literal)}, expr_origin};
 		},
-		[&](ast::sf::floating_point_literal literal) -> result_type {
+		[&](ast::common::floating_point_literal literal) -> result_type {
 			return lang::single_object{lang::fractional{literal.value, position_tag_of(literal)}, expr_origin};
 		},
-		[&](ast::sf::rarity_literal literal) -> result_type {
+		[&](ast::common::rarity_literal literal) -> result_type {
 			return lang::single_object{lang::rarity{literal.value, position_tag_of(literal)}, expr_origin};
 		},
-		[&](ast::sf::shape_literal literal) -> result_type {
+		[&](ast::common::shape_literal literal) -> result_type {
 			return lang::single_object{lang::shape{literal.value, position_tag_of(literal)}, expr_origin};
 		},
-		[&](ast::sf::suit_literal literal) -> result_type {
+		[&](ast::common::suit_literal literal) -> result_type {
 			return lang::single_object{lang::suit{literal.value, position_tag_of(literal)}, expr_origin};
 		},
-		[&](ast::sf::influence_literal literal) -> result_type {
+		[&](ast::common::influence_literal literal) -> result_type {
 			return lang::single_object{lang::influence{literal.value, position_tag_of(literal)}, expr_origin};
 		},
-		[&](ast::sf::shaper_voice_line_literal literal) -> result_type {
+		[&](ast::common::shaper_voice_line_literal literal) -> result_type {
 			return lang::single_object{lang::shaper_voice_line{literal.value, position_tag_of(literal)}, expr_origin};
 		},
-		[&](ast::sf::gem_quality_type_literal literal) -> result_type {
+		[&](ast::common::gem_quality_type_literal literal) -> result_type {
 			return lang::single_object{lang::gem_quality_type{literal.value, position_tag_of(literal)}, expr_origin};
 		},
-		[&](const ast::sf::string_literal& literal) -> result_type {
+		[&](const ast::common::string_literal& literal) -> result_type {
 			return lang::single_object{lang::string{literal, position_tag_of(literal)}, expr_origin};
 		}
 	));
@@ -299,7 +299,7 @@ evaluate_sequence(
 		using result_type = outcome<lang::object>;
 
 		primitive.apply_visitor(x3::make_lambda_visitor<result_type>(
-			[&](const ast::sf::literal_expression& expr) -> result_type {
+			[&](const ast::common::literal_expression& expr) -> result_type {
 				return evaluate_literal(st, expr).map_result<lang::object>(
 					[&](lang::single_object so) {
 						return lang::object{{std::move(so)}, parser::position_tag_of(expr)};

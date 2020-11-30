@@ -9,12 +9,13 @@
 #include <string>
 
 using namespace fs;
-namespace sf = parser::ast::sf;
+namespace ast = parser::ast;
+namespace sf  = parser::ast::sf;
 
 namespace {
 
 template <typename Value>
-bool test_literal(const sf::string_literal& str_lit, const Value& value)
+bool test_literal(const ast::common::string_literal& str_lit, const Value& value)
 {
 	if (str_lit != value) {
 		BOOST_ERROR("failed comparison of " << str_lit << " and " << value);
@@ -57,12 +58,12 @@ const sf::primitive_value* get_primitive(const sf::definition& def, const char* 
 template <typename Literal, typename Value>
 bool test_literal_expression(const sf::primitive_value& prim, const Value& value)
 {
-	if (!holds_alternative<sf::literal_expression>(prim.var)) {
+	if (!holds_alternative<ast::common::literal_expression>(prim.var)) {
 		BOOST_ERROR("expected literal expression");
 		return false;
 	}
 
-	const auto& expr = boost::get<sf::literal_expression>(prim.var);
+	const auto& expr = boost::get<ast::common::literal_expression>(prim.var);
 	if (!holds_alternative<Literal>(expr.var)) {
 		BOOST_ERROR("definition is literal_expression but does not hold expected literal");
 		return false;
@@ -133,8 +134,8 @@ $n2 = 2 ## #text
 		const std::vector<sf::definition>& defs = ast.definitions;
 		BOOST_TEST_REQUIRE(static_cast<int>(defs.size()) == 2);
 
-		test_literal_definition<sf::integer_literal>(defs[0], "n1", 1);
-		test_literal_definition<sf::integer_literal>(defs[1], "n2", 2);
+		test_literal_definition<ast::common::integer_literal>(defs[0], "n1", 1);
+		test_literal_definition<ast::common::integer_literal>(defs[1], "n2", 2);
 	}
 
 	BOOST_AUTO_TEST_CASE(identifiers)
@@ -157,12 +158,12 @@ $Identifiedd = $Corruptedd
 		const std::vector<sf::definition>& defs = ast.definitions;
 		BOOST_TEST_REQUIRE(static_cast<int>(defs.size()) == 9);
 
-		test_literal_definition<sf::integer_literal>(defs[0], "n1", 1);
-		test_literal_definition<sf::integer_literal>(defs[1], "n_2", 2);
-		test_literal_definition<sf::integer_literal>(defs[2], "n__3__", 3);
-		test_literal_definition<sf::integer_literal>(defs[3], "bUt_RaIdEr_Is_fAsTeR", 4);
-		test_literal_definition<sf::integer_literal>(defs[4], "gOtTa_BuIlD_sOmE_dEfEnSe", 5);
-		test_literal_definition<sf::integer_literal>(defs[5], "GGG", 666);
+		test_literal_definition<ast::common::integer_literal>(defs[0], "n1", 1);
+		test_literal_definition<ast::common::integer_literal>(defs[1], "n_2", 2);
+		test_literal_definition<ast::common::integer_literal>(defs[2], "n__3__", 3);
+		test_literal_definition<ast::common::integer_literal>(defs[3], "bUt_RaIdEr_Is_fAsTeR", 4);
+		test_literal_definition<ast::common::integer_literal>(defs[4], "gOtTa_BuIlD_sOmE_dEfEnSe", 5);
+		test_literal_definition<ast::common::integer_literal>(defs[5], "GGG", 666);
 		test_identifier_definition(defs[6], "not_a_keyword1", "ttrue");
 		test_identifier_definition(defs[7], "not_a_keyword2", "falsee");
 		test_identifier_definition(defs[8], "Identifiedd", "Corruptedd");
@@ -178,7 +179,7 @@ $Identifiedd = $Corruptedd
 		const std::vector<sf::definition>& defs = ast.definitions;
 		BOOST_TEST_REQUIRE(static_cast<int>(defs.size()) == 1);
 
-		test_literal_definition<sf::string_literal>(defs[0], "empty_string", "");
+		test_literal_definition<ast::common::string_literal>(defs[0], "empty_string", "");
 	}
 
 	BOOST_AUTO_TEST_CASE(integer_sequence)
@@ -200,22 +201,22 @@ $Identifiedd = $Corruptedd
 		BOOST_TEST_REQUIRE(holds_alternative<sf::sequence>(defs[0].def.value.var));
 		const auto& seq0 = boost::get<sf::sequence>(defs[0].def.value.var);
 		BOOST_TEST_REQUIRE(seq0.size() == 1u);
-		test_literal_expression<sf::integer_literal>(seq0[0], 1);
+		test_literal_expression<ast::common::integer_literal>(seq0[0], 1);
 
 		BOOST_TEST_REQUIRE(holds_alternative<sf::sequence>(defs[1].def.value.var));
 		const auto& seq1 = boost::get<sf::sequence>(defs[1].def.value.var);
 		BOOST_TEST_REQUIRE(seq1.size() == 3u);
-		test_literal_expression<sf::integer_literal>(seq1[0], 0);
-		test_literal_expression<sf::integer_literal>(seq1[1], 1);
-		test_literal_expression<sf::integer_literal>(seq1[2], 2);
+		test_literal_expression<ast::common::integer_literal>(seq1[0], 0);
+		test_literal_expression<ast::common::integer_literal>(seq1[1], 1);
+		test_literal_expression<ast::common::integer_literal>(seq1[2], 2);
 
 		BOOST_TEST_REQUIRE(holds_alternative<sf::sequence>(defs[2].def.value.var));
 		const auto& seq2 = boost::get<sf::sequence>(defs[2].def.value.var);
 		BOOST_TEST_REQUIRE(seq2.size() == 4u);
-		test_literal_expression<sf::integer_literal>(seq2[0], 3);
-		test_literal_expression<sf::integer_literal>(seq2[1], 4);
-		test_literal_expression<sf::integer_literal>(seq2[2], 5);
-		test_literal_expression<sf::integer_literal>(seq2[3], 255);
+		test_literal_expression<ast::common::integer_literal>(seq2[0], 3);
+		test_literal_expression<ast::common::integer_literal>(seq2[1], 4);
+		test_literal_expression<ast::common::integer_literal>(seq2[2], 5);
+		test_literal_expression<ast::common::integer_literal>(seq2[3], 255);
 	}
 
 	BOOST_AUTO_TEST_CASE(string_sequence)
@@ -240,7 +241,7 @@ $Identifiedd = $Corruptedd
 		BOOST_TEST_REQUIRE(seq.size() == names.size()); // sanity check
 
 		for (std::size_t i = 0; i < seq.size(); ++i) {
-			if (!test_literal_expression<sf::string_literal>(seq[i], names[i])) {
+			if (!test_literal_expression<ast::common::string_literal>(seq[i], names[i])) {
 				BOOST_ERROR("failed literal expression for i = " << i);
 			}
 		}
