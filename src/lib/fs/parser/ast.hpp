@@ -702,7 +702,7 @@ namespace rf
 	{
 		bool links_matter;
 		comparison_operator_expression comparison_type;
-		std::vector<socket_spec_literal> specs;
+		literal_sequence literals;
 	};
 
 	struct boolean_condition : x3::position_tagged

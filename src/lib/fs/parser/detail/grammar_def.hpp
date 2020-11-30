@@ -431,9 +431,7 @@ namespace rf
 	const auto socket_spec_condition_def =
 		make_keyword(symbols::rf::socket_spec_condition_properties)
 		> common::comparison_operator_expression
-		// this temporary skip grammar change is necessary - otherwise line break is skipped
-		// and lines further (which will start with keywords) are parsed as socket letters
-		> x3::skip(common::non_eol_whitespace)[+common::socket_spec_literal];
+		> literal_sequence;
 	BOOST_SPIRIT_DEFINE(socket_spec_condition)
 
 	const boolean_condition_type boolean_condition = "boolean condition";

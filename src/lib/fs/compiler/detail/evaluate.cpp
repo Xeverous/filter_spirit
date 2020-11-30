@@ -39,61 +39,6 @@ make_integer_in_range(
 
 // ---- spirit filter ----
 
-[[nodiscard]] outcome<lang::single_object>
-evaluate_literal(
-	settings st,
-	const ast::common::literal_expression& expression)
-{
-	using result_type = outcome<lang::single_object>;
-	using parser::position_tag_of;
-	const auto expr_origin = position_tag_of(expression);
-
-	return expression.apply_visitor(x3::make_lambda_visitor<result_type>(
-		[&](ast::common::temp_literal literal) -> result_type {
-			return lang::single_object{lang::temp{position_tag_of(literal)}, expr_origin};
-		},
-		[&](ast::common::none_literal literal) -> result_type {
-			return lang::single_object{lang::none{position_tag_of(literal)}, expr_origin};
-		},
-		[&](ast::common::socket_spec_literal literal) -> result_type {
-			return detail::evaluate_socket_spec_literal(st, literal)
-				.map_result<lang::single_object>([&](lang::socket_spec ss) {
-					return lang::single_object{ss, expr_origin};
-				});
-		},
-		[&](ast::common::boolean_literal literal) -> result_type {
-			return lang::single_object{lang::boolean{literal.value, position_tag_of(literal)}, expr_origin};
-		},
-		[&](ast::common::integer_literal literal) -> result_type {
-			return lang::single_object{lang::integer{literal.value, position_tag_of(literal)}, expr_origin};
-		},
-		[&](ast::common::floating_point_literal literal) -> result_type {
-			return lang::single_object{lang::fractional{literal.value, position_tag_of(literal)}, expr_origin};
-		},
-		[&](ast::common::rarity_literal literal) -> result_type {
-			return lang::single_object{lang::rarity{literal.value, position_tag_of(literal)}, expr_origin};
-		},
-		[&](ast::common::shape_literal literal) -> result_type {
-			return lang::single_object{lang::shape{literal.value, position_tag_of(literal)}, expr_origin};
-		},
-		[&](ast::common::suit_literal literal) -> result_type {
-			return lang::single_object{lang::suit{literal.value, position_tag_of(literal)}, expr_origin};
-		},
-		[&](ast::common::influence_literal literal) -> result_type {
-			return lang::single_object{lang::influence{literal.value, position_tag_of(literal)}, expr_origin};
-		},
-		[&](ast::common::shaper_voice_line_literal literal) -> result_type {
-			return lang::single_object{lang::shaper_voice_line{literal.value, position_tag_of(literal)}, expr_origin};
-		},
-		[&](ast::common::gem_quality_type_literal literal) -> result_type {
-			return lang::single_object{lang::gem_quality_type{literal.value, position_tag_of(literal)}, expr_origin};
-		},
-		[&](const ast::common::string_literal& literal) -> result_type {
-			return lang::single_object{lang::string{literal, position_tag_of(literal)}, expr_origin};
-		}
-	));
-}
-
 [[nodiscard]] outcome<lang::object>
 evaluate_name(
 	const ast::sf::name& name,
@@ -201,7 +146,7 @@ make_builtin_alert_sound(
 }
 
 outcome<lang::socket_spec>
-evaluate_socket_spec_literal(
+evaluate(
 	settings st,
 	const parser::ast::common::socket_spec_literal& literal)
 {
@@ -280,6 +225,28 @@ evaluate_socket_spec_literal(
 	return {ss, std::move(logs)};
 }
 
+[[nodiscard]] outcome<lang::single_object>
+evaluate(
+	settings st,
+	const ast::common::literal_expression& expression)
+{
+	using result_type = outcome<lang::single_object>;
+	using parser::position_tag_of;
+	const auto expr_origin = position_tag_of(expression);
+
+	return expression.apply_visitor(x3::make_lambda_visitor<result_type>(
+		[&](const auto& literal) {
+			return lang::single_object{evaluate(literal), expr_origin};
+		},
+		[&](ast::common::socket_spec_literal literal) -> result_type {
+			return detail::evaluate(st, literal)
+				.map_result<lang::single_object>([&](lang::socket_spec ss) {
+					return lang::single_object{ss, expr_origin};
+				});
+		}
+	));
+}
+
 outcome<lang::object>
 evaluate_sequence(
 	settings st,
@@ -300,7 +267,7 @@ evaluate_sequence(
 
 		primitive.apply_visitor(x3::make_lambda_visitor<result_type>(
 			[&](const ast::common::literal_expression& expr) -> result_type {
-				return evaluate_literal(st, expr).map_result<lang::object>(
+				return evaluate(st, expr).map_result<lang::object>(
 					[&](lang::single_object so) {
 						return lang::object{{std::move(so)}, parser::position_tag_of(expr)};
 					}
@@ -318,6 +285,50 @@ evaluate_sequence(
 			 * parent one will be more appropriate for any diagnostic messages.
 			 */
 			std::move(obj.values.begin(), obj.values.end(), std::back_inserter(seq_values));
+		})
+		.move_logs_to(log);
+
+		if (!should_continue(st.error_handling, log))
+			return log;
+	}
+
+	const auto sequence_origin = parser::position_tag_of(sequence);
+	const auto num_elements = static_cast<int>(seq_values.size());
+
+	if (num_elements < min_allowed_elements
+		|| (max_allowed_elements && num_elements > *max_allowed_elements))
+	{
+		// It is possible to return object + log here, but there are functions
+		// that expect the result of this function to match required min/max
+		// elements. Therefore, only log is returned.
+		log.emplace_back(error(errors::invalid_amount_of_arguments{
+			min_allowed_elements, max_allowed_elements, num_elements, sequence_origin}));
+		return log;
+	}
+
+	return {lang::object{std::move(seq_values), sequence_origin}, std::move(log)};
+}
+
+outcome<lang::object>
+evaluate_literal_sequence(
+	settings st,
+	const parser::ast::rf::literal_sequence& sequence,
+	int min_allowed_elements,
+	std::optional<int> max_allowed_elements)
+{
+	FS_ASSERT(!sequence.empty());
+
+	lang::object::container_type seq_values;
+	seq_values.reserve(sequence.size());
+
+	log_container log;
+
+	for (const ast::common::literal_expression& literal_expr : sequence) {
+		evaluate(st, literal_expr)
+		// lang::single_object is not ideal here, because it supports more than literals
+		// but other code in real filter's compiler logic will simply error on non-literals
+		.map_result([&](lang::single_object obj) {
+			seq_values.push_back(std::move(obj));
 		})
 		.move_logs_to(log);
 

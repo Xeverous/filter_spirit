@@ -139,7 +139,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::rf::socket_spec_condition,
-	links_matter, comparison_type, specs)
+	links_matter, comparison_type, literals)
 
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::rf::boolean_condition,

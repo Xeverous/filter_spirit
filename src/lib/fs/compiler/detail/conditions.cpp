@@ -655,9 +655,10 @@ real_filter_add_socket_spec_condition(
 	lang::socket_spec_condition::container_type specs;
 	log_container logs;
 
-	for (ast::rf::socket_spec_literal lit : condition.specs) {
-		detail::evaluate_socket_spec_literal(st, lit)
-			.map_result([&](lang::socket_spec ss) { specs.push_back(ss); })
+	for (ast::common::literal_expression lit_expr : condition.literals) {
+		detail::evaluate(st, lit_expr)
+			.map_result<lang::socket_spec>([&](lang::single_object so) { return detail::get_as_socket_spec(so); })
+			.map_result<>([&](lang::socket_spec ss) { specs.push_back(ss); })
 			.move_logs_to(logs);
 
 		if (!should_continue(st.error_handling, logs))

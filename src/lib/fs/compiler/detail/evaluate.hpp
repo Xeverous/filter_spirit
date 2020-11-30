@@ -56,10 +56,103 @@ make_builtin_alert_sound(
 	lang::builtin_alert_sound_id sound_id,
 	std::optional<lang::integer> volume = std::nullopt);
 
+[[nodiscard]] inline lang::string
+evaluate(const parser::ast::common::string_literal& sl)
+{
+	return {static_cast<std::string>(sl), parser::position_tag_of(sl)};
+}
+
+[[nodiscard]] inline lang::boolean
+evaluate(parser::ast::common::boolean_literal bl)
+{
+	return {bl.value, parser::position_tag_of(bl)};
+}
+
+[[nodiscard]] inline lang::integer
+evaluate(parser::ast::common::integer_literal il)
+{
+	return {il.value, parser::position_tag_of(il)};
+}
+
+[[nodiscard]] inline lang::fractional
+evaluate(parser::ast::common::floating_point_literal fpl)
+{
+	return {fpl.value, parser::position_tag_of(fpl)};
+}
+
+[[nodiscard]] inline lang::rarity
+evaluate(parser::ast::common::rarity_literal rl)
+{
+	return {rl.value, parser::position_tag_of(rl)};
+}
+
+[[nodiscard]] inline lang::suit
+evaluate(parser::ast::common::suit_literal sl)
+{
+	return {sl.value, parser::position_tag_of(sl)};
+}
+
+[[nodiscard]] inline lang::shape
+evaluate(parser::ast::common::shape_literal sl)
+{
+	return {sl.value, parser::position_tag_of(sl)};
+}
+
+[[nodiscard]] inline lang::shaper_voice_line
+evaluate(parser::ast::common::shaper_voice_line_literal svll)
+{
+	return {svll.value, parser::position_tag_of(svll)};
+}
+
+[[nodiscard]] inline lang::gem_quality_type
+evaluate(parser::ast::common::gem_quality_type_literal gqtl)
+{
+	return {gqtl.value, parser::position_tag_of(gqtl)};
+}
+
+[[nodiscard]] inline lang::influence
+evaluate(parser::ast::common::influence_literal il)
+{
+	return {il.value, parser::position_tag_of(il)};
+}
+
+[[nodiscard]] inline lang::temp
+evaluate(parser::ast::common::temp_literal tl)
+{
+	return {parser::position_tag_of(tl)};
+}
+
+[[nodiscard]] inline lang::none
+evaluate(parser::ast::common::none_literal nl)
+{
+	return {parser::position_tag_of(nl)};
+}
+
 [[nodiscard]] outcome<lang::socket_spec>
-evaluate_socket_spec_literal(
+evaluate(
 	settings st,
 	const parser::ast::common::socket_spec_literal& literal);
+
+[[nodiscard]] outcome<lang::single_object>
+evaluate(
+	settings st,
+	const parser::ast::common::literal_expression& expression);
+
+[[nodiscard]] inline outcome<lang::color>
+evaluate(settings st, parser::ast::rf::color_literal cl)
+{
+	std::optional<lang::integer> a;
+	if (cl.a)
+		a = evaluate(*cl.a);
+
+	return make_color(st, evaluate(cl.r), evaluate(cl.g), evaluate(cl.b), a);
+}
+
+[[nodiscard]] inline outcome<lang::minimap_icon>
+evaluate(parser::ast::rf::icon_literal il)
+{
+	return make_minimap_icon(evaluate(il.size), evaluate(il.suit), evaluate(il.shape));
+}
 
 [[nodiscard]] outcome<lang::object>
 evaluate_sequence(
@@ -70,82 +163,17 @@ evaluate_sequence(
 	std::optional<int> max_allowed_elements = std::nullopt);
 
 [[nodiscard]] outcome<lang::object>
+evaluate_literal_sequence(
+	settings st,
+	const parser::ast::rf::literal_sequence& sequence,
+	int min_allowed_elements = 1,
+	std::optional<int> max_allowed_elements = std::nullopt);
+
+[[nodiscard]] outcome<lang::object>
 evaluate_value_expression(
 	settings st,
 	const parser::ast::sf::value_expression& value_expression,
 	const lang::symbol_table& symbols);
-
-[[nodiscard]] inline lang::string
-evaluate(parser::ast::rf::string_literal sl)
-{
-	return {static_cast<std::string>(sl), parser::position_tag_of(sl)};
-}
-
-[[nodiscard]] inline lang::boolean
-evaluate(parser::ast::rf::boolean_literal bl)
-{
-	return {bl.value, parser::position_tag_of(bl)};
-}
-
-[[nodiscard]] inline lang::integer
-evaluate(parser::ast::rf::integer_literal il)
-{
-	return {il.value, parser::position_tag_of(il)};
-}
-
-[[nodiscard]] inline outcome<lang::color>
-evaluate(
-	settings st,
-	parser::ast::rf::color_literal cl)
-{
-	std::optional<lang::integer> a;
-	if (cl.a)
-		a = evaluate(*cl.a);
-
-	return make_color(st, evaluate(cl.r), evaluate(cl.g), evaluate(cl.b), a);
-}
-
-[[nodiscard]] inline lang::rarity
-evaluate(parser::ast::rf::rarity_literal rl)
-{
-	return {rl.value, parser::position_tag_of(rl)};
-}
-
-[[nodiscard]] inline lang::suit
-evaluate(parser::ast::rf::suit_literal sl)
-{
-	return {sl.value, parser::position_tag_of(sl)};
-}
-
-[[nodiscard]] inline lang::shape
-evaluate(parser::ast::rf::shape_literal sl)
-{
-	return {sl.value, parser::position_tag_of(sl)};
-}
-
-[[nodiscard]] inline lang::shaper_voice_line
-evaluate(parser::ast::rf::shaper_voice_line_literal svll)
-{
-	return {svll.value, parser::position_tag_of(svll)};
-}
-
-[[nodiscard]] inline lang::gem_quality_type
-evaluate(parser::ast::rf::gem_quality_type_literal gqtl)
-{
-	return {gqtl.value, parser::position_tag_of(gqtl)};
-}
-
-[[nodiscard]] inline lang::influence
-evaluate(parser::ast::rf::influence_literal il)
-{
-	return {il.value, parser::position_tag_of(il)};
-}
-
-[[nodiscard]] inline outcome<lang::minimap_icon>
-evaluate(parser::ast::rf::icon_literal il)
-{
-	return make_minimap_icon(evaluate(il.size), evaluate(il.suit), evaluate(il.shape));
-}
 
 template <typename T>
 [[nodiscard]] outcome<T>
