@@ -183,6 +183,26 @@ namespace common
 		void get_value() const {}
 	};
 
+	struct literal_expression : x3::variant<
+		boolean_literal,
+		rarity_literal,
+		shape_literal,
+		suit_literal,
+		influence_literal,
+		shaper_voice_line_literal,
+		gem_quality_type_literal,
+		temp_literal,
+		none_literal,
+		socket_spec_literal,
+		floating_point_literal,
+		integer_literal,
+		string_literal
+	>, x3::position_tagged
+	{
+		using base_type::base_type;
+		using base_type::operator=;
+	};
+
 	// < or > or <= or >= or = or nothing (defaults to =)
 	struct comparison_operator_expression : x3::position_tagged
 	{
@@ -271,27 +291,9 @@ namespace sf
 	using temp_literal = common::temp_literal;
 	using none_literal = common::none_literal;
 
-	// ---- expressions ----
+	using literal_expression = common::literal_expression;
 
-	struct literal_expression : x3::variant<
-			boolean_literal,
-			rarity_literal,
-			shape_literal,
-			suit_literal,
-			influence_literal,
-			shaper_voice_line_literal,
-			gem_quality_type_literal,
-			temp_literal,
-			none_literal,
-			socket_spec_literal,
-			floating_point_literal,
-			integer_literal,
-			string_literal
-		>, x3::position_tagged
-	{
-		using base_type::base_type;
-		using base_type::operator=;
-	};
+	// ---- expressions ----
 
 	struct item_category_expression : x3::position_tagged
 	{

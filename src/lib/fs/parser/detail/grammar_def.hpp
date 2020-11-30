@@ -120,7 +120,33 @@ namespace common
 	const auto none_literal_def = make_keyword(lang::keywords::rf::none) > x3::attr(ast::common::none_literal{});
 	BOOST_SPIRIT_DEFINE(none_literal)
 
-	// ---- rules ----
+	// ---- expressions ----
+
+	const literal_expression_type literal_expression = "literal";
+	const auto literal_expression_def =
+	// 1. Order here is crucial in context-sensitive grammars
+	// 2. Order should match types in literal_expression_type::attribute_type
+		// Keyword literals first. They are the most unique (only 1 allowed pattern of characters)
+		  common::boolean_literal
+		| common::rarity_literal
+		| common::shape_literal
+		| common::suit_literal
+		| common::influence_literal
+		| common::shaper_voice_line_literal
+		| common::gem_quality_type_literal
+		| common::temp_literal
+		| common::none_literal
+		// 1. Must be attempted before integer literal, otherwise integer literal for eg "5GGG" would
+		// leave letters which immediately follow (no whitespace) that would trigger parse error
+		// 2. Must be attempted after all keyword literals, otherwise they will be incorrectly
+		// attempted as a socket spec and error as they do not consist only of R/G/B/W/A/D letters
+		| common::socket_spec_literal
+		// Must be attempted before integer literal. Otherwise integer literal will just consume
+		// the number and do not check if there is any . character following it.
+		| common::floating_point_literal
+		| common::integer_literal
+		| common::string_literal;
+	BOOST_SPIRIT_DEFINE(literal_expression)
 
 	const comparison_operator_expression_type comparison_operator_expression = "comparison operator";
 	const auto comparison_operator_expression_def = symbols::rf::comparison_operators | x3::attr(lang::comparison_type::equal_soft);
@@ -129,6 +155,8 @@ namespace common
 	const exact_matching_policy_expression_type exact_matching_policy_expression = "exact matching policy expression";
 	const auto exact_matching_policy_expression_def = ("==" > x3::attr(true)) | ("=" > x3::attr(false)) | x3::attr(false);
 	BOOST_SPIRIT_DEFINE(exact_matching_policy_expression)
+
+	// ---- statements ----
 
 	const visibility_statement_type visibility_statement = "visibility statement";
 	const auto visibility_statement_def = make_keyword(symbols::rf::visibility_literals);
@@ -162,38 +190,12 @@ namespace sf
 	const auto compound_action_expression_def = '{' >> *action > '}';
 	BOOST_SPIRIT_DEFINE(compound_action_expression)
 
-	const literal_expression_type literal_expression = "literal";
-	const auto literal_expression_def =
-	// 1. Order here is crucial in context-sensitive grammars
-	// 2. Order should match types in literal_expression_type::attribute_type
-		// Keyword literals first. They are the most unique (only 1 allowed pattern of characters)
-		  common::boolean_literal
-		| common::rarity_literal
-		| common::shape_literal
-		| common::suit_literal
-		| common::influence_literal
-		| common::shaper_voice_line_literal
-		| common::gem_quality_type_literal
-		| common::temp_literal
-		| common::none_literal
-		// 1. Must be attempted before integer literal, otherwise integer literal for eg "5GGG" would
-		// leave letters which immediately follow (no whitespace) that would trigger parse error
-		// 2. Must be attempted after all keyword literals, otherwise they will be incorrectly
-		// attempted as a socket spec and error as they do not consist only of R/G/B/W/A/D letters
-		| common::socket_spec_literal
-		// Must be attempted before integer literal. Otherwise integer literal will just consume
-		// the number and do not check if there is any . character following it.
-		| common::floating_point_literal
-		| common::integer_literal
-		| common::string_literal;
-	BOOST_SPIRIT_DEFINE(literal_expression)
-
 	const item_category_expression_type item_category_expression = "item category expression";
 	const auto item_category_expression_def = make_keyword(symbols::sf::item_categories);
 	BOOST_SPIRIT_DEFINE(item_category_expression)
 
 	const primitive_value_type primitive_value = "primitive";
-	const auto primitive_value_def = name | literal_expression;
+	const auto primitive_value_def = name | common::literal_expression;
 	BOOST_SPIRIT_DEFINE(primitive_value)
 
 	const sequence_type sequence = "sequence";

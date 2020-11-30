@@ -90,6 +90,7 @@ namespace common
 	struct temp_literal_class                    : error_on_error, annotate_on_success {};
 	struct none_literal_class                    : error_on_error, annotate_on_success {};
 
+	struct literal_expression_class              : error_on_error, annotate_on_success {};
 	struct comparison_operator_expression_class  : error_on_error, annotate_on_success {};
 	struct exact_matching_policy_expression_class: error_on_error, annotate_on_success {};
 
@@ -114,7 +115,6 @@ namespace sf
 	// ---- expressions ----
 
 	struct compound_action_expression_class      : error_on_error, annotate_on_success {};
-	struct literal_expression_class              : error_on_error, annotate_on_success {};
 	struct item_category_expression_class        : error_on_error, annotate_on_success {};
 	struct primitive_value_class                 : error_on_error, annotate_on_success {};
 	struct sequence_class                        : error_on_error, annotate_on_success {};
@@ -272,7 +272,10 @@ namespace common
 	using none_literal_type = x3::rule<none_literal_class, ast::common::none_literal>;
 	BOOST_SPIRIT_DECLARE(none_literal_type)
 
-	// ---- rules ----
+	// ---- expressions ----
+
+	using literal_expression_type = x3::rule<literal_expression_class, ast::sf::literal_expression>;
+	BOOST_SPIRIT_DECLARE(literal_expression_type)
 
 	using comparison_operator_expression_type = x3::rule<comparison_operator_expression_class, ast::common::comparison_operator_expression>;
 	BOOST_SPIRIT_DECLARE(comparison_operator_expression_type)
@@ -308,9 +311,6 @@ namespace sf
 
 	using compound_action_expression_type = x3::rule<compound_action_expression_class, ast::sf::compound_action_expression>;
 	BOOST_SPIRIT_DECLARE(compound_action_expression_type)
-
-	using literal_expression_type = x3::rule<literal_expression_class, ast::sf::literal_expression>;
-	BOOST_SPIRIT_DECLARE(literal_expression_type)
 
 	using item_category_expression_type = x3::rule<item_category_expression_class, ast::sf::item_category_expression>;
 	BOOST_SPIRIT_DECLARE(item_category_expression_type)
