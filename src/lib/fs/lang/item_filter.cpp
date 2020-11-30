@@ -346,10 +346,13 @@ item_filtering_result pass_item_through_filter(const item& itm, const item_filte
 			style.override_with(block.actions);
 			style.visibility = block.visibility;
 
-			if (block.continuation.continue_)
+			if (block.continuation.continue_) {
+				FS_ASSERT(lang::is_valid(block.continuation.origin));
 				block_result.continue_origin = block.continuation.origin;
-			else
+			}
+			else {
 				stop_filtering = true;
+			}
 		}
 
 		match_history.push_back(std::move(block_result));
