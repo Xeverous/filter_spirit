@@ -654,6 +654,8 @@ namespace rf
 		using base_type::operator=;
 	};
 
+	struct literal_sequence : std::vector<common::literal_expression>, x3::position_tagged {};
+
 	using comparison_operator_expression = common::comparison_operator_expression;
 	using exact_matching_policy = common::exact_matching_policy;
 

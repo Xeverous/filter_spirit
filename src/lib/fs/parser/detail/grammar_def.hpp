@@ -396,6 +396,12 @@ namespace rf
 	const auto influence_spec_def = common::none_literal | influence_literal_array;
 	BOOST_SPIRIT_DEFINE(influence_spec)
 
+	// ---- expressions ----
+
+	const literal_sequence_type literal_sequence = "literal sequence";
+	const auto literal_sequence_def = x3::skip(common::non_eol_whitespace)[+common::literal_expression];
+	BOOST_SPIRIT_DEFINE(literal_sequence)
+
 	// ---- conditions ----
 
 	const rarity_condition_type rarity_condition = "rarity condition";

@@ -171,6 +171,10 @@ namespace rf
 	struct influence_literal_array_class         : error_on_error, annotate_on_success {};
 	struct influence_spec_class                  : error_on_error, annotate_on_success {};
 
+	// ---- expression ----
+
+	struct literal_sequence_class                : error_on_error, annotate_on_success {};
+
 	// ---- conditions ----
 
 	struct rarity_condition_class                : error_on_error, annotate_on_success {};
@@ -433,6 +437,10 @@ namespace rf
 
 	using influence_spec_type = x3::rule<influence_spec_class, ast::rf::influence_spec>;
 	BOOST_SPIRIT_DECLARE(influence_spec_type)
+
+	// ---- expressions ----
+
+	using literal_sequence_type               = x3::rule<literal_sequence_class,            ast::rf::literal_sequence>;
 
 	// ---- conditions ----
 
