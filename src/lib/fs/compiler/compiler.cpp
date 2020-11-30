@@ -259,6 +259,15 @@ verify_autogen(
 	return result;
 }
 
+[[nodiscard]] lang::item_visibility
+evaluate(parser::ast::common::visibility_statement visibility)
+{
+	return lang::item_visibility{
+		visibility.show,
+		parser::position_tag_of(visibility)
+	};
+}
+
 [[nodiscard]] outcome<lang::spirit_item_filter_block>
 make_spirit_filter_block(
 	settings /* st */,
@@ -331,7 +340,7 @@ compile_statements_recursively(
 			[&](const ast::sf::behavior_statement& bs) {
 				return make_spirit_filter_block(
 					st,
-					lang::item_visibility{bs.visibility.show, parser::position_tag_of(bs.visibility)},
+					evaluate(bs.visibility),
 					parent_conditions,
 					parent_actions,
 					to_block_continuation(bs.continue_))
@@ -443,12 +452,7 @@ compile_real_filter(
 					return logs;
 			}
 
-			// inline implementation of evaluate_visibility_statement (never fails)
-			filter_block.visibility = lang::item_visibility{
-				block.visibility.show,
-				parser::position_tag_of(block.visibility)
-			};
-
+			filter_block.visibility = evaluate(block.visibility);
 			return {std::move(filter_block), std::move(logs)};
 		}()
 		.map_result([&](lang::item_filter_block filter_block) {
