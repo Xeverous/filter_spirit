@@ -13,18 +13,39 @@ namespace fs::lang
 
 struct item_visibility
 {
+	item_visibility(bool show, position_tag origin)
+	: show(show), origin(origin)
+	{
+	}
+
 	bool show;
 	position_tag origin;
 };
 
 struct block_continuation
 {
-	bool continue_;
-	position_tag origin;
+	std::optional<position_tag> origin;
 };
 
 struct item_filter_block
 {
+	item_filter_block(item_visibility visibility)
+	: visibility(visibility)
+	{
+	}
+
+	item_filter_block(
+		item_visibility visibility,
+		condition_set conditions,
+		action_set actions,
+		block_continuation continuation)
+	: visibility(visibility)
+	, conditions(conditions)
+	, actions(actions)
+	, continuation(continuation)
+	{
+	}
+
 	void generate(std::ostream& output_stream) const;
 
 	item_visibility visibility;

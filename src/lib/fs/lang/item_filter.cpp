@@ -239,7 +239,7 @@ void item_filter_block::generate(std::ostream& output_stream) const
 	conditions.generate(output_stream);
 	actions.generate(output_stream);
 
-	if (continuation.continue_)
+	if (continuation.origin)
 		output_stream << '\t' << keywords::rf::continue_ << '\n';
 
 	output_stream << '\n';
@@ -346,9 +346,9 @@ item_filtering_result pass_item_through_filter(const item& itm, const item_filte
 			style.override_with(block.actions);
 			style.visibility = block.visibility;
 
-			if (block.continuation.continue_) {
-				FS_ASSERT(lang::is_valid(block.continuation.origin));
-				block_result.continue_origin = block.continuation.origin;
+			if (block.continuation.origin) {
+				FS_ASSERT(lang::is_valid(*block.continuation.origin));
+				block_result.continue_origin = *block.continuation.origin;
 			}
 			else {
 				stop_filtering = true;

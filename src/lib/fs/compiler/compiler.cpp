@@ -291,23 +291,23 @@ make_spirit_filter_block(
 		return verify_autogen(*conditions.autogen, conditions.conditions, visibility.origin)
 			.map_result<lang::spirit_item_filter_block>([&]() {
 				return lang::spirit_item_filter_block{
-					lang::item_filter_block{
+					lang::item_filter_block(
 						visibility,
 						std::move(conditions.conditions),
 						std::move(actions),
 						continuation
-					},
+					),
 					lang::autogen_extension{conditions.price, *conditions.autogen}};
 			});
 	}
 
 	return lang::spirit_item_filter_block{
-		lang::item_filter_block{
+		lang::item_filter_block(
 			visibility,
 			std::move(conditions.conditions),
 			std::move(actions),
 			continuation
-		},
+		),
 		std::nullopt};
 }
 
@@ -315,10 +315,10 @@ lang::block_continuation
 to_block_continuation(
 	boost::optional<ast::common::continue_statement> statement)
 {
-	if (!statement)
-		return lang::block_continuation{false, lang::position_tag{}};
-
-	return lang::block_continuation{true, parser::position_tag_of(*statement)};
+	if (statement)
+		return lang::block_continuation{parser::position_tag_of(*statement)};
+	else
+		return lang::block_continuation{std::nullopt};
 }
 
 outcome<>
@@ -432,7 +432,7 @@ compile_real_filter(
 
 	for (const auto& block : ast) {
 		[&]() -> outcome<lang::item_filter_block> {
-			lang::item_filter_block filter_block;
+			lang::item_filter_block filter_block(evaluate(block.visibility));
 			log_container logs;
 
 			for (const auto& rule : block.rules) {
@@ -452,7 +452,6 @@ compile_real_filter(
 					return logs;
 			}
 
-			filter_block.visibility = evaluate(block.visibility);
 			return {std::move(filter_block), std::move(logs)};
 		}()
 		.map_result([&](lang::item_filter_block filter_block) {
