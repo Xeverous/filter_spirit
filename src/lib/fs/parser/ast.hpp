@@ -71,12 +71,29 @@ namespace common
 
 		int get_value() const { return value; }
 
-		// add an initializer here because this type
-		// is exposed using x3::attr in the grammar
-		int value = 0;
+		int value;
+	};
+
+	struct floating_point_literal : x3::position_tagged
+	{
+		floating_point_literal& operator=(double n)
+		{
+			value = n;
+			return *this;
+		}
+
+		double get_value() const { return value; }
+
+		double value;
 	};
 
 	struct string_literal : std::string, x3::position_tagged {};
+
+	struct socket_spec_literal : x3::position_tagged
+	{
+		boost::optional<integer_literal> socket_count;
+		identifier socket_colors;
+	};
 
 	struct rarity_literal : x3::position_tagged
 	{
@@ -233,7 +250,7 @@ namespace sf
 			return *this;
 		}
 
-		const auto& get_value () const { return value; }
+		const auto& get_value() const { return value; }
 
 		identifier value;
 	};
@@ -241,21 +258,9 @@ namespace sf
 	// ---- literal types ----
 
 	using integer_literal = common::integer_literal;
-
-	struct floating_point_literal : x3::position_tagged
-	{
-		floating_point_literal& operator=(double n)
-		{
-			value = n;
-			return *this;
-		}
-
-		double get_value() const { return value; }
-
-		double value;
-	};
-
+	using floating_point_literal = common::floating_point_literal;
 	using string_literal = common::string_literal;
+	using socket_spec_literal = common::socket_spec_literal;
 	using boolean_literal = common::boolean_literal;
 	using rarity_literal = common::rarity_literal;
 	using shape_literal = common::shape_literal;
@@ -265,12 +270,6 @@ namespace sf
 	using gem_quality_type_literal = common::gem_quality_type_literal;
 	using temp_literal = common::temp_literal;
 	using none_literal = common::none_literal;
-
-	struct socket_spec_literal : x3::position_tagged
-	{
-		boost::optional<integer_literal> socket_count;
-		identifier socket_colors;
-	};
 
 	// ---- expressions ----
 
@@ -629,6 +628,8 @@ namespace rf
 
 	using boolean_literal = common::boolean_literal;
 	using integer_literal = common::integer_literal;
+	using floating_point_literal = common::floating_point_literal;
+	using socket_spec_literal = common::socket_spec_literal;
 	using suit_literal = common::suit_literal;
 	using shape_literal = common::shape_literal;
 	using rarity_literal = common::rarity_literal;
@@ -637,12 +638,6 @@ namespace rf
 	using shaper_voice_line_literal = common::shaper_voice_line_literal;
 	using gem_quality_type_literal = common::gem_quality_type_literal;
 	using none_literal = common::none_literal;
-
-	struct socket_spec_literal : x3::position_tagged
-	{
-		integer_literal socket_count;
-		identifier socket_colors;
-	};
 
 	struct color_literal : x3::position_tagged
 	{

@@ -77,7 +77,9 @@ namespace common
 {
 	struct identifier_class                      : error_on_error, annotate_on_success {};
 	struct integer_literal_class                 : error_on_error, annotate_on_success {};
+	struct floating_point_literal_class          : error_on_error, annotate_on_success {};
 	struct string_literal_class                  : error_on_error, annotate_on_success {};
+	struct socket_spec_literal_class             : error_on_error, annotate_on_success {};
 	struct boolean_literal_class                 : error_on_error, annotate_on_success {};
 	struct rarity_literal_class                  : error_on_error, annotate_on_success {};
 	struct shape_literal_class                   : error_on_error, annotate_on_success {};
@@ -107,8 +109,7 @@ namespace sf
 
 	// ---- literal types ----
 
-	struct floating_point_literal_class          : error_on_error, annotate_on_success {};
-	struct socket_spec_literal_class             : error_on_error, annotate_on_success {};
+	// (all in common)
 
 	// ---- expressions ----
 
@@ -169,7 +170,6 @@ namespace rf
 	struct string_literal_array_class            : error_on_error, annotate_on_success {};
 	struct influence_literal_array_class         : error_on_error, annotate_on_success {};
 	struct influence_spec_class                  : error_on_error, annotate_on_success {};
-	struct socket_spec_literal_class             : error_on_error, annotate_on_success {};
 
 	// ---- conditions ----
 
@@ -233,11 +233,17 @@ namespace common
 
 	// ---- literal types ----
 
+	using floating_point_literal_type = x3::rule<floating_point_literal_class, ast::common::floating_point_literal>;
+	BOOST_SPIRIT_DECLARE(floating_point_literal_type)
+
 	using integer_literal_type = x3::rule<integer_literal_class, ast::common::integer_literal>;
 	BOOST_SPIRIT_DECLARE(integer_literal_type)
 
 	using string_literal_type = x3::rule<string_literal_class, ast::common::string_literal>;
 	BOOST_SPIRIT_DECLARE(string_literal_type)
+
+	using socket_spec_literal_type = x3::rule<socket_spec_literal_class, ast::common::socket_spec_literal>;
+	BOOST_SPIRIT_DECLARE(socket_spec_literal_type)
 
 	using boolean_literal_type = x3::rule<boolean_literal_class, ast::common::boolean_literal>;
 	BOOST_SPIRIT_DECLARE(boolean_literal_type)
@@ -296,11 +302,7 @@ namespace sf
 
 	// ---- literal types ----
 
-	using floating_point_literal_type = x3::rule<floating_point_literal_class, ast::sf::floating_point_literal>;
-	BOOST_SPIRIT_DECLARE(floating_point_literal_type)
-
-	using socket_spec_literal_type = x3::rule<socket_spec_literal_class, ast::sf::socket_spec_literal>;
-	BOOST_SPIRIT_DECLARE(socket_spec_literal_type)
+	// (all in common)
 
 	// ---- expressions ----
 
@@ -431,9 +433,6 @@ namespace rf
 
 	using influence_spec_type = x3::rule<influence_spec_class, ast::rf::influence_spec>;
 	BOOST_SPIRIT_DECLARE(influence_spec_type)
-
-	using socket_spec_literal_type = x3::rule<socket_spec_literal_class, ast::rf::socket_spec_literal>;
-	BOOST_SPIRIT_DECLARE(socket_spec_literal_type)
 
 	// ---- conditions ----
 

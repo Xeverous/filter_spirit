@@ -656,7 +656,7 @@ real_filter_add_socket_spec_condition(
 	log_container logs;
 
 	for (ast::rf::socket_spec_literal lit : condition.specs) {
-		detail::evaluate_socket_spec_literal(st, lit.socket_count, lit.socket_colors)
+		detail::evaluate_socket_spec_literal(st, lit)
 			.map_result([&](lang::socket_spec ss) { specs.push_back(ss); })
 			.move_logs_to(logs);
 

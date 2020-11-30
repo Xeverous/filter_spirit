@@ -63,6 +63,15 @@ namespace common
 
 	// ---- literal types ----
 
+	/*
+	 * Enable strict parsing policy for floating-point expressions. This will cause to fail the match
+	 * if the expression does not contain '.' or exponent. This policy is necessary to avoid parsing
+	 * integer literals as valid floating-point literals.
+	 */
+	const floating_point_literal_type floating_point_literal = "number (fractional)";
+	const auto floating_point_literal_def = x3::real_parser<double, x3::strict_real_policies<double>>{};
+	BOOST_SPIRIT_DEFINE(floating_point_literal)
+
 	const integer_literal_type integer_literal = "number (integer)";
 	const auto integer_literal_def = x3::int_;
 	BOOST_SPIRIT_DEFINE(integer_literal)
@@ -70,6 +79,10 @@ namespace common
 	const string_literal_type string_literal = "string";
 	const auto string_literal_def = x3::lexeme['"' > *(x3::char_ - (x3::lit('"') | '\n' | '\r')) > '"'];
 	BOOST_SPIRIT_DEFINE(string_literal)
+
+	const socket_spec_literal_type socket_spec_literal = "socket spec literal";
+	const auto socket_spec_literal_def = x3::lexeme[-common::integer_literal >> common::identifier];
+	BOOST_SPIRIT_DEFINE(socket_spec_literal)
 
 	const boolean_literal_type boolean_literal = "boolean literal";
 	const auto boolean_literal_def = make_keyword(symbols::rf::booleans);
@@ -138,18 +151,7 @@ namespace sf
 
 	// ---- literal types ----
 
-	/*
-	 * Enable strict parsing policy for floating-point expressions. This will cause to fail the match
-	 * if the expression does not contain '.' or exponent. This policy is necessary to avoid parsing
-	 * integer literals as valid floating-point literals.
-	 */
-	const floating_point_literal_type floating_point_literal = "number (fractional)";
-	const auto floating_point_literal_def = x3::real_parser<double, x3::strict_real_policies<double>>{};
-	BOOST_SPIRIT_DEFINE(floating_point_literal)
-
-	const socket_spec_literal_type socket_spec_literal = "socket spec literal";
-	const auto socket_spec_literal_def = x3::lexeme[-common::integer_literal >> common::identifier];
-	BOOST_SPIRIT_DEFINE(socket_spec_literal)
+	// (no spirit-filter-specific literal types)
 
 	// ---- expressions ----
 
@@ -178,10 +180,10 @@ namespace sf
 		// leave letters which immediately follow (no whitespace) that would trigger parse error
 		// 2. Must be attempted after all keyword literals, otherwise they will be incorrectly
 		// attempted as a socket spec and error as they do not consist only of R/G/B/W/A/D letters
-		| socket_spec_literal
+		| common::socket_spec_literal
 		// Must be attempted before integer literal. Otherwise integer literal will just consume
 		// the number and do not check if there is any . character following it.
-		| floating_point_literal
+		| common::floating_point_literal
 		| common::integer_literal
 		| common::string_literal;
 	BOOST_SPIRIT_DEFINE(literal_expression)
@@ -392,16 +394,6 @@ namespace rf
 	const auto influence_spec_def = common::none_literal | influence_literal_array;
 	BOOST_SPIRIT_DEFINE(influence_spec)
 
-	const socket_spec_literal_type socket_spec_literal = "socket spec literal";
-	const auto socket_spec_literal_def =
-		x3::lexeme[
-			// TODO this value-initializes position tags - implement more advanced source location tracking
-			// that will allow custom synthesised/virtual source positions
-			(common::integer_literal >> (common::identifier | x3::attr(ast::rf::identifier{})))
-			| (x3::attr(ast::rf::integer_literal{}) >> common::identifier)
-		];
-	BOOST_SPIRIT_DEFINE(socket_spec_literal)
-
 	// ---- conditions ----
 
 	const rarity_condition_type rarity_condition = "rarity condition";
@@ -429,7 +421,11 @@ namespace rf
 
 	const socket_spec_condition_type socket_spec_condition = "socket spec condition";
 	const auto socket_spec_condition_def =
-		make_keyword(symbols::rf::socket_spec_condition_properties) > common::comparison_operator_expression > +socket_spec_literal;
+		make_keyword(symbols::rf::socket_spec_condition_properties)
+		> common::comparison_operator_expression
+		// this temporary skip grammar change is necessary - otherwise line break is skipped
+		// and lines further (which will start with keywords) are parsed as socket letters
+		> x3::skip(common::non_eol_whitespace)[+common::socket_spec_literal];
 	BOOST_SPIRIT_DEFINE(socket_spec_condition)
 
 	const boolean_condition_type boolean_condition = "boolean condition";

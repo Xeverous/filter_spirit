@@ -56,7 +56,7 @@ evaluate_literal(
 			return lang::single_object{lang::none{position_tag_of(literal)}, expr_origin};
 		},
 		[&](ast::sf::socket_spec_literal literal) -> result_type {
-			return detail::evaluate_socket_spec_literal(st, literal.socket_count, literal.socket_colors)
+			return detail::evaluate_socket_spec_literal(st, literal)
 				.map_result<lang::single_object>([&](lang::socket_spec ss) {
 					return lang::single_object{ss, expr_origin};
 				});
@@ -203,15 +203,14 @@ make_builtin_alert_sound(
 outcome<lang::socket_spec>
 evaluate_socket_spec_literal(
 	settings st,
-	boost::optional<ast::common::integer_literal> int_lit,
-	const parser::ast::common::identifier& iden)
+	const parser::ast::common::socket_spec_literal& literal)
 {
 	log_container logs;
 	lang::socket_spec ss;
-	ss.origin = parser::position_tag_of(iden);
+	ss.origin = parser::position_tag_of(literal.socket_colors);
 
-	if (int_lit) {
-		const auto& socket_count = *int_lit;
+	if (literal.socket_count) {
+		const auto& socket_count = *literal.socket_count;
 
 		if (socket_count.value < lang::limits::min_item_sockets
 			|| socket_count.value > lang::limits::max_item_sockets)
@@ -220,7 +219,7 @@ evaluate_socket_spec_literal(
 				lang::limits::min_item_sockets,
 				lang::limits::max_item_sockets,
 				socket_count.value,
-				parser::position_tag_of(socket_count)}});
+				parser::position_tag_of(*literal.socket_count)}});
 
 			if (!should_continue(st.error_handling, logs))
 				return logs;
@@ -230,7 +229,7 @@ evaluate_socket_spec_literal(
 		ss.origin = lang::merge_origins(parser::position_tag_of(socket_count), ss.origin);
 	}
 
-	const std::string& raw_letters = iden.value;
+	const std::string& raw_letters = literal.socket_colors.value;
 	if (raw_letters.empty()) {
 		/*
 		 * This should be considered internal error because:
@@ -241,7 +240,7 @@ evaluate_socket_spec_literal(
 		 */
 		logs.emplace_back(error(errors::internal_compiler_error{
 			errors::internal_compiler_error_cause::evaluate_socket_spec_literal,
-			parser::position_tag_of(iden)
+			parser::position_tag_of(literal.socket_colors)
 		}));
 		return logs;
 	}
@@ -264,7 +263,7 @@ evaluate_socket_spec_literal(
 			++ss.d;
 		else {
 			logs.emplace_back(error(errors::illegal_character_in_socket_spec{
-				parser::position_tag_of(iden), static_cast<int>(i)
+				parser::position_tag_of(literal.socket_colors), static_cast<int>(i)
 			}));
 
 			if (!should_continue(st.error_handling, logs))

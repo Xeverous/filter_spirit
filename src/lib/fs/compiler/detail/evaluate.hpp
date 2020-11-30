@@ -59,8 +59,7 @@ make_builtin_alert_sound(
 [[nodiscard]] outcome<lang::socket_spec>
 evaluate_socket_spec_literal(
 	settings st,
-	boost::optional<parser::ast::common::integer_literal> int_lit,
-	const parser::ast::common::identifier& iden);
+	const parser::ast::common::socket_spec_literal& literal);
 
 [[nodiscard]] outcome<lang::object>
 evaluate_sequence(
