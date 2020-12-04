@@ -635,13 +635,6 @@ namespace rf
 		boost::optional<integer_literal> a;
 	};
 
-	struct icon_literal : x3::position_tagged
-	{
-		integer_literal size;
-		suit_literal suit;
-		shape_literal shape;
-	};
-
 	struct string_literal_array : std::vector<string_literal>, x3::position_tagged {};
 	struct influence_literal_array : std::vector<influence_literal>, x3::position_tagged {};
 
@@ -793,15 +786,15 @@ namespace rf
 
 	struct minimap_icon_action : x3::position_tagged
 	{
-		auto& operator=(icon_literal il)
+		auto& operator=(literal_sequence seq)
 		{
-			icon = il;
+			literals = std::move(seq);
 			return *this;
 		}
 
-		const auto& get_value() const { return icon; }
+		const auto& get_value() const { return literals; }
 
-		icon_literal icon;
+		literal_sequence literals;
 	};
 
 	struct play_effect_action : x3::position_tagged

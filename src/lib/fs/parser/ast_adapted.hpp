@@ -118,10 +118,6 @@ BOOST_FUSION_ADAPT_STRUCT(
 	r, g, b, a)
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::rf::icon_literal,
-	size, suit, shape)
-
-BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::rf::rarity_condition,
 	comparison_type, rarity)
 

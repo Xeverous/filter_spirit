@@ -148,12 +148,6 @@ evaluate(settings st, parser::ast::rf::color_literal cl)
 	return make_color(st, evaluate(cl.r), evaluate(cl.g), evaluate(cl.b), a);
 }
 
-[[nodiscard]] inline outcome<lang::minimap_icon>
-evaluate(parser::ast::rf::icon_literal il)
-{
-	return make_minimap_icon(evaluate(il.size), evaluate(il.suit), evaluate(il.shape));
-}
-
 [[nodiscard]] outcome<lang::object>
 evaluate_sequence(
 	settings st,

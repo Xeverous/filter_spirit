@@ -380,10 +380,6 @@ namespace rf
 		> -common::integer_literal;
 	BOOST_SPIRIT_DEFINE(color_literal)
 
-	const icon_literal_type icon_literal = "icon literal";
-	const auto icon_literal_def = common::integer_literal > make_keyword(common::suit_literal) > make_keyword(common::shape_literal);
-	BOOST_SPIRIT_DEFINE(icon_literal)
-
 	const string_literal_array_type string_literal_array = "1 or more string literals";
 	const auto string_literal_array_def = +common::string_literal;
 	BOOST_SPIRIT_DEFINE(string_literal_array)
@@ -488,7 +484,7 @@ namespace rf
 	BOOST_SPIRIT_DEFINE(switch_drop_sound_action)
 
 	const minimap_icon_action_type minimap_icon_action = "minimap icon action";
-	const auto minimap_icon_action_def = make_keyword(lang::keywords::rf::minimap_icon) > icon_literal;
+	const auto minimap_icon_action_def = make_keyword(lang::keywords::rf::minimap_icon) > literal_sequence;
 	BOOST_SPIRIT_DEFINE(minimap_icon_action)
 
 	const play_effect_action_type play_effect_action = "play effct action";

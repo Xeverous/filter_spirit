@@ -426,9 +426,6 @@ namespace rf
 	using color_literal_type = x3::rule<color_literal_class, ast::rf::color_literal>;
 	BOOST_SPIRIT_DECLARE(color_literal_type)
 
-	using icon_literal_type = x3::rule<icon_literal_class, ast::rf::icon_literal>;
-	BOOST_SPIRIT_DECLARE(icon_literal_type)
-
 	using string_literal_array_type = x3::rule<string_literal_array_class, ast::rf::string_literal_array>;
 	BOOST_SPIRIT_DECLARE(string_literal_array_type)
 

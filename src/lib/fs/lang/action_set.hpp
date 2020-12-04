@@ -164,6 +164,8 @@ struct minimap_icon
 	minimap_icon(integer size, suit color, shape shape_)
 	: size(size), color(color), shape_(shape_) {}
 
+	static constexpr int sentinel_cancel_value = -1;
+
 	integer size;
 	suit color;
 	shape shape_;

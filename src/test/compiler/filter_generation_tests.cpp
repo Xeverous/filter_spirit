@@ -578,6 +578,69 @@ Hide
 			BOOST_TEST(compare_strings(expected_filter, actual_filter));
 		}
 
+		BOOST_AUTO_TEST_CASE(sentinel_minimap_icon)
+		{
+			const std::string actual_filter = generate_filter(minimal_input() + R"(
+MinimapIcon 0 Yellow Star
+
+DropLevel >= 10 {
+	MinimapIcon 1 Green Raindrop
+
+	ItemLevel < 70 {
+		MinimapIcon -1
+		Hide
+	}
+
+	Rarity >= Rare
+	ItemLevel >= 70 {
+		SetFontSize 40
+		DisableDropSound
+		Show
+	}
+
+	Sockets 6 {
+		MinimapIcon -1
+		Show
+		Continue
+	}
+
+	EnableDropSound
+	Show
+}
+
+Hide
+)");
+			const std::string_view expected_filter =
+R"(Hide
+	ItemLevel < 70
+	DropLevel >= 10
+
+Show
+	ItemLevel >= 70
+	DropLevel >= 10
+	Rarity >= Rare
+	SetFontSize 40
+	DisableDropSound
+	MinimapIcon 1 Green Raindrop
+
+Show
+	DropLevel >= 10
+	Sockets = 6
+	Continue
+
+Show
+	DropLevel >= 10
+	EnableDropSound
+	MinimapIcon 1 Green Raindrop
+
+Hide
+	MinimapIcon 0 Yellow Star
+
+)";
+
+			BOOST_TEST(compare_strings(expected_filter, actual_filter));
+		}
+
 		BOOST_AUTO_TEST_CASE(delirium_new_colors_and_shapes)
 		{
 			const std::string actual_filter = generate_filter(minimal_input() + R"(

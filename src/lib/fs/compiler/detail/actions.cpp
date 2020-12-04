@@ -17,6 +17,44 @@ namespace
 using namespace fs;
 using namespace fs::compiler;
 
+// ---- generic helpers ----
+
+[[nodiscard]] outcome<std::optional<lang::minimap_icon>>
+make_minimap_icon(
+	settings /* st */,
+	const lang::object& obj)
+{
+	FS_ASSERT(obj.values.size() >= 1u);
+	FS_ASSERT(obj.values.size() <= 3u);
+
+	return detail::get_as<lang::integer>(obj.values[0])
+		.map_result<std::optional<lang::minimap_icon>>([&](lang::integer icon_size)
+		-> outcome<std::optional<lang::minimap_icon>>
+		{
+			if (icon_size.value == lang::minimap_icon::sentinel_cancel_value)
+				return std::optional<lang::minimap_icon>();
+
+			// TODO this is somewhat misleading, the expectations are:
+			// A) 1-3 arguments where first is integer{-1}
+			// B)   3 arguments where [0] is integer, [1] is suit, [2] is shape
+			if (obj.values.size() != 3u) {
+				return error{errors::invalid_amount_of_arguments{
+					3, 3, static_cast<int>(obj.values.size()), obj.origin}};
+			}
+
+			FS_ASSERT(obj.values.size() == 3u);
+
+			return detail::get_as<lang::suit>(obj.values[1])
+				.merge_with(detail::get_as<lang::shape>(obj.values[2]))
+				.map_result<lang::minimap_icon>([&](lang::suit s, lang::shape sh) {
+					return detail::make_minimap_icon(icon_size, s, sh);
+				})
+				.map_result<std::optional<lang::minimap_icon>>([](lang::minimap_icon icon) {
+					return std::optional<lang::minimap_icon>(icon);
+				});
+		});
+}
+
 // ---- spirit filter helpers ----
 
 [[nodiscard]] outcome<>
@@ -121,18 +159,15 @@ spirit_filter_add_minimap_icon_action(
 	const lang::symbol_table& symbols,
 	lang::action_set& set)
 {
-	return detail::evaluate_sequence(st, action.seq, symbols, 3, 3)
-		.map_result<lang::minimap_icon>([](lang::object obj) {
-			FS_ASSERT(obj.values.size() == 3u);
-
-			return detail::get_as<lang::integer>(obj.values[0])
-				.merge_with(detail::get_as<lang::suit>(obj.values[1]))
-				.merge_with(detail::get_as<lang::shape>(obj.values[2]))
-				.map_result<lang::minimap_icon>(detail::make_minimap_icon);
+	return detail::evaluate_sequence(st, action.seq, symbols, 1, 3)
+		.map_result<std::optional<lang::minimap_icon>>([&](lang::object obj) {
+			return make_minimap_icon(st, obj);
 		})
-		.map_result([&](lang::minimap_icon icon) {
-			// override previous action
-			set.minimap_icon = lang::minimap_icon_action{icon, parser::position_tag_of(action)};
+		.map_result([&](std::optional<lang::minimap_icon> icon) {
+			if (icon)
+				set.minimap_icon = lang::minimap_icon_action{*icon, parser::position_tag_of(action)};
+			else
+				set.minimap_icon = std::nullopt;
 		});
 }
 
@@ -431,6 +466,24 @@ real_filter_make_builtin_alert_sound(
 	}
 }
 
+outcome<>
+real_filter_add_minimap_icon_action(
+	settings st,
+	const ast::rf::minimap_icon_action& action,
+	std::optional<lang::minimap_icon_action>& target)
+{
+	return detail::evaluate_literal_sequence(st, action.literals, 1, 3)
+		.map_result<std::optional<lang::minimap_icon>>([&](lang::object obj) {
+			return make_minimap_icon(st, obj);
+		})
+		.map_result<>([&](std::optional<lang::minimap_icon> icon) {
+			if (icon)
+				target = lang::minimap_icon_action{*icon, parser::position_tag_of(action)};
+			else
+				target = std::nullopt;
+		});
+}
+
 } // namespace
 
 namespace fs::compiler::detail
@@ -496,11 +549,7 @@ real_filter_add_action(
 				set.set_font_size);
 		},
 		[&](const ast::rf::minimap_icon_action& action) -> result_type {
-			return evaluate(action.icon).map_result([&](lang::minimap_icon icon) {
-				return real_filter_add_action_impl(
-					lang::minimap_icon_action{icon, parser::position_tag_of(action)},
-					set.minimap_icon);
-			});
+			return real_filter_add_minimap_icon_action(st, action, set.minimap_icon);
 		},
 		[&](const ast::rf::play_effect_action& action) -> result_type {
 			return real_filter_add_action_impl(
