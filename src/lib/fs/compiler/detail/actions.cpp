@@ -2,10 +2,14 @@
 #include <fs/compiler/detail/actions.hpp>
 #include <fs/lang/limits.hpp>
 #include <fs/utility/assert.hpp>
+#include <fs/utility/monadic.hpp>
 
 #include <boost/spirit/home/x3/support/utility/lambda_visitor.hpp>
+#include <boost/optional.hpp>
 
 #include <utility>
+#include <algorithm>
+#include <iterator>
 #include <type_traits>
 
 namespace ast = fs::parser::ast;
@@ -19,416 +23,453 @@ using namespace fs::compiler;
 
 // ---- generic helpers ----
 
-[[nodiscard]] outcome<std::optional<lang::minimap_icon>>
+[[nodiscard]] boost::optional<boost::optional<lang::minimap_icon>>
 make_minimap_icon(
 	settings /* st */,
-	const lang::object& obj)
+	const lang::object& obj,
+	diagnostics_container& diagnostics)
 {
 	FS_ASSERT(obj.values.size() >= 1u);
 	FS_ASSERT(obj.values.size() <= 3u);
 
-	return detail::get_as<lang::integer>(obj.values[0])
-		.map_result<std::optional<lang::minimap_icon>>([&](lang::integer icon_size)
-		-> outcome<std::optional<lang::minimap_icon>>
+	return detail::get_as<lang::integer>(obj.values[0], diagnostics)
+		.flat_map([&](lang::integer icon_size) -> boost::optional<boost::optional<lang::minimap_icon>>
 		{
 			if (icon_size.value == lang::minimap_icon::sentinel_cancel_value)
-				return std::optional<lang::minimap_icon>();
+				return boost::optional<lang::minimap_icon>();
 
 			// TODO this is somewhat misleading, the expectations are:
 			// A) 1-3 arguments where first is integer{-1}
 			// B)   3 arguments where [0] is integer, [1] is suit, [2] is shape
 			if (obj.values.size() != 3u) {
-				return error{errors::invalid_amount_of_arguments{
-					3, 3, static_cast<int>(obj.values.size()), obj.origin}};
+				diagnostics.emplace_back(error{errors::invalid_amount_of_arguments{
+					3, 3, static_cast<int>(obj.values.size()), obj.origin}});
+				return boost::none;
 			}
 
 			FS_ASSERT(obj.values.size() == 3u);
 
-			return detail::get_as<lang::suit>(obj.values[1])
-				.merge_with(detail::get_as<lang::shape>(obj.values[2]))
-				.map_result<lang::minimap_icon>([&](lang::suit s, lang::shape sh) {
-					return detail::make_minimap_icon(icon_size, s, sh);
-				})
-				.map_result<std::optional<lang::minimap_icon>>([](lang::minimap_icon icon) {
-					return std::optional<lang::minimap_icon>(icon);
+			auto suit = detail::get_as<lang::suit>(obj.values[1], diagnostics);
+			auto shape = detail::get_as<lang::shape>(obj.values[2], diagnostics);
+
+			if (!suit || !shape)
+				return boost::none;
+
+			return detail::make_minimap_icon(icon_size, *suit, *shape, diagnostics)
+				.map([](lang::minimap_icon icon) {
+					return boost::optional<lang::minimap_icon>(icon);
 				});
 		});
 }
 
 // ---- spirit filter helpers ----
 
-[[nodiscard]] outcome<>
+[[nodiscard]] bool
 spirit_filter_add_set_color_action_impl(
 	lang::color_action_type action_type,
 	lang::color_action action,
-	lang::action_set& set)
+	lang::action_set& set,
+	diagnostics_container& diagnostics)
 {
 	// override previous action
 	switch (action_type) {
 		case lang::color_action_type::set_border_color: {
 			set.set_border_color = action;
-			return outcome<>::success();
+			return true;
 		}
 		case lang::color_action_type::set_text_color: {
 			set.set_text_color = action;
-			return outcome<>::success();
+			return true;
 		}
 		case lang::color_action_type::set_background_color: {
 			set.set_background_color = action;
-			return outcome<>::success();
+			return true;
 		}
 	}
 
-	return error(errors::internal_compiler_error{
+	diagnostics.emplace_back(error(errors::internal_compiler_error{
 		errors::internal_compiler_error_cause::spirit_filter_add_set_color_action_impl,
-		action.origin});
+		action.origin}));
+	return false;
 }
 
-[[nodiscard]] outcome<>
+[[nodiscard]] bool
 spirit_filter_add_set_color_action(
 	settings st,
 	const ast::sf::set_color_action& action,
 	const lang::symbol_table& symbols,
-	lang::action_set& set)
+	lang::action_set& set,
+	diagnostics_container& diagnostics)
 {
-	return detail::evaluate_sequence(st, action.seq, symbols, 3, 4)
-		.map_result<lang::color>([&](lang::object obj) {
+	return detail::evaluate_sequence(st, action.seq, symbols, 3, 4, diagnostics)
+		.flat_map([&](lang::object obj) -> boost::optional<lang::color> {
 			const auto num_values = obj.values.size();
 			FS_ASSERT(num_values == 3u || num_values == 4u);
 
-			auto rgb = detail::get_as<lang::integer>(obj.values[0])
-				.merge_with(detail::get_as<lang::integer>(obj.values[1]))
-				.merge_with(detail::get_as<lang::integer>(obj.values[2]));
+			const auto r = detail::get_as<lang::integer>(obj.values[0], diagnostics);
+			const auto g = detail::get_as<lang::integer>(obj.values[1], diagnostics);
+			const auto b = detail::get_as<lang::integer>(obj.values[2], diagnostics);
+
+			if (!r || !g || !b)
+				return boost::none;
 
 			if (num_values == 4u) {
-				return std::move(rgb)
-					.merge_with(detail::get_as<lang::integer>(obj.values[3]))
-					.map_result<lang::color>(
-						[&](lang::integer r, lang::integer g, lang::integer b, lang::integer a) {
-							return detail::make_color(st, r, g, b, a);
-						}
-					);
+				return detail::get_as<lang::integer>(obj.values[3], diagnostics)
+					.flat_map([&](lang::integer a) {
+						return detail::make_color(st, *r, *g, *b, a, diagnostics);
+					}
+				);
 			}
 			else {
-				return std::move(rgb)
-					.map_result<lang::color>(
-						[&](lang::integer r, lang::integer g, lang::integer b) {
-							return detail::make_color(st, r, g, b);
-						}
-					);
+				return detail::make_color(st, *r, *g, *b, boost::none, diagnostics);
 			}
 		})
-		.map_result([&](lang::color col) {
-			auto act = lang::color_action{col, parser::position_tag_of(action)};
-			return spirit_filter_add_set_color_action_impl(action.action_type, act, set);
-		});
+		.map([&](lang::color color) {
+			auto act = lang::color_action{color, parser::position_tag_of(action)};
+			return spirit_filter_add_set_color_action_impl(action.action_type, act, set, diagnostics);
+		})
+		.value_or(false);
 }
 
-[[nodiscard]] outcome<>
+[[nodiscard]] bool
 spirit_filter_add_set_font_size_action(
 	settings st,
 	const ast::sf::set_font_size_action& action,
 	const lang::symbol_table& symbols,
-	lang::action_set& set)
+	lang::action_set& set,
+	diagnostics_container& diagnostics)
 {
-	return detail::evaluate_sequence(st, action.seq, symbols, 1, 1)
-		.map_result<lang::integer>([](lang::object obj) {
+	return detail::evaluate_sequence(st, action.seq, symbols, 1, 1, diagnostics)
+		.flat_map([&](lang::object obj) {
 			FS_ASSERT(obj.values.size() == 1u);
-			return detail::get_as<lang::integer>(obj.values[0]);
+			return detail::get_as<lang::integer>(obj.values[0], diagnostics);
 		})
-		.map_result<lang::font_size_action>([&](lang::integer font_size) {
-			outcome<lang::font_size_action> result(lang::font_size_action{font_size, parser::position_tag_of(action)});
-
+		.map([&](lang::integer font_size) {
 			if (font_size.value < lang::limits::min_filter_font_size
 				|| font_size.value > lang::limits::max_filter_font_size)
 			{
-				result.logs().emplace_back(warning(warnings::font_size_outside_range{font_size.origin}));
+				diagnostics.emplace_back(warning(warnings::font_size_outside_range{font_size.origin}));
 			}
 
-			return result;
+			return lang::font_size_action{font_size, parser::position_tag_of(action)};
 		})
-		.map_result([&](lang::font_size_action fsa) {
+		.map([&](lang::font_size_action fsa) {
 			set.set_font_size = fsa;
-		});
+			return true;
+		})
+		.value_or(false);
 }
 
-[[nodiscard]] outcome<>
+[[nodiscard]] bool
 spirit_filter_add_minimap_icon_action(
 	settings st,
 	const ast::sf::minimap_icon_action& action,
 	const lang::symbol_table& symbols,
-	lang::action_set& set)
+	lang::action_set& set,
+	diagnostics_container& diagnostics)
 {
-	return detail::evaluate_sequence(st, action.seq, symbols, 1, 3)
-		.map_result<std::optional<lang::minimap_icon>>([&](lang::object obj) {
-			return make_minimap_icon(st, obj);
+	return detail::evaluate_sequence(st, action.seq, symbols, 1, 3, diagnostics)
+		.flat_map([&](lang::object obj) {
+			return make_minimap_icon(st, obj, diagnostics);
 		})
-		.map_result([&](std::optional<lang::minimap_icon> icon) {
+		.map([&](boost::optional<lang::minimap_icon> icon) {
 			if (icon)
 				set.minimap_icon = lang::minimap_icon_action{*icon, parser::position_tag_of(action)};
 			else
 				set.minimap_icon = std::nullopt;
-		});
+			return true;
+		})
+		.value_or(false);
 }
 
-[[nodiscard]] outcome<>
+[[nodiscard]] bool
 spirit_filter_add_play_effect_action(
 	settings st,
 	const ast::sf::play_effect_action& action,
 	const lang::symbol_table& symbols,
-	lang::action_set& set)
+	lang::action_set& set,
+	diagnostics_container& diagnostics)
 {
-	return detail::evaluate_sequence(st, action.seq, symbols, 1, 2)
-		.map_result<lang::play_effect>([](lang::object obj) {
+	return detail::evaluate_sequence(st, action.seq, symbols, 1, 2, diagnostics)
+		.flat_map([&](lang::object obj) -> boost::optional<lang::play_effect> {
 			const auto num_values = obj.values.size();
 			FS_ASSERT(num_values == 1u || num_values == 2u);
 
-			return detail::get_as<lang::suit>(obj.values[0])
-				.merge_with([&]() -> outcome<bool> {
-					if (num_values != 2)
-						return false; // no "Temp" token, therefore false
+			auto suit = detail::get_as<lang::suit>(obj.values[0], diagnostics);
+			auto is_temp = [&]() -> boost::optional<bool> {
+				if (num_values != 2)
+					return false; // no "Temp" token, therefore false
 
-					FS_ASSERT(num_values == 2u);
+				FS_ASSERT(num_values == 2u);
 
-					// there is an extra token, it must be "Temp"; if successful map to true
-					return detail::get_as<lang::temp>(obj.values[1])
-						.map_result<bool>([](lang::temp) { return true; });
-				}())
-				.map_result<lang::play_effect>([](lang::suit s, bool is_temp) {
-					return lang::play_effect{s, is_temp};
-				});
+				// there is an extra token, it must be "Temp"; if successful map to true
+				return detail::get_as<lang::temp>(obj.values[1], diagnostics)
+					.map([](lang::temp) { return true; });
+			}();
+
+			if (!suit || !is_temp)
+				return boost::none;
+
+			return lang::play_effect{*suit, *is_temp};
 		})
-		.map_result([&](lang::play_effect effect) {
+		.map([&](lang::play_effect effect) {
 			// override previous action
 			set.play_effect = lang::play_effect_action{effect, parser::position_tag_of(action)};
-		});
+			return true;
+		})
+		.value_or(false);
 }
 
-[[nodiscard]] outcome<lang::builtin_alert_sound_id>
+[[nodiscard]] boost::optional<lang::builtin_alert_sound_id>
 make_builtin_alert_sound_id(
-	const lang::single_object& sobj)
+	const lang::single_object& sobj,
+	diagnostics_container& diagnostics)
 {
-	auto integer_sound_id = detail::get_as<lang::integer>(sobj);
-	auto shaper_sound_id = detail::get_as<lang::shaper_voice_line>(sobj);
+	diagnostics_container diagnostics_integer;
+	auto integer_sound_id = detail::get_as<lang::integer>(sobj, diagnostics_integer);
+	diagnostics_container diagnostics_shaper;
+	auto shaper_sound_id = detail::get_as<lang::shaper_voice_line>(sobj, diagnostics_shaper);
 
-	if (integer_sound_id.has_result()) {
-		return std::move(integer_sound_id).map_result<lang::builtin_alert_sound_id>([](lang::integer sound_id) {
-			return detail::make_builtin_alert_sound_id(sound_id);
+	if (integer_sound_id.has_value()) {
+		std::move(diagnostics_integer.begin(), diagnostics_integer.end(), std::back_inserter(diagnostics));
+		return std::move(integer_sound_id).flat_map([&](lang::integer sound_id) {
+			return detail::make_builtin_alert_sound_id(sound_id, diagnostics);
 		});
 	}
-	else if (shaper_sound_id.has_result()) {
-		return std::move(shaper_sound_id).map_result<lang::builtin_alert_sound_id>([](lang::shaper_voice_line sound_id) {
+	else if (shaper_sound_id.has_value()) {
+		std::move(diagnostics_shaper.begin(), diagnostics_shaper.end(), std::back_inserter(diagnostics));
+		return std::move(shaper_sound_id).flat_map([](lang::shaper_voice_line sound_id) {
 			return detail::make_builtin_alert_sound_id(sound_id);
 		});
 	}
 	else {
-		log_container logs;
 		// main error
-		logs.emplace_back(error(errors::invalid_builtin_alert_sound_id{sobj.origin}));
+		diagnostics.emplace_back(error(errors::invalid_builtin_alert_sound_id{sobj.origin}));
 		// errors specifying each sound ID variant problems
-		logs.emplace_back(note{notes::fixed_text{"in attempt of integer sound ID"}});
-		integer_sound_id.move_logs_to(logs);
-		logs.emplace_back(note{notes::fixed_text{"in attempt of Shaper voice line sound ID"}});
-		shaper_sound_id.move_logs_to(logs);
-		return logs;
+		diagnostics.emplace_back(note{notes::fixed_text{"in attempt of integer sound ID"}});
+		std::move(diagnostics_integer.begin(), diagnostics_integer.end(), std::back_inserter(diagnostics));
+		diagnostics.emplace_back(note{notes::fixed_text{"in attempt of Shaper voice line sound ID"}});
+		std::move(diagnostics_shaper.begin(), diagnostics_shaper.end(), std::back_inserter(diagnostics));
+		return boost::none;
 	}
 }
 
-[[nodiscard]] outcome<lang::builtin_alert_sound>
+[[nodiscard]] boost::optional<lang::builtin_alert_sound>
 make_builtin_alert_sound(
 	settings st,
 	bool positional,
-	const lang::object& obj)
+	const lang::object& obj,
+	diagnostics_container& diagnostics)
 {
 	const auto num_args = obj.values.size();
 	FS_ASSERT(num_args == 1u || num_args == 2u);
 
-	auto sound_id = make_builtin_alert_sound_id(obj.values[0]);
+	const auto sound_id = make_builtin_alert_sound_id(obj.values[0], diagnostics);
+
+	if (!sound_id)
+		return boost::none;
 
 	if (num_args == 2u) {
-		return std::move(sound_id)
-			.merge_with(detail::get_as<lang::integer>(obj.values[1]))
-			.map_result<lang::builtin_alert_sound>([&](lang::builtin_alert_sound_id sound_id, lang::integer volume) {
-				return detail::make_builtin_alert_sound(st, positional, sound_id, volume);
+		return detail::get_as<lang::integer>(obj.values[1], diagnostics)
+			.flat_map([&](lang::integer volume) {
+				return detail::make_builtin_alert_sound(st, positional, *sound_id, volume, diagnostics);
 			});
 	}
 	else {
-		return std::move(sound_id)
-			.map_result<lang::builtin_alert_sound>([&](lang::builtin_alert_sound_id sound_id) {
-				return detail::make_builtin_alert_sound(st, positional, sound_id);
-			});
+		return detail::make_builtin_alert_sound(st, positional, *sound_id, boost::none, diagnostics);
 	}
 }
 
-[[nodiscard]] outcome<>
+[[nodiscard]] bool
 spirit_filter_add_play_alert_sound_action(
 	settings st,
 	const ast::sf::play_alert_sound_action& action,
 	const lang::symbol_table& symbols,
-	lang::action_set& set)
+	lang::action_set& set,
+	diagnostics_container& diagnostics)
 {
-	return detail::evaluate_sequence(st, action.seq, symbols, 1, 2)
-		.map_result<lang::builtin_alert_sound>([&](lang::object obj) {
+	return detail::evaluate_sequence(st, action.seq, symbols, 1, 2, diagnostics)
+		.flat_map([&](lang::object obj) {
 			FS_ASSERT(obj.values.size() == 1u || obj.values.size() == 2u);
-			return make_builtin_alert_sound(st, action.positional, obj);
+			return make_builtin_alert_sound(st, action.positional, obj, diagnostics);
 		})
-		.map_result([&](lang::builtin_alert_sound bas) {
+		.map([&](lang::builtin_alert_sound bas) {
 			// override previous action
 			set.play_alert_sound = lang::alert_sound_action{
 				lang::alert_sound{bas},
 				parser::position_tag_of(action)
 			};
-		});
+			return true;
+		})
+		.value_or(false);
 }
 
-[[nodiscard]] outcome<lang::custom_alert_sound>
+[[nodiscard]] boost::optional<lang::custom_alert_sound>
 make_custom_alert_sound(
 	settings /* st */,
-	const lang::single_object& sobj)
+	const lang::single_object& sobj,
+	diagnostics_container& diagnostics)
 {
-	return detail::get_as<lang::string>(sobj)
-		.map_result<lang::custom_alert_sound>([](lang::string str) {
+	return detail::get_as<lang::string>(sobj, diagnostics)
+		.map([](lang::string str) {
 			return lang::custom_alert_sound{std::move(str)};
 		});
 }
 
-[[nodiscard]] outcome<>
+[[nodiscard]] bool
 spirit_filter_add_custom_alert_sound_action(
 	settings st,
 	const ast::sf::custom_alert_sound_action& action,
 	const lang::symbol_table& symbols,
-	lang::action_set& set)
+	lang::action_set& set,
+	diagnostics_container& diagnostics)
 {
-	return detail::evaluate_sequence(st, action.seq, symbols, 1, 1)
-		.map_result<lang::custom_alert_sound>([&](lang::object obj) {
+	return detail::evaluate_sequence(st, action.seq, symbols, 1, 1, diagnostics)
+		.flat_map([&](lang::object obj) {
 			FS_ASSERT(obj.values.size() == 1u);
-			return make_custom_alert_sound(st, obj.values[0]);
+			return make_custom_alert_sound(st, obj.values[0], diagnostics);
 		})
-		.map_result([&](lang::custom_alert_sound cas) {
+		.map([&](lang::custom_alert_sound cas) {
 			set.play_alert_sound = lang::alert_sound_action{
 				lang::alert_sound{std::move(cas)},
 				parser::position_tag_of(action)
 			};
-		});
+			return true;
+		})
+		.value_or(false);
 }
 
-[[nodiscard]] outcome<>
+[[nodiscard]] bool
 spirit_filter_add_set_alert_sound_action(
 	settings st,
 	const ast::sf::set_alert_sound_action& action,
 	const lang::symbol_table& symbols,
-	lang::action_set& set)
+	lang::action_set& set,
+	diagnostics_container& diagnostics)
 {
-	return detail::evaluate_sequence(st, action.seq, symbols, 1, 2)
-		.map_result<lang::alert_sound>([&](lang::object obj) -> outcome<lang::alert_sound> {
+	return detail::evaluate_sequence(st, action.seq, symbols, 1, 2, diagnostics)
+		.flat_map([&](lang::object obj) -> boost::optional<lang::alert_sound> {
 			const auto num_values = obj.values.size();
 			FS_ASSERT(num_values == 1u || num_values == 2u);
 
 			// SetAlertSound always generates non-positional sounds, hence the false
-			auto builtin_alert = make_builtin_alert_sound(st, false, obj);
-			auto custom_alert = [&]() -> outcome<lang::custom_alert_sound> {
+			diagnostics_container diagnostics_builtin;
+			auto builtin_alert = make_builtin_alert_sound(st, false, obj, diagnostics_builtin);
+			diagnostics_container diagnostics_custom;
+			auto custom_alert = [&]() -> boost::optional<lang::custom_alert_sound> {
 				if (num_values == 2u) {
-					return error(errors::invalid_amount_of_arguments{
+					diagnostics_custom.emplace_back(error(errors::invalid_amount_of_arguments{
 						/* min */ 1, /* max */ 1, /* actual */ 2, parser::position_tag_of(action.seq)
-					});
+					}));
+					return boost::none;
 				}
 
 				FS_ASSERT(num_values == 1u);
-				return make_custom_alert_sound(st, obj.values[0]);
+				return make_custom_alert_sound(st, obj.values[0], diagnostics_custom);
 			}();
 
-			if (custom_alert.has_result()) {
+			if (custom_alert.has_value()) {
+				std::move(diagnostics_custom.begin(), diagnostics_custom.end(), std::back_inserter(diagnostics));
 				return std::move(custom_alert)
-					.map_result<lang::alert_sound>([](lang::custom_alert_sound cas) {
+					.map([](lang::custom_alert_sound cas) {
 						return lang::alert_sound{std::move(cas)};
 					});
 			}
-			else if (builtin_alert.has_result()) {
+			else if (builtin_alert.has_value()) {
+				std::move(diagnostics_builtin.begin(), diagnostics_builtin.end(), std::back_inserter(diagnostics));
 				return std::move(builtin_alert)
-					.map_result<lang::alert_sound>([](lang::builtin_alert_sound bas) {
+					.map([](lang::builtin_alert_sound bas) {
 						return lang::alert_sound{std::move(bas)};
 					});
 			}
 			else {
-				log_container logs;
-				// main error
-				logs.emplace_back(error(
+				diagnostics.emplace_back(error(
 					errors::invalid_set_alert_sound{parser::position_tag_of(action.seq)}));
 				// errors specifying each sound variant problems
-				logs.emplace_back(note{notes::fixed_text{"in attempt of custom alert sound"}});
-				custom_alert.move_logs_to(logs);
-				logs.emplace_back(note{notes::fixed_text{"in attempt of built-in alert sound"}});
-				builtin_alert.move_logs_to(logs);
-				return logs;
+				diagnostics.emplace_back(note{notes::fixed_text{"in attempt of custom alert sound"}});
+				std::move(diagnostics_custom.begin(), diagnostics_custom.end(), std::back_inserter(diagnostics));
+				diagnostics.emplace_back(note{notes::fixed_text{"in attempt of built-in alert sound"}});
+				std::move(diagnostics_builtin.begin(), diagnostics_builtin.end(), std::back_inserter(diagnostics));
+				return boost::none;
 			}
 		})
-		.map_result([&](lang::alert_sound alert) {
+		.map([&](lang::alert_sound as) {
 			set.play_alert_sound = lang::alert_sound_action{
-				lang::alert_sound{std::move(alert)},
+				lang::alert_sound{std::move(as)},
 				parser::position_tag_of(action)
 			};
-		});
+			return true;
+		})
+		.value_or(false);
 }
 
-[[nodiscard]] outcome<>
+[[nodiscard]] bool
 spirit_filter_add_compound_action(
 	settings st,
 	const ast::sf::compound_action& action,
 	const lang::symbol_table& symbols,
-	lang::action_set& set)
+	lang::action_set& set,
+	diagnostics_container& diagnostics)
 {
-	return detail::evaluate_sequence(st, action.seq, symbols, 1, 1)
-		.map_result<lang::action_set>([](lang::object obj) {
+	return detail::evaluate_sequence(st, action.seq, symbols, 1, 1, diagnostics)
+		.flat_map([&](lang::object obj) {
 			FS_ASSERT(obj.values.size() == 1u);
-			return detail::get_as<lang::action_set>(obj.values[0]);
+			return detail::get_as<lang::action_set>(obj.values[0], diagnostics);
 		})
-		.map_result([&](lang::action_set as) {
+		.map([&](lang::action_set as) {
 			set.override_with(as);
-		});
+			return true;
+		})
+		.value_or(false);
 }
 
 // ---- real filter helpers ----
 
 template <typename T>
-[[nodiscard]] outcome<>
+[[nodiscard]] bool
 real_filter_add_action_impl(
 	T&& action,
-	std::optional<T>& target)
+	std::optional<T>& target,
+	diagnostics_container& diagnostics)
 {
 	if (target) {
-		return error(errors::action_redefinition{action.origin, (*target).origin});
+		diagnostics.emplace_back(error(errors::action_redefinition{action.origin, (*target).origin}));
+		return false;
 	}
 
-	target = std::move(action);
-	return outcome<>::success();
+	target = std::forward<T>(action);
+	return true;
 }
 
-[[nodiscard]] outcome<>
+[[nodiscard]] bool
 real_filter_add_color_action(
 	settings st,
 	const ast::rf::color_action& action,
-	lang::action_set& set)
+	lang::action_set& set,
+	diagnostics_container& diagnostics)
 {
-	return detail::evaluate(st, action.color)
-		.map_result([&](lang::color col) -> outcome<> {
-			auto act = lang::color_action{col, parser::position_tag_of(action)};
+	boost::optional<lang::color> color = detail::evaluate(st, action.color, diagnostics);
+	if (color) {
+		auto act = lang::color_action{*color, parser::position_tag_of(action)};
 
-			switch (action.action) {
-				case lang::color_action_type::set_border_color: {
-					return real_filter_add_action_impl(std::move(act), set.set_border_color);
-				}
-				case lang::color_action_type::set_text_color: {
-					return real_filter_add_action_impl(std::move(act), set.set_text_color);
-				}
-				case lang::color_action_type::set_background_color: {
-					return real_filter_add_action_impl(std::move(act), set.set_background_color);
-				}
+		switch (action.action) {
+			case lang::color_action_type::set_border_color: {
+				return real_filter_add_action_impl(std::move(act), set.set_border_color, diagnostics);
 			}
+			case lang::color_action_type::set_text_color: {
+				return real_filter_add_action_impl(std::move(act), set.set_text_color, diagnostics);
+			}
+			case lang::color_action_type::set_background_color: {
+				return real_filter_add_action_impl(std::move(act), set.set_background_color, diagnostics);
+			}
+		}
 
-			return error(errors::internal_compiler_error{
-				errors::internal_compiler_error_cause::real_filter_add_color_action,
-				act.origin});
-		});
+		diagnostics.emplace_back(error(errors::internal_compiler_error{
+			errors::internal_compiler_error_cause::real_filter_add_color_action,
+			act.origin}));
+	}
+
+	return false;
 }
 
 [[nodiscard]] lang::builtin_alert_sound_id
@@ -466,22 +507,26 @@ real_filter_make_builtin_alert_sound(
 	}
 }
 
-outcome<>
+[[nodiscard]] bool
 real_filter_add_minimap_icon_action(
 	settings st,
 	const ast::rf::minimap_icon_action& action,
-	std::optional<lang::minimap_icon_action>& target)
+	std::optional<lang::minimap_icon_action>& target,
+	diagnostics_container& diagnostics)
 {
-	return detail::evaluate_literal_sequence(st, action.literals, 1, 3)
-		.map_result<std::optional<lang::minimap_icon>>([&](lang::object obj) {
-			return make_minimap_icon(st, obj);
+	return detail::evaluate_literal_sequence(st, action.literals, 1, 3, diagnostics)
+		.flat_map([&](lang::object obj) {
+			return make_minimap_icon(st, obj, diagnostics);
 		})
-		.map_result<>([&](std::optional<lang::minimap_icon> icon) {
+		.map([&](boost::optional<lang::minimap_icon> icon) {
 			if (icon)
 				target = lang::minimap_icon_action{*icon, parser::position_tag_of(action)};
 			else
 				target = std::nullopt;
-		});
+
+			return true;
+		})
+		.value_or(false);
 }
 
 } // namespace
@@ -489,104 +534,110 @@ real_filter_add_minimap_icon_action(
 namespace fs::compiler::detail
 {
 
-outcome<>
+bool
 spirit_filter_add_action(
 	settings st,
 	const ast::sf::action& action,
 	const lang::symbol_table& symbols,
-	lang::action_set& set)
+	lang::action_set& set,
+	diagnostics_container& diagnostics)
 {
-	return action.apply_visitor(x3::make_lambda_visitor<outcome<>>(
+	return action.apply_visitor(x3::make_lambda_visitor<bool>(
 		[&](const ast::sf::set_color_action& a) {
-			return spirit_filter_add_set_color_action(st, a, symbols, set);
+			return spirit_filter_add_set_color_action(st, a, symbols, set, diagnostics);
 		},
 		[&](const ast::sf::set_font_size_action& a) {
-			return spirit_filter_add_set_font_size_action(st, a, symbols, set);
+			return spirit_filter_add_set_font_size_action(st, a, symbols, set, diagnostics);
 		},
 		[&](const ast::sf::minimap_icon_action& a) {
-			return spirit_filter_add_minimap_icon_action(st, a, symbols, set);
+			return spirit_filter_add_minimap_icon_action(st, a, symbols, set, diagnostics);
 		},
 		[&](const ast::sf::play_effect_action& a) {
-			return spirit_filter_add_play_effect_action(st, a, symbols, set);
+			return spirit_filter_add_play_effect_action(st, a, symbols, set, diagnostics);
 		},
 		[&](const ast::sf::play_alert_sound_action& a) {
-			return spirit_filter_add_play_alert_sound_action(st, a, symbols, set);
+			return spirit_filter_add_play_alert_sound_action(st, a, symbols, set, diagnostics);
 		},
 		[&](const ast::sf::custom_alert_sound_action& a) {
-			return spirit_filter_add_custom_alert_sound_action(st, a, symbols, set);
+			return spirit_filter_add_custom_alert_sound_action(st, a, symbols, set, diagnostics);
 		},
 		[&](const ast::sf::set_alert_sound_action& a) {
-			return spirit_filter_add_set_alert_sound_action(st, a, symbols, set);
+			return spirit_filter_add_set_alert_sound_action(st, a, symbols, set, diagnostics);
 		},
 		[&](const ast::sf::switch_drop_sound_action& a) {
 			set.switch_drop_sound = lang::switch_drop_sound_action{a.enable, parser::position_tag_of(action)};
-			return outcome<>::success();
+			return true;
 		},
 		[&](const ast::sf::compound_action& ca) {
-			return spirit_filter_add_compound_action(st, ca, symbols, set);
+			return spirit_filter_add_compound_action(st, ca, symbols, set, diagnostics);
 		}
 	));
 }
 
-outcome<>
+bool
 real_filter_add_action(
 	settings st,
 	const parser::ast::rf::action& a,
-	lang::action_set& set)
+	lang::action_set& set,
+	diagnostics_container& diagnostics)
 {
-	using result_type = outcome<>;
-
-	return a.apply_visitor(x3::make_lambda_visitor<result_type>(
+	return a.apply_visitor(x3::make_lambda_visitor<bool>(
 		[&](const ast::rf::color_action& action) {
-			return real_filter_add_color_action(st, action, set);
+			return real_filter_add_color_action(st, action, set, diagnostics);
 		},
-		[&](const ast::rf::set_font_size_action& action) -> result_type {
+		[&](const ast::rf::set_font_size_action& action) {
 			return real_filter_add_action_impl(
 				lang::font_size_action{
 					lang::integer{action.font_size.value},
 					parser::position_tag_of(action)
 				},
-				set.set_font_size);
+				set.set_font_size,
+				diagnostics);
 		},
-		[&](const ast::rf::minimap_icon_action& action) -> result_type {
-			return real_filter_add_minimap_icon_action(st, action, set.minimap_icon);
+		[&](const ast::rf::minimap_icon_action& action) {
+			return real_filter_add_minimap_icon_action(st, action, set.minimap_icon, diagnostics);
 		},
-		[&](const ast::rf::play_effect_action& action) -> result_type {
+		[&](const ast::rf::play_effect_action& action) {
 			return real_filter_add_action_impl(
 				lang::play_effect_action{
 					lang::play_effect{evaluate(action.suit), action.is_temporary},
 					parser::position_tag_of(action)
 				},
-				set.play_effect);
+				set.play_effect,
+				diagnostics);
 		},
-		[&](const ast::rf::play_alert_sound_action& action) -> result_type {
+		[&](const ast::rf::play_alert_sound_action& action) {
 			return real_filter_add_action_impl(
 				lang::alert_sound_action{
 					real_filter_make_builtin_alert_sound(action.id, action.volume, false),
 					parser::position_tag_of(action)
 				},
-				set.play_alert_sound);
+				set.play_alert_sound,
+				diagnostics);
 		},
-		[&](const ast::rf::play_alert_sound_positional_action& action) -> result_type {
+		[&](const ast::rf::play_alert_sound_positional_action& action) {
 			return real_filter_add_action_impl(
 				lang::alert_sound_action{
 					real_filter_make_builtin_alert_sound(action.id, action.volume, true),
 					parser::position_tag_of(action)
 				},
-				set.play_alert_sound);
+				set.play_alert_sound,
+				diagnostics);
 		},
-		[&](const ast::rf::custom_alert_sound_action& action) -> result_type {
+		[&](const ast::rf::custom_alert_sound_action& action) {
 			return real_filter_add_action_impl(
 				lang::alert_sound_action{
 					lang::alert_sound{lang::custom_alert_sound{evaluate(action.path)}},
 					parser::position_tag_of(action)
 				},
-				set.play_alert_sound);
+				set.play_alert_sound,
+				diagnostics);
 		},
-		[&](const ast::rf::switch_drop_sound_action& action) -> result_type {
+		[&](const ast::rf::switch_drop_sound_action& action) {
 			return real_filter_add_action_impl(
 				lang::switch_drop_sound_action{action.enable, parser::position_tag_of(action)},
-				set.switch_drop_sound);
+				set.switch_drop_sound,
+				diagnostics);
 		}
 	));
 }

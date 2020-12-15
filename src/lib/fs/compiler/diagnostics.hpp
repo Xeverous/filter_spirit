@@ -1,18 +1,23 @@
 #pragma once
 
-#include <fs/compiler/settings.hpp>
-#include <fs/parser/parser.hpp>
 #include <fs/lang/object.hpp>
 #include <fs/lang/position_tag.hpp>
 #include <fs/utility/better_enum.hpp>
-#include <fs/utility/outcome.hpp>
 #include <fs/log/logger.hpp>
 
-#include <variant>
-#include <optional>
+#include <boost/container/small_vector.hpp>
+#include <boost/optional.hpp>
 
-namespace fs::compiler::errors
-{
+#include <variant>
+
+namespace fs::parser {
+
+class lookup_data;
+class line_lookup;
+
+}
+
+namespace fs::compiler::errors {
 
 struct name_already_exists
 {
@@ -28,7 +33,7 @@ struct no_such_name
 struct invalid_amount_of_arguments
 {
 	int min_allowed;
-	std::optional<int> max_allowed;
+	boost::optional<int> max_allowed;
 	int actual;
 	lang::position_tag arguments;
 };
@@ -36,7 +41,7 @@ struct invalid_amount_of_arguments
 struct invalid_integer_value
 {
 	int min_allowed_value;
-	std::optional<int> max_allowed_value;
+	boost::optional<int> max_allowed_value;
 	int actual_value;
 	lang::position_tag origin;
 };
@@ -108,7 +113,7 @@ struct price_without_autogen
 	// price is a range-based condition so we allow
 	// an optional second origin to be specified
 	lang::position_tag price_origin;
-	std::optional<lang::position_tag> another_price_origin;
+	boost::optional<lang::position_tag> another_price_origin;
 };
 
 enum class autogen_error_cause
@@ -206,60 +211,36 @@ using note = std::variant<
 	notes::failed_operations_count
 >;
 
-using log_message = std::variant<error, warning, note>;
+using diagnostic_message = std::variant<error, warning, note>;
+using diagnostics_container = boost::container::small_vector<diagnostic_message, 4>;
 
-constexpr std::size_t outcome_buffer_size = 4;
-
-template <typename... R>
-using outcome = utility::outcome<log_message, outcome_buffer_size, R...>;
-
-using log_container = utility::outcome_base<log_message, outcome_buffer_size>::log_container_type;
-
-inline bool has_errors(const log_container& logs)
+inline bool has_errors(const diagnostics_container& messages)
 {
-	for (const auto& msg : logs)
+	for (const auto& msg : messages)
 		if (std::holds_alternative<error>(msg))
 			return true;
 
 	return false;
 }
 
-inline bool has_warnings(const log_container& logs)
+inline bool has_warnings(const diagnostics_container& messages)
 {
-	for (const auto& msg : logs)
+	for (const auto& msg : messages)
 		if (std::holds_alternative<warning>(msg))
 			return true;
 
 	return false;
 }
 
-inline bool has_warnings_or_errors(const log_container& logs)
+inline bool has_warnings_or_errors(const diagnostics_container& messages)
 {
-	return has_warnings(logs) || has_errors(logs);
+	return has_warnings(messages) || has_errors(messages);
 }
 
-inline bool should_continue(error_handling_settings settings, const log_container& logs)
-{
-	if (settings.stop_on_error) {
-		if (has_errors(logs) || (settings.treat_warnings_as_errors && has_warnings_or_errors(logs)))
-			return false;
-	}
-
-	return true;
-}
-
-template <typename... R>
-bool should_continue(error_handling_settings settings, const outcome<R...>& o)
-{
-	if (!o.has_result())
-		return false;
-
-	return should_continue(settings, o.logs());
-}
-
-void output_logs(
-	const log_container& logs,
+void output_diagnostics(
+	const diagnostics_container& messages,
 	const parser::lookup_data& lookup_data,
+	const parser::line_lookup& lines,
 	log::logger& logger);
 
 } // namespace fs::compiler

@@ -7,6 +7,7 @@
 
 #include <boost/container/static_vector.hpp>
 #include <boost/spirit/home/x3/support/utility/lambda_visitor.hpp>
+#include <boost/optional.hpp>
 
 #include <utility>
 
@@ -23,158 +24,191 @@ using namespace fs::compiler;
 // ---- generic helpers ----
 
 template <typename T>
-[[nodiscard]] outcome<>
+[[nodiscard]] bool
 add_range_condition(
 	lang::comparison_type comparison_type,
 	T value,
 	lang::position_tag condition_origin,
-	lang::range_condition<T>& target)
+	lang::range_condition<T>& target,
+	diagnostics_container& diagnostics)
 {
 	switch (comparison_type) {
 		case lang::comparison_type::equal_soft:
 		case lang::comparison_type::equal_hard: {
-			if (target.lower_bound.has_value())
-				return error(errors::lower_bound_redefinition{condition_origin, (*target.lower_bound).origin});
+			if (target.lower_bound.has_value()) {
+				diagnostics.emplace_back(error(errors::lower_bound_redefinition{
+					condition_origin, (*target.lower_bound).origin}));
+				return false;
+			}
 
-			if (target.upper_bound.has_value())
-				return error(errors::upper_bound_redefinition{condition_origin, (*target.upper_bound).origin});
+			if (target.upper_bound.has_value()) {
+				diagnostics.emplace_back(error(errors::upper_bound_redefinition{
+					condition_origin, (*target.upper_bound).origin}));
+				return false;
+			}
 
 			target.set_exact(value, condition_origin);
-			return outcome<>::success();
+			return true;
 		}
 		case lang::comparison_type::less: {
-			if (target.upper_bound.has_value())
-				return error(errors::upper_bound_redefinition{condition_origin, (*target.upper_bound).origin});
+			if (target.upper_bound.has_value()) {
+				diagnostics.emplace_back(error(errors::upper_bound_redefinition{
+					condition_origin, (*target.upper_bound).origin}));
+				return false;
+			}
 
 			target.set_upper_bound(value, false, condition_origin);
-			return outcome<>::success();
+			return true;
 		}
 		case lang::comparison_type::less_equal: {
-			if (target.upper_bound.has_value())
-				return error(errors::upper_bound_redefinition{condition_origin, (*target.upper_bound).origin});
+			if (target.upper_bound.has_value()) {
+				diagnostics.emplace_back(error(errors::upper_bound_redefinition{
+					condition_origin, (*target.upper_bound).origin}));
+				return false;
+			}
 
 			target.set_upper_bound(value, true, condition_origin);
-			return outcome<>::success();
+			return true;
 		}
 		case lang::comparison_type::greater: {
-			if (target.lower_bound.has_value())
-				return error(errors::lower_bound_redefinition{condition_origin, (*target.lower_bound).origin});
+			if (target.lower_bound.has_value()) {
+				diagnostics.emplace_back(error(errors::lower_bound_redefinition{
+					condition_origin, (*target.lower_bound).origin}));
+				return false;
+			}
 
 			target.set_lower_bound(value, false, condition_origin);
-			return outcome<>::success();
+			return true;
 		}
 		case lang::comparison_type::greater_equal: {
-			if (target.lower_bound.has_value())
-				return error(errors::lower_bound_redefinition{condition_origin, (*target.lower_bound).origin});
+			if (target.lower_bound.has_value()) {
+				diagnostics.emplace_back(error(errors::lower_bound_redefinition{
+					condition_origin, (*target.lower_bound).origin}));
+				return false;
+			}
 
 			target.set_lower_bound(value, true, condition_origin);
-			return outcome<>::success();
+			return true;
 		}
 	}
 
-	return error(errors::internal_compiler_error{
+	diagnostics.emplace_back(error(errors::internal_compiler_error{
 		errors::internal_compiler_error_cause::add_range_condition,
 		condition_origin
-	});
+	}));
+	return false;
 }
 
-[[nodiscard]] outcome<>
+[[nodiscard]] bool
 add_numeric_comparison_condition(
 	lang::numeric_comparison_condition_property property,
 	lang::comparison_type cmp,
 	lang::integer intgr,
 	lang::position_tag condition_origin,
-	lang::condition_set& set)
+	lang::condition_set& set,
+	diagnostics_container& diagnostics)
 {
 	switch (property) {
 		case lang::numeric_comparison_condition_property::item_level: {
-			return add_range_condition(cmp, intgr, condition_origin, set.item_level);
+			return add_range_condition(cmp, intgr, condition_origin, set.item_level, diagnostics);
 		}
 		case lang::numeric_comparison_condition_property::drop_level: {
-			return add_range_condition(cmp, intgr, condition_origin, set.drop_level);
+			return add_range_condition(cmp, intgr, condition_origin, set.drop_level, diagnostics);
 		}
 		case lang::numeric_comparison_condition_property::quality: {
-			return add_range_condition(cmp, intgr, condition_origin, set.quality);
+			return add_range_condition(cmp, intgr, condition_origin, set.quality, diagnostics);
 		}
 		case lang::numeric_comparison_condition_property::linked_sockets: {
-			return add_range_condition(cmp, intgr, condition_origin, set.linked_sockets);
+			return add_range_condition(cmp, intgr, condition_origin, set.linked_sockets, diagnostics);
 		}
 		case lang::numeric_comparison_condition_property::height: {
-			return add_range_condition(cmp, intgr, condition_origin, set.height);
+			return add_range_condition(cmp, intgr, condition_origin, set.height, diagnostics);
 		}
 		case lang::numeric_comparison_condition_property::width: {
-			return add_range_condition(cmp, intgr, condition_origin, set.width);
+			return add_range_condition(cmp, intgr, condition_origin, set.width, diagnostics);
 		}
 		case lang::numeric_comparison_condition_property::stack_size: {
-			return add_range_condition(cmp, intgr, condition_origin, set.stack_size);
+			return add_range_condition(cmp, intgr, condition_origin, set.stack_size, diagnostics);
 		}
 		case lang::numeric_comparison_condition_property::gem_level: {
-			return add_range_condition(cmp, intgr, condition_origin, set.gem_level);
+			return add_range_condition(cmp, intgr, condition_origin, set.gem_level, diagnostics);
 		}
 		case lang::numeric_comparison_condition_property::map_tier: {
-			return add_range_condition(cmp, intgr, condition_origin, set.map_tier);
+			return add_range_condition(cmp, intgr, condition_origin, set.map_tier, diagnostics);
 		}
 		case lang::numeric_comparison_condition_property::area_level: {
-			return add_range_condition(cmp, intgr, condition_origin, set.area_level);
+			return add_range_condition(cmp, intgr, condition_origin, set.area_level, diagnostics);
 		}
 		case lang::numeric_comparison_condition_property::corrupted_mods: {
-			return add_range_condition(cmp, intgr, condition_origin, set.corrupted_mods);
+			return add_range_condition(cmp, intgr, condition_origin, set.corrupted_mods, diagnostics);
 		}
 	}
 
-	return error(errors::internal_compiler_error{
+	diagnostics.emplace_back(error(errors::internal_compiler_error{
 		errors::internal_compiler_error_cause::add_numeric_comparison_condition,
 		condition_origin
-	});
+	}));
+	return false;
 }
 
-[[nodiscard]] outcome<>
+[[nodiscard]] bool
 add_string_array_condition_impl(
 	std::vector<lang::string> strings,
 	bool is_exact_match,
 	lang::position_tag condition_origin,
-	std::optional<lang::strings_condition>& target)
+	std::optional<lang::strings_condition>& target,
+	diagnostics_container& diagnostics)
 {
-	if (target.has_value())
-		return error(errors::condition_redefinition{condition_origin, (*target).origin});
+	if (target.has_value()) {
+		diagnostics.emplace_back(error(errors::condition_redefinition{condition_origin, (*target).origin}));
+		return false;
+	}
 
 	target = lang::strings_condition{std::move(strings), is_exact_match, condition_origin};
-	return outcome<>::success();
+	return true;
 }
 
-[[nodiscard]] outcome<>
+[[nodiscard]] bool
 add_string_array_condition(
 	lang::string_array_condition_property property,
 	std::vector<lang::string> strings,
 	bool exact_match,
 	lang::position_tag condition_origin,
-	lang::condition_set& set)
+	lang::condition_set& set,
+	diagnostics_container& diagnostics)
 {
 	switch (property) {
 		case lang::string_array_condition_property::class_: {
-			return add_string_array_condition_impl(std::move(strings), exact_match, condition_origin, set.class_);
+			return add_string_array_condition_impl(
+				std::move(strings), exact_match, condition_origin, set.class_, diagnostics);
 		}
 		case lang::string_array_condition_property::base_type: {
-			return add_string_array_condition_impl(std::move(strings), exact_match, condition_origin, set.base_type);
+			return add_string_array_condition_impl(
+				std::move(strings), exact_match, condition_origin, set.base_type, diagnostics);
 		}
 		case lang::string_array_condition_property::has_explicit_mod: {
-			return add_string_array_condition_impl(std::move(strings), exact_match, condition_origin, set.has_explicit_mod);
+			return add_string_array_condition_impl(
+				std::move(strings), exact_match, condition_origin, set.has_explicit_mod, diagnostics);
 		}
 		case lang::string_array_condition_property::has_enchantment: {
-			return add_string_array_condition_impl(std::move(strings), exact_match, condition_origin, set.has_enchantment);
+			return add_string_array_condition_impl(
+				std::move(strings), exact_match, condition_origin, set.has_enchantment, diagnostics);
 		}
 		case lang::string_array_condition_property::prophecy: {
-			return add_string_array_condition_impl(std::move(strings), exact_match, condition_origin, set.prophecy);
+			return add_string_array_condition_impl(
+				std::move(strings), exact_match, condition_origin, set.prophecy, diagnostics);
 		}
 		case lang::string_array_condition_property::enchantment_passive_node: {
-			return add_string_array_condition_impl(std::move(strings), exact_match, condition_origin, set.enchantment_passive_node);
+			return add_string_array_condition_impl(
+				std::move(strings), exact_match, condition_origin, set.enchantment_passive_node, diagnostics);
 		}
 	}
 
-	return error(errors::internal_compiler_error{
+	diagnostics.emplace_back(error(errors::internal_compiler_error{
 		errors::internal_compiler_error_cause::add_string_array_condition,
 		condition_origin
-	});
+	}));
+	return false;
 }
 
 /*
@@ -191,32 +225,31 @@ using influences_container = boost::container::static_vector<
 	lang::limits::max_filter_influences
 >;
 
-[[nodiscard]] outcome<>
+[[nodiscard]] bool
 add_has_influence_condition(
 	settings st,
 	influences_container influences,
 	bool is_exact_match,
 	lang::position_tag origin,
-	std::optional<lang::influences_condition>& target)
+	std::optional<lang::influences_condition>& target,
+	diagnostics_container& diagnostics)
 {
-	log_container logs;
 	for (std::size_t i = 0; i < influences.size(); ++i) {
 		for (std::size_t j = 0; j < influences.size(); ++j) {
 			if (j != i && influences[i] == influences[j]) {
-				logs.emplace_back(error(errors::duplicate_influence{
+				diagnostics.emplace_back(error(errors::duplicate_influence{
 					influences[i].origin, influences[j].origin}));
 
-				if (!should_continue(st.error_handling, logs))
-					return logs;
+				if (st.error_handling.stop_on_error)
+					return false;
 			}
 		}
 	}
 
-	if (target.has_value())
-		logs.emplace_back(error(errors::condition_redefinition{origin, (*target).origin}));
-
-	if (!should_continue(st.error_handling, logs))
-		return logs;
+	if (target.has_value()) {
+		diagnostics.emplace_back(error(errors::condition_redefinition{origin, (*target).origin}));
+		return false;
+	}
 
 	const auto contains = [&](lang::influence_type type) {
 		for (const auto infl : influences)
@@ -238,304 +271,340 @@ add_has_influence_condition(
 		is_exact_match,
 		origin
 	};
-	return outcome<>::success(std::move(logs));
+	return true;
 }
 
-[[nodiscard]] outcome<>
+[[nodiscard]] bool
 add_gem_quality_type_condition(
 	lang::gem_quality_type type,
 	lang::position_tag origin,
-	std::optional<lang::gem_quality_type_condition>& target)
+	std::optional<lang::gem_quality_type_condition>& target,
+	diagnostics_container& diagnostics)
 {
-	if (target.has_value())
-		return error(errors::condition_redefinition{origin, (*target).origin});
+	if (target.has_value()) {
+		diagnostics.emplace_back(error(errors::condition_redefinition{origin, (*target).origin}));
+		return false;
+	}
 
 	target = lang::gem_quality_type_condition{type, origin};
-	return outcome<>::success();
+	return true;
 }
 
-[[nodiscard]] outcome<>
+[[nodiscard]] bool
 add_socket_spec_condition(
 	bool links_matter,
 	lang::socket_spec_condition condition,
-	lang::condition_set& set)
+	lang::condition_set& set,
+	diagnostics_container& diagnostics)
 {
 	auto& target = links_matter ? set.socket_group : set.sockets;
 
-	if (target.has_value())
-		return error(errors::condition_redefinition{condition.origin, (*target).origin});
+	if (target.has_value()) {
+		diagnostics.emplace_back(error(errors::condition_redefinition{condition.origin, (*target).origin}));
+		return false;
+	}
 
 	target = std::move(condition);
-	return outcome<>::success();
+	return true;
 }
 
-[[nodiscard]] outcome<>
+[[nodiscard]] bool
 add_boolean_condition_impl(
 	lang::boolean boolean,
 	lang::position_tag condition_origin,
-	std::optional<lang::boolean_condition>& target)
+	std::optional<lang::boolean_condition>& target,
+	diagnostics_container& diagnostics)
 {
-	if (target.has_value())
-		return error(errors::condition_redefinition{condition_origin, (*target).origin});
+	if (target.has_value()) {
+		diagnostics.emplace_back(error(errors::condition_redefinition{condition_origin, (*target).origin}));
+		return false;
+	}
 
 	target = lang::boolean_condition{boolean, condition_origin};
-	return outcome<>::success();
+	return true;
 }
 
-[[nodiscard]] outcome<>
+[[nodiscard]] bool
 add_boolean_condition(
 	lang::boolean boolean,
 	lang::position_tag condition_origin,
 	lang::boolean_condition_property property,
-	lang::condition_set& condition_set)
+	lang::condition_set& condition_set,
+	diagnostics_container& diagnostics)
 {
 	switch (property) {
 		case lang::boolean_condition_property::identified: {
-			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_identified);
+			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_identified, diagnostics);
 		}
 		case lang::boolean_condition_property::corrupted: {
-			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_corrupted);
+			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_corrupted, diagnostics);
 		}
 		case lang::boolean_condition_property::mirrored: {
-			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_mirrored);
+			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_mirrored, diagnostics);
 		}
 		case lang::boolean_condition_property::elder_item: {
-			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_elder_item);
+			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_elder_item, diagnostics);
 		}
 		case lang::boolean_condition_property::shaper_item: {
-			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_shaper_item);
+			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_shaper_item, diagnostics);
 		}
 		case lang::boolean_condition_property::fractured_item: {
-			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_fractured_item);
+			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_fractured_item, diagnostics);
 		}
 		case lang::boolean_condition_property::synthesised_item: {
-			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_synthesised_item);
+			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_synthesised_item, diagnostics);
 		}
 		case lang::boolean_condition_property::any_enchantment: {
-			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_enchanted);
+			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_enchanted, diagnostics);
 		}
 		case lang::boolean_condition_property::shaped_map: {
-			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_shaped_map);
+			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_shaped_map, diagnostics);
 		}
 		case lang::boolean_condition_property::elder_map: {
-			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_elder_map);
+			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_elder_map, diagnostics);
 		}
 		case lang::boolean_condition_property::blighted_map: {
-			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_blighted_map);
+			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_blighted_map, diagnostics);
 		}
 		case lang::boolean_condition_property::replica: {
-			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_replica);
+			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_replica, diagnostics);
 		}
 		case lang::boolean_condition_property::alternate_quality: {
-			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_alternate_quality);
+			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_alternate_quality, diagnostics);
 		}
 	}
 
-	return error(errors::internal_compiler_error{
+	diagnostics.emplace_back(error(errors::internal_compiler_error{
 		errors::internal_compiler_error_cause::add_boolean_condition,
 		condition_origin
-	});
+	}));
+	return false;
 }
 
 // ---- spirit filter helpers ----
 
-[[nodiscard]] outcome<>
+[[nodiscard]] bool
 spirit_filter_add_autogen_condition(
 	const ast::sf::autogen_condition& condition,
-	lang::spirit_condition_set& set)
+	lang::spirit_condition_set& set,
+	diagnostics_container& diagnostics)
 {
 	const auto condition_origin = parser::position_tag_of(condition);
 
-	if (set.autogen.has_value())
-		return error(errors::condition_redefinition{condition_origin, (*set.autogen).origin});
+	if (set.autogen.has_value()) {
+		diagnostics.emplace_back(error(errors::condition_redefinition{condition_origin, (*set.autogen).origin}));
+		return false;
+	}
 
 	set.autogen = lang::autogen_condition{condition.cat_expr.category, condition_origin};
-	return outcome<>::success();
+	return true;
 }
 
-[[nodiscard]] outcome<>
+[[nodiscard]] bool
 spirit_filter_add_price_comparison_condition(
 	settings st,
 	const ast::sf::price_comparison_condition& condition,
 	const lang::symbol_table& symbols,
-	lang::spirit_condition_set& set)
+	lang::spirit_condition_set& set,
+	diagnostics_container& diagnostics)
 {
-	return detail::evaluate_sequence(st, condition.seq, symbols, 1, 1)
-		.map_result<lang::fractional>([](lang::object obj) {
+	return detail::evaluate_sequence(st, condition.seq, symbols, 1, 1, diagnostics)
+		.flat_map([&](lang::object obj) {
 			FS_ASSERT(obj.values.size() == 1u);
-			return detail::get_as_fractional(obj.values[0]);
+			return detail::get_as_fractional(obj.values[0], diagnostics);
 		})
-		.map_result([&](lang::fractional frac) {
+		.map([&](lang::fractional frac) {
 			return add_range_condition(
 				condition.comparison_type.value,
 				frac,
 				parser::position_tag_of(condition),
-				set.price);
-		});
+				set.price,
+				diagnostics);
+		})
+		.value_or(false);
 }
 
-[[nodiscard]] outcome<>
+[[nodiscard]] bool
 spirit_filter_add_rarity_comparison_condition(
 	settings st,
 	const ast::sf::rarity_comparison_condition& condition,
 	const lang::symbol_table& symbols,
-	lang::condition_set& set)
+	lang::condition_set& set,
+	diagnostics_container& diagnostics)
 {
-	return detail::evaluate_sequence(st, condition.seq, symbols, 1, 1)
-		.map_result<lang::rarity>([](lang::object obj) {
+	return detail::evaluate_sequence(st, condition.seq, symbols, 1, 1, diagnostics)
+		.flat_map([&](lang::object obj) {
 			FS_ASSERT(obj.values.size() == 1u);
-			return detail::get_as<lang::rarity>(obj.values[0]);
+			return detail::get_as<lang::rarity>(obj.values[0], diagnostics);
 		})
-		.map_result([&](lang::rarity rar) {
+		.map([&](lang::rarity rar) {
 			return add_range_condition(
 				condition.comparison_type.value,
 				rar,
 				parser::position_tag_of(condition),
-				set.rarity);
-		});
+				set.rarity,
+				diagnostics);
+		})
+		.value_or(false);
 }
 
-[[nodiscard]] outcome<>
+[[nodiscard]] bool
 spirit_filter_add_numeric_comparison_condition(
 	settings st,
 	const ast::sf::numeric_comparison_condition& condition,
 	const lang::symbol_table& symbols,
-	lang::condition_set& set)
+	lang::condition_set& set,
+	diagnostics_container& diagnostics)
 {
-	return detail::evaluate_sequence(st, condition.seq, symbols, 1, 1)
-		.map_result<lang::integer>([](lang::object obj) {
+	return detail::evaluate_sequence(st, condition.seq, symbols, 1, 1, diagnostics)
+		.flat_map([&](lang::object obj) {
 			FS_ASSERT(obj.values.size() == 1u);
-			return detail::get_as<lang::integer>(obj.values[0]);
+			return detail::get_as<lang::integer>(obj.values[0], diagnostics);
 		})
-		.map_result([&](lang::integer intgr) {
-			const auto origin = parser::position_tag_of(condition);
+		.map([&](lang::integer intgr) {
 			return add_numeric_comparison_condition(
-				condition.property, condition.comparison_type.value, intgr, origin, set);
-		});
+				condition.property,
+				condition.comparison_type.value,
+				intgr,
+				parser::position_tag_of(condition),
+				set,
+				diagnostics);
+		})
+		.value_or(false);
 }
 
-[[nodiscard]] outcome<>
+[[nodiscard]] bool
 spirit_filter_add_string_array_condition(
 	settings st,
 	const ast::sf::string_array_condition& condition,
 	const lang::symbol_table& symbols,
-	lang::condition_set& set)
+	lang::condition_set& set,
+	diagnostics_container& diagnostics)
 {
 	using vec_t = std::vector<lang::string>;
-	return detail::evaluate_sequence(st, condition.seq, symbols)
-		.map_result<vec_t>([&](lang::object obj) -> outcome<vec_t> {
+	return detail::evaluate_sequence(st, condition.seq, symbols, 1, boost::none, diagnostics)
+		.flat_map([&](lang::object obj) -> boost::optional<vec_t> {
 			vec_t strings;
-			log_container logs;
 
 			for (auto& sobj : obj.values) {
-				if (detail::get_as<lang::none>(sobj).has_result())
+				// skip "None"s - they may come from variables
+				// if an object is not none - ignore the problem and move forward
+				// because of ignoring all logs are thrown away
+				diagnostics_container diagnostics_none;
+				if (detail::get_as<lang::none>(sobj, diagnostics_none).has_value())
 					continue;
 
-				detail::get_as<lang::string>(sobj)
-					.map_result([&](lang::string str) { strings.push_back(std::move(str)); })
-					.move_logs_to(logs);
+				boost::optional<lang::string> str = detail::get_as<lang::string>(sobj, diagnostics);
 
-				if (!should_continue(st.error_handling, logs))
-					return logs;
+				if (str)
+					strings.push_back(std::move(*str));
+				else if (st.error_handling.stop_on_error)
+					return boost::none;
 			}
 
-			return {std::move(strings), std::move(logs)};
+			return strings;
 		})
-		.map_result([&](vec_t strings) {
+		.map([&](vec_t strings) {
 			return add_string_array_condition(
 				condition.property,
 				std::move(strings),
 				condition.exact_match.required,
 				parser::position_tag_of(condition),
-				set);
-		});
+				set,
+				diagnostics);
+		})
+		.value_or(false);
 }
 
-[[nodiscard]] outcome<>
+[[nodiscard]] bool
 spirit_filter_add_has_influence_condition(
 	settings st,
 	const ast::sf::has_influence_condition& condition,
 	const lang::symbol_table& symbols,
-	lang::condition_set& set)
+	lang::condition_set& set,
+	diagnostics_container& diagnostics)
 {
-	return detail::evaluate_sequence(st, condition.seq, symbols, 1, lang::limits::max_filter_influences)
-		.map_result<influences_container>([&](lang::object obj) -> outcome<influences_container> {
+	return detail::evaluate_sequence(st, condition.seq, symbols, 1, lang::limits::max_filter_influences, diagnostics)
+		.flat_map([&](lang::object obj) -> boost::optional<influences_container> {
 			if (obj.values.size() == 1u) {
-				auto none = detail::get_as<lang::none>(obj.values.front());
-				if (none.has_result())
+				diagnostics_container diagnostics_none; // ignore logs and move on if get_as<none> fails
+				if (detail::get_as<lang::none>(obj.values.front(), diagnostics_none).has_value())
 					return influences_container();
 			}
 
 			influences_container influences;
-			log_container logs;
 
 			for (auto& sobj : obj.values) {
-				detail::get_as<lang::influence>(sobj)
-					.map_result([&](lang::influence inf) { influences.emplace_back(inf); })
-					.move_logs_to(logs);
+				boost::optional<lang::influence> infl = detail::get_as<lang::influence>(sobj, diagnostics);
 
-				if (!should_continue(st.error_handling, logs))
-					return logs;
+				if (infl)
+					influences.emplace_back(*infl);
+				else if (st.error_handling.stop_on_error)
+					return boost::none;
 			}
 
-			return {std::move(influences), std::move(logs)};
+			return influences;
 		})
-		.map_result([&](influences_container influences) {
+		.map([&](influences_container influences) {
 			return add_has_influence_condition(
 				st,
 				std::move(influences),
 				condition.exact_match.required,
 				parser::position_tag_of(condition),
-				set.has_influence);
-		});
+				set.has_influence,
+				diagnostics);
+		})
+		.value_or(false);
 }
 
-[[nodiscard]] outcome<>
+[[nodiscard]] bool
 spirit_filter_add_gem_quality_type_condition(
 	settings st,
 	const ast::sf::gem_quality_type_condition& condition,
 	const lang::symbol_table& symbols,
-	lang::condition_set& set)
+	lang::condition_set& set,
+	diagnostics_container& diagnostics)
 {
-	return detail::evaluate_sequence(st, condition.seq, symbols, 1, 1)
-		.map_result<lang::gem_quality_type>([](lang::object obj) {
+	return detail::evaluate_sequence(st, condition.seq, symbols, 1, 1, diagnostics)
+		.flat_map([&](lang::object obj) {
 			FS_ASSERT(obj.values.size() == 1u);
-			return detail::get_as<lang::gem_quality_type>(obj.values[0]);
+			return detail::get_as<lang::gem_quality_type>(obj.values[0], diagnostics);
 		})
-		.map_result([&](lang::gem_quality_type type) {
+		.map([&](lang::gem_quality_type gqt) {
 			return add_gem_quality_type_condition(
-				type,
+				gqt,
 				parser::position_tag_of(condition),
-				set.gem_quality_type);
-		});
+				set.gem_quality_type,
+				diagnostics);
+		})
+		.value_or(false);
 }
 
-[[nodiscard]] outcome<>
+[[nodiscard]] bool
 spirit_filter_add_socket_spec_condition(
 	settings st,
 	const ast::sf::socket_spec_condition& condition,
 	const lang::symbol_table& symbols,
-	lang::condition_set& set)
+	lang::condition_set& set,
+	diagnostics_container& diagnostics)
 {
 	using specs_t = lang::socket_spec_condition::container_type;
-
-	return detail::evaluate_sequence(st, condition.seq, symbols, 1)
-		.map_result<specs_t>([&](lang::object obj) -> outcome<specs_t> {
+	return detail::evaluate_sequence(st, condition.seq, symbols, 1, boost::none, diagnostics)
+		.flat_map([&](lang::object obj) -> boost::optional<specs_t> {
 			specs_t specs;
-			log_container logs;
 
 			for (auto& val : obj.values) {
-				detail::get_as_socket_spec(val)
-					.map_result([&](lang::socket_spec ss) { specs.push_back(ss); })
-					.move_logs_to(logs);
+				boost::optional<lang::socket_spec> ss = detail::get_as_socket_spec(val, diagnostics);
 
-				if (!should_continue(st.error_handling, logs))
-					return logs;
+				if (ss)
+					specs.push_back(*ss);
+				else if (st.error_handling.stop_on_error)
+					return boost::none;
 			}
 
-			return {std::move(specs), std::move(logs)};
+			return specs;
 		})
-		.map_result([&](specs_t specs) {
+		.map([&](specs_t specs) {
 			return add_socket_spec_condition(
 				condition.links_matter,
 				lang::socket_spec_condition{
@@ -543,48 +612,55 @@ spirit_filter_add_socket_spec_condition(
 					std::move(specs),
 					parser::position_tag_of(condition)
 				},
-				set);
-		});
+				set,
+				diagnostics);
+		})
+		.value_or(false);
 }
 
-[[nodiscard]] outcome<>
+[[nodiscard]] bool
 spirit_filter_add_boolean_condition(
 	settings st,
 	const ast::sf::boolean_condition& condition,
 	const lang::symbol_table& symbols,
-	lang::condition_set& condition_set)
+	lang::condition_set& condition_set,
+	diagnostics_container& diagnostics)
 {
-	return detail::evaluate_sequence(st, condition.seq, symbols, 1, 1)
-		.map_result<lang::boolean>([](lang::object obj) {
+	return detail::evaluate_sequence(st, condition.seq, symbols, 1, 1, diagnostics)
+		.flat_map([&](lang::object obj) {
 			FS_ASSERT(obj.values.size() == 1u);
-			return detail::get_as<lang::boolean>(obj.values[0]);
+			return detail::get_as<lang::boolean>(obj.values[0], diagnostics);
 		})
-		.map_result([&](lang::boolean b) {
+		.map([&](lang::boolean b) {
 			return add_boolean_condition(
 				b,
 				parser::position_tag_of(condition),
 				condition.property,
-				condition_set);
-		});
+				condition_set,
+				diagnostics);
+		})
+		.value_or(false);
 }
 
 // ---- real filter helpers ----
 
-[[nodiscard]] outcome<>
+[[nodiscard]] bool
 real_filter_add_numeric_comparison_condition(
 	ast::rf::numeric_condition numeric_condition,
-	lang::condition_set& set)
+	lang::condition_set& set,
+	diagnostics_container& diagnostics)
 {
 	const lang::integer intgr = detail::evaluate(numeric_condition.integer);
 	const auto origin = parser::position_tag_of(numeric_condition);
 	const lang::comparison_type cmp = numeric_condition.comparison_type.value;
-	return add_numeric_comparison_condition(numeric_condition.property, cmp, intgr, origin, set);
+	return add_numeric_comparison_condition(numeric_condition.property, cmp, intgr, origin, set, diagnostics);
 }
 
-[[nodiscard]] outcome<>
+[[nodiscard]] bool
 real_filter_add_string_array_condition(
 	const parser::ast::rf::string_array_condition& condition,
-	lang::condition_set& set)
+	lang::condition_set& set,
+	diagnostics_container& diagnostics)
 {
 	std::vector<lang::string> strings;
 	strings.reserve(condition.string_literals.size());
@@ -594,23 +670,25 @@ real_filter_add_string_array_condition(
 
 	const auto origin = parser::position_tag_of(condition);
 	const bool exact_match = condition.exact_match.required;
-	return add_string_array_condition(condition.property, std::move(strings), exact_match, origin, set);
+	return add_string_array_condition(condition.property, std::move(strings), exact_match, origin, set, diagnostics);
 }
 
-[[nodiscard]] outcome<influences_container>
+[[nodiscard]] boost::optional<influences_container>
 real_filter_make_influences_container(
 	const ast::rf::influence_spec& spec,
-	lang::position_tag condition_origin)
+	lang::position_tag condition_origin,
+	diagnostics_container& diagnostics)
 {
-	using result_type = outcome<influences_container>;
+	using result_type = boost::optional<influences_container>;
 
 	return spec.apply_visitor(x3::make_lambda_visitor<result_type>(
 		[&](const ast::rf::influence_literal_array& array) -> result_type {
 			const auto num_inf = static_cast<int>(array.size());
 
 			if (num_inf < 1 || num_inf > lang::limits::max_filter_influences) {
-				return error(errors::invalid_amount_of_arguments{
-					/* min */ 1, /* max */ lang::limits::max_filter_influences, /* actual */ num_inf, condition_origin});
+				diagnostics.emplace_back(error(errors::invalid_amount_of_arguments{
+					/* min */ 1, /* max */ lang::limits::max_filter_influences, /* actual */ num_inf, condition_origin}));
+				return boost::none;
 			}
 
 			influences_container influences;
@@ -626,54 +704,55 @@ real_filter_make_influences_container(
 	));
 }
 
-[[nodiscard]] outcome<>
+[[nodiscard]] bool
 real_filter_add_has_influence_condition(
 	settings st,
 	const ast::rf::has_influence_condition& condition,
-	std::optional<lang::influences_condition>& target)
+	std::optional<lang::influences_condition>& target,
+	diagnostics_container& diagnostics)
 {
 	const auto condition_origin = parser::position_tag_of(condition);
-
-	return real_filter_make_influences_container(condition.spec, condition_origin)
-		.map_result([&](influences_container influences) {
+	return real_filter_make_influences_container(condition.spec, condition_origin, diagnostics)
+		.map([&](influences_container influences) {
 			return add_has_influence_condition(
 				st,
 				std::move(influences),
 				condition.exact_match.required,
 				condition_origin,
-				target);
-		});
-
+				target,
+				diagnostics);
+		})
+		.value_or(false);
 }
 
-[[nodiscard]] outcome<>
+[[nodiscard]] bool
 real_filter_add_socket_spec_condition(
 	settings st,
 	const ast::rf::socket_spec_condition& condition,
-	lang::condition_set& set)
+	lang::condition_set& set,
+	diagnostics_container& diagnostics)
 {
 	lang::socket_spec_condition::container_type specs;
-	log_container logs;
 
 	for (ast::common::literal_expression lit_expr : condition.literals) {
-		detail::evaluate(st, lit_expr)
-			.map_result<lang::socket_spec>([&](lang::single_object so) { return detail::get_as_socket_spec(so); })
-			.map_result<>([&](lang::socket_spec ss) { specs.push_back(ss); })
-			.move_logs_to(logs);
+		boost::optional<lang::socket_spec> ss = detail::evaluate(st, lit_expr, diagnostics)
+			.flat_map([&](lang::single_object so) { return detail::get_as_socket_spec(so, diagnostics); });
 
-		if (!should_continue(st.error_handling, logs))
-			return logs;
+		if (ss)
+			specs.push_back(*ss);
+		else if (st.error_handling.stop_on_error)
+			return false;
 	}
 
-	return outcome<>::success(std::move(logs))
-		.merge_with(add_socket_spec_condition(
-			condition.links_matter,
-			lang::socket_spec_condition{
-				condition.comparison_type.value,
-				std::move(specs),
-				parser::position_tag_of(condition)
-			},
-			set));
+	return add_socket_spec_condition(
+		condition.links_matter,
+		lang::socket_spec_condition{
+			condition.comparison_type.value,
+			std::move(specs),
+			parser::position_tag_of(condition)
+		},
+		set,
+		diagnostics);
 }
 
 } // namespace
@@ -681,103 +760,105 @@ real_filter_add_socket_spec_condition(
 namespace fs::compiler::detail
 {
 
-outcome<>
+bool
 spirit_filter_add_conditions(
 	settings st,
 	const std::vector<ast::sf::condition>& conditions,
 	const lang::symbol_table& symbols,
-	lang::spirit_condition_set& set)
+	lang::spirit_condition_set& set,
+	diagnostics_container& diagnostics)
 {
-	log_container logs;
 	int failed_conditions = 0;
 
 	for (const ast::sf::condition& condition : conditions) {
-		auto condition_outcome = condition.apply_visitor(x3::make_lambda_visitor<outcome<>>(
+		const bool condition_result = condition.apply_visitor(x3::make_lambda_visitor<bool>(
 			[&](const ast::sf::autogen_condition& cond) {
-				return spirit_filter_add_autogen_condition(cond, set);
+				return spirit_filter_add_autogen_condition(cond, set, diagnostics);
 			},
 			[&](const ast::sf::price_comparison_condition& cond) {
-				return spirit_filter_add_price_comparison_condition(st, cond, symbols, set);
+				return spirit_filter_add_price_comparison_condition(st, cond, symbols, set, diagnostics);
 			},
 			[&](const ast::sf::rarity_comparison_condition& cond) {
-				return spirit_filter_add_rarity_comparison_condition(st, cond, symbols, set.conditions);
+				return spirit_filter_add_rarity_comparison_condition(st, cond, symbols, set.conditions, diagnostics);
 			},
 			[&](const ast::sf::numeric_comparison_condition& cond) {
-				return spirit_filter_add_numeric_comparison_condition(st, cond, symbols, set.conditions);
+				return spirit_filter_add_numeric_comparison_condition(st, cond, symbols, set.conditions, diagnostics);
 			},
 			[&](const ast::sf::string_array_condition& cond) {
-				return spirit_filter_add_string_array_condition(st, cond, symbols, set.conditions);
+				return spirit_filter_add_string_array_condition(st, cond, symbols, set.conditions, diagnostics);
 			},
 			[&](const ast::sf::has_influence_condition& cond) {
-				return spirit_filter_add_has_influence_condition(st, cond, symbols, set.conditions);
+				return spirit_filter_add_has_influence_condition(st, cond, symbols, set.conditions, diagnostics);
 			},
 			[&](const ast::sf::gem_quality_type_condition& cond) {
-				return spirit_filter_add_gem_quality_type_condition(st, cond, symbols, set.conditions);
+				return spirit_filter_add_gem_quality_type_condition(st, cond, symbols, set.conditions, diagnostics);
 			},
 			[&](const ast::sf::socket_spec_condition& cond) {
-				return spirit_filter_add_socket_spec_condition(st, cond, symbols, set.conditions);
+				return spirit_filter_add_socket_spec_condition(st, cond, symbols, set.conditions, diagnostics);
 			},
 			[&](const ast::sf::boolean_condition& cond) {
-				return spirit_filter_add_boolean_condition(st, cond, symbols, set.conditions);
+				return spirit_filter_add_boolean_condition(st, cond, symbols, set.conditions, diagnostics);
 			}
 		));
 
-		if (!condition_outcome.has_result())
+		if (!condition_result) {
 			++failed_conditions;
 
-		if (!should_continue(st.error_handling, condition_outcome)) {
-			condition_outcome.move_logs_to(logs);
-			logs.emplace_back(note{notes::failed_operations_count{"condition", failed_conditions}});
-			return logs;
+			if (st.error_handling.stop_on_error) {
+				diagnostics.emplace_back(note{notes::failed_operations_count{"condition", failed_conditions}});
+				return false;
+			}
 		}
-
-		condition_outcome.move_logs_to(logs);
 	}
 
 	if (failed_conditions > 0)
-		logs.emplace_back(note{notes::failed_operations_count{"condition", failed_conditions}});
+		diagnostics.emplace_back(note{notes::failed_operations_count{"condition", failed_conditions}});
 
-	return outcome<>::success(std::move(logs));
+	return true;
 }
 
-outcome<>
+bool
 real_filter_add_condition(
 	settings st,
 	const parser::ast::rf::condition& condition,
-	lang::condition_set& condition_set)
+	lang::condition_set& condition_set,
+	diagnostics_container& diagnostics)
 {
-	return condition.apply_visitor(x3::make_lambda_visitor<outcome<>>(
+	return condition.apply_visitor(x3::make_lambda_visitor<bool>(
 		[&](const ast::rf::rarity_condition& cond) {
 			return add_range_condition(
 				cond.comparison_type.value,
 				evaluate(cond.rarity),
 				parser::position_tag_of(cond),
-				condition_set.rarity);
+				condition_set.rarity,
+				diagnostics);
 		},
 		[&](const ast::rf::numeric_condition& cond) {
-			return real_filter_add_numeric_comparison_condition(cond, condition_set);
+			return real_filter_add_numeric_comparison_condition(cond, condition_set, diagnostics);
 		},
 		[&](const ast::rf::string_array_condition& cond) {
-			return real_filter_add_string_array_condition(cond, condition_set);
+			return real_filter_add_string_array_condition(cond, condition_set, diagnostics);
 		},
 		[&](const ast::rf::has_influence_condition& cond) {
-			return real_filter_add_has_influence_condition(st, cond, condition_set.has_influence);
+			return real_filter_add_has_influence_condition(st, cond, condition_set.has_influence, diagnostics);
 		},
 		[&](const ast::rf::gem_quality_type_condition& cond) {
 			return add_gem_quality_type_condition(
 				evaluate(cond.value),
 				parser::position_tag_of(cond),
-				condition_set.gem_quality_type);
+				condition_set.gem_quality_type,
+				diagnostics);
 		},
 		[&](const ast::rf::socket_spec_condition& cond) {
-			return real_filter_add_socket_spec_condition(st, cond, condition_set);
+			return real_filter_add_socket_spec_condition(st, cond, condition_set, diagnostics);
 		},
 		[&](const ast::rf::boolean_condition& cond) {
 			return add_boolean_condition(
 				evaluate(cond.value),
 				parser::position_tag_of(cond),
 				cond.property,
-				condition_set);
+				condition_set,
+				diagnostics);
 		}
 	));
 }

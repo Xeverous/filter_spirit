@@ -5,10 +5,13 @@
 #include <fs/parser/parser.hpp>
 #include <fs/parser/ast_adapted.hpp> // required adaptation info for fs::log::structure_printer
 #include <fs/compiler/compiler.hpp>
-#include <fs/compiler/outcome.hpp>
+#include <fs/compiler/diagnostics.hpp>
 #include <fs/compiler/settings.hpp>
 #include <fs/log/logger.hpp>
 #include <fs/log/structure_printer.hpp>
+#include <fs/utility/monadic.hpp>
+
+#include <utility>
 
 namespace {
 
@@ -36,24 +39,23 @@ std::optional<fs::lang::spirit_item_filter> parse_and_compile_spirit_filter(
 
 	logger.info() << "Resolving filter template symbols...\n";
 
-	const compiler::outcome<lang::symbol_table> symbols_outcome =
-		compiler::resolve_spirit_filter_symbols(st.compile_settings, parse_data.ast.definitions);
-	compiler::output_logs(symbols_outcome.logs(), parse_data.lookup, logger);
+	compiler::diagnostics_container diagnostics_symbols;
+	const boost::optional<lang::symbol_table> symbols =
+		compiler::resolve_spirit_filter_symbols(st.compile_settings, parse_data.ast.definitions, diagnostics_symbols);
+	compiler::output_diagnostics(diagnostics_symbols, parse_data.lookup, parse_data.lines, logger);
 
-	if (!symbols_outcome.has_result())
+	if (!symbols)
 		return std::nullopt;
 
 	logger.info() << "Symbols resolved.\n";
 	logger.info() << "Compiling filter template...\n";
 
-	compiler::outcome<lang::spirit_item_filter> spirit_filter_outcome =
-		compiler::compile_spirit_filter_statements(st.compile_settings, parse_data.ast.statements, symbols_outcome.result());
-	compiler::output_logs(spirit_filter_outcome.logs(), parse_data.lookup, logger);
+	compiler::diagnostics_container diagnostics_spirit_filter;
+	boost::optional<lang::spirit_item_filter> spirit_filter =
+		compiler::compile_spirit_filter_statements(st.compile_settings, parse_data.ast.statements, *symbols, diagnostics_spirit_filter);
+	compiler::output_diagnostics(diagnostics_spirit_filter, parse_data.lookup, parse_data.lines, logger);
 
-	if (!spirit_filter_outcome.has_result())
-		return std::nullopt;
-
-	return std::move(spirit_filter_outcome).result();
+	return utility::to_std_optional(std::move(spirit_filter));
 }
 
 } // namespace

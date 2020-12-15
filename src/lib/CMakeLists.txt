@@ -25,7 +25,7 @@ target_sources(filter_spirit
 		fs/parser/parser.cpp
 		fs/parser/detail/grammar.cpp
 		fs/compiler/compiler.cpp
-		fs/compiler/outcome.cpp
+		fs/compiler/diagnostics.cpp
 		fs/compiler/detail/actions.cpp
 		fs/compiler/detail/conditions.cpp
 		fs/compiler/detail/evaluate.cpp
@@ -61,7 +61,7 @@ target_sources(filter_spirit
 		fs/compiler/detail/conditions.hpp
 		fs/compiler/detail/evaluate.hpp
 		fs/compiler/compiler.hpp
-		fs/compiler/outcome.hpp
+		fs/compiler/diagnostics.hpp
 		fs/generator/make_item_filter.hpp
 		fs/generator/common.hpp
 		fs/generator/generator.hpp
@@ -120,6 +120,7 @@ target_sources(filter_spirit
 		fs/parser/parser.hpp
 		fs/utility/assert.hpp
 		fs/utility/math.hpp
+		fs/utility/monadic.hpp
 		fs/utility/algorithm.hpp
 		fs/utility/better_enum.hpp
 		fs/utility/dump_json.hpp

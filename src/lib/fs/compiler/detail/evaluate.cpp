@@ -24,31 +24,38 @@ namespace
 
 // this could actually return something like bounded_integer<Min, Max>
 // so far all use cases provide constexpr min/max values
-[[nodiscard]] outcome<lang::integer>
+[[nodiscard]] boost::optional<lang::integer>
 make_integer_in_range(
 	lang::integer int_obj,
 	int min_allowed_value,
-	std::optional<int> max_allowed_value)
+	boost::optional<int> max_allowed_value,
+	diagnostics_container& diagnostics)
 {
 	const auto val = int_obj.value;
-	if (val < min_allowed_value || (max_allowed_value && val > *max_allowed_value))
-		return error(errors::invalid_integer_value{min_allowed_value, max_allowed_value, val, int_obj.origin});
+	if (val < min_allowed_value || (max_allowed_value && val > *max_allowed_value)) {
+		diagnostics.emplace_back(error(errors::invalid_integer_value{
+			min_allowed_value, max_allowed_value, val, int_obj.origin}));
+		return boost::none;
+	}
 
 	return int_obj;
 }
 
 // ---- spirit filter ----
 
-[[nodiscard]] outcome<lang::object>
+[[nodiscard]] boost::optional<lang::object>
 evaluate_name(
 	const ast::sf::name& name,
-	const lang::symbol_table& symbols)
+	const lang::symbol_table& symbols,
+	diagnostics_container& diagnostics)
 {
 	const auto name_origin = parser::position_tag_of(name);
 
 	const auto it = symbols.find(name.value.value);
-	if (it == symbols.end())
-		return error(errors::no_such_name{name_origin});
+	if (it == symbols.end()) {
+		diagnostics.emplace_back(error(errors::no_such_name{name_origin}));
+		return boost::none;
+	}
 
 	/*
 	 * Named objects should have origin pointing to the name;
@@ -58,30 +65,27 @@ evaluate_name(
 	return lang::object{it->second.object_instance.values, name_origin};
 }
 
-[[nodiscard]] outcome<lang::object>
+[[nodiscard]] boost::optional<lang::object>
 evaluate_compound_action(
 	settings st,
 	const ast::sf::compound_action_expression& expr,
-	const lang::symbol_table& symbols)
+	const lang::symbol_table& symbols,
+	diagnostics_container& diagnostics)
 {
 	lang::action_set set;
-	log_container logs;
 
 	for (const ast::sf::action& act : expr) {
-		detail::spirit_filter_add_action(st, act, symbols, set).move_logs_to(logs);
+		const bool result = detail::spirit_filter_add_action(st, act, symbols, set, diagnostics);
 
-		if (!should_continue(st.error_handling, logs))
-			return logs;
+		if (!result && st.error_handling.stop_on_error)
+			return boost::none;
 	}
 
 	const auto origin = parser::position_tag_of(expr);
 
-	return {
-		lang::object{
-			lang::object::container_type{lang::single_object{std::move(set), origin}},
-			origin
-		},
-		std::move(logs)
+	return lang::object{
+		lang::object::container_type{lang::single_object{std::move(set), origin}},
+		origin
 	};
 }
 
@@ -90,67 +94,79 @@ evaluate_compound_action(
 namespace fs::compiler::detail
 {
 
-outcome<lang::color>
+boost::optional<lang::color>
 make_color(
 	settings /* st */,
 	lang::integer r,
 	lang::integer g,
 	lang::integer b,
-	std::optional<lang::integer> a)
+	boost::optional<lang::integer> a,
+	diagnostics_container& diagnostics)
 {
-	auto rgb = make_integer_in_range(r, 0, 255)
-		.merge_with(make_integer_in_range(g, 0, 255))
-		.merge_with(make_integer_in_range(b, 0, 255));
+	const auto result_r = make_integer_in_range(r, 0, 255, diagnostics);
+	const auto result_g = make_integer_in_range(g, 0, 255, diagnostics);
+	const auto result_b = make_integer_in_range(b, 0, 255, diagnostics);
+
+	if (!result_r || !result_g || !result_b)
+		return boost::none;
 
 	if (a) {
-		return std::move(rgb)
-			.merge_with(make_integer_in_range(*a, 0, 255))
-			.map_result<lang::color>([](lang::integer r, lang::integer g, lang::integer b, lang::integer a) {
-				return lang::color{r, g, b, a};
-			});
+		const auto result_a = make_integer_in_range(*a, 0, 255, diagnostics);
+
+		if (!result_a)
+			return boost::none;
+
+		return lang::color{*result_r, *result_g, *result_b, *result_a};
 	}
 	else {
-		return std::move(rgb)
-			.map_result<lang::color>([](lang::integer r, lang::integer g, lang::integer b) {
-				return lang::color{r, g, b};
-			});
+		return lang::color{*result_r, *result_g, *result_b};
 	}
 }
 
-outcome<lang::builtin_alert_sound_id>
+boost::optional<lang::builtin_alert_sound_id>
 make_builtin_alert_sound_id(
-	lang::integer sound_id)
+	lang::integer sound_id,
+	diagnostics_container& diagnostics)
 {
-	return make_integer_in_range(sound_id, lang::limits::min_filter_sound_id, lang::limits::max_filter_sound_id)
-		.map_result<lang::builtin_alert_sound_id>([](lang::integer sound_id) {
-			return lang::builtin_alert_sound_id{sound_id};
-		});
+	return make_integer_in_range(
+		sound_id,
+		lang::limits::min_filter_sound_id,
+		lang::limits::max_filter_sound_id,
+		diagnostics)
+	.map([](lang::integer sound_id) {
+		return lang::builtin_alert_sound_id{sound_id};
+	});
 }
 
-outcome<lang::builtin_alert_sound>
+boost::optional<lang::builtin_alert_sound>
 make_builtin_alert_sound(
 	settings /* st */,
 	bool positional,
 	lang::builtin_alert_sound_id sound_id,
-	std::optional<lang::integer> volume)
+	boost::optional<lang::integer> volume,
+	diagnostics_container& diagnostics)
 {
 	if (volume) {
-		return make_integer_in_range(*volume, lang::limits::min_filter_volume, lang::limits::max_filter_volume)
-			.map_result<lang::builtin_alert_sound>([&](lang::integer volume) {
-				return lang::builtin_alert_sound{positional, sound_id, volume};
-			});
+		return make_integer_in_range(
+			*volume,
+			lang::limits::min_filter_volume,
+			lang::limits::max_filter_volume,
+			diagnostics)
+		.map([&](lang::integer volume) {
+			return lang::builtin_alert_sound{positional, sound_id, volume};
+		});
 	}
 	else {
 		return lang::builtin_alert_sound{positional, sound_id};
 	}
 }
 
-outcome<lang::socket_spec>
+boost::optional<lang::socket_spec>
 evaluate(
-	settings st,
-	const parser::ast::common::socket_spec_literal& literal)
+	settings /* st */,
+	const parser::ast::common::socket_spec_literal& literal,
+	diagnostics_container& diagnostics)
 {
-	log_container logs;
 	lang::socket_spec ss;
 	ss.origin = parser::position_tag_of(literal.socket_colors);
 
@@ -160,14 +176,11 @@ evaluate(
 		if (socket_count.value < lang::limits::min_item_sockets
 			|| socket_count.value > lang::limits::max_item_sockets)
 		{
-			logs.emplace_back(error{errors::invalid_integer_value{
+			diagnostics.emplace_back(error{errors::invalid_integer_value{
 				lang::limits::min_item_sockets,
 				lang::limits::max_item_sockets,
 				socket_count.value,
 				parser::position_tag_of(*literal.socket_count)}});
-
-			if (!should_continue(st.error_handling, logs))
-				return logs;
 		}
 
 		ss.num = socket_count.value;
@@ -183,11 +196,11 @@ evaluate(
 		 * 2. If integer literal is not present, then both tokens are empty so
 		 *    something must have gone really bad with whitespace grammar.
 		 */
-		logs.emplace_back(error(errors::internal_compiler_error{
+		diagnostics.emplace_back(error(errors::internal_compiler_error{
 			errors::internal_compiler_error_cause::evaluate_socket_spec_literal,
 			parser::position_tag_of(literal.socket_colors)
 		}));
-		return logs;
+		return boost::none;
 	}
 
 	for (std::size_t i = 0; i < raw_letters.size(); ++i) {
@@ -207,30 +220,28 @@ evaluate(
 		else if (c == kw::d)
 			++ss.d;
 		else {
-			logs.emplace_back(error(errors::illegal_character_in_socket_spec{
+			diagnostics.emplace_back(error(errors::illegal_character_in_socket_spec{
 				parser::position_tag_of(literal.socket_colors), static_cast<int>(i)
 			}));
-
-			if (!should_continue(st.error_handling, logs))
-				return logs;
 		}
 	}
 
 	if (!ss.is_valid()) {
 		// return failure now, can not go further with invalid socket spec
-		logs.emplace_back(error(errors::invalid_socket_spec{ss.origin}));
-		return logs;
+		diagnostics.emplace_back(error(errors::invalid_socket_spec{ss.origin}));
+		return boost::none;
 	}
 
-	return {ss, std::move(logs)};
+	return ss;
 }
 
-[[nodiscard]] outcome<lang::single_object>
+[[nodiscard]] boost::optional<lang::single_object>
 evaluate(
 	settings st,
-	const ast::common::literal_expression& expression)
+	const ast::common::literal_expression& expression,
+	diagnostics_container& diagnostics)
 {
-	using result_type = outcome<lang::single_object>;
+	using result_type = boost::optional<lang::single_object>;
 	using parser::position_tag_of;
 	const auto expr_origin = position_tag_of(expression);
 
@@ -239,45 +250,46 @@ evaluate(
 			return lang::single_object{evaluate(literal), expr_origin};
 		},
 		[&](ast::common::socket_spec_literal literal) -> result_type {
-			return detail::evaluate(st, literal)
-				.map_result<lang::single_object>([&](lang::socket_spec ss) {
+			return detail::evaluate(st, literal, diagnostics)
+				.map([&](lang::socket_spec ss) {
 					return lang::single_object{ss, expr_origin};
 				});
 		}
 	));
 }
 
-outcome<lang::object>
+boost::optional<lang::object>
 evaluate_sequence(
 	settings st,
 	const ast::sf::sequence& sequence,
 	const lang::symbol_table& symbols,
 	int min_allowed_elements,
-	std::optional<int> max_allowed_elements)
+	boost::optional<int> max_allowed_elements,
+	diagnostics_container& diagnostics)
 {
 	FS_ASSERT(!sequence.empty());
 
 	lang::object::container_type seq_values;
 	seq_values.reserve(sequence.size());
 
-	log_container log;
-
 	for (const ast::sf::primitive_value& primitive : sequence) {
-		using result_type = outcome<lang::object>;
+		using result_type = boost::optional<lang::object>;
 
-		primitive.apply_visitor(x3::make_lambda_visitor<result_type>(
+		result_type result = primitive.apply_visitor(x3::make_lambda_visitor<result_type>(
 			[&](const ast::common::literal_expression& expr) -> result_type {
-				return evaluate(st, expr).map_result<lang::object>(
-					[&](lang::single_object so) {
+				return evaluate(st, expr, diagnostics)
+					.map([&](lang::single_object so) {
 						return lang::object{{std::move(so)}, parser::position_tag_of(expr)};
 					}
 				);
 			},
 			[&](const ast::sf::name& name) {
-				return evaluate_name(name, symbols);
+				return evaluate_name(name, symbols, diagnostics);
 			}
-		))
-		.map_result([&](lang::object obj) {
+		));
+
+		if (result) {
+			lang::object& obj = *result;
 			/*
 			 * Flatten the sequence to the parent sequence,
 			 * append elements from this sequence in the same order.
@@ -285,11 +297,10 @@ evaluate_sequence(
 			 * parent one will be more appropriate for any diagnostic messages.
 			 */
 			std::move(obj.values.begin(), obj.values.end(), std::back_inserter(seq_values));
-		})
-		.move_logs_to(log);
-
-		if (!should_continue(st.error_handling, log))
-			return log;
+		}
+		else if (st.error_handling.stop_on_error) {
+			return boost::none;
+		}
 	}
 
 	const auto sequence_origin = parser::position_tag_of(sequence);
@@ -298,42 +309,39 @@ evaluate_sequence(
 	if (num_elements < min_allowed_elements
 		|| (max_allowed_elements && num_elements > *max_allowed_elements))
 	{
-		// It is possible to return object + log here, but there are functions
+		// It is possible to return an object here, but there are functions
 		// that expect the result of this function to match required min/max
-		// elements. Therefore, only log is returned.
-		log.emplace_back(error(errors::invalid_amount_of_arguments{
+		// elements. Therefore, an error is added and no object is returned.
+		diagnostics.emplace_back(error(errors::invalid_amount_of_arguments{
 			min_allowed_elements, max_allowed_elements, num_elements, sequence_origin}));
-		return log;
+		return boost::none;
 	}
 
-	return {lang::object{std::move(seq_values), sequence_origin}, std::move(log)};
+	return lang::object{std::move(seq_values), sequence_origin};
 }
 
-outcome<lang::object>
+boost::optional<lang::object>
 evaluate_literal_sequence(
 	settings st,
 	const parser::ast::rf::literal_sequence& sequence,
 	int min_allowed_elements,
-	std::optional<int> max_allowed_elements)
+	boost::optional<int> max_allowed_elements,
+	diagnostics_container& diagnostics)
 {
 	FS_ASSERT(!sequence.empty());
 
 	lang::object::container_type seq_values;
 	seq_values.reserve(sequence.size());
 
-	log_container log;
-
 	for (const ast::common::literal_expression& literal_expr : sequence) {
-		evaluate(st, literal_expr)
 		// lang::single_object is not ideal here, because it supports more than literals
 		// but other code in real filter's compiler logic will simply error on non-literals
-		.map_result([&](lang::single_object obj) {
-			seq_values.push_back(std::move(obj));
-		})
-		.move_logs_to(log);
+		boost::optional<lang::single_object> so = evaluate(st, literal_expr, diagnostics);
 
-		if (!should_continue(st.error_handling, log))
-			return log;
+		if (so)
+			seq_values.push_back(std::move(*so));
+		else if (st.error_handling.stop_on_error)
+			return boost::none;
 	}
 
 	const auto sequence_origin = parser::position_tag_of(sequence);
@@ -342,37 +350,40 @@ evaluate_literal_sequence(
 	if (num_elements < min_allowed_elements
 		|| (max_allowed_elements && num_elements > *max_allowed_elements))
 	{
-		// It is possible to return object + log here, but there are functions
+		// It is possible to return an object here, but there are functions
 		// that expect the result of this function to match required min/max
-		// elements. Therefore, only log is returned.
-		log.emplace_back(error(errors::invalid_amount_of_arguments{
+		// elements. Therefore, an error is added and no object is returned.
+		diagnostics.emplace_back(error(errors::invalid_amount_of_arguments{
 			min_allowed_elements, max_allowed_elements, num_elements, sequence_origin}));
-		return log;
+		return boost::none;
 	}
 
-	return {lang::object{std::move(seq_values), sequence_origin}, std::move(log)};
+	return lang::object{std::move(seq_values), sequence_origin};
 }
 
-outcome<lang::object>
+boost::optional<lang::object>
 evaluate_value_expression(
 	settings st,
 	const ast::sf::value_expression& value_expression,
-	const lang::symbol_table& symbols)
+	const lang::symbol_table& symbols,
+	diagnostics_container& diagnostics)
 {
-	using result_type = outcome<lang::object>;
+	using result_type = boost::optional<lang::object>;
 
 	return value_expression.apply_visitor(x3::make_lambda_visitor<result_type>(
 		[&](const ast::sf::sequence& seq) {
-			return evaluate_sequence(st, seq, symbols);
+			return evaluate_sequence(st, seq, symbols, 1, boost::none, diagnostics);
 		},
 		[&](const ast::sf::compound_action_expression& expr) {
-			return evaluate_compound_action(st, expr, symbols);
+			return evaluate_compound_action(st, expr, symbols, diagnostics);
 		}
 	));
 }
 
-[[nodiscard]] outcome<lang::fractional>
-get_as_fractional(const lang::single_object& sobj)
+[[nodiscard]] boost::optional<lang::fractional>
+get_as_fractional(
+	const lang::single_object& sobj,
+	diagnostics_container& diagnostics)
 {
 	auto& val = sobj.value;
 
@@ -385,12 +396,14 @@ get_as_fractional(const lang::single_object& sobj)
 		return lang::fractional{static_cast<double>(intgr.value), intgr.origin};
 	}
 
-	return error(errors::type_mismatch{lang::object_type::fractional, sobj.type(), sobj.origin});
+	diagnostics.emplace_back(error(errors::type_mismatch{lang::object_type::fractional, sobj.type(), sobj.origin}));
+	return boost::none;
 }
 
-outcome<lang::socket_spec>
+boost::optional<lang::socket_spec>
 get_as_socket_spec(
-	const lang::single_object& sobj)
+	const lang::single_object& sobj,
+	diagnostics_container& diagnostics)
 {
 	auto& val = sobj.value;
 
@@ -406,7 +419,8 @@ get_as_socket_spec(
 		return ss;
 	}
 
-	return error(errors::type_mismatch{lang::object_type::socket_spec, sobj.type(), sobj.origin});
+	diagnostics.emplace_back(error(errors::type_mismatch{lang::object_type::socket_spec, sobj.type(), sobj.origin}));
+	return boost::none;
 }
 
 } // namespace fs::compiler::detail

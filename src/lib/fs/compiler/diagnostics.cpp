@@ -1,10 +1,8 @@
+#include <fs/compiler/diagnostics.hpp>
 #include <fs/lang/limits.hpp>
 #include <fs/parser/parser.hpp>
-#include <fs/compiler/outcome.hpp>
 #include <fs/log/logger.hpp>
 #include <fs/utility/visitor.hpp>
-#include <fs/utility/algorithm.hpp>
-#include <fs/utility/string_helpers.hpp>
 
 namespace
 {
@@ -440,12 +438,13 @@ void output_note(
 namespace fs::compiler
 {
 
-void output_logs(
-	const log_container& logs,
+void output_diagnostics(
+	const diagnostics_container& messages,
 	const parser::lookup_data& lookup_data,
+	const parser::line_lookup& /* lines */, // TODO optimize printer code to use it
 	log::logger& logger)
 {
-	for (const auto& msg : logs) {
+	for (const auto& msg : messages) {
 		std::visit(utility::visitor{
 			[&](const error& err) { output_error(err, lookup_data, logger); },
 			[&](const warning& warn) { output_warning(warn, lookup_data, logger); },

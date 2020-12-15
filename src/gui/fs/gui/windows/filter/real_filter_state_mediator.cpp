@@ -1,5 +1,8 @@
 #include <fs/gui/windows/filter/real_filter_state_mediator.hpp>
 #include <fs/compiler/compiler.hpp>
+#include <fs/utility/monadic.hpp>
+
+#include <utility>
 
 namespace fs::gui {
 
@@ -50,13 +53,11 @@ void real_filter_state_mediator::on_parsed_real_filter_change(const parser::pars
 		return;
 	}
 
-	compiler::outcome<lang::item_filter> result = compiler::compile_real_filter({}, parsed_real_filter->ast);
-	compiler::output_logs(result.logs(), parsed_real_filter->lookup, logger());
+	compiler::diagnostics_container diagnostics;
+	boost::optional<lang::item_filter> result = compiler::compile_real_filter({}, parsed_real_filter->ast, diagnostics);
+	compiler::output_diagnostics(diagnostics, parsed_real_filter->lookup, parsed_real_filter->lines, logger());
 
-	if (result.has_result())
-		new_filter_representation(std::move(result.result()));
-	else
-		new_filter_representation(std::nullopt);
+	new_filter_representation(utility::to_std_optional(std::move(result)));
 }
 
 void real_filter_state_mediator::draw_interface_derived(application& /* app */)

@@ -3,7 +3,7 @@
 #include "common/string_operations.hpp"
 
 #include <fs/compiler/compiler.hpp>
-#include <fs/compiler/outcome.hpp>
+#include <fs/compiler/diagnostics.hpp>
 #include <fs/generator/make_item_filter.hpp>
 #include <fs/lang/position_tag.hpp>
 #include <fs/log/string_logger.hpp>
@@ -69,37 +69,39 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 		static
 		lang::symbol_table expect_success_when_resolving_symbols(
 			const std::vector<parser::ast::sf::definition>& defs,
-			const parser::lookup_data& lookup_data)
+			const parser::parsed_spirit_filter& parse_data)
 		{
-			compiler::outcome<lang::symbol_table> symbols_outcome = resolve_symbols(defs);
+			compiler::diagnostics_container diagnostics;
+			boost::optional<lang::symbol_table> symbols = resolve_symbols(defs, diagnostics);
 
-			if (compiler::has_errors(symbols_outcome.logs())) {
+			if (compiler::has_errors(diagnostics)) {
 				log::string_logger logger;
-				compiler::output_logs(symbols_outcome.logs(), lookup_data, logger);
+				compiler::output_diagnostics(diagnostics, parse_data.lookup, parse_data.lines, logger);
 				BOOST_FAIL("resolve_symbols failed but should not:\n" << logger.str());
 			}
 
-			BOOST_TEST_REQUIRE(symbols_outcome.has_result());
-			return std::move(symbols_outcome).result();
+			BOOST_TEST_REQUIRE(symbols.has_value());
+			return *symbols;
 		}
 
 		static
 		lang::item_filter expect_success_when_building_filter(
 			const std::vector<parser::ast::sf::statement>& top_level_statements,
-			const parser::lookup_data& lookup_data,
+			const parser::parsed_spirit_filter& parse_data,
 			const lang::symbol_table& symbols)
 		{
-			compiler::outcome<lang::spirit_item_filter> sf_outcome =
-				compiler::compile_spirit_filter_statements(compiler::settings{}, top_level_statements, symbols);
+			compiler::diagnostics_container diagnostics;
+			boost::optional<lang::spirit_item_filter> spirit_filter =
+				compiler::compile_spirit_filter_statements(compiler::settings{}, top_level_statements, symbols, diagnostics);
 
-			if (compiler::has_errors(sf_outcome.logs())) {
+			if (compiler::has_errors(diagnostics)) {
 				log::string_logger logger;
-				compiler::output_logs(sf_outcome.logs(), lookup_data, logger);
+				compiler::output_diagnostics(diagnostics, parse_data.lookup, parse_data.lines, logger);
 				BOOST_FAIL("building spirit filter blocks failed but should not:\n" << logger.str());
 			}
 
-			BOOST_TEST_REQUIRE(sf_outcome.has_result());
-			return generator::make_item_filter(sf_outcome.result(), /* empty item price data */ {});
+			BOOST_TEST_REQUIRE(spirit_filter.has_value());
+			return generator::make_item_filter(*spirit_filter, /* empty item price data */ {});
 		}
 	};
 
@@ -126,7 +128,7 @@ $string         = "Leather Belt"
 			const std::string_view input = input_str;
 			const parser::parsed_spirit_filter parse_data = parse(input);
 			const parser::lookup_data& lookup_data = parse_data.lookup;
-			const lang::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.definitions, lookup_data);
+			const lang::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.definitions, parse_data);
 
 			expect_object(symbols, lookup_data, "none", search(input, "$none").result(),
 				{{lang::none{}, search(input, "None").result()}}
@@ -177,7 +179,7 @@ $z = 6 7 8 9
 			const std::string_view input = input_str;
 			const parser::parsed_spirit_filter parse_data = parse(input);
 			const parser::lookup_data& lookup_data = parse_data.lookup;
-			const lang::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.definitions, lookup_data);
+			const lang::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.definitions, parse_data);
 
 			expect_object(
 				symbols, lookup_data, "x", search(input, "$x").result(), {
@@ -212,7 +214,7 @@ $z = 4W 0 6 RGB
 			const std::string_view input = input_str;
 			const parser::parsed_spirit_filter parse_data = parse(input);
 			const parser::lookup_data& lookup_data = parse_data.lookup;
-			const lang::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.definitions, lookup_data);
+			const lang::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.definitions, parse_data);
 
 			expect_object(
 				symbols, lookup_data, "x", search(input, "$x").result(), {
@@ -274,11 +276,10 @@ $z = 4W 0 6 RGB
 				const std::string input_str = minimal_input() + action + "\nShow";
 				const std::string_view input = input_str;
 				const parser::parsed_spirit_filter parse_data = parse(input);
-				const parser::lookup_data& lookup_data = parse_data.lookup;
 				const lang::symbol_table symbols =
-					expect_success_when_resolving_symbols(parse_data.ast.definitions, lookup_data);
+					expect_success_when_resolving_symbols(parse_data.ast.definitions, parse_data);
 				const lang::item_filter filter =
-					expect_success_when_building_filter(parse_data.ast.statements, parse_data.lookup, symbols);
+					expect_success_when_building_filter(parse_data.ast.statements, parse_data, symbols);
 				BOOST_TEST_REQUIRE(static_cast<int>(filter.blocks.size()) == 1);
 				const lang::item_filter_block& block = filter.blocks[0];
 				BOOST_TEST(block.visibility.show == true);

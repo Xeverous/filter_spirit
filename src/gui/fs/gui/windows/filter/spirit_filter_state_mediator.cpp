@@ -2,6 +2,7 @@
 #include <fs/compiler/compiler.hpp>
 #include <fs/generator/make_item_filter.hpp>
 #include <fs/utility/assert.hpp>
+#include <fs/utility/monadic.hpp>
 
 #include <imgui.h>
 
@@ -60,15 +61,13 @@ void spirit_filter_state_mediator::on_parsed_spirit_filter_change(const parser::
 		return;
 	}
 
-	compiler::outcome<lang::symbol_table> result = compiler::resolve_spirit_filter_symbols(
-		{}, parsed_spirit_filter->ast.definitions);
+	compiler::diagnostics_container diagnostics;
+	boost::optional<lang::symbol_table> result = compiler::resolve_spirit_filter_symbols(
+		{}, parsed_spirit_filter->ast.definitions, diagnostics);
 
-	compiler::output_logs(result.logs(), parsed_spirit_filter->lookup, logger());
+	compiler::output_diagnostics(diagnostics, parsed_spirit_filter->lookup, parsed_spirit_filter->lines, logger());
 
-	if (result.has_result())
-		new_spirit_filter_symbols(std::move(result.result()));
-	else
-		new_spirit_filter_symbols(std::nullopt);
+	new_spirit_filter_symbols(utility::to_std_optional(std::move(result)));
 }
 
 void spirit_filter_state_mediator::new_spirit_filter_symbols(std::optional<lang::symbol_table> symbols)
@@ -86,15 +85,13 @@ void spirit_filter_state_mediator::on_spirit_filter_symbols_change(
 		return;
 	}
 
-	compiler::outcome<lang::spirit_item_filter> result = compiler::compile_spirit_filter_statements(
-		{}, parsed_spirit_filter->ast.statements, *spirit_filter_symbols);
+	compiler::diagnostics_container diagnostics;
+	boost::optional<lang::spirit_item_filter> result = compiler::compile_spirit_filter_statements(
+		{}, parsed_spirit_filter->ast.statements, *spirit_filter_symbols, diagnostics);
 
-	compiler::output_logs(result.logs(), parsed_spirit_filter->lookup, logger());
+	compiler::output_diagnostics(diagnostics, parsed_spirit_filter->lookup, parsed_spirit_filter->lines, logger());
 
-	if (result.has_result())
-		new_spirit_filter(std::move(result.result()));
-	else
-		new_spirit_filter(std::nullopt);
+	new_spirit_filter(utility::to_std_optional(std::move(result)));
 }
 
 void spirit_filter_state_mediator::new_spirit_filter(std::optional<lang::spirit_item_filter> filter)
