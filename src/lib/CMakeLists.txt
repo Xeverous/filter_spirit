@@ -196,8 +196,3 @@ target_link_libraries(filter_spirit
 		$<$<CXX_COMPILER_ID:GNU>:atomic>
 		$<$<CXX_COMPILER_ID:Clang>:atomic>
 )
-
-# Windows requires additional networking libraries for Boost ASIO
-if(WIN32)
-	target_link_libraries(filter_spirit PRIVATE wsock32 ws2_32)
-endif()
