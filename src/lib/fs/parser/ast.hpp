@@ -799,8 +799,15 @@ namespace rf
 
 	struct play_effect_action : x3::position_tagged
 	{
-		suit_literal suit;
-		bool is_temporary;
+		auto& operator=(literal_sequence seq)
+		{
+			literals = std::move(seq);
+			return *this;
+		}
+
+		const auto& get_value() const { return literals; }
+
+		literal_sequence literals;
 	};
 
 	struct action : x3::variant<

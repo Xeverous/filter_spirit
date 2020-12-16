@@ -227,7 +227,7 @@ void output_error_impl(
 }
 
 void output_error_impl(
-	errors::invalid_builtin_alert_sound_id error,
+	errors::invalid_action error,
 	const parser::lookup_data& lookup_data,
 	log::message_stream& stream)
 {
@@ -235,7 +235,9 @@ void output_error_impl(
 		lookup_data.get_view_of_whole_content(),
 		lookup_data.position_of(error.origin),
 		log::strings::error,
-		"invalid built-in alert sound ID: should be integer ID or Shaper voice line");
+		"invalid ",
+		error.action_name,
+		" action");
 }
 
 void output_error_impl(

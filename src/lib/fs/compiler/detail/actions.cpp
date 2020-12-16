@@ -1,6 +1,7 @@
 #include <fs/compiler/detail/evaluate.hpp>
 #include <fs/compiler/detail/actions.hpp>
 #include <fs/lang/limits.hpp>
+#include <fs/lang/keywords.hpp>
 #include <fs/utility/assert.hpp>
 #include <fs/utility/monadic.hpp>
 
@@ -60,6 +61,58 @@ make_minimap_icon(
 					return lang::minimap_icon{icon, obj.origin};
 				});
 		});
+}
+
+[[nodiscard]] boost::optional<lang::play_effect>
+make_play_effect(
+	settings /* st */,
+	const lang::object& obj,
+	diagnostics_container& diagnostics)
+{
+	FS_ASSERT(obj.values.size() >= 1u);
+	FS_ASSERT(obj.values.size() <= 2u);
+
+	diagnostics_container diagnostics_none;
+	auto none = detail::get_as<lang::none>(obj.values[0], diagnostics_none);
+	diagnostics_container diagnostics_suit;
+	auto suit = detail::get_as<lang::suit>(obj.values[0], diagnostics_suit);
+
+	if (none.has_value()) {
+		std::move(diagnostics_none.begin(), diagnostics_none.end(), std::back_inserter(diagnostics));
+		return lang::play_effect{lang::disabled_play_effect{*none}, obj.origin};
+	}
+	else if (suit.has_value()) {
+		std::move(diagnostics_suit.begin(), diagnostics_suit.end(), std::back_inserter(diagnostics));
+
+		const auto num_values = obj.values.size();
+		FS_ASSERT(num_values == 1u || num_values == 2u);
+
+		auto is_temp = [&]() -> boost::optional<bool> {
+			if (num_values != 2)
+				return false; // no "Temp" token, therefore false
+
+			FS_ASSERT(num_values == 2u);
+
+			// there is an extra token, it must be "Temp"; if successful map to true
+			return detail::get_as<lang::temp>(obj.values[1], diagnostics)
+				.map([](lang::temp) { return true; });
+		}();
+
+		if (!is_temp)
+			return boost::none;
+
+		return lang::play_effect{lang::enabled_play_effect{*suit, *is_temp}, obj.origin};
+	}
+	else {
+		// main error
+		diagnostics.emplace_back(error(errors::invalid_action{lang::keywords::rf::play_effect, obj.origin}));
+		// errors specifying each variant problems
+		diagnostics.emplace_back(note{notes::fixed_text{"in attempt of PlayEffect None"}});
+		std::move(diagnostics_none.begin(), diagnostics_none.end(), std::back_inserter(diagnostics));
+		diagnostics.emplace_back(note{notes::fixed_text{"in attempt of PlayEffect Suit [Temp]"}});
+		std::move(diagnostics_suit.begin(), diagnostics_suit.end(), std::back_inserter(diagnostics));
+		return boost::none;
+	}
 }
 
 // ---- spirit filter helpers ----
@@ -188,26 +241,8 @@ spirit_filter_add_play_effect_action(
 	diagnostics_container& diagnostics)
 {
 	return detail::evaluate_sequence(st, action.seq, symbols, 1, 2, diagnostics)
-		.flat_map([&](lang::object obj) -> boost::optional<lang::play_effect> {
-			const auto num_values = obj.values.size();
-			FS_ASSERT(num_values == 1u || num_values == 2u);
-
-			auto suit = detail::get_as<lang::suit>(obj.values[0], diagnostics);
-			auto is_temp = [&]() -> boost::optional<bool> {
-				if (num_values != 2)
-					return false; // no "Temp" token, therefore false
-
-				FS_ASSERT(num_values == 2u);
-
-				// there is an extra token, it must be "Temp"; if successful map to true
-				return detail::get_as<lang::temp>(obj.values[1], diagnostics)
-					.map([](lang::temp) { return true; });
-			}();
-
-			if (!suit || !is_temp)
-				return boost::none;
-
-			return lang::play_effect{*suit, *is_temp};
+		.flat_map([&](lang::object obj) {
+			return make_play_effect(st, obj, diagnostics);
 		})
 		.map([&](lang::play_effect effect) {
 			// override previous action
@@ -229,19 +264,15 @@ make_builtin_alert_sound_id(
 
 	if (integer_sound_id.has_value()) {
 		std::move(diagnostics_integer.begin(), diagnostics_integer.end(), std::back_inserter(diagnostics));
-		return std::move(integer_sound_id).flat_map([&](lang::integer sound_id) {
-			return detail::make_builtin_alert_sound_id(sound_id, diagnostics);
-		});
+		return detail::make_builtin_alert_sound_id(*integer_sound_id, diagnostics);
 	}
 	else if (shaper_sound_id.has_value()) {
 		std::move(diagnostics_shaper.begin(), diagnostics_shaper.end(), std::back_inserter(diagnostics));
-		return std::move(shaper_sound_id).flat_map([](lang::shaper_voice_line sound_id) {
-			return detail::make_builtin_alert_sound_id(sound_id);
-		});
+		return detail::make_builtin_alert_sound_id(*shaper_sound_id);
 	}
 	else {
 		// main error
-		diagnostics.emplace_back(error(errors::invalid_builtin_alert_sound_id{sobj.origin}));
+		diagnostics.emplace_back(error(errors::invalid_action{"AlertSound", sobj.origin}));
 		// errors specifying each sound ID variant problems
 		diagnostics.emplace_back(note{notes::fixed_text{"in attempt of integer sound ID"}});
 		std::move(diagnostics_integer.begin(), diagnostics_integer.end(), std::back_inserter(diagnostics));
@@ -367,17 +398,11 @@ spirit_filter_add_set_alert_sound_action(
 
 			if (custom_alert.has_value()) {
 				std::move(diagnostics_custom.begin(), diagnostics_custom.end(), std::back_inserter(diagnostics));
-				return std::move(custom_alert)
-					.map([](lang::custom_alert_sound cas) {
-						return lang::alert_sound{std::move(cas)};
-					});
+				return lang::alert_sound{std::move(*custom_alert)};
 			}
 			else if (builtin_alert.has_value()) {
 				std::move(diagnostics_builtin.begin(), diagnostics_builtin.end(), std::back_inserter(diagnostics));
-				return std::move(builtin_alert)
-					.map([](lang::builtin_alert_sound bas) {
-						return lang::alert_sound{std::move(bas)};
-					});
+				return lang::alert_sound{*builtin_alert};
 			}
 			else {
 				diagnostics.emplace_back(error(
@@ -522,6 +547,24 @@ real_filter_add_minimap_icon_action(
 		.value_or(false);
 }
 
+[[nodiscard]] bool
+real_filter_add_play_effect_action(
+	settings st,
+	const ast::rf::play_effect_action& action,
+	std::optional<lang::play_effect_action>& target,
+	diagnostics_container& diagnostics)
+{
+	return detail::evaluate_literal_sequence(st, action.literals, 1, 2, diagnostics)
+		.flat_map([&](lang::object obj) {
+			return make_play_effect(st, obj, diagnostics);
+		})
+		.map([&](lang::play_effect effect) {
+			target = lang::play_effect_action{effect, parser::position_tag_of(action)};
+			return true;
+		})
+		.value_or(false);
+}
+
 } // namespace
 
 namespace fs::compiler::detail
@@ -591,13 +634,7 @@ real_filter_add_action(
 			return real_filter_add_minimap_icon_action(st, action, set.minimap_icon, diagnostics);
 		},
 		[&](const ast::rf::play_effect_action& action) {
-			return real_filter_add_action_impl(
-				lang::play_effect_action{
-					lang::play_effect{evaluate(action.suit), action.is_temporary},
-					parser::position_tag_of(action)
-				},
-				set.play_effect,
-				diagnostics);
+			return real_filter_add_play_effect_action(st, action, set.play_effect, diagnostics);
 		},
 		[&](const ast::rf::play_alert_sound_action& action) {
 			return real_filter_add_action_impl(

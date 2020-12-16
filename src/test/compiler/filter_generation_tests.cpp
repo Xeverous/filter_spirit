@@ -578,16 +578,19 @@ Hide
 			BOOST_TEST(compare_strings(expected_filter, actual_filter));
 		}
 
-		BOOST_AUTO_TEST_CASE(sentinel_minimap_icon)
+		BOOST_AUTO_TEST_CASE(disabled_actions)
 		{
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
 MinimapIcon 0 Yellow Star
+PlayEffect Yellow
 
 DropLevel >= 10 {
 	MinimapIcon 1 Green Raindrop
+	PlayEffect Green
 
 	ItemLevel < 70 {
 		MinimapIcon -1
+		PlayEffect None
 		Hide
 	}
 
@@ -600,6 +603,7 @@ DropLevel >= 10 {
 
 	Sockets 6 {
 		MinimapIcon -1
+		PlayEffect None
 		Show
 		Continue
 	}
@@ -615,6 +619,7 @@ R"(Hide
 	ItemLevel < 70
 	DropLevel >= 10
 	MinimapIcon -1
+	PlayEffect None
 
 Show
 	ItemLevel >= 70
@@ -623,20 +628,24 @@ Show
 	SetFontSize 40
 	DisableDropSound
 	MinimapIcon 1 Green Raindrop
+	PlayEffect Green
 
 Show
 	DropLevel >= 10
 	Sockets = 6
 	MinimapIcon -1
+	PlayEffect None
 	Continue
 
 Show
 	DropLevel >= 10
 	EnableDropSound
 	MinimapIcon 1 Green Raindrop
+	PlayEffect Green
 
 Hide
 	MinimapIcon 0 Yellow Star
+	PlayEffect Yellow
 
 )";
 

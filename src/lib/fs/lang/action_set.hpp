@@ -217,30 +217,53 @@ inline bool operator!=(minimap_icon_action lhs, minimap_icon_action rhs)
 	return !(lhs == rhs);
 }
 
-struct play_effect
+struct enabled_play_effect
 {
-	play_effect(suit s, bool is_temporary)
+	enabled_play_effect(suit s, bool is_temporary)
 	: color(s), is_temporary(is_temporary) {}
 
 	suit color;
 	bool is_temporary;
 };
 
-inline bool operator==(play_effect lhs, play_effect rhs) noexcept
+inline bool operator==(enabled_play_effect lhs, enabled_play_effect rhs) noexcept
 {
 	return std::tie(lhs.color, lhs.is_temporary) == std::tie(rhs.color, rhs.is_temporary);
+}
+inline bool operator!=(enabled_play_effect lhs, enabled_play_effect rhs) noexcept { return !(lhs == rhs); }
+
+struct disabled_play_effect
+{
+	none none_;
+};
+
+inline bool operator==(disabled_play_effect lhs, disabled_play_effect rhs) noexcept
+{
+	return lhs.none_ == rhs.none_;
+}
+inline bool operator!=(disabled_play_effect lhs, disabled_play_effect rhs) noexcept { return !(lhs == rhs); }
+
+struct play_effect
+{
+	std::variant<enabled_play_effect, disabled_play_effect> effect;
+	position_tag origin;
+};
+
+inline bool operator==(play_effect lhs, play_effect rhs) noexcept
+{
+	return lhs.effect == rhs.effect;
 }
 inline bool operator!=(play_effect lhs, play_effect rhs) noexcept { return !(lhs == rhs); }
 
 struct play_effect_action
 {
-	play_effect beam;
+	play_effect effect;
 	position_tag origin;
 };
 
 inline bool operator==(play_effect_action lhs, play_effect_action rhs)
 {
-	return lhs.beam == rhs.beam;
+	return lhs.effect == rhs.effect;
 }
 
 inline bool operator!=(play_effect_action lhs, play_effect_action rhs)

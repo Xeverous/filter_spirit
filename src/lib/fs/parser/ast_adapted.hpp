@@ -154,9 +154,5 @@ BOOST_FUSION_ADAPT_STRUCT(
 	id, volume)
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::rf::play_effect_action,
-	suit, is_temporary)
-
-BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::rf::filter_block,
 	visibility, rules)

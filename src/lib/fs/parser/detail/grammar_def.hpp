@@ -488,10 +488,7 @@ namespace rf
 	BOOST_SPIRIT_DEFINE(minimap_icon_action)
 
 	const play_effect_action_type play_effect_action = "play effct action";
-	const auto play_effect_action_def =
-		make_keyword(lang::keywords::rf::play_effect)
-		> common::suit_literal
-		> ((make_keyword(lang::keywords::rf::temp) > x3::attr(true)) | x3::attr(false));
+	const auto play_effect_action_def = make_keyword(lang::keywords::rf::play_effect) > literal_sequence;
 	BOOST_SPIRIT_DEFINE(play_effect_action)
 
 	const action_type action = "action";

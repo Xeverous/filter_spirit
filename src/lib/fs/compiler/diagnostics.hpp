@@ -96,8 +96,9 @@ struct upper_bound_redefinition
 	lang::position_tag original_definition;
 };
 
-struct invalid_builtin_alert_sound_id
+struct invalid_action
 {
+	const char* action_name;
 	lang::position_tag origin;
 };
 
@@ -195,7 +196,7 @@ using error = std::variant<
 	errors::action_redefinition,
 	errors::lower_bound_redefinition,
 	errors::upper_bound_redefinition,
-	errors::invalid_builtin_alert_sound_id,
+	errors::invalid_action,
 	errors::invalid_set_alert_sound,
 	errors::price_without_autogen,
 	errors::autogen_error,

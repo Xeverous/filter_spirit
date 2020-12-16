@@ -254,11 +254,19 @@ void output_beam_effect(
 	if (!play_effect_action.has_value())
 		return;
 
-	const lang::play_effect& effect = (*play_effect_action).beam;
+	const lang::play_effect& effect = (*play_effect_action).effect;
 	output_stream << '\t' << kw::play_effect << ' ';
-	output_suit(effect.color.value, output_stream);
-	if (effect.is_temporary)
-		output_stream << ' ' << kw::temp;
+
+	std::visit(utility::visitor{
+		[&](lang::enabled_play_effect effect) {
+			output_suit(effect.color.value, output_stream);
+			if (effect.is_temporary)
+				output_stream << ' ' << kw::temp;
+		},
+		[&](lang::disabled_play_effect /* effect */) {
+			output_stream << kw::none;
+		}
+	}, effect.effect);
 
 	output_stream << '\n';
 }
