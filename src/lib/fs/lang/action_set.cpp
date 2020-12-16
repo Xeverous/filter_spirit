@@ -230,11 +230,20 @@ void output_minimap_icon(
 		return;
 
 	const lang::minimap_icon& mi = (*minimap_icon_action).icon;
-	output_stream << '\t' << kw::minimap_icon << ' ' << mi.size.value << ' ';
+	output_stream << '\t' << kw::minimap_icon << ' ';
 
-	output_suit(mi.color.value, output_stream);
-	output_stream << ' ';
-	output_shape(mi.shape_.value, output_stream);
+	std::visit(utility::visitor{
+		[&](lang::enabled_minimap_icon icon) {
+			output_stream << icon.size.value << ' ';
+			output_suit(icon.color.value, output_stream);
+			output_stream << ' ';
+			output_shape(icon.shape_.value, output_stream);
+		},
+		[&](lang::disabled_minimap_icon /* icon */) {
+			output_stream << lang::minimap_icon::sentinel_cancel_value;
+		}
+	}, mi.icon);
+
 	output_stream << '\n';
 }
 

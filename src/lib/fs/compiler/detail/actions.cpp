@@ -23,7 +23,7 @@ using namespace fs::compiler;
 
 // ---- generic helpers ----
 
-[[nodiscard]] boost::optional<boost::optional<lang::minimap_icon>>
+[[nodiscard]] boost::optional<lang::minimap_icon>
 make_minimap_icon(
 	settings /* st */,
 	const lang::object& obj,
@@ -33,10 +33,10 @@ make_minimap_icon(
 	FS_ASSERT(obj.values.size() <= 3u);
 
 	return detail::get_as<lang::integer>(obj.values[0], diagnostics)
-		.flat_map([&](lang::integer icon_size) -> boost::optional<boost::optional<lang::minimap_icon>>
+		.flat_map([&](lang::integer icon_size) -> boost::optional<lang::minimap_icon>
 		{
 			if (icon_size.value == lang::minimap_icon::sentinel_cancel_value)
-				return boost::optional<lang::minimap_icon>();
+				return lang::minimap_icon{lang::disabled_minimap_icon{icon_size.origin}, obj.origin};
 
 			// TODO this is somewhat misleading, the expectations are:
 			// A) 1-3 arguments where first is integer{-1}
@@ -55,9 +55,9 @@ make_minimap_icon(
 			if (!suit || !shape)
 				return boost::none;
 
-			return detail::make_minimap_icon(icon_size, *suit, *shape, diagnostics)
-				.map([](lang::minimap_icon icon) {
-					return boost::optional<lang::minimap_icon>(icon);
+			return detail::make_enabled_minimap_icon(icon_size, *suit, *shape, diagnostics)
+				.map([&](lang::enabled_minimap_icon icon) {
+					return lang::minimap_icon{icon, obj.origin};
 				});
 		});
 }
@@ -172,11 +172,8 @@ spirit_filter_add_minimap_icon_action(
 		.flat_map([&](lang::object obj) {
 			return make_minimap_icon(st, obj, diagnostics);
 		})
-		.map([&](boost::optional<lang::minimap_icon> icon) {
-			if (icon)
-				set.minimap_icon = lang::minimap_icon_action{*icon, parser::position_tag_of(action)};
-			else
-				set.minimap_icon = std::nullopt;
+		.map([&](lang::minimap_icon icon) {
+			set.minimap_icon = lang::minimap_icon_action{icon, parser::position_tag_of(action)};
 			return true;
 		})
 		.value_or(false);
@@ -518,12 +515,8 @@ real_filter_add_minimap_icon_action(
 		.flat_map([&](lang::object obj) {
 			return make_minimap_icon(st, obj, diagnostics);
 		})
-		.map([&](boost::optional<lang::minimap_icon> icon) {
-			if (icon)
-				target = lang::minimap_icon_action{*icon, parser::position_tag_of(action)};
-			else
-				target = std::nullopt;
-
+		.map([&](lang::minimap_icon icon) {
+			target = lang::minimap_icon_action{icon, parser::position_tag_of(action)};
 			return true;
 		})
 		.value_or(false);

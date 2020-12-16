@@ -6,6 +6,7 @@
 #include <utility>
 #include <tuple>
 #include <iosfwd>
+#include <optional>
 
 namespace fs::lang
 {
@@ -159,21 +160,44 @@ inline bool operator!=(switch_drop_sound_action lhs, switch_drop_sound_action rh
 	return !(lhs == rhs);
 }
 
-struct minimap_icon
+struct enabled_minimap_icon
 {
-	minimap_icon(integer size, suit color, shape shape_)
+	enabled_minimap_icon(integer size, suit color, shape shape_)
 	: size(size), color(color), shape_(shape_) {}
-
-	static constexpr int sentinel_cancel_value = -1;
 
 	integer size;
 	suit color;
 	shape shape_;
 };
 
-inline bool operator==(minimap_icon lhs, minimap_icon rhs) noexcept
+inline bool operator==(enabled_minimap_icon lhs, enabled_minimap_icon rhs) noexcept
 {
 	return std::tie(lhs.size, lhs.color, lhs.shape_) == std::tie(rhs.size, rhs.color, rhs.shape_);
+}
+inline bool operator!=(enabled_minimap_icon lhs, enabled_minimap_icon rhs) noexcept { return !(lhs == rhs); }
+
+struct disabled_minimap_icon
+{
+	position_tag sentinel_origin;
+};
+
+inline bool operator==(disabled_minimap_icon /* lhs */, disabled_minimap_icon /* rhs */) noexcept
+{
+	return true;
+}
+inline bool operator!=(disabled_minimap_icon lhs, disabled_minimap_icon rhs) noexcept { return !(lhs == rhs); }
+
+struct minimap_icon
+{
+	static constexpr int sentinel_cancel_value = -1;
+
+	std::variant<enabled_minimap_icon, disabled_minimap_icon> icon;
+	position_tag expr_origin;
+};
+
+inline bool operator==(minimap_icon lhs, minimap_icon rhs) noexcept
+{
+	return lhs.icon == rhs.icon;
 }
 inline bool operator!=(minimap_icon lhs, minimap_icon rhs) noexcept { return !(lhs == rhs); }
 

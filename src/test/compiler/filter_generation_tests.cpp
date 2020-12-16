@@ -614,6 +614,7 @@ Hide
 R"(Hide
 	ItemLevel < 70
 	DropLevel >= 10
+	MinimapIcon -1
 
 Show
 	ItemLevel >= 70
@@ -626,6 +627,7 @@ Show
 Show
 	DropLevel >= 10
 	Sockets = 6
+	MinimapIcon -1
 	Continue
 
 Show

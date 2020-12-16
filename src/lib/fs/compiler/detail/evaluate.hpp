@@ -29,8 +29,8 @@ make_socket_spec(
 	lang::position_tag origin,
 	diagnostics_container& diagnostics);
 
-[[nodiscard]] inline boost::optional<lang::minimap_icon>
-make_minimap_icon(
+[[nodiscard]] inline boost::optional<lang::enabled_minimap_icon>
+make_enabled_minimap_icon(
 	lang::integer size,
 	lang::suit suit,
 	lang::shape shape,
@@ -41,7 +41,7 @@ make_minimap_icon(
 		return boost::none;
 	}
 
-	return lang::minimap_icon{size, suit, shape};
+	return lang::enabled_minimap_icon{size, suit, shape};
 }
 
 [[nodiscard]] boost::optional<lang::builtin_alert_sound_id>
