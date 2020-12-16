@@ -151,20 +151,19 @@ add_numeric_comparison_condition(
 	return false;
 }
 
+template <typename Condition>
 [[nodiscard]] bool
-add_string_array_condition_impl(
-	std::vector<lang::string> strings,
-	bool is_exact_match,
-	lang::position_tag condition_origin,
-	std::optional<lang::strings_condition>& target,
+add_non_range_condition(
+	Condition condition,
+	std::optional<Condition>& target,
 	diagnostics_container& diagnostics)
 {
 	if (target.has_value()) {
-		diagnostics.emplace_back(error(errors::condition_redefinition{condition_origin, (*target).origin}));
+		diagnostics.emplace_back(error(errors::condition_redefinition{condition.origin, (*target).origin}));
 		return false;
 	}
 
-	target = lang::strings_condition{std::move(strings), is_exact_match, condition_origin};
+	target = std::move(condition);
 	return true;
 }
 
@@ -172,35 +171,47 @@ add_string_array_condition_impl(
 add_string_array_condition(
 	lang::string_array_condition_property property,
 	std::vector<lang::string> strings,
-	bool exact_match,
+	bool is_exact_match,
 	lang::position_tag condition_origin,
 	lang::condition_set& set,
 	diagnostics_container& diagnostics)
 {
 	switch (property) {
 		case lang::string_array_condition_property::class_: {
-			return add_string_array_condition_impl(
-				std::move(strings), exact_match, condition_origin, set.class_, diagnostics);
+			return add_non_range_condition(
+				lang::strings_condition{std::move(strings), is_exact_match, condition_origin},
+				set.class_,
+				diagnostics);
 		}
 		case lang::string_array_condition_property::base_type: {
-			return add_string_array_condition_impl(
-				std::move(strings), exact_match, condition_origin, set.base_type, diagnostics);
+			return add_non_range_condition(
+				lang::strings_condition{std::move(strings), is_exact_match, condition_origin},
+				set.base_type,
+				diagnostics);
 		}
 		case lang::string_array_condition_property::has_explicit_mod: {
-			return add_string_array_condition_impl(
-				std::move(strings), exact_match, condition_origin, set.has_explicit_mod, diagnostics);
+			return add_non_range_condition(
+				lang::strings_condition{std::move(strings), is_exact_match, condition_origin},
+				set.has_explicit_mod,
+				diagnostics);
 		}
 		case lang::string_array_condition_property::has_enchantment: {
-			return add_string_array_condition_impl(
-				std::move(strings), exact_match, condition_origin, set.has_enchantment, diagnostics);
+			return add_non_range_condition(
+				lang::strings_condition{std::move(strings), is_exact_match, condition_origin},
+				set.has_enchantment,
+				diagnostics);
 		}
 		case lang::string_array_condition_property::prophecy: {
-			return add_string_array_condition_impl(
-				std::move(strings), exact_match, condition_origin, set.prophecy, diagnostics);
+			return add_non_range_condition(
+				lang::strings_condition{std::move(strings), is_exact_match, condition_origin},
+				set.prophecy,
+				diagnostics);
 		}
 		case lang::string_array_condition_property::enchantment_passive_node: {
-			return add_string_array_condition_impl(
-				std::move(strings), exact_match, condition_origin, set.enchantment_passive_node, diagnostics);
+			return add_non_range_condition(
+				lang::strings_condition{std::move(strings), is_exact_match, condition_origin},
+				set.enchantment_passive_node,
+				diagnostics);
 		}
 	}
 
@@ -246,11 +257,6 @@ add_has_influence_condition(
 		}
 	}
 
-	if (target.has_value()) {
-		diagnostics.emplace_back(error(errors::condition_redefinition{origin, (*target).origin}));
-		return false;
-	}
-
 	const auto contains = [&](lang::influence_type type) {
 		for (const auto infl : influences)
 			if (infl.value == type)
@@ -259,35 +265,21 @@ add_has_influence_condition(
 		return false;
 	};
 
-	target = lang::influences_condition{
-		lang::influence_info{
-			contains(lang::influence_type::shaper),
-			contains(lang::influence_type::elder),
-			contains(lang::influence_type::crusader),
-			contains(lang::influence_type::redeemer),
-			contains(lang::influence_type::hunter),
-			contains(lang::influence_type::warlord)
+	return add_non_range_condition(
+		lang::influences_condition{
+			lang::influence_info{
+				contains(lang::influence_type::shaper),
+				contains(lang::influence_type::elder),
+				contains(lang::influence_type::crusader),
+				contains(lang::influence_type::redeemer),
+				contains(lang::influence_type::hunter),
+				contains(lang::influence_type::warlord)
+			},
+			is_exact_match,
+			origin
 		},
-		is_exact_match,
-		origin
-	};
-	return true;
-}
-
-[[nodiscard]] bool
-add_gem_quality_type_condition(
-	lang::gem_quality_type type,
-	lang::position_tag origin,
-	std::optional<lang::gem_quality_type_condition>& target,
-	diagnostics_container& diagnostics)
-{
-	if (target.has_value()) {
-		diagnostics.emplace_back(error(errors::condition_redefinition{origin, (*target).origin}));
-		return false;
-	}
-
-	target = lang::gem_quality_type_condition{type, origin};
-	return true;
+		target,
+		diagnostics);
 }
 
 [[nodiscard]] bool
@@ -298,30 +290,7 @@ add_socket_spec_condition(
 	diagnostics_container& diagnostics)
 {
 	auto& target = links_matter ? set.socket_group : set.sockets;
-
-	if (target.has_value()) {
-		diagnostics.emplace_back(error(errors::condition_redefinition{condition.origin, (*target).origin}));
-		return false;
-	}
-
-	target = std::move(condition);
-	return true;
-}
-
-[[nodiscard]] bool
-add_boolean_condition_impl(
-	lang::boolean boolean,
-	lang::position_tag condition_origin,
-	std::optional<lang::boolean_condition>& target,
-	diagnostics_container& diagnostics)
-{
-	if (target.has_value()) {
-		diagnostics.emplace_back(error(errors::condition_redefinition{condition_origin, (*target).origin}));
-		return false;
-	}
-
-	target = lang::boolean_condition{boolean, condition_origin};
-	return true;
+	return add_non_range_condition(condition, target, diagnostics);
 }
 
 [[nodiscard]] bool
@@ -334,43 +303,82 @@ add_boolean_condition(
 {
 	switch (property) {
 		case lang::boolean_condition_property::identified: {
-			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_identified, diagnostics);
+			return add_non_range_condition(
+				lang::boolean_condition{boolean, condition_origin},
+				condition_set.is_identified,
+				diagnostics);
 		}
 		case lang::boolean_condition_property::corrupted: {
-			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_corrupted, diagnostics);
+			return add_non_range_condition(
+				lang::boolean_condition{boolean, condition_origin},
+				condition_set.is_corrupted,
+				diagnostics);
 		}
 		case lang::boolean_condition_property::mirrored: {
-			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_mirrored, diagnostics);
+			return add_non_range_condition(
+				lang::boolean_condition{boolean, condition_origin},
+				condition_set.is_mirrored,
+				diagnostics);
 		}
 		case lang::boolean_condition_property::elder_item: {
-			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_elder_item, diagnostics);
+			return add_non_range_condition(
+				lang::boolean_condition{boolean, condition_origin},
+				condition_set.is_elder_item,
+				diagnostics);
 		}
 		case lang::boolean_condition_property::shaper_item: {
-			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_shaper_item, diagnostics);
+			return add_non_range_condition(
+				lang::boolean_condition{boolean, condition_origin},
+				condition_set.is_shaper_item,
+				diagnostics);
 		}
 		case lang::boolean_condition_property::fractured_item: {
-			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_fractured_item, diagnostics);
+			return add_non_range_condition(
+				lang::boolean_condition{boolean, condition_origin},
+				condition_set.is_fractured_item,
+				diagnostics);
 		}
 		case lang::boolean_condition_property::synthesised_item: {
-			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_synthesised_item, diagnostics);
+			return add_non_range_condition(
+				lang::boolean_condition{boolean, condition_origin},
+				condition_set.is_synthesised_item,
+				diagnostics);
 		}
 		case lang::boolean_condition_property::any_enchantment: {
-			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_enchanted, diagnostics);
+			return add_non_range_condition(
+				lang::boolean_condition{boolean, condition_origin},
+				condition_set.is_enchanted,
+				diagnostics);
 		}
 		case lang::boolean_condition_property::shaped_map: {
-			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_shaped_map, diagnostics);
+			return add_non_range_condition(
+				lang::boolean_condition{boolean, condition_origin},
+				condition_set.is_shaped_map,
+				diagnostics);
 		}
 		case lang::boolean_condition_property::elder_map: {
-			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_elder_map, diagnostics);
+			return add_non_range_condition(
+				lang::boolean_condition{boolean, condition_origin},
+				condition_set.is_elder_map,
+				diagnostics);
 		}
 		case lang::boolean_condition_property::blighted_map: {
-			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_blighted_map, diagnostics);
+			return add_non_range_condition(
+				lang::boolean_condition{boolean, condition_origin},
+				condition_set.is_blighted_map,
+				diagnostics);
 		}
 		case lang::boolean_condition_property::replica: {
-			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_replica, diagnostics);
+			return add_non_range_condition(
+				lang::boolean_condition{boolean, condition_origin},
+				condition_set.is_replica,
+				diagnostics);
 		}
 		case lang::boolean_condition_property::alternate_quality: {
-			return add_boolean_condition_impl(boolean, condition_origin, condition_set.is_alternate_quality, diagnostics);
+			return add_non_range_condition(
+				lang::boolean_condition{boolean, condition_origin},
+				condition_set.is_alternate_quality,
+				diagnostics);
 		}
 	}
 
@@ -382,23 +390,6 @@ add_boolean_condition(
 }
 
 // ---- spirit filter helpers ----
-
-[[nodiscard]] bool
-spirit_filter_add_autogen_condition(
-	const ast::sf::autogen_condition& condition,
-	lang::spirit_condition_set& set,
-	diagnostics_container& diagnostics)
-{
-	const auto condition_origin = parser::position_tag_of(condition);
-
-	if (set.autogen.has_value()) {
-		diagnostics.emplace_back(error(errors::condition_redefinition{condition_origin, (*set.autogen).origin}));
-		return false;
-	}
-
-	set.autogen = lang::autogen_condition{condition.cat_expr.category, condition_origin};
-	return true;
-}
 
 [[nodiscard]] bool
 spirit_filter_add_price_comparison_condition(
@@ -571,9 +562,8 @@ spirit_filter_add_gem_quality_type_condition(
 			return detail::get_as<lang::gem_quality_type>(obj.values[0], diagnostics);
 		})
 		.map([&](lang::gem_quality_type gqt) {
-			return add_gem_quality_type_condition(
-				gqt,
-				parser::position_tag_of(condition),
+			return add_non_range_condition(
+				lang::gem_quality_type_condition{gqt, parser::position_tag_of(condition)},
 				set.gem_quality_type,
 				diagnostics);
 		})
@@ -773,7 +763,10 @@ spirit_filter_add_conditions(
 	for (const ast::sf::condition& condition : conditions) {
 		const bool condition_result = condition.apply_visitor(x3::make_lambda_visitor<bool>(
 			[&](const ast::sf::autogen_condition& cond) {
-				return spirit_filter_add_autogen_condition(cond, set, diagnostics);
+				return add_non_range_condition(
+					lang::autogen_condition{cond.cat_expr.category, parser::position_tag_of(cond)},
+					set.autogen,
+					diagnostics);
 			},
 			[&](const ast::sf::price_comparison_condition& cond) {
 				return spirit_filter_add_price_comparison_condition(st, cond, symbols, set, diagnostics);
@@ -843,9 +836,8 @@ real_filter_add_condition(
 			return real_filter_add_has_influence_condition(st, cond, condition_set.has_influence, diagnostics);
 		},
 		[&](const ast::rf::gem_quality_type_condition& cond) {
-			return add_gem_quality_type_condition(
-				evaluate(cond.value),
-				parser::position_tag_of(cond),
+			return add_non_range_condition(
+				lang::gem_quality_type_condition{evaluate(cond.value), parser::position_tag_of(cond)},
 				condition_set.gem_quality_type,
 				diagnostics);
 		},
