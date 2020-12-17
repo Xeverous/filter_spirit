@@ -21,9 +21,10 @@ ___
 
 I planned to release first graphical version at the end of Delirium league or a bit earlier but you know, it's my first that large project and I'm also playing the game and working full-time. I have [heavily contributed to elements](https://github.com/cycfi/elements/issues?q=author%3AXeverous) and made some own GUI library experiments which were planned to be used for FS GUI. Obviously I could use something well-known like Qt or wxWidgets but none of them fully satisfy my requirements so I decided to contribute to a new promising project instead. Call it a bit of Shaper's perfection syndrome. All of experiments failed and elements project itself is in too early stage to make it work for what I want. Current plan is to use [Magnum](https://magnum.graphics) with [Dear Imgui](https://github.com/ocornut/imgui) which could enable both a web-based port and a native desktop application, both with very rich UI. Expect updates on this topic in the middle (or later) of Heist league.
 
-Recent UI screen (work in progress):
+Recent UI screens (work in progress):
 
 ![image](https://user-images.githubusercontent.com/20820409/99323133-d121c980-2871-11eb-843c-fe995abce24d.png)
+![image](https://user-images.githubusercontent.com/20820409/102475151-d1bca400-4059-11eb-9028-110dd1d58ebf.png)
 
 *Code on `gui-magnum` branch.*
 ___
