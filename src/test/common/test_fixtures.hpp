@@ -17,7 +17,7 @@ class parser_fixture
 {
 protected:
 	static
-	fs::parser::parsed_spirit_filter parse(std::string_view input);
+	parser::parsed_spirit_filter parse(std::string_view input);
 };
 
 class compiler_fixture : public parser_fixture

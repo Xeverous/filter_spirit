@@ -192,6 +192,199 @@ test_boolean_condition(
 		return condition_match_result::failure(condition.origin);
 }
 
+/*
+ * Sockets and SocketGroup are one of the most unintuitive and complex conditions.
+ * There are multiple inconsistencies:
+ * - items with no sockets get special treatment, as if they had one link-group of size 0
+ *   (which is different from having no link-groups)
+ * - an item can match < but not <=
+ * - an item can match > but not >=
+ * - < and > use OR operation for subrequirements, other comparisons use AND (function C)
+ *   (thus "< 5G" is equivalent to "< 5 G" but "<= 5G" is not equivalent to "<= 5 G")
+ * - soft-equal (no comparison symbol or only 1 "=" character):
+ *   - uses == to compare sockets/link count (function A)
+ *   - uses <= for color counts (function B)
+ *
+ * Sockets     <  5GGG # less than 5        sockets OR  less than 3x G socket
+ * Sockets     <= 5GGG # at most   5        sockets AND at most   3x G socket
+ * Sockets        5GGG # exactly   5        sockets AND at least  3x G socket
+ * Sockets     == 5GGG # exactly   5        sockets AND exactly   3x G socket
+ * Sockets     >= 5GGG # at least  5        sockets AND at least  3x G socket
+ * Sockets     >  5GGG # more than 5        sockets OR  more than 3x G socket
+ * SocketGroup <  5GGG # less than 5 linked sockets OR  less than 3x G linked within any  group
+ * SocketGroup <= 5GGG # at most   5 linked sockets AND at most   3x G linked within such group
+ * SocketGroup    5GGG # exactly   5 linked sockets AND at least  3x G linked within such group
+ * SocketGroup == 5GGG # exactly   5 linked sockets AND exactly   3x G linked within such group
+ * SocketGroup >= 5GGG # at least  5 linked sockets AND at least  3x G linked within such group
+ * SocketGroup >  5GGG # more than 5 linked sockets OR  more than 3x G linked within any  group
+ */
+[[nodiscard]] bool // (A)
+test_socket_or_link_count(std::optional<int> opt_req, comparison_type comparison, int item_stat)
+{
+	if (!opt_req)
+		return true;
+
+	const int req = *opt_req;
+
+	if (comparison == comparison_type::less)
+		return item_stat < req;
+	else if (comparison == comparison_type::less_equal)
+		return item_stat <= req;
+	else if (comparison == comparison_type::greater)
+		return item_stat > req;
+	else if (comparison == comparison_type::greater_equal)
+		return item_stat >= req;
+	else
+		return item_stat == req;
+}
+
+[[nodiscard]] std::optional<bool> // (B)
+test_color_count(int req, comparison_type comparison, int item_stat)
+{
+	/*
+	 * It is impossible to query for count == 0 of specific socket color.
+	 * This is because for each required specific color, a specific letter
+	 * needs to be written. Multiple letters increase required count.
+	 * No letters means no requirement therefore the caller must check
+	 * for results elsewhere. There is no good default here, return nothing.
+	 */
+	if (req == 0)
+		return std::nullopt;
+
+	if (comparison == comparison_type::less)
+		return item_stat < req;
+	else if (comparison == comparison_type::less_equal)
+		return item_stat <= req;
+	else if (comparison == comparison_type::greater)
+		return item_stat > req;
+	else if (comparison == comparison_type::greater_equal || comparison == comparison_type::equal_soft)
+		return item_stat >= req;
+	else
+		return item_stat == req;
+}
+
+[[nodiscard]] bool
+test_color_count_all_groups(const socket_info& item_sockets, socket_color c, int req, comparison_type comparison)
+{
+	for (const linked_sockets& group : item_sockets.groups) {
+		if (test_color_count(req, comparison, group.count_of(c)).value_or(false))
+			return true;
+	}
+
+	return false;
+}
+
+[[nodiscard]] bool // (C)
+is_sockets_condition_using_or(comparison_type comparison)
+{
+	return comparison == comparison_type::less || comparison == comparison_type::greater;
+}
+
+[[nodiscard]] bool
+test_sockets_condition(
+	comparison_type comparison,
+	socket_spec ss,
+	const socket_info& item_sockets)
+{
+	if (item_sockets.groups.empty()) {
+		return test_socket_or_link_count(ss.num, comparison, 0)
+			&& test_color_count(ss.r, comparison, 0).value_or(true)
+			&& test_color_count(ss.g, comparison, 0).value_or(true)
+			&& test_color_count(ss.b, comparison, 0).value_or(true)
+			&& test_color_count(ss.w, comparison, 0).value_or(true)
+			&& test_color_count(ss.a, comparison, 0).value_or(true)
+			&& test_color_count(ss.d, comparison, 0).value_or(true);
+	}
+
+	if (is_sockets_condition_using_or(comparison)) {
+		return test_socket_or_link_count(ss.num, comparison, item_sockets.sockets())
+			|| test_color_count(ss.r, comparison, item_sockets.count_of(socket_color::r)).value_or(false)
+			|| test_color_count(ss.g, comparison, item_sockets.count_of(socket_color::g)).value_or(false)
+			|| test_color_count(ss.b, comparison, item_sockets.count_of(socket_color::b)).value_or(false)
+			|| test_color_count(ss.w, comparison, item_sockets.count_of(socket_color::w)).value_or(false)
+			|| test_color_count(ss.a, comparison, item_sockets.count_of(socket_color::a)).value_or(false)
+			|| test_color_count(ss.d, comparison, item_sockets.count_of(socket_color::d)).value_or(false);
+	}
+	else {
+		return test_socket_or_link_count(ss.num, comparison, item_sockets.sockets())
+			&& test_color_count(ss.r, comparison, item_sockets.count_of(socket_color::r)).value_or(true)
+			&& test_color_count(ss.g, comparison, item_sockets.count_of(socket_color::g)).value_or(true)
+			&& test_color_count(ss.b, comparison, item_sockets.count_of(socket_color::b)).value_or(true)
+			&& test_color_count(ss.w, comparison, item_sockets.count_of(socket_color::w)).value_or(true)
+			&& test_color_count(ss.a, comparison, item_sockets.count_of(socket_color::a)).value_or(true)
+			&& test_color_count(ss.d, comparison, item_sockets.count_of(socket_color::d)).value_or(true);
+	}
+}
+
+[[nodiscard]] bool
+test_socket_group_condition(
+	comparison_type comparison,
+	socket_spec ss,
+	const socket_info& item_sockets)
+{
+	if (item_sockets.groups.empty()) {
+		return test_socket_or_link_count(ss.num, comparison, 0)
+			&& test_color_count(ss.r, comparison, 0).value_or(true)
+			&& test_color_count(ss.g, comparison, 0).value_or(true)
+			&& test_color_count(ss.b, comparison, 0).value_or(true)
+			&& test_color_count(ss.w, comparison, 0).value_or(true)
+			&& test_color_count(ss.a, comparison, 0).value_or(true)
+			&& test_color_count(ss.d, comparison, 0).value_or(true);
+	}
+
+	if (is_sockets_condition_using_or(comparison)) {
+		return test_socket_or_link_count(ss.num, comparison, item_sockets.links())
+			|| test_color_count_all_groups(item_sockets, socket_color::r, ss.r, comparison)
+			|| test_color_count_all_groups(item_sockets, socket_color::g, ss.g, comparison)
+			|| test_color_count_all_groups(item_sockets, socket_color::b, ss.b, comparison)
+			|| test_color_count_all_groups(item_sockets, socket_color::w, ss.w, comparison)
+			|| test_color_count_all_groups(item_sockets, socket_color::a, ss.a, comparison)
+			|| test_color_count_all_groups(item_sockets, socket_color::d, ss.d, comparison);
+	}
+	else {
+		for (const linked_sockets& group : item_sockets.groups) {
+			const bool result = test_socket_or_link_count(ss.num, comparison, group.sockets.size())
+				&& test_color_count(ss.r, comparison, group.count_of(socket_color::r)).value_or(true)
+				&& test_color_count(ss.g, comparison, group.count_of(socket_color::g)).value_or(true)
+				&& test_color_count(ss.b, comparison, group.count_of(socket_color::b)).value_or(true)
+				&& test_color_count(ss.w, comparison, group.count_of(socket_color::w)).value_or(true)
+				&& test_color_count(ss.a, comparison, group.count_of(socket_color::a)).value_or(true)
+				&& test_color_count(ss.d, comparison, group.count_of(socket_color::d)).value_or(true);
+
+			if (result)
+				return true;
+		}
+
+		return false;
+	}
+}
+
+[[nodiscard]] std::optional<condition_match_result>
+test_socket_spec_condition(
+	const std::optional<socket_spec_condition>& opt_condition,
+	bool group_matters,
+	const socket_info& item_sockets)
+{
+	if (!opt_condition)
+		return std::nullopt;
+
+	const socket_spec_condition& condition = *opt_condition;
+
+	for (socket_spec ss : condition.values) {
+		const auto result = [&]() {
+			if (group_matters)
+				return test_socket_group_condition(condition.comparison, ss, item_sockets);
+			else
+				return test_sockets_condition(condition.comparison, ss, item_sockets);
+		}();
+
+		if (result)
+			return condition_match_result::success(condition.origin, ss.origin);
+	}
+
+	return condition_match_result::failure(condition.origin);
+}
+
 item_style default_item_style(const item& itm)
 {
 	item_style result;
@@ -336,7 +529,9 @@ item_filtering_result pass_item_through_filter(const item& itm, const item_filte
 		cs_result.is_alternate_quality = test_boolean_condition(cs.is_alternate_quality, itm.is_alternate_quality);
 
 		// TODO gem quality type matching
-		// TODO sockets matching
+
+		cs_result.sockets      = test_socket_spec_condition(cs.sockets,      false, itm.sockets);
+		cs_result.socket_group = test_socket_spec_condition(cs.socket_group, true,  itm.sockets);
 
 		block_match_result block_result;
 		block_result.condition_set_result = std::move(cs_result);

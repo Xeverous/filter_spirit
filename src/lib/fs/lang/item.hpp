@@ -321,6 +321,12 @@ struct socket_info
 			[](int sum, const linked_sockets& s){ return sum + s.sockets.size(); });
 	}
 
+	int count_of(socket_color c) const noexcept
+	{
+		return std::accumulate(groups.begin(), groups.end(), 0,
+			[c](int sum, const linked_sockets& s){ return sum + s.count_of(c); });
+	}
+
 	bool is_valid() const noexcept
 	{
 		return verify() == item_validity::valid;
