@@ -35,6 +35,21 @@ std::size_t origins_line_number(
 	return r.first.line_number;
 }
 
+void color_line_by_origin(
+	lang::position_tag origin,
+	const parser::lookup_data& lookup,
+	const parser::line_lookup& lines,
+	std::vector<ImU32>& line_colors,
+	ImU32 color)
+{
+	if (!lang::is_valid(origin))
+		return;
+
+	const std::size_t line_number = origins_line_number(lookup, lines, origin);
+	FS_ASSERT(line_number < line_colors.size());
+	line_colors[line_number] = color;
+}
+
 void color_line_by_condition_result(
 	const std::optional<lang::condition_match_result>& opt_result,
 	const parser::lookup_data& lookup,
@@ -65,26 +80,30 @@ void color_line_by_condition_result(
 	const parser::line_lookup& lines,
 	std::vector<ImU32>& line_colors)
 {
+	/*
+	 * Range conditions that are defined using = will have the same origin for both bounds
+	 * (= x is treated as >= x and <= x at the same time). We need to avoid coloring the
+	 * same line twice - otherwise one result with override another.
+	 *
+	 * If origins are the same, the coloring must use success color only if both succeded.
+	 */
+	if (result.lower_bound.has_value() && result.upper_bound.has_value()) {
+		if (lang::compare((*result.lower_bound).condition_origin(), (*result.upper_bound).condition_origin()) == 0) {
+
+			const bool is_success = (*result.lower_bound).is_successful() && (*result.upper_bound).is_successful();
+			const lang::position_tag origin = (*result.lower_bound).condition_origin();
+
+			if (is_success)
+				color_line_by_origin(origin, lookup, lines, line_colors, color_background_condition_success);
+			else
+				color_line_by_origin(origin, lookup, lines, line_colors, color_background_condition_failure);
+
+			return;
+		}
+	}
+
 	color_line_by_condition_result(result.lower_bound, lookup, lines, line_colors);
 	color_line_by_condition_result(result.upper_bound, lookup, lines, line_colors);
-}
-
-template <typename T>
-void color_line_by_origin(
-	const T& t,
-	const parser::lookup_data& lookup,
-	const parser::line_lookup& lines,
-	std::vector<ImU32>& line_colors,
-	ImU32 color)
-{
-	const lang::position_tag origin = t.origin;
-
-	if (!lang::is_valid(origin))
-		return;
-
-	const std::size_t line_number = origins_line_number(lookup, lines, origin);
-	FS_ASSERT(line_number < line_colors.size());
-	line_colors[line_number] = color;
 }
 
 template <typename Action>
@@ -94,7 +113,7 @@ void color_line_by_action_origin(
 	const parser::line_lookup& lines,
 	std::vector<ImU32>& line_colors)
 {
-	color_line_by_origin(action, lookup, lines, line_colors, color_background_matched_action);
+	color_line_by_origin(action.origin, lookup, lines, line_colors, color_background_matched_action);
 }
 
 template <typename Action>
@@ -308,7 +327,7 @@ void debug_state::recompute()
 	color_line_by_action_origin(style.minimap_icon,       lookup, lines, _line_colors);
 	color_line_by_action_origin(style.play_effect,        lookup, lines, _line_colors);
 
-	color_line_by_origin(style.visibility, lookup, lines, _line_colors, color_background_matched_visibility);
+	color_line_by_origin(style.visibility.origin, lookup, lines, _line_colors, color_background_matched_visibility);
 }
 
 void debug_state::draw_interface(const fonting& f)
