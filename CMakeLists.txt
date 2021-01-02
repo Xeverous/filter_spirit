@@ -41,7 +41,8 @@ option(FILTER_SPIRIT_ADD_FILESYSTEM_LINK
 	"add linker command for standard filesystem library (required by earlier GCC and Clang versions)" OFF)
 option(FILTER_SPIRIT_ENABLE_LTO
 	"enable link-time optimization for Filter Spirit targets" ON)
-set(FILTER_SPIRIT_PLATFORM "" CACHE STRING "win7 (Windows 7 or newer) or sdl2 (any platform suppored by SDL2)")
+set(FILTER_SPIRIT_PLATFORM "" CACHE STRING
+	"win7 (Windows 7 or newer) OR sdl2 (any platform suppored by SDL2) OR emscripten")
 
 ##############################################################################
 # specify explicitly where to output all binary objects

@@ -157,6 +157,8 @@ if(FILTER_SPIRIT_PLATFORM STREQUAL "win7")
 	target_compile_definitions(filter_spirit PUBLIC FILTER_SPIRIT_PLATFORM_WINDOWS)
 elseif(FILTER_SPIRIT_PLATFORM STREQUAL "sdl2")
 	target_compile_definitions(filter_spirit PUBLIC FILTER_SPIRIT_PLATFORM_SDL)
+elseif(FILTER_SPIRIT_PLATFORM STREQUAL "emscripten")
+	target_compile_definitions(filter_spirit PUBLIC FILTER_SPIRIT_PLATFORM_EMSCRIPTEN)
 else()
 	message(FATAL_ERROR "missing or invalid FILTER_SPIRIT_PLATFORM")
 endif()
@@ -169,18 +171,29 @@ if(FILTER_SPIRIT_ENABLE_LTO)
 	set_target_properties(filter_spirit PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif()
 
-# https://gitlab.kitware.com/cmake/cmake/issues/20431
-get_target_property(CURL_INCLUDE_DIR PkgConfig::libcurl INTERFACE_INCLUDE_DIRECTORIES)
-target_link_directories(filter_spirit
-	PUBLIC
-		${CURL_INCLUDE_DIR}/../bin)
-
 target_link_libraries(filter_spirit
 	PUBLIC
 		nlohmann_json::nlohmann_json
-		OpenSSL::SSL
-		PkgConfig::libcurl
+		Boost::boost
+		# FS uses atomic operations in networking callbacks
+		$<$<CXX_COMPILER_ID:GNU>:atomic>
+		$<$<CXX_COMPILER_ID:Clang>:atomic>
 )
+
+# add networking libraries for non-emscripten builds
+if(NOT FILTER_SPIRIT_PLATFORM STREQUAL "emscripten")
+	# https://gitlab.kitware.com/cmake/cmake/issues/20431
+	get_target_property(CURL_INCLUDE_DIR PkgConfig::libcurl INTERFACE_INCLUDE_DIRECTORIES)
+	target_link_directories(filter_spirit
+		PUBLIC
+			${CURL_INCLUDE_DIR}/../bin)
+
+	target_link_libraries(filter_spirit
+		PUBLIC
+			OpenSSL::SSL
+			PkgConfig::libcurl
+	)
+endif()
 
 # earlier GCC and Clang versions which support C++17 require explicit link to filesystem library
 if(FILTER_SPIRIT_ADD_FILESYSTEM_LINK)
@@ -189,10 +202,3 @@ if(FILTER_SPIRIT_ADD_FILESYSTEM_LINK)
 		$<$<CXX_COMPILER_ID:Clang>:c++fs>
 	)
 endif()
-
-# FS uses atomic operations in networking callbacks
-target_link_libraries(filter_spirit
-	PUBLIC
-		$<$<CXX_COMPILER_ID:GNU>:atomic>
-		$<$<CXX_COMPILER_ID:Clang>:atomic>
-)
