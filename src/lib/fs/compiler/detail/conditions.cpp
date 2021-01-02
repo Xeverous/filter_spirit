@@ -556,14 +556,25 @@ spirit_filter_add_gem_quality_type_condition(
 	lang::condition_set& set,
 	diagnostics_container& diagnostics)
 {
-	return detail::evaluate_sequence(st, condition.seq, symbols, 1, 1, diagnostics)
-		.flat_map([&](lang::object obj) {
-			FS_ASSERT(obj.values.size() == 1u);
-			return detail::get_as<lang::gem_quality_type>(obj.values[0], diagnostics);
+	using qualities_t = lang::gem_quality_type_condition::container_type;
+	return detail::evaluate_sequence(st, condition.seq, symbols, 1, boost::none, diagnostics)
+		.flat_map([&](lang::object obj) -> boost::optional<qualities_t> {
+			qualities_t qualities;
+
+			for (auto& val : obj.values) {
+				boost::optional<lang::gem_quality_type> qt = detail::get_as<lang::gem_quality_type>(val, diagnostics);
+
+				if (qt)
+					qualities.push_back(*qt);
+				else if (st.error_handling.stop_on_error)
+					return boost::none;
+			}
+
+			return qualities;
 		})
-		.map([&](lang::gem_quality_type gqt) {
+		.map([&](qualities_t qualities) {
 			return add_non_range_condition(
-				lang::gem_quality_type_condition{gqt, parser::position_tag_of(condition)},
+				lang::gem_quality_type_condition{std::move(qualities), parser::position_tag_of(condition)},
 				set.gem_quality_type,
 				diagnostics);
 		})
@@ -716,6 +727,31 @@ real_filter_add_has_influence_condition(
 }
 
 [[nodiscard]] bool
+real_filter_add_gem_quality_type_condition(
+	settings st,
+	const ast::rf::gem_quality_type_condition& condition,
+	std::optional<lang::gem_quality_type_condition>& target,
+	diagnostics_container& diagnostics)
+{
+	lang::gem_quality_type_condition::container_type qualities;
+
+	for (ast::common::literal_expression lit_expr : condition.literals) {
+		boost::optional<lang::gem_quality_type> qt = detail::evaluate(st, lit_expr, diagnostics)
+			.flat_map([&](lang::single_object so) { return detail::get_as<lang::gem_quality_type>(so, diagnostics); });
+
+		if (qt)
+			qualities.push_back(*qt);
+		else if (st.error_handling.stop_on_error)
+			return false;
+	}
+
+	return add_non_range_condition(
+		lang::gem_quality_type_condition{std::move(qualities), parser::position_tag_of(condition)},
+		target,
+		diagnostics);
+}
+
+[[nodiscard]] bool
 real_filter_add_socket_spec_condition(
 	settings st,
 	const ast::rf::socket_spec_condition& condition,
@@ -836,10 +872,7 @@ real_filter_add_condition(
 			return real_filter_add_has_influence_condition(st, cond, condition_set.has_influence, diagnostics);
 		},
 		[&](const ast::rf::gem_quality_type_condition& cond) {
-			return add_non_range_condition(
-				lang::gem_quality_type_condition{evaluate(cond.value), parser::position_tag_of(cond)},
-				condition_set.gem_quality_type,
-				diagnostics);
+			return real_filter_add_gem_quality_type_condition(st, cond, condition_set.gem_quality_type, diagnostics);
 		},
 		[&](const ast::rf::socket_spec_condition& cond) {
 			return real_filter_add_socket_spec_condition(st, cond, condition_set, diagnostics);

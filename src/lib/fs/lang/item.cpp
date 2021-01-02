@@ -97,9 +97,9 @@ int snprintf_dropped_item_label(char* buf, std::size_t buf_size, const item& itm
 	else if (itm.gem_level != lang::item::sentinel_gem_level) {
 		// dropped gems display their quality type name (if non-zero or alternate) and level (if not 1)
 		if (itm.quality != lang::item::sentinel_quality && itm.gem_level != 1)
-			return std::snprintf(buf, buf_size, "Superior %s (Level %d)", itm.base_type.c_str(), itm.gem_level);
+			return std::snprintf(buf, buf_size, "%s %s (Level %d)", lang::to_c_str(itm.gem_quality_type), itm.base_type.c_str(), itm.gem_level);
 		else if (itm.quality != lang::item::sentinel_quality)
-			return std::snprintf(buf, buf_size, "Superior %s", itm.base_type.c_str());
+			return std::snprintf(buf, buf_size, "%s %s", lang::to_c_str(itm.gem_quality_type), itm.base_type.c_str());
 		else if (itm.gem_level != 1)
 			return std::snprintf(buf, buf_size, "%s (Level %d)", itm.base_type.c_str(), itm.gem_level);
 		else

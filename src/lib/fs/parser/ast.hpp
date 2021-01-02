@@ -680,15 +680,15 @@ namespace rf
 
 	struct gem_quality_type_condition : x3::position_tagged
 	{
-		auto& operator=(gem_quality_type_literal lit)
+		auto& operator=(literal_sequence seq)
 		{
-			value = lit;
+			literals = std::move(seq);
 			return *this;
 		}
 
-		const auto& get_value() const { return value; }
+		const auto& get_value() const { return literals; }
 
-		gem_quality_type_literal value;
+		literal_sequence literals;
 	};
 
 	struct socket_spec_condition : x3::position_tagged

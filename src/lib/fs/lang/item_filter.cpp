@@ -177,6 +177,24 @@ test_influences_condition(
 }
 
 [[nodiscard]] std::optional<condition_match_result>
+test_gem_quality_type_condition(
+	const std::optional<gem_quality_type_condition>& opt_condition,
+	lang::gem_quality_type_type item_gqt)
+{
+	if (!opt_condition)
+		return std::nullopt;
+
+	const gem_quality_type_condition& condition = *opt_condition;
+
+	for (lang::gem_quality_type gqt : condition.values) {
+		if (item_gqt == gqt.value)
+			return condition_match_result::success(condition.origin, gqt.origin);
+	}
+
+	return condition_match_result::failure(condition.origin);
+}
+
+[[nodiscard]] std::optional<condition_match_result>
 test_boolean_condition(
 	std::optional<boolean_condition> opt_condition,
 	bool item_property_value)
@@ -528,7 +546,7 @@ item_filtering_result pass_item_through_filter(const item& itm, const item_filte
 		cs_result.is_replica           = test_boolean_condition(cs.is_replica,           itm.is_replica);
 		cs_result.is_alternate_quality = test_boolean_condition(cs.is_alternate_quality, itm.is_alternate_quality);
 
-		// TODO gem quality type matching
+		cs_result.gem_quality_type = test_gem_quality_type_condition(cs.gem_quality_type, itm.gem_quality_type);
 
 		cs_result.sockets      = test_socket_spec_condition(cs.sockets,      false, itm.sockets);
 		cs_result.socket_group = test_socket_spec_condition(cs.socket_group, true,  itm.sockets);

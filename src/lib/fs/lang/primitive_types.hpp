@@ -174,6 +174,22 @@ struct gem_quality_type
 	position_tag origin = {};
 };
 
+inline const char* to_c_str(gem_quality_type_type gqt)
+{
+	namespace kw = keywords::rf;
+
+	if (gqt == gem_quality_type_type::superior)
+		return kw::superior;
+	else if (gqt == gem_quality_type_type::divergent)
+		return kw::divergent;
+	else if (gqt == gem_quality_type_type::anomalous)
+		return kw::anomalous;
+	else if (gqt == gem_quality_type_type::phantasmal)
+		return kw::phantasmal;
+	else
+		return "?";
+}
+
 inline bool operator==(gem_quality_type lhs, gem_quality_type rhs) noexcept { return lhs.value == rhs.value; }
 inline bool operator!=(gem_quality_type lhs, gem_quality_type rhs) noexcept { return !(lhs == rhs); }
 

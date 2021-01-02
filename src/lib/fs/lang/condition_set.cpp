@@ -64,22 +64,24 @@ void output_gem_quality_type_condition(
 	if (!condition.has_value())
 		return;
 
-	output_stream << '\t' << kw::gem_quality_type << ' ';
+	output_stream << '\t' << kw::gem_quality_type;
 
 	auto& cond = *condition;
-	switch (cond.value.value) {
-		case lang::gem_quality_type_type::superior:
-			output_stream << kw::superior;
-			break;
-		case lang::gem_quality_type_type::divergent:
-			output_stream << kw::divergent;
-			break;
-		case lang::gem_quality_type_type::anomalous:
-			output_stream << kw::anomalous;
-			break;
-		case lang::gem_quality_type_type::phantasmal:
-			output_stream << kw::phantasmal;
-			break;
+	for (lang::gem_quality_type gqt : cond.values) {
+		switch (gqt.value) {
+			case lang::gem_quality_type_type::superior:
+				output_stream << ' ' << kw::superior;
+				break;
+			case lang::gem_quality_type_type::divergent:
+				output_stream << ' ' << kw::divergent;
+				break;
+			case lang::gem_quality_type_type::anomalous:
+				output_stream << ' ' << kw::anomalous;
+				break;
+			case lang::gem_quality_type_type::phantasmal:
+				output_stream << ' ' << kw::phantasmal;
+				break;
+		}
 	}
 
 	output_stream << '\n';

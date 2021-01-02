@@ -506,6 +506,7 @@ struct item
 	static constexpr auto sentinel_quality    = 0;
 	static constexpr auto sentinel_rarity     = rarity_type::normal;
 	static constexpr auto sentinel_stack_size = 1;
+	static constexpr auto sentinel_gem_quality_type = gem_quality_type_type::superior;
 	static constexpr auto sentinel_gem_level  = 0;
 	static constexpr auto sentinel_map_tier   = 0;
 
@@ -521,6 +522,7 @@ struct item
 	int corrupted_mods = 0;
 	int stack_size = sentinel_stack_size;
 	int max_stack_size = sentinel_stack_size; // filters do not support this property
+	gem_quality_type_type gem_quality_type = sentinel_gem_quality_type;
 	int gem_level = sentinel_gem_level;
 	int max_gem_level = sentinel_gem_level; // filters do not support this property
 	int map_tier = sentinel_map_tier;

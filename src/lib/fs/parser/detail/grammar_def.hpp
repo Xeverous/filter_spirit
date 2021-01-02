@@ -420,7 +420,7 @@ namespace rf
 	BOOST_SPIRIT_DEFINE(has_influence_condition)
 
 	const gem_quality_type_condition_type gem_quality_type_condition = "gem quality type condition";
-	const auto gem_quality_type_condition_def = make_keyword(lang::keywords::rf::gem_quality_type) > common::gem_quality_type_literal;
+	const auto gem_quality_type_condition_def = make_keyword(lang::keywords::rf::gem_quality_type) > literal_sequence;
 	BOOST_SPIRIT_DEFINE(gem_quality_type_condition)
 
 	const socket_spec_condition_type socket_spec_condition = "socket spec condition";

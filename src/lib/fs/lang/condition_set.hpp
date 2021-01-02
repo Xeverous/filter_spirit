@@ -167,7 +167,9 @@ struct boolean_condition
 
 struct gem_quality_type_condition
 {
-	gem_quality_type value;
+	using container_type = boost::container::small_vector<gem_quality_type, 4>;
+
+	container_type values;
 	position_tag origin;
 };
 
