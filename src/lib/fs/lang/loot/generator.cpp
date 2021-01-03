@@ -1167,7 +1167,7 @@ void generator::generate_equippable_items_monster_pack(
 	// in increasing order of these 2 properties
 	std::shuffle(_temp_ilvl_rarity.begin(), _temp_ilvl_rarity.end(), _rng);
 
-	for (const auto [ilvl, rar] : _temp_ilvl_rarity) {
+	for (const auto& [ilvl, rar] : _temp_ilvl_rarity) {
 		generate_equippable_item(
 			db, receiver, quality, ilvl,
 			chance_to_identify, chance_to_corrupt, chance_to_mirror,
