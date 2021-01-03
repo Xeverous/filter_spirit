@@ -56,7 +56,6 @@ target_sources(filter_spirit
 		fs/utility/string_helpers.cpp
 		fs/network/url_encode.cpp
 		fs/network/download.cpp
-		fs/network/curl/error.cpp
 		fs/network/poe_watch/download_data.cpp
 		fs/network/poe_watch/parse_data.cpp
 		fs/network/poe_watch/api_data.cpp
@@ -107,9 +106,6 @@ target_sources(filter_spirit
 		fs/network/url_encode.hpp
 		fs/network/exceptions.hpp
 		fs/network/download.hpp
-		fs/network/curl/easy.hpp
-		fs/network/curl/error.hpp
-		fs/network/curl/libcurl.hpp
 		fs/network/poe_ninja/api_data.hpp
 		fs/network/poe_ninja/download_data.hpp
 		fs/network/poe_ninja/parse_data.hpp
@@ -142,6 +138,17 @@ target_sources(filter_spirit
 		fs/utility/async.hpp
 		fs/version.hpp
 )
+
+if(NOT FILTER_SPIRIT_PLATFORM STREQUAL "emscripten")
+	target_sources(filter_spirit
+		PRIVATE
+			fs/network/curl/error.cpp
+		PUBLIC
+			fs/network/curl/easy.hpp
+			fs/network/curl/error.hpp
+			fs/network/curl/libcurl.hpp
+	)
+endif()
 
 target_include_directories(filter_spirit
 	PUBLIC

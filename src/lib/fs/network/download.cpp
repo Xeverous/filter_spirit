@@ -1,26 +1,30 @@
-#include <fs/network/curl/easy.hpp>
 #include <fs/network/download.hpp>
-#include <fs/version.hpp>
 
+#ifndef __EMSCRIPTEN__
+#include <fs/network/curl/easy.hpp>
+#include <fs/version.hpp>
 #include <curl/curl.h>
+#endif
 
 #include <utility>
+#include <stdexcept>
 
 namespace
 {
 
-namespace net = fs::network;
+using namespace fs;
 
+#ifndef __EMSCRIPTEN__
 // https://tools.ietf.org/html/rfc7231#section-5.5.3
 std::string fs_user_agent()
 {
-	return "FilterSpirit/" + to_string(fs::version::current())
-		+ " (" + fs::version::repository_link + ") " + curl_version();
+	return "FilterSpirit/" + to_string(version::current())
+		+ " (" + version::repository_link + ") " + curl_version();
 }
 
 std::size_t write_callback(char* data, std::size_t /* size */, std::size_t nmemb, void* userdata) noexcept
 {
-	auto& result = *reinterpret_cast<net::request_result*>(userdata);
+	auto& result = *reinterpret_cast<network::request_result*>(userdata);
 
 	try {
 		result.data.append(data, nmemb);
@@ -45,10 +49,10 @@ int xferinfo_callback(
 	curl_off_t /* ultotal */,
 	curl_off_t /* ulnow */) noexcept
 {
-	auto& info = *reinterpret_cast<net::download_info*>(userdata);
+	auto& info = *reinterpret_cast<network::download_info*>(userdata);
 
 	info.xfer_info.store(
-		net::download_xfer_info{
+		network::download_xfer_info{
 			static_cast<std::size_t>(dltotal),
 			static_cast<std::size_t>(dlnow)
 		},
@@ -57,13 +61,13 @@ int xferinfo_callback(
 	return 0; // no error
 }
 
-void save_error(net::request_result& res, std::error_code ec)
+void save_error(network::request_result& res, std::error_code ec)
 {
 	res.is_error = true;
 	res.data = ec.message();
 }
 
-void save_error_to_all(std::vector<net::request_result>& results, std::error_code ec)
+void save_error_to_all(std::vector<network::request_result>& results, std::error_code ec)
 {
 	for (auto& r : results)
 		save_error(r, ec);
@@ -71,9 +75,9 @@ void save_error_to_all(std::vector<net::request_result>& results, std::error_cod
 
 [[nodiscard]] bool
 setup_download(
-	net::curl::easy_handle& easy,
-	const net::download_settings& settings,
-	std::vector<net::request_result>& results)
+	network::curl::easy_handle& easy,
+	const network::download_settings& settings,
+	std::vector<network::request_result>& results)
 {
 	if (const auto ec = easy.write_callback(write_callback); ec) {
 		save_error_to_all(results, ec);
@@ -124,41 +128,37 @@ setup_download(
 
 void
 log_download(
-	fs::log::logger& logger,
+	log::logger& logger,
 	std::string_view target_url)
 {
 	logger.info() << "GET " << target_url << '\n';
 }
 
-} // namespace
-
-namespace fs::network {
-
-download_result
-download(
+network::download_result
+download_using_curl(
 	std::string_view target_name,
 	const std::vector<std::string>& urls,
-	const download_settings& settings,
-	download_info* info,
+	const network::download_settings& settings,
+	network::download_info* info,
 	log::logger& logger)
 {
-	std::vector<request_result> results(urls.size());
-	curl::easy_handle easy;
+	std::vector<network::request_result> results(urls.size());
+	network::curl::easy_handle easy;
 
 	if (!setup_download(easy, settings, results))
-		return download_result{std::move(results)};
+		return network::download_result{std::move(results)};
 
 	if (info) {
 		info->requests_total.store(urls.size(), std::memory_order::memory_order_release);
 
 		if (auto ec = easy.xferinfo_callback(xferinfo_callback); ec) {
 			save_error_to_all(results, ec);
-			return net::download_result{std::move(results)};
+			return network::download_result{std::move(results)};
 		}
 
 		if (auto ec = easy.xferinfo_callback_data(info); ec) {
 			save_error_to_all(results, ec);
-			return net::download_result{std::move(results)};
+			return network::download_result{std::move(results)};
 		}
 	}
 
@@ -196,7 +196,32 @@ download(
 			throw std::runtime_error(r.data);
 	}
 
-	return download_result{std::move(results)};
+	return network::download_result{std::move(results)};
+}
+#endif // !__EMSCRIPTEN__
+
+} // namespace
+
+namespace fs::network {
+
+download_result
+download(
+	std::string_view target_name,
+	const std::vector<std::string>& urls,
+	const download_settings& settings,
+	download_info* info,
+	log::logger& logger)
+{
+#ifdef __EMSCRIPTEN__
+	(void) target_name;
+	(void) urls;
+	(void) settings;
+	(void) info;
+	(void) logger;
+	throw std::runtime_error("Network download not supported in Emscripten build");
+#else
+	return download_using_curl(target_name, urls, settings, info, logger);
+#endif
 }
 
 }
