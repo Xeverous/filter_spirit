@@ -9,7 +9,9 @@
 
 #include <SDL_version.h>
 
+#ifndef __EMSCRIPTEN__
 #include <curl/curl.h>
+#endif
 
 #include <boost/version.hpp>
 #include <boost/config.hpp>
@@ -92,9 +94,15 @@ void version_info_window::draw_contents()
 	ImGui::SameLine(line_width);
 	ImGui::TextUnformatted(_sdl_version.c_str());
 
+#ifdef __EMSCRIPTEN__
+	ImGui::TextUnformatted("Emscripten version:");
+	ImGui::SameLine(line_width);
+	ImGui::Text("%d.%d.%d", __EMSCRIPTEN_major__, __EMSCRIPTEN_minor__, __EMSCRIPTEN_tiny__);
+#else
 	ImGui::TextUnformatted("libraries for networking:");
 	ImGui::SameLine(line_width);
 	ImGui::TextUnformatted(curl_version());
+#endif
 
 	ImGui::Dummy({0.0f, ImGui::GetFontSize() * 2.0f});
 
