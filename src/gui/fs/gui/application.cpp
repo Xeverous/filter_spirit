@@ -233,6 +233,8 @@ void application::draw_main_menu_bar()
 
 void application::drawEvent()
 {
+	tick_event();
+
 	Magnum::GL::defaultFramebuffer.clear(Magnum::GL::FramebufferClear::Color);
 
 	_imgui.newFrame();
@@ -289,7 +291,7 @@ void application::drawEvent()
 	redraw();
 }
 
-void application::tickEvent()
+void application::tick_event()
 {
 	remove_closed_windows();
 	open_pending_modals();

@@ -34,7 +34,13 @@ public:
 	explicit application(const Arguments& arguments);
 
 	void drawEvent() override;
-	void tickEvent() override;
+
+	/*
+	 * This would normally be "tickEvent() override"
+	 * but such function is not supported on Emscripten,
+	 * so it is called in drawEvent instead.
+	 */
+	void tick_event();
 
 	void viewportEvent(ViewportEvent& event) override;
 
