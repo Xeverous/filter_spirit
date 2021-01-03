@@ -41,6 +41,8 @@ option(FILTER_SPIRIT_ADD_FILESYSTEM_LINK
 	"add linker command for standard filesystem library (required by earlier GCC and Clang versions)" OFF)
 option(FILTER_SPIRIT_ENABLE_LTO
 	"enable link-time optimization for Filter Spirit targets" ON)
+option(FILTER_SPIRIT_USE_EXTERNAL_JSON
+	"ON: use installed nlohmann/json library through find_package(); OFF: use from repository submodule" OFF)
 set(FILTER_SPIRIT_PLATFORM "" CACHE STRING
 	"win7 (Windows 7 or newer) OR sdl2 (any platform suppored by SDL2) OR emscripten")
 
@@ -51,7 +53,8 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-if(FILTER_SPIRIT_ENABLE_LTO)
+# disable checking LTO support on emscripten, its broken
+if(FILTER_SPIRIT_ENABLE_LTO AND NOT FILTER_SPIRIT_PLATFORM STREQUAL "emscripten")
 	include(CheckIPOSupported)
 	check_ipo_supported(RESULT IPO_SUPPORTED OUTPUT IPO_ERROR)
 

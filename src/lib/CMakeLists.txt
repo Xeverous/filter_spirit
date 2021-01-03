@@ -1,11 +1,21 @@
-find_package(nlohmann_json 3.0.0 REQUIRED)
-find_package(OpenSSL REQUIRED)
-find_package(Boost 1.68 REQUIRED)
+if(FILTER_SPIRIT_USE_EXTERNAL_JSON)
+	message(STATUS "using nlohmann/json from find_package()")
+	find_package(nlohmann_json 3.0.0 REQUIRED)
+else()
+	message(STATUS "using nlohmann/json from subrepository")
+	add_subdirectory(${CMAKE_SOURCE_DIR}/external/json json)
+endif()
 
-# libcurl >=7.17 has no requirements for string argument lifetimes
-# FS relies on this in the implementation, so such version is a must
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(libcurl REQUIRED IMPORTED_TARGET libcurl>=7.17.0)
+# add networking libraries for non-emscripten builds
+if(NOT FILTER_SPIRIT_PLATFORM STREQUAL "emscripten")
+	find_package(OpenSSL REQUIRED)
+	# libcurl >=7.17 has no requirements for string argument lifetimes
+	# FS relies on this in the implementation, so such version is a must
+	find_package(PkgConfig REQUIRED)
+	pkg_check_modules(libcurl REQUIRED IMPORTED_TARGET libcurl>=7.17.0)
+endif()
+
+find_package(Boost 1.68 REQUIRED)
 
 # Some source files are shared with tests, GUI and CLI executables.
 # Compile these as shared library so that it can be reused by both
