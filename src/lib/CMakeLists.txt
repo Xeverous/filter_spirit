@@ -26,7 +26,13 @@ find_package(Boost 1.68 REQUIRED)
 # code on the whole content and the resulting shared library object is
 # likely exporting a ton of unnecessary symbols. Object target could also
 # speed up the linking because there will be much less exported symbols.
-add_library(filter_spirit SHARED)
+#
+# For Emscripten, always build static libraries (shared are not supported)
+if(NOT FILTER_SPIRIT_PLATFORM STREQUAL "emscripten")
+	add_library(filter_spirit SHARED)
+else()
+	add_library(filter_spirit STATIC)
+endif()
 
 # We list all internal headers also as public because public headers
 # include them indirectly, which still requires include path propagation
@@ -192,13 +198,10 @@ target_link_libraries(filter_spirit
 	PUBLIC
 		nlohmann_json::nlohmann_json
 		Boost::boost
-		# FS uses atomic operations in networking callbacks
-		$<$<CXX_COMPILER_ID:GNU>:atomic>
-		$<$<CXX_COMPILER_ID:Clang>:atomic>
 )
 
-# add networking libraries for non-emscripten builds
 if(NOT FILTER_SPIRIT_PLATFORM STREQUAL "emscripten")
+	# add networking libraries for non-emscripten builds
 	# https://gitlab.kitware.com/cmake/cmake/issues/20431
 	get_target_property(CURL_INCLUDE_DIR PkgConfig::libcurl INTERFACE_INCLUDE_DIRECTORIES)
 	target_link_directories(filter_spirit
@@ -209,6 +212,10 @@ if(NOT FILTER_SPIRIT_PLATFORM STREQUAL "emscripten")
 		PUBLIC
 			OpenSSL::SSL
 			PkgConfig::libcurl
+			# FS uses atomic operations in networking callbacks
+			# GCC and Clang require explicit linking for them
+			$<$<CXX_COMPILER_ID:GNU>:atomic>
+			$<$<CXX_COMPILER_ID:Clang>:atomic>
 	)
 endif()
 

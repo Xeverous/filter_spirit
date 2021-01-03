@@ -4,8 +4,13 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/" ${CMAKE_MODULE_PATH})
 set(CORRADE_USE_PEDANTIC_FLAGS ON)
 add_subdirectory("${CMAKE_SOURCE_DIR}/external/corrade" corrade EXCLUDE_FROM_ALL)
 
-# Add Magnum as a subproject, enable Sdl2Application
-set(WITH_SDL2APPLICATION ON CACHE BOOL "" FORCE)
+# Add Magnum as a subproject, enable specific application implementation
+if(FILTER_SPIRIT_PLATFORM STREQUAL "emscripten")
+	set(WITH_EMSCRIPTENAPPLICATION ON CACHE BOOL "" FORCE)
+else()
+	set(WITH_SDL2APPLICATION ON CACHE BOOL "" FORCE)
+endif()
+
 add_subdirectory("${CMAKE_SOURCE_DIR}/external/magnum" magnum EXCLUDE_FROM_ALL)
 
 set(IMGUI_DIR ${CMAKE_SOURCE_DIR}/external/imgui)
@@ -14,7 +19,12 @@ add_subdirectory("${CMAKE_SOURCE_DIR}/external/magnum-integration" magnum-integr
 
 add_subdirectory("${CMAKE_SOURCE_DIR}/external/tiny_file_dialogs" tiny_file_dialogs EXCLUDE_FROM_ALL)
 
-find_package(Magnum REQUIRED GL Sdl2Application)
+if(FILTER_SPIRIT_PLATFORM STREQUAL "emscripten")
+	find_package(Magnum REQUIRED GL EmscriptenApplication)
+else()
+	find_package(Magnum REQUIRED GL Sdl2Application)
+endif()
+
 find_package(MagnumIntegration REQUIRED ImGui)
 
 add_executable(filter_spirit_gui)
@@ -99,11 +109,16 @@ target_link_libraries(filter_spirit_gui
 	PRIVATE
 		filter_spirit
 		tiny_file_dialogs
+		Corrade::Main
 		MagnumIntegration::ImGui
 		Magnum::Application
 		Magnum::GL
 		Magnum::Magnum
 )
+
+if(FILTER_SPIRIT_PLATFORM STREQUAL "emscripten")
+	target_link_options(filter_spirit_gui BEFORE PUBLIC "SHELL: -s USE_SDL=2")
+endif()
 
 add_custom_target(copy_data ALL
 	COMMAND ${CMAKE_COMMAND} -E copy_directory
