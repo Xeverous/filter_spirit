@@ -2,8 +2,8 @@
 #include <fs/version.hpp>
 
 #include <Magnum/GL/Context.h>
-#include <Magnum/Version.h>
-#include <Corrade/Version.h>
+#include <Magnum/version.h>
+#include <Corrade/version.h>
 
 #include <imgui.h>
 
