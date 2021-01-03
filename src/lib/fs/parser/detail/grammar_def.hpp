@@ -187,7 +187,7 @@ namespace sf
 	const action_type action = "action";
 
 	const compound_action_expression_type compound_action_expression = "compound action expression";
-	const auto compound_action_expression_def = '{' >> *action > '}';
+	const auto compound_action_expression_def = ('{' >> *action) > '}';
 	BOOST_SPIRIT_DEFINE(compound_action_expression)
 
 	const item_category_expression_type item_category_expression = "item category expression";
@@ -209,7 +209,7 @@ namespace sf
 	// ---- definitions ----
 
 	const constant_definition_type constant_definition = "constant definiton";
-	const auto constant_definition_def = name >> '=' > value_expression;
+	const auto constant_definition_def = (name >> '=') > value_expression;
 	BOOST_SPIRIT_DEFINE(constant_definition)
 
 	// future space for metedata definitions
@@ -353,7 +353,7 @@ namespace sf
 	const auto statement_def = action | behavior_statement | rule_block;
 	BOOST_SPIRIT_DEFINE(statement)
 
-	const auto rule_block_def = *condition >> x3::lit('{') > *statement > x3::lit('}');
+	const auto rule_block_def = (*condition >> x3::lit('{')) > *statement > x3::lit('}');
 	BOOST_SPIRIT_DEFINE(rule_block)
 
 	const filter_structure_type filter_structure = "filter structure";
