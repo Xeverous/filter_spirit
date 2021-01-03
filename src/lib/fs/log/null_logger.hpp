@@ -16,10 +16,10 @@ public:
 	void begin_message(severity /* s */) override {}
 	void end_message() override {}
 
-	void add(std::string_view /* text */) override {}
-	void add(char /* character */) override {}
-	void add(std::int64_t /* number */) override {}
-	void add(std::uint64_t /* number */) override {}
+	void add_str(std::string_view /* text */) override {}
+	void add_char(char /* character */) override {}
+	void add_intmax(std::intmax_t /* number */) override {}
+	void add_uintmax(std::uintmax_t /* number */) override {}
 };
 
 }

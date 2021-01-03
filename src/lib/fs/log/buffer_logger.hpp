@@ -35,22 +35,22 @@ public:
 		_current_message.text.clear();
 	}
 
-	void add(std::string_view text) override
+	void add_str(std::string_view text) override
 	{
 		_current_message.text.append(text);
 	}
 
-	void add(char character) override
+	void add_char(char character) override
 	{
 		_current_message.text.push_back(character);
 	}
 
-	void add(std::int64_t number) override
+	void add_intmax(std::intmax_t number) override
 	{
 		_current_message.text.append(std::to_string(number));
 	}
 
-	void add(std::uint64_t number) override
+	void add_uintmax(std::uintmax_t number) override
 	{
 		_current_message.text.append(std::to_string(number));
 	}

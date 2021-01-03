@@ -28,22 +28,22 @@ public:
 		std::cout << std::flush;
 	}
 
-	void add(std::string_view text) override
+	void add_str(std::string_view text) override
 	{
 		std::cout << text;
 	}
 
-	void add(char character) override
+	void add_char(char character) override
 	{
 		std::cout << character;
 	}
 
-	void add(std::int64_t number) override
+	void add_intmax(std::intmax_t number) override
 	{
 		std::cout << number;
 	}
 
-	void add(std::uint64_t number) override
+	void add_uintmax(std::uintmax_t number) override
 	{
 		std::cout << number;
 	}

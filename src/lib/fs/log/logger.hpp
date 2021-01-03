@@ -151,16 +151,23 @@ public:
 	virtual void begin_logging() {}
 	virtual void end_logging() {}
 
-	virtual void add(std::string_view text) = 0;
-	virtual void add(char character) = 0;
-	virtual void add(std::int64_t number) = 0;
-	virtual void add(std::uint64_t number) = 0;
+	virtual void add_str(std::string_view text) = 0;
+	virtual void add_char(char character) = 0;
+	virtual void add_intmax(std::intmax_t number) = 0;
+	virtual void add_uintmax(std::uintmax_t number) = 0;
 
-	void add(std::int32_t number) { add(static_cast<std::int64_t>(number)); }
-	void add(std::int16_t number) { add(static_cast<std::int64_t>(number)); }
+	void add(std::string_view text) { add_str(text); }
+	void add(char character) { add_char(character); }
 
-	void add(std::uint32_t number) { add(static_cast<std::uint64_t>(number)); }
-	void add(std::uint16_t number) { add(static_cast<std::uint64_t>(number)); }
+	void add(short number)     { add_intmax(number); }
+	void add(int number)       { add_intmax(number); }
+	void add(long number)      { add_intmax(number); }
+	void add(long long number) { add_intmax(number); }
+
+	void add(unsigned short number)     { add_uintmax(number); }
+	void add(unsigned int number)       { add_uintmax(number); }
+	void add(unsigned long number)      { add_uintmax(number); }
+	void add(unsigned long long number) { add_uintmax(number); }
 
 protected:
 	friend class message_stream;
