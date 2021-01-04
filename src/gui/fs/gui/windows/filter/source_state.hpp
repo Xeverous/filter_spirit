@@ -37,12 +37,17 @@ public:
 		return _file_path.has_value() ? &*_file_path : nullptr;
 	}
 
+// These are not available in emscripten builds because there is no way to load user files there
+// (JavaScript has no access to user's files)
+#ifndef __EMSCRIPTEN__
 	// use string instead of string_view because filesystem wants C-strings
 	void load_source_file(std::string path, filter_state_mediator_base& mediator);
 	void reload_source_file(filter_state_mediator_base& mediator);
+#endif
+
+	void new_source(std::optional<std::string> source, filter_state_mediator_base& mediator);
 
 private:
-	void new_source(std::optional<std::string> source, filter_state_mediator_base& mediator);
 	void on_text_input_done(filter_state_mediator_base& mediator);
 	void on_text_input_cancel();
 
