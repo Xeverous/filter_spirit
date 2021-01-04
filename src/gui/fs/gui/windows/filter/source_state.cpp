@@ -82,6 +82,8 @@ void source_state::open_source_edit()
 
 void source_state::on_text_input_done(filter_state_mediator_base& mediator)
 {
+	_is_source_edited = true;
+
 	FS_ASSERT(ImGui::IsPopupOpen(popup_text_input_title));
 	ImGui::CloseCurrentPopup();
 
@@ -118,6 +120,7 @@ void source_state::reload_source_file(filter_state_mediator_base& mediator)
 void source_state::new_source(std::optional<std::string> src, filter_state_mediator_base& mediator)
 {
 	_source = std::move(src);
+	_is_source_edited = false;
 	mediator.on_source_change(source());
 }
 

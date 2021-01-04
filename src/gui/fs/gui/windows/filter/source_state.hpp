@@ -37,6 +37,11 @@ public:
 		return _file_path.has_value() ? &*_file_path : nullptr;
 	}
 
+	bool is_source_edited() const
+	{
+		return _is_source_edited;
+	}
+
 // These are not available in emscripten builds because there is no way to load user files there
 // (JavaScript has no access to user's files)
 #ifndef __EMSCRIPTEN__
@@ -55,6 +60,7 @@ private:
 	std::optional<std::string> _file_path;
 	aux::multiline_text_input _text_input;
 	bool _popup_pending = false;
+	bool _is_source_edited = false;
 };
 
 }
