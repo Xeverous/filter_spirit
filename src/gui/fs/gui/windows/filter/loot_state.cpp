@@ -1,5 +1,6 @@
 #include <fs/gui/windows/filter/loot_state.hpp>
 #include <fs/gui/windows/filter/item_tooltip.hpp>
+#include <fs/gui/windows/filter/filter_state_mediator.hpp>
 #include <fs/gui/application.hpp>
 #include <fs/gui/settings/fonting.hpp>
 #include <fs/gui/auxiliary/widgets.hpp>
@@ -326,7 +327,7 @@ void loot_slider_range::draw(const char* str)
 		std::swap(min(), max());
 }
 
-void loot_state::draw_interface(application& app, filter_state_mediator_base& mediator)
+void loot_state::draw_interface(application& app, filter_state_mediator& mediator)
 {
 	const std::optional<lang::loot::item_database>& database = app.item_database();
 	if (!database) {
@@ -595,7 +596,7 @@ void loot_state::draw_loot_buttons_equipment(const lang::loot::item_database& db
 	ImGui::EndChild();
 }
 
-void loot_state::draw_loot_canvas(const fonting& f, filter_state_mediator_base& mediator)
+void loot_state::draw_loot_canvas(const fonting& f, filter_state_mediator& mediator)
 {
 	const ImVec2 canvas_begin = ImGui::GetCursorScreenPos(); // in screen coordinates
 	const ImVec2 canvas_size(ImGui::GetContentRegionAvail().x, ImGui::GetFontSize() * 8.0f);
@@ -702,7 +703,7 @@ void loot_state::on_canvas_hover(ImVec2 mouse_position, const fonting& f)
 		draw_item_tooltip(itm.itm, *itm.filtering_result, f);
 }
 
-void loot_state::on_canvas_right_click(ImVec2 mouse_position, filter_state_mediator_base& mediator)
+void loot_state::on_canvas_right_click(ImVec2 mouse_position, filter_state_mediator& mediator)
 {
 	const looted_item* const ptr = find_item_by_mouse_position(_items, mouse_position);
 	if (ptr == nullptr)
@@ -713,6 +714,23 @@ void loot_state::on_canvas_right_click(ImVec2 mouse_position, filter_state_media
 		"Items found by mouse position must have been rendered and therefore filtered");
 
 	mediator.on_debug_open(ptr->itm, *ptr->filtering_result);
+}
+
+void loot_state::clear_items(filter_state_mediator& mediator)
+{
+	_items.clear();
+	_last_items_size = 0;
+	_num_hidden_items = 0;
+	_canvas_offset_y = 0.0f;
+	mediator.on_loot_change();
+}
+
+void loot_state::clear_filter_results(filter_state_mediator& mediator)
+{
+	for (looted_item& itm : _items)
+		itm.filtering_result = std::nullopt;
+
+	mediator.on_filter_results_clear();
 }
 
 void loot_state::update_items(const lang::item_filter& filter)
@@ -727,7 +745,7 @@ void loot_state::update_items(const lang::item_filter& filter)
 	}
 }
 
-void loot_state::refilter_items(const lang::item_filter& filter, filter_state_mediator_base& mediator)
+void loot_state::refilter_items(const lang::item_filter& filter, filter_state_mediator& mediator)
 {
 	_num_hidden_items = 0;
 

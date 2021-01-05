@@ -1,6 +1,5 @@
 #pragma once
 
-#include <fs/gui/windows/filter/real_filter_state_mediator_base.hpp>
 #include <fs/gui/windows/filter/filter_state_mediator.hpp>
 #include <fs/parser/parser.hpp>
 #include <fs/log/buffer_logger.hpp>
@@ -9,9 +8,7 @@
 
 namespace fs::gui {
 
-class real_filter_state_mediator
-	: public virtual real_filter_state_mediator_base
-	, public filter_state_mediator
+class real_filter_state_mediator: public filter_state_mediator
 {
 public:
 	log::buffer_logger& logger() override
@@ -20,9 +17,9 @@ public:
 	}
 
 	void on_source_change(const std::string* source) override;
-	void on_parsed_real_filter_change(const parser::parsed_real_filter* parsed_real_filter) override;
+	void on_parsed_real_filter_change(const parser::parsed_real_filter* parsed_real_filter);
 
-	const parser::parsed_real_filter* parsed_real_filter() const override
+	const parser::parsed_real_filter* parsed_real_filter() const
 	{
 		return _parsed_real_filter.has_value() ? &*_parsed_real_filter : nullptr;
 	}

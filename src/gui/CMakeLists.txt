@@ -64,13 +64,10 @@ target_sources(filter_spirit_gui
 		fs/gui/windows/filter/market_data_state.hpp
 		fs/gui/windows/filter/filter_state_mediator.cpp
 		fs/gui/windows/filter/filter_state_mediator.hpp
-		fs/gui/windows/filter/filter_state_mediator_base.hpp
 		fs/gui/windows/filter/real_filter_state_mediator.cpp
 		fs/gui/windows/filter/real_filter_state_mediator.hpp
-		fs/gui/windows/filter/real_filter_state_mediator_base.hpp
 		fs/gui/windows/filter/spirit_filter_state_mediator.cpp
 		fs/gui/windows/filter/spirit_filter_state_mediator.hpp
-		fs/gui/windows/filter/spirit_filter_state_mediator_base.hpp
 		fs/gui/windows/filter/loot_state.cpp
 		fs/gui/windows/filter/loot_state.hpp
 		fs/gui/windows/filter/source_state.cpp

@@ -1,11 +1,11 @@
 #pragma once
 
-#include <fs/gui/windows/filter/spirit_filter_state_mediator_base.hpp>
 #include <fs/gui/windows/filter/filter_state_mediator.hpp>
 #include <fs/gui/windows/filter/market_data_state.hpp>
 #include <fs/parser/parser.hpp>
 #include <fs/lang/item_filter.hpp>
 #include <fs/lang/symbol_table.hpp>
+#include <fs/log/buffer_logger.hpp>
 #include <fs/log/thread_safe_logger.hpp>
 
 #include <utility>
@@ -14,9 +14,7 @@
 
 namespace fs::gui {
 
-class spirit_filter_state_mediator
-	: public virtual spirit_filter_state_mediator_base
-	, public filter_state_mediator
+class spirit_filter_state_mediator: public filter_state_mediator
 {
 public:
 	spirit_filter_state_mediator(std::vector<lang::league> available_leagues)
@@ -26,23 +24,23 @@ public:
 	}
 
 	log::logger& logger() override;
-	std::shared_ptr<log::thread_safe_logger<log::buffer_logger>> share_logger() override
+	std::shared_ptr<log::thread_safe_logger<log::buffer_logger>> share_logger()
 	{
 		return _logger_ptr;
 	}
 
 	void on_source_change(const std::string* source) override;
 	void on_parsed_spirit_filter_change(
-		const parser::parsed_spirit_filter* parsed_spirit_filter) override;
+		const parser::parsed_spirit_filter* parsed_spirit_filter);
 	void on_spirit_filter_symbols_change(
 		const parser::parsed_spirit_filter* parsed_spirit_filter,
-		const lang::symbol_table* spirit_filter_symbols) override;
+		const lang::symbol_table* spirit_filter_symbols);
 	void on_spirit_filter_change(
-		const lang::spirit_item_filter* spirit_filter) override;
+		const lang::spirit_item_filter* spirit_filter);
 	void on_price_report_change(
-		const lang::market::item_price_report& report) override;
+		const lang::market::item_price_report& report);
 
-	const parser::parsed_spirit_filter* parsed_spirit_filter() const override
+	const parser::parsed_spirit_filter* parsed_spirit_filter() const
 	{
 		return _parsed_spirit_filter.has_value() ? &*_parsed_spirit_filter : nullptr;
 	}
@@ -50,17 +48,17 @@ public:
 	const parser::lookup_data* lookup_data() const override;
 	const parser::line_lookup* line_lookup() const override;
 
-	const lang::symbol_table* spirit_filter_symbols() const override
+	const lang::symbol_table* spirit_filter_symbols() const
 	{
 		return _spirit_filter_symbols.has_value() ? &*_spirit_filter_symbols : nullptr;
 	}
 
-	const lang::spirit_item_filter* spirit_filter() const override
+	const lang::spirit_item_filter* spirit_filter() const
 	{
 		return _spirit_filter.has_value() ? &*_spirit_filter : nullptr;
 	}
 
-	const lang::market::item_price_report& price_report() const override
+	const lang::market::item_price_report& price_report() const
 	{
 		return _market_data.price_report();
 	}

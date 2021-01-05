@@ -1,4 +1,5 @@
 #include <fs/gui/windows/filter/market_data_state.hpp>
+#include <fs/gui/windows/filter/spirit_filter_state_mediator.hpp>
 #include <fs/gui/auxiliary/widgets.hpp>
 #include <fs/gui/application.hpp>
 #include <fs/network/ggg/download_data.hpp>
@@ -49,7 +50,7 @@ float calculate_progress(std::size_t done, std::size_t size)
 
 namespace fs::gui {
 
-void market_data_state::refresh_item_price_report(application& app, spirit_filter_state_mediator_base& mediator)
+void market_data_state::refresh_item_price_report(application& app, spirit_filter_state_mediator& mediator)
 {
 	if (!_selected_league) {
 		_price_report = {};
@@ -89,7 +90,7 @@ void market_data_state::refresh_item_price_report(application& app, spirit_filte
 	_price_report_download_running = true;
 }
 
-void market_data_state::refresh_available_leagues(application& app, spirit_filter_state_mediator_base& mediator)
+void market_data_state::refresh_available_leagues(application& app, spirit_filter_state_mediator& mediator)
 {
 	if (_leagues_download_running)
 		return;
@@ -143,7 +144,7 @@ void market_data_state::check_downloads(application& app, log::logger& logger)
 	}
 }
 
-void market_data_state::draw_interface(application& app, spirit_filter_state_mediator_base& mediator)
+void market_data_state::draw_interface(application& app, spirit_filter_state_mediator& mediator)
 {
 	check_downloads(app, mediator.logger());
 

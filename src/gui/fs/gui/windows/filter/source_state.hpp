@@ -7,7 +7,7 @@
 
 namespace fs::gui {
 
-class filter_state_mediator_base;
+class filter_state_mediator;
 class fonting;
 
 /**
@@ -25,7 +25,7 @@ public:
 
 	void open_source_edit();
 
-	void draw_interface(const fonting& f, filter_state_mediator_base& mediator);
+	void draw_interface(const fonting& f, filter_state_mediator& mediator);
 
 	const std::string* source() const
 	{
@@ -46,14 +46,14 @@ public:
 // (JavaScript has no access to user's files)
 #ifndef __EMSCRIPTEN__
 	// use string instead of string_view because filesystem wants C-strings
-	void load_source_file(std::string path, filter_state_mediator_base& mediator);
-	void reload_source_file(filter_state_mediator_base& mediator);
+	void load_source_file(std::string path, filter_state_mediator& mediator);
+	void reload_source_file(filter_state_mediator& mediator);
 #endif
 
-	void new_source(std::optional<std::string> source, filter_state_mediator_base& mediator);
+	void new_source(std::optional<std::string> source, filter_state_mediator& mediator);
 
 private:
-	void on_text_input_done(filter_state_mediator_base& mediator);
+	void on_text_input_done(filter_state_mediator& mediator);
 	void on_text_input_cancel();
 
 	std::optional<std::string> _source;

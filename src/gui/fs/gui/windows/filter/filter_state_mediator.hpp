@@ -1,6 +1,5 @@
 #pragma once
 
-#include <fs/gui/windows/filter/filter_state_mediator_base.hpp>
 #include <fs/gui/windows/filter/source_state.hpp>
 #include <fs/gui/windows/filter/loot_state.hpp>
 #include <fs/gui/windows/filter/debug_state.hpp>
@@ -14,34 +13,44 @@ namespace fs::gui {
 
 class fonting;
 
-class filter_state_mediator : public virtual filter_state_mediator_base
+class filter_state_mediator
 {
 public:
+	virtual ~filter_state_mediator() = default;
+
 	void load_source_file(std::string path);
 	void open_text_input();
 
-	void on_filter_representation_change(const lang::item_filter* filter_representation) override;
-	void on_debug_open(const lang::item& itm, const lang::item_filtering_result& result) override;
-	void on_loot_change() override;
-	void on_filter_results_change() override;
-	void on_filter_results_clear() override;
+	virtual void on_source_change(const std::string* source) = 0; // template method pattern
+	void on_filter_representation_change(const lang::item_filter* filter_representation);
+	void on_debug_open(const lang::item& itm, const lang::item_filtering_result& result);
+	void on_loot_change();
+	void on_filter_results_change();
+	void on_filter_results_clear();
 
-	const std::string* source() const override
+	// template method pattern
+	virtual log::logger& logger() = 0;
+
+	const std::string* source() const
 	{
 		return _source.source();
 	}
 
-	const std::string* source_path() const override
+	const std::string* source_path() const
 	{
 		return _source.source_path();
 	}
 
-	const lang::item_filter* filter_representation() const override
+	// template method pattern
+	virtual const parser::lookup_data* lookup_data() const = 0;
+	virtual const parser::line_lookup* line_lookup() const = 0;
+
+	const lang::item_filter* filter_representation() const
 	{
 		return _filter_representation.has_value() ? &*_filter_representation : nullptr;
 	}
 
-	void draw_interface(application& app) override;
+	void draw_interface(application& app);
 
 protected:
 	// template method pattern

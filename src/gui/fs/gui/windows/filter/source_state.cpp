@@ -1,4 +1,4 @@
-#include <fs/gui/windows/filter/filter_state_mediator_base.hpp>
+#include <fs/gui/windows/filter/filter_state_mediator.hpp>
 #include <fs/gui/windows/filter/source_state.hpp>
 #include <fs/gui/settings/fonting.hpp>
 #include <fs/gui/auxiliary/widgets.hpp>
@@ -13,7 +13,7 @@ constexpr auto popup_text_input_title = "Filter source - text edit";
 
 namespace fs::gui {
 
-void source_state::draw_interface(const fonting& f, filter_state_mediator_base& mediator)
+void source_state::draw_interface(const fonting& f, filter_state_mediator& mediator)
 {
 	if (ImGui::CollapsingHeader("Source", ImGuiTreeNodeFlags_DefaultOpen)) {
 #ifndef __EMSCRIPTEN__
@@ -80,7 +80,7 @@ void source_state::open_source_edit()
 	_popup_pending = true;
 }
 
-void source_state::on_text_input_done(filter_state_mediator_base& mediator)
+void source_state::on_text_input_done(filter_state_mediator& mediator)
 {
 	_is_source_edited = true;
 
@@ -104,20 +104,20 @@ void source_state::on_text_input_cancel()
 }
 
 #ifndef __EMSCRIPTEN__
-void source_state::load_source_file(std::string path, filter_state_mediator_base& mediator)
+void source_state::load_source_file(std::string path, filter_state_mediator& mediator)
 {
 	_file_path = std::move(path);
 	reload_source_file(mediator);
 }
 
-void source_state::reload_source_file(filter_state_mediator_base& mediator)
+void source_state::reload_source_file(filter_state_mediator& mediator)
 {
 	if (_file_path)
 		new_source(utility::load_file(*_file_path, mediator.logger()), mediator);
 }
 #endif
 
-void source_state::new_source(std::optional<std::string> src, filter_state_mediator_base& mediator)
+void source_state::new_source(std::optional<std::string> src, filter_state_mediator& mediator)
 {
 	_source = std::move(src);
 	_is_source_edited = false;

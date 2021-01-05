@@ -1,6 +1,5 @@
 #pragma once
 
-#include <fs/gui/windows/filter/spirit_filter_state_mediator_base.hpp>
 #include <fs/lang/market/item_price_data.hpp>
 #include <fs/lang/league.hpp>
 #include <fs/network/download.hpp>
@@ -12,6 +11,7 @@
 namespace fs::gui {
 
 class application;
+class spirit_filter_state_mediator;
 
 class market_data_state
 {
@@ -21,7 +21,7 @@ public:
 	{
 	}
 
-	void draw_interface(application& app, spirit_filter_state_mediator_base& mediator);
+	void draw_interface(application& app, spirit_filter_state_mediator& mediator);
 
 	const lang::market::item_price_report& price_report() const
 	{
@@ -29,11 +29,11 @@ public:
 	}
 
 private:
-	void on_league_change(application& app, spirit_filter_state_mediator_base& mediator) { refresh_item_price_report(app, mediator); }
-	void on_api_change   (application& app, spirit_filter_state_mediator_base& mediator) { refresh_item_price_report(app, mediator); }
+	void on_league_change(application& app, spirit_filter_state_mediator& mediator) { refresh_item_price_report(app, mediator); }
+	void on_api_change   (application& app, spirit_filter_state_mediator& mediator) { refresh_item_price_report(app, mediator); }
 
-	void refresh_item_price_report(application& app, spirit_filter_state_mediator_base& mediator);
-	void refresh_available_leagues(application& app, spirit_filter_state_mediator_base& mediator);
+	void refresh_item_price_report(application& app, spirit_filter_state_mediator& mediator);
+	void refresh_available_leagues(application& app, spirit_filter_state_mediator& mediator);
 
 	void check_downloads(application& app, log::logger& logger);
 
