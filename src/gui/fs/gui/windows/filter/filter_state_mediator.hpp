@@ -18,8 +18,11 @@ class filter_state_mediator
 public:
 	virtual ~filter_state_mediator() = default;
 
+#ifndef __EMSCRIPTEN__
 	void load_source_file(std::string path);
+#endif
 	void open_text_input();
+	void new_source(std::string source);
 
 	virtual void on_source_change(const std::string* source) = 0; // template method pattern
 	void on_filter_representation_change(const lang::item_filter* filter_representation);

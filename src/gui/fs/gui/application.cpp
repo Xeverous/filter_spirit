@@ -161,9 +161,9 @@ void application::draw_main_menu_bar()
 			ImGui::Separator();
 
 			if (ImGui::MenuItem("Spirit filter - from text input"))
-				_spirit_filters.emplace_back(*this);
+				_spirit_filters.push_back(spirit_filter_window::from_text_input(*this));
 			if (ImGui::MenuItem("Real filter - from text input"))
-				_real_filters.emplace_back(*this);
+				_real_filters.push_back(real_filter_window::from_text_input(*this));
 
 			ImGui::Separator();
 
@@ -350,7 +350,7 @@ void application::on_open_spirit_filter()
 		/* multiselect allowed? */ 0);
 
 	if (selected_path != nullptr)
-		_spirit_filters.emplace_back(*this, selected_path);
+		_spirit_filters.push_back(spirit_filter_window::from_file(*this, selected_path));
 }
 
 void application::on_open_real_filter()
@@ -366,7 +366,7 @@ void application::on_open_real_filter()
 		/* multiselect allowed? */ 0);
 
 	if (selected_path != nullptr)
-		_real_filters.emplace_back(*this, selected_path);
+		_real_filters.push_back(real_filter_window::from_file(*this, selected_path));
 }
 
 } // namespace fs::gui
