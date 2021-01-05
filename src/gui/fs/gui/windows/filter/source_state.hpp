@@ -32,7 +32,7 @@ public:
 		return _source.has_value() ? &*_source : nullptr;
 	}
 
-	const std::string* source_path() const
+	const std::string* path() const
 	{
 		return _file_path.has_value() ? &*_file_path : nullptr;
 	}

@@ -7,6 +7,8 @@
 
 namespace {
 
+using namespace fs::gui;
+
 ImVec2 drawable_area_size()
 {
 	ImVec2 result = ImGui::GetIO().DisplaySize;
@@ -16,6 +18,19 @@ ImVec2 drawable_area_size()
 
 constexpr auto str_real_filter_text_input = "Real filter - from text input";
 constexpr auto str_spirit_filter_text_input = "Spirit filter - from text input";
+
+std::string make_title(const source_state& state, const char* text_input_title)
+{
+	if (const auto* path = state.path(); path) {
+		if (state.is_source_edited())
+			return *path + " [edited]";
+		else
+			return *path;
+	}
+	else {
+		return text_input_title;
+	}
+}
 
 }
 
@@ -39,11 +54,7 @@ real_filter_window::real_filter_window(application& app)
 
 void real_filter_window::draw_contents()
 {
-	if (const auto* path = _state.source_path(); path)
-		title(*path);
-	else
-		title(str_real_filter_text_input);
-
+	title(make_title(_state.source(), str_real_filter_text_input));
 	_state.draw_interface(_application.get());
 }
 
@@ -67,11 +78,7 @@ spirit_filter_window::spirit_filter_window(application& app)
 
 void spirit_filter_window::draw_contents()
 {
-	if (const auto* path = _state.source_path(); path)
-		title(*path);
-	else
-		title(str_spirit_filter_text_input);
-
+	title(make_title(_state.source(), str_spirit_filter_text_input));
 	_state.draw_interface(_application.get());
 }
 

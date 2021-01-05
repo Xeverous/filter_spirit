@@ -31,14 +31,9 @@ public:
 	// template method pattern
 	virtual log::logger& logger() = 0;
 
-	const std::string* source() const
+	const source_state& source() const
 	{
-		return _source.source();
-	}
-
-	const std::string* source_path() const
-	{
-		return _source.source_path();
+		return _source;
 	}
 
 	// template method pattern
