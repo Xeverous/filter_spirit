@@ -269,10 +269,10 @@ void debug_state::recompute()
 	const lang::item_filtering_result& result = info.result.get();
 	for (const lang::block_match_result& block : result.match_history) {
 		/*
-		 * Right not every condition is colored in the same way.
+		 * Right now every condition is colored in the same way.
 		 * Might want to do more precise coloring later
 		 * (then specific condition results will have specific types).
-		*/
+		 */
 		const lang::condition_set_match_result& cs = block.condition_set_result;
 		color_line_by_condition_result(cs.item_level,               lookup, lines, _line_colors);
 		color_line_by_condition_result(cs.drop_level,               lookup, lines, _line_colors);
