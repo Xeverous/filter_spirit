@@ -27,6 +27,12 @@ std::string make_title(const source_state& state, const char* text_input_title)
 		else
 			return *path;
 	}
+	else if (const auto* name = state.name(); name) {
+		if (state.is_source_edited())
+			return *name + " [edited]";
+		else
+			return *name;
+	}
 	else {
 		return text_input_title;
 	}
@@ -59,10 +65,11 @@ real_filter_window real_filter_window::from_text_input(application& app)
 	return window;
 }
 
-real_filter_window real_filter_window::from_source(application& app, std::string source)
+real_filter_window real_filter_window::from_source(application& app, std::string name, std::string source)
 {
 	real_filter_window window(app);
 	window._state.new_source(std::move(source));
+	window._state.source().name(std::move(name));
 	return window;
 }
 
@@ -96,10 +103,11 @@ spirit_filter_window spirit_filter_window::from_text_input(application& app)
 	return window;
 }
 
-spirit_filter_window spirit_filter_window::from_source(application& app, std::string source)
+spirit_filter_window spirit_filter_window::from_source(application& app, std::string name, std::string source)
 {
 	spirit_filter_window window(app);
 	window._state.new_source(std::move(source));
+	window._state.source().name(std::move(name));
 	return window;
 }
 

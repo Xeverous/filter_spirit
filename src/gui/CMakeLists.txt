@@ -38,6 +38,8 @@ target_sources(filter_spirit_gui
 		fs/gui/imgui_window.hpp
 		fs/gui/auxiliary/color_convert.hpp
 		fs/gui/auxiliary/colors.hpp
+		fs/gui/auxiliary/file_dialogs.cpp
+		fs/gui/auxiliary/file_dialogs.hpp
 		fs/gui/auxiliary/raii.hpp
 		fs/gui/auxiliary/rect.hpp
 		fs/gui/auxiliary/widgets.cpp
@@ -105,7 +107,6 @@ endif()
 target_link_libraries(filter_spirit_gui
 	PRIVATE
 		filter_spirit
-		tiny_file_dialogs
 		Corrade::Main
 		MagnumIntegration::ImGui
 		Magnum::Application
@@ -115,6 +116,8 @@ target_link_libraries(filter_spirit_gui
 
 if(FILTER_SPIRIT_PLATFORM STREQUAL "emscripten")
 	target_link_options(filter_spirit_gui BEFORE PUBLIC "SHELL: -s USE_SDL=2")
+else()
+	target_link_libraries(filter_spirit_gui PRIVATE tiny_file_dialogs)
 endif()
 
 add_custom_target(copy_data ALL

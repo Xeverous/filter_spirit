@@ -2,8 +2,6 @@
 #include <fs/utility/file.hpp>
 #include <fs/version.hpp>
 
-#include <tinyfiledialogs.h>
-
 #include <Magnum/GL/Context.h>
 #include <Magnum/GL/DefaultFramebuffer.h>
 #include <Magnum/GL/Renderer.h>
@@ -153,9 +151,9 @@ void application::draw_main_menu_bar()
 {
 	if (ImGui::BeginMainMenuBar()) {
 		if (ImGui::BeginMenu("File")) {
-			if (ImGui::MenuItem("Open spirit filter template file..."))
+			if (ImGui::MenuItem("Open spirit filter template file...") && !_open_file_dialog.is_dialog_opened())
 				_modal_dialog_state = modal_dialog_state_type::open_spirit_filter;
-			if (ImGui::MenuItem("Open real filter file..."))
+			if (ImGui::MenuItem("Open real filter file...") && !_open_file_dialog.is_dialog_opened())
 				_modal_dialog_state = modal_dialog_state_type::open_real_filter;
 
 			ImGui::Separator();
@@ -294,7 +292,7 @@ void application::drawEvent()
 void application::tick_event()
 {
 	remove_closed_windows();
-	open_pending_modals();
+	process_open_file_modals();
 	rebuild_pending_fonts();
 }
 
@@ -316,14 +314,40 @@ void application::remove_closed_windows()
 		_real_filters.end());
 }
 
-void application::open_pending_modals()
+void application::process_open_file_modals()
 {
-	if (_modal_dialog_state == modal_dialog_state_type::open_spirit_filter)
-		on_open_spirit_filter();
-	else if (_modal_dialog_state == modal_dialog_state_type::open_real_filter)
-		on_open_real_filter();
+	if (!_open_file_dialog.is_dialog_opened()) {
+		if (_modal_dialog_state == modal_dialog_state_type::open_spirit_filter) {
+			_open_file_dialog.open_dialog("Select filter template file");
+		}
+		else if (_modal_dialog_state == modal_dialog_state_type::open_real_filter) {
+			const auto patterns = { "*.filter" };
+			_open_file_dialog.open_dialog(
+				"Select real filter file",
+				"Path of Exile Item Filters (*.filter)",
+				patterns.begin(),
+				patterns.end());
+		}
+	}
 
-	_modal_dialog_state = modal_dialog_state_type::none;
+	if (_open_file_dialog.has_result()) {
+		aux::file_dialog_result result = *_open_file_dialog.take_result();
+
+		if (_modal_dialog_state == modal_dialog_state_type::open_spirit_filter) {
+			if (result.file_path)
+				_spirit_filters.push_back(spirit_filter_window::from_file(*this, *result.file_path));
+			else if (result.file_name && result.file_content)
+				_spirit_filters.push_back(spirit_filter_window::from_source(*this, *result.file_name, *result.file_content));
+		}
+		else if (_modal_dialog_state == modal_dialog_state_type::open_real_filter) {
+			if (result.file_path)
+				_real_filters.push_back(real_filter_window::from_file(*this, *result.file_path));
+			else if (result.file_name && result.file_content)
+				_real_filters.push_back(real_filter_window::from_source(*this, *result.file_name, *result.file_content));
+		}
+
+		_modal_dialog_state = modal_dialog_state_type::none;
+	}
 }
 
 void application::rebuild_pending_fonts()
@@ -337,36 +361,6 @@ void application::rebuild_pending_fonts()
 	}
 
 	_fonting.update();
-}
-
-void application::on_open_spirit_filter()
-{
-	const char* const selected_path = tinyfd_openFileDialog(
-		/* title */ "Select filter template file",
-		/* default path */ nullptr,
-		/* number of filter patterns */ 0,
-		/* (no filters) */ nullptr,
-		/* filter pattern description */ nullptr,
-		/* multiselect allowed? */ 0);
-
-	if (selected_path != nullptr)
-		_spirit_filters.push_back(spirit_filter_window::from_file(*this, selected_path));
-}
-
-void application::on_open_real_filter()
-{
-	const auto patterns = { "*.filter" };
-
-	const char* const selected_path = tinyfd_openFileDialog(
-		/* title */ "Select real filter file",
-		/* default path */ nullptr,
-		/* number of filter patterns */ patterns.size(),
-		/* filters array */ patterns.begin(),
-		/* filter pattern description */ "Path of Exile Item Filters (*.filter)",
-		/* multiselect allowed? */ 0);
-
-	if (selected_path != nullptr)
-		_real_filters.push_back(real_filter_window::from_file(*this, selected_path));
 }
 
 } // namespace fs::gui

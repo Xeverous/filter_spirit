@@ -4,6 +4,7 @@
 
 #include <string>
 #include <optional>
+#include <utility>
 
 namespace fs::gui {
 
@@ -37,6 +38,16 @@ public:
 		return _file_path.has_value() ? &*_file_path : nullptr;
 	}
 
+	const std::string* name() const
+	{
+		return _file_name.has_value() ? &*_file_name : nullptr;
+	}
+
+	void name(std::optional<std::string> nm)
+	{
+		_file_name = std::move(nm);
+	}
+
 	bool is_source_edited() const
 	{
 		return _is_source_edited;
@@ -58,6 +69,7 @@ private:
 
 	std::optional<std::string> _source;
 	std::optional<std::string> _file_path;
+	std::optional<std::string> _file_name;
 	aux::multiline_text_input _text_input;
 	bool _popup_pending = false;
 	bool _is_source_edited = false;

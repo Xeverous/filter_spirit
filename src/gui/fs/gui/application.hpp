@@ -9,6 +9,7 @@
 #include <fs/gui/settings/theming.hpp>
 #include <fs/gui/settings/fonting.hpp>
 #include <fs/gui/settings/networking.hpp>
+#include <fs/gui/auxiliary/file_dialogs.hpp>
 #include <fs/lang/loot/item_database.hpp>
 #include <fs/lang/loot/generator.hpp>
 #include <fs/network/item_price_report.hpp>
@@ -76,11 +77,8 @@ public:
 private:
 	void draw_main_menu_bar();
 
-	void on_open_spirit_filter();
-	void on_open_real_filter();
-
 	void remove_closed_windows();
-	void open_pending_modals();
+	void process_open_file_modals();
 	void rebuild_pending_fonts();
 
 	Magnum::ImGuiIntegration::Context _imgui{Magnum::NoCreate};
@@ -112,6 +110,8 @@ private:
 	};
 
 	modal_dialog_state_type _modal_dialog_state = modal_dialog_state_type::none;
+	aux::open_file_dialog _open_file_dialog;
+
 	std::vector<spirit_filter_window> _spirit_filters;
 	std::vector<real_filter_window> _real_filters;
 

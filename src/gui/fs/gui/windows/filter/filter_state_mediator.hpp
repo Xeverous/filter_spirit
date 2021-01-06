@@ -34,6 +34,11 @@ public:
 	// template method pattern
 	virtual log::logger& logger() = 0;
 
+	source_state& source()
+	{
+		return _source;
+	}
+
 	const source_state& source() const
 	{
 		return _source;

@@ -19,7 +19,7 @@ public:
 	static real_filter_window from_file(application& app, std::string path);
 #endif
 	static real_filter_window from_text_input(application& app);
-	static real_filter_window from_source(application& app, std::string source);
+	static real_filter_window from_source(application& app, std::string name, std::string source);
 
 protected:
 	void draw_contents() override;
@@ -38,7 +38,7 @@ public:
 	static spirit_filter_window from_file(application& app, std::string path);
 #endif
 	static spirit_filter_window from_text_input(application& app);
-	static spirit_filter_window from_source(application& app, std::string source);
+	static spirit_filter_window from_source(application& app, std::string name, std::string source);
 
 protected:
 	void draw_contents() override;
