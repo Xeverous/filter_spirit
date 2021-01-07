@@ -26,8 +26,6 @@ class fonting;
 
 struct debug_info
 {
-	std::reference_wrapper<const parser::lookup_data> lookup;
-	std::reference_wrapper<const parser::line_lookup> lines;
 	std::reference_wrapper<const lang::item> itm;
 	std::reference_wrapper<const lang::item_filtering_result> result;
 };
@@ -41,8 +39,8 @@ public:
 		const lang::item& itm,
 		const lang::item_filtering_result& result)
 	{
-		_info = debug_info{std::ref(lookup), std::ref(lines), std::ref(itm), std::ref(result)};
-		recompute();
+		_info = debug_info{std::ref(itm), std::ref(result)};
+		recompute(lookup, lines);
 		open_popup();
 	}
 
@@ -67,9 +65,9 @@ public:
 		_info = std::nullopt;
 	}
 
-	void recompute();
+	void recompute(const parser::lookup_data& lookup, const parser::line_lookup& lines);
 
-	void draw_interface(const fonting& f);
+	void draw_interface(const fonting& f, const parser::lookup_data* lookup, const parser::line_lookup* lines);
 
 private:
 	// popup state

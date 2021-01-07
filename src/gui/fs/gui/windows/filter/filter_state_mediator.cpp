@@ -57,7 +57,13 @@ void filter_state_mediator::on_loot_change()
 
 void filter_state_mediator::on_filter_results_change()
 {
-	_debug_state.recompute();
+	const parser::lookup_data* lookup = lookup_data();
+	const parser::line_lookup* lines = line_lookup();
+
+	if (lookup && lines)
+		_debug_state.recompute(*lookup, *lines);
+	else
+		_debug_state.invalidate();
 }
 
 void filter_state_mediator::on_filter_results_clear()
@@ -77,7 +83,7 @@ void filter_state_mediator::draw_interface(application& app)
 	ImGui::NextColumn();
 
 	draw_interface_loot(app);
-	_debug_state.draw_interface(app.font_settings());
+	_debug_state.draw_interface(app.font_settings(), lookup_data(), line_lookup());
 }
 
 void filter_state_mediator::draw_interface_filter_representation()

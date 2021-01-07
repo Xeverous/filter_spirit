@@ -251,18 +251,16 @@ constexpr auto debug_popup_title = "Item debug";
 
 namespace fs::gui {
 
-void debug_state::recompute()
+void debug_state::recompute(const parser::lookup_data& lookup, const parser::line_lookup& lines)
 {
 	if (!_info)
 		return;
 
-	const debug_info& info = *_info;
-	const parser::lookup_data& lookup = info.lookup;
-	const parser::line_lookup& lines = info.lines;
-
-	_line_colors.clear();
+	for (auto& color : _line_colors)
+		color = color_background_default;
 	_line_colors.resize(lines.num_lines(), color_background_default);
 
+	const debug_info& info = *_info;
 	// uncomment if item_filter is actually used within debug_state class
 	// FS_ASSERT(info.result.get().match_history.size() <= info.filter.get().blocks.size());
 
@@ -330,7 +328,7 @@ void debug_state::recompute()
 	color_line_by_origin(style.visibility.origin, lookup, lines, _line_colors, color_background_matched_visibility);
 }
 
-void debug_state::draw_interface(const fonting& f)
+void debug_state::draw_interface(const fonting& f, const parser::lookup_data* /* lookup */, const parser::line_lookup* lines)
 {
 	if (_popup_pending) {
 		ImGui::OpenPopup(debug_popup_title);
@@ -338,13 +336,13 @@ void debug_state::draw_interface(const fonting& f)
 		_popup_open = true;
 	}
 
-	if (!_info)
+	if (!_info || !lines)
 		return;
 
 	ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize); // take whole space
 	if (ImGui::BeginPopupModal(debug_popup_title, &_popup_open, ImGuiWindowFlags_NoResize)) {
 		const debug_info& info = *_info;
-		_drawing_offset_y = draw_debug_interface_impl(info.itm.get(), info.result.get(), info.lines.get(), _line_colors, f, _drawing_offset_y);
+		_drawing_offset_y = draw_debug_interface_impl(info.itm.get(), info.result.get(), *lines, _line_colors, f, _drawing_offset_y);
 		ImGui::EndPopup();
 	}
 }
