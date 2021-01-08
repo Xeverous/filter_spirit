@@ -11,6 +11,11 @@ namespace fs::gui {
 class real_filter_state_mediator: public filter_state_mediator
 {
 public:
+	real_filter_state_mediator() = default;
+
+	real_filter_state_mediator(real_filter_state_mediator&& other) noexcept = default;
+	real_filter_state_mediator& operator=(real_filter_state_mediator&& other) noexcept = default;
+
 	log::buffer_logger& logger() override
 	{
 		return _logger;

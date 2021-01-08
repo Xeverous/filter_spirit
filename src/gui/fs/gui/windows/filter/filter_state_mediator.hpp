@@ -16,6 +16,8 @@ class fonting;
 class filter_state_mediator
 {
 public:
+	filter_state_mediator() = default;
+
 	virtual ~filter_state_mediator() = default;
 
 #ifndef __EMSCRIPTEN__
@@ -56,6 +58,9 @@ public:
 	void draw_interface(application& app);
 
 protected:
+	filter_state_mediator(filter_state_mediator&& other) noexcept = default;
+	filter_state_mediator& operator=(filter_state_mediator&& other) noexcept = default;
+
 	// template method pattern
 	virtual void draw_interface_logs_derived(gui_logger& gl, const fonting& f) = 0;
 	virtual void draw_interface_derived(application& app) = 0;
