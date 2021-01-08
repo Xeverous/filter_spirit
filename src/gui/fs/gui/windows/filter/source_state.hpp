@@ -5,6 +5,7 @@
 #include <string>
 #include <optional>
 #include <utility>
+#include <memory>
 
 namespace fs::gui {
 
@@ -30,7 +31,7 @@ public:
 
 	const std::string* source() const
 	{
-		return _source.has_value() ? &*_source : nullptr;
+		return _source.get();
 	}
 
 	const std::string* path() const
@@ -67,7 +68,13 @@ private:
 	void on_text_input_done(filter_state_mediator& mediator);
 	void on_text_input_cancel();
 
-	std::optional<std::string> _source;
+	/*
+	 * Source has to be in unique_ptr instead of optional
+	 * because the parser/compiler/debug data stores iterators
+	 * to the string data. String moves may invalidate iterators,
+	 * so a unique_ptr storage ensures that string is not moved.
+	 */
+	std::unique_ptr<std::string> _source;
 	std::optional<std::string> _file_path;
 	std::optional<std::string> _file_name;
 	aux::multiline_text_input _text_input;

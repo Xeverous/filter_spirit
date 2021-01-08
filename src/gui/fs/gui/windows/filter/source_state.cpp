@@ -90,7 +90,7 @@ void source_state::on_text_input_done(filter_state_mediator& mediator)
 	if (_source)
 		(*_source) = _text_input.c_str();
 	else
-		_source.emplace(_text_input.c_str());
+		_source = std::make_unique<std::string>(_text_input.c_str());
 
 	_file_path = std::nullopt;
 
@@ -119,7 +119,16 @@ void source_state::reload_source_file(filter_state_mediator& mediator)
 
 void source_state::new_source(std::optional<std::string> src, filter_state_mediator& mediator)
 {
-	_source = std::move(src);
+	if (src) {
+		if (_source)
+			*_source = std::move(*src);
+		else
+			_source = std::make_unique<std::string>(std::move(*src));
+	}
+	else {
+		_source.reset();
+	}
+
 	_is_source_edited = false;
 	mediator.on_source_change(source());
 }
