@@ -12,6 +12,8 @@ void open_file_dialog::open_dialog(
 	const char* const* patterns_first,
 	const char* const* patterns_last)
 {
+#ifdef __EMSCRIPTEN__
+#else
 	const char* const selected_path = tinyfd_openFileDialog(
 		/* title */ title,
 		/* default path */ nullptr,
@@ -26,6 +28,7 @@ void open_file_dialog::open_dialog(
 		result.file_path = selected_path;
 
 	_result = std::move(result);
+#endif
 }
 
 }

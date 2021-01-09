@@ -334,16 +334,22 @@ void application::process_open_file_modals()
 		aux::file_dialog_result result = *_open_file_dialog.take_result();
 
 		if (_modal_dialog_state == modal_dialog_state_type::open_spirit_filter) {
+#ifdef __EMSCRIPTEN__
+			if (result.file_name && result.file_content)
+				_spirit_filters.push_back(spirit_filter_window::from_source(*this, *result.file_name, *result.file_content));
+#else
 			if (result.file_path)
 				_spirit_filters.push_back(spirit_filter_window::from_file(*this, *result.file_path));
-			else if (result.file_name && result.file_content)
-				_spirit_filters.push_back(spirit_filter_window::from_source(*this, *result.file_name, *result.file_content));
+#endif
 		}
 		else if (_modal_dialog_state == modal_dialog_state_type::open_real_filter) {
+#ifdef __EMSCRIPTEN__
+			if (result.file_name && result.file_content)
+				_real_filters.push_back(real_filter_window::from_source(*this, *result.file_name, *result.file_content));
+#else
 			if (result.file_path)
 				_real_filters.push_back(real_filter_window::from_file(*this, *result.file_path));
-			else if (result.file_name && result.file_content)
-				_real_filters.push_back(real_filter_window::from_source(*this, *result.file_name, *result.file_content));
+#endif
 		}
 
 		_modal_dialog_state = modal_dialog_state_type::none;
