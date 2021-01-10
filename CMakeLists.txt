@@ -47,10 +47,10 @@ set(FILTER_SPIRIT_PLATFORM "" CACHE STRING
 	"win7 (Windows 7 or newer) OR sdl2 (any platform suppored by SDL2) OR emscripten")
 
 ##############################################################################
-# specify explicitly where to output all binary objects
+# specify explicitly where to output all objects
 
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # disable checking LTO support on emscripten, its broken
