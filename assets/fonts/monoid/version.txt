@@ -1,6 +1,0 @@
-https://larsenwork.com/monoid/
-v0.61
-Alternates: (none)
-LineHeight: M
-Tracking:   Normal
-Ligatures:  Off

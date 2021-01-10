@@ -63,11 +63,11 @@ void font::load()
 fonting::fonting()
 {
 #define FONTS_PATH "assets/fonts"
-	_text_fonts.emplace_back(FONTS_PATH "/fontin/Fontin-Regular.otf",   "Fontin Regular");
 	_text_fonts.emplace_back(FONTS_PATH "/fontin/Fontin-SmallCaps.otf", "Fontin SmallCaps");
+	_text_fonts.emplace_back(FONTS_PATH "/fontin/Fontin-Regular.otf",   "Fontin Regular");
 
-	_monospaced_fonts.emplace_back(FONTS_PATH "/monoid/Monoid-Regular-NoCalt.ttf", "Monoid Regular");
-	_monospaced_fonts.emplace_back(FONTS_PATH "/monoid/Monoid-Retina-NoCalt.ttf",  "Monoid Retina");
+	_monospaced_fonts.emplace_back(FONTS_PATH "/ubuntu_mono/UbuntuMono-Regular.ttf", "Ubuntu Mono Regular");
+	_monospaced_fonts.emplace_back(FONTS_PATH "/ubuntu_mono/UbuntuMono-Bold.ttf",    "Ubuntu Mono Bold");
 
 	_monospaced_fonts.emplace_back(FONTS_PATH "/fira_code/ttf/FiraCode-Light.ttf",    "Fira Code Light");
 	_monospaced_fonts.emplace_back(FONTS_PATH "/fira_code/ttf/FiraCode-Regular.ttf",  "Fira Code Regular");
@@ -76,32 +76,20 @@ fonting::fonting()
 	_monospaced_fonts.emplace_back(FONTS_PATH "/fira_code/ttf/FiraCode-Bold.ttf",     "Fira Code Bold");
 	_monospaced_fonts.emplace_back(FONTS_PATH "/fira_code/ttf/FiraCode-Retina.ttf",   "Fira Code Retina");
 
-	_monospaced_fonts.emplace_back(FONTS_PATH "/inconsolata/Inconsolata.otf", "Inconsolata");
+	_monospaced_fonts.emplace_back(FONTS_PATH "/jet_brains_mono/ttf/JetBrainsMono-Regular.ttf",   "Jet Brains Mono Regular");
+	_monospaced_fonts.emplace_back(FONTS_PATH "/jet_brains_mono/ttf/JetBrainsMono-Medium.ttf",    "Jet Brains Mono Medium");
+	_monospaced_fonts.emplace_back(FONTS_PATH "/jet_brains_mono/ttf/JetBrainsMono-Bold.ttf",      "Jet Brains Mono Bold");
+	_monospaced_fonts.emplace_back(FONTS_PATH "/jet_brains_mono/ttf/JetBrainsMono-ExtraBold.ttf", "Jet Brains Mono ExtraBold");
 
-	_monospaced_fonts.emplace_back(FONTS_PATH "/jet_brains_mono/ttf/JetBrainsMono-Regular.ttf",    "Jet Brains Mono Regular");
-	_monospaced_fonts.emplace_back(FONTS_PATH "/jet_brains_mono/ttf/JetBrainsMono-Medium.ttf",     "Jet Brains Mono Medium");
-	_monospaced_fonts.emplace_back(FONTS_PATH "/jet_brains_mono/ttf/JetBrainsMono-Bold.ttf",       "Jet Brains Mono Bold");
-	_monospaced_fonts.emplace_back(FONTS_PATH "/jet_brains_mono/ttf/JetBrainsMono-ExtraBold.ttf",  "Jet Brains Mono ExtraBold");
-
-	_monospaced_fonts.emplace_back(FONTS_PATH "/hack/Hack-Regular.ttf",    "Hack Regular");
-	_monospaced_fonts.emplace_back(FONTS_PATH "/hack/Hack-Bold.ttf",       "Hack Bold");
-
-	_monospaced_fonts.emplace_back(FONTS_PATH "/roboto_mono/static/RobotoMono-Medium.ttf",     "Roboto Mono Medium");
-	_monospaced_fonts.emplace_back(FONTS_PATH "/roboto_mono/static/RobotoMono-Regular.ttf",    "Roboto Mono Regular");
-	_monospaced_fonts.emplace_back(FONTS_PATH "/roboto_mono/static/RobotoMono-SemiBold.ttf",   "Roboto Mono SemiBold");
-	_monospaced_fonts.emplace_back(FONTS_PATH "/roboto_mono/static/RobotoMono-Bold.ttf",       "Roboto Mono Bold");
-
-	_monospaced_fonts.emplace_back(FONTS_PATH "/ubuntu_mono/UbuntuMono-Regular.ttf",    "Ubuntu Mono Regular");
-	_monospaced_fonts.emplace_back(FONTS_PATH "/ubuntu_mono/UbuntuMono-Bold.ttf",       "Ubuntu Mono Bold");
+	_monospaced_fonts.emplace_back(FONTS_PATH "/hack/Hack-Regular.ttf", "Hack Regular");
+	_monospaced_fonts.emplace_back(FONTS_PATH "/hack/Hack-Bold.ttf",    "Hack Bold");
 #undef FONTS_PATH
 }
 
 void fonting::build_default_fonts()
 {
-	FS_ASSERT(_text_fonts.size() >= 2u);
-	_selected_text_font_index = 1;
-	FS_ASSERT(_monospaced_fonts.size() >= 20u);
-	_selected_monospaced_font_index = 19;
+	FS_ASSERT(!_text_fonts.empty());
+	FS_ASSERT(!_monospaced_fonts.empty());
 	rebuild();
 }
 
@@ -118,6 +106,8 @@ void fonting::draw_font_selection_ui()
 
 ImFont* fonting::filter_preview_font(int size) const
 {
+	FS_ASSERT(size >= lang::limits::min_filter_font_size);
+	FS_ASSERT(size <= lang::limits::max_filter_font_size);
 	const std::size_t index = size - lang::limits::min_filter_font_size;
 	FS_ASSERT(index < _filter_preview_fonts.size());
 	const auto result = _filter_preview_fonts[index];
@@ -152,9 +142,9 @@ void fonting::rebuild()
 	_monospaced_font = build_font(atlas, _monospaced_fonts[_selected_monospaced_font_index], _monospaced_font_size);
 	FS_ASSERT(_monospaced_font != nullptr);
 
-	FS_ASSERT(_text_fonts.size() >= 2u); // loop below relies on preview font in [1]
+	FS_ASSERT(!_text_fonts.empty()); // loop below assumes that preview font is first in _text_fonts
 	for (std::size_t i = 0; i < _filter_preview_fonts.size(); ++i) {
-		_filter_preview_fonts[i] = build_font(atlas, _text_fonts[1], i + lang::limits::min_filter_font_size);
+		_filter_preview_fonts[i] = build_font(atlas, _text_fonts.front(), i + lang::limits::min_filter_font_size);
 		FS_ASSERT(_filter_preview_fonts[i] != nullptr);
 	}
 
