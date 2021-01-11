@@ -116,7 +116,6 @@ private:
 	[[nodiscard]]
 	detail::range_type get_range_of_whole_content() const
 	{
-		FS_ASSERT(!_position_cache.get_positions().empty());
 		return detail::range_type(_position_cache.first(), _position_cache.last());
 	}
 
