@@ -84,7 +84,6 @@ void source_state::on_text_input_done(filter_state_mediator& mediator)
 {
 	_is_source_edited = true;
 
-	FS_ASSERT(ImGui::IsPopupOpen(popup_text_input_title));
 	ImGui::CloseCurrentPopup();
 
 	if (_source)
@@ -99,7 +98,6 @@ void source_state::on_text_input_done(filter_state_mediator& mediator)
 
 void source_state::on_text_input_cancel()
 {
-	FS_ASSERT(ImGui::IsPopupOpen(popup_text_input_title));
 	ImGui::CloseCurrentPopup();
 }
 
