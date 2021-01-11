@@ -115,21 +115,59 @@ target_link_libraries(filter_spirit_gui
 )
 
 if(FILTER_SPIRIT_PLATFORM STREQUAL "emscripten")
-	target_link_options(filter_spirit_gui BEFORE PUBLIC "SHELL: -s USE_SDL=2")
+	target_compile_options(filter_spirit_gui PUBLIC
+		-fexceptions
+		"SHELL: -s DISABLE_EXCEPTION_CATCHING=0" # we need exceptions (too much code uses them)
+	)
+
+	target_link_options(filter_spirit_gui PUBLIC
+		-fexceptions
+		"SHELL: -s USE_SDL=2"   # use emscripten's port of SDLv2 library
+		"SHELL: -s STRICT=1"    # disable deprecated back-compat emscripten behavior
+		"SHELL: -s STRICT_JS=1" # Add "use strict;" to generated JS
+		"SHELL: -s INITIAL_MEMORY=134217728 -s ALLOW_MEMORY_GROWTH=1"
+		"SHELL: -s DISABLE_EXCEPTION_CATCHING=0"
+		"SHELL: --preload-file ${CMAKE_SOURCE_DIR}/data@data --preload-file ${CMAKE_SOURCE_DIR}/assets@assets"
+	)
+
+	if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+		target_compile_options(filter_spirit_gui PUBLIC
+			"SHELL: -s EXCEPTION_DEBUG=1"
+		)
+
+		target_link_options(filter_spirit_gui PUBLIC
+			"SHELL: -s EXCEPTION_DEBUG=1"
+		)
+	endif()
+
+	add_custom_target(copy_page ALL
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+		${CMAKE_CURRENT_SOURCE_DIR}/emscripten/index.html
+		${CMAKE_BINARY_DIR}/bin
+	)
+
+	add_dependencies(filter_spirit_gui copy_page)
 else()
 	target_link_libraries(filter_spirit_gui PRIVATE tiny_file_dialogs)
+
+	add_custom_target(copy_data ALL
+		COMMAND ${CMAKE_COMMAND} -E copy_directory
+		${CMAKE_SOURCE_DIR}/data
+		${CMAKE_BINARY_DIR}/bin/data
+	)
+
+	add_custom_target(copy_assets ALL
+		COMMAND ${CMAKE_COMMAND} -E copy_directory
+		${CMAKE_SOURCE_DIR}/assets
+		${CMAKE_BINARY_DIR}/bin/assets
+	)
+
+	add_custom_target(copy_certificates ALL
+		COMMAND ${CMAKE_COMMAND} -E copy_directory
+		${CMAKE_SOURCE_DIR}/certificates
+		${CMAKE_BINARY_DIR}/bin/certificates
+	)
+
+	add_dependencies(filter_spirit_gui copy_data copy_assets copy_certificates)
 endif()
 
-add_custom_target(copy_data ALL
-	COMMAND ${CMAKE_COMMAND} -E copy_directory
-	${CMAKE_SOURCE_DIR}/data
-	${CMAKE_BINARY_DIR}/bin/data
-)
-
-add_custom_target(copy_assets ALL
-	COMMAND ${CMAKE_COMMAND} -E copy_directory
-	${CMAKE_SOURCE_DIR}/assets
-	${CMAKE_BINARY_DIR}/bin/assets
-)
-
-add_dependencies(filter_spirit_gui copy_data copy_assets)
