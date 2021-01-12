@@ -2,8 +2,8 @@
 
 namespace fs::lang {
 
-class item;
-class item_filtering_result;
+struct item;
+struct item_filtering_result;
 
 }
 
