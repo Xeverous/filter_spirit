@@ -1,4 +1,5 @@
 #include <fs/gui/application.hpp>
+#include <fs/gui/auxiliary/widgets.hpp>
 #include <fs/utility/file.hpp>
 #include <fs/version.hpp>
 
@@ -183,10 +184,17 @@ void application::draw_main_menu_bar()
 				_color_picker.take_focus();
 			}
 
+#ifndef NDEBUG // right now only in debug builds, the thing is under construction
 			if (ImGui::MenuItem(_single_item_preview.title().c_str())) {
 				_single_item_preview.open();
 				_single_item_preview.take_focus();
 			}
+#endif
+
+			ImGui::Separator();
+
+			ImGui::MenuItem("Fishing Cheatsheet", nullptr, false, false);
+			aux::on_hover_text_tooltip("Complete Krillson's quests first in order to unlock this feature");
 
 			ImGui::Separator();
 
