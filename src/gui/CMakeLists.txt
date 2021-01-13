@@ -118,6 +118,7 @@ if(FILTER_SPIRIT_PLATFORM STREQUAL "emscripten")
 	target_compile_options(filter_spirit_gui PUBLIC
 		-fexceptions
 		"SHELL: -s DISABLE_EXCEPTION_CATCHING=0" # we need exceptions (too much code uses them)
+		"SHELL: -s WASM=0"
 	)
 
 	target_link_options(filter_spirit_gui PUBLIC
@@ -127,6 +128,7 @@ if(FILTER_SPIRIT_PLATFORM STREQUAL "emscripten")
 		"SHELL: -s STRICT_JS=1" # Add "use strict;" to generated JS
 		"SHELL: -s INITIAL_MEMORY=134217728 -s ALLOW_MEMORY_GROWTH=1"
 		"SHELL: -s DISABLE_EXCEPTION_CATCHING=0"
+		"SHELL: -s WASM=0"
 		"SHELL: --preload-file ${CMAKE_SOURCE_DIR}/data@data --preload-file ${CMAKE_SOURCE_DIR}/assets@assets"
 	)
 
