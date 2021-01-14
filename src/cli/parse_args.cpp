@@ -97,8 +97,9 @@ int run(int argc, char* argv[])
 				("do not verify the authenticity of the peer's certificate"))
 			("no-ssl-host", po::bool_switch(&no_ssl_verify_host),
 				("do not verify certificate's name against host name"))
-			("timeout,t", po::value(&timeout_ms)->value_name("MILLISECONDS")->default_value(5000),
-				("timeout for networking operations, 0 means never timeout"))
+			("timeout,t", po::value(&timeout_ms)->value_name("MILLISECONDS")
+				->default_value(fs::network::download_settings::timeout_default),
+				("timeout for downloading data, 0 means never timeout"))
 		;
 
 		bool opt_generate = false;

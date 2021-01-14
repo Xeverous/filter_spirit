@@ -47,7 +47,10 @@ struct download_info
 
 struct download_settings
 {
-	long timeout_milliseconds = 0; /** (no timeout) */
+	static constexpr long timeout_default = 60'000;
+	static constexpr long timeout_never   =      0;
+
+	long timeout_milliseconds = timeout_default;
 	bool ssl_verify_peer = true;
 	bool ssl_verify_host = true;
 	std::string ca_info_path = "certificates/cacert.pem";
