@@ -152,23 +152,24 @@ void market_data_state::draw_interface(application& app, spirit_filter_state_med
 		return;
 
 	if (ImGui::BeginCombo("API", lang::to_string(_selected_api))) {
-		for (auto dst : {
-			lang::data_source_type::none,
-			lang::data_source_type::poe_ninja,
-			lang::data_source_type::poe_watch
-		}) {
-			if (ImGui::Selectable(lang::to_string(dst), dst == _selected_api)) {
+		const auto make_selectable = [&, this](lang::data_source_type dst, ImGuiSelectableFlags flags = 0) {
+			if (ImGui::Selectable(lang::to_string(dst), _selected_api == dst, flags))
+			{
 				_selected_api = dst;
 				on_api_change(app, mediator);
 			}
+		};
 
-			if (dst == lang::data_source_type::none && ImGui::IsItemHovered()) {
-				aux::on_hover_text_tooltip(
-					"Do not use any market data.\n"
-					"All autogenerations will output no items.\n"
-					"Same behavior as if all items had no confidence.");
-			}
-		}
+		make_selectable(lang::data_source_type::none);
+		aux::on_hover_text_tooltip(
+			"Do not use any market data.\n"
+			"All autogenerations will output no items.\n"
+			"Same behavior as if all items had no confidence.");
+
+		make_selectable(lang::data_source_type::poe_ninja);
+
+		make_selectable(lang::data_source_type::poe_watch, ImGuiSelectableFlags_Disabled);
+		aux::on_hover_text_tooltip("Under construction. Website's API recently got reborn and refactored.");
 
 		ImGui::EndCombo();
 	}
