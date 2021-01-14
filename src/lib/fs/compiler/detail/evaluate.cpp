@@ -22,24 +22,7 @@ namespace
 
 // ---- generic helpers ----
 
-// this could actually return something like bounded_integer<Min, Max>
-// so far all use cases provide constexpr min/max values
-[[nodiscard]] boost::optional<lang::integer>
-make_integer_in_range(
-	lang::integer int_obj,
-	int min_allowed_value,
-	boost::optional<int> max_allowed_value,
-	diagnostics_container& diagnostics)
-{
-	const auto val = int_obj.value;
-	if (val < min_allowed_value || (max_allowed_value && val > *max_allowed_value)) {
-		diagnostics.emplace_back(error(errors::invalid_integer_value{
-			min_allowed_value, max_allowed_value, val, int_obj.origin}));
-		return boost::none;
-	}
-
-	return int_obj;
-}
+// (none)
 
 // ---- spirit filter ----
 
@@ -94,6 +77,25 @@ evaluate_compound_action(
 namespace fs::compiler::detail
 {
 
+// this could actually return something like bounded_integer<Min, Max>
+// so far all use cases provide constexpr min/max values
+boost::optional<lang::integer>
+make_integer_in_range(
+	lang::integer int_obj,
+	int min_allowed_value,
+	boost::optional<int> max_allowed_value,
+	diagnostics_container& diagnostics)
+{
+	const auto val = int_obj.value;
+	if (val < min_allowed_value || (max_allowed_value && val > *max_allowed_value)) {
+		diagnostics.emplace_back(error(errors::invalid_integer_value{
+			min_allowed_value, max_allowed_value, val, int_obj.origin}));
+		return boost::none;
+	}
+
+	return int_obj;
+}
+
 boost::optional<lang::color>
 make_color(
 	settings /* st */,
@@ -120,44 +122,6 @@ make_color(
 	}
 	else {
 		return lang::color{*result_r, *result_g, *result_b};
-	}
-}
-
-boost::optional<lang::builtin_alert_sound_id>
-make_builtin_alert_sound_id(
-	lang::integer sound_id,
-	diagnostics_container& diagnostics)
-{
-	return make_integer_in_range(
-		sound_id,
-		lang::limits::min_filter_sound_id,
-		lang::limits::max_filter_sound_id,
-		diagnostics)
-	.map([](lang::integer sound_id) {
-		return lang::builtin_alert_sound_id{sound_id};
-	});
-}
-
-boost::optional<lang::builtin_alert_sound>
-make_builtin_alert_sound(
-	settings /* st */,
-	bool positional,
-	lang::builtin_alert_sound_id sound_id,
-	boost::optional<lang::integer> volume,
-	diagnostics_container& diagnostics)
-{
-	if (volume) {
-		return make_integer_in_range(
-			*volume,
-			lang::limits::min_filter_volume,
-			lang::limits::max_filter_volume,
-			diagnostics)
-		.map([&](lang::integer volume) {
-			return lang::builtin_alert_sound{positional, sound_id, volume};
-		});
-	}
-	else {
-		return lang::builtin_alert_sound{positional, sound_id};
 	}
 }
 
@@ -235,7 +199,7 @@ evaluate(
 	return ss;
 }
 
-[[nodiscard]] boost::optional<lang::single_object>
+boost::optional<lang::single_object>
 evaluate(
 	settings st,
 	const ast::common::literal_expression& expression,
@@ -380,7 +344,7 @@ evaluate_value_expression(
 	));
 }
 
-[[nodiscard]] boost::optional<lang::fractional>
+boost::optional<lang::fractional>
 get_as_fractional(
 	const lang::single_object& sobj,
 	diagnostics_container& diagnostics)

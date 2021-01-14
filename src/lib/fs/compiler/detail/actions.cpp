@@ -115,6 +115,96 @@ make_play_effect(
 	}
 }
 
+[[nodiscard]] boost::optional<lang::builtin_alert_sound_id>
+make_builtin_alert_sound_id(
+	const lang::single_object& sobj,
+	diagnostics_container& diagnostics)
+{
+	diagnostics_container diagnostics_integer;
+	auto integer_sound_id = detail::get_as<lang::integer>(sobj, diagnostics_integer);
+	diagnostics_container diagnostics_shaper;
+	auto shaper_sound_id = detail::get_as<lang::shaper_voice_line>(sobj, diagnostics_shaper);
+
+	if (integer_sound_id.has_value()) {
+		std::move(diagnostics_integer.begin(), diagnostics_integer.end(), std::back_inserter(diagnostics));
+		return detail::make_integer_in_range(
+			*integer_sound_id,
+			lang::limits::min_filter_sound_id,
+			lang::limits::max_filter_sound_id,
+			diagnostics)
+			.map([](lang::integer sound_id) {
+				return lang::builtin_alert_sound_id{sound_id};
+			});
+	}
+	else if (shaper_sound_id.has_value()) {
+		std::move(diagnostics_shaper.begin(), diagnostics_shaper.end(), std::back_inserter(diagnostics));
+		return lang::builtin_alert_sound_id(*shaper_sound_id);
+	}
+	else {
+		// main error
+		diagnostics.emplace_back(error(errors::invalid_action{"AlertSound", sobj.origin}));
+		// errors specifying each sound ID variant problems
+		diagnostics.emplace_back(note{notes::fixed_text{"in attempt of integer sound ID"}});
+		std::move(diagnostics_integer.begin(), diagnostics_integer.end(), std::back_inserter(diagnostics));
+		diagnostics.emplace_back(note{notes::fixed_text{"in attempt of Shaper voice line sound ID"}});
+		std::move(diagnostics_shaper.begin(), diagnostics_shaper.end(), std::back_inserter(diagnostics));
+		return boost::none;
+	}
+}
+
+[[nodiscard]] boost::optional<lang::builtin_alert_sound>
+make_builtin_alert_sound(
+	settings st,
+	bool is_positional,
+	const lang::single_object& sobj,
+	diagnostics_container& diagnostics)
+{
+	return make_builtin_alert_sound_id(sobj, diagnostics)
+		.map([&](lang::builtin_alert_sound_id sound_id) {
+			return lang::builtin_alert_sound{is_positional, sound_id};
+		});
+}
+
+[[nodiscard]] boost::optional<lang::custom_alert_sound>
+make_custom_alert_sound(
+	settings /* st */,
+	const lang::single_object& sobj,
+	diagnostics_container& diagnostics)
+{
+	return detail::get_as<lang::string>(sobj, diagnostics)
+		.map([](lang::string str) {
+			return lang::custom_alert_sound{std::move(str)};
+		});
+}
+
+[[nodiscard]] boost::optional<lang::volume>
+make_volume(
+	settings /* st */,
+	lang::integer intgr,
+	diagnostics_container& diagnostics)
+{
+	return detail::make_integer_in_range(
+		intgr,
+		lang::limits::min_filter_volume,
+		lang::limits::max_filter_volume,
+		diagnostics)
+		.map([](lang::integer vol) {
+			return lang::volume{vol};
+		});
+}
+
+[[nodiscard]] boost::optional<lang::volume>
+make_volume(
+	settings st,
+	lang::single_object sobj,
+	diagnostics_container& diagnostics)
+{
+	return detail::get_as<lang::integer>(sobj, diagnostics)
+		.flat_map([&](lang::integer intgr) {
+			return make_volume(st, intgr, diagnostics);
+		});
+}
+
 // ---- spirit filter helpers ----
 
 [[nodiscard]] bool
@@ -124,7 +214,6 @@ spirit_filter_add_set_color_action_impl(
 	lang::action_set& set,
 	diagnostics_container& diagnostics)
 {
-	// override previous action
 	switch (action_type) {
 		case lang::color_action_type::set_border_color: {
 			set.set_border_color = action;
@@ -245,67 +334,10 @@ spirit_filter_add_play_effect_action(
 			return make_play_effect(st, obj, diagnostics);
 		})
 		.map([&](lang::play_effect effect) {
-			// override previous action
 			set.play_effect = lang::play_effect_action{effect, parser::position_tag_of(action)};
 			return true;
 		})
 		.value_or(false);
-}
-
-[[nodiscard]] boost::optional<lang::builtin_alert_sound_id>
-make_builtin_alert_sound_id(
-	const lang::single_object& sobj,
-	diagnostics_container& diagnostics)
-{
-	diagnostics_container diagnostics_integer;
-	auto integer_sound_id = detail::get_as<lang::integer>(sobj, diagnostics_integer);
-	diagnostics_container diagnostics_shaper;
-	auto shaper_sound_id = detail::get_as<lang::shaper_voice_line>(sobj, diagnostics_shaper);
-
-	if (integer_sound_id.has_value()) {
-		std::move(diagnostics_integer.begin(), diagnostics_integer.end(), std::back_inserter(diagnostics));
-		return detail::make_builtin_alert_sound_id(*integer_sound_id, diagnostics);
-	}
-	else if (shaper_sound_id.has_value()) {
-		std::move(diagnostics_shaper.begin(), diagnostics_shaper.end(), std::back_inserter(diagnostics));
-		return detail::make_builtin_alert_sound_id(*shaper_sound_id);
-	}
-	else {
-		// main error
-		diagnostics.emplace_back(error(errors::invalid_action{"AlertSound", sobj.origin}));
-		// errors specifying each sound ID variant problems
-		diagnostics.emplace_back(note{notes::fixed_text{"in attempt of integer sound ID"}});
-		std::move(diagnostics_integer.begin(), diagnostics_integer.end(), std::back_inserter(diagnostics));
-		diagnostics.emplace_back(note{notes::fixed_text{"in attempt of Shaper voice line sound ID"}});
-		std::move(diagnostics_shaper.begin(), diagnostics_shaper.end(), std::back_inserter(diagnostics));
-		return boost::none;
-	}
-}
-
-[[nodiscard]] boost::optional<lang::builtin_alert_sound>
-make_builtin_alert_sound(
-	settings st,
-	bool positional,
-	const lang::object& obj,
-	diagnostics_container& diagnostics)
-{
-	const auto num_args = obj.values.size();
-	FS_ASSERT(num_args == 1u || num_args == 2u);
-
-	const auto sound_id = make_builtin_alert_sound_id(obj.values[0], diagnostics);
-
-	if (!sound_id)
-		return boost::none;
-
-	if (num_args == 2u) {
-		return detail::get_as<lang::integer>(obj.values[1], diagnostics)
-			.flat_map([&](lang::integer volume) {
-				return detail::make_builtin_alert_sound(st, positional, *sound_id, volume, diagnostics);
-			});
-	}
-	else {
-		return detail::make_builtin_alert_sound(st, positional, *sound_id, boost::none, diagnostics);
-	}
 }
 
 [[nodiscard]] bool
@@ -317,31 +349,28 @@ spirit_filter_add_play_alert_sound_action(
 	diagnostics_container& diagnostics)
 {
 	return detail::evaluate_sequence(st, action.seq, symbols, 1, 2, diagnostics)
-		.flat_map([&](lang::object obj) {
+		.flat_map([&](lang::object obj) -> boost::optional<lang::alert_sound> {
 			FS_ASSERT(obj.values.size() == 1u || obj.values.size() == 2u);
-			return make_builtin_alert_sound(st, action.positional, obj, diagnostics);
+			auto bas = make_builtin_alert_sound(st, action.positional, obj.values[0], diagnostics);
+
+			boost::optional<lang::volume> vol = lang::volume{};
+			if (obj.values.size() == 2u) {
+				vol = make_volume(st, obj.values[1], diagnostics);
+			}
+
+			if (bas && vol)
+				return lang::alert_sound{*bas, *vol};
+			else
+				return boost::none;
 		})
-		.map([&](lang::builtin_alert_sound bas) {
-			// override previous action
+		.map([&](lang::alert_sound as) {
 			set.play_alert_sound = lang::alert_sound_action{
-				lang::alert_sound{bas},
+				std::move(as),
 				parser::position_tag_of(action)
 			};
 			return true;
 		})
 		.value_or(false);
-}
-
-[[nodiscard]] boost::optional<lang::custom_alert_sound>
-make_custom_alert_sound(
-	settings /* st */,
-	const lang::single_object& sobj,
-	diagnostics_container& diagnostics)
-{
-	return detail::get_as<lang::string>(sobj, diagnostics)
-		.map([](lang::string str) {
-			return lang::custom_alert_sound{std::move(str)};
-		});
 }
 
 [[nodiscard]] bool
@@ -352,14 +381,24 @@ spirit_filter_add_custom_alert_sound_action(
 	lang::action_set& set,
 	diagnostics_container& diagnostics)
 {
-	return detail::evaluate_sequence(st, action.seq, symbols, 1, 1, diagnostics)
-		.flat_map([&](lang::object obj) {
-			FS_ASSERT(obj.values.size() == 1u);
-			return make_custom_alert_sound(st, obj.values[0], diagnostics);
+	return detail::evaluate_sequence(st, action.seq, symbols, 1, 2, diagnostics)
+		.flat_map([&](lang::object obj) -> boost::optional<lang::alert_sound> {
+			FS_ASSERT(obj.values.size() == 1u || obj.values.size() == 2u);
+			auto cas = make_custom_alert_sound(st, obj.values[0], diagnostics);
+
+			boost::optional<lang::volume> vol = lang::volume{};
+			if (obj.values.size() == 2u) {
+				vol = make_volume(st, obj.values[1], diagnostics);
+			}
+
+			if (cas && vol)
+				return lang::alert_sound{std::move(*cas), *vol};
+			else
+				return boost::none;
 		})
-		.map([&](lang::custom_alert_sound cas) {
+		.map([&](lang::alert_sound as) {
 			set.play_alert_sound = lang::alert_sound_action{
-				lang::alert_sound{std::move(cas)},
+				std::move(as),
 				parser::position_tag_of(action)
 			};
 			return true;
@@ -382,27 +421,25 @@ spirit_filter_add_set_alert_sound_action(
 
 			// SetAlertSound always generates non-positional sounds, hence the false
 			diagnostics_container diagnostics_builtin;
-			auto builtin_alert = make_builtin_alert_sound(st, false, obj, diagnostics_builtin);
+			auto builtin_alert = make_builtin_alert_sound(st, false, obj.values[0], diagnostics_builtin);
 			diagnostics_container diagnostics_custom;
-			auto custom_alert = [&]() -> boost::optional<lang::custom_alert_sound> {
-				if (num_values == 2u) {
-					diagnostics_custom.emplace_back(error(errors::invalid_amount_of_arguments{
-						/* min */ 1, /* max */ 1, /* actual */ 2, parser::position_tag_of(action.seq)
-					}));
-					return boost::none;
-				}
+			auto custom_alert = make_custom_alert_sound(st, obj.values[0], diagnostics_custom);
 
-				FS_ASSERT(num_values == 1u);
-				return make_custom_alert_sound(st, obj.values[0], diagnostics_custom);
-			}();
-
-			if (custom_alert.has_value()) {
-				std::move(diagnostics_custom.begin(), diagnostics_custom.end(), std::back_inserter(diagnostics));
-				return lang::alert_sound{std::move(*custom_alert)};
+			boost::optional<lang::volume> vol = lang::volume{};
+			diagnostics_container diagnostics_volume;
+			if (obj.values.size() == 2u) {
+				vol = make_volume(st, obj.values[1], diagnostics_volume);
 			}
-			else if (builtin_alert.has_value()) {
+
+			if (custom_alert.has_value() && vol.has_value()) {
+				std::move(diagnostics_custom.begin(), diagnostics_custom.end(), std::back_inserter(diagnostics));
+				std::move(diagnostics_volume.begin(), diagnostics_volume.end(), std::back_inserter(diagnostics));
+				return lang::alert_sound{std::move(*custom_alert), *vol};
+			}
+			else if (builtin_alert.has_value() && vol.has_value()) {
 				std::move(diagnostics_builtin.begin(), diagnostics_builtin.end(), std::back_inserter(diagnostics));
-				return lang::alert_sound{*builtin_alert};
+				std::move(diagnostics_volume.begin(), diagnostics_volume.end(), std::back_inserter(diagnostics));
+				return lang::alert_sound{*builtin_alert, *vol};
 			}
 			else {
 				diagnostics.emplace_back(error(
@@ -412,6 +449,8 @@ spirit_filter_add_set_alert_sound_action(
 				std::move(diagnostics_custom.begin(), diagnostics_custom.end(), std::back_inserter(diagnostics));
 				diagnostics.emplace_back(note{notes::fixed_text{"in attempt of built-in alert sound"}});
 				std::move(diagnostics_builtin.begin(), diagnostics_builtin.end(), std::back_inserter(diagnostics));
+
+				std::move(diagnostics_volume.begin(), diagnostics_volume.end(), std::back_inserter(diagnostics));
 				return boost::none;
 			}
 		})
@@ -494,41 +533,6 @@ real_filter_add_color_action(
 	return false;
 }
 
-[[nodiscard]] lang::builtin_alert_sound_id
-real_filter_make_builtin_alert_sound_id(
-	ast::rf::sound_id sound_id)
-{
-	return sound_id.apply_visitor(x3::make_lambda_visitor<lang::builtin_alert_sound_id>(
-		[](ast::rf::integer_literal sound_id) {
-			return lang::builtin_alert_sound_id{detail::evaluate(sound_id)};
-		},
-		[](ast::rf::shaper_voice_line_literal sound_id) {
-			return lang::builtin_alert_sound_id{detail::evaluate(sound_id)};
-		}
-	));
-}
-
-[[nodiscard]] lang::alert_sound
-real_filter_make_builtin_alert_sound(
-	ast::rf::sound_id sound_id,
-	boost::optional<ast::rf::integer_literal> volume,
-	bool positional)
-{
-	if (volume) {
-		return lang::alert_sound{lang::builtin_alert_sound{
-			positional,
-			real_filter_make_builtin_alert_sound_id(sound_id),
-			detail::evaluate(*volume)
-		}};
-	}
-	else {
-		return lang::alert_sound{lang::builtin_alert_sound{
-			positional,
-			real_filter_make_builtin_alert_sound_id(sound_id)
-		}};
-	}
-}
-
 [[nodiscard]] bool
 real_filter_add_minimap_icon_action(
 	settings st,
@@ -561,6 +565,66 @@ real_filter_add_play_effect_action(
 		.map([&](lang::play_effect effect) {
 			target = lang::play_effect_action{effect, parser::position_tag_of(action)};
 			return true;
+		})
+		.value_or(false);
+}
+
+[[nodiscard]] boost::optional<lang::volume>
+real_filter_make_volume(
+	settings st,
+	boost::optional<ast::rf::integer_literal> maybe_integer,
+	diagnostics_container& diagnostics)
+{
+	if (!maybe_integer)
+		return lang::volume{};
+
+	return maybe_integer.flat_map([&](ast::rf::integer_literal il) {
+		return make_volume(st, detail::evaluate(il), diagnostics);
+	});
+}
+
+[[nodiscard]] bool
+real_filter_add_play_alert_sound_action(
+	settings st,
+	const ast::rf::play_alert_sound_action& action,
+	std::optional<lang::alert_sound_action>& target,
+	diagnostics_container& diagnostics)
+{
+	auto sobj = detail::evaluate(st, action.id, diagnostics);
+	auto volume = real_filter_make_volume(st, action.volume, diagnostics);
+
+	if (!sobj || !volume)
+		return false;
+
+	return make_builtin_alert_sound(st, action.positional, *sobj, diagnostics)
+		.map([&](lang::builtin_alert_sound bas) {
+			return real_filter_add_action_impl(
+				lang::alert_sound_action{
+					lang::alert_sound{bas, *volume},
+					parser::position_tag_of(action)
+				},
+				target,
+				diagnostics);
+		})
+		.value_or(false);
+}
+
+[[nodiscard]] bool
+real_filter_add_custom_alert_sound_action(
+	settings st,
+	const ast::rf::custom_alert_sound_action& action,
+	std::optional<lang::alert_sound_action>& target,
+	diagnostics_container& diagnostics)
+{
+	return real_filter_make_volume(st, action.volume, diagnostics)
+		.map([&](lang::volume vol) {
+			return real_filter_add_action_impl(
+				lang::alert_sound_action{
+					lang::alert_sound{lang::custom_alert_sound{detail::evaluate(action.path)}, vol},
+					parser::position_tag_of(action)
+				},
+				target,
+				diagnostics);
 		})
 		.value_or(false);
 }
@@ -637,31 +701,10 @@ real_filter_add_action(
 			return real_filter_add_play_effect_action(st, action, set.play_effect, diagnostics);
 		},
 		[&](const ast::rf::play_alert_sound_action& action) {
-			return real_filter_add_action_impl(
-				lang::alert_sound_action{
-					real_filter_make_builtin_alert_sound(action.id, action.volume, false),
-					parser::position_tag_of(action)
-				},
-				set.play_alert_sound,
-				diagnostics);
-		},
-		[&](const ast::rf::play_alert_sound_positional_action& action) {
-			return real_filter_add_action_impl(
-				lang::alert_sound_action{
-					real_filter_make_builtin_alert_sound(action.id, action.volume, true),
-					parser::position_tag_of(action)
-				},
-				set.play_alert_sound,
-				diagnostics);
+			return real_filter_add_play_alert_sound_action(st, action, set.play_alert_sound, diagnostics);
 		},
 		[&](const ast::rf::custom_alert_sound_action& action) {
-			return real_filter_add_action_impl(
-				lang::alert_sound_action{
-					lang::alert_sound{lang::custom_alert_sound{evaluate(action.path)}},
-					parser::position_tag_of(action)
-				},
-				set.play_alert_sound,
-				diagnostics);
+			return real_filter_add_custom_alert_sound_action(st, action, set.play_alert_sound, diagnostics);
 		},
 		[&](const ast::rf::switch_drop_sound_action& action) {
 			return real_filter_add_action_impl(

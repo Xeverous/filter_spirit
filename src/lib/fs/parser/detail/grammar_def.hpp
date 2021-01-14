@@ -455,26 +455,18 @@ namespace rf
 	const auto set_font_size_action_def = make_keyword(lang::keywords::rf::set_font_size) > common::integer_literal;
 	BOOST_SPIRIT_DEFINE(set_font_size_action)
 
-	const sound_id_type sound_id = "sound ID";
-	const auto sound_id_def = common::integer_literal | common::shaper_voice_line_literal;
-	BOOST_SPIRIT_DEFINE(sound_id)
-
-	const play_alert_sound_action_type play_alert_sound_action = "alert sound action";
+	const play_alert_sound_action_type play_alert_sound_action = "play alert sound action";
 	const auto play_alert_sound_action_def =
-		make_keyword(lang::keywords::rf::play_alert_sound)
-		> sound_id
+		make_keyword(symbols::rf::play_alert_sound_actions)
+		> common::literal_expression
 		> -common::integer_literal; // volume (optional token)
 	BOOST_SPIRIT_DEFINE(play_alert_sound_action)
 
-	const play_alert_sound_positional_action_type play_alert_sound_positional_action = "positional alert sound action";
-	const auto play_alert_sound_positional_action_def =
-		make_keyword(lang::keywords::rf::play_alert_sound_positional)
-		> sound_id
-		> -common::integer_literal; // volume (optional token)
-	BOOST_SPIRIT_DEFINE(play_alert_sound_positional_action)
-
 	const custom_alert_sound_action_type custom_alert_sound_action = "custom alert sound action";
-	const auto custom_alert_sound_action_def = make_keyword(lang::keywords::rf::custom_alert_sound) > common::string_literal;
+	const auto custom_alert_sound_action_def =
+		make_keyword(lang::keywords::rf::custom_alert_sound)
+		> common::string_literal
+		> -common::integer_literal; // volume (optional token)
 	BOOST_SPIRIT_DEFINE(custom_alert_sound_action)
 
 	const switch_drop_sound_action_type switch_drop_sound_action = "switch drop sound action";
@@ -496,7 +488,6 @@ namespace rf
 		color_action
 		| set_font_size_action
 		| play_alert_sound_action
-		| play_alert_sound_positional_action
 		| custom_alert_sound_action
 		| switch_drop_sound_action
 		| minimap_icon_action

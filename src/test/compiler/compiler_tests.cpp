@@ -254,7 +254,6 @@ $z = 4W 0 6 RGB
 
 						const auto& actual = std::get<lang::builtin_alert_sound>(actual_alert_sound.sound);
 						BOOST_TEST((actual.sound_id.id == expected.sound_id.id));
-						BOOST_TEST((actual.volume == expected.volume));
 						BOOST_TEST(actual.is_positional == expected.is_positional);
 					},
 					[&](const lang::custom_alert_sound& expected)
@@ -266,6 +265,8 @@ $z = 4W 0 6 RGB
 						BOOST_TEST(actual.path.value == expected.path.value);
 					}
 				}, expected_alert_sound.sound);
+
+				BOOST_TEST((actual_alert_sound.vol == expected_alert_sound.vol));
 			}
 
 			static
@@ -298,20 +299,21 @@ $z = 4W 0 6 RGB
 			{
 				expect_alert_sound_impl(
 					"PlayAlertSound " + expression,
-					lang::alert_sound{lang::builtin_alert_sound{false, sound_id, volume}});
+					lang::alert_sound{lang::builtin_alert_sound{false, sound_id}, lang::volume{volume}});
 				expect_alert_sound_impl(
 					"PlayAlertSoundPositional " + expression,
-					lang::alert_sound{lang::builtin_alert_sound{true, sound_id, volume}});
+					lang::alert_sound{lang::builtin_alert_sound{true, sound_id}, lang::volume{volume}});
 			}
 
 			static
 			void expect_custom_alert_sound(
 				std::string expression,
-				const lang::string& path)
+				const lang::string& path,
+				std::optional<lang::integer> volume = std::nullopt)
 			{
 				expect_alert_sound_impl(
 					"CustomAlertSound " + expression,
-					lang::alert_sound{lang::custom_alert_sound{path}});
+					lang::alert_sound{lang::custom_alert_sound{path}, lang::volume{volume}});
 			}
 		};
 
@@ -342,6 +344,11 @@ $z = 4W 0 6 RGB
 			BOOST_AUTO_TEST_CASE(custom_path)
 			{
 				expect_custom_alert_sound("\"pop.wav\"", string{"pop.wav"});
+			}
+
+			BOOST_AUTO_TEST_CASE(custom_path_and_volume)
+			{
+				expect_custom_alert_sound("\"pop.wav\" 123", string{"pop.wav"}, integer{123});
 			}
 
 		BOOST_AUTO_TEST_SUITE_END()

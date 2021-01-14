@@ -83,33 +83,6 @@ void output_builtin_alert_sound_id(
 	}, sound_id.id);
 }
 
-void output_builtin_alert_sound(
-	lang::builtin_alert_sound alert_sound,
-	std::ostream& output_stream)
-{
-	output_stream << '\t';
-
-	if (alert_sound.is_positional)
-		output_stream << kw::play_alert_sound_positional;
-	else
-		output_stream << kw::play_alert_sound;
-
-	output_builtin_alert_sound_id(alert_sound.sound_id, output_stream);
-
-	if (alert_sound.volume.has_value())
-		output_stream << ' ' << (*alert_sound.volume).value;
-
-	output_stream << '\n';
-}
-
-void output_custom_alert_sound(
-	const lang::custom_alert_sound& alert_sound,
-	std::ostream& output_stream)
-{
-	output_stream << '\t' << kw::custom_alert_sound
-		<< " \"" << alert_sound.path.value << "\"\n";
-}
-
 void output_alert_sound(
 	const std::optional<lang::alert_sound_action>& alert_sound_action,
 	std::ostream& output_stream)
@@ -117,15 +90,27 @@ void output_alert_sound(
 	if (!alert_sound_action.has_value())
 		return;
 
+	output_stream << '\t';
+
 	const lang::alert_sound& as = (*alert_sound_action).alert;
 	std::visit(utility::visitor{
 		[&output_stream](lang::builtin_alert_sound sound) {
-			output_builtin_alert_sound(sound, output_stream);
+			if (sound.is_positional)
+				output_stream << kw::play_alert_sound_positional;
+			else
+				output_stream << kw::play_alert_sound;
+
+			output_builtin_alert_sound_id(sound.sound_id, output_stream);
 		},
 		[&output_stream](const lang::custom_alert_sound& sound) {
-			output_custom_alert_sound(sound, output_stream);
+			output_stream << kw::custom_alert_sound << " \"" << sound.path.value << '\"';
 		}
 	}, as.sound);
+
+	if (as.vol.value)
+		output_stream << ' ' << (*as.vol.value).value;
+
+	output_stream << '\n';
 }
 
 void output_switch_drop_sound(

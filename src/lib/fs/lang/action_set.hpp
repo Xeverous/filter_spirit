@@ -88,18 +88,16 @@ inline bool operator!=(builtin_alert_sound_id lhs, builtin_alert_sound_id rhs)
 
 struct builtin_alert_sound
 {
-	explicit builtin_alert_sound(bool is_positional, builtin_alert_sound_id sound_id, std::optional<integer> volume = std::nullopt)
-	: is_positional(is_positional), sound_id(sound_id), volume(volume) {}
+	explicit builtin_alert_sound(bool is_positional, builtin_alert_sound_id sound_id)
+	: is_positional(is_positional), sound_id(sound_id) {}
 
-	bool is_positional;
+	bool is_positional; // this is not a lang type because it is implied by keyword, not by value
 	builtin_alert_sound_id sound_id;
-	std::optional<integer> volume;
 };
 
 inline bool operator==(builtin_alert_sound lhs, builtin_alert_sound rhs) noexcept
 {
-	return std::tie(lhs.is_positional, lhs.sound_id, lhs.volume)
-		== std::tie(rhs.is_positional, rhs.sound_id, rhs.volume);
+	return std::tie(lhs.is_positional, lhs.sound_id) == std::tie(rhs.is_positional, rhs.sound_id);
 }
 inline bool operator!=(builtin_alert_sound lhs, builtin_alert_sound rhs) noexcept { return !(lhs == rhs); }
 
@@ -114,18 +112,30 @@ struct custom_alert_sound
 inline bool operator==(const custom_alert_sound& lhs, const custom_alert_sound& rhs) noexcept { return lhs.path == rhs.path; }
 inline bool operator!=(const custom_alert_sound& lhs, const custom_alert_sound& rhs) noexcept { return !(lhs == rhs); }
 
-struct alert_sound
+struct volume
 {
-	explicit alert_sound(builtin_alert_sound sound)
-	: sound(sound) {}
-
-	explicit alert_sound(custom_alert_sound sound)
-	: sound(std::move(sound)) {}
-
-	std::variant<builtin_alert_sound, custom_alert_sound> sound;
+	std::optional<integer> value;
 };
 
-inline bool operator==(const alert_sound& lhs, const alert_sound& rhs) noexcept { return lhs.sound == rhs.sound; }
+inline bool operator==(const volume& lhs, const volume& rhs) noexcept { return lhs.value == rhs.value; }
+inline bool operator!=(const volume& lhs, const volume& rhs) noexcept { return !(lhs == rhs); }
+
+struct alert_sound
+{
+	explicit alert_sound(builtin_alert_sound sound, volume vol)
+	: sound(sound), vol(vol) {}
+
+	explicit alert_sound(custom_alert_sound sound, volume vol)
+	: sound(std::move(sound)), vol(vol) {}
+
+	std::variant<builtin_alert_sound, custom_alert_sound> sound;
+	volume vol;
+};
+
+inline bool operator==(const alert_sound& lhs, const alert_sound& rhs) noexcept
+{
+	return std::tie(lhs.sound, lhs.vol) == std::tie(rhs.sound, rhs.vol);
+}
 inline bool operator!=(const alert_sound& lhs, const alert_sound& rhs) noexcept { return !(lhs == rhs); }
 
 struct alert_sound_action

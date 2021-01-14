@@ -647,7 +647,8 @@ namespace rf
 		using base_type::operator=;
 	};
 
-	struct literal_sequence : std::vector<common::literal_expression>, x3::position_tagged {};
+	using literal_expression = common::literal_expression;
+	struct literal_sequence : std::vector<literal_expression>, x3::position_tagged {};
 
 	using comparison_operator_expression = common::comparison_operator_expression;
 	using exact_matching_policy = common::exact_matching_policy;
@@ -737,38 +738,17 @@ namespace rf
 		integer_literal font_size;
 	};
 
-	struct sound_id : x3::variant<
-		integer_literal,
-		shaper_voice_line_literal
-	>, x3::position_tagged
-	{
-		using base_type::base_type;
-		using base_type::operator=;
-	};
-
 	struct play_alert_sound_action : x3::position_tagged
 	{
-		sound_id id;
-		boost::optional<integer_literal> volume;
-	};
-
-	struct play_alert_sound_positional_action : x3::position_tagged
-	{
-		sound_id id;
+		bool positional;
+		literal_expression id;
 		boost::optional<integer_literal> volume;
 	};
 
 	struct custom_alert_sound_action : x3::position_tagged
 	{
-		auto& operator=(string_literal sl)
-		{
-			path = std::move(sl);
-			return *this;
-		}
-
-		const auto& get_value() const { return path; }
-
 		string_literal path;
+		boost::optional<integer_literal> volume;
 	};
 
 	struct switch_drop_sound_action : x3::position_tagged
@@ -814,7 +794,6 @@ namespace rf
 		color_action,
 		set_font_size_action,
 		play_alert_sound_action,
-		play_alert_sound_positional_action,
 		custom_alert_sound_action,
 		switch_drop_sound_action,
 		minimap_icon_action,

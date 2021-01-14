@@ -13,6 +13,13 @@
 namespace fs::compiler::detail
 {
 
+[[nodiscard]] boost::optional<lang::integer>
+make_integer_in_range(
+	lang::integer int_obj,
+	int min_allowed_value,
+	boost::optional<int> max_allowed_value,
+	diagnostics_container& diagnostics);
+
 [[nodiscard]] boost::optional<lang::color>
 make_color(
 	settings st,
@@ -43,26 +50,6 @@ make_enabled_minimap_icon(
 
 	return lang::enabled_minimap_icon{size, suit, shape};
 }
-
-[[nodiscard]] boost::optional<lang::builtin_alert_sound_id>
-make_builtin_alert_sound_id(
-	lang::integer sound_id,
-	diagnostics_container& diagnostics);
-
-[[nodiscard]] inline boost::optional<lang::builtin_alert_sound_id>
-make_builtin_alert_sound_id(
-	lang::shaper_voice_line sound_id)
-{
-	return lang::builtin_alert_sound_id{sound_id};
-}
-
-[[nodiscard]] boost::optional<lang::builtin_alert_sound>
-make_builtin_alert_sound(
-	settings st,
-	bool positional,
-	lang::builtin_alert_sound_id sound_id,
-	boost::optional<lang::integer> volume,
-	diagnostics_container& diagnostics);
 
 [[nodiscard]] inline lang::string
 evaluate(const parser::ast::common::string_literal& sl)

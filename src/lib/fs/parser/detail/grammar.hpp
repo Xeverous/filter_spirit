@@ -189,9 +189,7 @@ namespace rf
 
 	struct color_action_class                    : error_on_error, annotate_on_success {};
 	struct set_font_size_action_class            : error_on_error, annotate_on_success {};
-	struct sound_id_class                        : error_on_error, annotate_on_success {};
 	struct play_alert_sound_action_class         : error_on_error, annotate_on_success {};
-	struct play_alert_sound_positional_action_class : error_on_error, annotate_on_success {};
 	struct custom_alert_sound_action_class       : error_on_error, annotate_on_success {};
 	struct switch_drop_sound_action_class        : error_on_error, annotate_on_success {};
 	struct minimap_icon_action_class             : error_on_error, annotate_on_success {};
@@ -462,9 +460,7 @@ namespace rf
 
 	using color_action_type                          = x3::rule<color_action_class,                       ast::rf::color_action>;
 	using set_font_size_action_type                  = x3::rule<set_font_size_action_class,               ast::rf::set_font_size_action>;
-	using sound_id_type                              = x3::rule<sound_id_class,                           ast::rf::sound_id>;
 	using play_alert_sound_action_type               = x3::rule<play_alert_sound_action_class,            ast::rf::play_alert_sound_action>;
-	using play_alert_sound_positional_action_type    = x3::rule<play_alert_sound_positional_action_class, ast::rf::play_alert_sound_positional_action>;
 	using custom_alert_sound_action_type             = x3::rule<custom_alert_sound_action_class,          ast::rf::custom_alert_sound_action>;
 	using switch_drop_sound_action_type              = x3::rule<switch_drop_sound_action_class,           ast::rf::switch_drop_sound_action>;
 	using minimap_icon_action_type                   = x3::rule<minimap_icon_action_class,                ast::rf::minimap_icon_action>;
@@ -472,9 +468,7 @@ namespace rf
 	BOOST_SPIRIT_DECLARE(
 		color_action_type,
 		set_font_size_action_type,
-		sound_id_type,
 		play_alert_sound_action_type,
-		play_alert_sound_positional_action_type,
 		custom_alert_sound_action_type,
 		switch_drop_sound_action_type,
 		minimap_icon_action_type,

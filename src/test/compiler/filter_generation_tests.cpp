@@ -241,6 +241,7 @@ Show
 			BOOST_TEST(compare_strings(expected_filter, actual_filter));
 		}
 
+
 		BOOST_AUTO_TEST_CASE(constants)
 		{
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
@@ -806,6 +807,27 @@ Show
 
 Show
 	PlayAlertSound ShVaal 150
+
+)";
+
+			BOOST_TEST(compare_strings(expected_filter, actual_filter));
+		}
+
+		BOOST_AUTO_TEST_CASE(custom_alert_sound)
+		{
+			const std::string actual_filter = generate_filter(minimal_input() + R"(
+CustomAlertSound "pop.wav"
+{ Show }
+
+CustomAlertSound "pop.wav" 123
+{ Show }
+)");
+			const std::string_view expected_filter =
+R"(Show
+	CustomAlertSound "pop.wav"
+
+Show
+	CustomAlertSound "pop.wav" 123
 
 )";
 

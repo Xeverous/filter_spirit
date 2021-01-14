@@ -578,8 +578,7 @@ PlayAlertSound           (Integer | ShaperVoiceLine) [Integer]
 PlayAlertSoundPositional (Integer | ShaperVoiceLine) [Integer]
 
 # path can be absolute or just the file name
-# note: custom sounds do not support specifying volume
-CustomAlertSound         String
+CustomAlertSound         String [Integer]
 
 # Some items always play specific built-in sounds,
 # even if you don't specify anything.
