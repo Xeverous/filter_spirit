@@ -564,7 +564,7 @@ SocketGroup >= 1 2 3R AA 3D 5GBW
 
 ## actions
 
-The optional 4th value for colors is the opacity value. `0` means fully transparent, `255` fully opaque. The default opacity is unknown but it is somewhat transparent.
+The optional 4th value for colors is the opacity value. `0` means fully transparent, `255` fully opaque. The default opacity is `240`.
 
 ```
 SetBorderColor           Integer Integer Integer [Integer]
@@ -584,6 +584,8 @@ CustomAlertSound         String [Integer]
 # even if you don't specify anything.
 # This action disables such behavior.
 DisableDropSound
+# ...and this action enables it back.
+EnableDropSound
 
 SetMinimapIcon           Integer Suit Shape
 
