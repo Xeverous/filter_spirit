@@ -13,6 +13,8 @@
 #include <curl/curl.h>
 #endif
 
+#include <nlohmann/json.hpp>
+
 #include <boost/version.hpp>
 #include <boost/config.hpp>
 
@@ -64,7 +66,7 @@ void version_info_window::draw_contents()
 		__DATE__[4] == ' ' ? '0' : __DATE__[4], __DATE__[5], '\0'
 	};
 
-	ImGui::TextUnformatted("Version information of FS and its dependencies:");
+	ImGui::TextUnformatted("Version information of FS and other software that has been used in the project:");
 
 	ImGui::TextUnformatted("Filter Spirit version:");
 	ImGui::SameLine(line_width);
@@ -73,6 +75,10 @@ void version_info_window::draw_contents()
 	ImGui::TextUnformatted("Boost version:");
 	ImGui::SameLine(line_width);
 	ImGui::TextUnformatted(_boost_version.c_str());
+
+	ImGui::TextUnformatted("nlohmann/json version:");
+	ImGui::SameLine(line_width);
+	ImGui::Text("%d.%d.%d", NLOHMANN_JSON_VERSION_MAJOR, NLOHMANN_JSON_VERSION_MINOR, NLOHMANN_JSON_VERSION_PATCH);
 
 	ImGui::TextUnformatted("Magnum version:");
 	ImGui::SameLine(line_width);
