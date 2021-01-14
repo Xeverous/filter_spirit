@@ -520,6 +520,7 @@ item_filtering_result pass_item_through_filter(const item& itm, const item_filte
 		cs_result.map_tier       = test_range_condition(cs.map_tier,       itm.map_tier);
 		cs_result.area_level     = test_range_condition(cs.area_level,     area_level);
 		cs_result.corrupted_mods = test_range_condition(cs.corrupted_mods, itm.corrupted_mods);
+		cs_result.enchantment_passive_num = test_range_condition(cs.enchantment_passive_num, 0); // TODO implement item support for it
 
 		cs_result.class_                   = test_strings_condition(cs.class_,                   itm.class_);
 		cs_result.base_type                = test_strings_condition(cs.base_type,                itm.base_type);

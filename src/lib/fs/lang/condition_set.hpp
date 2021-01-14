@@ -233,6 +233,7 @@ struct condition_set
 	integer_range_condition map_tier;
 	integer_range_condition area_level;
 	integer_range_condition corrupted_mods;
+	integer_range_condition enchantment_passive_num;
 	std::optional<boolean_condition> is_identified;
 	std::optional<boolean_condition> is_corrupted;
 	std::optional<boolean_condition> is_mirrored;
@@ -329,6 +330,7 @@ struct condition_set_match_result
 			&& is_not_failure_range(map_tier)
 			&& is_not_failure_range(area_level)
 			&& is_not_failure_range(corrupted_mods)
+			&& is_not_failure_range(enchantment_passive_num)
 			&& is_not_failure(class_)
 			&& is_not_failure(base_type)
 			&& is_not_failure(sockets)
@@ -366,6 +368,7 @@ struct condition_set_match_result
 	range_condition_match_result map_tier;
 	range_condition_match_result area_level;
 	range_condition_match_result corrupted_mods;
+	range_condition_match_result enchantment_passive_num;
 	std::optional<condition_match_result> class_;
 	std::optional<condition_match_result> base_type;
 	std::optional<condition_match_result> sockets;

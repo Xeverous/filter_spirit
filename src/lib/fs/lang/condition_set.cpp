@@ -247,6 +247,7 @@ void condition_set::generate(std::ostream& output_stream) const
 	output_range_condition(map_tier,       kw::map_tier,       output_stream);
 	output_range_condition(area_level,     kw::area_level,     output_stream);
 	output_range_condition(corrupted_mods, kw::corrupted_mods, output_stream);
+	output_range_condition(enchantment_passive_num, kw::enchantment_passive_num, output_stream);
 
 	output_gem_quality_type_condition(gem_quality_type, output_stream);
 

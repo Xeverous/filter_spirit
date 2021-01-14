@@ -142,6 +142,9 @@ add_numeric_comparison_condition(
 		case lang::numeric_comparison_condition_property::corrupted_mods: {
 			return add_range_condition(cmp, intgr, condition_origin, set.corrupted_mods, diagnostics);
 		}
+		case lang::numeric_comparison_condition_property::enchantment_passive_num: {
+			return add_range_condition(cmp, intgr, condition_origin, set.enchantment_passive_num, diagnostics);
+		}
 	}
 
 	diagnostics.emplace_back(error(errors::internal_compiler_error{

@@ -55,6 +55,7 @@ namespace rf
 	constexpr auto area_level       = "AreaLevel";
 	constexpr auto corrupted_mods   = "CorruptedMods";
 	constexpr auto enchantment_passive_node = "EnchantmentPassiveNode";
+	constexpr auto enchantment_passive_num  = "EnchantmentPassiveNum";
 	constexpr auto replica          = "Replica";
 	constexpr auto alternate_quality = "AlternateQuality";
 	constexpr auto gem_quality_type = "GemQualityType";

@@ -80,18 +80,19 @@ X+      # 1 or more X tokens
 ```
 
 ```
-Rarity        [CMP] Rarity+
-ItemLevel     [CMP] Intege+
-DropLevel     [CMP] Intege+
-Quality       [CMP] Intege+
-LinkedSockets [CMP] Intege+
-Height        [CMP] Intege+
-Width         [CMP] Intege+
-StackSize     [CMP] Intege+
-GemLevel      [CMP] Intege+
-MapTier       [CMP] Intege+
-AreaLevel     [CMP] Intege+
-CorruptedMods [CMP] Intege+
+Rarity                [CMP] Rarity+
+ItemLevel             [CMP] Integer+
+DropLevel             [CMP] Integer+
+Quality               [CMP] Integer+
+LinkedSockets         [CMP] Integer+
+Height                [CMP] Integer+
+Width                 [CMP] Integer+
+StackSize             [CMP] Integer+
+GemLevel              [CMP] Integer+
+MapTier               [CMP] Integer+
+AreaLevel             [CMP] Integer+
+CorruptedMods         [CMP] Integer+
+EnchantmentPassiveNum [CMP] Integer+
 
 Class                  [EQ] String+
 BaseType               [EQ] String+

@@ -292,6 +292,7 @@ void debug_state::recompute(const parser::lookup_data& lookup, const parser::lin
 		color_line_by_condition_result(cs.has_enchantment,          lookup, lines, _line_colors);
 		color_line_by_condition_result(cs.prophecy,                 lookup, lines, _line_colors);
 		color_line_by_condition_result(cs.enchantment_passive_node, lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.enchantment_passive_num,  lookup, lines, _line_colors);
 		color_line_by_condition_result(cs.has_influence,            lookup, lines, _line_colors);
 		color_line_by_condition_result(cs.gem_quality_type,         lookup, lines, _line_colors);
 		color_line_by_condition_result(cs.is_identified,            lookup, lines, _line_colors);

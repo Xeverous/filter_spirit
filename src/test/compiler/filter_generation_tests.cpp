@@ -112,7 +112,9 @@ R"(Show
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
 BaseType "Vaal"
 Quality > 0
-Width 1 {
+Width 1
+EnchantmentPassiveNum <= 9
+{
 	Show
 }
 )");
@@ -120,6 +122,7 @@ Width 1 {
 R"(Show
 	Quality > 0
 	Width = 1
+	EnchantmentPassiveNum <= 9
 	BaseType "Vaal"
 
 )";

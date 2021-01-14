@@ -27,7 +27,8 @@ enum class numeric_comparison_condition_property
 	gem_level,
 	map_tier,
 	area_level,
-	corrupted_mods
+	corrupted_mods,
+	enchantment_passive_num
 };
 
 // all conditions which work with array of strings
