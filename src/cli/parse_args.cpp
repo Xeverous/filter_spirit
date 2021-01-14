@@ -31,7 +31,7 @@ void print_help(const boost::program_options::options_description& options)
 		"./filter_spirit_cli -n \"Standard\" -a 120 -g filter_template.txt output.filter\n"
 		"download API data for future reuse:\n"
 		"./filter_spirit_cli -n \"Standard\" -a 0\n"
-		"generate/refresh an item filter (using previously saved data):\n"
+		"generate/refresh an item filter (from specific saved data, never download) (not recommended):\n"
 		"./filter_spirit_cli -r cache/ninja_Standard -g filter_template.txt output.filter\n";
 
 	options.print(std::cout);
@@ -131,7 +131,7 @@ int run(int argc, char* argv[])
 		std::vector<std::string> compare_paths;
 		po::options_description generic_options("generic options (use 1)");
 		generic_options.add_options()
-			("list-leagues,l", po::bool_switch(&opt_list_leagues), "download and list available leagues")
+			("list-leagues,l", po::bool_switch(&opt_list_leagues), "list leagues available for data download")
 			("help,h",         po::bool_switch(&opt_help),    "print this message")
 			("version,v",      po::bool_switch(&opt_version), "print version number")
 			("info,i",         po::value(&info_path)->value_name("DIRPATH"), "show information about given item price data save")
