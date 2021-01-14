@@ -6,6 +6,14 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 
 *newest at the top*
 
+### 3.13 (Ritual + Echoes of the Atlas) - [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3009221)
+
+- [patch notes](https://www.pathofexile.com/forum/view-thread/3009157)
+- New condition: `EnchantmentPassiveNum`.
+- `CustomAlertSound` now also supports volume.
+- Fixes to some syntax bugs and more small improvements.
+- New webpage describing filters: https://www.pathofexile.com/item-filter/about
+
 ### 3.12 (Heist) - [Item Filter Information](https://www.pathofexile.com/forum/view-thread/2935826)
 
 - [patch notes](https://www.pathofexile.com/forum/view-thread/2935777)
