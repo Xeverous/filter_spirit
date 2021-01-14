@@ -21,14 +21,27 @@ Given that:
 
 ...~~I'm not really going to support traling comments in generated filters, at most make it optional~~ I might add similar feature to Filter Spirit at some point.
 
+## gotchas
+
+These are not bugs, but may be viewed as such if understood incorrectly.
+
+- Resonators fall into `"Delve Stackable Socketable Currency"`, `"Stackable Socketable Currency"`, `"Socketable Currency"` and `"Currency"` class conditions but not into `"Stackable Currency"`. This may seem inconsistent with how other supersets of item classes are handled - other supersets either do work (`"Axes"` vs `"Two Hand Axes"`) or error when loading (`"Two Axes"`). This is because some strings may be substrings of another class name - if unsure about class name validity use `==` and the game client will error if it is not a proper full class name.
+- There is no `"Currency"` class. All semingly such items are classified exactly as `"Stackable Currency"`, even if they do not stack in game (eg Prophecies). Note that `Class "Currency"` works because it uses substring-based matching by default - `Class == "Currency"` will fail.
+
+Other:
+
+- Quest items must be filtered with an explicit item class (`Class "Quest Items"`). This is intended, not a bug.
+- Disabled Prophecies cannot drop and cannot be filtered. Also intended.
+
 ## bugs
+
+No currently know bugs.
 
 - ~~Game can issue "Your Item Filter is out of date" instead of "Failed to load Item Filter" in numerous cases of syntax errors.~~ **fixed in 3.8**
 - ~~Fossils are classified as `Stackable Currency`. They do not actually stack in game.~~ **fixed in 3.7.4**: fossils now stack
-- Resonators fall into `"Delve Stackable Socketable Currency"`, `"Stackable Socketable Currency"`, `"Socketable Currency"` and `"Currency"` classes but not into `"Stackable Currency"`. This is inconsistent with how other supersets of item classes are handled - other supersets either do work (`"Axes"` vs `"Two Hand Axes"`) or error when loading (`"Two Axes"`). The behaviour inconsistency border is the fact whether given superset-class-name is a direct substring of subset-class-name.
 - ~~Resonators can have 1-4 sockets and Item Filter detects that correctly. Jeweller's orb errors on resonators reporting that they have no sockets. Everyone knows why it is that but ... new players gonna be mad with such contradictory descriptions.~~ **Fixed in 3.8**: the error upon using Jeweller's Orb on a resonator is now: "Item has fixed Sockets".
 - ~~`#` starts a comment untill end of line. `#` is not accepted in some contexts:~~ **fixed in 3.8**
-- (not my list): https://github.com/xhul-github/xhul-filter/blob/master/misc.txt
+- (not my list, might be outdated): https://github.com/xhul-github/xhul-filter/blob/master/misc.txt
 
 ```
 # as of 3.8, nothing from this example code occurs
@@ -56,8 +69,10 @@ Show
 	PlayAlertSoundPositional 1 300 # this comment works
 	CustomAlertSound "airhorn.wav" # this comment works
 ```
+
 - ~~generally, in many places text that should cause syntax errors is accepted because characters are skipped in some contexts. Optional `+` or `-` character is accepted for numbers (btw, negative quality would buff Blood of the Karui). Almost sure GGG uses string-to-int functions like `strtol()` with base = 10 which stop on first non-digit character. Null terminated strings were a huge mistake, but that's a completely different topic.~~ **fixed in 3.8**
 - ~~custom alert sounds have a really buggy implementation (looks like very naive approach of searching for `"`):~~ **fixed in 3.8**:
+
 ```
 # this is accepted and you may have an illusion that the volume works
 # but everything after second " is completely ignored
@@ -73,15 +88,8 @@ Show
 # actual: plays pop on item drop like it was not a comment
 # since 3.8: error: Incorrect format: CustomAlertSound [filepath]
 	CustomAlertSound # "pop.wav"
-```
 
-- these are still present:
-
-```
-# loads correctly, but does not play anything upon item drop
-	CustomAlertSound ""
-
-# works fine
+# worked in the past, should fail after 3.13
 	CustomAlertSound WHERE IS MY HH???"pop.wav"
 ```
 
@@ -117,7 +125,7 @@ Quality <= 0xB3X 4#pop | + | + | + | + | + |   |   |   |   |   |    |
 
 ## other observations
 
-- `SocketGroup` accepts only RGBW letters, however, when you ctrl+C an item in game abyss sockets are denoted with A and fossil sockets (on resonators) are denoted with D.
+- In the past `SocketGroup` accepted only RGBW letters, however, when you ctrl+C an item in game abyss sockets were denoted with A and fossil sockets (on resonators) were denoted with D. Since patch 3.9.2f, filters also support abyss sockets and sockets on resonators.
 - Filters were/are never meant to be backwards-compatible. Any future game patch can break existing filters. This has already happened in the past.
 - You can specify `CustomAlertSound` and (`PlayAlertSound` and/or `PlayAlertSoundPositional`) at the same time
   - if custom alert is last, custom sound is played

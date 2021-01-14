@@ -35,7 +35,7 @@ No. Invalid blocks are not generated. Consider this:
 
 ```
 Class "Divination Card"
-Autogen cars
+Autogen cards
 Price >= 100
 Price < 150 {
 	# ...
@@ -57,9 +57,15 @@ This block is invalid but since there is nothing it should catch such blocks are
 
 Yes. this program does not interact with the game client in any way. It only produces a text file that is later read by it.
 
+**Some players were banned for overusing GGG's trade listing API through price-check macro tools. How frequently this program attempts connections?**
+
+The only thing that is queried from GGG's API is `https://api.pathofexile.com/leagues` which lists basic information of available leagues (name, time span, is-SSF, is-HC, etc). It's done once and cached untill you press the refresh button. Restarting the program does not cause it to download again.
+
+Filter-related work does not care about individual listings. It cares about highest possible and average value of an item, as seen by the filter. Therefore, it is much more appropriate to obtain average item prices by category which is exactly the data that is reported by sites such as poe.ninja and poe.watch. This data is queried lazily, that is, only when necessary and cached for long time (2h by default) because it does not change often (IIRC poe.ninja changes data at most hourly). The program never attempts to download data when in background or just because it has been restarted.
+
 **I have a networking problem. Can you...?**
 
-FS uses [libcurl](https://curl.haxx.se) for networking. It is possible to expose much more of [its options](https://curl.haxx.se/libcurl/c/curl_easy_setopt.html). Just inform me what is the problem and what specific you need. Note that some of the options read environmental variables so some of them may already be used this way.
+FS uses [libcurl](https://curl.haxx.se) for networking. It is possible to expose much more of [its options](https://curl.haxx.se/libcurl/c/curl_easy_setopt.html). Just inform me what is the problem and what specific you need. Note that some of the options read environmental variables so you can already influence program's behavior this way (only FS restart required).
 
 ## design of FS
 
@@ -68,7 +74,7 @@ FS uses [libcurl](https://curl.haxx.se) for networking. It is possible to expose
 2 main reasons:
 
 - I wanted the thing to be searchable - being easy to find and distinguish from other tools. "Yet another filter tool" or "Filter generator/compiler" are to broad terms, so I picked something unique that intentionally has no direct meaning to avoid misinterpretation.
-- The heart of the program is the LL parser made using Boost Spirit library. It (ab)uses operator overloading and expressions templates to express language syntax using plain C++ code - each operator implements 1 particular action (skip, alternate, loop until, look ahead etc) and thanks to templates you can freely combine them to form very nested types that merge all these loops and if-elses into a single parse function. [Wikipedia has a short article on it.](https://en.wikipedia.org/wiki/Spirit_Parser_Framework)
+- The heart of the program is the LL parser made using Boost Spirit library. It (ab)uses operator overloading and expressions templates to express language syntax using plain C++ code - each operator implements 1 particular action (skip, alternate, loop until, look ahead etc) and thanks to templates you can freely combine them to form very nested types that merge all these loops and if-elses into a single parse function. [Wikipedia has a short article on it.](https://en.wikipedia.org/wiki/Spirit_Parser_Framework). I had no better idea for the project so it was left with the initial meaning - filter program based on Spirit library.
 
 **Why this library in particular?**
 

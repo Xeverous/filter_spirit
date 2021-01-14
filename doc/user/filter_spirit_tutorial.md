@@ -2,51 +2,23 @@
 
 ## preface
 
-In order to write filters using FS well, you first need to understand what an actual filter can do (and what it can not).
+Just like real filters, Filter Spirit requires files in UTF-8 encoding. UTF-8 everywhere.](http://utf8everywhere.org/)
 
-If you have never been editing an actual filter, here are the related articles from wiki (not maintained by me):
-
-- pathofexile.gamepedia.com/Item_filter
-- pathofexile.gamepedia.com/Item_filter_guide
-
-You don't have to understand and remember every detail - just the rough idea how it works.
-
-Real filters have no access to following information:
-
-- player level
-- league
-- item full name after identification (only base type name)
-- whether the item has been allocated to you (while playing in a party)
-- whether the item has multiple variants (some uniques have)
-- whether the item has any drop restrictions
-- whether the item has alternate art
-- whether the item has already been picked up and dropped again by a player
-- whether the currently played character can equip the item
-
-Additionally
-
-- Some items can not be hidden (`Hide` will be ignored by the game). Read FAQ for more details.
-- Many unique items share the same base type. So your next Inpulsa's drop is very likely to actually be Tinkerskin (both are `Sadist Garb`). This pretty much makes filtering some unique items impossible because multiple uniques share the same base (very common for belts, rings, amulets and jewels). There is no better way to workaround it other than having blocks for:
-  - "bad drops" (base with only bad uniques)
-  - "good drops" (base with only good uniques)
-  - "potentially good drops" (base with at least 1 good unique)
-
-Filter Spirit requires files in UTF-8 encoding. This is the same as for real filters. [UTF-8 everywhere.](http://utf8everywhere.org/)
-
-## actual filter vs Filter Spirit
+## actual filters vs FS filter templates
 
 Filter Spirit is a tool that lets you write a filter using enhanced syntax and market information. It is important to note few key things:
 
 - The enhanced-syntax-filter-template-file is read by FS program. It is not modified and only used to generate an actual filter. This brings the possibility to refresh (redo the generation) which updates the base types of worthy items while maintaining the same filter structure.
-- FS filters syntax is similar to the real filters only to make it easier to learn and understand how it works. It could use a completely different grammar but there would not be much point in it. Ideas for new extensions welcome.
-- FS filters syntax IS NOT a superset of real filters. Copy-pasting a real filter to FS will almost always cause syntax errors. However, the convertion is pretty easy (read further).
-- Because FS only generates real filters based on extra information, it can not do more than actual filters. FS exists mostly to save you time and error-prone manual work by reducing duplicated code and automating incorporation of market information.
+- FS filters syntax is similar to the real filters only to make it easier to learn and understand how it works. In theory, it could use a completely different grammar but in practice, there would not be much point in it. Ideas for new extensions welcome.
+- FS filter templates use a declarative, not imperative language. It is not Turing-complete and therefore can not be labeled as a programming language.
+- FS filters syntax IS NOT a superset of real filters. Copy-pasting a real filter to FS will almost always cause syntax errors. However, the convertion is pretty easy (you only need to move `Show` and `Hide`).
+- Because FS only generates real filters based on extra information, it can not do more than actual filters. FS exists mostly to save you time and error-prone manual work by reducing duplicated code and automating incorporation of market information. It is not a game plugin or any sort of a hack, only a text file compiler/generator.
 
 ## FS features
 
 Core features of FS syntax are:
 
-- Being able to name constants. No more copy-pasting the same color values - just write `$color_money = 213 159 15` and reuse `$color_money` whenever you want
+- Being able to name constants. No more copy-pasting the same color values - just write `$color_money = 213 159 15` and reuse `$color_money` whenever you want.
 - Being able to name sets of styles. Write `$x = { SetFontSize 42 SetTextColor $black }` and reuse in any block.
 - Nesting of blocks. This is a very powerful feature allowing to significantly remove duplicate code and override styles for specific items.
 - Querying item prices at generation time. `Autogen cards Price >= 100` will query poe.ninja or poe.watch for divination cards worth 100 or more chaos.
@@ -58,7 +30,7 @@ Similarly to actual filters, FS skips any whitespace characters (tabs, spaces, l
 
 The only requirement is that you place 1 condition/action per line. Some of them accept an arbitrary amount of tokens (eg `BaseType` accepts 1 or more strings) so an end-of-line is expected to tell the parser where is the end of the rule.
 
-Just like in actual filters, comments start with `#` and span until end of line.
+Just like in actual filters, comments start with `#` and span until end of line. There are no restrictions where comments can appear.
 
 ### file structure
 
@@ -117,26 +89,12 @@ Each value in FS language has an associated type.
 
 When compiling the filter template, actions and conditions check that they have got values of appropriate types: something like `SetFontSize "abc"` will result in an error.
 
-Don't worry if you can not grasp all of the following tables - this is more for reference than to remember. If something goes wrong in the generation process, you will be given a clear error.
-
-`Suit` is named suit to avoid name conflict with `Color`. Since there are very few possible values, you can think of it as a suit of playing cards.
+FS extends filter literals with additional ones:
 
 expression(s) | type | notes
 --------------|------|------
-`None` | NoneType | use to clear a condition or assign nothing
-`Temp` | TempType | optional token for some actions
-`False`, `True` | Boolean |
-`123` | Integer | leading zeros accepted (`0123` is equal to `123`)
 `3.14` | Fractional | `.` character is required
-`-1.2e-3` | FloatingPoint | scientific notation syntax as defined by C99 or C++11 standard
-`RGB`, `3GGG`, `AA` | SocketSpec | `W` - white socket, `A` - abyss socket, `D` - resonator socket
-`Normal`, `Magic`, `Rare`, `Unique` | Rarity |
-`Circle`, `Diamond`, `Hexagon`, `Square`, `Star`, `Triangle`, `Cross`, `Moon`, `Raindrop`, `Kite`, `Pentagon`, `UpsideDownHouse` | Shape |
-`Red`, `Green`, `Blue`, `White`, `Brown`, `Yellow`, `Cyan`, `Grey`, `Orange`, `Pink`, `Purple` | Suit |
-`ShMirror`, `ShExalted`, `ShDivine`, `ShGeneral`, `ShRegal`, `ShChaos`, `ShFusing`, `ShAlchemy`, `ShVaal`, `ShBlessed` | ShaperVoiceLine
-`Superior`, `Divergent`, `Anomalous`, `Phantasmal` | `QualityType` |
-`Shaper`, `Elder`, `Crusader`, `Redeemer`, `Hunter`, `Warlord` | Influence |
-`"abc"` | String | UTF-8 encoding, line breaking characters (LF and CR) not allowed between quotes
+`-1.2e-3` | Fractional | scientific notation syntax as defined by C99 or C++11 standard
 
 ### blocks
 
@@ -470,152 +428,49 @@ Class "Currency" {
 # ...
 ```
 
-## conditions
+## condition extensions
 
-FS supports all conditions that the actual filters support. Some conditions allow values of multiple types. Place 1 condition per line.
-
-Grammar overview (not a normative documentation as actual EBNF grammar specifications are much harder to read):
+FS offers extra conditions that automatically fill `BaseType` condition with item names downloaded from economy APIs. More on autogenerated block further in this article.
 
 ```
-X       # X token is required
-[X]     # X token is optional
-X | Y   # X or Y token
-X*      # 0 or more X tokens
-X+      # 1 or more X tokens
-
-# token CMP: < | > | <= | >= | = | ==
-# token EQ: = | ==
-# token SS: [Integer] R*G*B*W*A*D*
-```
-
-```
-Rarity        [CMP] Rarity
-ItemLevel     [CMP] Integer
-DropLevel     [CMP] Integer
-Quality       [CMP] Integer
-LinkedSockets [CMP] Integer
-Height        [CMP] Integer
-Width         [CMP] Integer
-StackSize     [CMP] Integer
-GemLevel      [CMP] Integer
-MapTier       [CMP] Integer
-AreaLevel     [CMP] Integer
-CorruptedMods [CMP] Integer
-
-Class                  [EQ] (None | String)+
-BaseType               [EQ] (None | String)+
-HasExplicitMod         [EQ] (None | String)+
-HasEnchantment         [EQ] (None | String)+
-Prophecy               [EQ] (None | String)+
-EnchantmentPassiveNode [EQ] (None | String)+
-HasInfluence           [EQ] None | Influence+
-
-GemQualityType QualityType
-
-Sockets     [CMP] SS+
-SocketGroup [CMP] SS+
-
-AnyEnchantment   Boolean
-Identified       Boolean
-Corrupted        Boolean
-Mirrored         Boolean
-ElderItem        Boolean
-ShaperItem       Boolean
-FracturedItem    Boolean
-SynthesisedItem  Boolean
-ShapedMap        Boolean
-ElderMap         Boolean
-BlightedMap      Boolean
-Replica          Boolean
-AlternateQuality Boolean
-
-# FS autogeneration extensions - explained further down this article
-Autogen         Identifier
+# FS autogeneration extensions
+Autogen         Identifier    # does not start with "$"
 Price           [CMP] Integer
 ```
 
 Examples:
 
 ```
-Class "Currency"
-BaseType "Shard" "Splinter"
-BaseType == "The Wolf"
-MapTier = 16
-Sockets 6
-Sockets >= 4RR
-SocketGroup >= 1 2 3R AA 3D 5GBW
+TODO
 ```
-
-### (nothing) vs `=` vs `==`
-
-- Comparison operator is optional. Unless otherwise specified, `(nothing)` has the same meaning as `=`.
-- For numeric and `Rarity` conditions there is no difference between `=` and `==`.
-- Analogical for all string-based conditions: `BaseType == "The Wolf"` will match only *The Wolf* card, `BaseType "The Wolf"` and `BaseType = "The Wolf"` will match all *The Wolf*, *The Wolf's Legacy* and *The Wolf's Shadow*.
-- Game client reports error upon loading a filter which has `==` with names that are not complete.
-- `HasInfluence` condition behaves differently with `==`:
-  - If there is nothing or `=`, it will match an item **with at least one of specified influences**.
-  - If there is `==`, it will only match items **with all specified influences**.
-- `Sockets` and `SocketGroup` have very complex matching rules. They are explained by Rhys in [this reddit thread](https://www.reddit.com/r/pathofexile/comments/f2t4tz/inconsistencies_in_new_filter_syntaxes/). FS preserves them as-is in generated filters.
 
 ### `None` in array-based conditions
 
-- `None` in `HasInfluence` is an official filter feature - it generates such block and it matches only items which have no influence. `None` will be accepted only if it appears exactly once, not mixed with any influence names.
-- `None` in other array conditions is a FS extension. They are skipped. Useful when the value comes from elsewhere - e.g. in code like `$chance_bases = None [...] BaseType $chance_bases`. Multiple variables may be used within one condition. If a block gets only `None`s it will not be generated.
-
-## actions
-
-The optional 4th value for colors is the opacity value. `0` means fully transparent, `255` fully opaque. The default opacity is `240`.
+`None` in array conditions (other than `HasInfluence`) is a FS extension. They are skipped. Useful when the value comes from elsewhere - e.g. in code like `$chance_bases = None [...] BaseType $chance_bases`. Multiple variables may be used within one condition. If a block gets only `None`s it will not be generated.
 
 ```
-SetBorderColor           Integer Integer Integer [Integer]
-SetTextColor             Integer Integer Integer [Integer]
-SetBackgroundColor       Integer Integer Integer [Integer]
+Class                  [EQ] (None | String)+
+BaseType               [EQ] (None | String)+
+HasExplicitMod         [EQ] (None | String)+
+HasEnchantment         [EQ] (None | String)+
+Prophecy               [EQ] (None | String)+
+EnchantmentPassiveNode [EQ] (None | String)+
+```
 
-SetFontSize              Integer
+### actions extensions
 
-# first token is built-in sound ID, second is volume
-PlayAlertSound           (Integer | ShaperVoiceLine) [Integer]
-PlayAlertSoundPositional (Integer | ShaperVoiceLine) [Integer]
-
-# path can be absolute or just the file name
-CustomAlertSound         String [Integer]
-
-# Some items always play specific built-in sounds,
-# even if you don't specify anything.
-# This action disables such behavior.
-DisableDropSound
-# ...and this action enables it back.
-EnableDropSound
-
-SetMinimapIcon           Integer Suit Shape
-
-PlayEffect               Suit [Temp]
-
-# FS extension - applies predefined group of actions
+```
+# applies predefined group of actions
 Set                      $identifier
 
-# FS extension - this action accepts both PlayAlertSound
-# and CustomAlertSound tokens. Useful when you want to use
-# constants because the constant can be freely changed
-# what sound variant it refers to.
-SetAlertSound            String | ((Integer | ShaperVoiceLine) [Integer])
+# this action accepts both PlayAlertSound and
+# CustomAlertSound tokens. Useful when you want
+# to use constants because the constant can be
+# freely changed what sound type it refers to.
+SetAlertSound            (String | Integer | ShaperVoiceLine) [Integer]
 ```
 
-Examples:
-
-```
-SetTextColor 240 200 150
-SetBackgroundColor 0 0 0 255
-CustomAlertSound "pop.wav"
-PlayAlertSound 1 $volume
-SetBeam Green                # permanent beam
-SetBeam Green Temp           # temporary beam
-SetMinimapIcon 0 Blue Square
-```
-
-### compound actions
-
-FS also supports compound actions. You can assign multiple actions to 1 identifier and use the `Set` keyword to apply all.
+Compound actions: you can assign multiple actions to 1 identifier and use the `Set` keyword to apply all.
 
 Like with every other actions, later (and deeper nested) actions override previous ones on their depth.
 
@@ -692,10 +547,10 @@ Show
 
 One of the core fancy features of FS.
 
-Autogeneration places strings into `BaseType` or similar conditions (in case of prophecies it populates `Prophecy` condition). The respective condition must be empty when you use autogeneration and the related `Class` condition must either not exist or match autogenerated item class. Some autogenerations place additional requirements - for `uniques_*` the `Rarity` condition must either not exist or allow `Unique`.
+Autogeneration places strings into `BaseType` (`Prophecy` in case of prophecies). The respective condition must be empty when you use autogeneration and the related `Class` condition must either not exist or match autogenerated item class. Some autogenerations place additional requirements - for `uniques_*` the `Rarity` condition must either not exist or allow `Unique`.
 
 - All queries only return high-confidence items. Low-confidence items are treated as if they did not exist in the price data.
-- You can limit what items appear using `Price` condition
+- You can limit what items appear using `Price` condition.
 
 Available queries:
 
@@ -723,7 +578,7 @@ Unique items are separated into 4 categories where each has ambiguous and unambi
 - Unambiguous outputs base types for which there is only 1 unique item. This is intended for blocks where it is known what unique dropped.
 - Ambiguous outputs base types for which there is more than 1 unique item, using the highest price of possible unique drops on each base. This is intended for blocks where it is unknown what unique dropped (FS assumes potentilly expensive one).
 - Unambiguous and Ambiguous never overlap in output.
-- FS removes undroppable uniques (eg Harbinger and vendor-only uniques) from market information before outputting base types. This results in less ambiguities and removes items which you would not care for anyway when writing the filter. Corruption-only uniques are not removed because 1) poe.watch and poe.ninja differ in their reports or searches 2) maps with Corrupting Tempest and some sextant mods can drop corrupted items
+- FS removes undroppable uniques (eg Harbinger and vendor-only uniques) from market information before outputting base types. This results in less ambiguities and removes items which you would not care for anyway when writing the filter. Corruption-only uniques are not removed because 1) poe.watch and poe.ninja differ in their reports or searches 2) maps with Corrupting Tempest and some sextant mods can drop corrupted items.
 
 Examples:
 
@@ -757,7 +612,7 @@ Class "Divination Card"
 
 	}
 
-	# any remaining cards, not catched above
+	# any remaining cards that did not appear in market data
 	Show
 }
 ```
@@ -791,9 +646,7 @@ Rarity Unique
 
 ## continuation
 
-As explained in [this GGG's post](https://www.pathofexile.com/forum/view-thread/2771031), you can place `Continue` at the end of the block to cause items to pass through it (with applied style) instead of stopping on first match. If an item matches a `Hide` block that `Continue`s, then later matches a `Show` block, it will use the most recently matched `Show` or `Hide` flag, and thus show. If an item matches and `Continue`s and then never matches any further blocks, it will also show or hide based on the most recently matched block.
-
-Currently, disabling minimap icons, beam effect and alert sounds (`-1`, `None`, etc) is not supported.
+Works same way as in real filters. `Continue` should appear below `Show`/`Hide` keywords.
 
 <table>
 <tr>

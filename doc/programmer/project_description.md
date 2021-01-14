@@ -17,12 +17,12 @@ Most of the program logic is realized using [monadic](https://en.wikiped
 
 Additionally:
 
-- In monadic approach, variant types do not need to have anything in common.
+- In monadic approach, variant types do not need to have anything in common. No inheritance is required.
 - Since monadic interfaces use a different way of dispatching, they do not require dynamic memory allocation and use through pointer indirection.
 
 Because the core program logic is mostly a parser+compiler, a lot of code is dedicated to work with the abstract syntax tree. Such code is very often case-specific so there is a rather low reuse of code - most functions are used only once. For this reason, monadic approach is a good choice because it is much more common to need to add a new behavior (new feature/function) than to add/modify a type (grammar change).
 
-Some of the code is very verbose (`std::variant<T1, T2> v = f(); if (std::holds_alternative<T1>(v)) ...`) due to lack of C++ first-class support for monadic interfaces. Planning to rewrite such code by adding a wrapper with overloaded operators which work similarly to ranges-v3 or a type with an interface as mentioned in wg21.link/p0798 - that would mostly be some hybrid of `boost::outcome` and `std/boost::variant/optional/tuple`.
+Some of the code is very verbose (`std::variant<T1, T2> v = f(); if (std::holds_alternative<T1>(v)) ...`) due to lack of C++ first-class support for monadic interfaces. I Planned to rewrite such code by adding a wrapper with overloaded operators which work similarly to ranges-v3 or a type with an interface as mentioned in wg21.link/p0798 - that would mostly be some hybrid of `boost::outcome` and `std/boost::variant/optional/tuple` but after 3 or 4 major refactors of compiler code I realized there is no good solution before C++23/26 with pattern matching. So far `boost::optional` does the job better than `std::optional` because it offers some extra member functions (typical for functional programming), especially `map` and `flat_map`.
 
 ## dependency overview
 

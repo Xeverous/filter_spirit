@@ -1,6 +1,8 @@
 # filter writing guidelines
 
 TODO some code samples are outdated
+TODO rewrite/refactor this article
+
 ___
 
 The following article aims to establish a set of good practices and conventions for writing a spirit filter (and in general, any filter).
