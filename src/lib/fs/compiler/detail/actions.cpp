@@ -154,7 +154,7 @@ make_builtin_alert_sound_id(
 
 [[nodiscard]] boost::optional<lang::builtin_alert_sound>
 make_builtin_alert_sound(
-	settings st,
+	settings /* st */,
 	bool is_positional,
 	const lang::single_object& sobj,
 	diagnostics_container& diagnostics)
@@ -416,8 +416,7 @@ spirit_filter_add_set_alert_sound_action(
 {
 	return detail::evaluate_sequence(st, action.seq, symbols, 1, 2, diagnostics)
 		.flat_map([&](lang::object obj) -> boost::optional<lang::alert_sound> {
-			const auto num_values = obj.values.size();
-			FS_ASSERT(num_values == 1u || num_values == 2u);
+			FS_ASSERT(obj.values.size() == 1u || obj.values.size() == 2u);
 
 			// SetAlertSound always generates non-positional sounds, hence the false
 			diagnostics_container diagnostics_builtin;
