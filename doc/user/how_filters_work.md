@@ -195,13 +195,15 @@ PlayEffect None
 
 # these are not [yet] supported by FS:
 CustomAlertSound "None"
-CustomAlertSound None
 CustomAlertSound ""
 PlayAlertSound None
 PlayAlertSoundPositional None
 ```
 
-Note: `CustomAlertSound ""` is equivalent to `CustomAlertSound None`.
+Note that:
+
+- `CustomAlertSound ""` and `CustomAlertSound "None"` are functionally equivalent.
+- `CustomAlertSound None` is not valid.
 
 ## `Sockets` and `SocketGroup`
 
