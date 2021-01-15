@@ -6,7 +6,11 @@ If you ever worked with web stuff - a perfect analogy is that Filter Spirit is t
 
 ## news
 
-All 3 new conditions from Hesit league implemented. Currently FS supports everything except `EnableDropSound` (`DisableDropSound` works) and disabling minimap icons, beam effect and alert sounds (`-1`, `None`, etc) (introduced with `Continue`). Sole `Continue` is supported.
+**First version with graphical interface has been released!** (no icon though, can someone make me a logo?)
+
+New filter features from 3.13 Echoes of the Atlas (Ritual league) update implemented. Currently FS supports everything except disabling non-custom alert sounds.
+
+Message me ([/u/Xeverous](https://old.reddit.com/user/Xeverous/) on reddit or Xeverous#2151 on Discord) if you are interested in it or have any questions/suggestions/whatever. You can also open an issue.
 
 ___
 
@@ -14,25 +18,10 @@ poe.watch is dead - only poe.ninja generation will work. Original author passed 
 
 ___
 
-FS is under construction, but a command-line version is already available. Message me ([/u/Xeverous](https://old.reddit.com/user/Xeverous/) on reddit or Xeverous#2151 on Discord) if you are interested in it or have any questions/suggestions/whatever. You can also open an issue.
-
-Read existing issues for more detailed information on current state of the work.
-___
-
-I planned to release first graphical version at the end of Delirium league or a bit earlier but you know, it's my first that large project and I'm also playing the game and working full-time. I have [heavily contributed to elements](https://github.com/cycfi/elements/issues?q=author%3AXeverous) and made some own GUI library experiments which were planned to be used for FS GUI. Obviously I could use something well-known like Qt or wxWidgets but none of them fully satisfy my requirements so I decided to contribute to a new promising project instead. Call it a bit of Shaper's perfection syndrome. All of experiments failed and elements project itself is in too early stage to make it work for what I want. Current plan is to use [Magnum](https://magnum.graphics) with [Dear Imgui](https://github.com/ocornut/imgui) which could enable both a web-based port and a native desktop application, both with very rich UI. Expect updates on this topic in the middle (or later) of Heist league.
-
-Recent UI screens (work in progress):
-
-![image](https://user-images.githubusercontent.com/20820409/99323133-d121c980-2871-11eb-843c-fe995abce24d.png)
-![image](https://user-images.githubusercontent.com/20820409/102475151-d1bca400-4059-11eb-9028-110dd1d58ebf.png)
-
-*Code on `gui-magnum` branch.*
-___
-
 Thanks to some users, I'm thinking of these program interface opportunities:
 
 - Visual Studio Code plugin that uses FS in the background.
-- WASM-compiled build, hosted on a static GitHub Pages website.
+- WASM-compiled build, hosted on a static GitHub Pages website (some work already in progress, JavaScript help needed).
 
 Please contact me if you are familiar with web-related technologies and would like to help in making these.
 
@@ -46,15 +35,19 @@ Core features:
   - **named style groups**: `$x = { SetFontSize 42 SetTextColor $black }`
   - **nesting of filter blocks** to inherit conditions and override actions
 - **querying item prices**: `Autogen cards Price > 50` pulls data from API to list div cards worth 50+ chaos at generation time. Refresh whenever you want - your filter is always up-to-date with market prices.
+- **Filter debugger & loot preview** - find matching blocks and preview randomly generated loot from specific game encounters. **You can debug both real filters and FS filter templates.**
+
+UI screens (might be slightly dated):
+
+![image](https://user-images.githubusercontent.com/20820409/99323133-d121c980-2871-11eb-843c-fe995abce24d.png)
+![image](https://user-images.githubusercontent.com/20820409/102475151-d1bca400-4059-11eb-9028-110dd1d58ebf.png)
 
 Planned features:
 
 - Support for filter variants (eg color-blind, strict, uber-strict, Animate Weapon support etc) - generate multiple filters with different flavours from a single source file.
-- Filter debugger & loot preview: something similar to https://bschug.github.io/poedit/poedit.html allowing to find matching blocks and preview randomly generated loot from specific game encounters.
-- User-defined highlight for Notepad++ for FS syntax.
 - Live edit mode - see generared code as you write.
 
-## example code
+## example filter template code
 
 There is a full example filter template source in the repository. You can also browse `src/test/compiler/filter_generation_tests.cpp` for even more examples.
 
@@ -134,17 +127,15 @@ Class "Divination Card" {
 
 Browse `doc` directory. Files are in Markdown so you can read them online on GitHub.
 
-Note that the tool is in its early development so things may chage. Suggestions welcome.
-
 ## program interface
 
-Currently only a command line executable. Graphic interface in development - see pinned issue.
+Graphic interface - just run `filter_spirit_gui`.
 
-In Windows, you can quickly open command line in desired directory by typing "cmd" in the file explorer's path - see https://stackoverflow.com/a/10135218/4818802. Do this in FS directory (where `filter_spirit_cli.exe` is) and you can instantly use the program, eg `filter_spirit_cli --help`.
+Command-line interface: on Windows, you can quickly open command line in desired directory by typing "cmd" in the file explorer's path - see https://stackoverflow.com/a/10135218/4818802. Do this in FS directory (where `filter_spirit_cli.exe` is) and you can instantly use the program, eg `filter_spirit_cli --help`.
 
 ## runtime dependencies
 
-FS does not need to install anything (it's fully portable). You can download latest release and immediately use the program.
+FS does not need to install anything (it's fully portable). You can download latest release and immediately use the program. The program never writes anything to system directories.
 
 ## building and dependencies
 
