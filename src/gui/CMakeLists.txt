@@ -175,3 +175,11 @@ else()
 	add_dependencies(filter_spirit_gui copy_data copy_assets copy_certificates)
 endif()
 
+# remove console window on Windows
+if(CMAKE_BUILD_TYPE STREQUAL "Release" AND FILTER_SPIRIT_PLATFORM STREQUAL "win7")
+	target_link_options(filter_spirit_gui PUBLIC
+		$<$<CXX_COMPILER_ID:GNU>:-mwindows>
+		$<$<CXX_COMPILER_ID:Clang>:-mwindows>
+		$<$<CXX_COMPILER_ID:MSVC>:/SUBSYSTEM:WINDOWS>
+	)
+endif()
