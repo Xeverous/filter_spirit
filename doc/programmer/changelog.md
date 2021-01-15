@@ -1,5 +1,11 @@
 # Filter Spirit changelog
 
+## version 1.0.0 (15.09.2021)
+
+- **First release of graphical interface!** Features filter generation and filter debug.
+- Added support for new filter stuff from 3.13 (Echoes of the Atlas + Ritual league) update.
+- Documentation overhaul.
+
 ## version 0.7.0 (18.09.2020)
 
 - Added support for `Continue` statement. Disabling minimap/beam/sound actions by `-1` or `None` is not yet implemented.
