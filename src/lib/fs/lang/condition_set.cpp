@@ -24,37 +24,29 @@ void output_range_condition(
 	if (!range.has_bound())
 		return;
 
-	if (range.is_exact())
-	{
-		output_stream << '\t' << name << " = " << (*range.lower_bound).value.value << '\n';
-		return;
-	}
+	output_stream << '\t' << name << ' ';
 
-	if (range.lower_bound.has_value())
-	{
-		output_stream << '\t' << name << ' ';
+	if (range.is_exact()) {
+		output_stream << "= " << (*range.lower_bound).value.value;
+	}
+	else if (range.lower_bound.has_value()) {
 		const lang::range_bound<T>& bound = *range.lower_bound;
 
 		if (bound.inclusive)
 			output_stream << ">= " << bound.value.value;
 		else
 			output_stream << "> " << bound.value.value;
-
-		output_stream << '\n';
 	}
-
-	if (range.upper_bound.has_value())
-	{
-		output_stream << '\t' << name << ' ';
+	else if (range.upper_bound.has_value()) {
 		const lang::range_bound<T>& bound = *range.upper_bound;
 
 		if (bound.inclusive)
 			output_stream << "<= " << bound.value.value;
 		else
 			output_stream << "< " << bound.value.value;
-
-		output_stream << '\n';
 	}
+
+	output_stream << '\n';
 }
 
 void output_gem_quality_type_condition(
@@ -169,6 +161,59 @@ void output_strings_condition(
 	output_stream << '\n';
 }
 
+void output_ranged_strings_condition(
+	const std::optional<lang::ranged_strings_condition>& condition,
+	const char* name,
+	std::ostream& output_stream)
+{
+	if (!condition.has_value())
+		return;
+
+	output_stream << '\t' << name;
+
+	auto& cond = *condition;
+	const lang::integer_range_condition& range = cond.integer_cond;
+
+	if (range.has_bound()) {
+		/*
+		 * note: this is different from range condition,
+		 * it places the integer right after the operator
+		 */
+		if (range.is_exact()) {
+			if (cond.strings_cond.exact_match_required)
+				output_stream << " ==";
+			else
+				output_stream << " =";
+
+			output_stream << (*range.lower_bound).value.value;
+		}
+		else if (range.lower_bound.has_value()) {
+			const lang::range_bound<lang::integer>& bound = *range.lower_bound;
+
+			if (bound.inclusive)
+				output_stream << " >=" << bound.value.value;
+			else
+				output_stream << " >" << bound.value.value;
+		}
+		else if (range.upper_bound.has_value()) {
+			const lang::range_bound<lang::integer>& bound = *range.upper_bound;
+
+			if (bound.inclusive)
+				output_stream << " <=" << bound.value.value;
+			else
+				output_stream << " <" << bound.value.value;
+		}
+	}
+	else if (cond.strings_cond.exact_match_required) {
+		output_stream << " ==";
+	}
+
+	for (const lang::string& str : cond.strings_cond.strings)
+		output_stream << " \"" << str.value << '"';
+
+	output_stream << '\n';
+}
+
 void output_influences_condition(
 	const std::optional<lang::influences_condition>& condition,
 	const char* name,
@@ -270,35 +315,46 @@ void condition_set::generate(std::ostream& output_stream) const
 
 	output_strings_condition(class_,                   kw::class_,                   output_stream);
 	output_strings_condition(base_type,                kw::base_type,                output_stream);
-	output_strings_condition(has_explicit_mod,         kw::has_explicit_mod,         output_stream);
-	output_strings_condition(has_enchantment,          kw::has_enchantment,          output_stream);
 	output_strings_condition(prophecy,                 kw::prophecy,                 output_stream);
 	output_strings_condition(enchantment_passive_node, kw::enchantment_passive_node, output_stream);
+
+	output_ranged_strings_condition(has_explicit_mod,  kw::has_explicit_mod,         output_stream);
+	output_ranged_strings_condition(has_enchantment,   kw::has_enchantment,          output_stream);
 
 	output_influences_condition(has_influence, kw::has_influence, output_stream);
 }
 
 bool condition_set::is_valid() const
 {
-	const auto is_valid_strings_condition = [](const std::optional<strings_condition>& condition) {
-		// no condition: ok, we just don't require item to have this property
-		if (!condition)
-			return true;
-
+	const auto is_valid_strings = [](const std::vector<lang::string>& strings) {
 		// empty list of allowed values: there are no items that can match this block
 		// game client will not accept an empty list so return that the block is invalid
-		if ((*condition).strings.empty())
+		if (strings.empty())
 			return false;
 
 		return true;
 	};
+	const auto is_valid_strings_condition = [&](const std::optional<strings_condition>& condition) {
+		// no condition: ok, we just don't require item to have this property
+		if (!condition)
+			return true;
+
+		return is_valid_strings((*condition).strings);
+	};
+	const auto is_valid_ranged_strings_condition = [&](const std::optional<ranged_strings_condition>& condition) {
+		// no condition: ok, we just don't require item to have this property
+		if (!condition)
+			return true;
+
+		return is_valid_strings((*condition).strings_cond.strings);
+	};
 
 	return is_valid_strings_condition(class_)
 		&& is_valid_strings_condition(base_type)
-		&& is_valid_strings_condition(has_explicit_mod)
-		&& is_valid_strings_condition(has_enchantment)
 		&& is_valid_strings_condition(prophecy)
-		&& is_valid_strings_condition(enchantment_passive_node);
+		&& is_valid_strings_condition(enchantment_passive_node)
+		&& is_valid_ranged_strings_condition(has_explicit_mod)
+		&& is_valid_ranged_strings_condition(has_enchantment);
 }
 
 }

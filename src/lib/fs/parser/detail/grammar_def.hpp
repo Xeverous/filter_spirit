@@ -251,6 +251,14 @@ namespace sf
 		> sequence;
 	BOOST_SPIRIT_DEFINE(string_array_condition)
 
+	const ranged_string_array_condition_type ranged_string_array_condition = "ranged string array condition";
+	const auto ranged_string_array_condition_def =
+		make_keyword(symbols::rf::ranged_string_array_condition_properties)
+		> common::comparison_operator_expression
+		> -common::integer_literal
+		> sequence;
+	BOOST_SPIRIT_DEFINE(ranged_string_array_condition)
+
 	const has_influence_condition_type has_influence_condition = "has influence condition";
 	const auto has_influence_condition_def =
 		make_keyword(lang::keywords::rf::has_influence)
@@ -282,6 +290,7 @@ namespace sf
 		| rarity_comparison_condition
 		| numeric_comparison_condition
 		| string_array_condition
+		| ranged_string_array_condition
 		| has_influence_condition
 		| gem_quality_type_condition
 		| socket_spec_condition
@@ -414,6 +423,14 @@ namespace rf
 		make_keyword(symbols::rf::string_array_condition_properties) > common::exact_matching_policy_expression > string_literal_array;
 	BOOST_SPIRIT_DEFINE(string_array_condition)
 
+	const ranged_string_array_condition_type ranged_string_array_condition = "ranged string array condition";
+	const auto ranged_string_array_condition_def =
+		make_keyword(symbols::rf::ranged_string_array_condition_properties)
+		> common::comparison_operator_expression
+		> -common::integer_literal
+		> string_literal_array;
+	BOOST_SPIRIT_DEFINE(ranged_string_array_condition)
+
 	const has_influence_condition_type has_influence_condition = "has influence condition";
 	const auto has_influence_condition_def =
 		make_keyword(lang::keywords::rf::has_influence) > common::exact_matching_policy_expression > influence_spec;
@@ -439,6 +456,7 @@ namespace rf
 		rarity_condition
 		| numeric_condition
 		| string_array_condition
+		| ranged_string_array_condition
 		| has_influence_condition
 		| gem_quality_type_condition
 		| socket_spec_condition

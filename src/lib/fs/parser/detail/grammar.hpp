@@ -132,6 +132,7 @@ namespace sf
 	struct rarity_comparison_condition_class     : error_on_error, annotate_on_success {};
 	struct numeric_comparison_condition_class    : error_on_error, annotate_on_success {};
 	struct string_array_condition_class          : error_on_error, annotate_on_success {};
+	struct ranged_string_array_condition_class   : error_on_error, annotate_on_success {};
 	struct has_influence_condition_class         : error_on_error, annotate_on_success {};
 	struct gem_quality_type_condition_class      : error_on_error, annotate_on_success {};
 	struct socket_spec_condition_class           : error_on_error, annotate_on_success {};
@@ -180,6 +181,7 @@ namespace rf
 	struct rarity_condition_class                : error_on_error, annotate_on_success {};
 	struct numeric_condition_class               : error_on_error, annotate_on_success {};
 	struct string_array_condition_class          : error_on_error, annotate_on_success {};
+	struct ranged_string_array_condition_class   : error_on_error, annotate_on_success {};
 	struct has_influence_condition_class         : error_on_error, annotate_on_success {};
 	struct gem_quality_type_condition_class      : error_on_error, annotate_on_success {};
 	struct socket_spec_condition_class           : error_on_error, annotate_on_success {};
@@ -351,6 +353,9 @@ namespace sf
 	using string_array_condition_type = x3::rule<string_array_condition_class, ast::sf::string_array_condition>;
 	BOOST_SPIRIT_DECLARE(string_array_condition_type)
 
+	using ranged_string_array_condition_type = x3::rule<ranged_string_array_condition_class, ast::sf::ranged_string_array_condition>;
+	BOOST_SPIRIT_DECLARE(ranged_string_array_condition_type)
+
 	using has_influence_condition_type = x3::rule<has_influence_condition_class, ast::sf::has_influence_condition>;
 	BOOST_SPIRIT_DECLARE(has_influence_condition_type)
 
@@ -439,17 +444,19 @@ namespace rf
 
 	// ---- conditions ----
 
-	using rarity_condition_type               = x3::rule<rarity_condition_class,            ast::rf::rarity_condition>;
-	using numeric_condition_type              = x3::rule<numeric_condition_class,           ast::rf::numeric_condition>;
-	using string_array_condition_type         = x3::rule<string_array_condition_class,      ast::rf::string_array_condition>;
-	using has_influence_condition_type        = x3::rule<has_influence_condition_class,     ast::rf::has_influence_condition>;
-	using gem_quality_type_condition_type     = x3::rule<gem_quality_type_condition_class,  ast::rf::gem_quality_type_condition>;
-	using socket_spec_condition_type          = x3::rule<socket_spec_condition_class,       ast::rf::socket_spec_condition>;
-	using boolean_condition_type              = x3::rule<boolean_condition_class,           ast::rf::boolean_condition>;
+	using rarity_condition_type               = x3::rule<rarity_condition_class,              ast::rf::rarity_condition>;
+	using numeric_condition_type              = x3::rule<numeric_condition_class,             ast::rf::numeric_condition>;
+	using string_array_condition_type         = x3::rule<string_array_condition_class,        ast::rf::string_array_condition>;
+	using ranged_string_array_condition_type  = x3::rule<ranged_string_array_condition_class, ast::rf::ranged_string_array_condition>;
+	using has_influence_condition_type        = x3::rule<has_influence_condition_class,       ast::rf::has_influence_condition>;
+	using gem_quality_type_condition_type     = x3::rule<gem_quality_type_condition_class,    ast::rf::gem_quality_type_condition>;
+	using socket_spec_condition_type          = x3::rule<socket_spec_condition_class,         ast::rf::socket_spec_condition>;
+	using boolean_condition_type              = x3::rule<boolean_condition_class,             ast::rf::boolean_condition>;
 	BOOST_SPIRIT_DECLARE(
 		rarity_condition_type,
 		numeric_condition_type,
 		string_array_condition_type,
+		ranged_string_array_condition_type,
 		has_influence_condition_type,
 		gem_quality_type_condition_type,
 		socket_spec_condition_type,

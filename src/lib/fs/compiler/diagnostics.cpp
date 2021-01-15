@@ -116,6 +116,32 @@ void output_error_impl(
 }
 
 void output_error_impl(
+	errors::invalid_ranged_strings_condition error,
+	const parser::lookup_data& lookup_data,
+	log::message_stream& stream)
+{
+	stream.print_line_number_with_description_and_underlined_code(
+		lookup_data.get_view_of_whole_content(),
+		lookup_data.position_of(error.condition_origin),
+		log::strings::error,
+		"invalid ranged strings array condition");
+	if (error.comparison_origin) {
+		stream.print_line_number_with_description_and_underlined_code(
+			lookup_data.get_view_of_whole_content(),
+			lookup_data.position_of(*error.comparison_origin),
+			log::strings::note,
+			"only == is allowed to be without a number");
+	}
+	if (error.integer_origin) {
+		stream.print_line_number_with_description_and_underlined_code(
+			lookup_data.get_view_of_whole_content(),
+			lookup_data.position_of(*error.integer_origin),
+			log::strings::note,
+			"if an integer is present, it must be preceded by a comparison operator");
+	}
+}
+
+void output_error_impl(
 	errors::illegal_character_in_socket_spec error,
 	const parser::lookup_data& lookup_data,
 	log::message_stream& stream)

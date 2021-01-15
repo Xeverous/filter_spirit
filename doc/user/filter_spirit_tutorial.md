@@ -2,7 +2,9 @@
 
 ## preface
 
-Just like real filters, Filter Spirit requires files in UTF-8 encoding. UTF-8 everywhere.](http://utf8everywhere.org/)
+Just like real filters, Filter Spirit requires files in UTF-8 encoding. [UTF-8 everywhere.](http://utf8everywhere.org/)
+
+This article assumes you have read `how_filters_work`. It only mentions filter extensions and differences in filter template syntax.
 
 ## actual filters vs FS filter templates
 
@@ -451,10 +453,11 @@ TODO
 ```
 Class                  [EQ] (None | String)+
 BaseType               [EQ] (None | String)+
-HasExplicitMod         [EQ] (None | String)+
-HasEnchantment         [EQ] (None | String)+
 Prophecy               [EQ] (None | String)+
 EnchantmentPassiveNode [EQ] (None | String)+
+
+HasExplicitMod         [==] | CMPInteger (None | String)+
+HasEnchantment         [==] | CMPInteger (None | String)+
 ```
 
 ### actions extensions

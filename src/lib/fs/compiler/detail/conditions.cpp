@@ -21,6 +21,8 @@ namespace
 using namespace fs;
 using namespace fs::compiler;
 
+using str_vec_t = std::vector<lang::string>;
+
 // ---- generic helpers ----
 
 template <typename T>
@@ -171,9 +173,33 @@ add_non_range_condition(
 }
 
 [[nodiscard]] bool
+add_ranged_strings_condition(
+	lang::strings_condition strings_cond,
+	lang::comparison_type cmp,
+	boost::optional<lang::integer> intgr,
+	std::optional<lang::ranged_strings_condition>& target,
+	diagnostics_container& diagnostics)
+{
+	lang::integer_range_condition integer_cond;
+	if (intgr.has_value()) {
+		if (!add_range_condition(cmp, *intgr, strings_cond.origin, integer_cond, diagnostics))
+			return false;
+	}
+
+	return add_non_range_condition(
+		lang::ranged_strings_condition{
+			integer_cond,
+			std::move(strings_cond),
+			strings_cond.origin
+		},
+		target,
+		diagnostics);
+}
+
+[[nodiscard]] bool
 add_string_array_condition(
 	lang::string_array_condition_property property,
-	std::vector<lang::string> strings,
+	str_vec_t strings,
 	bool is_exact_match,
 	lang::position_tag condition_origin,
 	lang::condition_set& set,
@@ -192,18 +218,6 @@ add_string_array_condition(
 				set.base_type,
 				diagnostics);
 		}
-		case lang::string_array_condition_property::has_explicit_mod: {
-			return add_non_range_condition(
-				lang::strings_condition{std::move(strings), is_exact_match, condition_origin},
-				set.has_explicit_mod,
-				diagnostics);
-		}
-		case lang::string_array_condition_property::has_enchantment: {
-			return add_non_range_condition(
-				lang::strings_condition{std::move(strings), is_exact_match, condition_origin},
-				set.has_enchantment,
-				diagnostics);
-		}
 		case lang::string_array_condition_property::prophecy: {
 			return add_non_range_condition(
 				lang::strings_condition{std::move(strings), is_exact_match, condition_origin},
@@ -220,6 +234,80 @@ add_string_array_condition(
 
 	diagnostics.emplace_back(error(errors::internal_compiler_error{
 		errors::internal_compiler_error_cause::add_string_array_condition,
+		condition_origin
+	}));
+	return false;
+}
+
+[[nodiscard]] bool
+add_ranged_string_array_condition(
+	lang::ranged_string_array_condition_property property,
+	str_vec_t strings,
+	lang::comparison_type comparison,
+	lang::position_tag comparison_origin,
+	boost::optional<lang::integer> integer,
+	lang::position_tag condition_origin,
+	lang::condition_set& set,
+	diagnostics_container& diagnostics)
+{
+	const auto check_comparison_origin = [](lang::position_tag origin) -> boost::optional<lang::position_tag> {
+		if (lang::is_valid(origin))
+			return origin;
+		else
+			return boost::none;
+	};
+	/*
+	 * Error checking:
+	 *
+	 * (op means any other operator than ==)
+	 * (N means integer literal)
+	 *
+	 * <ConditionKeyword>     "..." #     valid
+	 * <ConditionKeyword> ==  "..." #     valid
+	 * <ConditionKeyword> op  "..." # NOT valid
+	 * <ConditionKeyword>   N "..." # NOT valid
+	 * <ConditionKeyword> ==N "..." #     valid
+	 * <ConditionKeyword> opN "..." #     valid
+	 */
+	if (comparison != lang::comparison_type::equal_soft && comparison != lang::comparison_type::equal_hard && !integer) {
+		diagnostics.emplace_back(error(errors::invalid_ranged_strings_condition{
+			condition_origin,
+			check_comparison_origin(comparison_origin),
+			boost::none,
+		}));
+		return false;
+	}
+	else if (comparison == lang::comparison_type::equal_soft && integer.has_value()) {
+		diagnostics.emplace_back(error(errors::invalid_ranged_strings_condition{
+			condition_origin,
+			check_comparison_origin(comparison_origin),
+			(*integer).origin,
+		}));
+		return false;
+	}
+
+	const bool is_exact_match = comparison == lang::comparison_type::equal_hard;
+	switch (property) {
+		case lang::ranged_string_array_condition_property::has_explicit_mod: {
+			return add_ranged_strings_condition(
+				lang::strings_condition{std::move(strings), is_exact_match, condition_origin},
+				comparison,
+				integer,
+				set.has_explicit_mod,
+				diagnostics);
+		}
+		case lang::ranged_string_array_condition_property::has_enchantment: {
+			return add_ranged_strings_condition(
+				lang::strings_condition{std::move(strings), is_exact_match, condition_origin},
+				comparison,
+				integer,
+				set.has_enchantment,
+				diagnostics);
+		}
+	}
+
+	diagnostics.emplace_back(error(errors::internal_compiler_error{
+		errors::internal_compiler_error_cause::add_ranged_string_array_condition,
 		condition_origin
 	}));
 	return false;
@@ -467,6 +555,33 @@ spirit_filter_add_numeric_comparison_condition(
 		.value_or(false);
 }
 
+[[nodiscard]] boost::optional<str_vec_t>
+spirit_filter_make_string_array(
+	settings st,
+	const lang::object& obj,
+	diagnostics_container& diagnostics)
+{
+	str_vec_t strings;
+
+	for (auto& sobj : obj.values) {
+		// skip "None"s - they may come from variables
+		// if an object is not none - ignore the problem and move forward
+		// because of ignoring all logs are thrown away
+		diagnostics_container diagnostics_none;
+		if (detail::get_as<lang::none>(sobj, diagnostics_none).has_value())
+			continue;
+
+		boost::optional<lang::string> str = detail::get_as<lang::string>(sobj, diagnostics);
+
+		if (str)
+			strings.push_back(std::move(*str));
+		else if (st.error_handling.stop_on_error)
+			return boost::none;
+	}
+
+	return strings;
+}
+
 [[nodiscard]] bool
 spirit_filter_add_string_array_condition(
 	settings st,
@@ -475,34 +590,41 @@ spirit_filter_add_string_array_condition(
 	lang::condition_set& set,
 	diagnostics_container& diagnostics)
 {
-	using vec_t = std::vector<lang::string>;
 	return detail::evaluate_sequence(st, condition.seq, symbols, 1, boost::none, diagnostics)
-		.flat_map([&](lang::object obj) -> boost::optional<vec_t> {
-			vec_t strings;
-
-			for (auto& sobj : obj.values) {
-				// skip "None"s - they may come from variables
-				// if an object is not none - ignore the problem and move forward
-				// because of ignoring all logs are thrown away
-				diagnostics_container diagnostics_none;
-				if (detail::get_as<lang::none>(sobj, diagnostics_none).has_value())
-					continue;
-
-				boost::optional<lang::string> str = detail::get_as<lang::string>(sobj, diagnostics);
-
-				if (str)
-					strings.push_back(std::move(*str));
-				else if (st.error_handling.stop_on_error)
-					return boost::none;
-			}
-
-			return strings;
+		.flat_map([&](lang::object obj) -> boost::optional<str_vec_t> {
+			return spirit_filter_make_string_array(st, obj, diagnostics);
 		})
-		.map([&](vec_t strings) {
+		.map([&](str_vec_t strings) {
 			return add_string_array_condition(
 				condition.property,
 				std::move(strings),
 				condition.exact_match.required,
+				parser::position_tag_of(condition),
+				set,
+				diagnostics);
+		})
+		.value_or(false);
+}
+
+[[nodiscard]] bool
+spirit_filter_add_ranged_string_array_condition(
+	settings st,
+	const ast::sf::ranged_string_array_condition& condition,
+	const lang::symbol_table& symbols,
+	lang::condition_set& set,
+	diagnostics_container& diagnostics)
+{
+	return detail::evaluate_sequence(st, condition.seq, symbols, 1, boost::none, diagnostics)
+		.flat_map([&](lang::object obj) -> boost::optional<str_vec_t> {
+			return spirit_filter_make_string_array(st, obj, diagnostics);
+		})
+		.map([&](str_vec_t strings) {
+			return add_ranged_string_array_condition(
+				condition.property,
+				std::move(strings),
+				condition.comparison_type.value,
+				parser::position_tag_of(condition.comparison_type),
+				condition.integer.map([](ast::common::integer_literal il) { return detail::evaluate(il); }),
 				parser::position_tag_of(condition),
 				set,
 				diagnostics);
@@ -660,21 +782,44 @@ real_filter_add_numeric_comparison_condition(
 	return add_numeric_comparison_condition(numeric_condition.property, cmp, intgr, origin, set, diagnostics);
 }
 
+[[nodiscard]] str_vec_t
+real_filter_make_string_array(
+	const parser::ast::rf::string_literal_array& string_literals)
+{
+	str_vec_t strings;
+	strings.reserve(string_literals.size());
+	for (const auto& str : string_literals)
+		strings.push_back(detail::evaluate(str));
+	return strings;
+}
+
 [[nodiscard]] bool
 real_filter_add_string_array_condition(
 	const parser::ast::rf::string_array_condition& condition,
 	lang::condition_set& set,
 	diagnostics_container& diagnostics)
 {
-	std::vector<lang::string> strings;
-	strings.reserve(condition.string_literals.size());
-	for (const auto& str : condition.string_literals) {
-		strings.push_back(detail::evaluate(str));
-	}
-
-	const auto origin = parser::position_tag_of(condition);
+	str_vec_t strings = real_filter_make_string_array(condition.string_literals);
 	const bool exact_match = condition.exact_match.required;
+	const auto origin = parser::position_tag_of(condition);
 	return add_string_array_condition(condition.property, std::move(strings), exact_match, origin, set, diagnostics);
+}
+
+[[nodiscard]] bool
+real_filter_add_ranged_string_array_condition(
+	const parser::ast::rf::ranged_string_array_condition& condition,
+	lang::condition_set& set,
+	diagnostics_container& diagnostics)
+{
+	return add_ranged_string_array_condition(
+		condition.property,
+		real_filter_make_string_array(condition.string_literals),
+		condition.comparison_type.value,
+		parser::position_tag_of(condition.comparison_type),
+		condition.integer.map([](ast::common::integer_literal il) { return detail::evaluate(il); }),
+		parser::position_tag_of(condition),
+		set,
+		diagnostics);
 }
 
 [[nodiscard]] boost::optional<influences_container>
@@ -819,6 +964,9 @@ spirit_filter_add_conditions(
 			[&](const ast::sf::string_array_condition& cond) {
 				return spirit_filter_add_string_array_condition(st, cond, symbols, set.conditions, diagnostics);
 			},
+			[&](const ast::sf::ranged_string_array_condition& cond) {
+				return spirit_filter_add_ranged_string_array_condition(st, cond, symbols, set.conditions, diagnostics);
+			},
 			[&](const ast::sf::has_influence_condition& cond) {
 				return spirit_filter_add_has_influence_condition(st, cond, symbols, set.conditions, diagnostics);
 			},
@@ -870,6 +1018,9 @@ real_filter_add_condition(
 		},
 		[&](const ast::rf::string_array_condition& cond) {
 			return real_filter_add_string_array_condition(cond, condition_set, diagnostics);
+		},
+		[&](const ast::rf::ranged_string_array_condition& cond) {
+			return real_filter_add_ranged_string_array_condition(cond, condition_set, diagnostics);
 		},
 		[&](const ast::rf::has_influence_condition& cond) {
 			return real_filter_add_has_influence_condition(st, cond, condition_set.has_influence, diagnostics);

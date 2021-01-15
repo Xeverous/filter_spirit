@@ -401,6 +401,14 @@ namespace sf
 		sequence seq;
 	};
 
+	struct ranged_string_array_condition : x3::position_tagged
+	{
+		lang::ranged_string_array_condition_property property;
+		comparison_operator_expression comparison_type;
+		boost::optional<common::integer_literal> integer;
+		sequence seq;
+	};
+
 	struct has_influence_condition : x3::position_tagged
 	{
 		exact_matching_policy exact_match;
@@ -439,6 +447,7 @@ namespace sf
 			rarity_comparison_condition,
 			numeric_comparison_condition,
 			string_array_condition,
+			ranged_string_array_condition,
 			has_influence_condition,
 			gem_quality_type_condition,
 			socket_spec_condition,
@@ -673,6 +682,14 @@ namespace rf
 		string_literal_array string_literals;
 	};
 
+	struct ranged_string_array_condition : x3::position_tagged
+	{
+		lang::ranged_string_array_condition_property property;
+		comparison_operator_expression comparison_type;
+		boost::optional<integer_literal> integer;
+		string_literal_array string_literals;
+	};
+
 	struct has_influence_condition : x3::position_tagged
 	{
 		exact_matching_policy exact_match;
@@ -709,6 +726,7 @@ namespace rf
 		rarity_condition,
 		numeric_condition,
 		string_array_condition,
+		ranged_string_array_condition,
 		has_influence_condition,
 		gem_quality_type_condition,
 		socket_spec_condition,

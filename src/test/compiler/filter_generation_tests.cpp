@@ -770,6 +770,32 @@ Show
 			BOOST_TEST(compare_strings(expected_filter, actual_filter));
 		}
 
+		BOOST_AUTO_TEST_CASE(ritual_new_ranged_string_array_conditions)
+		{
+			const std::string actual_filter = generate_filter(minimal_input() + R"(
+HasExplicitMod ==  "of Haast" "of Tzteosh" "of Ephij" { Show }
+HasExplicitMod     "of Haast" "of Tzteosh" "of Ephij" { Show }
+HasExplicitMod ==2 "of Haast" "of Tzteosh" "of Ephij" { Show }
+HasExplicitMod >=2 "of Haast" "of Tzteosh" "of Ephij" { Show }
+)");
+			const std::string_view expected_filter =
+R"(Show
+	HasExplicitMod == "of Haast" "of Tzteosh" "of Ephij"
+
+Show
+	HasExplicitMod "of Haast" "of Tzteosh" "of Ephij"
+
+Show
+	HasExplicitMod ==2 "of Haast" "of Tzteosh" "of Ephij"
+
+Show
+	HasExplicitMod >=2 "of Haast" "of Tzteosh" "of Ephij"
+
+)";
+
+			BOOST_TEST(compare_strings(expected_filter, actual_filter));
+		}
+
 		BOOST_AUTO_TEST_CASE(shaper_voice_lines)
 		{
 			const std::string actual_filter = generate_filter(minimal_input() + R"(

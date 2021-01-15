@@ -189,6 +189,13 @@ struct strings_condition
 	position_tag origin;
 };
 
+struct ranged_strings_condition
+{
+	integer_range_condition integer_cond;
+	strings_condition strings_cond;
+	position_tag origin;
+};
+
 struct influences_condition
 {
 	influence_info influence;
@@ -222,8 +229,8 @@ struct condition_set
 	std::optional<socket_spec_condition> socket_group;
 	integer_range_condition height;
 	integer_range_condition width;
-	std::optional<strings_condition> has_explicit_mod;
-	std::optional<strings_condition> has_enchantment;
+	std::optional<ranged_strings_condition> has_explicit_mod;
+	std::optional<ranged_strings_condition> has_enchantment;
 	std::optional<strings_condition> prophecy;
 	std::optional<strings_condition> enchantment_passive_node;
 	std::optional<influences_condition> has_influence;

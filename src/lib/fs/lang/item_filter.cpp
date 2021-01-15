@@ -13,6 +13,19 @@ namespace {
 using namespace fs;
 using namespace fs::lang;
 
+[[nodiscard]] bool
+compare_strings(
+	bool exact_match_required,
+	const std::string& lhs,
+	const std::string& rhs)
+{
+	// In-game filters ignore diacritics, here 2 UTF-8 strings are compared strictly.
+	if (exact_match_required)
+		return lhs == rhs;
+	else
+		return utility::contains(lhs, rhs);
+}
+
 template <typename T, typename U> [[nodiscard]]
 range_condition_match_result test_range_condition(range_condition<T> condition, U item_property_value)
 {
@@ -43,15 +56,8 @@ test_strings_condition_impl(
 	const std::string& property)
 {
 	for (const auto& str : condition.strings) {
-		// In-game filters ignore diacritics, here 2 UTF-8 strings are compared strictly.
-		if (condition.exact_match_required) {
-			if (property == str.value)
-				return condition_match_result::success(condition.origin, str.origin);
-		}
-		else {
-			if (utility::contains(property, str.value))
-				return condition_match_result::success(condition.origin, str.origin);
-		}
+		if (compare_strings(condition.exact_match_required, property, str.value))
+			return condition_match_result::success(condition.origin, str.origin);
 	}
 
 	return condition_match_result::failure(condition.origin);
@@ -70,14 +76,9 @@ test_strings_condition(
 
 [[nodiscard]] std::optional<condition_match_result>
 test_strings_condition(
-	const std::optional<strings_condition>& opt_condition,
+	const strings_condition& condition,
 	const std::vector<std::string>& properties)
 {
-	if (!opt_condition)
-		return std::nullopt;
-
-	const strings_condition& condition = *opt_condition;
-
 	for (const auto& prop : properties) {
 		condition_match_result result = test_strings_condition_impl(condition, prop);
 		if (result.is_successful())
@@ -85,6 +86,65 @@ test_strings_condition(
 	}
 
 	return condition_match_result::failure(condition.origin);
+}
+
+[[nodiscard]] std::optional<condition_match_result>
+test_strings_condition(
+	const std::optional<strings_condition>& opt_condition,
+	const std::vector<std::string>& properties)
+{
+	if (!opt_condition)
+		return std::nullopt;
+
+	return test_strings_condition(*opt_condition, properties);
+}
+
+[[nodiscard]] std::optional<condition_match_result>
+test_ranged_strings_condition(
+	const std::optional<ranged_strings_condition>& opt_condition,
+	const std::vector<std::string>& properties)
+{
+	if (!opt_condition)
+		return std::nullopt;
+
+	const ranged_strings_condition& condition = *opt_condition;
+	const integer_range_condition& integer_cond = condition.integer_cond;
+	const strings_condition& strings_cond = condition.strings_cond;
+
+	if (integer_cond.has_bound()) {
+		int matches = 0;
+
+		for (const auto& prop : properties) {
+			for (const auto& str : strings_cond.strings) {
+				if (compare_strings(strings_cond.exact_match_required, prop, str.value))
+					++matches;
+			}
+		}
+
+		range_condition_match_result result = test_range_condition(integer_cond, matches);
+		if (integer_cond.is_exact()) {
+			FS_ASSERT(result.lower_bound.has_value());
+			FS_ASSERT(result.upper_bound.has_value());
+
+			if ((*result.lower_bound).is_successful() && (*result.upper_bound).is_successful())
+				return condition_match_result::success(condition.origin);
+			else
+				return condition_match_result::failure(condition.origin);
+		}
+		else if (integer_cond.lower_bound) {
+			return result.lower_bound;
+		}
+		else if (integer_cond.upper_bound) {
+			return result.upper_bound;
+		}
+		else {
+			FS_ASSERT_MSG(false, "unreachable: if integer condition has a bound, it should get here");
+			return condition_match_result::failure(condition.origin); // silence no-return warning
+		}
+	}
+	else {
+		return test_strings_condition(strings_cond, properties);
+	}
 }
 
 [[nodiscard]] std::optional<condition_match_result>
@@ -524,9 +584,10 @@ item_filtering_result pass_item_through_filter(const item& itm, const item_filte
 
 		cs_result.class_                   = test_strings_condition(cs.class_,                   itm.class_);
 		cs_result.base_type                = test_strings_condition(cs.base_type,                itm.base_type);
-		cs_result.has_explicit_mod         = test_strings_condition(cs.has_explicit_mod,         itm.explicit_mods);
-		cs_result.has_enchantment          = test_strings_condition(cs.has_enchantment,          itm.enchantments_labirynth);
 		cs_result.enchantment_passive_node = test_strings_condition(cs.enchantment_passive_node, itm.enchantments_passive_nodes);
+
+		cs_result.has_explicit_mod         = test_ranged_strings_condition(cs.has_explicit_mod,  itm.explicit_mods);
+		cs_result.has_enchantment          = test_ranged_strings_condition(cs.has_enchantment,   itm.enchantments_labirynth);
 
 		cs_result.prophecy = test_prophecy_condition(cs.prophecy, itm);
 

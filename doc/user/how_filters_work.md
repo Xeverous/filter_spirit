@@ -96,11 +96,12 @@ EnchantmentPassiveNum [CMP] Integer+
 
 Class                  [EQ] String+
 BaseType               [EQ] String+
-HasExplicitMod         [EQ] String+
-HasEnchantment         [EQ] String+
 Prophecy               [EQ] String+
 EnchantmentPassiveNode [EQ] String+
 HasInfluence           [EQ] None | Influence+
+
+HasExplicitMod         [==] | CMPInteger String+
+HasEnchantment         [==] | CMPInteger String+
 
 GemQualityType QualityType
 
@@ -140,9 +141,25 @@ Wiki has some class-name related info (might be outdated):
   - If there is `==`, it will only match items **with all specified influences**.
 - `Sockets` and `SocketGroup` have very complex matching rules. They are explained by Rhys in [this reddit thread](https://www.reddit.com/r/pathofexile/comments/f2t4tz/inconsistencies_in_new_filter_syntaxes/) and at the bottom of this article (to not clutter this section).
 
-### `None` in array-based conditions
+### `HasInfluence`
 
-- `None` in `HasInfluence` is an official filter feature - it generates such block and it matches only items which have no influence. `None` will be accepted only if it appears exactly once, not mixed with any influence names.
+`None` will be accepted only if it appears exactly once, not mixed with any influence names. The block will match only items which have no influence.
+
+### `HasExplicitMod` and `HasEnchantment`
+
+These can be used like other string array conditions, but they can also have an operator immediately followed by an integer to change behavior from "at least 1 match" to specific range of matches.
+
+```
+op - any operator of: < <= = >= >
+
+HasExplicitMod ==  "of Haast" "of Tzteosh" "of Ephij" # item must have >= 1 mod, strict string matching
+HasExplicitMod op  "of Haast" "of Tzteosh" "of Ephij" # invalid syntax
+HasExplicitMod     "of Haast" "of Tzteosh" "of Ephij" # item must have >= 1 mod
+
+HasExplicitMod ==2 "of Haast" "of Tzteosh" "of Ephij" # item must have == 2 mods, strict string matching
+HasExplicitMod op2 "of Haast" "of Tzteosh" "of Ephij" # item must have op 2 mods
+HasExplicitMod   2 "of Haast" "of Tzteosh" "of Ephij" # invalid syntax
+```
 
 ## actions
 

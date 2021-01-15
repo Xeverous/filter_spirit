@@ -31,16 +31,21 @@ enum class numeric_comparison_condition_property
 	enchantment_passive_num
 };
 
-// all conditions which work with array of strings
+// conditions which work with array of strings
 // (basically all array conditions except influence)
 enum class string_array_condition_property
 {
 	class_,
 	base_type,
-	has_explicit_mod,
-	has_enchantment,
 	prophecy,
 	enchantment_passive_node
+};
+
+// conditions which work with array of strings AND optionally a comparison
+enum class ranged_string_array_condition_property
+{
+	has_explicit_mod,
+	has_enchantment
 };
 
 // all conditions which are boolean tests

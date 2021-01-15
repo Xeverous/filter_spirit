@@ -53,6 +53,13 @@ struct type_mismatch
 	lang::position_tag expression;
 };
 
+struct invalid_ranged_strings_condition
+{
+	lang::position_tag condition_origin;
+	boost::optional<lang::position_tag> comparison_origin;
+	boost::optional<lang::position_tag> integer_origin;
+};
+
 struct illegal_character_in_socket_spec
 {
 	lang::position_tag origin;
@@ -139,6 +146,7 @@ BETTER_ENUM(internal_compiler_error_cause, int,
 	add_range_condition,
 	add_numeric_comparison_condition,
 	add_string_array_condition,
+	add_ranged_string_array_condition,
 
 	real_filter_add_color_action,
 
@@ -189,6 +197,7 @@ using error = std::variant<
 	errors::invalid_amount_of_arguments,
 	errors::invalid_integer_value,
 	errors::type_mismatch,
+	errors::invalid_ranged_strings_condition,
 	errors::illegal_character_in_socket_spec,
 	errors::invalid_socket_spec,
 	errors::duplicate_influence,
