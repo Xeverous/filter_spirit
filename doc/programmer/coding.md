@@ -57,6 +57,7 @@ Read respectibe Boost library tutorials before modifying or even reading the cod
 
 Example commits you might want to check:
 
+- `d8ba8066b7f052fb3841803630bafa9389cde053`: support for new comparisons in `HasExplicitMod` and `HasEnchantment`
 - `4786b89cf04e6fbf89ea5c205f92ce8ec85ce879`: support for `EnchantmentPassiveNum`
 - `9f6ec9a244996939da867c2c312f3e1bc79fe1ca`: support for `Replica` and `AlternateQuality`
 - `7ea011a65a719663bf853c5343c3ab22802e07c0`: support for `EnableDropSound`
