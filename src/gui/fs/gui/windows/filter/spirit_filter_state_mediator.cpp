@@ -1,12 +1,38 @@
 #include <fs/gui/windows/filter/spirit_filter_state_mediator.hpp>
 #include <fs/compiler/compiler.hpp>
 #include <fs/generator/make_item_filter.hpp>
+#include <fs/generator/generator.hpp>
 #include <fs/utility/assert.hpp>
 #include <fs/utility/monadic.hpp>
+#include <fs/utility/file.hpp>
 
 #include <imgui.h>
 
+#ifndef __EMSCRIPTEN__
+#include <tinyfiledialogs.h>
+#endif
+
 namespace fs::gui {
+
+namespace {
+
+// Note: this implementation will not compile on Emscripten,
+// tiny file dialogs do not work there
+void save_filter(const lang::market::item_price_metadata& metadata, const lang::item_filter& filter, log::logger& logger)
+{
+	const char* const path = tinyfd_saveFileDialog("Save filter", nullptr, 0, nullptr, nullptr);
+	if (path == nullptr)
+		return;
+
+	std::string output_content = generator::item_filter_to_string(filter);
+	generator::prepend_metadata(metadata, output_content);
+
+	std::filesystem::path output_filepath(path);
+	if (utility::save_file(output_filepath, output_content, logger))
+		logger.info() << "Item filter successfully saved as " << output_filepath.generic_string() << ".\n";
+}
+
+}
 
 log::logger& spirit_filter_state_mediator::logger()
 {
@@ -128,6 +154,12 @@ void spirit_filter_state_mediator::draw_interface_derived(application& app)
 	draw_interface_spirit_filter_symbols();
 	draw_interface_spirit_filter();
 	_market_data.draw_interface(app, *this);
+}
+
+void spirit_filter_state_mediator::draw_interface_save_filter(const lang::item_filter& filter, log::logger& logger)
+{
+	if (ImGui::Button("Save filter as..."))
+		save_filter(_market_data.price_report().metadata, filter, logger);
 }
 
 void spirit_filter_state_mediator::draw_interface_logs_derived(gui_logger& gl, const fonting& f)

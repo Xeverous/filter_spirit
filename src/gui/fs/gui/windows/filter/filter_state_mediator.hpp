@@ -57,6 +57,9 @@ public:
 
 	void draw_interface(application& app);
 
+	// template method pattern
+	virtual void draw_interface_save_filter(const lang::item_filter& filter, log::logger& logger) = 0;
+
 protected:
 	filter_state_mediator(filter_state_mediator&& other) noexcept = default;
 	filter_state_mediator& operator=(filter_state_mediator&& other) noexcept = default;

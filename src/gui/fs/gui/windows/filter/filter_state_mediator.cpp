@@ -89,10 +89,13 @@ void filter_state_mediator::draw_interface(application& app)
 void filter_state_mediator::draw_interface_filter_representation()
 {
 	if (ImGui::CollapsingHeader("Filter representation", ImGuiTreeNodeFlags_DefaultOpen)) {
-		if (_filter_representation)
+		if (_filter_representation) {
 			ImGui::TextWrapped("Ready, %zu blocks", (*_filter_representation).blocks.size());
-		else
+			draw_interface_save_filter(*_filter_representation, logger());
+		}
+		else {
 			ImGui::TextWrapped("Not available.");
+		}
 	}
 }
 
