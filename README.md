@@ -7,6 +7,7 @@ If you ever worked with web stuff - a perfect analogy is that Filter Spirit is t
 ## news
 
 **First version with graphical interface has been released!** (no icon though, can someone make me a logo?)
+[DOWNLOAD HERE](https://github.com/Xeverous/filter_spirit/releases)
 
 New filter features from 3.13 Echoes of the Atlas (Ritual league) update implemented. Currently FS supports everything except disabling non-custom alert sounds.
 
