@@ -1,5 +1,9 @@
 # Filter Spirit changelog
 
+## version 1.0.1 (15.09.2021)
+
+- Fixed startup crash, caused by `std::random_device` on MinGW toolchain.
+
 ## version 1.0.0 (15.09.2021)
 
 - **First release of graphical interface!** Features filter generation and filter debug.
