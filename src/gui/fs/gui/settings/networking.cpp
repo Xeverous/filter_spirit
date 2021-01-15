@@ -31,6 +31,7 @@ void networking::draw_interface()
 	aux::on_hover_text_tooltip(network::strings::ca_bundle_desc);
 
 	aux::input_string("Proxy", _download_settings.proxy);
+	aux::on_hover_text_tooltip(network::strings::proxy_desc);
 }
 
 }

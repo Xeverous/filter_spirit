@@ -87,10 +87,7 @@ int run(int argc, char* argv[])
 		po::options_description networking_options("networking options");
 		networking_options.add_options()
 			("proxy,x", po::value(&opt_proxy)->value_name("PROXY"),
-				("use PROXY for transfers, example values: \"http://my.proxy:80\","
-					" \"https://user:password@proxyserver.com:3128\""
-					" see https://curl.haxx.se/libcurl/c/CURLOPT_PROXY.html for"
-					" more examples, documentation and environmental variables"))
+				(fs::network::strings::proxy_desc))
 			("ca-bundle,b", po::value(&opt_ca_bundle)->value_name("FILEPATH"),
 				(fs::network::strings::ca_bundle_desc))
 			("no-ssl-peer", po::bool_switch(&no_ssl_verify_peer),

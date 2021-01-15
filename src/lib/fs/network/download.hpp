@@ -18,6 +18,12 @@ constexpr auto ca_bundle_desc =
 	"the certificates that are delivered with Mozilla Firefox. "
 	"This option has no effect when you opt out of SSL verification.";
 
+constexpr auto proxy_desc =
+	"use PROXY for transfers, example values: \"http://my.proxy:80\","
+	" \"https://user:password@proxyserver.com:3128\""
+	" see https://curl.haxx.se/libcurl/c/CURLOPT_PROXY.html for"
+	" more examples, documentation and environmental variables";
+
 }
 
 struct request_result
