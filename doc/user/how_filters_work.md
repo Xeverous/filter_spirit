@@ -124,6 +124,11 @@ AlternateQuality Boolean
 
 Note: numeric and `Rarity` conditions can accept multiple values, but there is no practicaly point in doing so. You can cover any range with 2 lines using different comparisons, which is much better than manually specifying all possible values in 1 line. Additionally, current FS implementation does not support this and will error on more than 1 value (this is true both for real filters and filter templates).
 
+Wiki has some class-name related info (might be outdated):
+
+- https://pathofexile.gamepedia.com/Item_class
+- https://pathofexile.gamepedia.com/Public_stash_tab_API#frameType
+
 ### (nothing) vs `=` vs `==`
 
 - Comparison operator is optional. Unless otherwise specified, `(nothing)` has the same meaning as `=`.
@@ -180,6 +185,10 @@ SetBeam Green                # permanent beam
 SetBeam Green Temp           # temporary beam
 SetMinimapIcon 0 Blue Square
 ```
+
+Notes:
+
+- `SetFontSize` will accept values in range 1-45 but depending on game's language settings they might be clamped to smaller range. English version clamps to 18-42.
 
 ## continuation
 

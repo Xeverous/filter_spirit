@@ -15,7 +15,7 @@ if(NOT FILTER_SPIRIT_PLATFORM STREQUAL "emscripten")
 	pkg_check_modules(libcurl REQUIRED IMPORTED_TARGET libcurl>=7.17.0)
 endif()
 
-find_package(Boost 1.68 REQUIRED)
+find_package(Boost 1.70 REQUIRED)
 
 # Some source files are shared with tests, GUI and CLI executables.
 # Compile these as shared library so that it can be reused by both

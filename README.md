@@ -146,28 +146,9 @@ In Windows, you can quickly open command line in desired directory by typing "cm
 
 FS does not need to install anything (it's fully portable). You can download latest release and immediately use the program.
 
-## build dependencies
+## building and dependencies
 
-- C++17 compiler
-- Boost 1.70+:
-  - spirit (FS uses newest X3 parser)
-  - fusion
-  - preprocessor
-  - optional
-  - variant
-  - **program_options**
-  - date_time
-  - beast
-  - asio
-  - system
-  - **unit_test_framework** (only if you build tests)
-- nlohmann/json 3.0+
-- **OpenSSL** 1.1+
-- **libcurl** 7.17+
-
-Bolded dependencies need to be build. Rest are header-only libraries.
-
-## building
+See documentation directory.
 
 Modern CMake build script. All dependencies are exposed as targets. See comments inside the build recipe for more information.
 

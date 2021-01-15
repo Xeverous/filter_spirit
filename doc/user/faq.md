@@ -63,6 +63,10 @@ The only thing that is queried from GGG's API is `https://api.pathofexile.com/le
 
 Filter-related work does not care about individual listings. It cares about highest possible and average value of an item, as seen by the filter. Therefore, it is much more appropriate to obtain average item prices by category which is exactly the data that is reported by sites such as poe.ninja and poe.watch. This data is queried lazily, that is, only when necessary and cached for long time (2h by default) because it does not change often (IIRC poe.ninja changes data at most hourly). The program never attempts to download data when in background or just because it has been restarted.
 
+**How does the program report itself over the network?**
+
+The User-Agent field is something like this: `FilterSpirit/0.5.0 (github.com/Xeverous/filter_spirit) libcurl/7.69.0-DEV OpenSSL/1.1.1d zlib/1.2.11`
+
 **I have a networking problem. Can you...?**
 
 FS uses [libcurl](https://curl.haxx.se) for networking. It is possible to expose much more of [its options](https://curl.haxx.se/libcurl/c/curl_easy_setopt.html). Just inform me what is the problem and what specific you need. Note that some of the options read environmental variables so you can already influence program's behavior this way (only FS restart required).
