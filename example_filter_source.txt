@@ -219,7 +219,7 @@ Class "Currency" {
 		Show
 	}
 
-	BaseType "Crusader's Exalted Orb" "Redeemer's Exalted Orb" "Hunter's Exalted Orb" "Warlord's Exalted Orb" "Awakener's Orb" {
+	BaseType "Crusader's Exalted Orb" "Redeemer's Exalted Orb" "Hunter's Exalted Orb" "Warlord's Exalted Orb" "Awakener's Orb" "Maven's Orb" {
 		SetTextColor $color_golden
 		SetBorderColor $color_golden
 		SetBackgroundColor $color_red
@@ -230,7 +230,7 @@ Class "Currency" {
 		Show
 	}
 
-	BaseType $currency_t2 "Facetor's Lens" "Infused Engineer's Orb" {
+	BaseType $currency_t2 "Facetor's Lens" "Infused Engineer's Orb" "Orb of Unmaking" "Ritual Splinter" "Ritual Vessel" "Crescent Splinter" {
 		SetTextColor $color_black
 		SetBackgroundColor $color_currency
 		SetFontSize $font_currency_t2
@@ -458,24 +458,25 @@ Class "Heist Cloak" "Heist Brooch" "Heist Tool" "Heist Gear" {
 	Show
 }
 
-Class == "Harvest Seed" {
-	SetTextColor $color_league_item
-	SetBorderColor $color_league_item
-	SetBackgroundColor $color_black
-	SetAlertSound $alert_league_item
-	SetFontSize $font_max
-	Show
-}
+# Removed in 3.13
+#Class == "Harvest Seed" {
+#	SetTextColor $color_league_item
+#	SetBorderColor $color_league_item
+#	SetBackgroundColor $color_black
+#	SetAlertSound $alert_league_item
+#	SetFontSize $font_max
+#	Show
+#}
 
-Class == "Seed Enhancer" {
-	SetTextColor $color_black
-	SetBackgroundColor $color_league_item
-	SetBorderColor $color_league_item
-	SetFontSize $font_max
-	SetAlertSound $alert_league_item
-	MinimapIcon 0 Cyan Raindrop
-	Show
-}
+#Class == "Seed Enhancer" {
+#	SetTextColor $color_black
+#	SetBackgroundColor $color_league_item
+#	SetBorderColor $color_league_item
+#	SetFontSize $font_max
+#	SetAlertSound $alert_league_item
+#	MinimapIcon 0 Cyan Raindrop
+#	Show
+#}
 
 Class "Gem" {
 	BaseType "Awakened" {
@@ -784,6 +785,17 @@ Class "Map Fragments" {
 		SetAlertSound $alert_misc_breachstone
 		Show
 	}
+
+	BaseType "The Maven's Writ" "Blood-filled Vessel" {
+		SetTextColor $color_mortal
+		SetBorderColor $color_mortal
+		SetBackgroundColor $color_white
+		SetFontSize $font_max
+		SetAlertSound $alert_fragment_mortal
+		Show
+	}
+
+	Show
 }
 
 Class "Leaguestones" {
@@ -799,7 +811,7 @@ Class "Leaguestones" {
 Class "Misc Map Item" {
 	# reliquary keys from Legacy ("Ancient") and Delve ("Timeworn")
 	# ...and any future reliquary keys
-	BaseType "Reliquary Key" {
+	BaseType "Reliquary Key" "Maven's Invitation" {
 		SetBorderColor 204 153 0
 		SetTextColor $color_white
 		SetBackgroundColor 204 153 0
