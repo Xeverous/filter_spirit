@@ -28,9 +28,10 @@ std::seed_seq make_seed_seq()
 	 * Some implementations do not implement random_device using
 	 * non-deterministic CPU instructions or OS APIs (most notably older
 	 * MinGW with GCC < 9.2). Mix it with time-based seed for extra safety.
+	 *
+	 * std::random_device has been removed due to crashes on MinGW (as of late 2020)
 	 */
-	std::random_device rd;
-	return std::seed_seq{static_cast<std::random_device::result_type>(std::time(nullptr)), rd(), rd(), rd(), rd(), rd(), rd(), rd()};
+	return std::seed_seq{static_cast<std::seed_seq::result_type>(std::time(nullptr))};
 }
 
 // in some functions .size() == 0 is used instead of .empty()
