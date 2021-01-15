@@ -50,6 +50,8 @@ target_sources(filter_spirit_gui
 		fs/gui/settings/theming.hpp
 		fs/gui/settings/networking.cpp
 		fs/gui/settings/networking.hpp
+		fs/gui/windows/about_window.cpp
+		fs/gui/windows/about_window.hpp
 		fs/gui/windows/application_log_window.cpp
 		fs/gui/windows/application_log_window.hpp
 		fs/gui/windows/color_picker_window.cpp

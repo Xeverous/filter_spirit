@@ -223,7 +223,10 @@ void application::draw_main_menu_bar()
 		}
 
 		if (ImGui::BeginMenu("About")) {
-			ImGui::MenuItem("About FS", nullptr, false, false);
+			if (ImGui::MenuItem(_about.title().c_str())) {
+				_about.open();
+				_about.take_focus();
+			}
 
 			if (ImGui::MenuItem(_version_info.title().c_str())) {
 				_version_info.open();
@@ -263,6 +266,7 @@ void application::drawEvent()
 	_color_picker.draw();
 	_single_item_preview.draw();
 	_settings.draw();
+	_about.draw();
 	_version_info.draw();
 
 	if (_show_demo_window) {

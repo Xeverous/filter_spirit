@@ -4,6 +4,7 @@
 #include <fs/gui/windows/color_picker_window.hpp>
 #include <fs/gui/windows/single_item_preview_window.hpp>
 #include <fs/gui/windows/settings_window.hpp>
+#include <fs/gui/windows/about_window.hpp>
 #include <fs/gui/windows/version_info_window.hpp>
 #include <fs/gui/windows/application_log_window.hpp>
 #include <fs/gui/settings/theming.hpp>
@@ -118,6 +119,7 @@ private:
 	color_picker_window _color_picker;
 	single_item_preview_window _single_item_preview;
 	settings_window _settings;
+	about_window _about;
 	version_info_window _version_info;
 };
 
