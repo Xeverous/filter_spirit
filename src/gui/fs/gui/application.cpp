@@ -202,6 +202,11 @@ void application::draw_main_menu_bar()
 				_show_demo_window = true;
 				_force_focus_demo_window = true;
 			}
+			aux::on_hover_text_tooltip(
+				"This demo comes from one of FS dependencies.\n"
+				"It is intended to showcase capabilities of Dear ImGui library.\n"
+				"If you have an idea for a richer and/or different interface,\n"
+				"this is the place to check what widgets are available.");
 
 			ImGui::Separator();
 
