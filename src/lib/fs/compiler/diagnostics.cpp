@@ -92,7 +92,7 @@ void output_error_impl(
 			lookup_data.get_view_of_whole_content(),
 			lookup_data.position_of(error.origin),
 			log::strings::error,
-			"invalid inetger value, expected at least ",
+			"invalid integer value, expected at least ",
 			error.min_allowed_value,
 			" but got ",
 			error.actual_value);
