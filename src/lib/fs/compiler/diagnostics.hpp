@@ -12,8 +12,7 @@
 
 namespace fs::parser {
 
-class lookup_data;
-class line_lookup;
+class parse_metadata;
 
 }
 
@@ -249,8 +248,7 @@ inline bool has_warnings_or_errors(const diagnostics_container& messages)
 
 void output_diagnostics(
 	const diagnostics_container& messages,
-	const parser::lookup_data& lookup_data,
-	const parser::line_lookup& lines,
+	const parser::parse_metadata& metadata,
 	log::logger& logger);
 
 } // namespace fs::compiler

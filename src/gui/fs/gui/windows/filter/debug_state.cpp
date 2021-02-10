@@ -26,34 +26,31 @@ constexpr ImU32 color_background_matched_visibility = IM_COL32(  0, 127, 255, 25
 constexpr ImU32 color_background_matched_action     = IM_COL32(127,  63, 192, 255);
 
 std::size_t origins_line_number(
-	const parser::lookup_data& lookup,
-	const parser::line_lookup& lines,
+	const parser::parse_metadata& metadata,
 	const lang::position_tag origin)
 {
-	const std::string_view sv = lookup.position_of(origin);
-	const parser::text_range r = lines.text_range_for(sv);
+	const std::string_view sv = metadata.lookup.position_of(origin);
+	const parser::text_range r = metadata.lines.text_range_for(sv);
 	return r.first.line_number;
 }
 
 void color_line_by_origin(
 	lang::position_tag origin,
-	const parser::lookup_data& lookup,
-	const parser::line_lookup& lines,
+	const parser::parse_metadata& metadata,
 	std::vector<ImU32>& line_colors,
 	ImU32 color)
 {
 	if (!lang::is_valid(origin))
 		return;
 
-	const std::size_t line_number = origins_line_number(lookup, lines, origin);
+	const std::size_t line_number = origins_line_number(metadata, origin);
 	FS_ASSERT(line_number < line_colors.size());
 	line_colors[line_number] = color;
 }
 
 void color_line_by_condition_result(
 	const std::optional<lang::condition_match_result>& opt_result,
-	const parser::lookup_data& lookup,
-	const parser::line_lookup& lines,
+	const parser::parse_metadata& metadata,
 	std::vector<ImU32>& line_colors)
 {
 	if (!opt_result)
@@ -65,7 +62,7 @@ void color_line_by_condition_result(
 	if (!lang::is_valid(origin))
 		return;
 
-	const std::size_t line_number = origins_line_number(lookup, lines, origin);
+	const std::size_t line_number = origins_line_number(metadata, origin);
 	FS_ASSERT(line_number < line_colors.size());
 
 	if (result.is_successful())
@@ -76,8 +73,7 @@ void color_line_by_condition_result(
 
 void color_line_by_condition_result(
 	const lang::range_condition_match_result& result,
-	const parser::lookup_data& lookup,
-	const parser::line_lookup& lines,
+	const parser::parse_metadata& metadata,
 	std::vector<ImU32>& line_colors)
 {
 	/*
@@ -94,39 +90,37 @@ void color_line_by_condition_result(
 			const lang::position_tag origin = (*result.lower_bound).condition_origin();
 
 			if (is_success)
-				color_line_by_origin(origin, lookup, lines, line_colors, color_background_condition_success);
+				color_line_by_origin(origin, metadata, line_colors, color_background_condition_success);
 			else
-				color_line_by_origin(origin, lookup, lines, line_colors, color_background_condition_failure);
+				color_line_by_origin(origin, metadata, line_colors, color_background_condition_failure);
 
 			return;
 		}
 	}
 
-	color_line_by_condition_result(result.lower_bound, lookup, lines, line_colors);
-	color_line_by_condition_result(result.upper_bound, lookup, lines, line_colors);
+	color_line_by_condition_result(result.lower_bound, metadata, line_colors);
+	color_line_by_condition_result(result.upper_bound, metadata, line_colors);
 }
 
 template <typename Action>
 void color_line_by_action_origin(
 	const Action& action,
-	const parser::lookup_data& lookup,
-	const parser::line_lookup& lines,
+	const parser::parse_metadata& metadata,
 	std::vector<ImU32>& line_colors)
 {
-	color_line_by_origin(action.origin, lookup, lines, line_colors, color_background_matched_action);
+	color_line_by_origin(action.origin, metadata, line_colors, color_background_matched_action);
 }
 
 template <typename Action>
 void color_line_by_action_origin(
 	const std::optional<Action>& opt_action,
-	const parser::lookup_data& lookup,
-	const parser::line_lookup& lines,
+	const parser::parse_metadata& metadata,
 	std::vector<ImU32>& line_colors)
 {
 	if (!opt_action)
 		return;
 
-	color_line_by_action_origin(*opt_action, lookup, lines, line_colors);
+	color_line_by_action_origin(*opt_action, metadata, line_colors);
 }
 
 float calculate_line_number_column_width(std::size_t num_lines)
@@ -251,14 +245,14 @@ constexpr auto debug_popup_title = "Item debug";
 
 namespace fs::gui {
 
-void debug_state::recompute(const parser::lookup_data& lookup, const parser::line_lookup& lines)
+void debug_state::recompute(const parser::parse_metadata& metadata)
 {
 	if (!_info)
 		return;
 
 	for (auto& color : _line_colors)
 		color = color_background_default;
-	_line_colors.resize(lines.num_lines(), color_background_default);
+	_line_colors.resize(metadata.lines.num_lines(), color_background_default);
 
 	const debug_info& info = *_info;
 	// uncomment if item_filter is actually used within debug_state class
@@ -272,64 +266,64 @@ void debug_state::recompute(const parser::lookup_data& lookup, const parser::lin
 		 * (then specific condition results will have specific types).
 		 */
 		const lang::condition_set_match_result& cs = block.condition_set_result;
-		color_line_by_condition_result(cs.item_level,               lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.drop_level,               lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.quality,                  lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.rarity,                   lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.linked_sockets,           lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.height,                   lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.width,                    lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.stack_size,               lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.gem_level,                lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.map_tier,                 lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.area_level,               lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.corrupted_mods,           lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.class_,                   lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.base_type,                lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.sockets,                  lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.socket_group,             lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.has_explicit_mod,         lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.has_enchantment,          lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.prophecy,                 lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.enchantment_passive_node, lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.enchantment_passive_num,  lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.has_influence,            lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.gem_quality_type,         lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.is_identified,            lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.is_corrupted,             lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.is_mirrored,              lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.is_elder_item,            lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.is_shaper_item,           lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.is_fractured_item,        lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.is_synthesised_item,      lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.is_enchanted,             lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.is_shaped_map,            lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.is_elder_map,             lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.is_blighted_map,          lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.is_replica,               lookup, lines, _line_colors);
-		color_line_by_condition_result(cs.is_alternate_quality,     lookup, lines, _line_colors);
+		color_line_by_condition_result(cs.item_level,               metadata, _line_colors);
+		color_line_by_condition_result(cs.drop_level,               metadata, _line_colors);
+		color_line_by_condition_result(cs.quality,                  metadata, _line_colors);
+		color_line_by_condition_result(cs.rarity,                   metadata, _line_colors);
+		color_line_by_condition_result(cs.linked_sockets,           metadata, _line_colors);
+		color_line_by_condition_result(cs.height,                   metadata, _line_colors);
+		color_line_by_condition_result(cs.width,                    metadata, _line_colors);
+		color_line_by_condition_result(cs.stack_size,               metadata, _line_colors);
+		color_line_by_condition_result(cs.gem_level,                metadata, _line_colors);
+		color_line_by_condition_result(cs.map_tier,                 metadata, _line_colors);
+		color_line_by_condition_result(cs.area_level,               metadata, _line_colors);
+		color_line_by_condition_result(cs.corrupted_mods,           metadata, _line_colors);
+		color_line_by_condition_result(cs.class_,                   metadata, _line_colors);
+		color_line_by_condition_result(cs.base_type,                metadata, _line_colors);
+		color_line_by_condition_result(cs.sockets,                  metadata, _line_colors);
+		color_line_by_condition_result(cs.socket_group,             metadata, _line_colors);
+		color_line_by_condition_result(cs.has_explicit_mod,         metadata, _line_colors);
+		color_line_by_condition_result(cs.has_enchantment,          metadata, _line_colors);
+		color_line_by_condition_result(cs.prophecy,                 metadata, _line_colors);
+		color_line_by_condition_result(cs.enchantment_passive_node, metadata, _line_colors);
+		color_line_by_condition_result(cs.enchantment_passive_num,  metadata, _line_colors);
+		color_line_by_condition_result(cs.has_influence,            metadata, _line_colors);
+		color_line_by_condition_result(cs.gem_quality_type,         metadata, _line_colors);
+		color_line_by_condition_result(cs.is_identified,            metadata, _line_colors);
+		color_line_by_condition_result(cs.is_corrupted,             metadata, _line_colors);
+		color_line_by_condition_result(cs.is_mirrored,              metadata, _line_colors);
+		color_line_by_condition_result(cs.is_elder_item,            metadata, _line_colors);
+		color_line_by_condition_result(cs.is_shaper_item,           metadata, _line_colors);
+		color_line_by_condition_result(cs.is_fractured_item,        metadata, _line_colors);
+		color_line_by_condition_result(cs.is_synthesised_item,      metadata, _line_colors);
+		color_line_by_condition_result(cs.is_enchanted,             metadata, _line_colors);
+		color_line_by_condition_result(cs.is_shaped_map,            metadata, _line_colors);
+		color_line_by_condition_result(cs.is_elder_map,             metadata, _line_colors);
+		color_line_by_condition_result(cs.is_blighted_map,          metadata, _line_colors);
+		color_line_by_condition_result(cs.is_replica,               metadata, _line_colors);
+		color_line_by_condition_result(cs.is_alternate_quality,     metadata, _line_colors);
 
 		if (block.continue_origin) {
-			const std::size_t line_number = origins_line_number(lookup, lines, *block.continue_origin);
+			const std::size_t line_number = origins_line_number(metadata, *block.continue_origin);
 			FS_ASSERT(line_number < _line_colors.size());
 			_line_colors[line_number] = color_background_matched_continue;
 		}
 	}
 
 	const lang::item_style& style = result.style;
-	color_line_by_action_origin(style.border_color,       lookup, lines, _line_colors);
-	color_line_by_action_origin(style.text_color,         lookup, lines, _line_colors);
-	color_line_by_action_origin(style.background_color,   lookup, lines, _line_colors);
-	color_line_by_action_origin(style.font_size,          lookup, lines, _line_colors);
-	color_line_by_action_origin(style.play_alert_sound,   lookup, lines, _line_colors);
-	color_line_by_action_origin(style.switch_drop_sound,  lookup, lines, _line_colors);
-	color_line_by_action_origin(style.minimap_icon,       lookup, lines, _line_colors);
-	color_line_by_action_origin(style.play_effect,        lookup, lines, _line_colors);
+	color_line_by_action_origin(style.border_color,      metadata, _line_colors);
+	color_line_by_action_origin(style.text_color,        metadata, _line_colors);
+	color_line_by_action_origin(style.background_color,  metadata, _line_colors);
+	color_line_by_action_origin(style.font_size,         metadata, _line_colors);
+	color_line_by_action_origin(style.play_alert_sound,  metadata, _line_colors);
+	color_line_by_action_origin(style.switch_drop_sound, metadata, _line_colors);
+	color_line_by_action_origin(style.minimap_icon,      metadata, _line_colors);
+	color_line_by_action_origin(style.play_effect,       metadata, _line_colors);
 
-	color_line_by_origin(style.visibility.origin, lookup, lines, _line_colors, color_background_matched_visibility);
+	color_line_by_origin(style.visibility.origin, metadata, _line_colors, color_background_matched_visibility);
 }
 
-void debug_state::draw_interface(const fonting& f, const parser::lookup_data* /* lookup */, const parser::line_lookup* lines)
+void debug_state::draw_interface(const fonting& f, const parser::parse_metadata* metadata)
 {
 	if (_popup_pending) {
 		ImGui::OpenPopup(debug_popup_title);
@@ -337,13 +331,13 @@ void debug_state::draw_interface(const fonting& f, const parser::lookup_data* /*
 		_popup_open = true;
 	}
 
-	if (!_info || !lines)
+	if (!_info || !metadata)
 		return;
 
 	ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize); // take whole space
 	if (ImGui::BeginPopupModal(debug_popup_title, &_popup_open, ImGuiWindowFlags_NoResize)) {
 		const debug_info& info = *_info;
-		_drawing_offset_y = draw_debug_interface_impl(info.itm.get(), info.result.get(), *lines, _line_colors, f, _drawing_offset_y);
+		_drawing_offset_y = draw_debug_interface_impl(info.itm.get(), info.result.get(), metadata->lines, _line_colors, f, _drawing_offset_y);
 		ImGui::EndPopup();
 	}
 }

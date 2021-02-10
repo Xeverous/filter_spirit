@@ -48,8 +48,7 @@ public:
 		return _parsed_spirit_filter.has_value() ? &*_parsed_spirit_filter : nullptr;
 	}
 
-	const parser::lookup_data* lookup_data() const override;
-	const parser::line_lookup* line_lookup() const override;
+	const parser::parse_metadata* parse_metadata() const override;
 
 	const lang::symbol_table* spirit_filter_symbols() const
 	{

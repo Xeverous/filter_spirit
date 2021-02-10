@@ -76,7 +76,7 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 
 			if (compiler::has_errors(diagnostics)) {
 				log::string_logger logger;
-				compiler::output_diagnostics(diagnostics, parse_data.lookup, parse_data.lines, logger);
+				compiler::output_diagnostics(diagnostics, parse_data.metadata, logger);
 				BOOST_FAIL("resolve_symbols failed but should not:\n" << logger.str());
 			}
 
@@ -96,7 +96,7 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 
 			if (compiler::has_errors(diagnostics)) {
 				log::string_logger logger;
-				compiler::output_diagnostics(diagnostics, parse_data.lookup, parse_data.lines, logger);
+				compiler::output_diagnostics(diagnostics, parse_data.metadata, logger);
 				BOOST_FAIL("building spirit filter blocks failed but should not:\n" << logger.str());
 			}
 
@@ -127,7 +127,7 @@ $string         = "Leather Belt"
 )";
 			const std::string_view input = input_str;
 			const parser::parsed_spirit_filter parse_data = parse(input);
-			const parser::lookup_data& lookup_data = parse_data.lookup;
+			const parser::lookup_data& lookup_data = parse_data.metadata.lookup;
 			const lang::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.definitions, parse_data);
 
 			expect_object(symbols, lookup_data, "none", search(input, "$none").result(),
@@ -178,7 +178,7 @@ $z = 6 7 8 9
 )";
 			const std::string_view input = input_str;
 			const parser::parsed_spirit_filter parse_data = parse(input);
-			const parser::lookup_data& lookup_data = parse_data.lookup;
+			const parser::lookup_data& lookup_data = parse_data.metadata.lookup;
 			const lang::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.definitions, parse_data);
 
 			expect_object(
@@ -213,7 +213,7 @@ $z = 4W 0 6 RGB
 )";
 			const std::string_view input = input_str;
 			const parser::parsed_spirit_filter parse_data = parse(input);
-			const parser::lookup_data& lookup_data = parse_data.lookup;
+			const parser::lookup_data& lookup_data = parse_data.metadata.lookup;
 			const lang::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.definitions, parse_data);
 
 			expect_object(

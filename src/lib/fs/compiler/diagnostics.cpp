@@ -468,15 +468,14 @@ namespace fs::compiler
 
 void output_diagnostics(
 	const diagnostics_container& messages,
-	const parser::lookup_data& lookup_data,
-	const parser::line_lookup& /* lines */, // TODO optimize printer code to use it
+	const parser::parse_metadata& metadata, // TODO optimize printer code to use parser::line_lookup
 	log::logger& logger)
 {
 	for (const auto& msg : messages) {
 		std::visit(utility::visitor{
-			[&](const error& err) { output_error(err, lookup_data, logger); },
-			[&](const warning& warn) { output_warning(warn, lookup_data, logger); },
-			[&](const note& n) { output_note(n, lookup_data, logger); }
+			[&](const error& err) { output_error(err, metadata.lookup, logger); },
+			[&](const warning& warn) { output_warning(warn, metadata.lookup, logger); },
+			[&](const note& n) { output_note(n, metadata.lookup, logger); }
 		}, msg);
 	}
 }

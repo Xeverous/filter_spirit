@@ -29,8 +29,7 @@ public:
 		return _parsed_real_filter.has_value() ? &*_parsed_real_filter : nullptr;
 	}
 
-	const parser::lookup_data* lookup_data() const override;
-	const parser::line_lookup* line_lookup() const override;
+	const parser::parse_metadata* parse_metadata() const override;
 
 private:
 	void new_parsed_real_filter(std::optional<parser::parsed_real_filter> parsed_real_filter);

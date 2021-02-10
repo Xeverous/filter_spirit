@@ -8,8 +8,7 @@
 
 namespace fs::parser {
 
-class lookup_data;
-class line_lookup;
+struct parse_metadata;
 
 }
 
@@ -34,13 +33,12 @@ class debug_state
 {
 public:
 	void open_debug(
-		const parser::lookup_data& lookup,
-		const parser::line_lookup& lines,
+		const parser::parse_metadata& metadata,
 		const lang::item& itm,
 		const lang::item_filtering_result& result)
 	{
 		_info = debug_info{std::ref(itm), std::ref(result)};
-		recompute(lookup, lines);
+		recompute(metadata);
 		open_popup();
 	}
 
@@ -65,9 +63,9 @@ public:
 		_info = std::nullopt;
 	}
 
-	void recompute(const parser::lookup_data& lookup, const parser::line_lookup& lines);
+	void recompute(const parser::parse_metadata& metadata);
 
-	void draw_interface(const fonting& f, const parser::lookup_data* lookup, const parser::line_lookup* lines);
+	void draw_interface(const fonting& f, const parser::parse_metadata* metadata);
 
 private:
 	// popup state

@@ -47,8 +47,7 @@ public:
 	}
 
 	// template method pattern
-	virtual const parser::lookup_data* lookup_data() const = 0;
-	virtual const parser::line_lookup* line_lookup() const = 0;
+	virtual const parser::parse_metadata* parse_metadata() const = 0;
 
 	const lang::item_filter* filter_representation() const
 	{

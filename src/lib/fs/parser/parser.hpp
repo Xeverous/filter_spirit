@@ -122,10 +122,15 @@ private:
 	detail::position_cache_type _position_cache;
 };
 
-struct parse_failure_data
+struct parse_metadata
 {
 	lookup_data lookup;
 	line_lookup lines;
+};
+
+struct parse_failure_data
+{
+	parse_metadata metadata;
 	error_holder_type errors;
 	const char* parser_stop_position; // not a C string but a string iterator
 };
@@ -135,8 +140,7 @@ void print_parse_errors(const parse_failure_data& parse_data, log::logger& logge
 struct parsed_spirit_filter
 {
 	ast::sf::ast_type ast;
-	lookup_data lookup;
-	line_lookup lines;
+	parse_metadata metadata;
 };
 
 [[nodiscard]]
@@ -145,8 +149,7 @@ std::variant<parsed_spirit_filter, parse_failure_data> parse_spirit_filter(std::
 struct parsed_real_filter
 {
 	ast::rf::ast_type ast;
-	lookup_data lookup;
-	line_lookup lines;
+	parse_metadata metadata;
 };
 
 [[nodiscard]]

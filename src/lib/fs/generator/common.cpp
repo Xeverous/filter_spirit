@@ -42,7 +42,7 @@ std::optional<fs::lang::spirit_item_filter> parse_and_compile_spirit_filter(
 	compiler::diagnostics_container diagnostics_symbols;
 	const boost::optional<lang::symbol_table> symbols =
 		compiler::resolve_spirit_filter_symbols(st.compile_settings, parse_data.ast.definitions, diagnostics_symbols);
-	compiler::output_diagnostics(diagnostics_symbols, parse_data.lookup, parse_data.lines, logger);
+	compiler::output_diagnostics(diagnostics_symbols, parse_data.metadata, logger);
 
 	if (!symbols)
 		return std::nullopt;
@@ -53,7 +53,7 @@ std::optional<fs::lang::spirit_item_filter> parse_and_compile_spirit_filter(
 	compiler::diagnostics_container diagnostics_spirit_filter;
 	boost::optional<lang::spirit_item_filter> spirit_filter =
 		compiler::compile_spirit_filter_statements(st.compile_settings, parse_data.ast.statements, *symbols, diagnostics_spirit_filter);
-	compiler::output_diagnostics(diagnostics_spirit_filter, parse_data.lookup, parse_data.lines, logger);
+	compiler::output_diagnostics(diagnostics_spirit_filter, parse_data.metadata, logger);
 
 	return utility::to_std_optional(std::move(spirit_filter));
 }

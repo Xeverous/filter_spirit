@@ -6,18 +6,10 @@
 
 namespace fs::gui {
 
-const parser::lookup_data* real_filter_state_mediator::lookup_data() const
+const parser::parse_metadata* real_filter_state_mediator::parse_metadata() const
 {
 	if (_parsed_real_filter)
-		return &((*_parsed_real_filter).lookup);
-	else
-		return nullptr;
-}
-
-const parser::line_lookup* real_filter_state_mediator::line_lookup() const
-{
-	if (_parsed_real_filter)
-		return &((*_parsed_real_filter).lines);
+		return &((*_parsed_real_filter).metadata);
 	else
 		return nullptr;
 }
@@ -55,7 +47,7 @@ void real_filter_state_mediator::on_parsed_real_filter_change(const parser::pars
 
 	compiler::diagnostics_container diagnostics;
 	boost::optional<lang::item_filter> result = compiler::compile_real_filter({}, parsed_real_filter->ast, diagnostics);
-	compiler::output_diagnostics(diagnostics, parsed_real_filter->lookup, parsed_real_filter->lines, logger());
+	compiler::output_diagnostics(diagnostics, parsed_real_filter->metadata, logger());
 
 	new_filter_representation(utility::to_std_optional(std::move(result)));
 }
@@ -67,7 +59,7 @@ void real_filter_state_mediator::draw_interface_derived(application& /* app */)
 			ImGui::TextWrapped(
 				"Parse successful, %zu blocks, %zu recorded AST nodes",
 				(*_parsed_real_filter).ast.size(),
-				(*_parsed_real_filter).lookup.size());
+				(*_parsed_real_filter).metadata.lookup.size());
 		}
 		else {
 			ImGui::TextUnformatted("Not available.");

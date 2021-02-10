@@ -40,18 +40,10 @@ log::logger& spirit_filter_state_mediator::logger()
 	return *_logger_ptr;
 }
 
-const parser::lookup_data* spirit_filter_state_mediator::lookup_data() const
+const parser::parse_metadata* spirit_filter_state_mediator::parse_metadata() const
 {
 	if (_parsed_spirit_filter)
-		return &((*_parsed_spirit_filter).lookup);
-	else
-		return nullptr;
-}
-
-const parser::line_lookup* spirit_filter_state_mediator::line_lookup() const
-{
-	if (_parsed_spirit_filter)
-		return &((*_parsed_spirit_filter).lines);
+		return &((*_parsed_spirit_filter).metadata);
 	else
 		return nullptr;
 }
@@ -91,7 +83,7 @@ void spirit_filter_state_mediator::on_parsed_spirit_filter_change(const parser::
 	boost::optional<lang::symbol_table> result = compiler::resolve_spirit_filter_symbols(
 		{}, parsed_spirit_filter->ast.definitions, diagnostics);
 
-	compiler::output_diagnostics(diagnostics, parsed_spirit_filter->lookup, parsed_spirit_filter->lines, logger());
+	compiler::output_diagnostics(diagnostics, parsed_spirit_filter->metadata, logger());
 
 	new_spirit_filter_symbols(utility::to_std_optional(std::move(result)));
 }
@@ -115,7 +107,7 @@ void spirit_filter_state_mediator::on_spirit_filter_symbols_change(
 	boost::optional<lang::spirit_item_filter> result = compiler::compile_spirit_filter_statements(
 		{}, parsed_spirit_filter->ast.statements, *spirit_filter_symbols, diagnostics);
 
-	compiler::output_diagnostics(diagnostics, parsed_spirit_filter->lookup, parsed_spirit_filter->lines, logger());
+	compiler::output_diagnostics(diagnostics, parsed_spirit_filter->metadata, logger());
 
 	new_spirit_filter(utility::to_std_optional(std::move(result)));
 }
@@ -178,7 +170,7 @@ void spirit_filter_state_mediator::draw_interface_parsed_spirit_filter()
 				"Parse successful, %zu definitions, %zu root level blocks, %zu recorded AST nodes",
 				(*_parsed_spirit_filter).ast.definitions.size(),
 				(*_parsed_spirit_filter).ast.statements.size(),
-				(*_parsed_spirit_filter).lookup.size());
+				(*_parsed_spirit_filter).metadata.lookup.size());
 		}
 		else {
 			ImGui::TextUnformatted("Not available.");

@@ -32,7 +32,7 @@ lang::item_filter parse_real_filter(std::string_view source)
 	boost::optional<lang::item_filter> filter = compiler::compile_real_filter(compiler::settings{}, parsed_filter.ast, diagnostics);
 	if (compiler::has_errors(diagnostics) || !filter) {
 		log::string_logger log;
-		compiler::output_diagnostics(diagnostics, parsed_filter.lookup, parsed_filter.lines, log);
+		compiler::output_diagnostics(diagnostics, parsed_filter.metadata, log);
 		BOOST_FAIL("Filter compilation failed: " << log.str());
 	}
 	BOOST_TEST_REQUIRE(filter.has_value());

@@ -39,15 +39,11 @@ void filter_state_mediator::on_filter_representation_change(const lang::item_fil
 
 void filter_state_mediator::on_debug_open(const lang::item& itm, const lang::item_filtering_result& result)
 {
-	const parser::lookup_data* lookup = lookup_data();
-	if (lookup == nullptr)
+	const parser::parse_metadata* metadata = parse_metadata();
+	if (metadata == nullptr)
 		return;
 
-	const parser::line_lookup* lines = line_lookup();
-	if (lines == nullptr)
-		return;
-
-	_debug_state.open_debug(*lookup, *lines, itm, result);
+	_debug_state.open_debug(*metadata, itm, result);
 }
 
 void filter_state_mediator::on_loot_change()
@@ -57,11 +53,10 @@ void filter_state_mediator::on_loot_change()
 
 void filter_state_mediator::on_filter_results_change()
 {
-	const parser::lookup_data* lookup = lookup_data();
-	const parser::line_lookup* lines = line_lookup();
+	const parser::parse_metadata* metadata = parse_metadata();
 
-	if (lookup && lines)
-		_debug_state.recompute(*lookup, *lines);
+	if (metadata)
+		_debug_state.recompute(*metadata);
 	else
 		_debug_state.invalidate();
 }
@@ -83,7 +78,7 @@ void filter_state_mediator::draw_interface(application& app)
 	ImGui::NextColumn();
 
 	draw_interface_loot(app);
-	_debug_state.draw_interface(app.font_settings(), lookup_data(), line_lookup());
+	_debug_state.draw_interface(app.font_settings(), parse_metadata());
 }
 
 void filter_state_mediator::draw_interface_filter_representation()
