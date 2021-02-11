@@ -22,6 +22,7 @@ using namespace fs;
 using namespace fs::compiler;
 
 using str_vec_t = std::vector<lang::string>;
+using dmid = diagnostic_message_id;
 
 // ---- generic helpers ----
 
@@ -38,14 +39,12 @@ add_range_condition(
 		case lang::comparison_type::equal_soft:
 		case lang::comparison_type::equal_hard: {
 			if (target.lower_bound.has_value()) {
-				diagnostics.emplace_back(error(errors::lower_bound_redefinition{
-					condition_origin, (*target.lower_bound).origin}));
+				push_error_lower_bound_redefinition(condition_origin, (*target.lower_bound).origin, diagnostics);
 				return false;
 			}
 
 			if (target.upper_bound.has_value()) {
-				diagnostics.emplace_back(error(errors::upper_bound_redefinition{
-					condition_origin, (*target.upper_bound).origin}));
+				push_error_upper_bound_redefinition(condition_origin, (*target.upper_bound).origin, diagnostics);
 				return false;
 			}
 
@@ -54,8 +53,7 @@ add_range_condition(
 		}
 		case lang::comparison_type::less: {
 			if (target.upper_bound.has_value()) {
-				diagnostics.emplace_back(error(errors::upper_bound_redefinition{
-					condition_origin, (*target.upper_bound).origin}));
+				push_error_upper_bound_redefinition(condition_origin, (*target.upper_bound).origin, diagnostics);
 				return false;
 			}
 
@@ -64,8 +62,7 @@ add_range_condition(
 		}
 		case lang::comparison_type::less_equal: {
 			if (target.upper_bound.has_value()) {
-				diagnostics.emplace_back(error(errors::upper_bound_redefinition{
-					condition_origin, (*target.upper_bound).origin}));
+				push_error_upper_bound_redefinition(condition_origin, (*target.upper_bound).origin, diagnostics);
 				return false;
 			}
 
@@ -74,8 +71,7 @@ add_range_condition(
 		}
 		case lang::comparison_type::greater: {
 			if (target.lower_bound.has_value()) {
-				diagnostics.emplace_back(error(errors::lower_bound_redefinition{
-					condition_origin, (*target.lower_bound).origin}));
+				push_error_lower_bound_redefinition(condition_origin, (*target.lower_bound).origin, diagnostics);
 				return false;
 			}
 
@@ -84,8 +80,7 @@ add_range_condition(
 		}
 		case lang::comparison_type::greater_equal: {
 			if (target.lower_bound.has_value()) {
-				diagnostics.emplace_back(error(errors::lower_bound_redefinition{
-					condition_origin, (*target.lower_bound).origin}));
+				push_error_lower_bound_redefinition(condition_origin, (*target.lower_bound).origin, diagnostics);
 				return false;
 			}
 
@@ -94,10 +89,7 @@ add_range_condition(
 		}
 	}
 
-	diagnostics.emplace_back(error(errors::internal_compiler_error{
-		errors::internal_compiler_error_cause::add_range_condition,
-		condition_origin
-	}));
+	push_error_internal_compiler_error(__func__, condition_origin, diagnostics);
 	return false;
 }
 
@@ -149,10 +141,7 @@ add_numeric_comparison_condition(
 		}
 	}
 
-	diagnostics.emplace_back(error(errors::internal_compiler_error{
-		errors::internal_compiler_error_cause::add_numeric_comparison_condition,
-		condition_origin
-	}));
+	push_error_internal_compiler_error(__func__, condition_origin, diagnostics);
 	return false;
 }
 
@@ -164,7 +153,11 @@ add_non_range_condition(
 	diagnostics_container& diagnostics)
 {
 	if (target.has_value()) {
-		diagnostics.emplace_back(error(errors::condition_redefinition{condition.origin, (*target).origin}));
+		diagnostics.push_back(make_error(
+			dmid::condition_redefinition,
+			condition.origin,
+			"condition redefinition (the same condition can not be specified again in the same block or nested blocks)"));
+		diagnostics.push_back(make_note_first_defined_here((*target).origin));
 		return false;
 	}
 
@@ -232,10 +225,7 @@ add_string_array_condition(
 		}
 	}
 
-	diagnostics.emplace_back(error(errors::internal_compiler_error{
-		errors::internal_compiler_error_cause::add_string_array_condition,
-		condition_origin
-	}));
+	push_error_internal_compiler_error(__func__, condition_origin, diagnostics);
 	return false;
 }
 
@@ -250,11 +240,23 @@ add_ranged_string_array_condition(
 	lang::condition_set& set,
 	diagnostics_container& diagnostics)
 {
-	const auto check_comparison_origin = [](lang::position_tag origin) -> boost::optional<lang::position_tag> {
-		if (lang::is_valid(origin))
-			return origin;
-		else
-			return boost::none;
+	auto push_error_invalid_ranged_strings_condition = [&](boost::optional<lang::position_tag> integer_origin) {
+		diagnostics.push_back(make_error(
+			dmid::invalid_ranged_strings_condition,
+			condition_origin,
+			"invalid ranged strings array condition"));
+		if (lang::is_valid(comparison_origin)) {
+			diagnostics.push_back(make_note(
+				dmid::minor_note,
+				comparison_origin,
+				"only == is allowed to be without a number"));
+		}
+		if (integer_origin) {
+			diagnostics.push_back(make_note(
+				dmid::minor_note,
+				*integer_origin,
+				"if an integer is present, it must be preceded by a comparison operator"));
+		}
 	};
 	/*
 	 * Error checking:
@@ -270,19 +272,11 @@ add_ranged_string_array_condition(
 	 * <ConditionKeyword> opN "..." #     valid
 	 */
 	if (comparison != lang::comparison_type::equal_soft && comparison != lang::comparison_type::equal_hard && !integer) {
-		diagnostics.emplace_back(error(errors::invalid_ranged_strings_condition{
-			condition_origin,
-			check_comparison_origin(comparison_origin),
-			boost::none,
-		}));
+		push_error_invalid_ranged_strings_condition(boost::none);
 		return false;
 	}
 	else if (comparison == lang::comparison_type::equal_soft && integer.has_value()) {
-		diagnostics.emplace_back(error(errors::invalid_ranged_strings_condition{
-			condition_origin,
-			check_comparison_origin(comparison_origin),
-			(*integer).origin,
-		}));
+		push_error_invalid_ranged_strings_condition((*integer).origin);
 		return false;
 	}
 
@@ -306,10 +300,7 @@ add_ranged_string_array_condition(
 		}
 	}
 
-	diagnostics.emplace_back(error(errors::internal_compiler_error{
-		errors::internal_compiler_error_cause::add_ranged_string_array_condition,
-		condition_origin
-	}));
+	push_error_internal_compiler_error(__func__, condition_origin, diagnostics);
 	return false;
 }
 
@@ -339,8 +330,8 @@ add_has_influence_condition(
 	for (std::size_t i = 0; i < influences.size(); ++i) {
 		for (std::size_t j = 0; j < influences.size(); ++j) {
 			if (j != i && influences[i] == influences[j]) {
-				diagnostics.emplace_back(error(errors::duplicate_influence{
-					influences[i].origin, influences[j].origin}));
+				diagnostics.push_back(make_error(dmid::duplicate_influence, influences[j].origin, "duplicate influence"));
+				diagnostics.push_back(make_note_first_defined_here(influences[i].origin));
 
 				if (st.error_handling.stop_on_error)
 					return false;
@@ -473,10 +464,7 @@ add_boolean_condition(
 		}
 	}
 
-	diagnostics.emplace_back(error(errors::internal_compiler_error{
-		errors::internal_compiler_error_cause::add_boolean_condition,
-		condition_origin
-	}));
+	push_error_internal_compiler_error(__func__, condition_origin, diagnostics);
 	return false;
 }
 
@@ -835,8 +823,8 @@ real_filter_make_influences_container(
 			const auto num_inf = static_cast<int>(array.size());
 
 			if (num_inf < 1 || num_inf > lang::limits::max_filter_influences) {
-				diagnostics.emplace_back(error(errors::invalid_amount_of_arguments{
-					/* min */ 1, /* max */ lang::limits::max_filter_influences, /* actual */ num_inf, condition_origin}));
+				push_error_invalid_amount_of_arguments(
+					1, lang::limits::max_filter_influences, num_inf, condition_origin, diagnostics);
 				return boost::none;
 			}
 
@@ -985,14 +973,14 @@ spirit_filter_add_conditions(
 			++failed_conditions;
 
 			if (st.error_handling.stop_on_error) {
-				diagnostics.emplace_back(note{notes::failed_operations_count{"condition", failed_conditions}});
+				diagnostics.push_back(make_note_minor(boost::none, "failed conditions: ", std::to_string(failed_conditions)));
 				return false;
 			}
 		}
 	}
 
 	if (failed_conditions > 0)
-		diagnostics.emplace_back(note{notes::failed_operations_count{"condition", failed_conditions}});
+		diagnostics.push_back(make_note_minor(boost::none, "failed conditions: ", std::to_string(failed_conditions)));
 
 	return true;
 }

@@ -16,6 +16,7 @@ namespace x3 = boost::spirit::x3;
 using namespace fs;
 using namespace fs::compiler;
 namespace ast = fs::parser::ast;
+using dmid = diagnostic_message_id;
 
 namespace
 {
@@ -36,7 +37,7 @@ evaluate_name(
 
 	const auto it = symbols.find(name.value.value);
 	if (it == symbols.end()) {
-		diagnostics.emplace_back(error(errors::no_such_name{name_origin}));
+		diagnostics.push_back(make_error(dmid::no_such_name, name_origin, "no such name exists"));
 		return boost::none;
 	}
 
@@ -83,13 +84,16 @@ boost::optional<lang::integer>
 make_integer_in_range(
 	lang::integer int_obj,
 	int min_allowed_value,
-	boost::optional<int> max_allowed_value,
+	int max_allowed_value,
 	diagnostics_container& diagnostics)
 {
 	const auto val = int_obj.value;
-	if (val < min_allowed_value || (max_allowed_value && val > *max_allowed_value)) {
-		diagnostics.emplace_back(error(errors::invalid_integer_value{
-			min_allowed_value, max_allowed_value, val, int_obj.origin}));
+	if (val < min_allowed_value || val > max_allowed_value) {
+		push_error_invalid_integer_value(
+			min_allowed_value,
+			max_allowed_value,
+			int_obj,
+			diagnostics);
 		return boost::none;
 	}
 
@@ -135,20 +139,20 @@ evaluate(
 	ss.origin = parser::position_tag_of(literal.socket_colors);
 
 	if (literal.socket_count) {
-		const auto& socket_count = *literal.socket_count;
+		const auto& intgr = evaluate(*literal.socket_count);
 
-		if (socket_count.value < lang::limits::min_item_sockets
-			|| socket_count.value > lang::limits::max_item_sockets)
+		if (intgr.value < lang::limits::min_item_sockets
+			|| intgr.value > lang::limits::max_item_sockets)
 		{
-			diagnostics.emplace_back(error{errors::invalid_integer_value{
+			push_error_invalid_integer_value(
 				lang::limits::min_item_sockets,
 				lang::limits::max_item_sockets,
-				socket_count.value,
-				parser::position_tag_of(*literal.socket_count)}});
+				intgr,
+				diagnostics);
 		}
 
-		ss.num = socket_count.value;
-		ss.origin = lang::merge_origins(parser::position_tag_of(socket_count), ss.origin);
+		ss.num = intgr.value;
+		ss.origin = lang::merge_origins(intgr.origin, ss.origin);
 	}
 
 	const std::string& raw_letters = literal.socket_colors.value;
@@ -160,10 +164,7 @@ evaluate(
 		 * 2. If integer literal is not present, then both tokens are empty so
 		 *    something must have gone really bad with whitespace grammar.
 		 */
-		diagnostics.emplace_back(error(errors::internal_compiler_error{
-			errors::internal_compiler_error_cause::evaluate_socket_spec_literal,
-			parser::position_tag_of(literal.socket_colors)
-		}));
+		push_error_internal_compiler_error(__func__, parser::position_tag_of(literal.socket_colors), diagnostics);
 		return boost::none;
 	}
 
@@ -184,16 +185,18 @@ evaluate(
 		else if (c == kw::d)
 			++ss.d;
 		else {
-			diagnostics.emplace_back(error(errors::illegal_character_in_socket_spec{
-				parser::position_tag_of(literal.socket_colors), static_cast<int>(i)
-			}));
+			diagnostics.push_back(make_error(
+				dmid::illegal_character_in_socket_spec,
+				parser::position_tag_of(literal.socket_colors),
+				"illegal character in socket group at position ",
+				std::to_string(i),
+				" (only R/G/B/W/A/D characters are allowed)"));
 		}
 	}
 
 	if (!ss.is_valid()) {
-		// return failure now, can not go further with invalid socket spec
-		diagnostics.emplace_back(error(errors::invalid_socket_spec{ss.origin}));
-		return boost::none;
+		diagnostics.push_back(make_error(dmid::invalid_socket_spec, ss.origin, "invalid socket group"));
+		return boost::none; // return nothing, flow can not go further with invalid socket spec
 	}
 
 	return ss;
@@ -276,8 +279,8 @@ evaluate_sequence(
 		// It is possible to return an object here, but there are functions
 		// that expect the result of this function to match required min/max
 		// elements. Therefore, an error is added and no object is returned.
-		diagnostics.emplace_back(error(errors::invalid_amount_of_arguments{
-			min_allowed_elements, max_allowed_elements, num_elements, sequence_origin}));
+		push_error_invalid_amount_of_arguments(
+			min_allowed_elements, max_allowed_elements, num_elements, sequence_origin, diagnostics);
 		return boost::none;
 	}
 
@@ -317,8 +320,8 @@ evaluate_literal_sequence(
 		// It is possible to return an object here, but there are functions
 		// that expect the result of this function to match required min/max
 		// elements. Therefore, an error is added and no object is returned.
-		diagnostics.emplace_back(error(errors::invalid_amount_of_arguments{
-			min_allowed_elements, max_allowed_elements, num_elements, sequence_origin}));
+		push_error_invalid_amount_of_arguments(
+			min_allowed_elements, max_allowed_elements, num_elements, sequence_origin, diagnostics);
 		return boost::none;
 	}
 
@@ -360,7 +363,7 @@ get_as_fractional(
 		return lang::fractional{static_cast<double>(intgr.value), intgr.origin};
 	}
 
-	diagnostics.emplace_back(error(errors::type_mismatch{lang::object_type::fractional, sobj.type(), sobj.origin}));
+	push_error_type_mismatch(lang::object_type::fractional, sobj.type(), sobj.origin, diagnostics);
 	return boost::none;
 }
 
@@ -383,7 +386,7 @@ get_as_socket_spec(
 		return ss;
 	}
 
-	diagnostics.emplace_back(error(errors::type_mismatch{lang::object_type::socket_spec, sobj.type(), sobj.origin}));
+	push_error_type_mismatch(lang::object_type::socket_spec, sobj.type(), sobj.origin, diagnostics);
 	return boost::none;
 }
 

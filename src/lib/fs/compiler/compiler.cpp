@@ -18,6 +18,8 @@ namespace
 using namespace fs;
 using namespace fs::compiler;
 
+using dmid = diagnostic_message_id;
+
 namespace ast = fs::parser::ast;
 namespace x3 = boost::spirit::x3;
 
@@ -48,7 +50,8 @@ add_constant_from_definition(
 
 	if (const auto it = symbols.find(wanted_name); it != symbols.end()) {
 		const lang::position_tag place_of_original_name = parser::position_tag_of(it->second.name_origin);
-		diagnostics.emplace_back(error(errors::name_already_exists{wanted_name_origin, place_of_original_name}));
+		diagnostics.push_back(make_error(dmid::name_already_exists, wanted_name_origin, "name already exists"));
+		diagnostics.push_back(make_note_first_defined_here(place_of_original_name));
 		return false;
 	}
 
@@ -86,39 +89,47 @@ verify_autogen_cards(
 
 	if (conditions.class_.has_value()) {
 		if (!condition_contains(*conditions.class_, fs::lang::classes::cards)) {
-			diagnostics.emplace_back(error(errors::autogen_error{
-				errors::autogen_error_cause::invalid_class_condition,
-				autogen_origin,
-				(*conditions.class_).origin,
-				visibility_origin}));
+			push_error_autogen_error(
+				autogen_error{
+					autogen_error_cause::invalid_class_condition,
+					autogen_origin,
+					(*conditions.class_).origin,
+					visibility_origin},
+				diagnostics);
 			result = false;
 		}
 	}
 
 	if (conditions.prophecy.has_value()) {
-		diagnostics.emplace_back(error(errors::autogen_error{
-			errors::autogen_error_cause::expected_empty_condition,
-			autogen_origin,
-			(*conditions.prophecy).origin,
-			visibility_origin}));
+		push_error_autogen_error(
+			autogen_error{
+				autogen_error_cause::expected_empty_condition,
+				autogen_origin,
+				(*conditions.prophecy).origin,
+				visibility_origin},
+			diagnostics);
 		result = false;
 	}
 
 	if (conditions.gem_level.has_bound()) {
-		diagnostics.emplace_back(error(errors::autogen_error{
-			errors::autogen_error_cause::expected_empty_condition,
-			autogen_origin,
-			*conditions.gem_level.first_origin(),
-			visibility_origin}));
+		push_error_autogen_error(
+			autogen_error{
+				autogen_error_cause::expected_empty_condition,
+				autogen_origin,
+				*conditions.gem_level.first_origin(),
+				visibility_origin},
+			diagnostics);
 		result = false;
 	}
 
 	if (conditions.map_tier.has_bound()) {
-		diagnostics.emplace_back(error(errors::autogen_error{
-			errors::autogen_error_cause::expected_empty_condition,
-			autogen_origin,
-			*conditions.map_tier.first_origin(),
-			visibility_origin}));
+		push_error_autogen_error(
+			autogen_error{
+				autogen_error_cause::expected_empty_condition,
+				autogen_origin,
+				*conditions.map_tier.first_origin(),
+				visibility_origin},
+			diagnostics);
 		result = false;
 	}
 
@@ -136,11 +147,13 @@ verify_autogen_currency(
 
 	if (conditions.class_.has_value()) {
 		if (!condition_contains(*conditions.class_, "Currency")) {
-			diagnostics.emplace_back(error(errors::autogen_error{
-				errors::autogen_error_cause::invalid_class_condition,
-				autogen_origin,
-				(*conditions.class_).origin,
-				visibility_origin}));
+			push_error_autogen_error(
+				autogen_error{
+					autogen_error_cause::invalid_class_condition,
+					autogen_origin,
+					(*conditions.class_).origin,
+					visibility_origin},
+				diagnostics);
 			result = false;
 		}
 	}
@@ -158,29 +171,35 @@ verify_autogen_uniques(
 	auto result = true;
 
 	if (!conditions.rarity.includes(lang::rarity_type::unique)) {
-		diagnostics.emplace_back(error(errors::autogen_error{
-			errors::autogen_error_cause::invalid_rarity_condition,
-			autogen.origin,
-			*conditions.rarity.first_origin(),
-			visibility_origin}));
+		push_error_autogen_error(
+			autogen_error{
+				autogen_error_cause::invalid_rarity_condition,
+				autogen.origin,
+				*conditions.rarity.first_origin(),
+				visibility_origin},
+			diagnostics);
 		result = false;
 	}
 
 	if (conditions.stack_size.has_bound()) {
-		diagnostics.emplace_back(error(errors::autogen_error{
-			errors::autogen_error_cause::expected_empty_condition,
-			autogen.origin,
-			*conditions.stack_size.first_origin(),
-			visibility_origin}));
+		push_error_autogen_error(
+			autogen_error{
+				autogen_error_cause::expected_empty_condition,
+				autogen.origin,
+				*conditions.stack_size.first_origin(),
+				visibility_origin},
+			diagnostics);
 		result = false;
 	}
 
 	if (conditions.gem_level.has_bound()) {
-		diagnostics.emplace_back(error(errors::autogen_error{
-			errors::autogen_error_cause::expected_empty_condition,
-			autogen.origin,
-			*conditions.gem_level.first_origin(),
-			visibility_origin}));
+		push_error_autogen_error(
+			autogen_error{
+				autogen_error_cause::expected_empty_condition,
+				autogen.origin,
+				*conditions.gem_level.first_origin(),
+				visibility_origin},
+			diagnostics);
 		result = false;
 	}
 
@@ -198,11 +217,13 @@ verify_autogen(
 
 	// all autogens require empty BaseType
 	if (conditions.base_type.has_value()) {
-		diagnostics.emplace_back(errors::autogen_error{
-			errors::autogen_error_cause::expected_empty_condition,
-			autogen.origin,
-			(*conditions.base_type).origin,
-			visibility_origin});
+		push_error_autogen_error(
+			autogen_error{
+				autogen_error_cause::expected_empty_condition,
+				autogen.origin,
+				(*conditions.base_type).origin,
+				visibility_origin},
+			diagnostics);
 		result = false;
 	}
 
@@ -210,11 +231,13 @@ verify_autogen(
 
 	// all autogens except prophecies require empty Prophecy
 	if (autogen.category != cat_t::prophecies && conditions.prophecy.has_value()) {
-		diagnostics.emplace_back(errors::autogen_error{
-			errors::autogen_error_cause::expected_empty_condition,
-			autogen.origin,
-			(*conditions.prophecy).origin,
-			visibility_origin});
+		push_error_autogen_error(
+			autogen_error{
+				autogen_error_cause::expected_empty_condition,
+				autogen.origin,
+				(*conditions.prophecy).origin,
+				visibility_origin},
+			diagnostics);
 		result = false;
 	}
 
@@ -224,11 +247,13 @@ verify_autogen(
 			autogen.category == cat_t::uniques_maps_ambiguous;
 		is_map_autogen && conditions.map_tier.has_bound())
 	{
-		diagnostics.emplace_back(errors::autogen_error{
-			errors::autogen_error_cause::expected_empty_condition,
-			autogen.origin,
-			*conditions.map_tier.first_origin(),
-			visibility_origin});
+		push_error_autogen_error(
+			autogen_error{
+				autogen_error_cause::expected_empty_condition,
+				autogen.origin,
+				*conditions.map_tier.first_origin(),
+				visibility_origin},
+			diagnostics);
 		result = false;
 	}
 
@@ -272,9 +297,7 @@ verify_autogen(
 	}
 
 	// failed to cover given category - add internal error and return failure
-	diagnostics.emplace_back(error(errors::internal_compiler_error{
-		errors::internal_compiler_error_cause::spirit_filter_verify_autogen_conditions,
-		autogen.origin}));
+	push_error_internal_compiler_error(__func__, autogen.origin, diagnostics);
 	return false;
 }
 
@@ -301,10 +324,14 @@ make_spirit_filter_block(
 		FS_ASSERT_MSG(
 			price_first_origin.has_value(),
 			"Price condition has a bound. It must have at least 1 origin.");
-		diagnostics.emplace_back(error(errors::price_without_autogen{
+		diagnostics.push_back(make_error(
+			dmid::price_without_autogen,
 			visibility.origin,
-			*price_first_origin,
-			utility::to_boost_optional(conditions.price.second_origin())}));
+			"generation of a block with price bound has missing autogeneration specifier"));
+		diagnostics.push_back(make_note_minor(*price_first_origin, "price bound specified here"));
+		if (auto price_second_origin = conditions.price.second_origin(); price_second_origin.has_value()) {
+			diagnostics.push_back(make_note_minor(*price_second_origin, "another price bound specified here"));
+		}
 		return boost::none;
 	}
 

@@ -17,7 +17,7 @@ namespace fs::compiler::detail
 make_integer_in_range(
 	lang::integer int_obj,
 	int min_allowed_value,
-	boost::optional<int> max_allowed_value,
+	int max_allowed_value,
 	diagnostics_container& diagnostics);
 
 [[nodiscard]] boost::optional<lang::color>
@@ -44,7 +44,7 @@ make_enabled_minimap_icon(
 	diagnostics_container& diagnostics)
 {
 	if (size.value != 0 && size.value != 1 && size.value != 2) {
-		diagnostics.emplace_back(error(errors::invalid_integer_value{0, 2, size.value, size.origin}));
+		push_error_invalid_integer_value(0, 2, size, diagnostics);
 		return boost::none;
 	}
 
@@ -179,7 +179,7 @@ get_as(
 	diagnostics_container& diagnostics)
 {
 	if (!std::holds_alternative<T>(sobj.value)) {
-		diagnostics.emplace_back(error(errors::type_mismatch{lang::object_type_of<T>(), sobj.type(), sobj.origin}));
+		push_error_type_mismatch(lang::object_type_of<T>(), sobj.type(), sobj.origin, diagnostics);
 		return boost::none;
 	}
 

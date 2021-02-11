@@ -3,6 +3,7 @@
 #include <fs/lang/object.hpp>
 #include <fs/lang/action_properties.hpp>
 #include <fs/lang/condition_properties.hpp>
+#include <fs/compiler/diagnostics.hpp>
 
 #include <boost/test/unit_test.hpp>
 
@@ -28,8 +29,7 @@
  */
 BOOST_TEST_DONT_PRINT_LOG_VALUE(std::optional<int>)
 
-namespace fs::lang
-{
+namespace fs::lang {
 
 inline
 std::ostream& boost_test_print_type(std::ostream& os, suit_type s)
@@ -50,6 +50,26 @@ std::ostream& boost_test_print_type(std::ostream& os, std::optional<object_type>
 		return boost_test_print_type(os, *type);
 	else
 		return os << "(object_type: ?)";
+}
+
+}
+
+namespace fs::compiler {
+
+inline
+std::ostream& boost_test_print_type(std::ostream& os, diagnostic_message_severity severity)
+{
+	const auto str =
+		severity == diagnostic_message_severity::error   ? "error"   :
+		severity == diagnostic_message_severity::warning ? "warning" :
+		"info";
+	return os << "(severity: " << str << ")";
+}
+
+inline
+std::ostream& boost_test_print_type(std::ostream& os, diagnostic_message_id id)
+{
+	return os << "(ID: " << static_cast<int>(id) << ")";
 }
 
 }

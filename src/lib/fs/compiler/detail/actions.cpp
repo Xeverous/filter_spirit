@@ -22,6 +22,8 @@ namespace
 using namespace fs;
 using namespace fs::compiler;
 
+using dmid = diagnostic_message_id;
+
 // ---- generic helpers ----
 
 [[nodiscard]] boost::optional<lang::minimap_icon>
@@ -43,8 +45,8 @@ make_minimap_icon(
 			// A) 1-3 arguments where first is integer{-1}
 			// B)   3 arguments where [0] is integer, [1] is suit, [2] is shape
 			if (obj.values.size() != 3u) {
-				diagnostics.emplace_back(error{errors::invalid_amount_of_arguments{
-					3, 3, static_cast<int>(obj.values.size()), obj.origin}});
+				push_error_invalid_amount_of_arguments(
+					3, 3, static_cast<int>(obj.values.size()), obj.origin, diagnostics);
 				return boost::none;
 			}
 
@@ -105,11 +107,11 @@ make_play_effect(
 	}
 	else {
 		// main error
-		diagnostics.emplace_back(error(errors::invalid_action{lang::keywords::rf::play_effect, obj.origin}));
+		diagnostics.push_back(make_error(dmid::invalid_play_effect, obj.origin, "invalid ", lang::keywords::rf::play_effect));
 		// errors specifying each variant problems
-		diagnostics.emplace_back(note{notes::fixed_text{"in attempt of PlayEffect None"}});
+		diagnostics.push_back(make_note_attempt_description("in attempt of None"));
 		std::move(diagnostics_none.begin(), diagnostics_none.end(), std::back_inserter(diagnostics));
-		diagnostics.emplace_back(note{notes::fixed_text{"in attempt of PlayEffect Suit [Temp]"}});
+		diagnostics.push_back(make_note_attempt_description("in attempt of Suit [Temp]"));
 		std::move(diagnostics_suit.begin(), diagnostics_suit.end(), std::back_inserter(diagnostics));
 		return boost::none;
 	}
@@ -142,11 +144,11 @@ make_builtin_alert_sound_id(
 	}
 	else {
 		// main error
-		diagnostics.emplace_back(error(errors::invalid_action{"AlertSound", sobj.origin}));
+		diagnostics.push_back(make_error(dmid::invalid_alert_sound_id, sobj.origin, "invalid value for alert sound ID"));
 		// errors specifying each sound ID variant problems
-		diagnostics.emplace_back(note{notes::fixed_text{"in attempt of integer sound ID"}});
+		diagnostics.push_back(make_note_attempt_description("in attempt of integer ID"));
 		std::move(diagnostics_integer.begin(), diagnostics_integer.end(), std::back_inserter(diagnostics));
-		diagnostics.emplace_back(note{notes::fixed_text{"in attempt of Shaper voice line sound ID"}});
+		diagnostics.push_back(make_note_attempt_description("in attempt of Shaper voice line ID"));
 		std::move(diagnostics_shaper.begin(), diagnostics_shaper.end(), std::back_inserter(diagnostics));
 		return boost::none;
 	}
@@ -229,9 +231,7 @@ spirit_filter_add_set_color_action_impl(
 		}
 	}
 
-	diagnostics.emplace_back(error(errors::internal_compiler_error{
-		errors::internal_compiler_error_cause::spirit_filter_add_set_color_action_impl,
-		action.origin}));
+	push_error_internal_compiler_error(__func__, action.origin, diagnostics);
 	return false;
 }
 
@@ -290,7 +290,15 @@ spirit_filter_add_set_font_size_action(
 			if (font_size.value < lang::limits::min_filter_font_size
 				|| font_size.value > lang::limits::max_filter_font_size)
 			{
-				diagnostics.emplace_back(warning(warnings::font_size_outside_range{font_size.origin}));
+				diagnostics.push_back(make_diagnostic_message(
+					make_warning_severity(st.error_handling),
+					dmid::font_size_outside_range,
+					font_size.origin,
+					"font size outside allowed range (",
+					std::to_string(lang::limits::min_filter_font_size),
+					" - ",
+					std::to_string(lang::limits::max_filter_font_size),
+					")"));
 			}
 
 			return lang::font_size_action{font_size, parser::position_tag_of(action)};
@@ -441,12 +449,15 @@ spirit_filter_add_set_alert_sound_action(
 				return lang::alert_sound{*builtin_alert, *vol};
 			}
 			else {
-				diagnostics.emplace_back(error(
-					errors::invalid_set_alert_sound{parser::position_tag_of(action.seq)}));
+				diagnostics.push_back(make_error(
+					dmid::invalid_set_alert_sound,
+					parser::position_tag_of(action.seq),
+					"invalid ",
+					lang::keywords::sf::set_alert_sound));
 				// errors specifying each sound variant problems
-				diagnostics.emplace_back(note{notes::fixed_text{"in attempt of custom alert sound"}});
+				diagnostics.push_back(make_note_attempt_description("in attempt of ", lang::keywords::rf::custom_alert_sound));
 				std::move(diagnostics_custom.begin(), diagnostics_custom.end(), std::back_inserter(diagnostics));
-				diagnostics.emplace_back(note{notes::fixed_text{"in attempt of built-in alert sound"}});
+				diagnostics.push_back(make_note_attempt_description("in attempt of ", lang::keywords::rf::play_alert_sound));
 				std::move(diagnostics_builtin.begin(), diagnostics_builtin.end(), std::back_inserter(diagnostics));
 
 				std::move(diagnostics_volume.begin(), diagnostics_volume.end(), std::back_inserter(diagnostics));
@@ -493,7 +504,11 @@ real_filter_add_action_impl(
 	diagnostics_container& diagnostics)
 {
 	if (target) {
-		diagnostics.emplace_back(error(errors::action_redefinition{action.origin, (*target).origin}));
+		diagnostics.push_back(make_error(
+			dmid::action_redefinition,
+			action.origin,
+			"action redefinition (the same action can not be specified multiple times in the same block)"));
+		diagnostics.push_back(make_note_first_defined_here((*target).origin));
 		return false;
 	}
 
@@ -509,26 +524,25 @@ real_filter_add_color_action(
 	diagnostics_container& diagnostics)
 {
 	boost::optional<lang::color> color = detail::evaluate(st, action.color, diagnostics);
-	if (color) {
-		auto act = lang::color_action{*color, parser::position_tag_of(action)};
 
-		switch (action.action) {
-			case lang::color_action_type::set_border_color: {
-				return real_filter_add_action_impl(std::move(act), set.set_border_color, diagnostics);
-			}
-			case lang::color_action_type::set_text_color: {
-				return real_filter_add_action_impl(std::move(act), set.set_text_color, diagnostics);
-			}
-			case lang::color_action_type::set_background_color: {
-				return real_filter_add_action_impl(std::move(act), set.set_background_color, diagnostics);
-			}
+	if (!color)
+		return false;
+
+	auto act = lang::color_action{*color, parser::position_tag_of(action)};
+
+	switch (action.action) {
+		case lang::color_action_type::set_border_color: {
+			return real_filter_add_action_impl(std::move(act), set.set_border_color, diagnostics);
 		}
-
-		diagnostics.emplace_back(error(errors::internal_compiler_error{
-			errors::internal_compiler_error_cause::real_filter_add_color_action,
-			act.origin}));
+		case lang::color_action_type::set_text_color: {
+			return real_filter_add_action_impl(std::move(act), set.set_text_color, diagnostics);
+		}
+		case lang::color_action_type::set_background_color: {
+			return real_filter_add_action_impl(std::move(act), set.set_background_color, diagnostics);
+		}
 	}
 
+	push_error_internal_compiler_error(__func__, act.origin, diagnostics);
 	return false;
 }
 
