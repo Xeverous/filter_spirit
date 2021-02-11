@@ -585,7 +585,6 @@ item equippable_item_to_item(
 	item result = elementary_item_to_item(itm, class_);
 	result.item_level = item_level;
 	result.rarity_ = rarity_;
-	// TODO implement color rolling (based on attribute requirements)
 	result.sockets = roll_links_and_colors(roll_sockets_amount(itm.max_sockets, item_level, rng), 0, 0, 0, rng);
 	return result;
 }
