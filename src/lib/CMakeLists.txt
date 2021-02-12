@@ -92,7 +92,6 @@ target_sources(filter_spirit
 		fs/lang/item.hpp
 		fs/lang/item.cpp
 		fs/lang/item_filter.hpp
-		fs/lang/item_classes.hpp
 		fs/lang/keywords.hpp
 		fs/lang/league.hpp
 		fs/lang/limits.hpp

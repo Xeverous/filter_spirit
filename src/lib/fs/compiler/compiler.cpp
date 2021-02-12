@@ -3,7 +3,7 @@
 #include <fs/compiler/detail/actions.hpp>
 #include <fs/compiler/detail/conditions.hpp>
 #include <fs/lang/item_filter.hpp>
-#include <fs/lang/item_classes.hpp>
+#include <fs/lang/item.hpp>
 #include <fs/utility/assert.hpp>
 #include <fs/utility/string_helpers.hpp>
 #include <fs/utility/monadic.hpp>
@@ -88,7 +88,7 @@ verify_autogen_cards(
 	auto result = true;
 
 	if (conditions.class_.has_value()) {
-		if (!condition_contains(*conditions.class_, fs::lang::classes::cards)) {
+		if (!condition_contains(*conditions.class_, fs::lang::item_class_names::divination_card)) {
 			push_error_autogen_error(
 				autogen_error{
 					autogen_error_cause::invalid_class_condition,

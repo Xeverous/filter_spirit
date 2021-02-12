@@ -560,7 +560,7 @@ item divination_card_to_item(const currency_item& card)
 
 item resonator_to_item(const resonator& reso)
 {
-	item result = currency_item_to_item(reso, item_class_names::currency_delve);
+	item result = currency_item_to_item(reso, item_class_names::currency_resonators);
 
 	for (int i = 0; i < reso.delve_sockets; ++i)
 		result.sockets.groups.push_back(linked_sockets{socket_color::d});
@@ -570,7 +570,7 @@ item resonator_to_item(const resonator& reso)
 
 item gem_to_item(const gem& gm, bool is_active)
 {
-	item result = elementary_item_to_item(gm, is_active ? item_class_names::gem_active : item_class_names::gem_support);
+	item result = elementary_item_to_item(gm, is_active ? item_class_names::gems_active : item_class_names::gems_support);
 	result.max_gem_level = gm.max_level;
 	return result;
 }
@@ -824,7 +824,7 @@ void generator::generate_quest_items(const item_database& db, item_receiver& rec
 		if (qi == nullptr)
 			return;
 
-		receiver.on_item(elementary_item_to_item(*qi, item_class_names::quest_item));
+		receiver.on_item(elementary_item_to_item(*qi, item_class_names::quest_items));
 	}
 }
 

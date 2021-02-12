@@ -1,7 +1,7 @@
 #include <fs/generator/make_item_filter.hpp>
 #include <fs/lang/item_filter.hpp>
 #include <fs/lang/condition_set.hpp>
-#include <fs/lang/item_classes.hpp>
+#include <fs/lang/item.hpp>
 #include <fs/utility/assert.hpp>
 
 #include <string>
@@ -150,6 +150,8 @@ make_filter_block(
 	// TODO when better origins are supported, add autogen origin
 	const lang::autogen_extension& autogen = *block_template.autogen;
 	switch (autogen.condition.category) {
+		namespace cn = lang::item_class_names;
+
 		case lang::item_category::cards:
 			result_block.conditions.base_type = make_strings_condition_basic(
 				item_price_data.divination_cards.begin(),
@@ -157,7 +159,7 @@ make_filter_block(
 				autogen.price_range,
 				autogen.condition.origin);
 			result_block.conditions.class_ = lang::strings_condition{
-				{lang::string{lang::classes::cards, {}}},
+				{lang::string{cn::divination_card, {}}},
 				true,
 				autogen.condition.origin};
 			break;
@@ -168,7 +170,7 @@ make_filter_block(
 				autogen.price_range,
 				autogen.condition.origin);
 			result_block.conditions.class_ = lang::strings_condition{
-				{lang::string{lang::classes::prophecies, {}}},
+				{lang::string{cn::prophecies, {}}},
 				true,
 				autogen.condition.origin};
 			break;
@@ -179,7 +181,7 @@ make_filter_block(
 				autogen.price_range,
 				autogen.condition.origin);
 			result_block.conditions.class_ = lang::strings_condition{
-				{lang::string{lang::classes::essences, {}}},
+				{lang::string{cn::essences, {}}},
 				true,
 				autogen.condition.origin};
 			break;
@@ -190,7 +192,7 @@ make_filter_block(
 				autogen.price_range,
 				autogen.condition.origin);
 			result_block.conditions.class_ = lang::strings_condition{
-				{lang::string{lang::classes::fossils, {}}},
+				{lang::string{cn::fossils, {}}},
 				true,
 				autogen.condition.origin};
 			break;
@@ -201,7 +203,7 @@ make_filter_block(
 				autogen.price_range,
 				autogen.condition.origin);
 			result_block.conditions.class_ = lang::strings_condition{
-				{lang::string{lang::classes::resonators, {}}},
+				{lang::string{cn::currency_resonators, {}}},
 				true,
 				autogen.condition.origin};
 			break;
@@ -212,7 +214,7 @@ make_filter_block(
 				autogen.price_range,
 				autogen.condition.origin);
 			result_block.conditions.class_ = lang::strings_condition{
-				{lang::string{lang::classes::scarabs, {}}},
+				{lang::string{cn::scarabs, {}}},
 				true,
 				autogen.condition.origin};
 			break;
@@ -223,7 +225,7 @@ make_filter_block(
 				autogen.price_range,
 				autogen.condition.origin);
 			result_block.conditions.class_ = lang::strings_condition{
-				{lang::string{lang::classes::incubators, {}}},
+				{lang::string{cn::incubator, {}}},
 				true,
 				autogen.condition.origin};
 			break;
@@ -234,7 +236,7 @@ make_filter_block(
 				autogen.price_range,
 				autogen.condition.origin);
 			result_block.conditions.class_ = lang::strings_condition{
-				{lang::string{lang::classes::oils, {}}},
+				{lang::string{cn::oils, {}}},
 				true,
 				autogen.condition.origin};
 			break;
@@ -245,7 +247,7 @@ make_filter_block(
 				autogen.price_range,
 				autogen.condition.origin);
 			result_block.conditions.class_ = lang::strings_condition{
-				{lang::string{lang::classes::catalysts, {}}},
+				{lang::string{cn::catalysts, {}}},
 				true,
 				autogen.condition.origin};
 			break;

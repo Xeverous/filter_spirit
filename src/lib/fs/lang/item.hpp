@@ -20,26 +20,49 @@ namespace fs::lang
 namespace item_class_names {
 
 	// core
-	constexpr auto currency_stackable = "Stackable Currency";
-	constexpr auto currency_delve = "Delve Stackable Socketable Currency";
-	constexpr auto incubator = "Incubator";
-	constexpr auto harvest_seed = "Harvest Seed";
-	constexpr auto harvest_seed_enhancer = "Seed Enhancer";
-	constexpr auto gem_active = "Active Skill Gems";
-	constexpr auto gem_support = "Support Skill Gems";
-	constexpr auto piece = "Piece";
-	constexpr auto incursion_item = "Incursion Item";
-	constexpr auto atlas_item = "Atlas Region Upgrade Item";
-	constexpr auto labyrinth_trinket = "Labyrinth Trinket";
-	constexpr auto labyrinth_item = "Labyrinth Item";
-	constexpr auto metamorph_sample = "Metamorph Sample";
-	constexpr auto divination_card = "Divination Card";
-	constexpr auto leaguestone = "Leaguestones";
-	constexpr auto map = "Maps";
-	constexpr auto map_fragment = "Map Fragments";
-	constexpr auto misc_map_item = "Misc Map Item";
-	constexpr auto quest_item = "Quest Items";
-	constexpr auto pantheon_soul = "Pantheon Soul";
+	constexpr auto currency_stackable         = "Stackable Currency";
+	constexpr auto currency_scrolls_generic   = currency_stackable;
+	constexpr auto currency_scrolls_harbinger = currency_stackable;
+	constexpr auto remnant_of_corruption      = currency_stackable;
+	constexpr auto prophecies                 = currency_stackable;
+	constexpr auto essences                   = currency_stackable;
+	constexpr auto fossils                    = currency_stackable;
+	constexpr auto oils                       = currency_stackable;
+	constexpr auto catalysts                  = currency_stackable;
+	constexpr auto blessings                  = currency_stackable;
+	constexpr auto delirium_orbs              = currency_stackable;
+	constexpr auto vials                      = currency_stackable;
+	constexpr auto nets                       = currency_stackable;
+	constexpr auto stacked_deck               = currency_stackable;
+	constexpr auto currency_resonators        = "Delve Stackable Socketable Currency";
+	constexpr auto divination_card            = "Divination Card";
+	constexpr auto incubator                  = "Incubator";
+	constexpr auto gems_active                = "Active Skill Gems";
+	constexpr auto gems_support               = "Support Skill Gems";
+	constexpr auto quest_items                = "Quest Items";
+	constexpr auto labyrinth_item             = "Labyrinth Item";
+	constexpr auto labyrinth_trinket          = "Labyrinth Trinket";
+	constexpr auto incursion_item             = "Incursion Item";
+	constexpr auto harvest_seed               = "Harvest Seed";
+	constexpr auto harvest_seed_enhancer      = "Seed Enhancer";
+	constexpr auto leaguestones               = "Leaguestones";
+	constexpr auto misc_map_items             = "Misc Map Items";
+	constexpr auto map_fragments              = "Map Fragments";
+	constexpr auto scarabs                    = map_fragments;
+	constexpr auto atlas_region_upgrade_item  = "Atlas Region Upgrade Item";
+	constexpr auto watchstones                = atlas_region_upgrade_item;
+	constexpr auto heist_trinkets             = "Trinkets";
+	constexpr auto heist_target               = "Heist Target";
+	constexpr auto heist_contract             = "Contract";
+	constexpr auto heist_blueprint            = "Blueprint";
+	constexpr auto heist_eq_cloak             = "Heist Cloak";
+	constexpr auto heist_eq_brooch            = "Heist Brooch";
+	constexpr auto heist_eq_tool              = "Heist Tool";
+	constexpr auto heist_eq_gear              = "Heist Gear";
+	constexpr auto metamorph_sample           = "Metamorph Sample";
+	constexpr auto piece                      = "Piece";
+	constexpr auto maps                       = "Maps";
+	constexpr auto pantheon_soul              = "Pantheon Soul";
 
 	// equipment - main parts
 	constexpr auto eq_gloves = "Gloves";
@@ -77,8 +100,9 @@ namespace item_class_names {
 	constexpr auto eq_belt = "Belts";
 
 	// jewels
-	constexpr auto jewel = "Jewel";
-	constexpr auto jewel_abyss = "Abyss Jewel";
+	constexpr auto jewel_abyss   = "Abyss Jewel";
+	constexpr auto jewel_basic   = "Jewel";
+	constexpr auto jewel_cluster = jewel_basic;
 
 	// flasks
 	constexpr auto flask_life = "Life Flasks";
