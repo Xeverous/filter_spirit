@@ -6,7 +6,6 @@
 #include <boost/container/static_vector.hpp>
 
 #include <algorithm>
-#include <string>
 #include <optional>
 #include <numeric>
 #include <vector>
@@ -40,7 +39,7 @@ namespace item_class_names {
 	constexpr auto map_fragment = "Map Fragments";
 	constexpr auto misc_map_item = "Misc Map Item";
 	constexpr auto quest_item = "Quest Items";
-	constexpr auto pantheon_sould = "Pantheon Soul";
+	constexpr auto pantheon_soul = "Pantheon Soul";
 
 	// equipment - main parts
 	constexpr auto eq_gloves = "Gloves";
