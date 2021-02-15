@@ -18,21 +18,6 @@ class parse_metadata;
 
 namespace fs::compiler {
 
-enum class autogen_error_cause
-{
-	expected_empty_condition,
-	invalid_rarity_condition,
-	invalid_class_condition
-};
-
-struct autogen_error
-{
-	autogen_error_cause cause;
-	lang::position_tag autogen_origin;
-	lang::position_tag condition_origin;
-	lang::position_tag visibility_origin;
-};
-
 enum class diagnostic_message_severity
 {
 	note, warning, error
@@ -65,7 +50,8 @@ enum class diagnostic_message_id
 	invalid_set_alert_sound,
 	invalid_play_effect,
 	price_without_autogen,
-	autogen_error,
+	autogen_incompatible_condition,
+	autogen_missing_condition,
 	internal_compiler_error,
 	font_size_outside_range,
 	failed_operations_count,
@@ -216,8 +202,15 @@ void push_error_internal_compiler_error(
 	std::string_view function_name,
 	lang::position_tag origin,
 	diagnostics_container& diagnostics);
-void push_error_autogen_error(
-	autogen_error error,
+void push_error_autogen_incompatible_condition(
+	lang::position_tag autogen_origin,
+	lang::position_tag condition_origin,
+	std::string required_matching_value,
+	diagnostics_container& diagnostics);
+void push_error_autogen_missing_condition(
+	lang::position_tag visibility_origin,
+	lang::position_tag autogen_origin,
+	std::string_view missing_condition,
 	diagnostics_container& diagnostics);
 
 inline bool has_errors(const diagnostics_container& messages)

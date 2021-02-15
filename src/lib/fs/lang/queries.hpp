@@ -4,6 +4,9 @@ namespace fs::lang
 {
 	enum class item_category
 	{
+		currency,
+		fragments,
+		delirium_orbs,
 		cards,
 		prophecies,
 		essences,
@@ -12,7 +15,12 @@ namespace fs::lang
 		scarabs,
 		incubators,
 		oils,
-		catalysts,
+		vials,
+
+		gems,
+
+		bases,
+
 		uniques_eq_unambiguous,
 		uniques_eq_ambiguous,
 		uniques_flasks_unambiguous,
@@ -24,6 +32,7 @@ namespace fs::lang
 
 		// not supported (yet)
 		// enchants_helmet
+		// invitations
 	};
 
 	inline bool is_uniques_category(item_category cat) noexcept

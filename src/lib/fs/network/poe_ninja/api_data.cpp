@@ -9,6 +9,7 @@ namespace
 
 constexpr auto filename_currency = "Currency.json";
 constexpr auto filename_fragment = "Fragment.json";
+constexpr auto filename_delirium_orb = "DeliriumOrb.json";
 constexpr auto filename_oil = "Oil.json";
 constexpr auto filename_incubator = "Incubator.json";
 constexpr auto filename_scarab = "Scarab.json";
@@ -27,7 +28,7 @@ constexpr auto filename_unique_flask = "UniqueFlask.json";
 constexpr auto filename_unique_weapon = "UniqueWeapon.json";
 constexpr auto filename_unique_armour = "UniqueArmour.json";
 constexpr auto filename_unique_accessory = "UniqueAccessory.json";
-constexpr auto filename_beast = "Beast.json";
+constexpr auto filename_vial = "Vial.json";
 
 }
 
@@ -37,6 +38,7 @@ namespace fs::network::poe_ninja
 #define FOR_ALL_MEMBERS(MACRO) \
 	MACRO(currency, filename_currency) \
 	MACRO(fragment, filename_fragment) \
+	MACRO(delirium_orb, filename_delirium_orb) \
 	MACRO(oil, filename_oil) \
 	MACRO(incubator, filename_incubator) \
 	MACRO(scarab, filename_scarab) \
@@ -55,7 +57,7 @@ namespace fs::network::poe_ninja
 	MACRO(unique_weapon, filename_unique_weapon) \
 	MACRO(unique_armour, filename_unique_armour) \
 	MACRO(unique_accessory, filename_unique_accessory) \
-	MACRO(beast, filename_beast)
+	MACRO(vial, filename_vial)
 
 bool api_item_price_data::save(const std::filesystem::path& directory, log::logger& logger) const
 {

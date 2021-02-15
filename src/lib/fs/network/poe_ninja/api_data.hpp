@@ -20,6 +20,7 @@ struct api_item_price_data
 	std::string fragment;
 
 	// poe.ninja/api/data/itemoverview
+	std::string delirium_orb;
 	std::string oil;
 	std::string incubator;
 	std::string scarab;
@@ -38,7 +39,7 @@ struct api_item_price_data
 	std::string unique_weapon;
 	std::string unique_armour;
 	std::string unique_accessory;
-	std::string beast;
+	std::string vial;
 };
 
 }

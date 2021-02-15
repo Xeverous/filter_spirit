@@ -560,7 +560,7 @@ item divination_card_to_item(const currency_item& card)
 
 item resonator_to_item(const resonator& reso)
 {
-	item result = currency_item_to_item(reso, item_class_names::currency_resonators);
+	item result = currency_item_to_item(reso, item_class_names::resonators);
 
 	for (int i = 0; i < reso.delve_sockets; ++i)
 		result.sockets.groups.push_back(linked_sockets{socket_color::d});

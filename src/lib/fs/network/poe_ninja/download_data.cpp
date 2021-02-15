@@ -33,6 +33,7 @@ download_item_price_data(
 	std::vector<std::string> urls = {
 		CURRENCY_OVERVIEW_LINK(Currency)    + league_encoded,
 		CURRENCY_OVERVIEW_LINK(Fragment)    + league_encoded,
+		ITEM_OVERVIEW_LINK(DeliriumOrb)     + league_encoded,
 		ITEM_OVERVIEW_LINK(Oil)             + league_encoded,
 		ITEM_OVERVIEW_LINK(Incubator)       + league_encoded,
 		ITEM_OVERVIEW_LINK(Scarab)          + league_encoded,
@@ -51,19 +52,19 @@ download_item_price_data(
 		ITEM_OVERVIEW_LINK(UniqueWeapon)    + league_encoded,
 		ITEM_OVERVIEW_LINK(UniqueArmour)    + league_encoded,
 		ITEM_OVERVIEW_LINK(UniqueAccessory) + league_encoded,
-		ITEM_OVERVIEW_LINK(Beast)           + league_encoded,
+		ITEM_OVERVIEW_LINK(Vial)            + league_encoded,
 	};
 
 	#undef CURRENCY_OVERVIEW_LINK
 	#undef ITEM_OVERVIEW_LINK
 
 	download_result result = download(target_name, urls, settings, info, logger);
-	// use preprocessor library to auto-repeat some boilerplate
+	// use preprocessor library to auto-repeat initialization boilerplate
 	// z = n + 1 (n is 0-based, z is 1-based), we ignore z
 	// d (data) is not needed, we ignore it
 	#define MOVE_RESULT_N(z, n, d) std::move(result.results[n].data),
 	return api_item_price_data {
-		BOOST_PP_REPEAT(21, MOVE_RESULT_N,)
+		BOOST_PP_REPEAT(22, MOVE_RESULT_N,)
 	};
 	#undef MOVE_RESULT_N
 }

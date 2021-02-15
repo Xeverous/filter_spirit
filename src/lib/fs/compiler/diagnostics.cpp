@@ -100,30 +100,32 @@ void push_error_internal_compiler_error(
 		log::strings::request_bug_report));
 }
 
-void push_error_autogen_error(
-	autogen_error error,
+void push_error_autogen_incompatible_condition(
+	lang::position_tag autogen_origin,
+	lang::position_tag condition_origin,
+	std::string required_matching_value,
 	diagnostics_container& diagnostics)
 {
-	const auto error_str = [&]() {
-		switch (error.cause) {
-			using cause_t = autogen_error_cause;
+	diagnostics.push_back(make_error(
+		dmid::autogen_incompatible_condition,
+		condition_origin,
+		"autogen-incompatible condition: it should either not exist or allow value ",
+		std::move(required_matching_value)));
+	diagnostics.push_back(make_note_minor(autogen_origin, "autogeneration specified here"));
+}
 
-			case cause_t::expected_empty_condition:
-				return "expected this condition to be empty";
-			case cause_t::invalid_rarity_condition:
-				return "expected no rarity condition or one that allows 'Unique'";
-			case cause_t::invalid_class_condition:
-				return "invalid class condition"; // TODO this is underspecified
-			// intentionally no default case
-			// GCC warns when a switch has no default and does not cover all enums
-		}
-
-		return "(unknown)";
-	}();
-
-	diagnostics.push_back(make_error(dmid::autogen_error, error.visibility_origin, "autogeneration here with invalid combination of conditions"));
-	diagnostics.push_back(make_note_minor(error.condition_origin, error_str));
-	diagnostics.push_back(make_note_minor(error.autogen_origin, "autogeneration specified here"));
+void push_error_autogen_missing_condition(
+	lang::position_tag visibility_origin,
+	lang::position_tag autogen_origin,
+	std::string_view required_condition,
+	diagnostics_container& diagnostics)
+{
+	diagnostics.push_back(make_error(
+		dmid::autogen_missing_condition,
+		visibility_origin,
+		"autogen with missing condition: ",
+		required_condition));
+	diagnostics.push_back(make_note_minor(autogen_origin, "autogeneration specified here"));
 }
 
 void output_diagnostics(

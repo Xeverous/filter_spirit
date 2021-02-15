@@ -66,69 +66,62 @@ add_constant_from_definition(
 		.value_or(false);
 }
 
-// ---- compile_spirit_filter_statements helpers ----
-
-bool condition_contains(const lang::strings_condition& condition, std::string_view fragment)
+[[nodiscard]] bool
+verify_string_condition_allows_value(
+	lang::position_tag autogen_origin,
+	const std::optional<lang::strings_condition>& opt_condition,
+	std::string_view str,
+	diagnostics_container& diagnostics)
 {
-	for (const auto& str : condition.strings) {
-		if (utility::contains(str.value, fragment))
-			return true;
-	}
+	if (!opt_condition)
+		return true;
 
+	const auto& condition = *opt_condition;
+	if (condition.find_match(str) != nullptr)
+		return true;
+
+	push_error_autogen_incompatible_condition(
+		autogen_origin,
+		condition.origin,
+		std::string("\"").append(str).append("\""),
+		diagnostics);
 	return false;
 }
 
+std::string to_std_string(int value)
+{
+	return std::to_string(value);
+}
+
+std::string to_std_string(lang::rarity_type value)
+{
+	return std::string(lang::to_string_view(value));
+}
+
+template <typename T, typename U>
 [[nodiscard]] bool
-verify_autogen_cards(
+verify_range_condition_allows_value(
 	lang::position_tag autogen_origin,
-	const lang::condition_set& conditions,
-	lang::position_tag visibility_origin,
+	lang::range_condition<T> condition,
+	U value,
 	diagnostics_container& diagnostics)
 {
 	auto result = true;
 
-	if (conditions.class_.has_value()) {
-		if (!condition_contains(*conditions.class_, fs::lang::item_class_names::divination_card)) {
-			push_error_autogen_error(
-				autogen_error{
-					autogen_error_cause::invalid_class_condition,
-					autogen_origin,
-					(*conditions.class_).origin,
-					visibility_origin},
-				diagnostics);
-			result = false;
-		}
-	}
-
-	if (conditions.prophecy.has_value()) {
-		push_error_autogen_error(
-			autogen_error{
-				autogen_error_cause::expected_empty_condition,
-				autogen_origin,
-				(*conditions.prophecy).origin,
-				visibility_origin},
+	if (condition.lower_bound && !condition.test_lower_bound(value)) {
+		push_error_autogen_incompatible_condition(
+			autogen_origin,
+			(*condition.lower_bound).origin,
+			to_std_string(value),
 			diagnostics);
 		result = false;
 	}
 
-	if (conditions.gem_level.has_bound()) {
-		push_error_autogen_error(
-			autogen_error{
-				autogen_error_cause::expected_empty_condition,
-				autogen_origin,
-				*conditions.gem_level.first_origin(),
-				visibility_origin},
-			diagnostics);
-		result = false;
-	}
-
-	if (conditions.map_tier.has_bound()) {
-		push_error_autogen_error(
-			autogen_error{
-				autogen_error_cause::expected_empty_condition,
-				autogen_origin,
-				*conditions.map_tier.first_origin(),
-				visibility_origin},
+	if (condition.upper_bound && !condition.test_upper_bound(value)) {
+		push_error_autogen_incompatible_condition(
+			autogen_origin,
+			(*condition.upper_bound).origin,
+			to_std_string(value),
 			diagnostics);
 		result = false;
 	}
@@ -137,25 +130,212 @@ verify_autogen_cards(
 }
 
 [[nodiscard]] bool
-verify_autogen_currency(
+verify_boolean_condition_allows_value(
+	lang::position_tag autogen_origin,
+	const std::optional<lang::boolean_condition>& opt_condition,
+	bool value,
+	diagnostics_container& diagnostics)
+{
+	if (!opt_condition)
+		return true;
+
+	const auto& condition = *opt_condition;
+	if (condition.value.value == value)
+		return true;
+
+	push_error_autogen_incompatible_condition(
+		autogen_origin,
+		condition.origin,
+		std::string(lang::to_string_view(value)),
+		diagnostics);
+	return false;
+}
+
+[[nodiscard]] bool
+verify_integer_range_condition_exists(
+	lang::position_tag visibility_origin,
+	lang::position_tag autogen_origin,
+	lang::integer_range_condition condition,
+	std::string_view condition_keyword,
+	diagnostics_container& diagnostics)
+{
+	if (condition.has_bound())
+		return true;
+
+	push_error_autogen_missing_condition(visibility_origin, autogen_origin, condition_keyword, diagnostics);
+	return false;
+}
+
+[[nodiscard]] bool
+verify_boolean_condition_exists(
+	lang::position_tag visibility_origin,
+	lang::position_tag autogen_origin,
+	const std::optional<lang::boolean_condition>& opt_condition,
+	std::string_view condition_keyword,
+	diagnostics_container& diagnostics)
+{
+	if (opt_condition)
+		return true;
+
+	push_error_autogen_missing_condition(visibility_origin, autogen_origin, condition_keyword, diagnostics);
+	return false;
+}
+
+[[nodiscard]] bool
+verify_autogen_singular(
 	lang::position_tag autogen_origin,
 	const lang::condition_set& conditions,
-	lang::position_tag visibility_origin,
+	std::string_view class_name,
 	diagnostics_container& diagnostics)
 {
 	auto result = true;
 
-	if (conditions.class_.has_value()) {
-		if (!condition_contains(*conditions.class_, "Currency")) {
-			push_error_autogen_error(
-				autogen_error{
-					autogen_error_cause::invalid_class_condition,
-					autogen_origin,
-					(*conditions.class_).origin,
-					visibility_origin},
-				diagnostics);
-			result = false;
-		}
+	if (!verify_string_condition_allows_value(autogen_origin, conditions.class_, class_name, diagnostics))
+		result = false;
+
+	if (!verify_range_condition_allows_value(autogen_origin, conditions.rarity, lang::item::sentinel_rarity, diagnostics))
+		result = false;
+
+	if (!verify_range_condition_allows_value(autogen_origin, conditions.item_level, lang::item::sentinel_item_level, diagnostics))
+		result = false;
+
+	if (!verify_range_condition_allows_value(autogen_origin, conditions.quality, lang::item::sentinel_quality, diagnostics))
+		result = false;
+
+	if (!verify_range_condition_allows_value(autogen_origin, conditions.linked_sockets, 0, diagnostics))
+		result = false;
+
+	if (!verify_range_condition_allows_value(autogen_origin, conditions.height, 1, diagnostics))
+		result = false;
+
+	if (!verify_range_condition_allows_value(autogen_origin, conditions.width, 1, diagnostics))
+		result = false;
+
+	if (!verify_range_condition_allows_value(autogen_origin, conditions.gem_level, lang::item::sentinel_gem_level, diagnostics))
+		result = false;
+
+	if (!verify_range_condition_allows_value(autogen_origin, conditions.map_tier, lang::item::sentinel_map_tier, diagnostics))
+		result = false;
+
+	if (!verify_range_condition_allows_value(autogen_origin, conditions.corrupted_mods, 0, diagnostics))
+		result = false;
+
+	if (!verify_range_condition_allows_value(autogen_origin, conditions.enchantment_passive_num, 0, diagnostics))
+		result = false;
+
+	if (!verify_boolean_condition_allows_value(autogen_origin, conditions.is_enchanted, false, diagnostics))
+		result = false;
+
+	if (!verify_boolean_condition_allows_value(autogen_origin, conditions.is_identified, false, diagnostics))
+		result = false;
+
+	if (!verify_boolean_condition_allows_value(autogen_origin, conditions.is_corrupted, false, diagnostics))
+		result = false;
+
+	if (!verify_boolean_condition_allows_value(autogen_origin, conditions.is_mirrored, false, diagnostics))
+		result = false;
+
+	if (!verify_boolean_condition_allows_value(autogen_origin, conditions.is_elder_item, false, diagnostics))
+		result = false;
+
+	if (!verify_boolean_condition_allows_value(autogen_origin, conditions.is_shaper_item, false, diagnostics))
+		result = false;
+
+	if (!verify_boolean_condition_allows_value(autogen_origin, conditions.is_fractured_item, false, diagnostics))
+		result = false;
+
+	if (!verify_boolean_condition_allows_value(autogen_origin, conditions.is_synthesised_item, false, diagnostics))
+		result = false;
+
+	if (!verify_boolean_condition_allows_value(autogen_origin, conditions.is_shaped_map, false, diagnostics))
+		result = false;
+
+	if (!verify_boolean_condition_allows_value(autogen_origin, conditions.is_elder_map, false, diagnostics))
+		result = false;
+
+	if (!verify_boolean_condition_allows_value(autogen_origin, conditions.is_blighted_map, false, diagnostics))
+		result = false;
+
+	if (!verify_boolean_condition_allows_value(autogen_origin, conditions.is_replica, false, diagnostics))
+		result = false;
+
+	if (!verify_boolean_condition_allows_value(autogen_origin, conditions.is_alternate_quality, false, diagnostics))
+		result = false;
+
+	return result;
+}
+
+[[nodiscard]] bool
+verify_autogen_gems(
+	lang::position_tag visibility_origin,
+	lang::position_tag autogen_origin,
+	const lang::condition_set& conditions,
+	diagnostics_container& diagnostics)
+{
+	auto result = true;
+
+	if (!verify_integer_range_condition_exists(
+		visibility_origin, autogen_origin, conditions.gem_level, lang::keywords::rf::gem_level, diagnostics))
+	{
+		result = false;
+	}
+
+	if (!verify_integer_range_condition_exists(
+		visibility_origin, autogen_origin, conditions.quality, lang::keywords::rf::quality, diagnostics))
+	{
+		result = false;
+	}
+
+	if (!verify_boolean_condition_exists(
+		visibility_origin, autogen_origin, conditions.is_corrupted, lang::keywords::rf::corrupted, diagnostics))
+	{
+		result = false;
+	}
+
+	return result;
+}
+
+[[nodiscard]] bool
+verify_autogen_bases(
+	lang::position_tag visibility_origin,
+	lang::position_tag autogen_origin,
+	const lang::condition_set& conditions,
+	diagnostics_container& diagnostics)
+{
+	auto result = true;
+
+	if (!verify_range_condition_allows_value(autogen_origin, conditions.rarity, lang::rarity_type::normal, diagnostics))
+		result = false;
+
+	if (!verify_range_condition_allows_value(autogen_origin, conditions.rarity, lang::rarity_type::magic, diagnostics))
+		result = false;
+
+	if (!verify_range_condition_allows_value(autogen_origin, conditions.rarity, lang::rarity_type::rare, diagnostics))
+		result = false;
+
+	if (!verify_boolean_condition_allows_value(autogen_origin, conditions.is_corrupted, false, diagnostics))
+		result = false;
+
+	if (!verify_boolean_condition_allows_value(autogen_origin, conditions.is_mirrored, false, diagnostics))
+		result = false;
+
+	if (!verify_integer_range_condition_exists(
+		visibility_origin, autogen_origin, conditions.item_level, lang::keywords::rf::item_level, diagnostics))
+	{
+		result = false;
+	}
+
+	if (!conditions.has_influence) {
+		push_error_autogen_missing_condition(visibility_origin, autogen_origin, lang::keywords::rf::has_influence, diagnostics);
+		result = false;
+	}
+	else if (!(*conditions.has_influence).exact_match_required) {
+		diagnostics.push_back(make_error(
+			dmid::autogen_incompatible_condition,
+			(*conditions.has_influence).origin,
+			"autogen-incompatible condition: HasInflunce needs to have strict matching (\"==\")"));
+		diagnostics.push_back(make_note_minor(autogen_origin, "autogeneration specified here"));
+		result = false;
 	}
 
 	return result;
@@ -163,47 +343,16 @@ verify_autogen_currency(
 
 [[nodiscard]] bool
 verify_autogen_uniques(
-	lang::autogen_condition autogen,
+	lang::position_tag autogen_origin,
 	const lang::condition_set& conditions,
-	lang::position_tag visibility_origin,
 	diagnostics_container& diagnostics)
 {
-	auto result = true;
-
-	if (!conditions.rarity.includes(lang::rarity_type::unique)) {
-		push_error_autogen_error(
-			autogen_error{
-				autogen_error_cause::invalid_rarity_condition,
-				autogen.origin,
-				*conditions.rarity.first_origin(),
-				visibility_origin},
-			diagnostics);
-		result = false;
-	}
-
-	if (conditions.stack_size.has_bound()) {
-		push_error_autogen_error(
-			autogen_error{
-				autogen_error_cause::expected_empty_condition,
-				autogen.origin,
-				*conditions.stack_size.first_origin(),
-				visibility_origin},
-			diagnostics);
-		result = false;
-	}
-
-	if (conditions.gem_level.has_bound()) {
-		push_error_autogen_error(
-			autogen_error{
-				autogen_error_cause::expected_empty_condition,
-				autogen.origin,
-				*conditions.gem_level.first_origin(),
-				visibility_origin},
-			diagnostics);
-		result = false;
-	}
-
-	return result;
+	/*
+	 * Uniques are pretty unique so we are not checking any conditions
+	 * besides rarity - uniques may contain very unusual values within
+	 * certain properties (corruption, enchant, links, sockets, mods, etc)
+	 */
+	return verify_range_condition_allows_value(autogen_origin, conditions.rarity, lang::rarity_type::unique, diagnostics);
 }
 
 [[nodiscard]] bool
@@ -213,73 +362,40 @@ verify_autogen(
 	lang::position_tag visibility_origin,
 	diagnostics_container& diagnostics)
 {
-	auto result = true;
-
-	// all autogens require empty BaseType
-	if (conditions.base_type.has_value()) {
-		push_error_autogen_error(
-			autogen_error{
-				autogen_error_cause::expected_empty_condition,
-				autogen.origin,
-				(*conditions.base_type).origin,
-				visibility_origin},
-			diagnostics);
-		result = false;
-	}
-
-	using cat_t = lang::item_category;
-
-	// all autogens except prophecies require empty Prophecy
-	if (autogen.category != cat_t::prophecies && conditions.prophecy.has_value()) {
-		push_error_autogen_error(
-			autogen_error{
-				autogen_error_cause::expected_empty_condition,
-				autogen.origin,
-				(*conditions.prophecy).origin,
-				visibility_origin},
-			diagnostics);
-		result = false;
-	}
-
-	// all autogens except uniques_maps_* require empty MapTier
-	if (const bool is_map_autogen =
-			autogen.category == cat_t::uniques_maps_unambiguous ||
-			autogen.category == cat_t::uniques_maps_ambiguous;
-		is_map_autogen && conditions.map_tier.has_bound())
-	{
-		push_error_autogen_error(
-			autogen_error{
-				autogen_error_cause::expected_empty_condition,
-				autogen.origin,
-				*conditions.map_tier.first_origin(),
-				visibility_origin},
-			diagnostics);
-		result = false;
-	}
-
 	switch (autogen.category) {
-		case cat_t::cards: {
-			if (!verify_autogen_cards(autogen.origin, conditions, visibility_origin, diagnostics))
-				result = false;
+		using cat_t = lang::item_category;
+		namespace cn = lang::item_class_names;
 
-			return result;
-		}
-
-		case cat_t::scarabs:
-		case cat_t::incubators:
-			return result; // TODO add checking
-
-		case cat_t::prophecies:
-		case cat_t::essences:
-		case cat_t::fossils:
-		case cat_t::resonators:
+		case cat_t::currency:
+			return verify_autogen_singular(autogen.origin, conditions, cn::currency_stackable, diagnostics);
+		case cat_t::fragments:
+			return verify_autogen_singular(autogen.origin, conditions, cn::map_fragments,      diagnostics);
+		case cat_t::delirium_orbs:
+			return verify_autogen_singular(autogen.origin, conditions, cn::delirium_orbs,      diagnostics);
 		case cat_t::oils:
-		case cat_t::catalysts: {
-			if (!verify_autogen_currency(autogen.origin, conditions, visibility_origin, diagnostics))
-				result = false;
+			return verify_autogen_singular(autogen.origin, conditions, cn::oils,               diagnostics);
+		case cat_t::incubators:
+			return verify_autogen_singular(autogen.origin, conditions, cn::incubator,          diagnostics);
+		case cat_t::scarabs:
+			return verify_autogen_singular(autogen.origin, conditions, cn::scarabs,            diagnostics);
+		case cat_t::fossils:
+			return verify_autogen_singular(autogen.origin, conditions, cn::fossils,            diagnostics);
+		case cat_t::resonators:
+			return verify_autogen_singular(autogen.origin, conditions, cn::resonators,         diagnostics);
+		case cat_t::essences:
+			return verify_autogen_singular(autogen.origin, conditions, cn::essences,           diagnostics);
+		case cat_t::cards:
+			return verify_autogen_singular(autogen.origin, conditions, cn::divination_card,    diagnostics);
+		case cat_t::prophecies:
+			return verify_autogen_singular(autogen.origin, conditions, cn::prophecies,         diagnostics);
+		case cat_t::vials:
+			return verify_autogen_singular(autogen.origin, conditions, cn::vials,              diagnostics);
 
-			return result;
-		}
+		case cat_t::gems:
+			return verify_autogen_gems(visibility_origin, autogen.origin, conditions, diagnostics);
+
+		case cat_t::bases:
+			return verify_autogen_bases(visibility_origin, autogen.origin, conditions, diagnostics);
 
 		case cat_t::uniques_eq_unambiguous:
 		case cat_t::uniques_eq_ambiguous:
@@ -288,12 +404,8 @@ verify_autogen(
 		case cat_t::uniques_jewels_unambiguous:
 		case cat_t::uniques_jewels_ambiguous:
 		case cat_t::uniques_maps_unambiguous:
-		case cat_t::uniques_maps_ambiguous: {
-			if (!verify_autogen_uniques(autogen, conditions, visibility_origin, diagnostics))
-				result = false;
-
-			return result;
-		}
+		case cat_t::uniques_maps_ambiguous:
+			return verify_autogen_uniques(autogen.origin, conditions, diagnostics);
 	}
 
 	// failed to cover given category - add internal error and return failure
@@ -335,16 +447,10 @@ make_spirit_filter_block(
 		return boost::none;
 	}
 
+	std::optional<lang::autogen_extension> autogen;
 	if (conditions.autogen) {
 		if (verify_autogen(*conditions.autogen, conditions.conditions, visibility.origin, diagnostics)) {
-			return lang::spirit_item_filter_block{
-				lang::item_filter_block(
-					visibility,
-					std::move(conditions.conditions),
-					std::move(actions),
-					continuation
-				),
-				lang::autogen_extension{conditions.price, *conditions.autogen}};
+			autogen = lang::autogen_extension{conditions.price, *conditions.autogen};
 		}
 		else {
 			return boost::none;
@@ -358,7 +464,7 @@ make_spirit_filter_block(
 			std::move(actions),
 			continuation
 		),
-		std::nullopt};
+		autogen};
 }
 
 lang::block_continuation

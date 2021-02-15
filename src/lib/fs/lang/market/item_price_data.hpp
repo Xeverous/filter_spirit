@@ -2,6 +2,7 @@
 
 #include <fs/log/logger.hpp>
 #include <fs/lang/data_source_type.hpp>
+#include <fs/lang/influence_info.hpp>
 
 #include <nlohmann/json.hpp>
 
@@ -55,29 +56,14 @@ struct base : elementary_item
 	base(
 		elementary_item ei,
 		int item_level,
-		bool is_shaper,
-		bool is_elder,
-		bool is_crusader,
-		bool is_redeemer,
-		bool is_hunter,
-		bool is_warlord)
+		influence_info influence)
 	: elementary_item(std::move(ei))
 	, item_level(item_level)
-	, is_shaper(is_shaper)
-	, is_elder(is_elder)
-	, is_crusader(is_crusader)
-	, is_redeemer(is_redeemer)
-	, is_hunter(is_hunter)
-	, is_warlord(is_warlord)
+	, influence(influence)
 	{}
 
 	int item_level;
-	bool is_shaper;
-	bool is_elder;
-	bool is_crusader;
-	bool is_redeemer;
-	bool is_hunter;
-	bool is_warlord;
+	influence_info influence;
 };
 
 bool is_undroppable_unique(std::string_view name) noexcept;
@@ -89,11 +75,13 @@ struct unique_item_price_data
 
 	// maps base type name to unique item name
 	// (only 1 unique on the given base)
-	std::unordered_map<std::string, elementary_item> unambiguous;
+	using unambiguous_container_type = std::unordered_map<std::string, elementary_item>;
+	unambiguous_container_type unambiguous;
 	// maps base type name to unique item names
 	// (contains multiple entries per base type)
-	// the vector is never empty
-	std::unordered_map<std::string, std::vector<elementary_item>> ambiguous;
+	// the vector should never have size 0 or 1
+	using ambiguous_container_type = std::unordered_map<std::string, std::vector<elementary_item>>;
+	ambiguous_container_type ambiguous;
 };
 
 struct item_price_metadata;
@@ -117,7 +105,10 @@ struct item_price_data
 
 	std::vector<divination_card> divination_cards;
 
-	std::vector<elementary_item> catalysts;
+	std::vector<elementary_item> currency;
+	std::vector<elementary_item> fragments;
+	std::vector<elementary_item> delirium_orbs;
+	std::vector<elementary_item> vials;
 	std::vector<elementary_item> oils;
 	std::vector<elementary_item> incubators;
 	std::vector<elementary_item> essences;

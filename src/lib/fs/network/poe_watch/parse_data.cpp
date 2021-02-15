@@ -698,7 +698,7 @@ parse_item_price_data(
 				result.oils.push_back(elementary_item{price_data, std::move(itm.name)});
 			}
 			if (curr.type == +categories::currency_type::catalyst) {
-				result.catalysts.push_back(elementary_item{price_data, std::move(itm.name)});
+				result.currency.push_back(elementary_item{price_data, std::move(itm.name)});
 			}
 
 			// we do not care about other currency items
@@ -736,12 +736,14 @@ parse_item_price_data(
 			result.bases.push_back(lang::market::base{
 				elementary_item{price_data, std::move(itm.name)},
 				base.ilvl,
-				base.is_shaper,
-				base.is_elder,
-				base.is_crusader,
-				base.is_redeemer,
-				base.is_hunter,
-				base.is_warlord});
+				lang::influence_info{
+					base.is_shaper,
+					base.is_elder,
+					base.is_crusader,
+					base.is_redeemer,
+					base.is_hunter,
+					base.is_warlord
+				}});
 			continue;
 		}
 		else if (std::holds_alternative<categories::gem>(itm.category)) {

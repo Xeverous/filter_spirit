@@ -157,21 +157,23 @@ namespace sf
 
 	// some item types are commented - there is no point in querying for them
 	// and/or sites like poe.watch and poe.ninja do not report their prices
+	constexpr auto currency        = "currency";
+	constexpr auto fragments       = "fragments";
 	constexpr auto cards           = "cards";           // 2.0 - The Awakening (Warbands + Tempest)
-	constexpr auto enchants_helmet = "enchants_helmet"; // 2.2 - Perandus league (also Ascendancy)
+	// constexpr auto enchants_helmet = "enchants_helmet"; // 2.2 - Perandus league (also Ascendancy)
 	constexpr auto prophecies      = "prophecies";      // 2.3 - Prophecy league
 	constexpr auto essences        = "essences";        // 2.4 - Essence league (also Atlas of Worlds)
 	constexpr auto leaguestones    = "leaguestones";    // 2.6 - Legacy league
-	// constexpr auto pieces       = "pieces";          // 3.0 - Harbinger league (also Fall of Oriath)
-	// constexpr auto nets         = "nets";            // 3.2 - Bestiary league
-	// constexpr auto vials        = "vials";           // 3.3 - Incursion league
+	// constexpr auto pieces       = "pieces";          // 3.0 - Harbinger league (also Fall of Oriath) (merged into uniques)
+	// constexpr auto nets         = "nets";            // 3.2 - Bestiary league (legacy items)
+	constexpr auto vials           = "vials";           // 3.3 - Incursion league
 	constexpr auto fossils         = "fossils";         // 3.4 - Delve league
 	constexpr auto resonators      = "resonators";      // as above
 	constexpr auto scarabs         = "scarabs";         // 3.5 - Betrayal league
 	constexpr auto incubators      = "incubators";      // 3.7 - Legion league
 	constexpr auto oils            = "oils";            // 3.8 - Blight league
-	constexpr auto catalysts       = "catalysts";       // 3.9 - Metamorph league
-
+	// constexpr auto catalysts    = "catalysts";       // 3.9 - Metamorph league (merged into currency)
+	constexpr auto delirium_orbs   = "delirium_orbs";   // 3.10 - Delirium league
 
 	constexpr auto uniques_eq_unambiguous    = "uniques_eq_unambiguous";
 	constexpr auto uniques_eq_ambiguous      = "uniques_eq_ambiguous";

@@ -43,6 +43,11 @@ struct boolean
 	position_tag origin = {};
 };
 
+inline std::string_view to_string_view(bool value) noexcept
+{
+	return value ? lang::keywords::rf::true_ : lang::keywords::rf::false_;
+}
+
 inline bool operator==(boolean lhs, boolean rhs) noexcept { return lhs.value == rhs.value; }
 inline bool operator!=(boolean lhs, boolean rhs) noexcept { return !(lhs == rhs); }
 

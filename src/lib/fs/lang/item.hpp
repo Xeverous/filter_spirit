@@ -21,8 +21,8 @@ namespace item_class_names {
 
 	// core
 	constexpr auto currency_stackable         = "Stackable Currency";
-	constexpr auto currency_scrolls_generic   = currency_stackable;
-	constexpr auto currency_scrolls_harbinger = currency_stackable;
+	constexpr auto scrolls_generic            = currency_stackable;
+	constexpr auto scrolls_harbinger          = currency_stackable;
 	constexpr auto remnant_of_corruption      = currency_stackable;
 	constexpr auto prophecies                 = currency_stackable;
 	constexpr auto essences                   = currency_stackable;
@@ -34,7 +34,7 @@ namespace item_class_names {
 	constexpr auto vials                      = currency_stackable;
 	constexpr auto nets                       = currency_stackable;
 	constexpr auto stacked_deck               = currency_stackable;
-	constexpr auto currency_resonators        = "Delve Stackable Socketable Currency";
+	constexpr auto resonators                 = "Delve Stackable Socketable Currency";
 	constexpr auto divination_card            = "Divination Card";
 	constexpr auto incubator                  = "Incubator";
 	constexpr auto gems_active                = "Active Skill Gems";

@@ -184,6 +184,8 @@ struct socket_spec_condition
 
 struct strings_condition
 {
+	const lang::string* find_match(std::string_view value) const;
+
 	std::vector<lang::string> strings;
 	bool exact_match_required;
 	position_tag origin;

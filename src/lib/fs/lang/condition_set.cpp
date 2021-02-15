@@ -1,6 +1,7 @@
 #include <fs/lang/condition_set.hpp>
 #include <fs/lang/keywords.hpp>
 #include <fs/utility/assert.hpp>
+#include <fs/utility/string_helpers.hpp>
 
 #include <ostream>
 
@@ -273,10 +274,33 @@ void output_boolean_condition(
 	output_stream << '\n';
 }
 
+[[nodiscard]] bool
+compare_strings(
+	bool exact_match_required,
+	std::string_view value,
+	std::string_view requirement)
+{
+	// In-game filters ignore diacritics, here 2 UTF-8 strings are compared strictly.
+	if (exact_match_required)
+		return value == requirement;
+	else
+		return utility::contains(value, requirement);
+}
+
 } // namespace
 
 namespace fs::lang
 {
+
+const lang::string* strings_condition::find_match(std::string_view value) const
+{
+	for (const auto& str : strings) {
+		if (compare_strings(exact_match_required, value, str.value))
+			return &str;
+	}
+
+	return nullptr;
+}
 
 void condition_set::generate(std::ostream& output_stream) const
 {

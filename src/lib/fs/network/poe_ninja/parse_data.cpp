@@ -85,10 +85,13 @@ get_item_price_data(const nlohmann::json& item)
 	};
 }
 
-[[nodiscard]] std::string
-get_item_name(const nlohmann::json& item)
+[[nodiscard]] lang::market::elementary_item
+get_currency_item_data(const nlohmann::json& item)
 {
-	return item.at("name").get<std::string>();
+	return lang::market::elementary_item{
+		get_currency_price_data(item),
+		item.at("currencyTypeName").get<std::string>()
+	};
 }
 
 [[nodiscard]] lang::market::elementary_item
@@ -96,26 +99,17 @@ get_elementary_item_data(const nlohmann::json& item)
 {
 	return lang::market::elementary_item{
 		get_item_price_data(item),
-		get_item_name(item)
+		item.at("name").get<std::string>()
 	};
 }
 
-[[nodiscard]] std::vector<lang::market::elementary_item> // (only for currency overview items)
-parse_catalysts(std::string_view json_str, log::logger& logger)
+[[nodiscard]] std::vector<lang::market::elementary_item>
+parse_currency_items(std::string_view json_str, log::logger& logger)
 {
 	std::vector<lang::market::elementary_item> result;
 
-	for_each_item(json_str, logger, [&](const nlohmann::json& item) {
-		auto& item_name = item.at("currencyTypeName").get_ref<const nlohmann::json::string_t&>();
-		if (!utility::contains(item_name, " Catalyst"))
-			return;
-
-		result.push_back(
-			lang::market::elementary_item{
-				get_currency_price_data(item),
-				item_name
-			}
-		);
+	for_each_item(json_str, logger, [&](const auto& item) {
+		result.push_back(get_currency_item_data(item));
 	});
 
 	return result;
@@ -179,23 +173,25 @@ parse_bases(std::string_view json_str, log::logger& logger)
 			result.emplace_back(
 				get_elementary_item_data(item),
 				item_level,
-				false, false, false, false, false, false
+				lang::influence_info{}
 			);
 		}
 		else {
 			const auto& infl = item_influence.get_ref<const nlohmann::json::string_t&>();
 
-			// as of now, poe.ninja only reports singly-influenced items
-			// we can just compare the influence string
+			// poe.ninja reports influence in strings as "X" or "X/Y"
+			// so we can safely use string-contains approach
 			result.emplace_back(
 				get_elementary_item_data(item),
 				item_level,
-				infl == "Shaper",
-				infl == "Elder",
-				infl == "Crusader",
-				infl == "Redeemer",
-				infl == "Hunter",
-				infl == "Warlord"
+				lang::influence_info{
+					utility::contains(infl, "Shaper"),
+					utility::contains(infl, "Elder"),
+					utility::contains(infl, "Crusader"),
+					utility::contains(infl, "Redeemer"),
+					utility::contains(infl, "Hunter"),
+					utility::contains(infl, "Warlord")
+				}
 			);
 		}
 	});
@@ -246,15 +242,18 @@ lang::market::item_price_data parse_item_price_data(const api_item_price_data& j
 
 	result.divination_cards = parse_divination_cards(jsons.divination_card, logger);
 
-	result.catalysts = parse_catalysts(jsons.currency, logger);
+	result.currency  = parse_currency_items(jsons.currency, logger);
+	result.fragments = parse_currency_items(jsons.fragment, logger);
 
-	result.oils = parse_elementary_items(jsons.oil, logger);
-	result.incubators = parse_elementary_items(jsons.incubator, logger);
-	result.essences = parse_elementary_items(jsons.essence, logger);
-	result.fossils = parse_elementary_items(jsons.fossil, logger);
-	result.prophecies = parse_elementary_items(jsons.prophecy, logger);
-	result.resonators = parse_elementary_items(jsons.resonator, logger);
-	result.scarabs = parse_elementary_items(jsons.scarab, logger);
+	result.delirium_orbs   = parse_elementary_items(jsons.delirium_orb,   logger);
+	result.oils            = parse_elementary_items(jsons.oil,            logger);
+	result.incubators      = parse_elementary_items(jsons.incubator,      logger);
+	result.scarabs         = parse_elementary_items(jsons.scarab,         logger);
+	result.fossils         = parse_elementary_items(jsons.fossil,         logger);
+	result.resonators      = parse_elementary_items(jsons.resonator,      logger);
+	result.essences        = parse_elementary_items(jsons.essence,        logger);
+	result.prophecies      = parse_elementary_items(jsons.prophecy,       logger);
+	result.vials           = parse_elementary_items(jsons.vial,           logger);
 	result.helmet_enchants = parse_elementary_items(jsons.helmet_enchant, logger);
 
 	result.gems = parse_gems(jsons.skill_gem, logger);

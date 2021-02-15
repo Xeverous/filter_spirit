@@ -239,6 +239,10 @@ void compare_item_price_data(
 				report_lhs, report_rhs);
 		};
 
+	run_compare_elementary(lhs.currency, rhs.currency, "currency");
+	run_compare_elementary(lhs.fragments, rhs.fragments, "fragments");
+	run_compare_elementary(lhs.delirium_orbs, rhs.delirium_orbs, "delirium orbs");
+	run_compare_elementary(lhs.vials, rhs.vials, "vials");
 	run_compare_elementary(lhs.oils, rhs.oils, "oils");
 	run_compare_elementary(lhs.incubators, rhs.incubators, "incubators");
 	run_compare_elementary(lhs.essences, rhs.essences, "essences");
@@ -334,7 +338,10 @@ log::message_stream& operator<<(log::message_stream& stream, const item_price_da
 {
 	return stream << "Item price data:\n"
 		"\tdivination cards: " << ipd.divination_cards.size() << "\n"
-		"\tcatalysts       : " << ipd.catalysts.size() << "\n"
+		"\tcurrency        : " << ipd.currency.size() << "\n"
+		"\tfragments       : " << ipd.fragments.size() << "\n"
+		"\tdelirium orbs   : " << ipd.delirium_orbs.size() << "\n"
+		"\tvials           : " << ipd.vials.size() << "\n"
 		"\toils            : " << ipd.oils.size() << "\n"
 		"\tincubators      : " << ipd.incubators.size() << "\n"
 		"\tessences        : " << ipd.essences.size() << "\n"
@@ -377,7 +384,10 @@ void item_price_data::sort()
 		};
 
 	std::sort(divination_cards.begin(), divination_cards.end(), compare_by_name_asc);
-	std::sort(catalysts.begin(),        catalysts.end(),        compare_by_name_asc);
+	std::sort(currency.begin(),         currency.end(),         compare_by_name_asc);
+	std::sort(fragments.begin(),        fragments.end(),        compare_by_name_asc);
+	std::sort(delirium_orbs.begin(),    delirium_orbs.end(),    compare_by_name_asc);
+	std::sort(vials.begin(),            vials.end(),            compare_by_name_asc);
 	std::sort(oils.begin(),             oils.end(),             compare_by_name_asc);
 	std::sort(incubators.begin(),       incubators.end(),       compare_by_name_asc);
 	std::sort(essences.begin(),         essences.end(),         compare_by_name_asc);

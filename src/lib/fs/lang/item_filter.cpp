@@ -1,6 +1,5 @@
 #include <fs/lang/item_filter.hpp>
 #include <fs/lang/keywords.hpp>
-#include <fs/utility/string_helpers.hpp>
 #include <fs/utility/assert.hpp>
 #include <fs/utility/type_traits.hpp>
 
@@ -12,19 +11,6 @@ namespace {
 
 using namespace fs;
 using namespace fs::lang;
-
-[[nodiscard]] bool
-compare_strings(
-	bool exact_match_required,
-	const std::string& lhs,
-	const std::string& rhs)
-{
-	// In-game filters ignore diacritics, here 2 UTF-8 strings are compared strictly.
-	if (exact_match_required)
-		return lhs == rhs;
-	else
-		return utility::contains(lhs, rhs);
-}
 
 template <typename T, typename U> [[nodiscard]]
 range_condition_match_result test_range_condition(range_condition<T> condition, U item_property_value)
@@ -55,12 +41,10 @@ test_strings_condition_impl(
 	const strings_condition& condition,
 	const std::string& property)
 {
-	for (const auto& str : condition.strings) {
-		if (compare_strings(condition.exact_match_required, property, str.value))
-			return condition_match_result::success(condition.origin, str.origin);
-	}
-
-	return condition_match_result::failure(condition.origin);
+	if (const lang::string* str = condition.find_match(property); str)
+		return condition_match_result::success(condition.origin, str->origin);
+	else
+		return condition_match_result::failure(condition.origin);
 }
 
 [[nodiscard]] std::optional<condition_match_result>
@@ -115,10 +99,8 @@ test_ranged_strings_condition(
 		int matches = 0;
 
 		for (const auto& prop : properties) {
-			for (const auto& str : strings_cond.strings) {
-				if (compare_strings(strings_cond.exact_match_required, prop, str.value))
-					++matches;
-			}
+			if (strings_cond.find_match(prop) != nullptr)
+				++matches;
 		}
 
 		range_condition_match_result result = test_range_condition(integer_cond, matches);
@@ -138,7 +120,7 @@ test_ranged_strings_condition(
 			return result.upper_bound;
 		}
 		else {
-			FS_ASSERT_MSG(false, "unreachable: if integer condition has a bound, it should get here");
+			FS_ASSERT_MSG(false, "unreachable: if integer condition has a bound, it should not get here");
 			return condition_match_result::failure(condition.origin); // silence no-return warning
 		}
 	}
@@ -474,7 +456,7 @@ item_style default_item_style(const item& itm)
 	else if (itm.rarity_ == rarity_type::unique)
 		result.text_color = color_action{color{integer{175}, integer{ 95}, integer{ 28}, integer{255}}, {}};
 
-	if (itm.class_ == item_class_names::currency_stackable || itm.class_ == item_class_names::currency_resonators)
+	if (itm.class_ == item_class_names::currency_stackable || itm.class_ == item_class_names::resonators)
 		result.text_color = color_action{color{integer{170}, integer{158}, integer{129}, integer{255}}, {}};
 	else if (itm.class_ == item_class_names::divination_card)
 		result.text_color = color_action{color{integer{  0}, integer{186}, integer{255}, integer{255}}, {}};
