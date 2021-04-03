@@ -82,11 +82,11 @@ void version_info_window::draw_contents()
 
 	ImGui::TextUnformatted("Magnum version:");
 	ImGui::SameLine(line_width);
-	ImGui::TextUnformatted(MAGNUM_VERSION_STRING);
+	ImGui::Text("%d/%d", MAGNUM_VERSION_YEAR, MAGNUM_VERSION_MONTH);
 
 	ImGui::TextUnformatted("Corrade version:");
 	ImGui::SameLine(line_width);
-	ImGui::TextUnformatted(CORRADE_VERSION_STRING);
+	ImGui::Text("%d/%d", CORRADE_VERSION_YEAR, CORRADE_VERSION_MONTH);
 
 	ImGui::TextUnformatted("Dear ImGui version:");
 	ImGui::SameLine(line_width);
