@@ -447,6 +447,13 @@ test_socket_spec_condition(
 
 item_style default_item_style(const item& itm)
 {
+	/*
+	 * There is no official info for these - all data here comes from own experiments and PoE wiki.
+	 * I checked resulting colors without filter in the blackest place I could find - Delve without lights.
+	 * Most of colors matched the ones from wiki (listed below) but surprisingly even on RGB 2 2 2
+	 * (blackest background I managed to find in Delve) some differed by ~10 (gamma correction?). Because
+	 * I often had value 254 I suspect my values were 1-off (or more), thus all values below are from wiki.
+	 */
 	item_style result;
 
 	if (itm.rarity_ == rarity_type::magic)
@@ -454,18 +461,18 @@ item_style default_item_style(const item& itm)
 	else if (itm.rarity_ == rarity_type::rare)
 		result.text_color = color_action{color{integer{255}, integer{255}, integer{119}, integer{255}}, {}};
 	else if (itm.rarity_ == rarity_type::unique)
-		result.text_color = color_action{color{integer{175}, integer{ 95}, integer{ 28}, integer{255}}, {}};
+		result.text_color = color_action{color{integer{175}, integer{ 96}, integer{ 37}, integer{255}}, {}};
 
 	if (itm.class_ == item_class_names::currency_stackable || itm.class_ == item_class_names::resonators)
-		result.text_color = color_action{color{integer{170}, integer{158}, integer{129}, integer{255}}, {}};
+		result.text_color = color_action{color{integer{170}, integer{158}, integer{130}, integer{255}}, {}};
 	else if (itm.class_ == item_class_names::divination_card)
-		result.text_color = color_action{color{integer{  0}, integer{186}, integer{255}, integer{255}}, {}};
+		result.text_color = color_action{color{integer{ 14}, integer{186}, integer{255}, integer{255}}, {}};
 	else if (itm.class_ == item_class_names::gems_active || itm.class_ == item_class_names::gems_support)
-		result.text_color = color_action{color{integer{ 13}, integer{162}, integer{155}, integer{255}}, {}};
+		result.text_color = color_action{color{integer{ 27}, integer{162}, integer{155}, integer{255}}, {}};
 	else if (itm.is_prophecy)
 		result.text_color = color_action{color{integer{181}, integer{ 75}, integer{255}, integer{255}}, {}};
 	else if (itm.class_ == item_class_names::quest_items)
-		result.text_color = color_action{color{integer{ 71}, integer{230}, integer{ 53}, integer{255}}, {}};
+		result.text_color = color_action{color{integer{ 74}, integer{230}, integer{ 58}, integer{255}}, {}};
 	// maps are both in these class names and in rarities - border color is the same as text color
 	else if (itm.class_ == item_class_names::maps || itm.class_ == item_class_names::map_fragments)
 		result.border_color = result.text_color;
