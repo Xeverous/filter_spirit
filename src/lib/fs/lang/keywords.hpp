@@ -149,6 +149,11 @@ namespace rf
 // keywords used in spirit filters
 namespace sf
 {
+	// ---- visibility extensions ----
+
+	constexpr auto show_hide = "ShowHide";
+	constexpr auto show_discard = "ShowDiscard";
+
 	// ---- condition extensions ----
 
 	// autogeneration feature

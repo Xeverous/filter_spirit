@@ -11,14 +11,16 @@
 namespace fs::lang
 {
 
+enum class item_visibility_policy { show, hide, discard };
+
 struct item_visibility
 {
-	item_visibility(bool show, position_tag origin)
-	: show(show), origin(origin)
+	item_visibility(item_visibility_policy policy, position_tag origin)
+	: policy(policy), origin(origin)
 	{
 	}
 
-	bool show;
+	item_visibility_policy policy;
 	position_tag origin;
 };
 
@@ -84,6 +86,12 @@ struct spirit_item_filter
 	std::vector<spirit_item_filter_block> blocks;
 };
 
+struct item_visibility_style
+{
+	bool show;
+	position_tag origin;
+};
+
 // all of the styles applied to an item after filtering
 struct item_style
 {
@@ -91,7 +99,7 @@ struct item_style
 
 	void override_with(const action_set& actions);
 
-	item_visibility visibility;
+	item_visibility_style visibility;
 
 	std::optional<color_action> border_color;
 	color_action text_color;

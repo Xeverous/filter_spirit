@@ -417,9 +417,48 @@ verify_autogen(
 evaluate(parser::ast::common::static_visibility_statement visibility)
 {
 	return lang::item_visibility{
-		visibility.show,
+		visibility.show ? lang::item_visibility_policy::show : lang::item_visibility_policy::hide,
 		parser::position_tag_of(visibility)
 	};
+}
+
+[[nodiscard]] boost::optional<lang::item_visibility>
+evaluate(
+	settings st,
+	parser::ast::sf::dynamic_visibility_statement visibility,
+	const lang::symbol_table& symbols,
+	diagnostics_container& diagnostics)
+{
+	return detail::evaluate_sequence(st, visibility.seq, symbols, 1, 1, diagnostics)
+		.flat_map([&](lang::object obj) {
+			FS_ASSERT(obj.values.size() == 1u);
+			return detail::get_as<lang::boolean>(obj.values[0], diagnostics);
+		})
+		.map([&](lang::boolean b) {
+			const lang::position_tag origin = parser::position_tag_of(visibility);
+			if (b.value) {
+				return lang::item_visibility{lang::item_visibility_policy::show, origin};
+			}
+			else {
+				if (visibility.policy.discard)
+					return lang::item_visibility{lang::item_visibility_policy::discard, origin};
+				else
+					return lang::item_visibility{lang::item_visibility_policy::hide, origin};
+			}
+		});
+}
+
+[[nodiscard]] boost::optional<lang::item_visibility>
+evaluate(
+	settings st,
+	parser::ast::sf::visibility_statement visibility,
+	const lang::symbol_table& symbols,
+	diagnostics_container& diagnostics)
+{
+	return visibility.apply_visitor(x3::make_lambda_visitor<boost::optional<lang::item_visibility>>(
+		[](parser::ast::common::static_visibility_statement visibility) { return evaluate(visibility); },
+		[&](parser::ast::sf::dynamic_visibility_statement visibility) { return evaluate(st, visibility, symbols, diagnostics); }
+	));
 }
 
 [[nodiscard]] boost::optional<lang::spirit_item_filter_block>
@@ -493,9 +532,13 @@ compile_statements_recursively(
 				return detail::spirit_filter_add_action(st, action, symbols, parent_actions, diagnostics);
 			},
 			[&](const ast::sf::behavior_statement& bs) {
+				boost::optional<lang::item_visibility> visibility = evaluate(st, bs.visibility, symbols, diagnostics);
+				if (!visibility)
+					return false;
+
 				boost::optional<lang::spirit_item_filter_block> block = make_spirit_filter_block(
 					st,
-					evaluate(bs.visibility),
+					*visibility,
 					parent_conditions,
 					parent_actions,
 					to_block_continuation(bs.continue_),

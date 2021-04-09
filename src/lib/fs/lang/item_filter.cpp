@@ -473,6 +473,12 @@ item_style default_item_style(const item& itm)
 	return result;
 }
 
+item_visibility_style to_item_visibility_style(item_visibility visibility)
+{
+	FS_ASSERT(visibility.policy != item_visibility_policy::discard);
+	return {visibility.policy == item_visibility_policy::show, visibility.origin};
+}
+
 } // namespace
 
 namespace fs::lang
@@ -480,10 +486,10 @@ namespace fs::lang
 
 void item_filter_block::generate(std::ostream& output_stream) const
 {
-	if (!conditions.is_valid())
+	if (!conditions.is_valid() || visibility.policy == item_visibility_policy::discard)
 		return;
 
-	if (visibility.show)
+	if (visibility.policy == item_visibility_policy::show)
 		output_stream << keywords::rf::show;
 	else
 		output_stream << keywords::rf::hide;
@@ -545,6 +551,9 @@ item_filtering_result pass_item_through_filter(const item& itm, const item_filte
 	item_style style = default_item_style(itm);
 
 	for (const item_filter_block& block : filter.blocks) {
+		// TODO these should not be here - the function should not expect item_filter with extra invariants
+		// instead of firing asserts, it should produce more detailed item_filtering_result
+		FS_ASSERT(block.visibility.policy != item_visibility_policy::discard);
 		FS_ASSERT(block.conditions.is_valid());
 
 		const condition_set& cs = block.conditions;
@@ -601,10 +610,10 @@ item_filtering_result pass_item_through_filter(const item& itm, const item_filte
 		bool stop_filtering = false;
 		if (block_result.condition_set_result.is_successful()) {
 			style.override_with(block.actions);
-			style.visibility = block.visibility;
+			style.visibility = to_item_visibility_style(block.visibility);
 
 			if (block.continuation.origin) {
-				FS_ASSERT(lang::is_valid(*block.continuation.origin));
+				FS_ASSERT(is_valid(*block.continuation.origin));
 				block_result.continue_origin = *block.continuation.origin;
 			}
 			else {

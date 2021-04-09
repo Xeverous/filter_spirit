@@ -516,6 +516,96 @@ Show
 			BOOST_TEST(compare_strings(expected_filter, actual_filter));
 		}
 
+		BOOST_AUTO_TEST_CASE(dynamic_visibility_enabled)
+		{
+			const std::string actual_filter = generate_filter(minimal_input() + R"(
+$show_rares = True
+$show_hammers = True
+
+BaseType "Gavel" "Stone Hammer" "Rock Breaker" {
+	SetTextColor 255 255 255
+	SetBackgroundColor 162 85 0
+
+	Rarity Normal {
+		 ShowDiscard $show_hammers
+	}
+
+	Rarity Magic
+	Quality > 12 {
+		 ShowDiscard $show_hammers
+	}
+
+	Rarity Rare
+	Quality > 16 {
+		 ShowDiscard $show_hammers
+	}
+}
+
+ShowHide $show_rares
+)");
+			const std::string_view expected_filter =
+R"(Show
+	Rarity = Normal
+	BaseType "Gavel" "Stone Hammer" "Rock Breaker"
+	SetTextColor 255 255 255
+	SetBackgroundColor 162 85 0
+
+Show
+	Quality > 12
+	Rarity = Magic
+	BaseType "Gavel" "Stone Hammer" "Rock Breaker"
+	SetTextColor 255 255 255
+	SetBackgroundColor 162 85 0
+
+Show
+	Quality > 16
+	Rarity = Rare
+	BaseType "Gavel" "Stone Hammer" "Rock Breaker"
+	SetTextColor 255 255 255
+	SetBackgroundColor 162 85 0
+
+Show
+
+)";
+
+			BOOST_TEST(compare_strings(expected_filter, actual_filter));
+		}
+
+		BOOST_AUTO_TEST_CASE(dynamic_visibility_disabled)
+		{
+			const std::string actual_filter = generate_filter(minimal_input() + R"(
+$show_rares = True
+$show_hammers = False
+
+BaseType "Gavel" "Stone Hammer" "Rock Breaker" {
+	SetTextColor 255 255 255
+	SetBackgroundColor 162 85 0
+
+	Rarity Normal {
+		 ShowDiscard $show_hammers
+	}
+
+	Rarity Magic
+	Quality > 12 {
+		 ShowDiscard $show_hammers
+	}
+
+	Rarity Rare
+	Quality > 16 {
+		 ShowDiscard $show_hammers
+	}
+}
+
+ShowHide $show_rares
+)");
+			const std::string_view expected_filter =
+R"(Show
+
+)";
+
+			BOOST_TEST(compare_strings(expected_filter, actual_filter));
+		}
+
 		BOOST_AUTO_TEST_CASE(continue_statement)
 		{
 			const std::string actual_filter = generate_filter(minimal_input() + R"(

@@ -154,6 +154,9 @@ namespace sf
 
 	// ---- filter structure ----
 
+	struct dynamic_visibility_policy_class       : error_on_error, annotate_on_success {};
+	struct dynamic_visibility_statement_class    : error_on_error, annotate_on_success {};
+	struct visibility_statement_class            : error_on_error, annotate_on_success {};
 	struct behavior_statement_class              : error_on_error, annotate_on_success {};
 	struct statement_class                       : error_on_error, annotate_on_success {};
 	struct rule_block_class                      : error_on_error, annotate_on_success {};
@@ -404,6 +407,15 @@ namespace sf
 	BOOST_SPIRIT_DECLARE(compound_action_type)
 
 	// ---- filter structure ----
+
+	using dynamic_visibility_policy_type = x3::rule<dynamic_visibility_policy_class, ast::sf::dynamic_visibility_policy>;
+	BOOST_SPIRIT_DECLARE(dynamic_visibility_policy_type)
+
+	using dynamic_visibility_statement_type = x3::rule<dynamic_visibility_statement_class, ast::sf::dynamic_visibility_statement>;
+	BOOST_SPIRIT_DECLARE(dynamic_visibility_statement_type)
+
+	using visibility_statement_type = x3::rule<visibility_statement_class, ast::sf::visibility_statement>;
+	BOOST_SPIRIT_DECLARE(visibility_statement_type)
 
 	using behavior_statement_type = x3::rule<behavior_statement_class, ast::sf::behavior_statement>;
 	BOOST_SPIRIT_DECLARE(behavior_statement_type)

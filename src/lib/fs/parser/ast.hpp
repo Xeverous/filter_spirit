@@ -584,9 +584,37 @@ namespace sf
 	using static_visibility_statement = common::static_visibility_statement;
 	using continue_statement = common::continue_statement;
 
+	struct dynamic_visibility_policy : x3::position_tagged
+	{
+		auto& operator=(bool value)
+		{
+			discard = value;
+			return *this;
+		}
+
+		bool get_value() const { return discard; }
+
+		bool discard;
+	};
+
+	struct dynamic_visibility_statement : x3::position_tagged
+	{
+		dynamic_visibility_policy policy;
+		sequence seq;
+	};
+
+	struct visibility_statement : x3::variant<
+			static_visibility_statement,
+			dynamic_visibility_statement
+		>, x3::position_tagged
+	{
+		using base_type::base_type;
+		using base_type::operator=;
+	};
+
 	struct behavior_statement : x3::position_tagged
 	{
-		static_visibility_statement visibility;
+		visibility_statement visibility;
 		boost::optional<continue_statement> continue_;
 	};
 

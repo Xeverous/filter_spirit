@@ -351,8 +351,22 @@ namespace sf
 
 	// ---- filter structure ----
 
+	const dynamic_visibility_policy_type dynamic_visibility_policy = "dynamic visivility policy";
+	const auto dynamic_visibility_policy_def =
+		(make_keyword(lang::keywords::sf::show_hide) > x3::attr(false)) |
+		(make_keyword(lang::keywords::sf::show_discard) > x3::attr(true));
+	BOOST_SPIRIT_DEFINE(dynamic_visibility_policy)
+
+	const dynamic_visibility_statement_type dynamic_visibility_statement = "dynamic visibility statement";
+	const auto dynamic_visibility_statement_def = dynamic_visibility_policy > sequence;
+	BOOST_SPIRIT_DEFINE(dynamic_visibility_statement)
+
+	const visibility_statement_type visibility_statement = "visibility statement";
+	const auto visibility_statement_def = common::static_visibility_statement | dynamic_visibility_statement;
+	BOOST_SPIRIT_DEFINE(visibility_statement)
+
 	const behavior_statement_type behavior_statement = "behavior statement";
-	const auto behavior_statement_def = common::static_visibility_statement > -common::continue_statement;
+	const auto behavior_statement_def = visibility_statement > -common::continue_statement;
 	BOOST_SPIRIT_DEFINE(behavior_statement)
 
 	// moved here due to circular dependency

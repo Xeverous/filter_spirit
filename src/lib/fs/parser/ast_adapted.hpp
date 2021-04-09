@@ -104,6 +104,10 @@ BOOST_FUSION_ADAPT_STRUCT(
 // ---- filter structure ----
 
 BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::sf::dynamic_visibility_statement,
+	policy, seq)
+
+BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::sf::behavior_statement,
 	visibility, continue_)
 
