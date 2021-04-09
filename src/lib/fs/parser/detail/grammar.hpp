@@ -94,7 +94,7 @@ namespace common
 	struct comparison_operator_expression_class  : error_on_error, annotate_on_success {};
 	struct exact_matching_policy_expression_class: error_on_error, annotate_on_success {};
 
-	struct visibility_statement_class            : error_on_error, annotate_on_success {};
+	struct static_visibility_statement_class     : error_on_error, annotate_on_success {};
 	struct continue_statement_class              : error_on_error, annotate_on_success {};
 }
 
@@ -202,7 +202,7 @@ namespace rf
 	struct condition_class                       : error_on_error, annotate_on_success {};
 	struct action_class                          : error_on_error, annotate_on_success {};
 	struct rule_class                            : error_on_error, annotate_on_success {};
-	struct visibility_statement_class            : error_on_error, annotate_on_success {};
+	struct static_visibility_statement_class     : error_on_error, annotate_on_success {};
 	struct filter_block_class                    : error_on_error, annotate_on_success {};
 	struct grammar_class                         : error_on_error, annotate_on_success {};
 } // namespace rf
@@ -289,8 +289,8 @@ namespace common
 
 	// ---- filter structure ----
 
-	using visibility_statement_type = x3::rule<visibility_statement_class, ast::common::visibility_statement>;
-	BOOST_SPIRIT_DECLARE(visibility_statement_type)
+	using static_visibility_statement_type = x3::rule<static_visibility_statement_class, ast::common::static_visibility_statement>;
+	BOOST_SPIRIT_DECLARE(static_visibility_statement_type)
 
 	using continue_statement_type = x3::rule<continue_statement_class, ast::common::continue_statement>;
 	BOOST_SPIRIT_DECLARE(continue_statement_type)
@@ -487,14 +487,14 @@ namespace rf
 	using condition_type                      = x3::rule<condition_class,                   ast::rf::condition>;
 	using action_type                         = x3::rule<action_class,                      ast::rf::action>;
 	using rule_type                           = x3::rule<rule_class,                        ast::rf::rule>;
-	using visibility_statement_type           = x3::rule<visibility_statement_class,        ast::rf::visibility_statement>;
+	using static_visibility_statement_type    = x3::rule<static_visibility_statement_class, ast::rf::static_visibility_statement>;
 	using filter_block_type                   = x3::rule<filter_block_class,                ast::rf::filter_block>;
 	using grammar_type                        = x3::rule<grammar_class,                     ast::rf::ast_type>;
 	BOOST_SPIRIT_DECLARE(
 		condition_type,
 		action_type,
 		rule_type,
-		visibility_statement_type,
+		static_visibility_statement_type,
 		filter_block_type,
 		grammar_type
 	)

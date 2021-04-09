@@ -158,9 +158,9 @@ namespace common
 
 	// ---- statements ----
 
-	const visibility_statement_type visibility_statement = "visibility statement";
-	const auto visibility_statement_def = make_keyword(symbols::rf::visibility_literals);
-	BOOST_SPIRIT_DEFINE(visibility_statement)
+	const static_visibility_statement_type static_visibility_statement = "static visibility statement";
+	const auto static_visibility_statement_def = make_keyword(symbols::rf::visibility_literals);
+	BOOST_SPIRIT_DEFINE(static_visibility_statement)
 
 	const continue_statement_type continue_statement = "continue statement";
 	const auto continue_statement_def = make_keyword(lang::keywords::rf::continue_);
@@ -352,7 +352,7 @@ namespace sf
 	// ---- filter structure ----
 
 	const behavior_statement_type behavior_statement = "behavior statement";
-	const auto behavior_statement_def = common::visibility_statement > -common::continue_statement;
+	const auto behavior_statement_def = common::static_visibility_statement > -common::continue_statement;
 	BOOST_SPIRIT_DEFINE(behavior_statement)
 
 	// moved here due to circular dependency
@@ -519,7 +519,7 @@ namespace rf
 	BOOST_SPIRIT_DEFINE(rule)
 
 	const filter_block_type filter_block = "filter block";
-	const auto filter_block_def = common::visibility_statement > *rule;
+	const auto filter_block_def = common::static_visibility_statement > *rule;
 	BOOST_SPIRIT_DEFINE(filter_block)
 
 	const grammar_type grammar = "code";

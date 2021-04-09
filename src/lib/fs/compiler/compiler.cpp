@@ -414,7 +414,7 @@ verify_autogen(
 }
 
 [[nodiscard]] lang::item_visibility
-evaluate(parser::ast::common::visibility_statement visibility)
+evaluate(parser::ast::common::static_visibility_statement visibility)
 {
 	return lang::item_visibility{
 		visibility.show,

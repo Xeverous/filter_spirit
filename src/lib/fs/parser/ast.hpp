@@ -236,9 +236,9 @@ namespace common
 		void get_value() const {}
 	};
 
-	struct visibility_statement : x3::position_tagged
+	struct static_visibility_statement : x3::position_tagged
 	{
-		visibility_statement operator=(bool value)
+		static_visibility_statement operator=(bool value)
 		{
 			show = value;
 			return *this;
@@ -581,12 +581,12 @@ namespace sf
 
 	// ---- filter structure ----
 
-	using visibility_statement = common::visibility_statement;
+	using static_visibility_statement = common::static_visibility_statement;
 	using continue_statement = common::continue_statement;
 
 	struct behavior_statement : x3::position_tagged
 	{
-		visibility_statement visibility;
+		static_visibility_statement visibility;
 		boost::optional<continue_statement> continue_;
 	};
 
@@ -828,11 +828,11 @@ namespace rf
 		using base_type::operator=;
 	};
 
-	using visibility_statement = common::visibility_statement;
+	using static_visibility_statement = common::static_visibility_statement;
 
 	struct filter_block : x3::position_tagged
 	{
-		visibility_statement visibility;
+		static_visibility_statement visibility;
 		std::vector<rule> rules;
 	};
 
