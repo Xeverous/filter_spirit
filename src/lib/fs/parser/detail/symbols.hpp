@@ -319,6 +319,8 @@ namespace sf
 				(lang::keywords::sf::incubators,    fs::lang::item_category::incubators)
 				(lang::keywords::sf::oils,          fs::lang::item_category::oils)
 				(lang::keywords::sf::vials,         fs::lang::item_category::vials)
+				(lang::keywords::sf::gems,          fs::lang::item_category::gems)
+				(lang::keywords::sf::bases,         fs::lang::item_category::bases)
 				(lang::keywords::sf::uniques_eq_unambiguous,     fs::lang::item_category::uniques_eq_unambiguous)
 				(lang::keywords::sf::uniques_eq_ambiguous,       fs::lang::item_category::uniques_eq_ambiguous)
 				(lang::keywords::sf::uniques_flasks_unambiguous, fs::lang::item_category::uniques_flasks_unambiguous)
