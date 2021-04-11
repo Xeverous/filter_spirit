@@ -2,6 +2,7 @@
 #include <fs/compiler/detail/actions.hpp>
 #include <fs/lang/limits.hpp>
 #include <fs/lang/keywords.hpp>
+#include <fs/lang/action_set.hpp>
 #include <fs/utility/assert.hpp>
 #include <fs/utility/monadic.hpp>
 
@@ -283,7 +284,7 @@ spirit_filter_add_set_color_action_impl(
 spirit_filter_add_set_color_action(
 	settings st,
 	const ast::sf::set_color_action& action,
-	const lang::symbol_table& symbols,
+	const symbol_table& symbols,
 	lang::action_set& set,
 	diagnostics_container& diagnostics)
 {
@@ -321,7 +322,7 @@ spirit_filter_add_set_color_action(
 spirit_filter_add_set_font_size_action(
 	settings st,
 	const ast::sf::set_font_size_action& action,
-	const lang::symbol_table& symbols,
+	const symbol_table& symbols,
 	lang::action_set& set,
 	diagnostics_container& diagnostics)
 {
@@ -358,7 +359,7 @@ spirit_filter_add_set_font_size_action(
 spirit_filter_add_minimap_icon_action(
 	settings st,
 	const ast::sf::minimap_icon_action& action,
-	const lang::symbol_table& symbols,
+	const symbol_table& symbols,
 	lang::action_set& set,
 	diagnostics_container& diagnostics)
 {
@@ -377,7 +378,7 @@ spirit_filter_add_minimap_icon_action(
 spirit_filter_add_play_effect_action(
 	settings st,
 	const ast::sf::play_effect_action& action,
-	const lang::symbol_table& symbols,
+	const symbol_table& symbols,
 	lang::action_set& set,
 	diagnostics_container& diagnostics)
 {
@@ -396,7 +397,7 @@ spirit_filter_add_play_effect_action(
 spirit_filter_add_play_alert_sound_action(
 	settings st,
 	const ast::sf::play_alert_sound_action& action,
-	const lang::symbol_table& symbols,
+	const symbol_table& symbols,
 	lang::action_set& set,
 	diagnostics_container& diagnostics)
 {
@@ -429,7 +430,7 @@ spirit_filter_add_play_alert_sound_action(
 spirit_filter_add_custom_alert_sound_action(
 	settings st,
 	const ast::sf::custom_alert_sound_action& action,
-	const lang::symbol_table& symbols,
+	const symbol_table& symbols,
 	lang::action_set& set,
 	diagnostics_container& diagnostics)
 {
@@ -462,7 +463,7 @@ spirit_filter_add_custom_alert_sound_action(
 spirit_filter_add_set_alert_sound_action(
 	settings st,
 	const ast::sf::set_alert_sound_action& action,
-	const lang::symbol_table& symbols,
+	const symbol_table& symbols,
 	lang::action_set& set,
 	diagnostics_container& diagnostics)
 {
@@ -689,7 +690,7 @@ bool
 spirit_filter_add_action(
 	settings st,
 	const ast::sf::action& action,
-	const lang::symbol_table& symbols,
+	const symbol_table& symbols,
 	lang::action_set& set,
 	diagnostics_container& diagnostics)
 {

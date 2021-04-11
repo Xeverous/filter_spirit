@@ -29,7 +29,7 @@ namespace
 [[nodiscard]] boost::optional<lang::object>
 evaluate_name_as_object(
 	const ast::sf::name& name,
-	const lang::symbol_table& symbols,
+	const symbol_table& symbols,
 	diagnostics_container& diagnostics)
 {
 	const auto name_origin = parser::position_tag_of(name);
@@ -175,7 +175,7 @@ boost::optional<lang::object>
 evaluate_sequence(
 	settings st,
 	const ast::sf::sequence& sequence,
-	const lang::symbol_table& symbols,
+	const symbol_table& symbols,
 	int min_allowed_elements,
 	boost::optional<int> max_allowed_elements,
 	diagnostics_container& diagnostics)

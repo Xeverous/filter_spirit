@@ -474,7 +474,7 @@ add_boolean_condition(
 spirit_filter_add_price_comparison_condition(
 	settings st,
 	const ast::sf::price_comparison_condition& condition,
-	const lang::symbol_table& symbols,
+	const symbol_table& symbols,
 	lang::spirit_condition_set& set,
 	diagnostics_container& diagnostics)
 {
@@ -498,7 +498,7 @@ spirit_filter_add_price_comparison_condition(
 spirit_filter_add_rarity_comparison_condition(
 	settings st,
 	const ast::sf::rarity_comparison_condition& condition,
-	const lang::symbol_table& symbols,
+	const symbol_table& symbols,
 	lang::condition_set& set,
 	diagnostics_container& diagnostics)
 {
@@ -522,7 +522,7 @@ spirit_filter_add_rarity_comparison_condition(
 spirit_filter_add_numeric_comparison_condition(
 	settings st,
 	const ast::sf::numeric_comparison_condition& condition,
-	const lang::symbol_table& symbols,
+	const symbol_table& symbols,
 	lang::condition_set& set,
 	diagnostics_container& diagnostics)
 {
@@ -574,7 +574,7 @@ spirit_filter_make_string_array(
 spirit_filter_add_string_array_condition(
 	settings st,
 	const ast::sf::string_array_condition& condition,
-	const lang::symbol_table& symbols,
+	const symbol_table& symbols,
 	lang::condition_set& set,
 	diagnostics_container& diagnostics)
 {
@@ -598,7 +598,7 @@ spirit_filter_add_string_array_condition(
 spirit_filter_add_ranged_string_array_condition(
 	settings st,
 	const ast::sf::ranged_string_array_condition& condition,
-	const lang::symbol_table& symbols,
+	const symbol_table& symbols,
 	lang::condition_set& set,
 	diagnostics_container& diagnostics)
 {
@@ -624,7 +624,7 @@ spirit_filter_add_ranged_string_array_condition(
 spirit_filter_add_has_influence_condition(
 	settings st,
 	const ast::sf::has_influence_condition& condition,
-	const lang::symbol_table& symbols,
+	const symbol_table& symbols,
 	lang::condition_set& set,
 	diagnostics_container& diagnostics)
 {
@@ -665,7 +665,7 @@ spirit_filter_add_has_influence_condition(
 spirit_filter_add_gem_quality_type_condition(
 	settings st,
 	const ast::sf::gem_quality_type_condition& condition,
-	const lang::symbol_table& symbols,
+	const symbol_table& symbols,
 	lang::condition_set& set,
 	diagnostics_container& diagnostics)
 {
@@ -698,7 +698,7 @@ spirit_filter_add_gem_quality_type_condition(
 spirit_filter_add_socket_spec_condition(
 	settings st,
 	const ast::sf::socket_spec_condition& condition,
-	const lang::symbol_table& symbols,
+	const symbol_table& symbols,
 	lang::condition_set& set,
 	diagnostics_container& diagnostics)
 {
@@ -736,7 +736,7 @@ spirit_filter_add_socket_spec_condition(
 spirit_filter_add_boolean_condition(
 	settings st,
 	const ast::sf::boolean_condition& condition,
-	const lang::symbol_table& symbols,
+	const symbol_table& symbols,
 	lang::condition_set& condition_set,
 	diagnostics_container& diagnostics)
 {
@@ -926,7 +926,7 @@ bool
 spirit_filter_add_conditions(
 	settings st,
 	const std::vector<ast::sf::condition>& conditions,
-	const lang::symbol_table& symbols,
+	const symbol_table& symbols,
 	lang::spirit_condition_set& set,
 	diagnostics_container& diagnostics)
 {

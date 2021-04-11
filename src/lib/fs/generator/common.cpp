@@ -1,12 +1,12 @@
 #include <fs/generator/common.hpp>
 #include <fs/generator/generator.hpp>
 #include <fs/generator/make_item_filter.hpp>
-#include <fs/lang/symbol_table.hpp>
 #include <fs/parser/parser.hpp>
 #include <fs/parser/ast_adapted.hpp> // required adaptation info for fs::log::structure_printer
 #include <fs/compiler/compiler.hpp>
 #include <fs/compiler/diagnostics.hpp>
 #include <fs/compiler/settings.hpp>
+#include <fs/compiler/symbol_table.hpp>
 #include <fs/log/logger.hpp>
 #include <fs/log/structure_printer.hpp>
 #include <fs/utility/monadic.hpp>
@@ -40,7 +40,7 @@ std::optional<fs::lang::spirit_item_filter> parse_and_compile_spirit_filter(
 	logger.info() << "Resolving filter template symbols...\n";
 
 	compiler::diagnostics_container diagnostics_symbols;
-	const boost::optional<lang::symbol_table> symbols =
+	const boost::optional<compiler::symbol_table> symbols =
 		compiler::resolve_spirit_filter_symbols(st.compile_settings, parse_data.ast.definitions, diagnostics_symbols);
 	compiler::output_diagnostics(diagnostics_symbols, parse_data.metadata, logger);
 

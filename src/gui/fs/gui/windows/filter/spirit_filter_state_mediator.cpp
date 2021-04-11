@@ -80,7 +80,7 @@ void spirit_filter_state_mediator::on_parsed_spirit_filter_change(const parser::
 	}
 
 	compiler::diagnostics_container diagnostics;
-	boost::optional<lang::symbol_table> result = compiler::resolve_spirit_filter_symbols(
+	boost::optional<compiler::symbol_table> result = compiler::resolve_spirit_filter_symbols(
 		{}, parsed_spirit_filter->ast.definitions, diagnostics);
 
 	compiler::output_diagnostics(diagnostics, parsed_spirit_filter->metadata, logger());
@@ -88,7 +88,7 @@ void spirit_filter_state_mediator::on_parsed_spirit_filter_change(const parser::
 	new_spirit_filter_symbols(utility::to_std_optional(std::move(result)));
 }
 
-void spirit_filter_state_mediator::new_spirit_filter_symbols(std::optional<lang::symbol_table> symbols)
+void spirit_filter_state_mediator::new_spirit_filter_symbols(std::optional<compiler::symbol_table> symbols)
 {
 	_spirit_filter_symbols = std::move(symbols);
 	on_spirit_filter_symbols_change(parsed_spirit_filter(), spirit_filter_symbols());
@@ -96,7 +96,7 @@ void spirit_filter_state_mediator::new_spirit_filter_symbols(std::optional<lang:
 
 void spirit_filter_state_mediator::on_spirit_filter_symbols_change(
 	const parser::parsed_spirit_filter* parsed_spirit_filter,
-	const lang::symbol_table* spirit_filter_symbols)
+	const compiler::symbol_table* spirit_filter_symbols)
 {
 	if (!spirit_filter_symbols || !parsed_spirit_filter) {
 		new_spirit_filter(std::nullopt);
@@ -182,8 +182,7 @@ void spirit_filter_state_mediator::draw_interface_spirit_filter_symbols()
 {
 	if (ImGui::CollapsingHeader("Spirit filter definitions", ImGuiTreeNodeFlags_DefaultOpen)) {
 		if (_spirit_filter_symbols) {
-			ImGui::TextWrapped("Resolving definitions successful, %zu definitions",
-				(*_spirit_filter_symbols).objects.size() + (*_spirit_filter_symbols).trees.size());
+			ImGui::TextWrapped("Resolving definitions successful, %zu definitions", (*_spirit_filter_symbols).size());
 		}
 		else {
 			ImGui::TextWrapped("Not available.");

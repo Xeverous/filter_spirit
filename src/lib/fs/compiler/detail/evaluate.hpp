@@ -3,7 +3,7 @@
 #include <fs/parser/ast.hpp>
 #include <fs/compiler/settings.hpp>
 #include <fs/compiler/diagnostics.hpp>
-#include <fs/lang/symbol_table.hpp>
+#include <fs/compiler/symbol_table.hpp>
 
 #include <boost/optional.hpp>
 
@@ -115,7 +115,7 @@ evaluate(
 evaluate_sequence(
 	settings st,
 	const parser::ast::sf::sequence& sequence,
-	const lang::symbol_table& symbols,
+	const symbol_table& symbols,
 	int min_allowed_elements,
 	boost::optional<int> max_allowed_elements,
 	diagnostics_container& diagnostics);

@@ -2,9 +2,9 @@
 
 #include <fs/gui/windows/filter/filter_state_mediator.hpp>
 #include <fs/gui/windows/filter/market_data_state.hpp>
+#include <fs/compiler/symbol_table.hpp>
 #include <fs/parser/parser.hpp>
 #include <fs/lang/item_filter.hpp>
-#include <fs/lang/symbol_table.hpp>
 #include <fs/log/buffer_logger.hpp>
 #include <fs/log/thread_safe_logger.hpp>
 
@@ -37,7 +37,7 @@ public:
 		const parser::parsed_spirit_filter* parsed_spirit_filter);
 	void on_spirit_filter_symbols_change(
 		const parser::parsed_spirit_filter* parsed_spirit_filter,
-		const lang::symbol_table* spirit_filter_symbols);
+		const compiler::symbol_table* spirit_filter_symbols);
 	void on_spirit_filter_change(
 		const lang::spirit_item_filter* spirit_filter);
 	void on_price_report_change(
@@ -50,7 +50,7 @@ public:
 
 	const parser::parse_metadata* parse_metadata() const override;
 
-	const lang::symbol_table* spirit_filter_symbols() const
+	const compiler::symbol_table* spirit_filter_symbols() const
 	{
 		return _spirit_filter_symbols.has_value() ? &*_spirit_filter_symbols : nullptr;
 	}
@@ -67,7 +67,7 @@ public:
 
 private:
 	void new_parsed_spirit_filter(std::optional<parser::parsed_spirit_filter> parsed_spirit_filter);
-	void new_spirit_filter_symbols(std::optional<lang::symbol_table> spirit_filter_symbols);
+	void new_spirit_filter_symbols(std::optional<compiler::symbol_table> spirit_filter_symbols);
 	void new_spirit_filter(std::optional<lang::spirit_item_filter> spirit_filter);
 
 	void refresh_filter_representation(
@@ -83,7 +83,7 @@ private:
 	void draw_interface_spirit_filter();
 
 	std::optional<parser::parsed_spirit_filter> _parsed_spirit_filter;
-	std::optional<lang::symbol_table> _spirit_filter_symbols;
+	std::optional<compiler::symbol_table> _spirit_filter_symbols;
 	std::optional<lang::spirit_item_filter> _spirit_filter;
 	market_data_state _market_data;
 	std::shared_ptr<log::thread_safe_logger<log::buffer_logger>> _logger_ptr;

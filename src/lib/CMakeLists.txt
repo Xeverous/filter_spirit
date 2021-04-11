@@ -77,6 +77,7 @@ target_sources(filter_spirit
 		fs/compiler/detail/evaluate.hpp
 		fs/compiler/compiler.hpp
 		fs/compiler/diagnostics.hpp
+		fs/compiler/symbol_table.hpp
 		fs/generator/make_item_filter.hpp
 		fs/generator/common.hpp
 		fs/generator/generator.hpp
@@ -99,7 +100,6 @@ target_sources(filter_spirit
 		fs/lang/position_tag.hpp
 		fs/lang/primitive_types.hpp
 		fs/lang/queries.hpp
-		fs/lang/symbol_table.hpp
 		fs/lang/influence_info.hpp
 		fs/log/string_logger.hpp
 		fs/log/buffer_logger.hpp

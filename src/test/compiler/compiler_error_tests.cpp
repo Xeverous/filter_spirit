@@ -35,7 +35,7 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 	{
 		const parser::parsed_spirit_filter parse_data = parse(minimal_input());
 		diagnostics_container diagnostics;
-		const boost::optional<lang::symbol_table> symbols =
+		const boost::optional<compiler::symbol_table> symbols =
 			resolve_symbols(parse_data.ast.definitions, diagnostics);
 		BOOST_TEST_REQUIRE(!compiler::has_errors(diagnostics));
 		BOOST_TEST_REQUIRE(symbols.has_value());
@@ -68,7 +68,7 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 		{
 			compiler::settings st;
 			diagnostics_container diagnostics;
-			const boost::optional<lang::symbol_table> symbols = resolve_symbols(st, fs.definitions, diagnostics);
+			const boost::optional<compiler::symbol_table> symbols = resolve_symbols(st, fs.definitions, diagnostics);
 			BOOST_TEST(!compiler::has_warnings_or_errors(diagnostics));
 			BOOST_TEST_REQUIRE(symbols.has_value());
 			(void) compiler::compile_spirit_filter_statements(st, fs.statements, *symbols, diagnostics);

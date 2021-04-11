@@ -1,9 +1,9 @@
 #pragma once
 
-#include <fs/lang/symbol_table.hpp>
 #include <fs/parser/parser.hpp>
 #include <fs/compiler/compiler.hpp>
 #include <fs/compiler/diagnostics.hpp>
+#include <fs/compiler/symbol_table.hpp>
 
 #include <string>
 #include <string_view>
@@ -24,7 +24,7 @@ class compiler_fixture : public parser_fixture
 {
 protected:
 	static
-	boost::optional<lang::symbol_table>
+	boost::optional<compiler::symbol_table>
 	resolve_symbols(
 		compiler::settings st,
 		const std::vector<parser::ast::sf::definition>& defs,
@@ -34,7 +34,7 @@ protected:
 	}
 
 	static
-	boost::optional<lang::symbol_table>
+	boost::optional<compiler::symbol_table>
 	resolve_symbols(
 		const std::vector<parser::ast::sf::definition>& defs,
 		compiler::diagnostics_container& diagnostics)

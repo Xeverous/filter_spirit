@@ -25,65 +25,6 @@ namespace x3 = boost::spirit::x3;
 
 // ---- resolve_spirit_filter_symbols helpers ----
 
-/*
- * core entry point into adding constants
- *
- * task:
- * Add object only if valid, error with appropriate information otherwise; in any case
- * after either successful addition or any error return immediately.
- *
- * flow:
- * - check that name is not already taken and error if so
- *   (it's impossible to have multiple objects with the same name)
- *   (as of now, filter's language has no scoping/name shadowing)
- * - convert expression to language object and proceed
- */
-[[nodiscard]] bool
-add_constant_from_definition(
-	settings st,
-	const ast::sf::constant_definition& def,
-	lang::symbol_table& symbols,
-	diagnostics_container& diagnostics)
-{
-	const auto wanted_name_origin = parser::position_tag_of(def.value_name);
-	const std::string& wanted_name = def.value_name.value.value;
-
-	if (const auto it = symbols.objects.find(wanted_name); it != symbols.objects.end()) {
-		const lang::position_tag place_of_original_name = parser::position_tag_of(it->second.name_origin);
-		diagnostics.push_back(make_error(dmid::name_already_exists, wanted_name_origin, "name already exists"));
-		diagnostics.push_back(make_note_first_defined_here(place_of_original_name));
-		return false;
-	}
-
-	if (const auto it = symbols.trees.find(wanted_name); it != symbols.trees.end()) {
-		const lang::position_tag place_of_original_name = parser::position_tag_of(it->second.name_origin);
-		diagnostics.push_back(make_error(dmid::name_already_exists, wanted_name_origin, "name already exists"));
-		diagnostics.push_back(make_note_first_defined_here(place_of_original_name));
-		return false;
-	}
-
-	return def.value.apply_visitor(x3::make_lambda_visitor<bool>(
-		[&](const ast::sf::sequence& seq) {
-			return detail::evaluate_sequence(st, seq, symbols, 1, boost::none, diagnostics)
-				.map([&](lang::object obj) {
-					const bool success = symbols.objects.emplace(
-						wanted_name,
-						lang::named_object{std::move(obj), wanted_name_origin}).second;
-					FS_ASSERT_MSG(success, "Insertion should succeed.");
-					return success;
-				})
-				.value_or(false);
-		},
-		[&](const ast::sf::statement_list_expression& expr) {
-			const bool success = symbols.trees.emplace(
-				wanted_name,
-				lang::named_tree{expr, wanted_name_origin}).second;
-			FS_ASSERT_MSG(success, "Insertion should succeed.");
-			return success;
-		}
-	));
-}
-
 [[nodiscard]] bool
 verify_string_condition_allows_value(
 	lang::position_tag autogen_origin,
@@ -444,7 +385,7 @@ evaluate(parser::ast::common::static_visibility_statement visibility)
 evaluate(
 	settings st,
 	parser::ast::sf::dynamic_visibility_statement visibility,
-	const lang::symbol_table& symbols,
+	const symbol_table& symbols,
 	diagnostics_container& diagnostics)
 {
 	return detail::evaluate_sequence(st, visibility.seq, symbols, 1, 1, diagnostics)
@@ -470,7 +411,7 @@ evaluate(
 evaluate(
 	settings st,
 	parser::ast::sf::visibility_statement visibility,
-	const lang::symbol_table& symbols,
+	const symbol_table& symbols,
 	diagnostics_container& diagnostics)
 {
 	return visibility.apply_visitor(x3::make_lambda_visitor<boost::optional<lang::item_visibility>>(
@@ -534,10 +475,10 @@ to_block_continuation(
 		return lang::block_continuation{std::nullopt};
 }
 
-[[nodiscard]] const lang::named_tree*
+[[nodiscard]] const named_tree*
 evaluate_name_as_tree(
 	const ast::sf::name& name,
-	const lang::symbol_table& symbols,
+	const symbol_table& symbols,
 	diagnostics_container& diagnostics)
 {
 	const auto it = symbols.trees.find(name.value.value);
@@ -560,7 +501,7 @@ evaluate_name_as_tree(
 compile_statements_recursively_impl(
 	settings st,
 	const std::vector<ast::sf::statement>& statements,
-	const lang::symbol_table& symbols,
+	const symbol_table& symbols,
 	lang::spirit_condition_set& conditions,
 	lang::action_set& actions,
 	std::vector<lang::spirit_item_filter_block>& blocks,
@@ -591,7 +532,7 @@ compile_statements_recursively_impl(
 							return false;
 						}
 
-						const lang::named_tree* tree = evaluate_name_as_tree(name, symbols, diagnostics);
+						const named_tree* tree = evaluate_name_as_tree(name, symbols, diagnostics);
 						if (!tree)
 							return false;
 
@@ -671,7 +612,7 @@ compile_statements_recursively_impl(
 compile_statements_recursively(
 	settings st,
 	const std::vector<ast::sf::statement>& statements,
-	const lang::symbol_table& symbols,
+	const symbol_table& symbols,
 	diagnostics_container& diagnostics)
 {
 	// start with empty conditions and actions
@@ -694,16 +635,59 @@ compile_statements_recursively(
 namespace fs::compiler
 {
 
-boost::optional<lang::symbol_table>
+bool
+symbol_table::add_symbol(
+	settings st,
+	const ast::sf::constant_definition& def,
+	diagnostics_container& diagnostics)
+{
+	const lang::position_tag definition_origin = parser::position_tag_of(def.value_name);
+	const std::string& name = def.value_name.value.value;
+
+	if (const auto it = objects.find(name); it != objects.end()) {
+		const lang::position_tag existing_origin = parser::position_tag_of(it->second.name_origin);
+		push_error_name_already_exists(existing_origin, definition_origin, diagnostics);
+		return false;
+	}
+
+	if (const auto it = trees.find(name); it != trees.end()) {
+		const lang::position_tag existing_origin = parser::position_tag_of(it->second.name_origin);
+		push_error_name_already_exists(existing_origin, definition_origin, diagnostics);
+		return false;
+	}
+
+	return def.value.apply_visitor(x3::make_lambda_visitor<bool>(
+		[&](const ast::sf::sequence& seq) {
+			return detail::evaluate_sequence(st, seq, *this, 1, boost::none, diagnostics)
+				.map([&](lang::object obj) {
+					const bool success = objects.emplace(
+						name,
+						named_object{std::move(obj), definition_origin}).second;
+					FS_ASSERT_MSG(success, "Insertion should succeed.");
+					return success;
+				})
+				.value_or(false);
+		},
+		[&](const ast::sf::statement_list_expression& expr) {
+			const bool success = trees.emplace(
+				name,
+				named_tree{expr, definition_origin}).second;
+			FS_ASSERT_MSG(success, "Insertion should succeed.");
+			return success;
+		}
+	));
+}
+
+boost::optional<symbol_table>
 resolve_spirit_filter_symbols(
 	settings st,
 	const std::vector<parser::ast::sf::definition>& definitions,
 	diagnostics_container& diagnostics)
 {
-	lang::symbol_table symbols;
+	symbol_table symbols;
 
 	for (const auto& def : definitions) {
-		const bool result = add_constant_from_definition(st, def.def, symbols, diagnostics);
+		const bool result = symbols.add_symbol(st, def.def, diagnostics);
 
 		if (!result && st.error_handling.stop_on_error)
 			return boost::none;
@@ -716,7 +700,7 @@ boost::optional<lang::spirit_item_filter>
 compile_spirit_filter_statements(
 	settings st,
 	const std::vector<ast::sf::statement>& statements,
-	const lang::symbol_table& symbols,
+	const symbol_table& symbols,
 	diagnostics_container& diagnostics)
 {
 	boost::optional<std::vector<lang::spirit_item_filter_block>> blocks =

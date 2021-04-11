@@ -169,6 +169,14 @@ namespace detail {
 
 }
 
+inline void push_error_name_already_exists(
+	lang::position_tag duplicate_origin,
+	lang::position_tag existing_origin,
+	diagnostics_container& diagnostics)
+{
+	diagnostics.push_back(make_error(diagnostic_message_id::name_already_exists, duplicate_origin, "name already exists"));
+	diagnostics.push_back(make_note_first_defined_here(existing_origin));
+}
 inline void push_error_no_such_name(
 	lang::position_tag name_origin,
 	diagnostics_container& diagnostics)

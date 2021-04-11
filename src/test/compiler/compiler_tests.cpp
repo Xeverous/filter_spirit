@@ -4,6 +4,7 @@
 
 #include <fs/compiler/compiler.hpp>
 #include <fs/compiler/diagnostics.hpp>
+#include <fs/compiler/symbol_table.hpp>
 #include <fs/generator/make_item_filter.hpp>
 #include <fs/lang/position_tag.hpp>
 #include <fs/log/string_logger.hpp>
@@ -23,7 +24,7 @@ namespace fs::test
 // note: object's internal origin is not checked
 // use the second pair element
 void expect_object(
-	const lang::symbol_table& symbols,
+	const compiler::symbol_table& symbols,
 	const parser::lookup_data& lookup_data,
 	const std::string& name,
 	std::string_view expected_name_origin,
@@ -35,7 +36,7 @@ void expect_object(
 		return;
 	}
 
-	const lang::named_object& named_object = it->second;
+	const compiler::named_object& named_object = it->second;
 	const lang::object& actual_obj = named_object.object_instance;
 	const std::string_view all_code = lookup_data.get_view_of_whole_content();
 
@@ -67,12 +68,12 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 	{
 	protected:
 		static
-		lang::symbol_table expect_success_when_resolving_symbols(
+		compiler::symbol_table expect_success_when_resolving_symbols(
 			const std::vector<parser::ast::sf::definition>& defs,
 			const parser::parsed_spirit_filter& parse_data)
 		{
 			compiler::diagnostics_container diagnostics;
-			boost::optional<lang::symbol_table> symbols = resolve_symbols(defs, diagnostics);
+			boost::optional<compiler::symbol_table> symbols = resolve_symbols(defs, diagnostics);
 
 			if (compiler::has_errors(diagnostics)) {
 				log::string_logger logger;
@@ -88,7 +89,7 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 		lang::item_filter expect_success_when_building_filter(
 			const std::vector<parser::ast::sf::statement>& top_level_statements,
 			const parser::parsed_spirit_filter& parse_data,
-			const lang::symbol_table& symbols)
+			const compiler::symbol_table& symbols)
 		{
 			compiler::diagnostics_container diagnostics;
 			boost::optional<lang::spirit_item_filter> spirit_filter =
@@ -128,7 +129,7 @@ $string         = "Leather Belt"
 			const std::string_view input = input_str;
 			const parser::parsed_spirit_filter parse_data = parse(input);
 			const parser::lookup_data& lookup_data = parse_data.metadata.lookup;
-			const lang::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.definitions, parse_data);
+			const compiler::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.definitions, parse_data);
 
 			expect_object(symbols, lookup_data, "none", search(input, "$none").result(),
 				{{lang::none{}, search(input, "None").result()}}
@@ -179,7 +180,7 @@ $z = 6 7 8 9
 			const std::string_view input = input_str;
 			const parser::parsed_spirit_filter parse_data = parse(input);
 			const parser::lookup_data& lookup_data = parse_data.metadata.lookup;
-			const lang::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.definitions, parse_data);
+			const compiler::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.definitions, parse_data);
 
 			expect_object(
 				symbols, lookup_data, "x", search(input, "$x").result(), {
@@ -214,7 +215,7 @@ $z = 4W 0 6 RGB
 			const std::string_view input = input_str;
 			const parser::parsed_spirit_filter parse_data = parse(input);
 			const parser::lookup_data& lookup_data = parse_data.metadata.lookup;
-			const lang::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.definitions, parse_data);
+			const compiler::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.definitions, parse_data);
 
 			expect_object(
 				symbols, lookup_data, "x", search(input, "$x").result(), {
@@ -277,7 +278,7 @@ $z = 4W 0 6 RGB
 				const std::string input_str = minimal_input() + action + "\nShow";
 				const std::string_view input = input_str;
 				const parser::parsed_spirit_filter parse_data = parse(input);
-				const lang::symbol_table symbols =
+				const compiler::symbol_table symbols =
 					expect_success_when_resolving_symbols(parse_data.ast.definitions, parse_data);
 				const lang::item_filter filter =
 					expect_success_when_building_filter(parse_data.ast.statements, parse_data, symbols);
