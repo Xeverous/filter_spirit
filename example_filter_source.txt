@@ -6,14 +6,14 @@ $color_white            = 255 255 255
 $color_black            =   0   0   0 255
 $color_orange           = 255 127   0
 $color_red              = 255   0   0
+$color_golden           = 240 200 150
 $color_error            = $color_red
 
-$color_golden           = 240 200 150
 $color_perandus         = 255 192 128
-$color_silver           = 192 192 255
 $color_chromatic_small  = 175 255 200
 $color_chromatic_big    = 128 128 192
 $color_breach           = 255  51 204
+$color_delirium         = 192 192 192
 $color_essence          =   0 128 192
 $color_vaal             = 255 140 120
 $color_gem              =  27 162 155
@@ -28,6 +28,7 @@ $color_normal           = 200 200 200
 $color_6s               = 152   0 152
 $color_5L               = 192 128   0
 $color_sacrifice        = 150 100   0
+$color_scarab           = 255  92   0
 $color_mortal           =  60 150   0
 $color_labirynth        =   0 150   0
 $color_incursion        = $color_labirynth
@@ -39,13 +40,12 @@ $color_map_white        = $color_normal
 $color_talisman         =  50 130  50
 $color_metamorph        =  25 181  25
 $color_rare_t1          =   0  96   0
-$color_rare_t2          =   0  64   0
 $color_chance_base      =  51 204 204
-$color_extra_base_drop  = 208  32 144
 $color_flask_utility    = 122 105  28
 $color_crafting         = 191 244   0
 $color_currency         = 213 159  15
 $color_currency_delve   = $color_currency
+$color_oil              = $color_golden
 $color_corrupted        = 255 127 127
 $color_shaper_item      =  49 127 155
 $color_elder_item       = 102   0 128
@@ -53,15 +53,14 @@ $color_conqueror_item   = 150 100 180
 $color_fractured_item   = 150 100 158
 $color_synthesised_item = 150 100 200
 $color_veiled_item      = 150 100 158
-$color_harvest          =   0 252 186
 $color_heist            =   0 252 186
 $color_league_item      =   0 252 186
 $color_harbinger        =  64 255 255
 
 $currency_t1 = "Exalted Orb" "Mirror of Kalandra" "Eternal Orb" "Albino Rhoa Feather" "Mirror Shard"
-$currency_t2 = "Divine Orb" "Chaos Orb" "Gemcutter's Prism" "Orb of Regret" "Regal Orb" "Stacked Deck" "Vaal Orb" "Simple Sextant" "Prime Sextant" "Awakened Sextant" "Remnant of Corruption" "Exalted Shard" "Orb of Annulment" "Orb of Binding" "Orb of Horizons" "Harbinger's Orb" "Engineer's Orb" "Ancient Orb" "Stacked Deck" "Vial of"
-$currency_t3 = "Cartographer's Chisel" "Jeweller's Orb" "Orb of Alchemy" "Orb of Alteration" "Orb of Chance" "Orb of Fusing" "Orb of Scouring" "Silver Coin" "Blessed Orb"
-$currency_t4 = "Annulment Shard" "Binding Shard" "Horizon Shard" "Harbinger's Shard" "Engineer's Shard" "Ancient Shard" "Chaos Shard" "Regal Shard" "Alchemy Shard"
+$currency_t2 = "Divine Orb" "Chaos Orb" "Gemcutter's Prism" "Orb of Regret" "Regal Orb" "Stacked Deck" "Vaal Orb" "Simple Sextant" "Prime Sextant" "Awakened Sextant" "Remnant of Corruption" "Exalted Shard" "Orb of Annulment" "Orb of Binding" "Orb of Horizons" "Harbinger's Orb" "Ancient Orb" "Vial of"
+$currency_t3 = "Cartographer's Chisel" "Jeweller's Orb" "Orb of Alchemy" "Orb of Alteration" "Orb of Fusing" "Orb of Scouring" "Silver Coin" "Blessed Orb" "Ancient Shard" "Harbinger's Shard"
+$currency_t4 = "Annulment Shard" "Binding Shard" "Horizon Shard" "Chaos Shard" "Regal Shard" "Alchemy Shard" "Engineer's Orb" "Orb of Chance"
 
 $font_min            = 18
 $font_max            = 42
@@ -69,21 +68,32 @@ $font_currency_t2    = $font_max
 $font_currency_t3    = 38
 $font_currency_t4    = 34
 $font_currency_delve = $font_currency_t2
-$font_scarab_top     = 42
+$font_scarab_high    = 42
 $font_scarab_mid     = 40
 $font_scarab_low     = 38
-$font_essence        = $font_max
-$font_mid_divination = $font_currency_t3
-$font_low_divination = $font_currency_t4
-$font_map            = $font_max
-$font_abyss_jewel    = $font_max
-$font_jewel          = 40
+$font_scarab_other   = 38
+$font_essence_t7_t6  = $font_max
+$font_essence_special= $font_max
+$font_essence_other  = $font_currency_t2
+$font_divination_high= $font_max
+$font_divination_mid = $font_currency_t3
+$font_divination_low = $font_currency_t4
+$font_oil_high       = $font_max
+$font_oil_mid        = $font_currency_t3
+$font_oil_low        = $font_currency_t4
+$font_map_blight     = $font_max
+$font_map_t16        = $font_max
+$font_map_red        = $font_max
+$font_map_yellow     = $font_max
+$font_map_white      = $font_max
+$font_jewel_basic    = 40
+$font_jewel_abyss    = 40
+$font_jewel_cluster  = 40
 $font_talisman       = 40
 $font_crafting       = 40
 $font_unique         = $font_max
 
 $alert_mlg_airhorn       = "mlg_airhorn.mp3"
-$alert_undisputed        = "zizaran_undisputed.mp3"
 $alert_airhorn           = "airhorn.mp3" # FIXME overused
 $alert_wow               = "wow.mp3"
 $alert_hitmarker         = "hitmarker.wav" # FIXME overused
@@ -110,11 +120,13 @@ $alert_currency_prophecy  = $alert_intervention
 $alert_currency_splinter  = $alert_hitmarker
 $alert_currency_blessing  = $alert_mlg_airhorn
 $alert_currency_vial      = $alert_intervention # TODO API pricing
-$alert_currency_essence_best  = $alert_explosion
-$alert_currency_essence_other = $alert_hitmarker
-$alert_scarab_top         = $alert_mlg_airhorn
+$alert_essence_t7_t6      = $alert_explosion
+$alert_essence_special    = $alert_explosion
+$alert_essence_other      = $alert_hitmarker
+$alert_scarab_high        = $alert_mlg_airhorn
 $alert_scarab_mid         = $alert_airhorn
 $alert_scarab_low         = $alert_intervention
+$alert_scarab_other       = $alert_intervention
 $alert_gem_awakened       = $alert_john_cena_earrape
 $alert_gem_drop_only      = $alert_hitmarker
 $alert_gem_20_quality     = $alert_airhorn
@@ -122,8 +134,8 @@ $alert_gem_quality        = $alert_hitmarker
 $alert_unique_piece       = $alert_wow
 $alert_unique_6L          = $alert_john_cena_earrape
 $alert_unique_maybe_valueable = "sudden_suspense.mp3"
-$alert_unique_best        = $alert_john_cena_earrape
-$alert_unique_good        = $alert_john_cena
+$alert_unique_high        = $alert_john_cena_earrape
+$alert_unique_mid         = $alert_john_cena
 $alert_unique_other       = $alert_uhh
 $alert_6L                 = $alert_mlg_airhorn
 $alert_5L                 = $alert_wow
@@ -145,10 +157,11 @@ $alert_quest_item         = $alert_uhh
 $alert_microtransaction   = $alert_mlg_airhorn
 $alert_divination_stack_1 = $alert_airhorn
 $alert_divination_always_pickup = $alert_hitmarker
-$alert_divination_maybe_pickup  = $alert_hitmarker # TODO this should be different
-$alert_divination_best    = $alert_john_cena_earrape
+$alert_divination_high    = $alert_john_cena_earrape
 $alert_divination_mid     = $alert_john_cena
 $alert_divination_low     = $alert_airhorn
+$alert_oil_high           = $alert_mlg_airhorn
+$alert_oil_mid            = $alert_airhorn
 $alert_map_blight         = $alert_mlg_airhorn
 $alert_map_t16            = $alert_metal_gear
 $alert_map_red            = $alert_metal_gear
@@ -171,11 +184,11 @@ $alert_league_item        = 2 300
 $alert_error              = "triggered.mp3"
 
 $beam_top_gem         = Green
-$beam_top_unique      = Brown
+$beam_unique          = Brown
 $beam_6L              = Red
 $beam_fishing_rod     = White
 $beam_currency        = Yellow
-$beam_good_map        = White
+$beam_map             = White
 $beam_reliquary       = $beam_currency
 $beam_delve_fossil    = $beam_currency
 $beam_delve_resonator = $beam_currency
@@ -183,24 +196,103 @@ $beam_divination      = Blue
 
 $icon_gem_awakened    = 0 Green Diamond
 $icon_gem_20_quality  = 0 Green Circle
-$icon_top_unique      = 0 Brown Triangle
-$icon_mid_unique      = 1 Brown Triangle
+$icon_unique_high     = 0 Brown Triangle
+$icon_unique_mid      = 2 Brown Triangle
 $icon_6L              = 0 Red Hexagon
 $icon_fishing_rod     = 0 White Star
-$icon_currency_t1     = 0 Yellow Star
-$icon_currency_t2     = 1 Yellow Star
-$icon_currency_t3     = 2 Yellow Star
-$icon_delve_fossil    = $icon_currency_t2
-$icon_delve_resonator = $icon_currency_t2
-$icon_reliquary       = $icon_currency_t1
-$icon_map_top         = 0 White Cross
-$icon_map_mid         = 2 White Cross
+$icon_currency_high   = 0 Yellow Star
+$icon_currency_mid    = 1 Yellow Star
+$icon_currency_low    = 2 Yellow Star
+$icon_delve_fossil    = $icon_currency_mid
+$icon_delve_resonator = $icon_currency_mid
+$icon_reliquary       = $icon_currency_high
+$icon_map_t16         = 0 White Cross
+$icon_map_red         = 2 White Cross
 $icon_map_blight      = 0 Orange Cross
-$icon_scarab_top      = 0 White Kite
-$icon_scarab_mid      = 2 White Kite
+$icon_scarab_high     = 0 White Kite
+$icon_scarab_mid      = 1 White Kite
+$icon_scarab_low      = 2 White Kite
 $icon_error           = 0 Red Square
 
 $bases_t1 = "Eternal Burgonet" "Lion Pelt" "Hubris Circlet" "Nightmare Bascinet" "Titan Gauntlets" "Slink Gloves" "Sorcerer Gloves" "Dragonscale Gauntlets" "Titan Greaves" "Slink Boots" "Sorcerer Boots" "Dragonscale Boots" "Assassin's Boots" "Glorious Plate" "Assassin's Garb" "Vaal Regalia" "Titanium Spirit Shield" "Harbinger Bow" "Ambusher" "Ezomyte Dagger" "Platinum Kris" "Imperial Skean" "Demon Dagger" "Void Sceptre" "Sambar Sceptre" "Profane Wand" "Prophecy Wand" "Tornado Wand" "Opal Wand" "Imbued Wand" "Demon's Horn" "Steel Ring" "Opal Ring" "Blue Pearl Amulet" "Marble Amulet" "Crystal Belt" "Bone Helmet" "Two-Toned Boots" "Spiked Gloves" "Gripped Gloves" "Fingerless Silk Gloves"
+
+# variables intended for easy config change
+$show_augs = False
+$show_trans = False
+$show_chromes = True
+
+$show_scrolls_wisdom = False
+$show_scrolls_portal = True
+
+$show_scaps = False
+$show_whetstones = False
+$show_bubles = True
+
+$show_4_low_splinters = False
+
+$show_essences_t7_t6 = True
+$show_essences_special = True
+$show_essences_other = False
+
+# oils
+
+# gems
+$show_gems_other = False
+
+$show_hammers = False
+
+$cfg_uniques_high_min_value = 100
+$cfg_uniques_mid_min_value = 10
+$cfg_uniques_low_min_value = 1
+
+$cfg_cards_high_min_value = 100
+$cfg_cards_mid_min_value = 10
+$cfg_cards_low_min_value = 1
+$show_cards_mid = True
+$show_cards_low = True
+$show_cards_very_low = False
+
+$cfg_oils_high_min_value = 50
+$cfg_oils_mid_min_value = 5
+$cfg_oils_low_min_value = 1
+$show_oils_mid = True
+$show_oils_low = True
+$show_oils_very_low = False
+
+$cfg_scarabs_high_min_value = 40
+$cfg_scarabs_mid_min_value = 15
+$cfg_scarabs_low_min_value = 3
+$show_scarabs_mid = True
+$show_scarabs_low = True
+$show_scarabs_very_low = True
+
+$show_jewels_abyss = False
+$show_jewels_basic = False
+
+$cfg_bases_crafting_min_ilvl = 86
+$cfg_bases_crafting_names = None
+
+$cfg_bases_chance_names = "Leather Belt"
+
+$show_gear_corrupted = False
+$show_gear_influenced = False
+$show_gear_fractured = True
+$show_gear_synthesised = True
+$show_gear_veiled = True
+
+$show_flasks_utility = True
+$show_flasks_20q = True
+$show_flasks_other = False
+
+$cfg_gear_4link_max_ilvl = 67
+$cfg_gear_3link_max_ilvl = 30
+
+$show_gear_chrome_big = False
+$show_gear_chrome_small = True
+$show_gear_identified_magic = False
+$show_gear_any_rare = False
+$show_gear_any_magic = False
+$show_gear_any_normal = False
 
 # this will apply globally to ALL blocks
 SetBackgroundColor $color_black
@@ -215,7 +307,7 @@ Class "Currency" {
 		SetFontSize $font_max
 		SetAlertSound $alert_currency_t1
 		PlayEffect $beam_currency
-		MinimapIcon $icon_currency_t1
+		MinimapIcon $icon_currency_high
 		Show
 	}
 
@@ -226,7 +318,7 @@ Class "Currency" {
 		SetFontSize $font_max
 		SetAlertSound $alert_currency_t1
 		PlayEffect $beam_currency
-		MinimapIcon $icon_currency_t1
+		MinimapIcon $icon_currency_high
 		Show
 	}
 
@@ -236,17 +328,17 @@ Class "Currency" {
 		SetFontSize $font_currency_t2
 		SetAlertSound $alert_currency_t2
 		PlayEffect $beam_currency
-		MinimapIcon $icon_currency_t2
+		MinimapIcon $icon_currency_mid
 		Show
 	}
 
-	BaseType "Catalyst" "Oil" "Delirium Orb" {
+	BaseType "Catalyst" "Delirium Orb" {
 		SetTextColor $color_black
 		SetBackgroundColor $color_currency
 		SetFontSize $font_currency_t2
 		SetAlertSound $alert_currency_t2
 		PlayEffect $beam_currency
-		MinimapIcon $icon_currency_t2
+		MinimapIcon $icon_currency_mid
 		Show
 	}
 
@@ -256,7 +348,7 @@ Class "Currency" {
 		SetFontSize $font_currency_t2
 		SetAlertSound $alert_currency_t2
 		PlayEffect $beam_currency
-		MinimapIcon $icon_currency_t2
+		MinimapIcon $icon_currency_mid
 		Show
 	}
 
@@ -280,12 +372,12 @@ Class "Currency" {
 
 	BaseType "Scroll of Wisdom" {
 		SetTextColor 220 195 160
-		Show
+		ShowHide $show_scrolls_wisdom
 	}
 
 	BaseType "Portal Scroll" {
 		SetTextColor 162 152 145
-		Show
+		ShowHide $show_scrolls_portal
 	}
 
 	BaseType "Time-light Scroll" "Fragmentation Scroll" "Deregulation Scroll" "Electroshock Scroll" "Haemocombustion Scroll" "Specularity Scroll" {
@@ -299,38 +391,38 @@ Class "Currency" {
 
 	BaseType "Armourer's Scrap" {
 		SetTextColor 150 100 70
-		Show
+		ShowHide $show_scaps
 	}
 
 	BaseType "Blacksmith's Whetstone" {
 		SetTextColor 190 160 130
-		Show
+		ShowHide $show_whetstones
 	}
 
 	BaseType "Glassblower's Bauble" {
 		SetTextColor 150 210 210
-		Show
+		ShowHide $show_bubles
 	}
 
 	BaseType "Orb of Transmutation" {
 		SetTextColor 70 115 160
-		Show
+		ShowHide $show_trans
 	}
 
 	BaseType "Orb of Augmentation" {
 		SetTextColor 120 165 202
-		Show
+		ShowHide $show_augs
 	}
 
 	BaseType "Chromatic Orb" {
 		SetTextColor 175 255 200
-		Show
+		ShowHide $show_chromes
 	}
 
 	BaseType "Fossil" {
 		SetTextColor $color_black
 		SetBackgroundColor $color_currency_delve
-		SetFontSize $font_currency_t2
+		SetFontSize $font_currency_delve
 		SetAlertSound $alert_currency_fossil
 		PlayEffect $beam_delve_fossil
 		MinimapIcon $icon_delve_fossil
@@ -340,7 +432,7 @@ Class "Currency" {
 	BaseType "Resonator" {
 		SetTextColor $color_black
 		SetBackgroundColor $color_currency_delve
-		SetFontSize $font_currency_t2
+		SetFontSize $font_currency_delve
 		SetAlertSound $alert_currency_resonator
 		PlayEffect $beam_delve_resonator
 		MinimapIcon $icon_delve_resonator
@@ -359,7 +451,7 @@ Class "Currency" {
 		SetBorderColor $color_heist
 		SetFontSize $font_currency_t3
 		SetAlertSound $alert_currency_t3
-		Show
+		Hide
 	}
 
 	BaseType "Prophecy" {
@@ -368,6 +460,32 @@ Class "Currency" {
 		SetFontSize $font_currency_t3
 		SetAlertSound $alert_currency_prophecy
 		Show
+	}
+
+	BaseType == "Simulacrum Splinter"
+	{
+		SetTextColor $color_black
+		SetBorderColor $color_black
+		SetBackgroundColor $color_delirium
+		SetFontSize $font_max
+		SetAlertSound $alert_currency_splinter
+		MinimapIcon 2 Grey UpsideDownHouse
+
+		StackSize >= 5
+		{
+			MinimapIcon 0 Grey UpsideDownHouse
+			Show
+		}
+
+		Show
+	}
+
+	BaseType == "Splinter of Xoph" "Splinter of Tul" "Splinter of Esh" "Splinter of Uul-Netol" "Timeless Eternal Empire Splinter" "Timeless Vaal Splinter" "Timeless Karui Splinter" {
+		SetTextColor $color_breach
+		SetBorderColor $color_breach
+		SetFontSize $font_max
+		SetAlertSound $alert_currency_splinter
+		ShowHide $show_4_low_splinters
 	}
 
 	BaseType "Splinter" {
@@ -394,22 +512,86 @@ Class "Currency" {
 		Show
 	}
 
-	BaseType "Transmutation Shard" "Alteration Shard" "Scroll Fragment" {
+	BaseType == "Transmutation Shard" "Alteration Shard" "Engineer's Shard" "Scroll Fragment" {
 		Hide
 	}
 
-	SetTextColor $color_essence
-	SetBorderColor $color_essence
+	{
+		SetTextColor $color_essence
+		SetBorderColor $color_essence
 
-	BaseType "Deafening Essence of" "Shrieking Essence of" "Essence of Hysteria" "Essence of Insanity" "Essence of Horror" "Essence of Delirium" {
-		SetFontSize $font_max
-		SetAlertSound $alert_currency_essence_best
-		Show
+		BaseType "Deafening Essence of" "Shrieking Essence of"
+		{
+			SetFontSize $font_essence_t7_t6
+			SetAlertSound $alert_essence_t7_t6
+			ShowHide $show_essences_t7_t6
+		}
+
+		BaseType "Essence of Hysteria" "Essence of Insanity" "Essence of Horror" "Essence of Delirium"
+		{
+			SetFontSize $font_essence_special
+			SetAlertSound $alert_essence_special
+			ShowHide $show_essences_special
+		}
+
+		BaseType "Essence" {
+			SetFontSize $font_currency_t3
+			SetAlertSound $alert_essence_other
+			SetFontSize $font_essence_other
+			ShowHide $show_essences_other
+		}
 	}
 
-	BaseType "Essence" {
-		SetFontSize $font_currency_t3
-		SetAlertSound $alert_currency_essence_other
+	Autogen oils
+	{
+		Price >= $cfg_oils_high_min_value
+		{
+			SetTextColor $color_black
+			SetBorderColor $color_oil
+			SetBackgroundColor $color_oil
+			SetFontSize $font_oil_high
+			PlayEffect Orange
+			SetAlertSound $alert_oil_high
+			MinimapIcon 0 Orange Raindrop
+			Show
+		}
+
+		Price < $cfg_oils_high_min_value
+		Price >= $cfg_oils_mid_min_value
+		{
+			SetTextColor $color_black
+			SetBorderColor $color_oil
+			SetBackgroundColor $color_oil
+			SetFontSize $font_oil_mid
+			PlayEffect Orange
+			SetAlertSound $alert_oil_mid
+			MinimapIcon 2 Orange Raindrop
+			ShowHide $show_oils_mid
+		}
+
+		Price < $cfg_oils_mid_min_value
+		Price > $cfg_oils_low_min_value
+		{
+			SetTextColor $color_oil
+			SetBorderColor $color_oil
+			SetFontSize $font_oil_low
+			ShowHide $show_oils_low
+		}
+
+		Price <= $cfg_oils_low_min_value
+		{
+			SetTextColor $color_oil
+			SetFontSize $font_oil_low
+			ShowHide $show_oils_very_low
+		}
+	}
+
+	# oils unknown to autogeneration
+	BaseType "Oil"
+	{
+		SetTextColor $color_oil
+		SetBorderColor $color_error
+		PlayEffect Orange Temp
 		Show
 	}
 
@@ -427,7 +609,7 @@ Class "Incubator" {
 	SetFontSize $font_currency_t2
 	SetAlertSound $alert_currency_t2
 	PlayEffect $beam_currency
-	MinimapIcon $icon_currency_t2
+	MinimapIcon $icon_currency_mid
 	Show
 }
 
@@ -458,26 +640,6 @@ Class "Heist Cloak" "Heist Brooch" "Heist Tool" "Heist Gear" {
 	Show
 }
 
-# Removed in 3.13
-#Class == "Harvest Seed" {
-#	SetTextColor $color_league_item
-#	SetBorderColor $color_league_item
-#	SetBackgroundColor $color_black
-#	SetAlertSound $alert_league_item
-#	SetFontSize $font_max
-#	Show
-#}
-
-#Class == "Seed Enhancer" {
-#	SetTextColor $color_black
-#	SetBackgroundColor $color_league_item
-#	SetBorderColor $color_league_item
-#	SetFontSize $font_max
-#	SetAlertSound $alert_league_item
-#	MinimapIcon 0 Cyan Raindrop
-#	Show
-#}
-
 Class "Gem" {
 	BaseType "Awakened" {
 		SetBackgroundColor $color_white
@@ -498,7 +660,14 @@ Class "Gem" {
 	BaseType "Vaal" {
 		SetTextColor $color_vaal
 
-		Quality 20 {
+		GemLevel >= 20 {
+			SetBackgroundColor $color_white
+			SetAlertSound $alert_gem_20_quality
+			MinimapIcon $icon_gem_20_quality
+			Show
+		}
+
+		Quality >= 20 {
 			SetBackgroundColor $color_white
 			SetAlertSound $alert_gem_20_quality
 			MinimapIcon $icon_gem_20_quality
@@ -515,7 +684,14 @@ Class "Gem" {
 	}
 
 	# non-vaal gems
-	Quality 20 {
+	GemLevel >= 20 {
+		SetBackgroundColor $color_white
+		SetAlertSound $alert_gem_20_quality
+		MinimapIcon $icon_gem_20_quality
+		Show
+	}
+
+	Quality >= 20 {
 		SetBackgroundColor $color_white
 		SetAlertSound $alert_gem_20_quality
 		MinimapIcon $icon_gem_20_quality
@@ -529,7 +705,7 @@ Class "Gem" {
 	}
 
 	# no special highlight for "just a gem"; just show the item
-	Show
+	ShowHide $show_gems_other
 }
 
 BaseType "Gavel" "Stone Hammer" "Rock Breaker" {
@@ -537,17 +713,17 @@ BaseType "Gavel" "Stone Hammer" "Rock Breaker" {
 	SetBackgroundColor $color_hammer
 
 	Rarity Normal {
-		Show
+		ShowDiscard $show_hammers
 	}
 
 	Rarity Magic
 	Quality > 12 {
-		Show
+		ShowDiscard $show_hammers
 	}
 
 	Rarity Rare
 	Quality > 16 {
-		Show
+		ShowDiscard $show_hammers
 	}
 }
 
@@ -569,8 +745,8 @@ LinkedSockets 6 {
 	SetBackgroundColor $color_white
 	SetFontSize $font_max
 	SetAlertSound $alert_unique_6L
-	PlayEffect $beam_top_unique
-	MinimapIcon $icon_top_unique
+	PlayEffect $beam_unique
+	MinimapIcon $icon_unique_high
 	Show
 }
 
@@ -587,12 +763,12 @@ Rarity Unique {
 		Autogen uniques_maps_ambiguous   { Show }
 	}
 
-	Price >= 100
+	Price >= $cfg_uniques_high_min_value
 	{
 		SetBackgroundColor $color_white
-		SetAlertSound $alert_unique_best
-		PlayEffect $beam_top_unique
-		MinimapIcon $icon_top_unique
+		SetAlertSound $alert_unique_high
+		PlayEffect $beam_unique
+		MinimapIcon $icon_unique_high
 
 		Autogen uniques_eq_unambiguous     { Show }
 		Autogen uniques_flasks_unambiguous { Show }
@@ -600,14 +776,23 @@ Rarity Unique {
 		Autogen uniques_maps_unambiguous   { Show }
 	}
 
-	Price >= 5
-	Price < 100
+	Price < $cfg_uniques_high_min_value
+	Price >= $cfg_uniques_mid_min_value
 	{
 		SetBackgroundColor $color_white
-		SetAlertSound $alert_unique_good
-		PlayEffect $beam_top_unique
-		MinimapIcon $icon_mid_unique
+		SetAlertSound $alert_unique_mid
+		PlayEffect $beam_unique
+		MinimapIcon $icon_unique_mid
 
+		Autogen uniques_eq_unambiguous     { Show }
+		Autogen uniques_flasks_unambiguous { Show }
+		Autogen uniques_jewels_unambiguous { Show }
+		Autogen uniques_maps_unambiguous   { Show }
+	}
+
+	Price < $cfg_uniques_mid_min_value
+	Price >= $cfg_uniques_low_min_value
+	{
 		Autogen uniques_eq_unambiguous     { Show }
 		Autogen uniques_flasks_unambiguous { Show }
 		Autogen uniques_jewels_unambiguous { Show }
@@ -674,36 +859,55 @@ Class "Atlas Region Upgrade Item" {
 {
 	Autogen scarabs
 	{
-		Price >= 20
+		Price >= $cfg_scarabs_high_min_value
 		{
-			SetTextColor $color_sacrifice
-			SetBorderColor $color_sacrifice
+			SetTextColor $color_scarab
+			SetBorderColor $color_scarab
 			SetBackgroundColor $color_white
-			SetFontSize $font_scarab_top
-			SetAlertSound $alert_scarab_top
-			MinimapIcon $icon_scarab_top
+			SetFontSize $font_scarab_high
+			SetAlertSound $alert_scarab_high
+			MinimapIcon $icon_scarab_high
 			Show
 		}
 
-		Price < 20
-		Price >= 10
+		Price < $cfg_scarabs_high_min_value
+		Price >= $cfg_scarabs_mid_min_value
 		{
-			SetTextColor $color_sacrifice
-			SetBorderColor $color_sacrifice
+			SetTextColor $color_scarab
+			SetBorderColor $color_scarab
 			SetBackgroundColor $color_white
 			SetFontSize $font_scarab_mid
 			SetAlertSound $alert_scarab_mid
 			MinimapIcon $icon_scarab_mid
-			Show
+			ShowHide $show_scarabs_mid
+		}
+
+		Price < $cfg_scarabs_mid_min_value
+		Price >= $cfg_scarabs_low_min_value
+		{
+			SetTextColor $color_scarab
+			SetBorderColor $color_scarab
+			SetBackgroundColor $color_black
+			SetFontSize $font_scarab_low
+			SetAlertSound $alert_scarab_low
+			MinimapIcon $icon_scarab_low
+			ShowHide $show_scarabs_low
+		}
+
+		Price < $cfg_scarabs_low_min_value
+		{
+			SetTextColor $color_scarab
+			SetBackgroundColor $color_black
+			ShowHide $show_scarabs_very_low
 		}
 	}
 
 	BaseType "Scarab" {
-		SetTextColor $color_sacrifice
-		SetBorderColor $color_sacrifice
+		SetTextColor $color_scarab
+		SetBorderColor $color_scarab
 		SetBackgroundColor $color_black
-		SetFontSize $font_scarab_low
-		SetAlertSound $alert_scarab_low
+		SetFontSize $font_scarab_other
+		SetAlertSound $alert_scarab_other
 		Show
 	}
 }
@@ -758,7 +962,7 @@ Class "Map Fragments" {
 		{ Show }
 	}
 
-	BaseType "Breachstone" {
+	BaseType "Breachstone" "Emblem" {
 		SetTextColor $color_breach
 		SetBorderColor $color_breach
 		SetBackgroundColor $color_white
@@ -795,6 +999,24 @@ Class "Map Fragments" {
 		Show
 	}
 
+	{
+		SetBorderColor $color_labirynth
+		SetTextColor $color_black
+		SetBackgroundColor $color_labirynth
+		SetFontSize $font_max
+
+		BaseType "Tribute to the Goddess" "Gift to the Goddess" "Dedication to the Goddess" {
+			SetAlertSound $alert_currency_t2
+			MinimapIcon $icon_currency_mid
+			Show
+		}
+
+		BaseType "Offering to the Goddess" {
+			SetAlertSound $alert_lab_offering
+			Show
+		}
+	}
+
 	Show
 }
 
@@ -811,7 +1033,7 @@ Class "Leaguestones" {
 Class "Misc Map Item" {
 	# reliquary keys from Legacy ("Ancient") and Delve ("Timeworn")
 	# ...and any future reliquary keys
-	BaseType "Reliquary Key" "Maven's Invitation" {
+	BaseType "Reliquary Key" {
 		SetBorderColor 204 153 0
 		SetTextColor $color_white
 		SetBackgroundColor 204 153 0
@@ -821,26 +1043,18 @@ Class "Misc Map Item" {
 		MinimapIcon $icon_reliquary
 		Show
 	}
-}
 
-{
-	SetBorderColor $color_labirynth
-	SetTextColor $color_black
-	SetBackgroundColor $color_labirynth
-	SetFontSize $font_max
-
-	BaseType "Tribute to the Goddess" "Gift to the Goddess" "Dedication to the Goddess" {
-		SetAlertSound $alert_currency_t2
-		MinimapIcon $icon_currency_t2
-		Show
-	}
-
-	BaseType "Offering to the Goddess" {
-		SetAlertSound $alert_lab_offering
+	BaseType "Maven's Invitation" {
+		SetBorderColor 204 153 0
+		SetTextColor $color_white
+		SetBackgroundColor 204 153 0
+		SetFontSize $font_max
+		SetAlertSound $alert_mlg_airhorn
+		PlayEffect $beam_reliquary
+		MinimapIcon $icon_reliquary
 		Show
 	}
 }
-
 
 # note: Izaro will speak upon key drops
 # sound alerts here may feel like unnecessary noise
@@ -881,6 +1095,7 @@ Class "Metamorph Sample" {
 	Show
 }
 
+# not sure of the Hideout class purpose
 Class "Quest" "Hideout" {
 	SetTextColor $color_quest
 	SetBorderColor $color_quest
@@ -904,10 +1119,10 @@ Class "Divination Card" {
 	SetTextColor $color_divination
 
 	# 1-stack-size cards - always wanted to pickup
-	BaseType "Chaotic Disposition" "The Void" "Divine Justice" "The Cartographer" "The Heroic Shot" {
+	BaseType "Chaotic Disposition" "The Void" "Divine Justice" "The Cartographer" "The Heroic Shot" "Society's Remorse"{
 		PlayEffect $beam_divination
 		SetBorderColor $color_divination
-		SetFontSize $font_mid_divination
+		SetFontSize $font_divination_mid
 		SetAlertSound $alert_divination_stack_1
 		PlayEffect $beam_divination
 		MinimapIcon 1 Blue Square
@@ -915,8 +1130,8 @@ Class "Divination Card" {
 	}
 
 	# low-value cards granting currency or useful fragments
-	BaseType "The Gambler" "Emperor's Luck" "Humility" "Loyalty" "Lucky Connections" "Lucky Deck" "No Traces" "The Catalyst" "The Encroaching Darkness" "The Gambler" "The Gemcutter" "The Innocent" "The Inventor" "The Master Artisan" "The Obscured" "The Puzzle" "The Risk" "The Survivalist" "The Wrath" "Three Faces in the Dark" "Vinia's Token" "Coveted Possession" "Sambodhi's Vow" "The Tinkerer's Table" "Monochrome" "Cameria's Cut" "Buried Treasure" "Last Hope" "The Journey" "The Fool" "Underground Forest" "The Deal" "Vinia's Token" "Demigod's Wager" "More is Never Enough" "The Union" "The Seeker" "The Sephirot" {
-		SetFontSize $font_mid_divination
+	BaseType "Humility" "Loyalty" "Lucky Connections" "Lucky Deck" "No Traces" "The Catalyst" "The Encroaching Darkness" "The Gemcutter" "The Innocent" "The Inventor" "The Master Artisan" "The Obscured" "The Risk" "The Survivalist" "The Wrath" "Three Faces in the Dark" "Vinia's Token" "Coveted Possession" "Sambodhi's Vow" "The Tinkerer's Table" "Monochrome" "Cameria's Cut" "Buried Treasure" "Last Hope" "The Journey" "The Fool" "Underground Forest" "The Deal" "Vinia's Token" "Demigod's Wager" "More is Never Enough" "The Union" "The Seeker" "The Sephirot" {
+		SetFontSize $font_divination_mid
 		SetAlertSound $alert_divination_always_pickup
 		PlayEffect $beam_divination Temp
 		Show
@@ -924,54 +1139,53 @@ Class "Divination Card" {
 
 	Autogen cards
 	{
-		Price >= 100
+		Price >= $cfg_cards_high_min_value
 		{
 			SetTextColor $color_black
 			SetBorderColor $color_divination
 			SetBackgroundColor $color_divination
-			SetFontSize $font_max
-			SetAlertSound $alert_divination_best
+			SetFontSize $font_divination_high
+			SetAlertSound $alert_divination_high
 			PlayEffect $beam_divination
 			MinimapIcon 0 Blue Square
 			Show
 		}
 
-		Price < 100
-		Price >= 10
+		Price < $cfg_cards_high_min_value
+		Price >= $cfg_cards_mid_min_value
 		{
 			SetBorderColor $color_divination
-			SetFontSize $font_mid_divination
+			SetFontSize $font_divination_mid
 			SetAlertSound $alert_divination_mid
 			PlayEffect $beam_divination
 			MinimapIcon 1 Blue Square
-			Show
+			ShowHide $show_cards_mid
 		}
 
-		Price < 10
-		Price > 1
+		Price < $cfg_cards_mid_min_value
+		Price > $cfg_cards_low_min_value
 		{
 			SetTextColor $color_divination
-			SetFontSize $font_low_divination
+			SetFontSize $font_divination_low
 			SetAlertSound $alert_divination_low
 			PlayEffect $beam_divination Temp
-			Show
+			ShowHide $show_cards_low
 		}
 
-		# poe.ninja seems to round prices to 1c
-		# or too many players sell for 1 chaos
-		# therefore, make this section inclusive to exactly 1c
-		Price <= 1
+		# poe.ninja seems to round prices to 1c or too many players sell for 1 chaos
+		# therefore, in case low is set to 1c, make last block have inclusive range
+		Price <= $cfg_cards_low_min_value
 		{
 			SetTextColor $color_divination
 			SetFontSize $font_min
-			Show
+			ShowHide $show_cards_very_low
 		}
 	}
 
 	# unknown cards
 	SetBorderColor $color_red
 	SetTextColor $color_divination
-	SetFontSize $font_mid_divination
+	SetFontSize $font_divination_mid
 	SetAlertSound $alert_divination_mid
 	PlayEffect $beam_divination Temp
 	Show
@@ -986,9 +1200,9 @@ Class "Maps" {
 		SetTextColor $color_white
 		SetBorderColor $color_white
 		SetBackgroundColor $color_orange
-		SetFontSize $font_max
+		SetFontSize $font_map_blight
 		SetAlertSound $alert_map_blight
-		PlayEffect $beam_good_map
+		PlayEffect $beam_map
 		MinimapIcon $icon_map_blight
 		Show
 	}
@@ -997,41 +1211,42 @@ Class "Maps" {
 		SetTextColor $color_white
 		SetBorderColor $color_white
 		SetBackgroundColor $color_red
-		SetFontSize $font_max
+		SetFontSize $font_map_t16
 		SetAlertSound $alert_map_t16
-		PlayEffect $beam_good_map
-		MinimapIcon $icon_map_top
+		PlayEffect $beam_map
+		MinimapIcon $icon_map_t16
 		Show
 	}
 
 	MapTier >= 11 {
 		SetBorderColor $color_map_red
 		SetBackgroundColor $color_black
-		SetFontSize $font_map
+		SetFontSize $font_map_red
 		SetAlertSound $alert_map_red
-		MinimapIcon $icon_map_mid
+		MinimapIcon $icon_map_red
 		Show
 	}
 
 	MapTier >= 6 {
 		SetBorderColor $color_map_yellow
 		SetBackgroundColor $color_black
-		SetFontSize $font_map
+		SetFontSize $font_map_yellow
 		SetAlertSound $alert_map_yellow
 		Show
 	}
 
 	# white maps
-	SetBorderColor $color_white
+	SetBorderColor $color_map_white
 	SetBackgroundColor $color_black
-	SetFontSize $font_map
+	SetFontSize $font_map_white
 	SetAlertSound $alert_map_white
 	Show
 }
 
-
-Class "Abyss Jewel" {
-	SetFontSize $font_abyss_jewel
+Class "Jewel"
+BaseType "Cluster Jewel"
+{
+	SetFontSize $font_jewel_cluster
 
 	Rarity Magic {
 		SetTextColor $color_magic
@@ -1045,25 +1260,45 @@ Class "Abyss Jewel" {
 		Show
 	}
 
-	Show # show normal abyss jewels (in case of future drops)
+	Show
 }
 
-Class "Jewel" {
-	SetFontSize $font_jewel
+Class == "Abyss Jewel"
+{
+	SetFontSize $font_jewel_abyss
 
 	Rarity Magic {
 		SetTextColor $color_magic
 		SetBorderColor $color_magic
-		Show
+		ShowHide $show_jewels_abyss
 	}
 
 	Rarity Rare {
 		SetTextColor $color_rare
 		SetBorderColor $color_rare
-		Show
+		ShowHide $show_jewels_abyss
 	}
 
-	Show # show normal jewels (in case of future drops)
+	ShowHide $show_jewels_abyss
+}
+
+Class "Jewel"
+{
+	SetFontSize $font_jewel_basic
+
+	Rarity Magic {
+		SetTextColor $color_magic
+		SetBorderColor $color_magic
+		ShowHide $show_jewels_basic
+	}
+
+	Rarity Rare {
+		SetTextColor $color_rare
+		SetBorderColor $color_rare
+		ShowHide $show_jewels_basic
+	}
+
+	ShowHide $show_jewels_basic
 }
 
 Class "Amulet"
@@ -1082,18 +1317,18 @@ BaseType "Talisman" {
 	Show
 }
 
-# bases you want to pickup for crafting
 Rarity <= Rare
-Corrupted False {
+Corrupted False
+Mirrored False
+ItemLevel >= $cfg_bases_crafting_min_ilvl
+BaseType $cfg_bases_crafting_names
+{
 	SetTextColor $color_black
 	SetBackgroundColor $color_crafting
 	SetFontSize $font_crafting
-	SetAlertSound $alert_mlg_airhorn
+	SetAlertSound $alert_base_crafting
 
-	ItemLevel >= 86
-	BaseType "Bone Helmet" "Two-Toned Boots" "Fingerless Silk Gloves" "Crystal Belt" "Spiked Gloves" {
-		Show
-	}
+	Show
 }
 
 # corrupted items
@@ -1102,7 +1337,7 @@ Corrupted False {
 Rarity <= Rare
 Corrupted True {
 	SetBackgroundColor $color_corrupted
-	Show
+	ShowHide $show_gear_corrupted
 }
 
 # bases
@@ -1110,63 +1345,62 @@ Rarity <= Rare {
 	HasInfluence Shaper {
 		SetBackgroundColor $color_shaper_item
 		SetAlertSound $alert_shaper_item
-
-		Show
+		ShowDiscard $show_gear_influenced
 	}
 
 	HasInfluence Elder {
 		SetBackgroundColor $color_elder_item
 		SetAlertSound $alert_elder_item
-
-		Show
+		ShowDiscard $show_gear_influenced
 	}
 
 	HasInfluence Crusader Redeemer Hunter Warlord {
 		SetBackgroundColor $color_conqueror_item
 		SetAlertSound $alert_conqueror_item
-
-		Show
+		ShowDiscard $show_gear_influenced
 	}
 
 	# non-influenced bases
 	FracturedItem True {
 		SetBackgroundColor $color_fractured_item
 		SetAlertSound $alert_fractured_item
-		Show
+		ShowDiscard $show_gear_fractured
 	}
 
 	SynthesisedItem True {
 		SetBackgroundColor $color_synthesised_item
 		SetAlertSound $alert_synthesised_item
-		Show
+		ShowDiscard $show_gear_synthesised
 	}
 
 	# Betrayal league items
-	HasExplicitMod "Veil" {
+	HasExplicitMod == "Veiled" "of the Veil" {
 		SetBackgroundColor $color_veiled_item
 		SetAlertSound $alert_veiled_item
-		Show
+		ShowDiscard $show_gear_veiled
 	}
 }
 
 # chrome items + chaos recipe rares
+# Show + Continue exists in few places to unconditionally apply colors
+# the actual filtering for non-RGB items happens later
 {
 	Rarity Normal {
 		SocketGroup RGB {
 			Width 2
 			Height <= 2 {
 				SetBorderColor $color_chromatic_small
-				Show
+				ShowDiscard $show_gear_chrome_small
 			}
 
 			Width 1
 			Height <= 4 {
 				SetBorderColor $color_chromatic_small
-				Show
+				ShowDiscard $show_gear_chrome_small
 			}
 
 			SetBorderColor $color_chromatic_big
-			Show
+			ShowDiscard $show_gear_chrome_big
 		}
 	}
 
@@ -1177,20 +1411,21 @@ Rarity <= Rare {
 			Width 2
 			Height <= 2 {
 				SetBorderColor $color_chromatic_small
-				Show
+				ShowDiscard $show_gear_chrome_small
 			}
 
 			Width 1
 			Height <= 4 {
 				SetBorderColor $color_chromatic_small
-				Show
+				ShowDiscard $show_gear_chrome_small
 			}
 
 			SetBorderColor $color_chromatic_big
-			Show
+			ShowDiscard $show_gear_chrome_big
 		}
 
-		Hide
+		Show
+		Continue
 	}
 
 	Rarity Rare {
@@ -1204,40 +1439,42 @@ Rarity <= Rare {
 					Width 2
 					Height <= 2 {
 						SetBorderColor $color_chromatic_small
-						Show
+						ShowDiscard $show_gear_chrome_small
 					}
 
 					Width 1
 					Height <= 4 {
 						SetBorderColor $color_chromatic_small
-						Show
+						ShowDiscard $show_gear_chrome_small
 					}
 
 					SetBorderColor $color_chromatic_big
-					Show
+					ShowDiscard $show_gear_chrome_big
 				}
 
 				Show
+				Continue
 			}
 
 			SocketGroup RGB {
 				Width 2
 				Height <= 2 {
 					SetBorderColor $color_chromatic_small
-					Show
+					ShowDiscard $show_gear_chrome_small
 				}
 
 				Width 1
 				Height <= 4 {
 					SetBorderColor $color_chromatic_small
-					Show
+					ShowDiscard $show_gear_chrome_small
 				}
 
 				SetBorderColor $color_chromatic_big
-				Show
+				ShowDiscard $show_gear_chrome_big
 			}
 
 			Show
+			Continue
 		}
 
 		ItemLevel >= 60 {
@@ -1250,40 +1487,42 @@ Rarity <= Rare {
 					Width 2
 					Height <= 2 {
 						SetBorderColor $color_chromatic_small
-						Show
+						ShowDiscard $show_gear_chrome_small
 					}
 
 					Width 1
 					Height <= 4 {
 						SetBorderColor $color_chromatic_small
-						Show
+						ShowDiscard $show_gear_chrome_small
 					}
 
 					SetBorderColor $color_chromatic_big
-					Show
+					ShowDiscard $show_gear_chrome_big
 				}
 
 				Show
+				Continue
 			}
 
 			SocketGroup RGB {
 				Width 2
 				Height <= 2 {
 					SetBorderColor $color_chromatic_small
-					Show
+					ShowDiscard $show_gear_chrome_small
 				}
 
 				Width 1
 				Height <= 4 {
 					SetBorderColor $color_chromatic_small
-					Show
+					ShowDiscard $show_gear_chrome_small
 				}
 
 				SetBorderColor $color_chromatic_big
-				Show
+				ShowDiscard $show_gear_chrome_big
 			}
 
 			Show
+			Continue
 		}
 
 		SetTextColor $color_rare_chance
@@ -1295,46 +1534,49 @@ Rarity <= Rare {
 				Width 2
 				Height <= 2 {
 					SetBorderColor $color_chromatic_small
-					Show
+					ShowDiscard $show_gear_chrome_small
 				}
 
 				Width 1
 				Height <= 4 {
 					SetBorderColor $color_chromatic_small
-					Show
+					ShowDiscard $show_gear_chrome_small
 				}
 
 				SetBorderColor $color_chromatic_big
-				Show
+				ShowDiscard $show_gear_chrome_big
 			}
 
 			Show
+			Continue
 		}
 
 		SocketGroup RGB {
 			Width 2
 			Height <= 2 {
 				SetBorderColor $color_chromatic_small
-				Show
+				ShowDiscard $show_gear_chrome_small
 			}
 
 			Width 1
 			Height <= 4 {
 				SetBorderColor $color_chromatic_small
-				Show
+				ShowDiscard $show_gear_chrome_small
 			}
 
 			SetBorderColor $color_chromatic_big
-			Show
+			ShowDiscard $show_gear_chrome_big
 		}
 
 		Show
+		Continue
 	}
 }
 
-# base types you want to pickup for chancing
 Rarity Normal
-BaseType "Leather Belt" {
+Corrupted False
+Mirrored False
+BaseType == $cfg_bases_chance_names {
 	SetTextColor $color_black
 	SetBackgroundColor $color_chance_base
 	SetAlertSound $alert_base_chance
@@ -1345,29 +1587,29 @@ BaseType "Leather Belt" {
 Class "Utility Flasks" {
 	SetTextColor $color_white
 	SetBackgroundColor $color_flask_utility
-	Show
+	ShowDiscard $show_flasks_utility
 }
 
 # free bubles
 Class "Flasks" {
 	Quality 20 {
 		SetBorderColor $color_white
-		Show
+		ShowDiscard $show_flasks_20q
 	}
 
-	Show
+	ShowDiscard $show_flasks_other
 }
 
 # leveling - 4Ls
 # ilvl cap: stop showing 4Ls once you reach maps
-ItemLevel <= 67
+ItemLevel <= $cfg_gear_4link_max_ilvl
 LinkedSockets 4 {
 	Show
 }
 
 # leveling - 3Ls
 # raise the ilvl cap if you have bad RNG and can't find 3L
-ItemLevel <= 30
+ItemLevel <= $cfg_gear_3link_max_ilvl
 LinkedSockets 3 {
 	Show
 }
@@ -1382,13 +1624,21 @@ ItemLevel <= 15 {
 Rarity Magic
 Identified True {
 	SetBorderColor $color_magic
-	Show
+	ShowDiscard $show_gear_identified_magic
 }
 
 # at this point all worthwhile items should be sorted out
 # hide all remaining garbage
-Rarity <= Rare {
-	Hide
+Rarity Rare {
+	ShowHide $show_gear_any_rare
+}
+
+Rarity Magic {
+	ShowHide $show_gear_any_magic
+}
+
+Rarity Normal {
+	ShowHide $show_gear_any_normal
 }
 
 # all non-rarity items that were not catched earlier
