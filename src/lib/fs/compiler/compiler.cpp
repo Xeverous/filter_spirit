@@ -506,6 +506,7 @@ compile_statements_recursively_impl(
 	lang::action_set& actions,
 	std::vector<lang::spirit_item_filter_block>& blocks,
 	diagnostics_container& diagnostics,
+	std::vector<lang::position_tag>& expand_stack,
 	int recursion_depth)
 {
 	for (const ast::sf::statement& statement : statements) {
@@ -528,7 +529,7 @@ compile_statements_recursively_impl(
 					},
 					[&](const ast::sf::name& name) {
 						if (recursion_depth == st.max_recursion_depth) {
-							push_error_recursion_limit_reached(parser::position_tag_of(name), diagnostics);
+							push_error_recursion_limit_reached(parser::position_tag_of(statement), diagnostics);
 							return false;
 						}
 
@@ -536,7 +537,8 @@ compile_statements_recursively_impl(
 						if (!tree)
 							return false;
 
-						return compile_statements_recursively_impl(
+						expand_stack.push_back(parser::position_tag_of(statement));
+						const bool result = compile_statements_recursively_impl(
 							st,
 							tree->statements,
 							symbols,
@@ -544,7 +546,10 @@ compile_statements_recursively_impl(
 							actions,
 							blocks,
 							diagnostics,
+							expand_stack,
 							recursion_depth + 1);
+						expand_stack.pop_back();
+						return result;
 					}
 				));
 			},
@@ -594,12 +599,18 @@ compile_statements_recursively_impl(
 						nested_actions,
 						blocks,
 						diagnostics,
+						expand_stack,
 						recursion_depth + 1);
 				}
 				else {
 					return false;
 				}
 			}));
+
+		if (!result) {
+			for (lang::position_tag origin : expand_stack)
+				diagnostics.push_back(make_note_minor(origin, "happened inside expansion"));
+		}
 
 		if (!result && st.error_handling.stop_on_error)
 			return false;
@@ -620,9 +631,10 @@ compile_statements_recursively(
 	lang::spirit_condition_set root_conditions;
 	lang::action_set root_actions;
 	std::vector<lang::spirit_item_filter_block> blocks;
+	std::vector<lang::position_tag> expand_stack;
 
 	const bool success = compile_statements_recursively_impl(
-		st, statements, symbols, root_conditions, root_actions, blocks, diagnostics, 1);
+		st, statements, symbols, root_conditions, root_actions, blocks, diagnostics, expand_stack, 1);
 
 	if (success)
 		return blocks;
