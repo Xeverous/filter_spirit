@@ -4,7 +4,6 @@
 #include <fs/utility/better_enum.hpp>
 #include <fs/lang/position_tag.hpp>
 #include <fs/lang/primitive_types.hpp>
-#include <fs/lang/action_set.hpp>
 #include <fs/lang/queries.hpp>
 
 #include <boost/container/small_vector.hpp>
@@ -27,8 +26,7 @@ using object_variant = std::variant<
 	suit,
 	shaper_voice_line,
 	gem_quality_type,
-	string,
-	action_set
+	string
 >;
 
 BETTER_ENUM(object_type, int,
@@ -44,8 +42,7 @@ BETTER_ENUM(object_type, int,
 	suit,
 	shaper_voice_line,
 	gem_quality_type,
-	string,
-	action_set)
+	string)
 
 
 [[nodiscard]]
@@ -129,8 +126,6 @@ namespace detail {
 	object_type object_type_of_impl<gem_quality_type>() noexcept { return object_type::gem_quality_type; }
 	template <> constexpr
 	object_type object_type_of_impl<string>() noexcept { return object_type::string; }
-	template <> constexpr
-	object_type object_type_of_impl<action_set>() noexcept { return object_type::action_set; }
 }
 
 template <typename T> [[nodiscard]] constexpr

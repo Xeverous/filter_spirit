@@ -182,7 +182,8 @@ void spirit_filter_state_mediator::draw_interface_spirit_filter_symbols()
 {
 	if (ImGui::CollapsingHeader("Spirit filter definitions", ImGuiTreeNodeFlags_DefaultOpen)) {
 		if (_spirit_filter_symbols) {
-			ImGui::TextWrapped("Resolving definitions successful, %zu definitions", (*_spirit_filter_symbols).size());
+			ImGui::TextWrapped("Resolving definitions successful, %zu definitions",
+				(*_spirit_filter_symbols).objects.size() + (*_spirit_filter_symbols).trees.size());
 		}
 		else {
 			ImGui::TextWrapped("Not available.");

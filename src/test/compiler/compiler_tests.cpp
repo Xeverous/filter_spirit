@@ -29,8 +29,8 @@ void expect_object(
 	std::string_view expected_name_origin,
 	std::initializer_list<std::pair<lang::object_variant, std::string_view>> expected_obj)
 {
-	const auto it = symbols.find(name);
-	if (it == symbols.end()) {
+	const auto it = symbols.objects.find(name);
+	if (it == symbols.objects.end()) {
 		BOOST_ERROR("expected " << name << " in symbol table");
 		return;
 	}

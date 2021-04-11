@@ -26,6 +26,50 @@ using dmid = diagnostic_message_id;
 
 // ---- generic helpers ----
 
+[[nodiscard]] boost::optional<lang::color>
+make_color(
+	settings /* st */,
+	lang::integer r,
+	lang::integer g,
+	lang::integer b,
+	boost::optional<lang::integer> a,
+	diagnostics_container& diagnostics)
+{
+	const auto result_r = detail::make_integer_in_range(r, 0, 255, diagnostics);
+	const auto result_g = detail::make_integer_in_range(g, 0, 255, diagnostics);
+	const auto result_b = detail::make_integer_in_range(b, 0, 255, diagnostics);
+
+	if (!result_r || !result_g || !result_b)
+		return boost::none;
+
+	if (a) {
+		const auto result_a = detail::make_integer_in_range(*a, 0, 255, diagnostics);
+
+		if (!result_a)
+			return boost::none;
+
+		return lang::color{*result_r, *result_g, *result_b, *result_a};
+	}
+	else {
+		return lang::color{*result_r, *result_g, *result_b};
+	}
+}
+
+[[nodiscard]] boost::optional<lang::enabled_minimap_icon>
+make_enabled_minimap_icon(
+	lang::integer size,
+	lang::suit suit,
+	lang::shape shape,
+	diagnostics_container& diagnostics)
+{
+	if (size.value != 0 && size.value != 1 && size.value != 2) {
+		push_error_invalid_integer_value(0, 2, size, diagnostics);
+		return boost::none;
+	}
+
+	return lang::enabled_minimap_icon{size, suit, shape};
+}
+
 [[nodiscard]] boost::optional<lang::minimap_icon>
 make_minimap_icon(
 	settings /* st */,
@@ -58,7 +102,7 @@ make_minimap_icon(
 			if (!suit || !shape)
 				return boost::none;
 
-			return detail::make_enabled_minimap_icon(icon_size, *suit, *shape, diagnostics)
+			return make_enabled_minimap_icon(icon_size, *suit, *shape, diagnostics)
 				.map([&](lang::enabled_minimap_icon icon) {
 					return lang::minimap_icon{icon, obj.origin};
 				});
@@ -258,12 +302,12 @@ spirit_filter_add_set_color_action(
 			if (num_values == 4u) {
 				return detail::get_as<lang::integer>(obj.values[3], diagnostics)
 					.flat_map([&](lang::integer a) {
-						return detail::make_color(st, *r, *g, *b, a, diagnostics);
+						return make_color(st, *r, *g, *b, a, diagnostics);
 					}
 				);
 			}
 			else {
-				return detail::make_color(st, *r, *g, *b, boost::none, diagnostics);
+				return make_color(st, *r, *g, *b, boost::none, diagnostics);
 			}
 		})
 		.map([&](lang::color color) {
@@ -474,26 +518,6 @@ spirit_filter_add_set_alert_sound_action(
 		.value_or(false);
 }
 
-[[nodiscard]] bool
-spirit_filter_add_compound_action(
-	settings st,
-	const ast::sf::compound_action& action,
-	const lang::symbol_table& symbols,
-	lang::action_set& set,
-	diagnostics_container& diagnostics)
-{
-	return detail::evaluate_sequence(st, action.seq, symbols, 1, 1, diagnostics)
-		.flat_map([&](lang::object obj) {
-			FS_ASSERT(obj.values.size() == 1u);
-			return detail::get_as<lang::action_set>(obj.values[0], diagnostics);
-		})
-		.map([&](lang::action_set as) {
-			set.override_with(as);
-			return true;
-		})
-		.value_or(false);
-}
-
 // ---- real filter helpers ----
 
 template <typename T>
@@ -516,6 +540,20 @@ real_filter_add_action_impl(
 	return true;
 }
 
+[[nodiscard]] boost::optional<lang::color>
+real_filter_evaluate_color_literal(
+	settings st,
+	parser::ast::rf::color_literal cl,
+	diagnostics_container& diagnostics)
+{
+	using detail::evaluate;
+	boost::optional<lang::integer> a;
+	if (cl.a)
+		a = evaluate(*cl.a);
+
+	return make_color(st, evaluate(cl.r), evaluate(cl.g), evaluate(cl.b), a, diagnostics);
+}
+
 [[nodiscard]] bool
 real_filter_add_color_action(
 	settings st,
@@ -523,7 +561,7 @@ real_filter_add_color_action(
 	lang::action_set& set,
 	diagnostics_container& diagnostics)
 {
-	boost::optional<lang::color> color = detail::evaluate(st, action.color, diagnostics);
+	boost::optional<lang::color> color = real_filter_evaluate_color_literal(st, action.color, diagnostics);
 
 	if (!color)
 		return false;
@@ -680,9 +718,6 @@ spirit_filter_add_action(
 		[&](const ast::sf::switch_drop_sound_action& a) {
 			set.switch_drop_sound = lang::switch_drop_sound_action{a.enable, parser::position_tag_of(action)};
 			return true;
-		},
-		[&](const ast::sf::compound_action& ca) {
-			return spirit_filter_add_compound_action(st, ca, symbols, set, diagnostics);
 		}
 	));
 }

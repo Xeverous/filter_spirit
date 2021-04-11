@@ -20,36 +20,12 @@ make_integer_in_range(
 	int max_allowed_value,
 	diagnostics_container& diagnostics);
 
-[[nodiscard]] boost::optional<lang::color>
-make_color(
-	settings st,
-	lang::integer r,
-	lang::integer g,
-	lang::integer b,
-	boost::optional<lang::integer> a,
-	diagnostics_container& diagnostics);
-
 [[nodiscard]] boost::optional<lang::socket_spec>
 make_socket_spec(
 	settings st,
 	const std::string& raw,
 	lang::position_tag origin,
 	diagnostics_container& diagnostics);
-
-[[nodiscard]] inline boost::optional<lang::enabled_minimap_icon>
-make_enabled_minimap_icon(
-	lang::integer size,
-	lang::suit suit,
-	lang::shape shape,
-	diagnostics_container& diagnostics)
-{
-	if (size.value != 0 && size.value != 1 && size.value != 2) {
-		push_error_invalid_integer_value(0, 2, size, diagnostics);
-		return boost::none;
-	}
-
-	return lang::enabled_minimap_icon{size, suit, shape};
-}
 
 [[nodiscard]] inline lang::string
 evaluate(const parser::ast::common::string_literal& sl)
@@ -135,19 +111,6 @@ evaluate(
 	const parser::ast::common::literal_expression& expression,
 	diagnostics_container& diagnostics);
 
-[[nodiscard]] inline boost::optional<lang::color>
-evaluate(
-	settings st,
-	parser::ast::rf::color_literal cl,
-	diagnostics_container& diagnostics)
-{
-	boost::optional<lang::integer> a;
-	if (cl.a)
-		a = evaluate(*cl.a);
-
-	return make_color(st, evaluate(cl.r), evaluate(cl.g), evaluate(cl.b), a, diagnostics);
-}
-
 [[nodiscard]] boost::optional<lang::object>
 evaluate_sequence(
 	settings st,
@@ -163,13 +126,6 @@ evaluate_literal_sequence(
 	const parser::ast::rf::literal_sequence& sequence,
 	int min_allowed_elements,
 	boost::optional<int> max_allowed_elements,
-	diagnostics_container& diagnostics);
-
-[[nodiscard]] boost::optional<lang::object>
-evaluate_value_expression(
-	settings st,
-	const parser::ast::sf::value_expression& value_expression,
-	const lang::symbol_table& symbols,
 	diagnostics_container& diagnostics);
 
 template <typename T>

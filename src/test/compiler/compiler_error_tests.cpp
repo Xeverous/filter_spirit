@@ -39,7 +39,8 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 			resolve_symbols(parse_data.ast.definitions, diagnostics);
 		BOOST_TEST_REQUIRE(!compiler::has_errors(diagnostics));
 		BOOST_TEST_REQUIRE(symbols.has_value());
-		BOOST_TEST((*symbols).empty());
+		BOOST_TEST((*symbols).objects.empty());
+		BOOST_TEST((*symbols).trees.empty());
 	}
 
 	/*

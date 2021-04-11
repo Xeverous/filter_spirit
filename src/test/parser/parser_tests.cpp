@@ -247,23 +247,23 @@ $Identifiedd = $Corruptedd
 		}
 	}
 
-	BOOST_AUTO_TEST_CASE(empty_compound_action_definition)
+	BOOST_AUTO_TEST_CASE(empty_subtree_definition)
 	{
 		const std::string input = minimal_input() + "\n"
-			"$empty_action = {}";
+			"$empty_subtree = {}";
 
 		const sf::ast_type ast = parse(input).ast;
 
 		const std::vector<sf::definition>& defs = ast.definitions;
 		BOOST_TEST_REQUIRE(defs.size() == 1u);
 
-		BOOST_TEST(defs[0].def.value_name.value.value == "empty_action");
+		BOOST_TEST(defs[0].def.value_name.value.value == "empty_subtree");
 
 		auto& val_expr = defs[0].def.value;
-		BOOST_TEST_REQUIRE(holds_alternative<sf::compound_action_expression>(val_expr.var));
+		BOOST_TEST_REQUIRE(holds_alternative<sf::statement_list_expression>(val_expr.var));
 
-		auto& ca_expr = boost::get<sf::compound_action_expression>(val_expr.var);
-		BOOST_TEST(ca_expr.empty());
+		auto& list_expr = boost::get<sf::statement_list_expression>(val_expr.var);
+		BOOST_TEST(list_expr.empty());
 	}
 
 	BOOST_AUTO_TEST_CASE(nested_block_definition)

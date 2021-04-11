@@ -183,13 +183,6 @@ namespace sf
 
 	// ---- expressions ----
 
-	// moved here due to circular dependency
-	const action_type action = "action";
-
-	const compound_action_expression_type compound_action_expression = "compound action expression";
-	const auto compound_action_expression_def = ('{' >> *action) > '}';
-	BOOST_SPIRIT_DEFINE(compound_action_expression)
-
 	const item_category_expression_type item_category_expression = "item category expression";
 	const auto item_category_expression_def = make_keyword(symbols::sf::item_categories);
 	BOOST_SPIRIT_DEFINE(item_category_expression)
@@ -202,8 +195,15 @@ namespace sf
 	const auto sequence_def = x3::skip(common::non_eol_whitespace)[+primitive_value];
 	BOOST_SPIRIT_DEFINE(sequence)
 
+	// moved here due to circular dependency
+	const statement_type statement = "statement";
+
+	const statement_list_expression_type statement_list_expression = "statement list expression";
+	const auto statement_list_expression_def = ('{' >> *statement) > '}';
+	BOOST_SPIRIT_DEFINE(statement_list_expression)
+
 	const value_expression_type value_expression = "expression";
-	const auto value_expression_def = compound_action_expression | sequence;
+	const auto value_expression_def = statement_list_expression | sequence;
 	BOOST_SPIRIT_DEFINE(value_expression)
 
 	// ---- definitions ----
@@ -333,10 +333,7 @@ namespace sf
 		(make_keyword(lang::keywords::rf::disable_drop_sound) > x3::attr(false));
 	BOOST_SPIRIT_DEFINE(switch_drop_sound_action)
 
-	const compound_action_type compound_action = "compound action";
-	const auto compound_action_def = make_keyword(lang::keywords::sf::set) > sequence;
-	BOOST_SPIRIT_DEFINE(compound_action)
-
+	const action_type action = "action";
 	const auto action_def =
 		  set_color_action
 		| set_font_size_action
@@ -345,11 +342,14 @@ namespace sf
 		| play_alert_sound_action
 		| custom_alert_sound_action
 		| set_alert_sound_action
-		| switch_drop_sound_action
-		| compound_action;
+		| switch_drop_sound_action;
 	BOOST_SPIRIT_DEFINE(action)
 
 	// ---- filter structure ----
+
+	const expand_statement_type expand_statement = "expand statement";
+	const auto expand_statement_def = make_keyword(lang::keywords::sf::expand) > sequence;
+	BOOST_SPIRIT_DEFINE(expand_statement)
 
 	const dynamic_visibility_policy_type dynamic_visibility_policy = "dynamic visivility policy";
 	const auto dynamic_visibility_policy_def =
@@ -372,8 +372,7 @@ namespace sf
 	// moved here due to circular dependency
 	const rule_block_type rule_block = "rule block";
 
-	const statement_type statement = "statement";
-	const auto statement_def = action | behavior_statement | rule_block;
+	const auto statement_def = expand_statement | action | behavior_statement | rule_block;
 	BOOST_SPIRIT_DEFINE(statement)
 
 	const auto rule_block_def = (*condition >> x3::lit('{')) > *statement > x3::lit('}');

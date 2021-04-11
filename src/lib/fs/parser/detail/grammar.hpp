@@ -114,10 +114,10 @@ namespace sf
 
 	// ---- expressions ----
 
-	struct compound_action_expression_class      : error_on_error, annotate_on_success {};
 	struct item_category_expression_class        : error_on_error, annotate_on_success {};
 	struct primitive_value_class                 : error_on_error, annotate_on_success {};
 	struct sequence_class                        : error_on_error, annotate_on_success {};
+	struct statement_list_expression_class       : error_on_error, annotate_on_success {};
 	struct value_expression_class                : error_on_error, annotate_on_success {};
 
 	// ---- definitions ----
@@ -149,11 +149,11 @@ namespace sf
 	struct custom_alert_sound_action_class       : error_on_error, annotate_on_success {};
 	struct set_alert_sound_action_class          : error_on_error, annotate_on_success {};
 	struct switch_drop_sound_action_class        : error_on_error, annotate_on_success {};
-	struct compound_action_class                 : error_on_error, annotate_on_success {};
 	struct action_class                          : error_on_error, annotate_on_success {};
 
 	// ---- filter structure ----
 
+	struct expand_statement_class                : error_on_error, annotate_on_success {};
 	struct dynamic_visibility_policy_class       : error_on_error, annotate_on_success {};
 	struct dynamic_visibility_statement_class    : error_on_error, annotate_on_success {};
 	struct visibility_statement_class            : error_on_error, annotate_on_success {};
@@ -316,9 +316,6 @@ namespace sf
 
 	// ---- expressions ----
 
-	using compound_action_expression_type = x3::rule<compound_action_expression_class, ast::sf::compound_action_expression>;
-	BOOST_SPIRIT_DECLARE(compound_action_expression_type)
-
 	using item_category_expression_type = x3::rule<item_category_expression_class, ast::sf::item_category_expression>;
 	BOOST_SPIRIT_DECLARE(item_category_expression_type)
 
@@ -327,6 +324,9 @@ namespace sf
 
 	using sequence_type = x3::rule<sequence_class, ast::sf::sequence>;
 	BOOST_SPIRIT_DECLARE(sequence_type)
+
+	using statement_list_expression_type = x3::rule<statement_list_expression_class, ast::sf::statement_list_expression>;
+	BOOST_SPIRIT_DECLARE(statement_list_expression_type)
 
 	using value_expression_type = x3::rule<value_expression_class, ast::sf::value_expression>;
 	BOOST_SPIRIT_DECLARE(value_expression_type)
@@ -403,10 +403,10 @@ namespace sf
 	using action_type = x3::rule<action_class, ast::sf::action>;
 	BOOST_SPIRIT_DECLARE(action_type)
 
-	using compound_action_type = x3::rule<compound_action_class, ast::sf::compound_action>;
-	BOOST_SPIRIT_DECLARE(compound_action_type)
-
 	// ---- filter structure ----
+
+	using expand_statement_type = x3::rule<expand_statement_class, ast::sf::expand_statement>;
+	BOOST_SPIRIT_DECLARE(expand_statement_type)
 
 	using dynamic_visibility_policy_type = x3::rule<dynamic_visibility_policy_class, ast::sf::dynamic_visibility_policy>;
 	BOOST_SPIRIT_DECLARE(dynamic_visibility_policy_type)

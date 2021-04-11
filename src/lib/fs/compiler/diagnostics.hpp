@@ -52,6 +52,7 @@ enum class diagnostic_message_id
 	price_without_autogen,
 	autogen_incompatible_condition,
 	autogen_missing_condition,
+	recursion_limit_reached,
 	internal_compiler_error,
 	font_size_outside_range,
 	failed_operations_count,
@@ -168,6 +169,12 @@ namespace detail {
 
 }
 
+inline void push_error_no_such_name(
+	lang::position_tag name_origin,
+	diagnostics_container& diagnostics)
+{
+	diagnostics.push_back(make_error(diagnostic_message_id::no_such_name, name_origin, "no such name has been defined"));
+}
 void push_error_invalid_integer_value(
 	int min,
 	int max,
@@ -198,6 +205,15 @@ void push_error_type_mismatch(
 	lang::object_type actual,
 	lang::position_tag origin,
 	diagnostics_container& diagnostics);
+inline void push_error_recursion_limit_reached(
+	lang::position_tag origin,
+	diagnostics_container& diagnostics)
+{
+	diagnostics.push_back(make_error(
+		diagnostic_message_id::recursion_limit_reached,
+		origin,
+		"recursion limit reached - you very likely made recursive tree which never ends"));
+}
 void push_error_internal_compiler_error(
 	std::string_view function_name,
 	lang::position_tag origin,

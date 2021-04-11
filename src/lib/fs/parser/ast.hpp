@@ -302,12 +302,12 @@ namespace sf
 
 	struct sequence : std::vector<primitive_value>, x3::position_tagged {};
 
-	struct action;
+	struct statement;
 
-	struct compound_action_expression : std::vector<action>, x3::position_tagged {};
+	struct statement_list_expression : std::vector<statement>, x3::position_tagged {};
 
 	struct value_expression : x3::variant<
-			compound_action_expression,
+			statement_list_expression,
 			sequence
 		>, x3::position_tagged
 	{
@@ -550,7 +550,24 @@ namespace sf
 		bool enable;
 	};
 
-	struct compound_action : x3::position_tagged
+	struct action : x3::variant<
+			set_color_action,
+			set_font_size_action,
+			minimap_icon_action,
+			play_effect_action,
+			play_alert_sound_action,
+			custom_alert_sound_action,
+			set_alert_sound_action,
+			switch_drop_sound_action
+		>, x3::position_tagged
+	{
+		using base_type::base_type;
+		using base_type::operator=;
+	};
+
+	// ---- filter structure ----
+
+	struct expand_statement : x3::position_tagged
 	{
 		auto& operator=(sequence s)
 		{
@@ -562,24 +579,6 @@ namespace sf
 
 		sequence seq;
 	};
-
-	struct action : x3::variant<
-			set_color_action,
-			set_font_size_action,
-			minimap_icon_action,
-			play_effect_action,
-			play_alert_sound_action,
-			custom_alert_sound_action,
-			set_alert_sound_action,
-			switch_drop_sound_action,
-			compound_action
-		>, x3::position_tagged
-	{
-		using base_type::base_type;
-		using base_type::operator=;
-	};
-
-	// ---- filter structure ----
 
 	using static_visibility_statement = common::static_visibility_statement;
 	using continue_statement = common::continue_statement;
@@ -623,10 +622,11 @@ namespace sf
 	struct rule_block : x3::position_tagged
 	{
 		std::vector<condition> conditions;
-		std::vector<struct statement> statements;
+		std::vector<statement> statements;
 	};
 
 	struct statement : x3::variant<
+			expand_statement,
 			action,
 			behavior_statement,
 			rule_block

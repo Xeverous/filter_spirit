@@ -267,17 +267,17 @@ R"(Show
 			BOOST_TEST(compare_strings(expected_filter, actual_filter));
 		}
 
-		BOOST_AUTO_TEST_CASE(compound_action)
+		BOOST_AUTO_TEST_CASE(expand_actions)
 		{
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
 $x = 1 2 3
-$comp = {
+$actions = {
 	SetBorderColor $x
 	SetTextColor $x
 }
 
 SetFontSize 36
-Set $comp
+Expand $actions
 Rarity Rare {
 	Show
 }
@@ -293,25 +293,25 @@ R"(Show
 			BOOST_TEST(compare_strings(expected_filter, actual_filter));
 		}
 
-		BOOST_AUTO_TEST_CASE(compound_action_in_compound_action)
+		BOOST_AUTO_TEST_CASE(expand_in_expand)
 		{
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
-$x = 1 2 3
-$y = 11 22 33
+$x = 11 22 33
+$y = 1 2 3
 
-$comp2 = {
-	SetBorderColor $y
-	SetTextColor $y
-}
-
-$comp1 = {
+$actions1 = {
 	SetBorderColor $x
-	Set $comp2
 	SetTextColor $x
 }
 
+$actions2 = {
+	SetBorderColor $y
+	Expand $actions1
+	SetTextColor $y
+}
+
 SetFontSize 36
-Set $comp1
+Expand $actions2
 Rarity Rare {
 	Show
 }
@@ -334,31 +334,31 @@ Show
 			BOOST_TEST(compare_strings(expected_filter, actual_filter));
 		}
 
-		BOOST_AUTO_TEST_CASE(compound_action_override)
+		BOOST_AUTO_TEST_CASE(expand_in_expand_override)
 		{
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
-$x = 1 2 3
-$y = 11 22 33
+$x = 11 22 33
+$y = 1 2 3
 
-$comp2 = {
-	SetBorderColor $y
-	SetTextColor $y
+$actions1 = {
+	SetBorderColor $x
+	SetTextColor $x
 	SetFontSize 42
 }
 
-$comp1 = {
-	SetBorderColor $x
-	SetTextColor $x
+$actions2 = {
+	SetBorderColor $y
+	SetTextColor $y
 }
 
 SetFontSize 36
-Set $comp1
+Expand $actions2
 Rarity Rare {
-	Set $comp2
+	Expand $actions1
 
 	Quality 20 {
 		SetBackgroundColor 50 50 50
-		Set $comp1
+		Expand $actions2
 		SetTextColor 100 100 100
 		Show
 	}
@@ -387,6 +387,131 @@ Show
 	SetBorderColor 1 2 3
 	SetTextColor 1 2 3
 	SetFontSize 36
+
+)";
+			BOOST_TEST(compare_strings(expected_filter, actual_filter));
+		}
+
+		BOOST_AUTO_TEST_CASE(expand_nested_tree)
+		{
+			const std::string actual_filter = generate_filter(minimal_input() + R"(
+$color_chromatic_small = 175 255 200
+$color_chromatic_big   = 128 128 192
+
+$chrome_item_logic = {
+	SocketGroup RGB {
+		Width 2
+		Height <= 2 {
+			SetBorderColor $color_chromatic_small
+			Show
+		}
+
+		Width 1
+		Height <= 4 {
+			SetBorderColor $color_chromatic_small
+			Show
+		}
+
+		SetBorderColor $color_chromatic_big
+		Show
+	}
+
+	Show
+}
+
+Rarity Normal {
+	SetTextColor 200 200 200
+	Expand $chrome_item_logic
+}
+
+Rarity Magic {
+	SetTextColor 136 136 255
+	Expand $chrome_item_logic
+}
+
+Rarity Rare {
+	SetTextColor 255 255 119
+	Expand $chrome_item_logic
+}
+)");
+			const std::string_view expected_filter =
+R"(Show
+	Rarity = Normal
+	Height <= 2
+	Width = 2
+	SocketGroup = RGB
+	SetBorderColor 175 255 200
+	SetTextColor 200 200 200
+
+Show
+	Rarity = Normal
+	Height <= 4
+	Width = 1
+	SocketGroup = RGB
+	SetBorderColor 175 255 200
+	SetTextColor 200 200 200
+
+Show
+	Rarity = Normal
+	SocketGroup = RGB
+	SetBorderColor 128 128 192
+	SetTextColor 200 200 200
+
+Show
+	Rarity = Normal
+	SetTextColor 200 200 200
+
+Show
+	Rarity = Magic
+	Height <= 2
+	Width = 2
+	SocketGroup = RGB
+	SetBorderColor 175 255 200
+	SetTextColor 136 136 255
+
+Show
+	Rarity = Magic
+	Height <= 4
+	Width = 1
+	SocketGroup = RGB
+	SetBorderColor 175 255 200
+	SetTextColor 136 136 255
+
+Show
+	Rarity = Magic
+	SocketGroup = RGB
+	SetBorderColor 128 128 192
+	SetTextColor 136 136 255
+
+Show
+	Rarity = Magic
+	SetTextColor 136 136 255
+
+Show
+	Rarity = Rare
+	Height <= 2
+	Width = 2
+	SocketGroup = RGB
+	SetBorderColor 175 255 200
+	SetTextColor 255 255 119
+
+Show
+	Rarity = Rare
+	Height <= 4
+	Width = 1
+	SocketGroup = RGB
+	SetBorderColor 175 255 200
+	SetTextColor 255 255 119
+
+Show
+	Rarity = Rare
+	SocketGroup = RGB
+	SetBorderColor 128 128 192
+	SetTextColor 255 255 119
+
+Show
+	Rarity = Rare
+	SetTextColor 255 255 119
 
 )";
 			BOOST_TEST(compare_strings(expected_filter, actual_filter));

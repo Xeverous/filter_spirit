@@ -48,22 +48,40 @@ add_constant_from_definition(
 	const auto wanted_name_origin = parser::position_tag_of(def.value_name);
 	const std::string& wanted_name = def.value_name.value.value;
 
-	if (const auto it = symbols.find(wanted_name); it != symbols.end()) {
+	if (const auto it = symbols.objects.find(wanted_name); it != symbols.objects.end()) {
 		const lang::position_tag place_of_original_name = parser::position_tag_of(it->second.name_origin);
 		diagnostics.push_back(make_error(dmid::name_already_exists, wanted_name_origin, "name already exists"));
 		diagnostics.push_back(make_note_first_defined_here(place_of_original_name));
 		return false;
 	}
 
-	return detail::evaluate_value_expression(st, def.value, symbols, diagnostics)
-		.map([&](lang::object obj) {
-			const bool success = symbols.emplace(
+	if (const auto it = symbols.trees.find(wanted_name); it != symbols.trees.end()) {
+		const lang::position_tag place_of_original_name = parser::position_tag_of(it->second.name_origin);
+		diagnostics.push_back(make_error(dmid::name_already_exists, wanted_name_origin, "name already exists"));
+		diagnostics.push_back(make_note_first_defined_here(place_of_original_name));
+		return false;
+	}
+
+	return def.value.apply_visitor(x3::make_lambda_visitor<bool>(
+		[&](const ast::sf::sequence& seq) {
+			return detail::evaluate_sequence(st, seq, symbols, 1, boost::none, diagnostics)
+				.map([&](lang::object obj) {
+					const bool success = symbols.objects.emplace(
+						wanted_name,
+						lang::named_object{std::move(obj), wanted_name_origin}).second;
+					FS_ASSERT_MSG(success, "Insertion should succeed.");
+					return success;
+				})
+				.value_or(false);
+		},
+		[&](const ast::sf::statement_list_expression& expr) {
+			const bool success = symbols.trees.emplace(
 				wanted_name,
-				lang::named_object{std::move(obj), wanted_name_origin}).second;
+				lang::named_tree{expr, wanted_name_origin}).second;
 			FS_ASSERT_MSG(success, "Insertion should succeed.");
 			return success;
-		})
-		.value_or(false);
+		}
+	));
 }
 
 [[nodiscard]] bool
@@ -506,7 +524,7 @@ make_spirit_filter_block(
 		autogen};
 }
 
-lang::block_continuation
+[[nodiscard]] lang::block_continuation
 to_block_continuation(
 	boost::optional<ast::common::continue_statement> statement)
 {
@@ -516,20 +534,81 @@ to_block_continuation(
 		return lang::block_continuation{std::nullopt};
 }
 
-bool
-compile_statements_recursively(
+[[nodiscard]] const lang::named_tree*
+evaluate_name_as_tree(
+	const ast::sf::name& name,
+	const lang::symbol_table& symbols,
+	diagnostics_container& diagnostics)
+{
+	const auto it = symbols.trees.find(name.value.value);
+	if (it == symbols.trees.end()) {
+		push_error_no_such_name(parser::position_tag_of(name), diagnostics);
+		return nullptr;
+	}
+
+	return &it->second;
+}
+
+/*
+ * This function is large, but:
+ * - it contains uniquely recursive non-duplicate code
+ * - any extracted function would have ~10-line-long function header
+ *
+ * Thus, it is better to leave it as it is.
+ */
+[[nodiscard]] bool
+compile_statements_recursively_impl(
 	settings st,
-	lang::spirit_condition_set parent_conditions,
-	lang::action_set parent_actions,
 	const std::vector<ast::sf::statement>& statements,
 	const lang::symbol_table& symbols,
+	lang::spirit_condition_set& conditions,
+	lang::action_set& actions,
 	std::vector<lang::spirit_item_filter_block>& blocks,
-	diagnostics_container& diagnostics)
+	diagnostics_container& diagnostics,
+	int recursion_depth)
 {
 	for (const ast::sf::statement& statement : statements) {
 		bool result = statement.apply_visitor(x3::make_lambda_visitor<bool>(
+			[&](const ast::sf::expand_statement& statement) {
+				if (statement.seq.size() != 1u) {
+					push_error_invalid_amount_of_arguments(
+						1, 1, statement.seq.size(), parser::position_tag_of(statement.seq), diagnostics);
+					return false;
+				}
+
+				const ast::sf::primitive_value& primitive = statement.seq.front();
+				return primitive.apply_visitor(x3::make_lambda_visitor<bool>(
+					[&](const ast::common::literal_expression& expr) {
+						diagnostics.push_back(make_error(
+							dmid::type_mismatch,
+							parser::position_tag_of(expr),
+							"type mismatch, expected named subtree but got a literal expression"));
+						return false;
+					},
+					[&](const ast::sf::name& name) {
+						if (recursion_depth == st.max_recursion_depth) {
+							push_error_recursion_limit_reached(parser::position_tag_of(name), diagnostics);
+							return false;
+						}
+
+						const lang::named_tree* tree = evaluate_name_as_tree(name, symbols, diagnostics);
+						if (!tree)
+							return false;
+
+						return compile_statements_recursively_impl(
+							st,
+							tree->statements,
+							symbols,
+							conditions,
+							actions,
+							blocks,
+							diagnostics,
+							recursion_depth + 1);
+					}
+				));
+			},
 			[&](const ast::sf::action& action) {
-				return detail::spirit_filter_add_action(st, action, symbols, parent_actions, diagnostics);
+				return detail::spirit_filter_add_action(st, action, symbols, actions, diagnostics);
 			},
 			[&](const ast::sf::behavior_statement& bs) {
 				boost::optional<lang::item_visibility> visibility = evaluate(st, bs.visibility, symbols, diagnostics);
@@ -539,8 +618,8 @@ compile_statements_recursively(
 				boost::optional<lang::spirit_item_filter_block> block = make_spirit_filter_block(
 					st,
 					*visibility,
-					parent_conditions,
-					parent_actions,
+					conditions,
+					actions,
 					to_block_continuation(bs.continue_),
 					diagnostics);
 
@@ -553,21 +632,28 @@ compile_statements_recursively(
 				}
 			},
 			[&](const ast::sf::rule_block& nested_block) {
-				// explicitly make a copy of parent conditions - the call stack will preserve
-				// old instance while nested blocks can add additional conditions that have limited lifetime
-				lang::spirit_condition_set nested_conditions(parent_conditions);
+				if (recursion_depth == st.max_recursion_depth) {
+					push_error_recursion_limit_reached(parser::position_tag_of(nested_block), diagnostics);
+					return false;
+				}
+
+				// explicitly make copies of parent conditions and actions - the call stack will preserve
+				// old instances while nested blocks can add additional ones that have limited lifetime
+				lang::spirit_condition_set nested_conditions = conditions;
 
 				if (detail::spirit_filter_add_conditions(
 					st, nested_block.conditions, symbols, nested_conditions, diagnostics))
 				{
-					return compile_statements_recursively(
+					lang::action_set nested_actions = actions;
+					return compile_statements_recursively_impl(
 						st,
-						std::move(nested_conditions),
-						parent_actions,
 						nested_block.statements,
 						symbols,
+						nested_conditions,
+						nested_actions,
 						blocks,
-						diagnostics);
+						diagnostics,
+						recursion_depth + 1);
 				}
 				else {
 					return false;
@@ -579,6 +665,28 @@ compile_statements_recursively(
 	}
 
 	return true;
+}
+
+[[nodiscard]] boost::optional<std::vector<lang::spirit_item_filter_block>>
+compile_statements_recursively(
+	settings st,
+	const std::vector<ast::sf::statement>& statements,
+	const lang::symbol_table& symbols,
+	diagnostics_container& diagnostics)
+{
+	// start with empty conditions and actions
+	// that's the default state before any nesting
+	lang::spirit_condition_set root_conditions;
+	lang::action_set root_actions;
+	std::vector<lang::spirit_item_filter_block> blocks;
+
+	const bool success = compile_statements_recursively_impl(
+		st, statements, symbols, root_conditions, root_actions, blocks, diagnostics, 1);
+
+	if (success)
+		return blocks;
+	else
+		return boost::none;
 }
 
 } // namespace
@@ -611,18 +719,15 @@ compile_spirit_filter_statements(
 	const lang::symbol_table& symbols,
 	diagnostics_container& diagnostics)
 {
-	std::vector<lang::spirit_item_filter_block> blocks;
-	// start with empty conditions and actions
-	// thats the default state before any nesting
-	if (!compile_statements_recursively(st, {}, {}, statements, symbols, blocks, diagnostics))
-		return boost::none;
+	boost::optional<std::vector<lang::spirit_item_filter_block>> blocks =
+		compile_statements_recursively(st, statements, symbols, diagnostics);
 
 	// This function is the point when we want to stop proceeding on any errors.
 	// Otherwise the returned filter could contain broken state.
-	if (has_errors(diagnostics))
+	if (!blocks || has_errors(diagnostics))
 		return boost::none;
 
-	return lang::spirit_item_filter{std::move(blocks)};
+	return lang::spirit_item_filter{std::move(*blocks)};
 }
 
 boost::optional<lang::item_filter>

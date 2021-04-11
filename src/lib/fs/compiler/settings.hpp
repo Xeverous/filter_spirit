@@ -12,6 +12,7 @@ struct error_handling_settings
 struct settings
 {
 	error_handling_settings error_handling;
+	int max_recursion_depth = 128;
 };
 
 }

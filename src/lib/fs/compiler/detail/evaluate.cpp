@@ -1,5 +1,4 @@
 #include <fs/compiler/detail/evaluate.hpp>
-#include <fs/compiler/detail/actions.hpp>
 #include <fs/lang/queries.hpp>
 #include <fs/lang/position_tag.hpp>
 #include <fs/lang/keywords.hpp>
@@ -28,16 +27,16 @@ namespace
 // ---- spirit filter ----
 
 [[nodiscard]] boost::optional<lang::object>
-evaluate_name(
+evaluate_name_as_object(
 	const ast::sf::name& name,
 	const lang::symbol_table& symbols,
 	diagnostics_container& diagnostics)
 {
 	const auto name_origin = parser::position_tag_of(name);
 
-	const auto it = symbols.find(name.value.value);
-	if (it == symbols.end()) {
-		diagnostics.push_back(make_error(dmid::no_such_name, name_origin, "no such name exists"));
+	const auto it = symbols.objects.find(name.value.value);
+	if (it == symbols.objects.end()) {
+		push_error_no_such_name(parser::position_tag_of(name), diagnostics);
 		return boost::none;
 	}
 
@@ -47,30 +46,6 @@ evaluate_name(
 	 * the origin of the value, which could be defined many assignments upwards.
 	 */
 	return lang::object{it->second.object_instance.values, name_origin};
-}
-
-[[nodiscard]] boost::optional<lang::object>
-evaluate_compound_action(
-	settings st,
-	const ast::sf::compound_action_expression& expr,
-	const lang::symbol_table& symbols,
-	diagnostics_container& diagnostics)
-{
-	lang::action_set set;
-
-	for (const ast::sf::action& act : expr) {
-		const bool result = detail::spirit_filter_add_action(st, act, symbols, set, diagnostics);
-
-		if (!result && st.error_handling.stop_on_error)
-			return boost::none;
-	}
-
-	const auto origin = parser::position_tag_of(expr);
-
-	return lang::object{
-		lang::object::container_type{lang::single_object{std::move(set), origin}},
-		origin
-	};
 }
 
 } // namespace
@@ -98,35 +73,6 @@ make_integer_in_range(
 	}
 
 	return int_obj;
-}
-
-boost::optional<lang::color>
-make_color(
-	settings /* st */,
-	lang::integer r,
-	lang::integer g,
-	lang::integer b,
-	boost::optional<lang::integer> a,
-	diagnostics_container& diagnostics)
-{
-	const auto result_r = make_integer_in_range(r, 0, 255, diagnostics);
-	const auto result_g = make_integer_in_range(g, 0, 255, diagnostics);
-	const auto result_b = make_integer_in_range(b, 0, 255, diagnostics);
-
-	if (!result_r || !result_g || !result_b)
-		return boost::none;
-
-	if (a) {
-		const auto result_a = make_integer_in_range(*a, 0, 255, diagnostics);
-
-		if (!result_a)
-			return boost::none;
-
-		return lang::color{*result_r, *result_g, *result_b, *result_a};
-	}
-	else {
-		return lang::color{*result_r, *result_g, *result_b};
-	}
 }
 
 boost::optional<lang::socket_spec>
@@ -251,7 +197,7 @@ evaluate_sequence(
 				);
 			},
 			[&](const ast::sf::name& name) {
-				return evaluate_name(name, symbols, diagnostics);
+				return evaluate_name_as_object(name, symbols, diagnostics);
 			}
 		));
 
@@ -326,25 +272,6 @@ evaluate_literal_sequence(
 	}
 
 	return lang::object{std::move(seq_values), sequence_origin};
-}
-
-boost::optional<lang::object>
-evaluate_value_expression(
-	settings st,
-	const ast::sf::value_expression& value_expression,
-	const lang::symbol_table& symbols,
-	diagnostics_container& diagnostics)
-{
-	using result_type = boost::optional<lang::object>;
-
-	return value_expression.apply_visitor(x3::make_lambda_visitor<result_type>(
-		[&](const ast::sf::sequence& seq) {
-			return evaluate_sequence(st, seq, symbols, 1, boost::none, diagnostics);
-		},
-		[&](const ast::sf::compound_action_expression& expr) {
-			return evaluate_compound_action(st, expr, symbols, diagnostics);
-		}
-	));
 }
 
 boost::optional<lang::fractional>
