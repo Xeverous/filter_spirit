@@ -4,6 +4,7 @@
 #include <fs/compiler/detail/conditions.hpp>
 #include <fs/lang/item_filter.hpp>
 #include <fs/lang/item.hpp>
+#include <fs/lang/keywords.hpp>
 #include <fs/utility/assert.hpp>
 #include <fs/utility/string_helpers.hpp>
 #include <fs/utility/monadic.hpp>
@@ -106,6 +107,28 @@ verify_boolean_condition_allows_value(
 		autogen_origin,
 		condition.origin,
 		std::string(lang::to_string_view(value)),
+		diagnostics);
+	return false;
+}
+
+[[nodiscard]] bool
+verify_gem_quality_type_condition_allows_superior(
+	lang::position_tag autogen_origin,
+	const std::optional<lang::gem_quality_type_condition>& opt_condition,
+	diagnostics_container& diagnostics)
+{
+	if (!opt_condition)
+		return true;
+
+	const auto& condition = *opt_condition;
+	for (lang::gem_quality_type quality_type : condition.values)
+		if (quality_type.value == lang::gem_quality_type_type::superior)
+			return true;
+
+	push_error_autogen_incompatible_condition(
+		autogen_origin,
+		condition.origin,
+		lang::keywords::rf::superior,
 		diagnostics);
 	return false;
 }
@@ -247,6 +270,12 @@ verify_autogen_gems(
 
 	if (!verify_boolean_condition_exists(
 		visibility_origin, autogen_origin, conditions.is_corrupted, lang::keywords::rf::corrupted, diagnostics))
+	{
+		result = false;
+	}
+
+	if (!verify_gem_quality_type_condition_allows_superior(
+		autogen_origin, conditions.gem_quality_type, diagnostics))
 	{
 		result = false;
 	}

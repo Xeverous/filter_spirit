@@ -3,6 +3,7 @@
 #include <fs/utility/dump_json.hpp>
 #include <fs/utility/string_helpers.hpp>
 #include <fs/lang/market/item_price_data.hpp>
+#include <fs/lang/keywords.hpp>
 #include <fs/log/logger.hpp>
 
 #include <nlohmann/json.hpp>
@@ -67,6 +68,12 @@ void for_each_item(std::string_view json_str, log::logger& logger, F f)
 	}
 }
 
+[[nodiscard]] const std::string&
+get_item_name(const nlohmann::json& item)
+{
+	return item.at("name").get_ref<const std::string&>();
+}
+
 [[nodiscard]] lang::market::price_data // (only for currency overview items)
 get_currency_price_data(const nlohmann::json& item)
 {
@@ -99,7 +106,7 @@ get_elementary_item_data(const nlohmann::json& item)
 {
 	return lang::market::elementary_item{
 		get_item_price_data(item),
-		item.at("name").get<std::string>()
+		get_item_name(item),
 	};
 }
 
@@ -147,13 +154,37 @@ parse_gems(std::string_view json_str, log::logger& logger)
 {
 	std::vector<lang::market::gem> result;
 
+	auto is_alternate_quality_gem = [](const nlohmann::json& item) {
+		const std::string& name = get_item_name(item);
+
+		if (utility::contains(name, lang::keywords::rf::divergent))
+			return true;
+
+		if (utility::contains(name, lang::keywords::rf::anomalous))
+			return true;
+
+		if (utility::contains(name, lang::keywords::rf::phantasmal))
+			return true;
+
+		return false;
+	};
+
 	for_each_item(json_str, logger, [&](const nlohmann::json& item) {
-		result.emplace_back(
-			get_elementary_item_data(item),
-			item.at("gemLevel").get<int>(),
-			item.at("gemQuality").get<int>(),
-			item.at("corrupted").get<bool>()
-		);
+		/*
+		 * Skip any alternate quality gems because:
+		 * - filters recognize such items with AlternateQuality property
+		 * - gem's BaseType can not contain quality name
+		 *
+		 * Thus, currently it is easier to simply not support alternate quality gems.
+		 */
+		if (!is_alternate_quality_gem(item)) {
+			result.emplace_back(
+				get_elementary_item_data(item),
+				item.at("gemLevel").get<int>(),
+				item.at("gemQuality").get<int>(),
+				item.at("corrupted").get<bool>()
+			);
+		}
 	});
 
 	return result;
