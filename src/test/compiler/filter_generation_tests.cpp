@@ -130,6 +130,50 @@ R"(Show
 			BOOST_TEST(compare_strings(expected_filter, actual_filter));
 		}
 
+		BOOST_AUTO_TEST_CASE(range_condition)
+		{
+			const std::string actual_filter = generate_filter(minimal_input() + R"(
+ItemLevel >= 75 {
+	SetTextColor 1 1 1
+	Show
+	Continue
+}
+
+ItemLevel >= 60
+ItemLevel < 75 {
+	SetTextColor 2 2 2
+	Show
+	Continue
+}
+
+ItemLevel < 60 {
+	SetTextColor 3 3 3
+	Show
+	Continue
+}
+)");
+			const std::string_view expected_filter =
+R"(Show
+	ItemLevel >= 75
+	SetTextColor 1 1 1
+	Continue
+
+Show
+	ItemLevel >= 60
+	ItemLevel < 75
+	SetTextColor 2 2 2
+	Continue
+
+Show
+	ItemLevel < 60
+	SetTextColor 3 3 3
+	Continue
+
+)";
+
+			BOOST_TEST(compare_strings(expected_filter, actual_filter));
+		}
+
 		BOOST_AUTO_TEST_CASE(strings_condition)
 		{
 			const std::string actual_filter = generate_filter(minimal_input() + R"(

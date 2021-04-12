@@ -25,29 +25,36 @@ void output_range_condition(
 	if (!range.has_bound())
 		return;
 
-	output_stream << '\t' << name << ' ';
-
 	if (range.is_exact()) {
-		output_stream << "= " << (*range.lower_bound).value.value;
+		output_stream << '\t' << name << " = " << (*range.lower_bound).value.value << '\n';
 	}
-	else if (range.lower_bound.has_value()) {
-		const lang::range_bound<T>& bound = *range.lower_bound;
+	else {
+		if (range.lower_bound.has_value()) {
+			const lang::range_bound<T>& bound = *range.lower_bound;
 
-		if (bound.inclusive)
-			output_stream << ">= " << bound.value.value;
-		else
-			output_stream << "> " << bound.value.value;
+			output_stream << '\t' << name;
+
+			if (bound.inclusive)
+				output_stream << " >= " << bound.value.value;
+			else
+				output_stream << " > " << bound.value.value;
+
+			output_stream << '\n';
+		}
+
+		if (range.upper_bound.has_value()) {
+			const lang::range_bound<T>& bound = *range.upper_bound;
+
+			output_stream << '\t' << name;
+
+			if (bound.inclusive)
+				output_stream << " <= " << bound.value.value;
+			else
+				output_stream << " < " << bound.value.value;
+
+			output_stream << '\n';
+		}
 	}
-	else if (range.upper_bound.has_value()) {
-		const lang::range_bound<T>& bound = *range.upper_bound;
-
-		if (bound.inclusive)
-			output_stream << "<= " << bound.value.value;
-		else
-			output_stream << "< " << bound.value.value;
-	}
-
-	output_stream << '\n';
 }
 
 void output_gem_quality_type_condition(
@@ -177,8 +184,9 @@ void output_ranged_strings_condition(
 
 	if (range.has_bound()) {
 		/*
-		 * note: this is different from range condition,
-		 * it places the integer right after the operator
+		 * note: this is different from range condition:
+		 * - it places the integer right after the operator
+		 * - if not exact, only one of bounds may be active
 		 */
 		if (range.is_exact()) {
 			if (cond.strings_cond.exact_match_required)
