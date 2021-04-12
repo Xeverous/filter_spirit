@@ -585,7 +585,7 @@ item_filtering_result pass_item_through_filter(const item& itm, const item_filte
 		cs_result.enchantment_passive_node = test_strings_condition(cs.enchantment_passive_node, itm.enchantments_passive_nodes);
 
 		cs_result.has_explicit_mod         = test_ranged_strings_condition(cs.has_explicit_mod,  itm.explicit_mods);
-		cs_result.has_enchantment          = test_ranged_strings_condition(cs.has_enchantment,   itm.enchantments_labirynth);
+		cs_result.has_enchantment          = test_ranged_strings_condition(cs.has_enchantment,   itm.enchantments_labyrinth);
 
 		cs_result.prophecy = test_prophecy_condition(cs.prophecy, itm);
 
@@ -599,7 +599,7 @@ item_filtering_result pass_item_through_filter(const item& itm, const item_filte
 		cs_result.is_fractured_item    = test_boolean_condition(cs.is_fractured_item,    itm.is_fractured_item);
 		cs_result.is_synthesised_item  = test_boolean_condition(cs.is_synthesised_item,  itm.is_synthesised_item);
 		cs_result.is_enchanted         = test_boolean_condition(cs.is_enchanted, // yes, this one reacts to any of these
-			!itm.enchantments_labirynth.empty() || !itm.enchantments_passive_nodes.empty() || !itm.annointments.empty());
+			!itm.enchantments_labyrinth.empty() || !itm.enchantments_passive_nodes.empty() || !itm.annointments.empty());
 		cs_result.is_shaped_map        = test_boolean_condition(cs.is_shaped_map,        itm.is_shaped_map);
 		cs_result.is_elder_map         = test_boolean_condition(cs.is_elder_map,         itm.is_elder_map);
 		cs_result.is_blighted_map      = test_boolean_condition(cs.is_blighted_map,      itm.is_blighted_map);

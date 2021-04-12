@@ -539,7 +539,7 @@ struct item
 	rarity_type rarity_ = sentinel_rarity;
 	socket_info sockets = {};
 	std::vector<std::string> explicit_mods = {};
-	std::vector<std::string> enchantments_labirynth = {};
+	std::vector<std::string> enchantments_labyrinth = {};
 	std::vector<std::string> enchantments_passive_nodes = {};
 	std::vector<std::string> annointments = {};
 	int corrupted_mods = 0;
