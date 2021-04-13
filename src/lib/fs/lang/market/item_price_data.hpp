@@ -67,6 +67,7 @@ struct base : elementary_item
 };
 
 bool is_undroppable_unique(std::string_view name) noexcept;
+bool is_drop_disabled_prophecy(std::string_view name) noexcept;
 
 // unlinked uniques
 struct unique_item_price_data

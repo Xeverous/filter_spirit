@@ -134,6 +134,22 @@ parse_elementary_items(std::string_view json_str, log::logger& logger)
 	return result;
 }
 
+[[nodiscard]] std::vector<lang::market::elementary_item>
+parse_prophecies(std::string_view json_str, log::logger& logger)
+{
+	std::vector<lang::market::elementary_item> result;
+
+	for_each_item(json_str, logger, [&](const auto& item) {
+		// Skip drop-disabled prophecies. Game rejects filters with them.
+		if (lang::market::is_drop_disabled_prophecy(get_item_name(item)))
+			return;
+
+		result.push_back(get_elementary_item_data(item));
+	});
+
+	return result;
+}
+
 [[nodiscard]] std::vector<lang::market::divination_card>
 parse_divination_cards(std::string_view json_str, log::logger& logger)
 {
@@ -283,7 +299,7 @@ lang::market::item_price_data parse_item_price_data(const api_item_price_data& j
 	result.fossils         = parse_elementary_items(jsons.fossil,         logger);
 	result.resonators      = parse_elementary_items(jsons.resonator,      logger);
 	result.essences        = parse_elementary_items(jsons.essence,        logger);
-	result.prophecies      = parse_elementary_items(jsons.prophecy,       logger);
+	result.prophecies      = parse_prophecies      (jsons.prophecy,       logger);
 	result.vials           = parse_elementary_items(jsons.vial,           logger);
 	result.helmet_enchants = parse_elementary_items(jsons.helmet_enchant, logger);
 

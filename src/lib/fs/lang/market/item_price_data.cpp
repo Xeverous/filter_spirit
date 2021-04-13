@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <cstring>
 #include <utility>
+#include <initializer_list>
 
 namespace
 {
@@ -267,6 +268,37 @@ namespace fs::lang::market
 bool is_undroppable_unique(std::string_view name) noexcept
 {
 	return std::binary_search(undroppable_uniques.begin(), undroppable_uniques.end(), name);
+}
+
+bool is_drop_disabled_prophecy(std::string_view name) noexcept
+{
+	const auto disabled_prophecies = {
+		"Ancient Rivalries",
+		"A Gracious Master",
+		"The Aesthete's Spirit",
+		"Brothers in Arms",
+		"Echoes of Mutation",
+		"Echoes of Lost Love",
+		"The Emperor's Trove",
+		"The Blacksmith"
+	};
+
+	/*
+	 * String-contains (instead of operator== is used) because:
+	 * - APIs may report prophecies with extra string content (A Master Seeks Help
+	 *   is a prime example - some tools add a master name in parenthesis)
+	 * - Some prophecies are a part of a chain (e.g. Ancient Rivalries I, II, III, IV)
+	 * - Filters detect prophecies in a weird way which makes me wonder what
+	 *   extra information BaseType carries in its string
+	 *   - Class == "Stackable Currency"
+	 *   - BaseType "Prophecy"
+	 *   - Prophecy == <actual name>
+	 */
+	for (auto prophecy : disabled_prophecies)
+		if (utility::contains(name, prophecy))
+			return true;
+
+	return false;
 }
 
 bool item_price_data::load_and_parse(
