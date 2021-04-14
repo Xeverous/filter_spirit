@@ -167,12 +167,18 @@ make_builtin_alert_sound_id(
 	const lang::single_object& sobj,
 	diagnostics_container& diagnostics)
 {
+	diagnostics_container diagnostics_none;
+	auto none_sound_id = detail::get_as<lang::none>(sobj, diagnostics_none);
 	diagnostics_container diagnostics_integer;
 	auto integer_sound_id = detail::get_as<lang::integer>(sobj, diagnostics_integer);
 	diagnostics_container diagnostics_shaper;
 	auto shaper_sound_id = detail::get_as<lang::shaper_voice_line>(sobj, diagnostics_shaper);
 
-	if (integer_sound_id.has_value()) {
+	if (none_sound_id.has_value()) {
+		std::move(diagnostics_none.begin(), diagnostics_none.end(), std::back_inserter(diagnostics));
+		return lang::builtin_alert_sound_id(*none_sound_id);
+	}
+	else if (integer_sound_id.has_value()) {
 		std::move(diagnostics_integer.begin(), diagnostics_integer.end(), std::back_inserter(diagnostics));
 		return detail::make_integer_in_range(
 			*integer_sound_id,
@@ -191,6 +197,8 @@ make_builtin_alert_sound_id(
 		// main error
 		diagnostics.push_back(make_error(dmid::invalid_alert_sound_id, sobj.origin, "invalid value for alert sound ID"));
 		// errors specifying each sound ID variant problems
+		diagnostics.push_back(make_note_attempt_description("in attempt of None (disabled action)"));
+		std::move(diagnostics_none.begin(), diagnostics_none.end(), std::back_inserter(diagnostics));
 		diagnostics.push_back(make_note_attempt_description("in attempt of integer ID"));
 		std::move(diagnostics_integer.begin(), diagnostics_integer.end(), std::back_inserter(diagnostics));
 		diagnostics.push_back(make_note_attempt_description("in attempt of Shaper voice line ID"));

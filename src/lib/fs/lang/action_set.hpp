@@ -11,10 +11,6 @@
 namespace fs::lang
 {
 
-// origins should point to the strings which create actions, eg:
-// SetTextColor 0 0 0 255
-// ~~~~~~~~~~~~
-
 struct color
 {
 	color(integer r, integer g, integer b, std::optional<integer> a = std::nullopt)
@@ -73,7 +69,10 @@ struct builtin_alert_sound_id
 	explicit builtin_alert_sound_id(shaper_voice_line svl)
 	: id(svl) {}
 
-	std::variant<integer, shaper_voice_line> id;
+	explicit builtin_alert_sound_id(none n)
+	: id(n) {}
+
+	std::variant<integer, shaper_voice_line, none> id;
 };
 
 inline bool operator==(builtin_alert_sound_id lhs, builtin_alert_sound_id rhs)
@@ -91,6 +90,8 @@ struct builtin_alert_sound
 	explicit builtin_alert_sound(bool is_positional, builtin_alert_sound_id sound_id)
 	: is_positional(is_positional), sound_id(sound_id) {}
 
+	bool is_disabled() const { return std::holds_alternative<none>(sound_id.id); }
+
 	bool is_positional; // this is not a lang type because it is implied by keyword, not by value
 	builtin_alert_sound_id sound_id;
 };
@@ -105,6 +106,8 @@ struct custom_alert_sound
 {
 	explicit custom_alert_sound(string path)
 	: path(std::move(path)) {}
+
+	bool is_disabled() const { return path.value.empty() || path.value == "None"; }
 
 	string path;
 };
@@ -127,6 +130,11 @@ struct alert_sound
 
 	explicit alert_sound(custom_alert_sound sound, volume vol)
 	: sound(std::move(sound)), vol(vol) {}
+
+	bool is_disabled() const
+	{
+		return std::visit([](auto sound) { return sound.is_disabled(); }, sound);
+	}
 
 	std::variant<builtin_alert_sound, custom_alert_sound> sound;
 	volume vol;

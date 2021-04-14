@@ -306,6 +306,8 @@ PlayAlertSound True
 
 			std::vector<diagnostic_message_pattern> patterns = {
 				diagnostic_message_pattern{dms::error, dmid::invalid_alert_sound_id, expected_origin, {}},
+				diagnostic_message_pattern{dms::note, dmid::attempt_description, boost::none, {"None"}},
+				diagnostic_message_pattern{dms::error, dmid::type_mismatch, expected_origin, {}},
 				diagnostic_message_pattern{dms::note, dmid::attempt_description, boost::none, {"integer"}},
 				diagnostic_message_pattern{dms::error, dmid::type_mismatch, expected_origin, {}},
 				diagnostic_message_pattern{dms::note, dmid::attempt_description, boost::none, {"Shaper"}},

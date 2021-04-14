@@ -211,15 +211,13 @@ Notes:
 
 As explained in [this GGG's post](https://www.pathofexile.com/forum/view-thread/2771031), you can place `Continue` at the end of the block to cause items to pass through it (with applied style) instead of stopping on first match. If an item matches a `Hide` block that `Continue`s, then later matches a `Show` block, it will use the most recently matched `Show` or `Hide` flag, and thus show. If an item matches and `Continue`s and then never matches any further blocks, it will also show or hide based on the most recently matched block.
 
-The same update also introduced ability to cancel previous actions through use of `-1`, `None` and `""` values. Currently, FS parser does not support disabling alert sounds and may error upon such code.
+The same update also introduced ability to cancel previous actions through use of `-1`, `None` and `""` values.
 
 Examples of all disabled actions:
 
 ```
 MinimapIcon -1
 PlayEffect None
-
-# these are not [yet] supported by FS:
 CustomAlertSound "None"
 CustomAlertSound ""
 PlayAlertSound None

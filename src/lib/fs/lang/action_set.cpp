@@ -43,6 +43,9 @@ void output_builtin_alert_sound_id(
 	output_stream << ' ';
 
 	std::visit(utility::visitor{
+		[&output_stream](lang::none sound_id) {
+			output_stream << kw::none;
+		},
 		[&output_stream](lang::integer sound_id) {
 			output_stream << sound_id.value;
 		},
@@ -107,7 +110,7 @@ void output_alert_sound(
 		}
 	}, as.sound);
 
-	if (as.vol.value)
+	if (as.vol.value && !as.is_disabled())
 		output_stream << ' ' << (*as.vol.value).value;
 
 	output_stream << '\n';

@@ -9,7 +9,7 @@ If you ever worked with web stuff - a perfect analogy is that Filter Spirit is t
 **First version with graphical interface has been released!** (no icon though, can someone make me a logo?)
 [DOWNLOAD HERE](https://github.com/Xeverous/filter_spirit/releases)
 
-New filter features from 3.13 Echoes of the Atlas (Ritual league) update implemented. Currently FS supports everything except disabling non-custom alert sounds.
+New filter features from 3.13 Echoes of the Atlas (Ritual league) update implemented. 3.14 (Ultimatum league) does not require any changes in program implementation.
 
 Message me ([/u/Xeverous](https://old.reddit.com/user/Xeverous/) on reddit or Xeverous#2151 on Discord) if you are interested in it or have any questions/suggestions/whatever. You can also open an issue.
 
@@ -36,6 +36,7 @@ Core features:
   - **named style groups**: `$x = { SetFontSize 42 SetTextColor $black }`
   - **nesting of filter blocks** to inherit conditions and override actions
 - **querying item prices**: `Autogen cards Price > 50` pulls data from API to list div cards worth 50+ chaos at generation time. Refresh whenever you want - your filter is always up-to-date with market prices.
+- **Support for filter variants** - selectively enable/disable certain blocks based on a variable to generate multiple filters with different flavours from a single source file.
 - **Filter debugger & loot preview** - find matching blocks and preview randomly generated loot from specific game encounters. **You can debug both real filters and FS filter templates.**
 
 UI screens (might be slightly dated):
@@ -45,7 +46,6 @@ UI screens (might be slightly dated):
 
 Planned features:
 
-- Support for filter variants (eg color-blind, strict, uber-strict, Animate Weapon support etc) - generate multiple filters with different flavours from a single source file.
 - Live edit mode - see generared code as you write.
 
 ## example filter template code

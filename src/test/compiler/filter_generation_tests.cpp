@@ -921,6 +921,315 @@ Hide
 			BOOST_TEST(compare_strings(expected_filter, actual_filter));
 		}
 
+		BOOST_AUTO_TEST_CASE(disabled_sounds)
+		{
+			const std::string actual_filter = generate_filter(minimal_input() + R"(
+SetAlertSound ShChaos 200
+Show
+Continue
+
+ItemLevel 1 {
+	PlayAlertSound 1 100
+	Show
+	Continue
+}
+
+ItemLevel 2 {
+	PlayAlertSound 2
+	Show
+	Continue
+}
+
+ItemLevel 3 {
+	PlayAlertSound ShGeneral 300
+	Show
+	Continue
+}
+
+ItemLevel 4 {
+	PlayAlertSound ShGeneral
+	Show
+	Continue
+}
+
+ItemLevel 5 {
+	PlayAlertSound None 50
+	Show
+	Continue
+}
+
+ItemLevel 6 {
+	PlayAlertSound None
+	Show
+	Continue
+}
+
+ItemLevel 1 {
+	PlayAlertSoundPositional 1 100
+	Show
+	Continue
+}
+
+ItemLevel 2 {
+	PlayAlertSoundPositional 2
+	Show
+	Continue
+}
+
+ItemLevel 3 {
+	PlayAlertSoundPositional ShGeneral 300
+	Show
+	Continue
+}
+
+ItemLevel 4 {
+	PlayAlertSoundPositional ShGeneral
+	Show
+	Continue
+}
+
+ItemLevel 5 {
+	PlayAlertSoundPositional None 50
+	Show
+	Continue
+}
+
+ItemLevel 6 {
+	PlayAlertSoundPositional None
+	Show
+	Continue
+}
+
+ItemLevel 7 {
+	CustomAlertSound "" 250
+	Show
+	Continue
+}
+
+ItemLevel 8 {
+	CustomAlertSound ""
+	Show
+	Continue
+}
+
+ItemLevel 9 {
+	CustomAlertSound "None" 150
+	Show
+	Continue
+}
+
+ItemLevel 10 {
+	CustomAlertSound "None"
+	Show
+	Continue
+}
+
+ItemLevel 1 {
+	SetAlertSound 1 100
+	Show
+	Continue
+}
+
+ItemLevel 2 {
+	SetAlertSound 2
+	Show
+	Continue
+}
+
+ItemLevel 3 {
+	SetAlertSound ShGeneral 300
+	Show
+	Continue
+}
+
+ItemLevel 4 {
+	SetAlertSound ShGeneral
+	Show
+	Continue
+}
+
+ItemLevel 5 {
+	SetAlertSound None 50
+	Show
+	Continue
+}
+
+ItemLevel 6 {
+	SetAlertSound None
+	Show
+	Continue
+}
+
+ItemLevel 7 {
+	SetAlertSound "" 250
+	Show
+	Continue
+}
+
+ItemLevel 8 {
+	SetAlertSound ""
+	Show
+	Continue
+}
+
+ItemLevel 9 {
+	SetAlertSound "None" 150
+	Show
+	Continue
+}
+
+ItemLevel 10 {
+	SetAlertSound "None"
+	Show
+	Continue
+}
+
+PlayAlertSound ShVaal 100
+Show
+)");
+			const std::string_view expected_filter =
+R"(Show
+	PlayAlertSound ShChaos 200
+	Continue
+
+Show
+	ItemLevel = 1
+	PlayAlertSound 1 100
+	Continue
+
+Show
+	ItemLevel = 2
+	PlayAlertSound 2
+	Continue
+
+Show
+	ItemLevel = 3
+	PlayAlertSound ShGeneral 300
+	Continue
+
+Show
+	ItemLevel = 4
+	PlayAlertSound ShGeneral
+	Continue
+
+Show
+	ItemLevel = 5
+	PlayAlertSound None
+	Continue
+
+Show
+	ItemLevel = 6
+	PlayAlertSound None
+	Continue
+
+Show
+	ItemLevel = 1
+	PlayAlertSoundPositional 1 100
+	Continue
+
+Show
+	ItemLevel = 2
+	PlayAlertSoundPositional 2
+	Continue
+
+Show
+	ItemLevel = 3
+	PlayAlertSoundPositional ShGeneral 300
+	Continue
+
+Show
+	ItemLevel = 4
+	PlayAlertSoundPositional ShGeneral
+	Continue
+
+Show
+	ItemLevel = 5
+	PlayAlertSoundPositional None
+	Continue
+
+Show
+	ItemLevel = 6
+	PlayAlertSoundPositional None
+	Continue
+
+Show
+	ItemLevel = 7
+	CustomAlertSound ""
+	Continue
+
+Show
+	ItemLevel = 8
+	CustomAlertSound ""
+	Continue
+
+Show
+	ItemLevel = 9
+	CustomAlertSound "None"
+	Continue
+
+Show
+	ItemLevel = 10
+	CustomAlertSound "None"
+	Continue
+
+Show
+	ItemLevel = 1
+	PlayAlertSound 1 100
+	Continue
+
+Show
+	ItemLevel = 2
+	PlayAlertSound 2
+	Continue
+
+Show
+	ItemLevel = 3
+	PlayAlertSound ShGeneral 300
+	Continue
+
+Show
+	ItemLevel = 4
+	PlayAlertSound ShGeneral
+	Continue
+
+Show
+	ItemLevel = 5
+	PlayAlertSound None
+	Continue
+
+Show
+	ItemLevel = 6
+	PlayAlertSound None
+	Continue
+
+Show
+	ItemLevel = 7
+	CustomAlertSound ""
+	Continue
+
+Show
+	ItemLevel = 8
+	CustomAlertSound ""
+	Continue
+
+Show
+	ItemLevel = 9
+	CustomAlertSound "None"
+	Continue
+
+Show
+	ItemLevel = 10
+	CustomAlertSound "None"
+	Continue
+
+Show
+	PlayAlertSound ShVaal 100
+
+)";
+
+			BOOST_TEST(compare_strings(expected_filter, actual_filter));
+		}
+
 		BOOST_AUTO_TEST_CASE(delirium_new_colors_and_shapes)
 		{
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
