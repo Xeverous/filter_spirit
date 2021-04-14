@@ -30,7 +30,7 @@ Core features of FS syntax are:
 
 Similarly to actual filters, FS skips any whitespace characters (tabs, spaces, line breaks), except when quoted (so `"Leather Belt"` is correctly parsed). This makes the language "immune" to any text formatting changes and lets you split long lines (except in the case below). Any ambiguities are resolved by lookahead or delimeters like `{}`.
 
-The only requirement is that you place 1 condition/action per line. Some of them accept an arbitrary amount of tokens (eg `BaseType` accepts 1 or more strings) so an end-of-line is expected to tell the parser where is the end of the rule.
+The only requirement is that you place 1 condition/action per line. Some of them accept an arbitrary amount of tokens (e.g. `BaseType` accepts 1 or more strings) so an end-of-line is expected to tell the parser where is the end of the rule.
 
 Just like in actual filters, comments start with `#` and span until end of line. There are no restrictions where comments can appear.
 
@@ -162,7 +162,7 @@ Class "Currency" {
 	}
 <div></div>
 	BaseType "Orb" {
-		# overwrites SetFontSize 36
+		# overrides SetFontSize 36
 		SetFontSize 42
 		Show
 	}
@@ -250,7 +250,7 @@ BaseType "Gavel" "Stone Hammer" "Rock Breaker" {
 	# no Show/Hide here: a block for a just hammer
 	# (without quality or rarity conditions) is not generated
 	# this might be useful if you would like the rest of hammers
-	# to be catched later eg for a chromatic orb recipe
+	# to be catched later e.g. for a chromatic orb recipe
 }
 </pre>
 </td>
@@ -437,9 +437,9 @@ Class == "Stackable Currency" {
 Expand $identifier
 ```
 
-You can assign multiple statements to 1 identifier and use the `Expand` keyword to apply all of them, as if they were written in the place of the `Expand` statement.
+You can assign multiple statements to an identifier and use the `Expand` keyword to apply all of them, as if they were written in the place of the `Expand` statement.
 
-Later (and deeper nested) actions override previous ones on their depth.
+Later (and deeper nested) actions override previous ones.
 
 <table>
 <tr>
@@ -453,26 +453,26 @@ Later (and deeper nested) actions override previous ones on their depth.
 $x = 1 2 3
 $y = 11 22 33
 <div></div>
-$comp1 = {
+$actions1 = {
 	SetBorderColor $x
 	SetTextColor $x
 }
 <div></div>
-$comp2 = {
+$actions2 = {
 	SetBorderColor $y
 	SetTextColor $y
 	SetFontSize 42
 }
 <div></div>
 SetFontSize 36
-Expand $comp1
+Expand $actions1
 <div></div>
 Rarity rare {
-	Expand $comp2
+	Expand $actions2
 <div></div>
 	Quality 20 {
 		SetBackgroundColor 50 50 50
-		Expand $comp1
+		Expand $actions1
 		SetTextColor 100 100 100
 		Show
 	}
@@ -722,7 +722,7 @@ HasExplicitMod         [==] | CMPInteger (None | String)+
 HasEnchantment         [==] | CMPInteger (None | String)+
 ```
 
-### action extensions
+## action extensions
 
 ```
 # this action accepts both PlayAlertSound and
@@ -776,7 +776,7 @@ Unique items are separated into 4 categories where each has ambiguous and unambi
 - Unambiguous outputs base types for which there is only 1 unique item. This is intended for blocks where it is known what unique dropped.
 - Ambiguous outputs base types for which there is more than 1 unique item, using the highest price of possible unique drops on each base. This is intended for blocks where it is unknown what unique dropped (FS assumes potentilly expensive one).
 - Unambiguous and Ambiguous never overlap in output.
-- FS removes undroppable uniques (eg Harbinger and vendor-only uniques) from market information before outputting base types. This results in less ambiguities and removes items which you would not care for anyway when writing the filter. Corruption-only uniques are not removed because 1) poe.watch and poe.ninja differ in their reports or searches 2) maps with Corrupting Tempest and some sextant mods can drop corrupted items.
+- FS removes undroppable uniques (e.g. Harbinger and vendor-only uniques) from market information before outputting base types. This results in less ambiguities and removes items which you would not care for anyway when writing the filter. Corruption-only uniques are not removed because 1) poe.watch and poe.ninja differ in their reports or searches 2) maps with Corrupting Tempest and some sextant mods can drop corrupted items.
 - It is recommended that you never hide any uniques. Names in `unambiguous` autogenerations are there only because used API reported 1 unique for specific base type. There is still a possibility that another unique item exists on the same base, which can drop but is not reported on any trade API.
 
 Some autogenerations place additional requirements:
@@ -1000,7 +1000,7 @@ From this important thing, I knew that strictness in FS must allow to cherry-pic
 Initially you probably thought there are only 2 (`Show` and `Hide`). Consider such real filter code:
 
 ```
-# hammers for chilsel recipe
+# hammers for chisel recipe
 Show
 	BaseType == "Gavel" "Stone Hammer" "Rock Breaker"
 	# ... some styles ...
@@ -1024,7 +1024,7 @@ It seems that changing such filter to a higher strictness is only a matter of ch
 - If block for hammers is changed to `Hide`, this means that every hammer will be hidden, no matter other properties. You might lose some RGB hammers that you would use for Chromatic Orb recipe.
 - If block for 5L is changed to `Hide`, this means that every 5L will be hidden, no matter other properties. You might lose some 5L6s items that you would vendor for Jeweller's Orbs.
 
-There are many more examples. In short, **it is wrong to use `Hide` for higher strictness - many items can have multiple interesting properties and they should not be hidden if one is unwanted**.
+Many more examples are possible. In short, **it is wrong to always use `Hide` for higher strictness - many items can have multiple interesting properties and they should not be hidden if one is unwanted**.
 
 Sometimes you really want to hide the item (e.g. `Engineer's Shard`). But in more complex situations, you want to deal with an item in the 3rd way: **remove the block from the filter**.
 
@@ -1056,10 +1056,10 @@ ShowDiscard [Boolean]
 ```
 
 - `ShowHide`:
-  - if supplied value is `True`, the block is generated as if it was `Show` statement
-  - if supplied value is `False`, the block is generated as if it was `Hide` statement
+  - if supplied value is `True`, the block is generated as if it was a `Show` statement
+  - if supplied value is `False`, the block is generated as if it was a `Hide` statement
 - `ShowDiscard`:
-  - if supplied value is `True`, the block is generated as if it was `Show`
+  - if supplied value is `True`, the block is generated as if it was a `Show` statement
   - if supplied value is `False`, the block is not generated, as if there was no statement
 
 With this feature, you can have configuration variables that can be easily edited between `True` and `False` which will correctly handle each case.
