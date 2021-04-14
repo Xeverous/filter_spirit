@@ -35,7 +35,7 @@ private:
 	void refresh_item_price_report(application& app, spirit_filter_state_mediator& mediator);
 	void refresh_available_leagues(application& app, spirit_filter_state_mediator& mediator);
 
-	void check_downloads(application& app, log::logger& logger);
+	void check_downloads(application& app, spirit_filter_state_mediator& mediator);
 
 	lang::data_source_type _selected_api = lang::data_source_type::poe_ninja;
 

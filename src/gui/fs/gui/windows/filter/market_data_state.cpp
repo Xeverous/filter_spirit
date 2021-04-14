@@ -114,19 +114,20 @@ void market_data_state::refresh_available_leagues(application& app, spirit_filte
 	_leagues_download_running = true;
 }
 
-void market_data_state::check_downloads(application& app, log::logger& logger)
+void market_data_state::check_downloads(application& app, spirit_filter_state_mediator& mediator)
 {
 	if (_leagues_download_running) {
 		if (utility::is_ready(_leagues_future)) {
 			try {
 				_available_leagues = _leagues_future.get();
 				app.leagues_cache().set_leagues(_available_leagues);
-				logger.info() << "League data download complete.\n";
+				mediator.logger().info() << "League data download complete.\n";
 			}
 			catch (const std::exception& e) {
-				logger.error() << "League download failed: " << e.what() << "\n";
+				mediator.logger().error() << "League download failed: " << e.what() << "\n";
 			}
 			_leagues_download_running = false;
+			on_league_change(app, mediator);
 		}
 	}
 
@@ -134,19 +135,20 @@ void market_data_state::check_downloads(application& app, log::logger& logger)
 		if (utility::is_ready(_price_report_future)) {
 			try {
 				_price_report = _price_report_future.get();
-				logger.info() << "Market data download and parsing complete.\n";
+				mediator.logger().info() << "Market data download complete.\n";
 			}
 			catch (const std::exception& e) {
-				logger.error() << "Market data download failed: " << e.what() << "\n";
+				mediator.logger().error() << "Market data download failed: " << e.what() << "\n";
 			}
 			_price_report_download_running = false;
+			refresh_item_price_report(app, mediator);
 		}
 	}
 }
 
 void market_data_state::draw_interface(application& app, spirit_filter_state_mediator& mediator)
 {
-	check_downloads(app, mediator.logger());
+	check_downloads(app, mediator);
 
 	if (!ImGui::CollapsingHeader("Market data", ImGuiTreeNodeFlags_DefaultOpen))
 		return;
