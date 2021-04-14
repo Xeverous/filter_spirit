@@ -444,15 +444,15 @@ $color_chromatic_big   = 128 128 192
 
 $chrome_item_logic = {
 	SocketGroup RGB {
+		SetBorderColor $color_chromatic_small
+
 		Width 2
 		Height <= 2 {
-			SetBorderColor $color_chromatic_small
 			Show
 		}
 
 		Width 1
 		Height <= 4 {
-			SetBorderColor $color_chromatic_small
 			Show
 		}
 
@@ -710,7 +710,9 @@ BaseType "Gavel" "Stone Hammer" "Rock Breaker" {
 	}
 }
 
-ShowHide $show_rares
+Rarity Rare {
+	ShowHide $show_rares
+}
 )");
 			const std::string_view expected_filter =
 R"(Show
@@ -734,6 +736,7 @@ Show
 	SetBackgroundColor 162 85 0
 
 Show
+	Rarity = Rare
 
 )";
 
@@ -765,10 +768,13 @@ BaseType "Gavel" "Stone Hammer" "Rock Breaker" {
 	}
 }
 
-ShowHide $show_rares
+Rarity Rare {
+	ShowHide $show_rares
+}
 )");
 			const std::string_view expected_filter =
 R"(Show
+	Rarity = Rare
 
 )";
 
