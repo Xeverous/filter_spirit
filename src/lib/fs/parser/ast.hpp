@@ -664,6 +664,8 @@ namespace rf
 	using gem_quality_type_literal = common::gem_quality_type_literal;
 	using none_literal = common::none_literal;
 
+	using continue_statement = common::continue_statement;
+
 	struct color_literal : x3::position_tagged
 	{
 		integer_literal r;
@@ -850,7 +852,7 @@ namespace rf
 		using base_type::operator=;
 	};
 
-	struct rule : x3::variant<condition, action>, x3::position_tagged
+	struct rule : x3::variant<condition, action, continue_statement>, x3::position_tagged
 	{
 		using base_type::base_type;
 		using base_type::operator=;

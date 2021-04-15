@@ -770,13 +770,17 @@ compile_real_filter(
 
 			for (const auto& rule : block.rules) {
 				const bool result = rule.apply_visitor(x3::make_lambda_visitor<bool>(
+					[&](const parser::ast::rf::condition& c) {
+						return detail::real_filter_add_condition(
+							st, c, filter_block.conditions, diagnostics);
+					},
 					[&](const parser::ast::rf::action& a) {
 						return detail::real_filter_add_action(
 							st, a, filter_block.actions, diagnostics);
 					},
-					[&](const parser::ast::rf::condition& c) {
-						return detail::real_filter_add_condition(
-							st, c, filter_block.conditions, diagnostics);
+					[&](parser::ast::rf::continue_statement cont) {
+						filter_block.continuation.origin = parser::position_tag_of(cont);
+						return true;
 					}
 				));
 

@@ -528,7 +528,7 @@ namespace rf
 	// ---- filter structure ----
 
 	const rule_type rule = "rule";
-	const auto rule_def = condition | action;
+	const auto rule_def = condition | action | common::continue_statement;
 	BOOST_SPIRIT_DEFINE(rule)
 
 	const filter_block_type filter_block = "filter block";
