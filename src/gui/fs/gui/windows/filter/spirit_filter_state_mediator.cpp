@@ -68,6 +68,7 @@ void spirit_filter_state_mediator::on_source_change(const std::string* source)
 		new_parsed_spirit_filter(std::nullopt);
 	}
 	else {
+		logger().info() << "Parse successful.";
 		new_parsed_spirit_filter(std::move(std::get<parser::parsed_spirit_filter>(result)));
 	}
 }
@@ -90,6 +91,9 @@ void spirit_filter_state_mediator::on_parsed_spirit_filter_change(const parser::
 		{}, parsed_spirit_filter->ast.definitions, diagnostics);
 
 	compiler::output_diagnostics(diagnostics, parsed_spirit_filter->metadata, logger());
+
+	if (result)
+		logger().info() << "Resolving definitions successful.";
 
 	new_spirit_filter_symbols(utility::to_std_optional(std::move(result)));
 }
@@ -114,6 +118,9 @@ void spirit_filter_state_mediator::on_spirit_filter_symbols_change(
 		{}, parsed_spirit_filter->ast.statements, *spirit_filter_symbols, diagnostics);
 
 	compiler::output_diagnostics(diagnostics, parsed_spirit_filter->metadata, logger());
+
+	if (result)
+		logger().info() << "Compilation successful.";
 
 	new_spirit_filter(utility::to_std_optional(std::move(result)));
 }

@@ -28,6 +28,7 @@ void real_filter_state_mediator::on_source_change(const std::string* source)
 		new_parsed_real_filter(std::nullopt);
 	}
 	else {
+		logger().info() << "Parse successful.";
 		new_parsed_real_filter(std::move(std::get<parser::parsed_real_filter>(result)));
 	}
 }
@@ -48,6 +49,9 @@ void real_filter_state_mediator::on_parsed_real_filter_change(const parser::pars
 	compiler::diagnostics_container diagnostics;
 	boost::optional<lang::item_filter> result = compiler::compile_real_filter({}, parsed_real_filter->ast, diagnostics);
 	compiler::output_diagnostics(diagnostics, parsed_real_filter->metadata, logger());
+
+	if (result)
+		logger().info() << "Compilation successful.";
 
 	new_filter_representation(utility::to_std_optional(std::move(result)));
 }
