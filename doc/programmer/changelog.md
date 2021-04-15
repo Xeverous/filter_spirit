@@ -9,11 +9,11 @@
 - Lots of internal improvements.
 - Significant documentation improvements.
 
-## version 1.0.1 (15.09.2021)
+## version 1.0.1 (15.01.2021)
 
 - Fixed startup crash, caused by `std::random_device` on MinGW toolchain.
 
-## version 1.0.0 (15.09.2021)
+## version 1.0.0 (15.01.2021)
 
 - **First release of graphical interface!** Features filter generation and filter debug.
 - Added support for new filter stuff from 3.13 (Echoes of the Atlas + Ritual league) update.
