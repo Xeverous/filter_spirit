@@ -1,5 +1,14 @@
 # Filter Spirit changelog
 
+## version 1.1.0 (15.04.2021)
+
+- Ovehaulued example filter.
+- Implemented support for every action and condition.
+- Added new feature: `Expand $subtree`.
+- Added new feature: `ShowHide $boolean` and `ShowDiscard $boolean`.
+- Lots of internal improvements.
+- Significant documentation improvements.
+
 ## version 1.0.1 (15.09.2021)
 
 - Fixed startup crash, caused by `std::random_device` on MinGW toolchain.
