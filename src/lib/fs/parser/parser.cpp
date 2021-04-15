@@ -72,7 +72,7 @@ void print_error(
 	stream.print_line_number_with_description_and_pointed_code(
 		lookup_data.get_view_of_whole_content(),
 		error.backtracking_place,
-		"backtracking parser here");
+		"previous checkpoint here");
 }
 
 } // namespace
@@ -127,11 +127,6 @@ void print_parse_errors(const parse_failure_data& parse_data, log::logger& logge
 
 	for (const parse_error& error : parse_data.errors)
 		print_error(error, parse_data.metadata.lookup, logger);
-
-	logger.info().print_line_number_with_description_and_pointed_code(
-		parse_data.metadata.lookup.get_view_of_whole_content(),
-		parse_data.parser_stop_position,
-		"parser stopped here");
 }
 
 }
