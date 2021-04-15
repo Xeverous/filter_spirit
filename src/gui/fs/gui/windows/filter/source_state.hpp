@@ -78,6 +78,7 @@ private:
 	std::optional<std::string> _file_path;
 	std::optional<std::string> _file_name;
 	aux::multiline_text_input _text_input;
+	bool _clear_logs_on_source_change = true;
 	bool _popup_pending = false;
 	bool _is_source_edited = false;
 };

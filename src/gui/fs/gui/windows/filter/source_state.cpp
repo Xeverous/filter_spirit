@@ -18,8 +18,12 @@ void source_state::draw_interface(const fonting& f, filter_state_mediator& media
 	if (ImGui::CollapsingHeader("Source", ImGuiTreeNodeFlags_DefaultOpen)) {
 #ifndef __EMSCRIPTEN__
 		if (is_from_file()) {
-			if (ImGui::Button("Reload"))
+			if (ImGui::Button("Reload")) {
+				if (_clear_logs_on_source_change)
+					mediator.clear_logs();
+
 				reload_source_file(mediator);
+			}
 
 			ImGui::SameLine();
 		}
@@ -29,6 +33,10 @@ void source_state::draw_interface(const fonting& f, filter_state_mediator& media
 			open_source_edit();
 
 		aux::on_hover_text_tooltip("Any changes here are temporary and do not change the file.");
+
+		ImGui::SameLine();
+
+		ImGui::Checkbox("Clear logs on source change", &_clear_logs_on_source_change);
 
 		ImGui::SameLine();
 
@@ -92,6 +100,9 @@ void source_state::on_text_input_done(filter_state_mediator& mediator)
 		_source = std::make_unique<std::string>(_text_input.c_str());
 
 	_file_path = std::nullopt;
+
+	if (_clear_logs_on_source_change)
+		mediator.clear_logs();
 
 	mediator.on_source_change(source());
 }

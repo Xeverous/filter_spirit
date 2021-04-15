@@ -21,6 +21,11 @@ public:
 		return _logger;
 	}
 
+	void clear_logs() override
+	{
+		_logger.clear();
+	}
+
 	void on_source_change(const std::string* source) override;
 	void on_parsed_real_filter_change(const parser::parsed_real_filter* parsed_real_filter);
 

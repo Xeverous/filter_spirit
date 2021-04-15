@@ -35,6 +35,7 @@ public:
 
 	// template method pattern
 	virtual log::logger& logger() = 0;
+	virtual void clear_logs() = 0;
 
 	source_state& source()
 	{

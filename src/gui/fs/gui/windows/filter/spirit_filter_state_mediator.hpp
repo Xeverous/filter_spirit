@@ -27,6 +27,8 @@ public:
 	spirit_filter_state_mediator& operator=(spirit_filter_state_mediator&& other) noexcept = default;
 
 	log::logger& logger() override;
+	void clear_logs() override;
+
 	std::shared_ptr<log::thread_safe_logger<log::buffer_logger>> share_logger()
 	{
 		return _logger_ptr;

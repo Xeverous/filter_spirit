@@ -40,6 +40,12 @@ log::logger& spirit_filter_state_mediator::logger()
 	return *_logger_ptr;
 }
 
+void spirit_filter_state_mediator::clear_logs()
+{
+	FS_ASSERT(_logger_ptr != nullptr);
+	(*_logger_ptr)([&](log::buffer_logger& l){ l.clear(); });
+}
+
 const parser::parse_metadata* spirit_filter_state_mediator::parse_metadata() const
 {
 	if (_parsed_spirit_filter)
