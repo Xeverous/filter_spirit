@@ -98,6 +98,8 @@ expression(s) | type | notes
 `3.14` | Fractional | `.` character is required
 `-1.2e-3` | Fractional | scientific notation syntax as defined by C99 or C++11 standard
 
+Note: game allows unquoted string literals (e.g. `abc` instead of `"abc"`) if they do not contain whitespace characters. FS does support this, but only when reading real filters. In filter templates, you must always write quoted string literals.
+
 ### blocks
 
 **All constants must be defined before any actions/conditions.** Otherwise you will get parse errors.
@@ -1052,16 +1054,16 @@ The decision is item specific, but **for each item, there is only 1 good answer*
 2 Item visibility extensions are available:
 
 ```
-ShowHide    [Boolean]
-ShowDiscard [Boolean]
+ShowHide    Boolean+
+ShowDiscard Boolean+
 ```
 
 - `ShowHide`:
-  - if supplied value is `True`, the block is generated as if it was a `Show` statement
-  - if supplied value is `False`, the block is generated as if it was a `Hide` statement
+  - if all supplied values are `True`, the block is generated as if it was a `Show` statement
+  - otherwise, the block is generated as if it was a `Hide` statement
 - `ShowDiscard`:
-  - if supplied value is `True`, the block is generated as if it was a `Show` statement
-  - if supplied value is `False`, the block is not generated, as if there was no statement
+  - if all supplied values are `True`, the block is generated as if it was a `Show` statement
+  - otherwise, the block is not generated, as if there was no statement
 
 With this feature, you can have configuration variables that can be easily edited between `True` and `False` which will correctly handle each case.
 
@@ -1127,4 +1129,16 @@ Generated filter with `$show_hammers = False`:
 ```
 Show
 	Rarity = Rare
+```
+
+Example with multiple values:
+
+```
+$leveling = True
+$caster = True
+$leveling_caster = $leveling $caster
+
+# both statements semantically equivalent
+ShowDiscard $leveling $caster
+ShowDiscard $leveling_caster
 ```

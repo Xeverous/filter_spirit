@@ -61,7 +61,9 @@ expression(s) | type | notes
 `ShMirror`, `ShExalted`, `ShDivine`, `ShGeneral`, `ShRegal`, `ShChaos`, `ShFusing`, `ShAlchemy`, `ShVaal`, `ShBlessed` | ShaperVoiceLine
 `Superior`, `Divergent`, `Anomalous`, `Phantasmal` | `QualityType` |
 `Shaper`, `Elder`, `Crusader`, `Redeemer`, `Hunter`, `Warlord` | Influence |
-`""`, `"abc"` | String | UTF-8 encoding, line breaking characters (LF and CR) not allowed between quotes
+`""`, `"abc"`, `"Leather Belt"` | String | UTF-8 encoding, line breaking characters (LF and CR) not allowed between quotes
+
+Note: game allows unquoted string literals (e.g. `abc` instead of `"abc"`) if they do not contain whitespace characters. FS does support this, but only when reading real filters. If you write filter templates, you must always write quoted string literals.
 
 ## conditions
 
@@ -124,6 +126,8 @@ AlternateQuality Boolean
 ```
 
 Note: numeric and `Rarity` conditions can accept multiple values, but there is no practicaly point in doing so. You can cover any range with 2 lines using different comparisons, which is much better than manually specifying all possible values in 1 line. Additionally, current FS implementation does not support this and will error on more than 1 value (this is true both for real filters and filter templates).
+
+Note: Game allows it, but currently FS does not support multiples of the same non-range condition within one block.
 
 Wiki has some class-name related info (might be outdated):
 
