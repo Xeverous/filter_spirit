@@ -1718,7 +1718,7 @@ Class == "Maps" {
 		Show
 	}
 
-	HasInfluence Shaper Elder {
+	{
 		SetTextColor $color_white
 		SetBorderColor $color_white
 		SetBackgroundColor $color_red
@@ -1726,7 +1726,17 @@ Class == "Maps" {
 		SetAlertSound $alert_map_guardian
 		PlayEffect $beam_map
 		MinimapIcon $icon_map_guardian
-		Show
+
+		# Shaper guardians are only on specific bases
+		BaseType == "Forge of the Phoenix" "Maze of the Minotaur" "Pit of the Chimera" "Lair of the Hydra" {
+			Show
+		}
+
+		# for filters, there is no better way to detect an Elder guardian
+		MapTier >= 14
+		HasInfluence Elder {
+			Show
+		}
 	}
 
 	# maps with Delirium and Blight encounter
