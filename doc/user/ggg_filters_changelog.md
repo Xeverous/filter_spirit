@@ -6,6 +6,13 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 
 *newest at the top*
 
+### 3.14 (Ultimatum) - [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3079980)
+
+- No new filter features. Only name changes within existing item classes.
+- [patch notes](https://www.pathofexile.com/forum/view-thread/3079973) (explode mod killed)
+- [balance manifesto](https://www.pathofexile.com/forum/view-thread/3079632) (It's All Nerfs)
+- [Harvest manifesto](https://www.pathofexile.com/forum/view-thread/3069670)
+
 ### 3.13 (Ritual + Echoes of the Atlas) - [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3009221)
 
 - [patch notes](https://www.pathofexile.com/forum/view-thread/3009157)
