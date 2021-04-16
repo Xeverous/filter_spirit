@@ -1,5 +1,13 @@
 # Filter Spirit changelog
 
+## version 1.2.0 (16.04.2021)
+
+- Real filter parser improvements:
+  - Allow overriding actions. This now prints a warning instead of an error. Previous behavior wasn't matching with game behavior.
+  - Allow unquoted strings if they do not contain whitespace characters. This is not recommended, but implemented for conformance with the game. FS templates are unchanged - they always require quotes for grammar consistency.
+- Bugfix of saving cached league data.
+- `ShowHide` and `ShowDiscard` now support multiple values. A block will be enabled only if all are `True`. Just like elsewhere, flattening of values is possible. Read documentation for more details.
+
 ## version 1.1.0 (15.04.2021)
 
 - Ovehaulued example filter.
