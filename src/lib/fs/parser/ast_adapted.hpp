@@ -135,11 +135,11 @@ BOOST_FUSION_ADAPT_STRUCT(
 
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::rf::string_array_condition,
-	property, exact_match, string_literals)
+	property, exact_match, strings)
 
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::rf::ranged_string_array_condition,
-	property, comparison_type, integer, string_literals)
+	property, comparison_type, integer, strings)
 
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::rf::has_influence_condition,

@@ -664,8 +664,6 @@ namespace rf
 	using gem_quality_type_literal = common::gem_quality_type_literal;
 	using none_literal = common::none_literal;
 
-	using continue_statement = common::continue_statement;
-
 	struct color_literal : x3::position_tagged
 	{
 		integer_literal r;
@@ -674,7 +672,26 @@ namespace rf
 		boost::optional<integer_literal> a;
 	};
 
-	struct string_literal_array : std::vector<string_literal>, x3::position_tagged {};
+	struct string : x3::position_tagged
+	{
+		auto& operator=(common::string_literal str)
+		{
+			value = std::move(static_cast<std::string&>(str));
+			return *this;
+		}
+
+		auto& operator=(common::identifier str)
+		{
+			value = std::move(str.value);
+			return *this;
+		}
+
+		const auto& get_value() const { return value; }
+
+		std::string value;
+	};
+
+	struct string_array : std::vector<string>, x3::position_tagged {};
 	struct influence_literal_array : std::vector<influence_literal>, x3::position_tagged {};
 
 	struct influence_spec : x3::variant<
@@ -709,7 +726,7 @@ namespace rf
 	{
 		lang::string_array_condition_property property;
 		exact_matching_policy exact_match;
-		string_literal_array string_literals;
+		string_array strings;
 	};
 
 	struct ranged_string_array_condition : x3::position_tagged
@@ -717,7 +734,7 @@ namespace rf
 		lang::ranged_string_array_condition_property property;
 		comparison_operator_expression comparison_type;
 		boost::optional<integer_literal> integer;
-		string_literal_array string_literals;
+		string_array strings;
 	};
 
 	struct has_influence_condition : x3::position_tagged
@@ -851,6 +868,8 @@ namespace rf
 		using base_type::base_type;
 		using base_type::operator=;
 	};
+
+	using continue_statement = common::continue_statement;
 
 	struct rule : x3::variant<condition, action, continue_statement>, x3::position_tagged
 	{

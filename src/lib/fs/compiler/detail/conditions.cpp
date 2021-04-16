@@ -772,13 +772,13 @@ real_filter_add_numeric_comparison_condition(
 
 [[nodiscard]] str_vec_t
 real_filter_make_string_array(
-	const parser::ast::rf::string_literal_array& string_literals)
+	const parser::ast::rf::string_array& strings)
 {
-	str_vec_t strings;
-	strings.reserve(string_literals.size());
-	for (const auto& str : string_literals)
-		strings.push_back(detail::evaluate(str));
-	return strings;
+	str_vec_t result;
+	result.reserve(strings.size());
+	for (const auto& str : strings)
+		result.push_back(detail::evaluate(str));
+	return result;
 }
 
 [[nodiscard]] bool
@@ -787,7 +787,7 @@ real_filter_add_string_array_condition(
 	lang::condition_set& set,
 	diagnostics_container& diagnostics)
 {
-	str_vec_t strings = real_filter_make_string_array(condition.string_literals);
+	str_vec_t strings = real_filter_make_string_array(condition.strings);
 	const bool exact_match = condition.exact_match.required;
 	const auto origin = parser::position_tag_of(condition);
 	return add_string_array_condition(condition.property, std::move(strings), exact_match, origin, set, diagnostics);
@@ -801,7 +801,7 @@ real_filter_add_ranged_string_array_condition(
 {
 	return add_ranged_string_array_condition(
 		condition.property,
-		real_filter_make_string_array(condition.string_literals),
+		real_filter_make_string_array(condition.strings),
 		condition.comparison_type.value,
 		parser::position_tag_of(condition.comparison_type),
 		condition.integer.map([](ast::common::integer_literal il) { return detail::evaluate(il); }),

@@ -28,6 +28,12 @@ make_socket_spec(
 	diagnostics_container& diagnostics);
 
 [[nodiscard]] inline lang::string
+evaluate(const parser::ast::rf::string& str)
+{
+	return {str.value, parser::position_tag_of(str)};
+}
+
+[[nodiscard]] inline lang::string
 evaluate(const parser::ast::common::string_literal& sl)
 {
 	return {static_cast<std::string>(sl), parser::position_tag_of(sl)};

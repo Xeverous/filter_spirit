@@ -402,9 +402,13 @@ namespace rf
 		> -common::integer_literal;
 	BOOST_SPIRIT_DEFINE(color_literal)
 
-	const string_literal_array_type string_literal_array = "1 or more string literals";
-	const auto string_literal_array_def = +common::string_literal;
-	BOOST_SPIRIT_DEFINE(string_literal_array)
+	const string_type string = "string";
+	const auto string_def = common::string_literal | common::identifier;
+	BOOST_SPIRIT_DEFINE(string)
+
+	const string_array_type string_array = "1 or more strings";
+	const auto string_array_def = x3::skip(common::non_eol_whitespace)[+string];
+	BOOST_SPIRIT_DEFINE(string_array)
 
 	const influence_literal_array_type influence_literal_array = "1 or more influence literals";
 	const auto influence_literal_array_def = +common::influence_literal;
@@ -433,7 +437,7 @@ namespace rf
 
 	const string_array_condition_type string_array_condition = "string array condition";
 	const auto string_array_condition_def =
-		make_keyword(symbols::rf::string_array_condition_properties) > common::exact_matching_policy_expression > string_literal_array;
+		make_keyword(symbols::rf::string_array_condition_properties) > common::exact_matching_policy_expression > string_array;
 	BOOST_SPIRIT_DEFINE(string_array_condition)
 
 	const ranged_string_array_condition_type ranged_string_array_condition = "ranged string array condition";
@@ -441,7 +445,7 @@ namespace rf
 		make_keyword(symbols::rf::ranged_string_array_condition_properties)
 		> common::comparison_operator_expression
 		> -common::integer_literal
-		> string_literal_array;
+		> string_array;
 	BOOST_SPIRIT_DEFINE(ranged_string_array_condition)
 
 	const has_influence_condition_type has_influence_condition = "has influence condition";

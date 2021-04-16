@@ -170,8 +170,9 @@ namespace rf
 	// ---- literal types ----
 
 	struct color_literal_class                   : error_on_error, annotate_on_success {};
+	struct string_class                          : error_on_error, annotate_on_success {};
 	struct icon_literal_class                    : error_on_error, annotate_on_success {};
-	struct string_literal_array_class            : error_on_error, annotate_on_success {};
+	struct string_array_class                    : error_on_error, annotate_on_success {};
 	struct influence_literal_array_class         : error_on_error, annotate_on_success {};
 	struct influence_spec_class                  : error_on_error, annotate_on_success {};
 
@@ -441,8 +442,11 @@ namespace rf
 	using color_literal_type = x3::rule<color_literal_class, ast::rf::color_literal>;
 	BOOST_SPIRIT_DECLARE(color_literal_type)
 
-	using string_literal_array_type = x3::rule<string_literal_array_class, ast::rf::string_literal_array>;
-	BOOST_SPIRIT_DECLARE(string_literal_array_type)
+	using string_type = x3::rule<string_class, ast::rf::string>;
+	BOOST_SPIRIT_DECLARE(string_type)
+
+	using string_array_type = x3::rule<string_array_class, ast::rf::string_array>;
+	BOOST_SPIRIT_DECLARE(string_array_type)
 
 	using influence_literal_array_type = x3::rule<influence_literal_array_class, ast::rf::influence_literal_array>;
 	BOOST_SPIRIT_DECLARE(influence_literal_array_type)
