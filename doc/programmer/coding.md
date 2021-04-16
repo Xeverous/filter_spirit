@@ -35,9 +35,9 @@ Right now too soon to write/use anything. Will edit the project to use them once
 
 General:
 
-- Follow C++ Core Guidelines. The project uses recommended `snake_case_style` only. Some external libraries (mostly ones used for GUI) use different styles but even they sometimes use the recommended style because the holy standards enforces this in certain concepts and language features.
+- Follow C++ Core Guidelines. The project uses recommended `snake_case_style` only. Some external libraries (mostly ones used for GUI) use different styles but even they sometimes use the recommended style because the holy standard enforces this in certain concepts and language features.
 - Do not use `BOOST_ASSERT`/`BOOST_ASSERT_MSG` directly. Use `FS_ASSERT`/`FS_ASSERT_MSG` instead. It wraps it and adds a layer of customization, implemented in CMake.
-- Report any new cases of `FS_ASSERT`/`FS_ASSERT_MSG` in noexcept functions. These are problematic because with specific build configuration asserts will throw.
+- Report any new cases of `FS_ASSERT`/`FS_ASSERT_MSG` in `noexcept` functions. These are problematic because with specific build configuration asserts will throw.
 - `src/fs/gui/windows` is not Windows-specific code. Files there are virtual windows in the application draw area.
 - Some types may seem quite simple that they could be rule-of-zero structs but instead they have private constructor and public static methods to create them. This is intended and exists to impose invariants.
 - No internal code should ever do backwards compiler/parser flow. That is, if you parse a token and the token results in some `lang` object, it should never be "converted back" to any parser type "just because it would be easier to match a function". Always refactor to avoid duplicate logic. This is because duplicate logic:
@@ -55,8 +55,12 @@ UI:
 
 Read respectibe Boost library tutorials before modifying or even reading the code! This is especially true for Boost Spirit X3, which is very unique how it expects code to be structured.
 
+[Boost Spirit X3 CppCon overview + tutorial](https://www.youtube.com/watch?v=xSBWklPLRvw) (60min)
+
 Example commits you might want to check:
 
+- `440e8b99f1cd4704999363a03e6bddebcd25e952`: support for `Expand`
+- `4aaa4a7500b0d8bdf668ca6e1b717fccdbeac3a1`: support for `ShowHide` and `ShowDiscard`
 - `d8ba8066b7f052fb3841803630bafa9389cde053`: support for new comparisons in `HasExplicitMod` and `HasEnchantment`
 - `4786b89cf04e6fbf89ea5c205f92ce8ec85ce879`: support for `EnchantmentPassiveNum`
 - `9f6ec9a244996939da867c2c312f3e1bc79fe1ca`: support for `Replica` and `AlternateQuality`

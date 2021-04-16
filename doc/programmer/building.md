@@ -9,7 +9,7 @@ Some of project's dependencies are already included in git submodules. If you pe
 
 Note that:
 
-- Due to some bugs, the earlier working GCC version is 9.0.
+- Due to some bugs, the earliest working GCC version is 9.0.
 - MSVC toolchain is not being used and not tested.
 
 ## external library requirements
@@ -31,6 +31,15 @@ Bolded dependencies need to be build. Rest are header-only libraries.
 
 ## invokation
 
-Just use CMake as it is supposed to be used. You may want to tweak `FILTER_SPIRIT_*` variables to decide what to build and with what options.
+Just use CMake as it is supposed to be used:
+
+```bash
+mkdir build
+cd build
+cmake .. [options...]
+make -j
+```
+
+You may want to tweak `FILTER_SPIRIT_*` CMake variables to decide what to build and with what options. Read main `CMakeLists.txt` for more info.
 
 For Emscripten, use it as emscripten recommends: `emcmake cmake ...` and `emmake make ...`.
