@@ -1762,7 +1762,7 @@ Class == "Maps" {
 		MinimapIcon $icon_map_guardian
 
 		# Shaper guardians are only on specific bases
-		BaseType == "Forge of the Phoenix" "Maze of the Minotaur" "Pit of the Chimera" "Lair of the Hydra" {
+		BaseType == "Forge of the Phoenix Map" "Maze of the Minotaur Map" "Pit of the Chimera Map" "Lair of the Hydra Map" {
 			Show
 		}
 
