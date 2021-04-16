@@ -4,7 +4,7 @@
 
 - Ovehaulued example filter.
 - Implemented support for every action and condition.
-- Added new feature: `Expand $subtree`.
+- Added new feature: `Expand $subtree`. This replaces previous `Set $actions` feature. It is a strict superset in terms of functionality, so simply replace all `Set` keywords with `Expand`.
 - Added new feature: `ShowHide $boolean` and `ShowDiscard $boolean`.
 - Lots of internal improvements.
 - Significant documentation improvements.
