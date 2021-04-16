@@ -216,8 +216,13 @@ std::vector<lang::league> load_leagues_from_disk(log::logger& logger)
 void update_leagues_on_disk(const ggg::api_league_data& api_data, log::logger& logger)
 {
 	const auto path = std::filesystem::path(cache_dir_path) / leagues_file_name;
-	if (!utility::save_file(path, api_data.leagues_json, logger))
+
+	if (!(
+		utility::create_directories(cache_dir_path, logger) &&
+		utility::save_file(path, api_data.leagues_json, logger)
+	)) {
 		logger.error() << "Failed to save leagues cache file.\n";
+	}
 }
 
 lang::market::item_price_report
