@@ -537,12 +537,11 @@ real_filter_add_action_impl(
 	diagnostics_container& diagnostics)
 {
 	if (target) {
-		diagnostics.push_back(make_error(
+		diagnostics.push_back(make_warning(
 			dmid::action_redefinition,
 			action.origin,
-			"action redefinition (the same action can not be specified multiple times in the same block)"));
+			"action redefinition (the previous one will be overriden)"));
 		diagnostics.push_back(make_note_first_defined_here((*target).origin));
-		return false;
 	}
 
 	target = std::forward<T>(action);
@@ -605,8 +604,10 @@ real_filter_add_minimap_icon_action(
 			return make_minimap_icon(st, obj, diagnostics);
 		})
 		.map([&](lang::minimap_icon icon) {
-			target = lang::minimap_icon_action{icon, parser::position_tag_of(action)};
-			return true;
+			return real_filter_add_action_impl(
+				lang::minimap_icon_action{icon, parser::position_tag_of(action)},
+				target,
+				diagnostics);
 		})
 		.value_or(false);
 }
@@ -623,8 +624,10 @@ real_filter_add_play_effect_action(
 			return make_play_effect(st, obj, diagnostics);
 		})
 		.map([&](lang::play_effect effect) {
-			target = lang::play_effect_action{effect, parser::position_tag_of(action)};
-			return true;
+			return real_filter_add_action_impl(
+				lang::play_effect_action{effect, parser::position_tag_of(action)},
+				target,
+				diagnostics);
 		})
 		.value_or(false);
 }
