@@ -45,6 +45,7 @@ $color_delirium            = 192 192 192
 $color_essence             =   0 128 192
 $color_labyrinth           =   0 150   0
 $color_incursion           = $color_labyrinth
+$color_ultimatum           = 165  72   0
 $color_harvest             =   0 252 186
 $color_quest               =  74 230  58
 $color_card                = 100 210 255
@@ -200,6 +201,7 @@ $alert_divine_vessel       = $alert_very_specific
 $alert_fragment_sacrifice  = $alert_frequent
 $alert_fragment_mortal     = $alert_common
 $alert_fragment_atlas      = $alert_uncommon
+$alert_fragment_sacred_blossom = $alert_uncommon
 $alert_breachstone         = $alert_uncommon
 $alert_emblem              = $alert_uncommon
 $alert_reliquary           = $alert_extraordinary
@@ -226,6 +228,7 @@ $alert_map_yellow          = $alert_map_low
 $alert_map_white           = $alert_map_low
 $alert_upgraded_offering   = $alert_very_specific
 $alert_invitation          = $alert_very_specific
+$alert_ultimatum           = $alert_uncommon
 $alert_talisman_rare       = $alert_check_required
 $alert_talisman_other      = $alert_check_required
 $alert_base_crafting       = $alert_common
@@ -260,6 +263,7 @@ $beam_unique          = Brown
 $beam_6_link          = Red
 $beam_map             = Grey
 $beam_influence       = Pink
+$beam_ultimatum       = Orange
 
 $icon_quest_item      = 0 Green Pentagon
 $icon_fishing_rod     = 0 White Star
@@ -292,6 +296,7 @@ $icon_gem_20_quality  = 0 Green Circle
 $icon_unique_high     = 0 Brown Triangle
 $icon_unique_mid      = 2 Brown Triangle
 $icon_6_link          = 0 Red Hexagon
+$icon_ultimatum       = 0 Orange Triangle
 $icon_error           = 0 Red Square
 
 $actions_currency_high = {
@@ -681,7 +686,7 @@ Class == "Stackable Currency" {
 		Show
 	}
 
-	BaseType == "Divine Orb" "Chaos Orb" "Gemcutter's Prism" "Stacked Deck" "Simple Sextant" "Prime Sextant" "Awakened Sextant" "Exalted Shard" "Orb of Annulment" "Harbinger's Orb" "Ancient Orb" "Ancient Shard" "Facetor's Lens" "Infused Engineer's Orb" "Orb of Unmaking" "Ritual Splinter" "Ritual Vessel" "Crescent Splinter"
+	BaseType == "Divine Orb" "Veiled Chaos Orb" "Chaos Orb" "Gemcutter's Prism" "Stacked Deck" "Simple Sextant" "Prime Sextant" "Awakened Sextant" "Exalted Shard" "Orb of Annulment" "Harbinger's Orb" "Ancient Orb" "Ancient Shard" "Facetor's Lens" "Infused Engineer's Orb" "Orb of Unmaking" "Ritual Splinter" "Ritual Vessel" "Crescent Splinter"
 	{
 		Expand $actions_currency_mid
 		Show
@@ -1473,6 +1478,14 @@ Class == "Map Fragments"
 		BaseType == "Fragment of Shape" "Fragment of Knowledge" "Fragment of Terror" "Fragment of Emptiness"
 		{ Show }
 	}
+	
+	BaseType == "Sacred Blossom" {
+		SetBorderColor $color_white
+		SetTextColor $color_white
+		SetBackgroundColor $color_harvest
+		SetFontSize $font_max
+		SetAlertSound $alert_fragment_sacred_blossom
+	}
 
 	BaseType "Breachstone" {
 		SetTextColor $color_breach
@@ -1564,13 +1577,13 @@ Class == "Leaguestones" {
 }
 
 Class == "Misc Map Items" {
+	SetFontSize $font_max
 	# reliquary keys from Legacy ("Ancient") and Delve ("Timeworn")
 	# ...and any future reliquary keys
 	BaseType "Reliquary Key" {
 		SetBorderColor 204 153 0
 		SetTextColor $color_white
 		SetBackgroundColor 204 153 0
-		SetFontSize $font_max
 		SetAlertSound $alert_reliquary
 		PlayEffect $beam_reliquary
 		MinimapIcon $icon_reliquary
@@ -1581,10 +1594,27 @@ Class == "Misc Map Items" {
 		SetBorderColor 204 153 0
 		SetTextColor $color_white
 		SetBackgroundColor 204 153 0
-		SetFontSize $font_max
 		SetAlertSound $alert_invitation
 		PlayEffect $beam_reliquary
 		MinimapIcon $icon_reliquary
+		Show
+	}
+	
+	BaseType "Inscribed Ultimatum" {
+		SetBackgroundColor $color_white
+		SetTextColor $color_ultimatum
+		SetBorderColor $color_ultimatum
+		SetAlertSound $alert_ultimatum
+		PlayEffect $beam_ultimatum
+		MinimapIcon $icon_ultimatum
+		Show
+	}
+	
+	BaseType "Chronicle of Atzoatl" {
+		SetBackgroundColor $color_white
+		SetTextColor $color_incursion
+		SetBorderColor $color_incursion
+		SetAlertSound $alert_undroppable
 		Show
 	}
 }
