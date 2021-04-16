@@ -2,6 +2,10 @@
 # This file is public domain. You can freely modify and reuse it in any way.
 # more about Filter Spirit tool on https://github.com/Xeverous/filter_spirit
 
+# This filter is designed towards endgame. It has some minor leveling help
+# like showing 3L, 4L and flasks but don't expect it to perform well in any
+# racing or things of this sort.
+
 # if you want to disable some action (so that an alert/icon/beam does not happen),
 # assign a special value
 # $icon_* = -1
@@ -224,8 +228,8 @@ $alert_upgraded_offering   = $alert_very_specific
 $alert_invitation          = $alert_very_specific
 $alert_talisman_rare       = $alert_check_required
 $alert_talisman_other      = $alert_check_required
-$alert_base_crafting       = 4
-$alert_base_chance         = 10
+$alert_base_crafting       = $alert_common
+$alert_base_chance         = $alert_common
 $alert_fractured_item      = $alert_very_specific
 $alert_synthesised_item    = $alert_very_specific
 $alert_veiled_item         = $alert_common
