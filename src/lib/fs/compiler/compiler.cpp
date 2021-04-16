@@ -410,6 +410,25 @@ evaluate(parser::ast::common::static_visibility_statement visibility)
 	};
 }
 
+[[nodiscard]] boost::optional<lang::boolean>
+fold_booleans_using_and(const lang::object& obj, diagnostics_container& diagnostics)
+{
+	lang::boolean result{true, obj.origin};
+	for (const lang::single_object& so : obj.values) {
+		/*
+		 * This implementation could short-circuit (return false on first false)
+		 * but it tries to run full loop to ensure that all subobjects are booleans.
+		 */
+		auto b = detail::get_as<lang::boolean>(so, diagnostics);
+		if (!b)
+			return boost::none;
+
+		result.value = result.value && (*b).value;
+	}
+
+	return result;
+}
+
 [[nodiscard]] boost::optional<lang::item_visibility>
 evaluate(
 	settings st,
@@ -417,10 +436,9 @@ evaluate(
 	const symbol_table& symbols,
 	diagnostics_container& diagnostics)
 {
-	return detail::evaluate_sequence(st, visibility.seq, symbols, 1, 1, diagnostics)
+	return detail::evaluate_sequence(st, visibility.seq, symbols, 1, boost::none, diagnostics)
 		.flat_map([&](lang::object obj) {
-			FS_ASSERT(obj.values.size() == 1u);
-			return detail::get_as<lang::boolean>(obj.values[0], diagnostics);
+			return fold_booleans_using_and(obj, diagnostics);
 		})
 		.map([&](lang::boolean b) {
 			const lang::position_tag origin = parser::position_tag_of(visibility);

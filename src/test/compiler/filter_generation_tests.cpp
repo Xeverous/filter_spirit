@@ -781,6 +781,36 @@ R"(Show
 			BOOST_TEST(compare_strings(expected_filter, actual_filter));
 		}
 
+		BOOST_AUTO_TEST_CASE(dynamic_visibility_multiple_values)
+		{
+			const std::string actual_filter = generate_filter(minimal_input() + R"(
+$x1 = True
+$x2 = True
+$x3 = True
+$xx = $x1 $x2 $x3
+
+ShowHide $x1 $x2 $x3
+ShowHide $x1 True $x2 True $x3
+ShowHide $xx
+ShowHide False $xx
+ShowHide $x1 True $xx True $x2 False $x3
+)");
+			const std::string_view expected_filter =
+R"(Show
+
+Show
+
+Show
+
+Hide
+
+Hide
+
+)";
+
+			BOOST_TEST(compare_strings(expected_filter, actual_filter));
+		}
+
 		BOOST_AUTO_TEST_CASE(continue_statement)
 		{
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
