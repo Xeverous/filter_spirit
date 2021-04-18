@@ -6,10 +6,10 @@ If you ever worked with web stuff - a perfect analogy is that Filter Spirit is t
 
 ## news
 
-**First version with graphical interface has been released!** (no icon though, can someone make me a logo?)
+**Ultimatum update with significant new features has been released!** (no icon though, can someone make me a logo?)
 [DOWNLOAD HERE](https://github.com/Xeverous/filter_spirit/releases)
 
-New filter features from 3.13 Echoes of the Atlas (Ritual league) update implemented. 3.14 (Ultimatum league) does not require any changes in program implementation.
+As of now, the tool supports all possible conditions and actions except few corner cases which are described in `doc/known_issues`.
 
 Message me ([/u/Xeverous](https://old.reddit.com/user/Xeverous/) on reddit or Xeverous#2151 on Discord) if you are interested in it or have any questions/suggestions/whatever. You can also open an issue.
 
