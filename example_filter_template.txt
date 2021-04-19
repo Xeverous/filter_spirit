@@ -2141,24 +2141,21 @@ BaseType == $cfg_base_chance_names {
 	Show
 }
 
+Class "Flasks"
+Rarity Normal
+Quality 20 {
+	SetBorderColor $color_white
+	ShowDiscard $show_flasks_20q
+	Continue
+}
+
 Class == "Utility Flasks" "Critical Utility Flasks" {
 	SetTextColor $color_white
 	SetBackgroundColor $color_flask_utility
-
-	Quality 20 {
-		SetBorderColor $color_white
-		ShowDiscard $show_flasks_20q
-	}
-
 	ShowDiscard $show_flasks_utility
 }
 
 Class "Flasks" {
-	Quality 20 {
-		SetBorderColor $color_white
-		ShowDiscard $show_flasks_20q
-	}
-
 	ShowDiscard $show_flasks_other
 }
 
