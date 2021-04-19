@@ -618,6 +618,7 @@ $show_jewels_basic = True
 
 $show_gear_fractured = True
 $show_gear_synthesised = True
+$show_gear_breach_ring = True
 $show_gear_corrupted = False
 $show_5_link = True # (6Ls are always shown)
 $show_6_socket = True
@@ -1478,7 +1479,7 @@ Class == "Map Fragments"
 		BaseType == "Fragment of Shape" "Fragment of Knowledge" "Fragment of Terror" "Fragment of Emptiness"
 		{ Show }
 	}
-	
+
 	BaseType == "Sacred Blossom" {
 		SetBorderColor $color_white
 		SetTextColor $color_white
@@ -1599,7 +1600,7 @@ Class == "Misc Map Items" {
 		MinimapIcon $icon_reliquary
 		Show
 	}
-	
+
 	BaseType "Inscribed Ultimatum" {
 		SetBackgroundColor $color_white
 		SetTextColor $color_ultimatum
@@ -1609,7 +1610,7 @@ Class == "Misc Map Items" {
 		MinimapIcon $icon_ultimatum
 		Show
 	}
-	
+
 	BaseType "Chronicle of Atzoatl" {
 		SetBackgroundColor $color_white
 		SetTextColor $color_incursion
@@ -2091,6 +2092,11 @@ Rarity <= Rare {
 
 	Corrupted True {
 		SetBackgroundColor $color_corrupted
+
+		BaseType == "Breach Ring" {
+			ShowHide $show_gear_breach_ring
+		}
+
 		ShowHide $show_gear_corrupted
 	}
 
