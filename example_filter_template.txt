@@ -444,23 +444,23 @@ $blocks_influence_price = {
 	Price < $cfg_influence_high_min_value
 	Price >= $cfg_influence_mid_min_value {
 		Expand $actions_influence_mid
-		ShowHide $show_influence_mid
+		ShowDiscard $show_influence_mid
 	}
 
 	Price < $cfg_influence_mid_min_value
 	Price > $cfg_influence_low_min_value {
 		Expand $actions_influence_low
-		ShowHide $show_influence_low
+		ShowDiscard $show_influence_low
 	}
 
 	Price <= $cfg_influence_low_min_value {
 		Expand $actions_influence_very_low
-		ShowHide $show_influence_very_low
+		ShowDiscard $show_influence_very_low
 	}
 }
 
 $blocks_influence_ilvl = {
-	ItemLevel 86 {
+	ItemLevel >= 86 {
 		Expand $blocks_influence_price
 	}
 
@@ -626,8 +626,8 @@ $cfg_influence_high_min_value = 100
 $cfg_influence_mid_min_value = 10
 $cfg_influence_low_min_value = 1
 $show_influence_mid = True
-$show_influence_low = True
-$show_influence_very_low = True
+$show_influence_low = False
+$show_influence_very_low = False
 $cfg_gear_veiled_always_show_mods = "Elreon's Veiled"
 $show_gear_veiled = True
 # Items with Incursion and Bestiary mods always drop as identified rare items.
