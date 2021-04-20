@@ -1842,7 +1842,9 @@ Class == "Jewel"
 		ShowHide $show_jewels_cluster_medium_4_5
 	}
 
-	ShowHide $show_jewels_cluster_other
+	BaseType "Cluster" {
+		ShowHide $show_jewels_cluster_other
+	}
 }
 
 Class == "Abyss Jewel"
