@@ -2040,7 +2040,7 @@ Rarity <= Rare {
 		Show
 	}
 
-	HasExplicitMod == "Veiled" "of the Veil" {
+	HasExplicitMod "Veil" {
 		SetBackgroundColor $color_veiled_item
 		SetAlertSound $alert_veiled_item
 		ShowDiscard $show_gear_veiled
