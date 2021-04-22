@@ -35,6 +35,7 @@ $color_6_link              = $color_red
 $color_5_link              = 192 128   0
 $color_base_chance         =  51 204 204
 $color_base_craft          = 191 244   0
+$color_atlas               = 205 185 114
 $color_fractured_item      = 150 100 158
 $color_synthesised_item    = 150 100 200
 $color_veiled_item         = 150 100 158
@@ -53,7 +54,7 @@ $color_gem                 =  27 162 155
 $color_corrupted           = 255 127 127
 $color_sacrifice           = 150 100   0
 $color_mortal              =  60 150   0
-$color_scarab              = 255  92   0
+$color_scarab              = $color_atlas
 $color_heist               =   0 252 186
 $color_harbinger           =  64 255 255
 $color_talisman            =  50 130  50
@@ -69,7 +70,6 @@ $color_map_yellow          = $color_rare
 $color_map_white           = $color_normal
 $color_flask_utility       = 122 105  28
 $color_hammer              = 162  85   0
-$color_atlas               = 205 185 114
 $color_influence_high      = 255   0 127
 $color_influence_mid       = 192   0  95
 $color_influence_low       = 127   0  63
@@ -97,10 +97,10 @@ $font_prophecy_high      = $font_high
 $font_prophecy_mid       = $font_mid
 $font_prophecy_low       = $font_low
 $font_prophecy_very_low  = $font_very_low
-$font_scarab_high        = $font_high
-$font_scarab_mid         = $font_mid
-$font_scarab_low         = $font_low
-$font_scarab_very_low    = $font_very_low
+$font_scarab_high        = $font_currency_high
+$font_scarab_mid         = $font_currency_mid
+$font_scarab_low         = $font_currency_low
+$font_scarab_very_low    = $font_currency_very_low
 $font_scarab_unknown     = $font_mid
 $font_essence_t7_t6      = $font_high
 $font_essence_special    = $font_high
@@ -1363,6 +1363,8 @@ Class == "Atlas Region Upgrade Item" {
 
 Class == "Map Fragments"
 {
+	# scarabs by default get border color 200 200 200
+	# we override it in all tiers to prevent mismatched colors
 	Autogen scarabs
 	{
 		Price >= $cfg_scarabs_high_min_value
@@ -1403,6 +1405,7 @@ Class == "Map Fragments"
 		Price < $cfg_scarabs_low_min_value
 		{
 			SetTextColor $color_scarab
+			SetBorderColor $color_scarab
 			SetBackgroundColor $color_black
 			SetFontSize $font_scarab_very_low
 			ShowHide $show_scarabs_very_low
@@ -1525,8 +1528,8 @@ Class == "Map Fragments"
 	}
 
 	BaseType == "Blood-filled Vessel" {
-		SetTextColor $color_scarab
-		SetBorderColor $color_scarab
+		SetTextColor $color_atlas
+		SetBorderColor $color_atlas
 		SetBackgroundColor $color_white
 		SetFontSize $font_max
 		SetAlertSound $alert_undroppable
