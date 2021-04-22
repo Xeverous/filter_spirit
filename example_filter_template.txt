@@ -52,9 +52,9 @@ $color_quest               =  74 230  58
 $color_card                = 100 210 255
 $color_gem                 =  27 162 155
 $color_corrupted           = 255 127 127
-$color_sacrifice           = 150 100   0
+$color_sacrifice           = 127  63   0
 $color_mortal              =  60 150   0
-$color_scarab              = $color_atlas
+$color_scarab              = 127 127   0
 $color_heist               =   0 252 186
 $color_harbinger           =  64 255 255
 $color_talisman            =  50 130  50
@@ -192,6 +192,7 @@ $alert_essence_other       = $alert_frequent
 $alert_scarab_high         = $alert_high
 $alert_scarab_mid          = $alert_mid
 $alert_scarab_low          = $alert_low
+$alert_scarab_very_low     = $alert_frequent
 $alert_scarab_unknown      = $alert_check_required
 $alert_unique_piece        = $alert_very_specific
 $alert_unique_6_link       = $alert_extraordinary
@@ -332,7 +333,6 @@ $actions_currency_low = {
 
 $actions_currency_very_low = {
 	SetTextColor $color_currency_very_low
-	SetBorderColor $color_currency_very_low
 	SetBackgroundColor $color_black
 	SetFontSize $font_currency_very_low
 	SetAlertSound $alert_currency_very_low
@@ -340,7 +340,6 @@ $actions_currency_very_low = {
 
 $actions_currency_low_shards = {
 	SetTextColor $color_currency_very_low
-	SetBorderColor $color_currency_very_low
 	SetBackgroundColor $color_black
 	SetFontSize $font_currency_very_low
 	SetAlertSound $alert_currency_very_low
@@ -1408,6 +1407,7 @@ Class == "Map Fragments"
 			SetBorderColor $color_scarab
 			SetBackgroundColor $color_black
 			SetFontSize $font_scarab_very_low
+			SetAlertSound $alert_scarab_very_low
 			ShowHide $show_scarabs_very_low
 		}
 	}
