@@ -552,9 +552,9 @@ $show_prophecies_mid = True
 $show_prophecies_low = True
 $show_prophecies_very_low = True
 
-$cfg_fossils_high_min_value = 100
-$cfg_fossils_mid_min_value = 10
-$cfg_fossils_low_min_value = 1
+$cfg_fossils_high_min_value = 30
+$cfg_fossils_mid_min_value = 5
+$cfg_fossils_low_min_value = 0.25
 $show_fossils_mid = True
 $show_fossils_low = True
 $show_fossils_very_low = True
