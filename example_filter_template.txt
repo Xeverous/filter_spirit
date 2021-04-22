@@ -2010,7 +2010,9 @@ Rarity <= Rare {
 		}
 
 		HasInfluence == None {
-			Expand $blocks_influence_ilvl
+			ItemLevel >= 86 {
+				Expand $blocks_influence_price
+			}
 		}
 	}
 
