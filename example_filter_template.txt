@@ -58,7 +58,10 @@ $color_heist               =   0 252 186
 $color_harbinger           =  64 255 255
 $color_talisman            =  50 130  50
 $color_metamorph           =  25 181  25
-$color_currency            = 213 159  15
+$color_currency_high       = $color_red
+$color_currency_mid        = 249 150  25
+$color_currency_low        = 213 159   0
+$color_currency_very_low   = 190 178 135
 $color_blight              = 255 127   0
 $color_prophecy            = 181  75 255
 $color_map_red             = $color_red
@@ -85,10 +88,11 @@ $font_mid                = 38
 $font_low                = 34
 $font_very_low           = 26
 
+$font_scroll             = $font_mid
 $font_currency_high      = $font_high
 $font_currency_mid       = $font_high
 $font_currency_low       = $font_mid
-$font_currency_very_low  = $font_very_low
+$font_currency_very_low  = $font_mid
 $font_prophecy_high      = $font_high
 $font_prophecy_mid       = $font_mid
 $font_prophecy_low       = $font_low
@@ -111,9 +115,9 @@ $font_gem_drop_only      = 38
 $font_gem_high           = $font_high
 $font_gem_mid            = $font_mid
 $font_gem_low            = $font_low
-$font_oil_high           = $font_high
-$font_oil_mid            = $font_mid
-$font_oil_low            = $font_low
+$font_oil_high           = $font_currency_high
+$font_oil_mid            = $font_currency_mid
+$font_oil_low            = $font_currency_low
 $font_map_blight         = $font_max
 $font_map_guardian       = $font_max
 $font_map_enchanted      = $font_max
@@ -302,7 +306,7 @@ $icon_error           = 0 Red Square
 $actions_currency_high = {
 	SetTextColor $color_golden
 	SetBorderColor $color_golden
-	SetBackgroundColor $color_red
+	SetBackgroundColor $color_currency_high
 	SetFontSize $font_currency_high
 	SetAlertSound $alert_currency_high
 	PlayEffect $beam_currency
@@ -311,7 +315,7 @@ $actions_currency_high = {
 
 $actions_currency_mid = {
 	SetTextColor $color_black
-	SetBackgroundColor $color_currency
+	SetBackgroundColor $color_currency_mid
 	SetFontSize $font_currency_mid
 	SetAlertSound $alert_currency_mid
 	PlayEffect $beam_currency
@@ -320,16 +324,24 @@ $actions_currency_mid = {
 
 $actions_currency_low = {
 	SetTextColor $color_black
-	SetBackgroundColor $color_currency
+	SetBackgroundColor $color_currency_low
 	SetFontSize $font_currency_low
 	SetAlertSound $alert_currency_low
 	PlayEffect $beam_currency
 }
 
 $actions_currency_very_low = {
-	SetTextColor $color_white
-	SetBorderColor $color_golden
-	SetBackgroundColor $color_currency
+	SetTextColor $color_currency_very_low
+	SetBorderColor $color_currency_very_low
+	SetBackgroundColor $color_black
+	SetFontSize $font_currency_very_low
+	SetAlertSound $alert_currency_very_low
+}
+
+$actions_currency_low_shards = {
+	SetTextColor $color_currency_very_low
+	SetBorderColor $color_currency_very_low
+	SetBackgroundColor $color_black
 	SetFontSize $font_currency_very_low
 	SetAlertSound $alert_currency_very_low
 }
@@ -504,12 +516,9 @@ $blocks_influence_ilvl = {
 
 $show_scrolls_wisdom = True
 $show_scrolls_portal = True
-$show_augs = True
-$show_trans = True
-$show_chromes = True
-$show_scaps = True
-$show_whetstones = True
-$show_bubles = True
+$show_currency_low = True
+$show_currency_very_low = True
+$show_currency_low_shards = True
 $show_rogue_markers = True
 # Show 4 worst breach spliters and 3 worst legion splinters
 # Other splinters are always shown
@@ -699,23 +708,30 @@ Class == "Stackable Currency" {
 		Show
 	}
 
-	BaseType == "Cartographer's Chisel" "Jeweller's Orb" "Orb of Alchemy" "Orb of Alteration" "Orb of Fusing" "Orb of Scouring" "Silver Coin" "Blessed Orb" "Harbinger's Shard" "Orb of Regret" "Regal Orb" "Vaal Orb" "Remnant of Corruption" "Orb of Binding" "Orb of Horizons" "Chaos Shard" {
+	BaseType == "Cartographer's Chisel" "Chromatic Orb" "Jeweller's Orb" "Orb of Alchemy" "Orb of Alteration" "Orb of Fusing" "Orb of Scouring" "Silver Coin" "Blessed Orb" "Harbinger's Shard" "Orb of Regret" "Regal Orb" "Vaal Orb" "Remnant of Corruption" "Orb of Binding" "Orb of Horizons" "Chaos Shard" {
 		Expand $actions_currency_low
-		Show
+		ShowHide $show_currency_low
 	}
 
-	BaseType == "Annulment Shard" "Binding Shard" "Horizon Shard" "Regal Shard" "Alchemy Shard" "Engineer's Orb" "Orb of Chance" {
+	BaseType == "Armourer's Scrap" "Blacksmith's Whetstone" "Glassblower's Bauble" "Orb of Transmutation" "Orb of Augmentation" "Orb of Chance" {
 		Expand $actions_currency_very_low
-		Show
+		ShowHide $show_currency_very_low
+	}
+
+	BaseType == "Annulment Shard" "Binding Shard" "Horizon Shard" "Regal Shard" "Alchemy Shard" "Engineer's Orb" {
+		Expand $actions_currency_low_shards
+		ShowHide $show_currency_low_shards
 	}
 
 	BaseType == "Scroll of Wisdom" {
 		SetTextColor 220 195 160
+		SetFontSize $font_scroll
 		ShowHide $show_scrolls_wisdom
 	}
 
 	BaseType == "Portal Scroll" {
 		SetTextColor 162 152 145
+		SetFontSize $font_scroll
 		ShowHide $show_scrolls_portal
 	}
 
@@ -731,36 +747,6 @@ Class == "Stackable Currency" {
 		PlayEffect Blue
 		MinimapIcon 0 Blue Moon
 		Show
-	}
-
-	BaseType == "Armourer's Scrap" {
-		SetTextColor 150 100 70
-		ShowHide $show_scaps
-	}
-
-	BaseType == "Blacksmith's Whetstone" {
-		SetTextColor 190 160 130
-		ShowHide $show_whetstones
-	}
-
-	BaseType == "Glassblower's Bauble" {
-		SetTextColor 150 210 210
-		ShowHide $show_bubles
-	}
-
-	BaseType == "Orb of Transmutation" {
-		SetTextColor 70 115 160
-		ShowHide $show_trans
-	}
-
-	BaseType == "Orb of Augmentation" {
-		SetTextColor 120 165 202
-		ShowHide $show_augs
-	}
-
-	BaseType == "Chromatic Orb" {
-		SetTextColor 175 255 200
-		ShowHide $show_chromes
 	}
 
 	Autogen fossils {
@@ -1035,7 +1021,7 @@ Class == "Stackable Currency" {
 
 	SetTextColor $color_error
 	SetBorderColor $color_error
-	SetBackgroundColor $color_currency
+	SetBackgroundColor $color_currency_mid
 	SetFontSize $font_max
 	SetAlertSound $alert_error
 	Show
@@ -1056,7 +1042,7 @@ Class == "Delve Stackable Socketable Currency"
 
 Class == "Incubator" {
 	SetTextColor $color_black
-	SetBackgroundColor $color_currency
+	SetBackgroundColor $color_currency_mid
 	SetFontSize $font_currency_mid
 	SetAlertSound $alert_currency_mid
 	PlayEffect $beam_currency
