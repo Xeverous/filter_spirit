@@ -54,7 +54,6 @@ $color_gem                 =  27 162 155
 $color_corrupted           = 255 127 127
 $color_sacrifice           = 127  63   0
 $color_mortal              =  60 150   0
-$color_scarab              = 127 127   0
 $color_heist               =   0 252 186
 $color_harbinger           =  64 255 255
 $color_talisman            =  50 130  50
@@ -63,6 +62,10 @@ $color_currency_high       = $color_red
 $color_currency_mid        = 249 150  25
 $color_currency_low        = 213 159   0
 $color_currency_very_low   = 190 178 135
+$color_scarab_high         = 244 244   0
+$color_scarab_mid          = 182 182   0
+$color_scarab_low          = 127 127   0
+$color_scarab_very_low     = $color_scarab_low
 $color_blight              = 255 127   0
 $color_prophecy            = 181  75 255
 $color_map_red             = $color_red
@@ -585,9 +588,9 @@ $show_gems_non_0_quality = True
 $show_gems_drop_only = True
 $show_gems_other = False
 
-$cfg_scarabs_high_min_value = 40
-$cfg_scarabs_mid_min_value = 15
-$cfg_scarabs_low_min_value = 3
+$cfg_scarabs_high_min_value = 25
+$cfg_scarabs_mid_min_value = 5
+$cfg_scarabs_low_min_value = 0.25
 $show_scarabs_mid = True
 $show_scarabs_low = True
 $show_scarabs_very_low = True
@@ -1368,9 +1371,9 @@ Class == "Map Fragments"
 	{
 		Price >= $cfg_scarabs_high_min_value
 		{
-			SetTextColor $color_white
-			SetBorderColor $color_scarab
-			SetBackgroundColor $color_scarab
+			SetTextColor $color_black
+			SetBorderColor $color_scarab_high
+			SetBackgroundColor $color_scarab_high
 			SetFontSize $font_scarab_high
 			SetAlertSound $alert_scarab_high
 			MinimapIcon $icon_scarab_high
@@ -1380,9 +1383,9 @@ Class == "Map Fragments"
 		Price < $cfg_scarabs_high_min_value
 		Price >= $cfg_scarabs_mid_min_value
 		{
-			SetTextColor $color_white
-			SetBorderColor $color_scarab
-			SetBackgroundColor $color_scarab
+			SetTextColor $color_black
+			SetBorderColor $color_scarab_mid
+			SetBackgroundColor $color_scarab_mid
 			SetFontSize $font_scarab_mid
 			SetAlertSound $alert_scarab_mid
 			MinimapIcon $icon_scarab_mid
@@ -1392,9 +1395,9 @@ Class == "Map Fragments"
 		Price < $cfg_scarabs_mid_min_value
 		Price >= $cfg_scarabs_low_min_value
 		{
-			SetTextColor $color_scarab
-			SetBorderColor $color_scarab
-			SetBackgroundColor $color_black
+			SetTextColor $color_black
+			SetBorderColor $color_scarab_low
+			SetBackgroundColor $color_scarab_low
 			SetFontSize $font_scarab_low
 			SetAlertSound $alert_scarab_low
 			MinimapIcon $icon_scarab_low
@@ -1403,8 +1406,8 @@ Class == "Map Fragments"
 
 		Price < $cfg_scarabs_low_min_value
 		{
-			SetTextColor $color_scarab
-			SetBorderColor $color_scarab
+			SetTextColor $color_scarab_very_low
+			SetBorderColor $color_scarab_very_low
 			SetBackgroundColor $color_black
 			SetFontSize $font_scarab_very_low
 			SetAlertSound $alert_scarab_very_low
@@ -1414,9 +1417,9 @@ Class == "Map Fragments"
 
 	# scarabs with unknown value
 	BaseType "Scarab" "Lure" {
-		SetTextColor $color_scarab
+		SetTextColor $color_black
 		SetBorderColor $color_red
-		SetBackgroundColor $color_black
+		SetBackgroundColor $color_scarab_mid
 		SetFontSize $font_scarab_unknown
 		SetAlertSound $alert_scarab_unknown
 		Show
