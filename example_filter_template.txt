@@ -1893,6 +1893,7 @@ BaseType "Talisman" {
 Rarity <= Rare {
 	# enchants and RGB - part 1/2
 	# these blocks only set styles (or not if discarded)
+	Sockets < 6
 	SocketGroup RGB {
 		Width 2
 		Height <= 2 {
@@ -2093,6 +2094,7 @@ Rarity <= Rare {
 	# enchants and RGB - part 2/2
 	# these blocks stop filtering to prevent hiding such items
 	# (it's the same code but without styles and Continue)
+	Sockets < 6
 	SocketGroup RGB {
 		Width 2
 		Height <= 2 {
