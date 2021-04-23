@@ -36,9 +36,9 @@ $color_5_link              = 192 128   0
 $color_base_chance         =  51 204 204
 $color_base_craft          = 191 244   0
 $color_atlas               = 205 185 114
-$color_fractured_item      = 150 100 158
-$color_synthesised_item    = 150 100 200
-$color_veiled_item         = 150 100 158
+$color_fractured_item      = 255 192 255
+$color_synthesised_item    = $color_fractured_item
+$color_veiled_item         = 215 174 134
 $color_perandus            = 255 192 128
 $color_breach              = 255  51 204
 $color_legion              = 200 133  44
@@ -1965,12 +1965,14 @@ Rarity <= Rare {
 	}
 
 	FracturedItem True {
+		SetTextColor $color_black
 		SetBackgroundColor $color_fractured_item
 		SetAlertSound $alert_fractured_item
 		ShowDiscard $show_gear_fractured
 	}
 
 	SynthesisedItem True {
+		SetTextColor $color_black
 		SetBackgroundColor $color_synthesised_item
 		SetAlertSound $alert_synthesised_item
 		ShowDiscard $show_gear_synthesised
@@ -2029,6 +2031,7 @@ Rarity <= Rare {
 	}
 
 	HasExplicitMod == $cfg_gear_veiled_always_show_mods {
+		SetTextColor $color_black
 		SetBackgroundColor $color_veiled_item
 		SetBorderColor $color_white
 		SetAlertSound $alert_veiled_item
@@ -2036,6 +2039,7 @@ Rarity <= Rare {
 	}
 
 	HasExplicitMod "Veil" {
+		SetTextColor $color_black
 		SetBackgroundColor $color_veiled_item
 		SetAlertSound $alert_veiled_item
 		ShowDiscard $show_gear_veiled
