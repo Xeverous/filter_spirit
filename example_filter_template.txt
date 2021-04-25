@@ -710,7 +710,7 @@ Class == "Stackable Currency" {
 		Show
 	}
 
-	BaseType == "Cartographer's Chisel" "Chromatic Orb" "Jeweller's Orb" "Orb of Alchemy" "Orb of Alteration" "Orb of Fusing" "Orb of Scouring" "Silver Coin" "Blessed Orb" "Harbinger's Shard" "Orb of Regret" "Regal Orb" "Vaal Orb" "Remnant of Corruption" "Orb of Binding" "Orb of Horizons" "Chaos Shard" {
+	BaseType == "Cartographer's Chisel" "Chromatic Orb" "Jeweller's Orb" "Orb of Alchemy" "Orb of Alteration" "Orb of Fusing" "Orb of Scouring" "Silver Coin" "Blessed Orb" "Harbinger's Shard" "Orb of Regret" "Regal Orb" "Vaal Orb" "Remnant of Corruption" "Orb of Binding" "Orb of Horizons" "Chaos Shard" "Annulment Shard" {
 		Expand $actions_currency_low
 		ShowHide $show_currency_low
 	}
@@ -720,7 +720,7 @@ Class == "Stackable Currency" {
 		ShowHide $show_currency_very_low
 	}
 
-	BaseType == "Annulment Shard" "Binding Shard" "Horizon Shard" "Regal Shard" "Alchemy Shard" "Engineer's Orb" {
+	BaseType == "Binding Shard" "Horizon Shard" "Regal Shard" "Alchemy Shard" "Engineer's Orb" {
 		Expand $actions_currency_low_shards
 		ShowHide $show_currency_low_shards
 	}
