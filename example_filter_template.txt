@@ -1652,19 +1652,14 @@ Class == "Metamorph Sample" {
 	Show
 }
 
-{
+Class == "Quest Items" {
 	SetTextColor $color_quest
 	SetBorderColor $color_quest
 	SetBackgroundColor $color_black
 	SetFontSize $font_quest
 	SetAlertSound $alert_quest_item
 	MinimapIcon $icon_quest_item
-
-	Class == "Quest Items" { Show }
-
-	# I don't know any droppable items of this class
-	# but since they exist better make a block for them
-	Class == "Microtransactions" { Show }
+	Show
 }
 
 Class == "Divination Card" {

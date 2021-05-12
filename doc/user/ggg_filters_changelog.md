@@ -6,6 +6,10 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 
 *newest at the top*
 
+### 3.14.1c (or maybe earlier)
+
+- undocumented change: filters stopped accepting `""` and `"Microtransactions"` item classes
+
 ### 3.14.0b - invisible items fix
 
 - [patch notes](https://www.pathofexile.com/forum/view-thread/3085367)
