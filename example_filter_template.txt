@@ -1662,9 +1662,9 @@ Class == "Metamorph Sample" {
 
 	Class == "Quest Items" { Show }
 
-	# I don't know any droppable items of these classes
+	# I don't know any droppable items of this class
 	# but since they exist better make a block for them
-	Class == "Hideout Doodads" "Microtransactions" { Show }
+	Class == "Microtransactions" { Show }
 }
 
 Class == "Divination Card" {

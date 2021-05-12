@@ -6,6 +6,13 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 
 *newest at the top*
 
+### 3.14.0b - invisible items fix
+
+- [patch notes](https://www.pathofexile.com/forum/view-thread/3085367)
+- [bug report](https://www.pathofexile.com/forum/view-thread/3084331)
+- [reddit thread](https://www.reddit.com/r/pathofexile/comments/mtcsw6/significant_bug_within_item_filters_invisible/)
+- *Fixed a bug where Item Filters could set item labels to be completely transparent when using certain `Continue` statements.*
+
 ### 3.14 (Ultimatum) - [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3079980)
 
 - No new filter features. Only name changes within existing item classes.
