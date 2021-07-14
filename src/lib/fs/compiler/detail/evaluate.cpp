@@ -36,7 +36,19 @@ evaluate_name_as_object(
 
 	const auto it = symbols.objects.find(name.value.value);
 	if (it == symbols.objects.end()) {
-		push_error_no_such_name(parser::position_tag_of(name), diagnostics);
+		if (const auto tit = symbols.trees.find(name.value.value); tit == symbols.trees.end()) {
+			push_error_no_such_name(name_origin, diagnostics);
+		}
+		else {
+			diagnostics.push_back(make_error(
+				dmid::type_mismatch,
+				name_origin,
+				"type mismatch in expression, expected primitive language type but got subtree object"));
+			diagnostics.push_back(make_note_minor(
+				boost::none,
+				"if you want to assign a subtree write \"$y = { Expand $x }\""));
+		}
+
 		return boost::none;
 	}
 

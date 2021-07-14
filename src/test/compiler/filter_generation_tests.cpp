@@ -320,8 +320,10 @@ $actions = {
 	SetTextColor $x
 }
 
+$actions_copy = { Expand $actions }
+
 SetFontSize 36
-Expand $actions
+Expand $actions_copy
 Rarity Rare {
 	Show
 }
