@@ -1,5 +1,6 @@
 #include <fs/gui/application.hpp>
 #include <fs/gui/auxiliary/widgets.hpp>
+#include <fs/gui/windows/filter_windows_fwd.hpp>
 #include <fs/utility/file.hpp>
 #include <fs/version.hpp>
 
@@ -159,10 +160,10 @@ void application::draw_main_menu_bar()
 
 			ImGui::Separator();
 
-			if (ImGui::MenuItem("Spirit filter - from text input"))
-				_spirit_filters.push_back(spirit_filter_window::from_text_input(*this));
-			if (ImGui::MenuItem("Real filter - from text input"))
-				_real_filters.push_back(real_filter_window::from_text_input(*this));
+			if (ImGui::MenuItem(str_spirit_filter_from_text_input))
+				_filters.push_back(spirit_filter_window_from_text_input(*this));
+			if (ImGui::MenuItem(str_real_filter_from_text_input))
+				_filters.push_back(real_filter_window_from_text_input(*this));
 
 			ImGui::Separator();
 
@@ -263,10 +264,8 @@ void application::drawEvent()
 
 	_application_log.draw();
 
-	for (auto& window : _spirit_filters)
-		window.draw();
-	for (auto& window : _real_filters)
-		window.draw();
+	for (auto& window : _filters)
+		window->draw();
 
 	_color_picker.draw();
 	_single_item_preview.draw();
@@ -317,18 +316,12 @@ void application::remove_closed_windows()
 {
 	// remove dynamically created windows that have been closed
 	// (with a pretty 1-statement STL erase-remove idiom)
-	_spirit_filters.erase(
+	_filters.erase(
 		std::remove_if(
-			_spirit_filters.begin(),
-			_spirit_filters.end(),
-			[](const spirit_filter_window& w){ return !w.is_opened(); }),
-		_spirit_filters.end());
-	_real_filters.erase(
-		std::remove_if(
-			_real_filters.begin(),
-			_real_filters.end(),
-			[](const real_filter_window& w){ return !w.is_opened(); }),
-		_real_filters.end());
+			_filters.begin(),
+			_filters.end(),
+			[](const std::unique_ptr<imgui_window>& ptr){ return !ptr->is_opened(); }),
+		_filters.end());
 }
 
 void application::process_open_file_modals()
@@ -353,19 +346,19 @@ void application::process_open_file_modals()
 		if (_modal_dialog_state == modal_dialog_state_type::open_spirit_filter) {
 #ifdef __EMSCRIPTEN__
 			if (result.file_name && result.file_content)
-				_spirit_filters.push_back(spirit_filter_window::from_source(*this, *result.file_name, *result.file_content));
+				_filters.push_back(spirit_filter_window_from_source(*this, *result.file_name, *result.file_content));
 #else
 			if (result.file_path)
-				_spirit_filters.push_back(spirit_filter_window::from_file(*this, *result.file_path));
+				_filters.push_back(spirit_filter_window_from_file(*this, *result.file_path));
 #endif
 		}
 		else if (_modal_dialog_state == modal_dialog_state_type::open_real_filter) {
 #ifdef __EMSCRIPTEN__
 			if (result.file_name && result.file_content)
-				_real_filters.push_back(real_filter_window::from_source(*this, *result.file_name, *result.file_content));
+				_filters.push_back(real_filter_window_from_source(*this, *result.file_name, *result.file_content));
 #else
 			if (result.file_path)
-				_real_filters.push_back(real_filter_window::from_file(*this, *result.file_path));
+				_filters.push_back(real_filter_window_from_file(*this, *result.file_path));
 #endif
 		}
 

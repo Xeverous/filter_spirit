@@ -1,6 +1,6 @@
 #pragma once
 
-#include <fs/gui/windows/filter_windows.hpp>
+#include <fs/gui/imgui_window.hpp>
 #include <fs/gui/windows/color_picker_window.hpp>
 #include <fs/gui/windows/single_item_preview_window.hpp>
 #include <fs/gui/windows/settings_window.hpp>
@@ -27,6 +27,7 @@
 
 #include <vector>
 #include <optional>
+#include <memory>
 
 namespace fs::gui {
 
@@ -113,8 +114,7 @@ private:
 	modal_dialog_state_type _modal_dialog_state = modal_dialog_state_type::none;
 	aux::open_file_dialog _open_file_dialog;
 
-	std::vector<spirit_filter_window> _spirit_filters;
-	std::vector<real_filter_window> _real_filters;
+	std::vector<std::unique_ptr<imgui_window>> _filters;
 
 	color_picker_window _color_picker;
 	single_item_preview_window _single_item_preview;

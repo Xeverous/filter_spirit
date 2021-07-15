@@ -1,3 +1,4 @@
+#include <fs/gui/windows/filter_windows_fwd.hpp>
 #include <fs/gui/windows/filter_windows.hpp>
 #include <fs/gui/application.hpp>
 
@@ -15,9 +16,6 @@ ImVec2 drawable_area_size()
 	result.y -= ImGui::GetFontSize();
 	return result;
 }
-
-constexpr auto str_real_filter_text_input = "Real filter - from text input";
-constexpr auto str_spirit_filter_text_input = "Spirit filter - from text input";
 
 std::string make_title(const source_state& state, const char* text_input_title)
 {
@@ -41,6 +39,38 @@ std::string make_title(const source_state& state, const char* text_input_title)
 }
 
 namespace fs::gui {
+
+#ifndef __EMSCRIPTEN__
+std::unique_ptr<imgui_window> real_filter_window_from_file(application& app, std::string path)
+{
+	return std::make_unique<real_filter_window>(real_filter_window::from_file(app, std::move(path)));
+}
+
+std::unique_ptr<imgui_window> spirit_filter_window_from_file(application& app, std::string path)
+{
+	return std::make_unique<spirit_filter_window>(spirit_filter_window::from_file(app, std::move(path)));
+}
+#endif
+
+std::unique_ptr<imgui_window> real_filter_window_from_text_input(application& app)
+{
+	return std::make_unique<real_filter_window>(real_filter_window::from_text_input(app));
+}
+
+std::unique_ptr<imgui_window> spirit_filter_window_from_text_input(application& app)
+{
+	return std::make_unique<spirit_filter_window>(spirit_filter_window::from_text_input(app));
+}
+
+std::unique_ptr<imgui_window> real_filter_window_from_source(application& app, std::string name, std::string source)
+{
+	return std::make_unique<real_filter_window>(real_filter_window::from_source(app, std::move(name), std::move(source)));
+}
+
+std::unique_ptr<imgui_window> spirit_filter_window_from_source(application& app, std::string name, std::string source)
+{
+	return std::make_unique<spirit_filter_window>(spirit_filter_window::from_source(app, std::move(name), std::move(source)));
+}
 
 real_filter_window::real_filter_window(application& app)
 : imgui_window({}, drawable_area_size())
@@ -75,7 +105,7 @@ real_filter_window real_filter_window::from_source(application& app, std::string
 
 void real_filter_window::draw_contents()
 {
-	title(make_title(_state.source(), str_real_filter_text_input));
+	title(make_title(_state.source(), str_real_filter_from_text_input));
 	_state.draw_interface(_application.get());
 }
 
@@ -113,7 +143,7 @@ spirit_filter_window spirit_filter_window::from_source(application& app, std::st
 
 void spirit_filter_window::draw_contents()
 {
-	title(make_title(_state.source(), str_spirit_filter_text_input));
+	title(make_title(_state.source(), str_spirit_filter_from_text_input));
 	_state.draw_interface(_application.get());
 }
 
