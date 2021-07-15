@@ -69,9 +69,70 @@ void for_each_item(std::string_view json_str, log::logger& logger, F f)
 }
 
 [[nodiscard]] const std::string&
-get_item_name(const nlohmann::json& item)
+get_item_property_name(const nlohmann::json& item)
 {
 	return item.at("name").get_ref<const std::string&>();
+}
+
+[[nodiscard]] bool
+get_item_property_corrupted(const nlohmann::json& item)
+{
+	if (const auto it = item.find("corrupted"); it == item.end())
+		return false;
+	else
+		return it->get<bool>();
+}
+
+[[nodiscard]] int
+get_item_property_gem_quality(const nlohmann::json& item)
+{
+	if (const auto it = item.find("gemQuality"); it == item.end())
+		return 0;
+	else
+		return it->get<int>();
+}
+
+[[nodiscard]] int
+get_item_property_links(const nlohmann::json& item)
+{
+	if (const auto it = item.find("links"); it == item.end())
+		return 0;
+	else
+		return it->get<int>();
+}
+
+[[nodiscard]] int
+get_item_property_stack_size(const nlohmann::json& item)
+{
+	if (const auto it = item.find("stackSize"); it == item.end())
+		return 1;
+	else
+		return it->get<int>();
+}
+
+
+[[nodiscard]] lang::influence_info
+get_item_property_influence_info(const nlohmann::json& item)
+{
+	const auto it = item.find("variant");
+	if (it == item.end())
+		return {};
+
+	if (it->is_null())
+		return {};
+
+	const auto& infl = it->get_ref<const nlohmann::json::string_t&>();
+
+	// poe.ninja reports influence in strings as "X" or "X/Y"
+	// so we can safely use string-contains approach
+	return lang::influence_info{
+		utility::contains(infl, "Shaper"),
+		utility::contains(infl, "Elder"),
+		utility::contains(infl, "Crusader"),
+		utility::contains(infl, "Redeemer"),
+		utility::contains(infl, "Hunter"),
+		utility::contains(infl, "Warlord")
+	};
 }
 
 [[nodiscard]] lang::market::price_data // (only for currency overview items)
@@ -106,7 +167,7 @@ get_elementary_item_data(const nlohmann::json& item)
 {
 	return lang::market::elementary_item{
 		get_item_price_data(item),
-		get_item_name(item),
+		get_item_property_name(item),
 	};
 }
 
@@ -141,7 +202,7 @@ parse_prophecies(std::string_view json_str, log::logger& logger)
 
 	for_each_item(json_str, logger, [&](const auto& item) {
 		// Skip drop-disabled prophecies. Game rejects filters with them.
-		if (lang::market::is_drop_disabled_prophecy(get_item_name(item)))
+		if (lang::market::is_drop_disabled_prophecy(get_item_property_name(item)))
 			return;
 
 		result.push_back(get_elementary_item_data(item));
@@ -158,7 +219,7 @@ parse_divination_cards(std::string_view json_str, log::logger& logger)
 	for_each_item(json_str, logger, [&](const nlohmann::json& item) {
 		result.emplace_back(
 			get_elementary_item_data(item),
-			item.at("stackSize").get<int>()
+			get_item_property_stack_size(item)
 		);
 	});
 
@@ -171,7 +232,7 @@ parse_gems(std::string_view json_str, log::logger& logger)
 	std::vector<lang::market::gem> result;
 
 	auto is_alternate_quality_gem = [](const nlohmann::json& item) {
-		const std::string& name = get_item_name(item);
+		const std::string& name = get_item_property_name(item);
 
 		if (utility::contains(name, lang::keywords::rf::divergent))
 			return true;
@@ -197,8 +258,8 @@ parse_gems(std::string_view json_str, log::logger& logger)
 			result.emplace_back(
 				get_elementary_item_data(item),
 				item.at("gemLevel").get<int>(),
-				item.at("gemQuality").get<int>(),
-				item.at("corrupted").get<bool>()
+				get_item_property_gem_quality(item),
+				get_item_property_corrupted(item)
 			);
 		}
 	});
@@ -212,35 +273,13 @@ parse_bases(std::string_view json_str, log::logger& logger)
 	std::vector<lang::market::base> result;
 
 	for_each_item(json_str, logger, [&](const nlohmann::json& item) {
-		const auto& item_influence = item.at("variant");
 		// yes, not really a proper name but poe.ninja reuses some fields for other purposes
 		const auto item_level = item.at("levelRequired").get<int>();
-
-		if (item_influence.is_null()) {
-			result.emplace_back(
-				get_elementary_item_data(item),
-				item_level,
-				lang::influence_info{}
-			);
-		}
-		else {
-			const auto& infl = item_influence.get_ref<const nlohmann::json::string_t&>();
-
-			// poe.ninja reports influence in strings as "X" or "X/Y"
-			// so we can safely use string-contains approach
-			result.emplace_back(
-				get_elementary_item_data(item),
-				item_level,
-				lang::influence_info{
-					utility::contains(infl, "Shaper"),
-					utility::contains(infl, "Elder"),
-					utility::contains(infl, "Crusader"),
-					utility::contains(infl, "Redeemer"),
-					utility::contains(infl, "Hunter"),
-					utility::contains(infl, "Warlord")
-				}
-			);
-		}
+		result.emplace_back(
+			get_elementary_item_data(item),
+			item_level,
+			get_item_property_influence_info(item)
+		);
 	});
 
 	return result;
@@ -253,7 +292,7 @@ void parse_and_fill_uniques(
 {
 	for_each_item(uniques_json, logger, [&](const nlohmann::json& item) {
 		// skip uniques which are linked
-		if (item.at("links").get<int>() == 6) {
+		if (get_item_property_links(item) == 6) {
 			return;
 		}
 
@@ -268,7 +307,7 @@ void parse_and_fill_uniques(
 
 		// skip uniques which do not drop (eg fated items) - this will reduce ambiguity and
 		// not pollute the filter with items we would not care for
-		const auto& name = item.at("name").get_ref<const nlohmann::json::string_t&>();
+		const auto& name = get_item_property_name(item);
 		if (lang::market::is_undroppable_unique(name)) {
 			return;
 		}

@@ -32,13 +32,13 @@ struct elementary_item
 
 struct divination_card : elementary_item
 {
-	divination_card(elementary_item ei, int stack_size)
-	: elementary_item(std::move(ei)), stack_size(stack_size) {}
+	divination_card(elementary_item ei, int max_stack_size)
+	: elementary_item(std::move(ei)), max_stack_size(max_stack_size) {}
 
-	divination_card(price_data price, std::string name, int stack_size)
-	: elementary_item{price, std::move(name)}, stack_size(stack_size) {}
+	divination_card(price_data price, std::string name, int max_stack_size)
+	: elementary_item{price, std::move(name)}, max_stack_size(max_stack_size) {}
 
-	int stack_size;
+	int max_stack_size;
 };
 
 struct gem : elementary_item

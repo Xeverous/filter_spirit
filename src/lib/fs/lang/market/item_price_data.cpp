@@ -192,21 +192,21 @@ void compare_item_price_data(
 	{
 		const auto compare_div_card_eq =
 			[](const divination_card& lhs, const divination_card& rhs) {
-				return lhs.stack_size == rhs.stack_size && lhs.name == rhs.name;
+				return lhs.max_stack_size == rhs.max_stack_size && lhs.name == rhs.name;
 			};
 
 		const auto compare_div_card_lt =
 			[](const divination_card& lhs, const divination_card& rhs) {
-				return std::tie(lhs.name, lhs.stack_size) < std::tie(rhs.name, rhs.stack_size);
+				return std::tie(lhs.name, lhs.max_stack_size) < std::tie(rhs.name, rhs.max_stack_size);
 			};
 
 		boost::format lhs_fmter("%-47s %2s |\n");
-		const auto report_lhs = [&](const divination_card& c) { stream << (lhs_fmter % c.name % c.stack_size).str(); };
+		const auto report_lhs = [&](const divination_card& c) { stream << (lhs_fmter % c.name % c.max_stack_size).str(); };
 
 		boost::format rhs_fmter("                                                   | %-47s %2s\n");
-		const auto report_rhs = [&](const divination_card& c) { stream << (rhs_fmter % c.name % c.stack_size).str(); };
+		const auto report_rhs = [&](const divination_card& c) { stream << (rhs_fmter % c.name % c.max_stack_size).str(); };
 
-		stream << "divination cards (name + stack size): " << lhs.divination_cards.size()
+		stream << "divination cards (name + max stack size): " << lhs.divination_cards.size()
 			<< " vs " << rhs.divination_cards.size() << '\n';
 		utility::diff_report(
 			lhs.divination_cards.begin(), lhs.divination_cards.end(),
