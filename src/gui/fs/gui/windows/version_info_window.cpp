@@ -55,7 +55,7 @@ version_info_window::version_info_window()
 {
 }
 
-void version_info_window::draw_contents()
+void version_info_window::draw_impl()
 {
 	const auto line_width = ImGui::GetFontSize() * 15.0f;
 	// __DATE__ has ugly "Mmm dd yyyy" format for legacy reasons, reorder it to ISO 8601

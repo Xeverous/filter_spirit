@@ -22,21 +22,20 @@ namespace {
 
 using namespace fs;
 
-void load_item_database(std::optional<lang::loot::item_database>& database, log::logger& logger)
+void load_item_database(lang::loot::item_database& database, log::logger& logger)
 {
 	logger.info() << "loading item database...\n";
 
-	std::optional<std::string> item_metadata_json = fs::utility::load_file("data/base_items.json", logger);
-	if (!item_metadata_json) {
-		logger.error() << "Failed to load item metadata, loot preview will be disabled.\n";
+	constexpr auto str_error_msg = "Failed to load item data, loot generation will not produce any items.\n";
+
+	std::optional<std::string> item_data_json = fs::utility::load_file("data/base_items.json", logger);
+	if (!item_data_json) {
+		logger.error() << str_error_msg;
 		return;
 	}
 
-	database.emplace();
-
-	if (!(*database).parse(*item_metadata_json, logger)) {
-		logger.error() << "Failed to parse item metadata, loot preview will be disabled.\n";
-		database = std::nullopt;
+	if (!database.parse(*item_data_json, logger)) {
+		logger.error() << str_error_msg;
 		return;
 	}
 
@@ -53,9 +52,6 @@ application::application(const Arguments& arguments)
 	Configuration{}
 		.setTitle("Filter Spirit v" + to_string(fs::version::current()))
 		.setWindowFlags(Configuration::WindowFlag::Resizable)}
-, _application_log(font_settings())
-, _color_picker(*this)
-, _settings(*this)
 {
 	if (auto ctx = ImGui::CreateContext(); ctx == nullptr) {
 		throw std::runtime_error("Failed to initialize Dear ImGui library!");
@@ -68,7 +64,7 @@ application::application(const Arguments& arguments)
 	 * for more details, see documentation of Magnum::ImGuiIntegration::Context
 	 */
 	_application_log.logger().info() << "Loading and building fonts...\n";
-	_fonting.build_default_fonts();
+	_settings.settings().fonting.build_default_fonts();
 	_application_log.logger().info() << "Fonts ready.\n";
 
 	_application_log.logger().info() << "Creating rendering context...\n";
@@ -87,13 +83,13 @@ application::application(const Arguments& arguments)
 		Magnum::GL::Renderer::BlendFunction::OneMinusSourceAlpha);
 
 #if !defined(MAGNUM_TARGET_WEBGL) && !defined(CORRADE_TARGET_ANDROID)
-	setMinimalLoopPeriod(_settings.min_frame_time_ms());
+	setMinimalLoopPeriod(_settings.settings().min_frame_time_ms);
 #endif
 
 	load_item_database(_item_database, _application_log.logger());
-	_leagues_cache.set_leagues(network::load_leagues_from_disk(_application_log.logger()));
-	_price_report_cache.load_cache_file_from_disk(_application_log.logger());
-	_theming.apply_current_theme();
+	_network_cache.leagues.set_leagues(network::load_leagues_from_disk(_application_log.logger()));
+	_network_cache.item_price_reports.load_cache_file_from_disk(_application_log.logger());
+	_settings.settings().theming.apply_current_theme();
 
 	_application_log.logger().info() << "Application initialized.\n";
 }
@@ -161,9 +157,9 @@ void application::draw_main_menu_bar()
 			ImGui::Separator();
 
 			if (ImGui::MenuItem(str_spirit_filter_from_text_input))
-				_filters.push_back(spirit_filter_window_from_text_input(*this));
+				_filters.push_back(spirit_filter_window_from_text_input(_network_cache));
 			if (ImGui::MenuItem(str_real_filter_from_text_input))
-				_filters.push_back(real_filter_window_from_text_input(*this));
+				_filters.push_back(real_filter_window_from_text_input());
 
 			ImGui::Separator();
 
@@ -262,14 +258,14 @@ void application::drawEvent()
 
 	draw_main_menu_bar();
 
-	_application_log.draw();
+	_application_log.draw(_settings.settings().fonting);
 
 	for (auto& window : _filters)
-		window->draw();
+		window->draw(_settings.settings(), _item_database, _loot_generator, _network_cache);
 
-	_color_picker.draw();
+	_color_picker.draw(_settings.settings().fonting);
 	_single_item_preview.draw();
-	_settings.draw();
+	_settings.draw(*this);
 	_about.draw();
 	_version_info.draw();
 
@@ -320,7 +316,7 @@ void application::remove_closed_windows()
 		std::remove_if(
 			_filters.begin(),
 			_filters.end(),
-			[](const std::unique_ptr<imgui_window>& ptr){ return !ptr->is_opened(); }),
+			[](const std::unique_ptr<filter_window>& ptr){ return !ptr->is_opened(); }),
 		_filters.end());
 }
 
@@ -346,19 +342,19 @@ void application::process_open_file_modals()
 		if (_modal_dialog_state == modal_dialog_state_type::open_spirit_filter) {
 #ifdef __EMSCRIPTEN__
 			if (result.file_name && result.file_content)
-				_filters.push_back(spirit_filter_window_from_source(*this, *result.file_name, *result.file_content));
+				_filters.push_back(spirit_filter_window_from_source(_network_cache, *result.file_name, *result.file_content));
 #else
 			if (result.file_path)
-				_filters.push_back(spirit_filter_window_from_file(*this, *result.file_path));
+				_filters.push_back(spirit_filter_window_from_file(_network_cache, *result.file_path));
 #endif
 		}
 		else if (_modal_dialog_state == modal_dialog_state_type::open_real_filter) {
 #ifdef __EMSCRIPTEN__
 			if (result.file_name && result.file_content)
-				_filters.push_back(real_filter_window_from_source(*this, *result.file_name, *result.file_content));
+				_filters.push_back(real_filter_window_from_source(*result.file_name, *result.file_content));
 #else
 			if (result.file_path)
-				_filters.push_back(real_filter_window_from_file(*this, *result.file_path));
+				_filters.push_back(real_filter_window_from_file(*result.file_path));
 #endif
 		}
 
@@ -371,12 +367,12 @@ void application::rebuild_pending_fonts()
 	// note: all of code below in this function has significant order requirements
 	// otherwise the program crashes due to font/rendering dependency shenanigans
 	// care when changing this function, for more - see implementation of fonting
-	if (_fonting.is_rebuild_needed()) {
-		_fonting.rebuild();
+	if (_settings.settings().fonting.is_rebuild_needed()) {
+		_settings.settings().fonting.rebuild();
 		_imgui.relayout(windowSize());
 	}
 
-	_fonting.update();
+	_settings.settings().fonting.update();
 }
 
 } // namespace fs::gui

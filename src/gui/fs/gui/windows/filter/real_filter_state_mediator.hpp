@@ -39,9 +39,9 @@ public:
 private:
 	void new_parsed_real_filter(std::optional<parser::parsed_real_filter> parsed_real_filter);
 
-	void draw_interface_derived(application& app) override;
+	void draw_interface_derived(const network_settings& networking, network::cache& cache) override;
 	void draw_interface_save_filter(const lang::item_filter& /* filter */, log::logger& /* logger */) override {}
-	void draw_interface_logs_derived(gui_logger& gl, const fonting& f) override;
+	void draw_interface_logs_derived(gui_logger& gl, const font_settings& fonting) override;
 
 	std::optional<parser::parsed_real_filter> _parsed_real_filter;
 	log::buffer_logger _logger;

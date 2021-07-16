@@ -76,9 +76,9 @@ private:
 		const lang::spirit_item_filter* spirit_filter,
 		const lang::market::item_price_data& item_price_data);
 
-	void draw_interface_derived(application& app) override;
+	void draw_interface_derived(const network_settings& networking, network::cache& cache) override;
 	void draw_interface_save_filter(const lang::item_filter& filter, log::logger& logger) override;
-	void draw_interface_logs_derived(gui_logger& gl, const fonting& f) override;
+	void draw_interface_logs_derived(gui_logger& gl, const font_settings& fonting) override;
 
 	void draw_interface_parsed_spirit_filter();
 	void draw_interface_spirit_filter_symbols();

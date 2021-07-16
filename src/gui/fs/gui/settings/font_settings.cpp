@@ -1,4 +1,4 @@
-#include <fs/gui/settings/fonting.hpp>
+#include <fs/gui/settings/font_settings.hpp>
 #include <fs/utility/assert.hpp>
 #include <fs/utility/file.hpp>
 
@@ -60,7 +60,7 @@ void font::load()
 		throw std::system_error(ec, "failed to load " + _path);
 }
 
-fonting::fonting()
+font_settings::font_settings()
 {
 #define FONTS_PATH "assets/fonts"
 	_text_fonts.emplace_back(FONTS_PATH "/fontin/Fontin-SmallCaps.otf", "Fontin SmallCaps");
@@ -86,14 +86,14 @@ fonting::fonting()
 #undef FONTS_PATH
 }
 
-void fonting::build_default_fonts()
+void font_settings::build_default_fonts()
 {
 	FS_ASSERT(!_text_fonts.empty());
 	FS_ASSERT(!_monospaced_fonts.empty());
 	rebuild();
 }
 
-void fonting::draw_font_selection_ui()
+void font_settings::draw_font_selection_ui()
 {
 	draw_font_selection_ui_impl("Application font", "Application font size (px)",
 		_text_fonts, _selected_text_font_index, _text_font_size, _rebuild_needed);
@@ -104,7 +104,7 @@ void fonting::draw_font_selection_ui()
 		_update_needed = true;
 }
 
-ImFont* fonting::filter_preview_font(int size) const
+ImFont* font_settings::filter_preview_font(int size) const
 {
 	FS_ASSERT(size >= lang::limits::min_filter_font_size);
 	FS_ASSERT(size <= lang::limits::max_filter_font_size);
@@ -115,7 +115,7 @@ ImFont* fonting::filter_preview_font(int size) const
 	return result;
 }
 
-void fonting::update()
+void font_settings::update()
 {
 	if (!_update_needed)
 		return;
@@ -128,7 +128,7 @@ void fonting::update()
 	_update_needed = false;
 }
 
-void fonting::rebuild()
+void font_settings::rebuild()
 {
 	ImGuiIO& io = ImGui::GetIO();
 	FS_ASSERT(io.Fonts != nullptr);

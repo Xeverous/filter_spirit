@@ -1,11 +1,11 @@
-#include <fs/gui/settings/networking.hpp>
+#include <fs/gui/settings/network_settings.hpp>
 #include <fs/gui/auxiliary/widgets.hpp>
 
 #include <imgui.h>
 
 namespace fs::gui {
 
-void networking::draw_interface()
+void network_settings::draw_interface()
 {
 	ImGui::TextWrapped(
 		"These options are only relevant for spirit filter templates that "

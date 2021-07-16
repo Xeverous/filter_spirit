@@ -35,6 +35,7 @@ target_sources(filter_spirit_gui
 		fs/gui/application.hpp
 		fs/gui/gui_logger.cpp
 		fs/gui/gui_logger.hpp
+		fs/gui/gui_settings.hpp
 		fs/gui/imgui_window.hpp
 		fs/gui/auxiliary/color_convert.hpp
 		fs/gui/auxiliary/colors.hpp
@@ -44,15 +45,13 @@ target_sources(filter_spirit_gui
 		fs/gui/auxiliary/rect.hpp
 		fs/gui/auxiliary/widgets.cpp
 		fs/gui/auxiliary/widgets.hpp
-		fs/gui/settings/fonting.cpp
-		fs/gui/settings/fonting.hpp
-		fs/gui/settings/theming.cpp
-		fs/gui/settings/theming.hpp
-		fs/gui/settings/networking.cpp
-		fs/gui/settings/networking.hpp
-		fs/gui/windows/about_window.cpp
+		fs/gui/settings/font_settings.cpp
+		fs/gui/settings/font_settings.hpp
+		fs/gui/settings/theme_settings.cpp
+		fs/gui/settings/theme_settings.hpp
+		fs/gui/settings/network_settings.cpp
+		fs/gui/settings/network_settings.hpp
 		fs/gui/windows/about_window.hpp
-		fs/gui/windows/application_log_window.cpp
 		fs/gui/windows/application_log_window.hpp
 		fs/gui/windows/color_picker_window.cpp
 		fs/gui/windows/color_picker_window.hpp

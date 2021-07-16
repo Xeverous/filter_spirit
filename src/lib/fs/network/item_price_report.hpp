@@ -92,4 +92,10 @@ private:
 	std::vector<lang::market::item_price_report> _memory_cache;
 };
 
+struct cache
+{
+	leagues_cache leagues;
+	item_price_report_cache item_price_reports;
+};
+
 }

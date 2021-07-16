@@ -1,6 +1,6 @@
 #include <fs/gui/windows/filter/debug_state.hpp>
 #include <fs/gui/windows/filter/item_tooltip.hpp>
-#include <fs/gui/settings/fonting.hpp>
+#include <fs/gui/settings/font_settings.hpp>
 #include <fs/gui/auxiliary/widgets.hpp>
 #include <fs/parser/parser.hpp>
 #include <fs/lang/item.hpp>
@@ -212,13 +212,13 @@ float draw_debug_interface_impl(
 	const lang::item_filtering_result& /* result */,
 	const parser::line_lookup& lines,
 	const std::vector<ImU32>& line_colors,
-	const gui::fonting& f,
+	const gui::font_settings& fonting,
 	float offset_y)
 {
-	const auto _1 = f.scoped_monospaced_font();
+	const auto _1 = fonting.scoped_monospaced_font();
 
-	const auto first_column_width = get_item_tooltip_first_column_width(f);
-	const auto second_column_width = get_item_tooltip_second_column_width(itm, f);
+	const auto first_column_width = get_item_tooltip_first_column_width(fonting);
+	const auto second_column_width = get_item_tooltip_second_column_width(itm, fonting);
 
 	ImGui::Columns(3);
 
@@ -323,7 +323,7 @@ void debug_state::recompute(const parser::parse_metadata& metadata)
 	color_line_by_origin(style.visibility.origin, metadata, _line_colors, color_background_matched_visibility);
 }
 
-void debug_state::draw_interface(const fonting& f, const parser::parse_metadata* metadata)
+void debug_state::draw_interface(const font_settings& fonting, const parser::parse_metadata* metadata)
 {
 	if (_popup_pending) {
 		ImGui::OpenPopup(debug_popup_title);
@@ -337,7 +337,8 @@ void debug_state::draw_interface(const fonting& f, const parser::parse_metadata*
 	ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize); // take whole space
 	if (ImGui::BeginPopupModal(debug_popup_title, &_popup_open, ImGuiWindowFlags_NoResize)) {
 		const debug_info& info = *_info;
-		_drawing_offset_y = draw_debug_interface_impl(info.itm.get(), info.result.get(), metadata->lines, _line_colors, f, _drawing_offset_y);
+		_drawing_offset_y = draw_debug_interface_impl(
+			info.itm.get(), info.result.get(), metadata->lines, _line_colors, fonting, _drawing_offset_y);
 		ImGui::EndPopup();
 	}
 }

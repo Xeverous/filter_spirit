@@ -21,7 +21,7 @@ struct item_filtering_result;
 
 namespace fs::gui {
 
-class fonting;
+class font_settings;
 
 struct debug_info
 {
@@ -65,7 +65,7 @@ public:
 
 	void recompute(const parser::parse_metadata& metadata);
 
-	void draw_interface(const fonting& f, const parser::parse_metadata* metadata);
+	void draw_interface(const font_settings& fonting, const parser::parse_metadata* metadata);
 
 private:
 	// popup state

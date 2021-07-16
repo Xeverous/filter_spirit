@@ -59,10 +59,10 @@ constexpr int num_item_preview_fonts()
 	return lang::limits::max_filter_font_size - lang::limits::min_filter_font_size + 1;
 }
 
-class fonting
+class font_settings
 {
 public:
-	fonting();
+	font_settings();
 
 	void build_default_fonts();
 

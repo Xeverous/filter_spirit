@@ -1,16 +1,17 @@
 #pragma once
 
-#include <fs/gui/settings/fonting.hpp>
 #include <fs/log/buffer_logger.hpp>
 
-#include <functional>
+#include <cstddef>
 
 namespace fs::gui {
+
+class font_settings;
 
 class gui_logger
 {
 public:
-	void draw(const fonting& f, log::buffer_logger& logger);
+	void draw(const font_settings& fonting, log::buffer_logger& logger);
 
 private:
 	std::size_t _last_log_size = 0;

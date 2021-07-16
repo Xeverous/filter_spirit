@@ -1,7 +1,6 @@
 #include <fs/gui/windows/color_picker_window.hpp>
+#include <fs/gui/settings/font_settings.hpp>
 #include <fs/gui/auxiliary/color_convert.hpp>
-#include <fs/gui/application.hpp>
-
 #include <imgui.h>
 
 #include <string>
@@ -18,7 +17,12 @@ void button_click_to_copy(const char* text)
 
 namespace fs::gui {
 
-void color_picker_window::draw_contents()
+void color_picker_window::draw(const font_settings& fonting)
+{
+	draw_window([this, &fonting](){ draw_impl(fonting); });
+}
+
+void color_picker_window::draw_impl(const font_settings& fonting)
 {
 	const ImGuiColorEditFlags flags = ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_AlphaBar;
 	const ImVec4 button_color = {
@@ -27,14 +31,14 @@ void color_picker_window::draw_contents()
 		_selected_color.z(),
 		_selected_color.w()
 	};
-	const auto button_size = _application.font_settings().monospaced_font_size() * 4; // * 4 because we draw 4 lines of text
+	const auto button_size = fonting.monospaced_font_size() * 4; // * 4 because we draw 4 lines of text
 	ImGui::ColorButton("", button_color, flags, ImVec2(button_size, button_size));
 	ImGui::SameLine();
 	ImGui::TextUnformatted("click to copy\nthese strings");
 	ImGui::SameLine();
 
 	{
-		auto _ = _application.font_settings().scoped_monospaced_font();
+		auto _ = fonting.scoped_monospaced_font();
 		ImGui::BeginGroup();
 
 		const auto rgba = aux::to_rgba(_selected_color);

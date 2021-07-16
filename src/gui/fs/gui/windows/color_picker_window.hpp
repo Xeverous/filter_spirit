@@ -7,22 +7,19 @@
 
 namespace fs::gui {
 
-class application;
+class font_settings;
 
 class color_picker_window : public imgui_window
 {
 public:
-	color_picker_window(application& app)
-	: imgui_window("Color picker")
-	, _application(app)
-	{
-	}
+	color_picker_window()
+	: imgui_window("Color picker") {}
 
-protected:
-	void draw_contents() override;
+	void draw(const font_settings& fonting);
 
 private:
-	application& _application;
+	void draw_impl(const font_settings& fonting);
+
 	Magnum::Color4 _selected_color = Magnum::Color4::fromSrgbAlpha(0xffffffff);
 };
 

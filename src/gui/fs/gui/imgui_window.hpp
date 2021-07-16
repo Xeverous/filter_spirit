@@ -26,8 +26,6 @@ public:
 	{
 	}
 
-	virtual ~imgui_window() = default;
-
 	bool is_opened() const noexcept { return _is_opened; }
 
 	void open() { _is_opened = true; }
@@ -49,7 +47,10 @@ public:
 		return _title;
 	}
 
-	void draw()
+protected:
+	// function should draw contents
+	template <typename F>
+	void draw_window(F f)
 	{
 		if (!_is_opened)
 			return;
@@ -63,13 +64,10 @@ public:
 
 		ImGui::SetNextWindowSize(_size, ImGuiCond_FirstUseEver);
 		if (ImGui::Begin(_imgui_window_str.c_str(), &_is_opened))
-			draw_contents();
+			f();
 
 		ImGui::End();
 	}
-
-protected:
-	virtual void draw_contents() = 0;
 
 private:
 	void recompute_window_str()

@@ -56,7 +56,7 @@ void real_filter_state_mediator::on_parsed_real_filter_change(const parser::pars
 	new_filter_representation(utility::to_std_optional(std::move(result)));
 }
 
-void real_filter_state_mediator::draw_interface_derived(application& /* app */)
+void real_filter_state_mediator::draw_interface_derived(const network_settings& /* networking */, network::cache& /* cache */)
 {
 	if (ImGui::CollapsingHeader("Real filter abstract syntax tree", ImGuiTreeNodeFlags_DefaultOpen)) {
 		if (_parsed_real_filter) {
@@ -71,9 +71,9 @@ void real_filter_state_mediator::draw_interface_derived(application& /* app */)
 	}
 }
 
-void real_filter_state_mediator::draw_interface_logs_derived(gui_logger& gl, const fonting& f)
+void real_filter_state_mediator::draw_interface_logs_derived(gui_logger& gl, const font_settings& fonting)
 {
-	gl.draw(f, _logger);
+	gl.draw(fonting, _logger);
 }
 
 }

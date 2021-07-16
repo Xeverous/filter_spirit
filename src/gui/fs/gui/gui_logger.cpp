@@ -1,4 +1,5 @@
 #include <fs/gui/gui_logger.hpp>
+#include <fs/gui/settings/font_settings.hpp>
 #include <fs/gui/auxiliary/raii.hpp>
 
 #include <imgui.h>
@@ -39,7 +40,7 @@ void copy_to_clipboard(const std::vector<fs::log::buffer_logger::message>& messa
 
 namespace fs::gui {
 
-void gui_logger::draw(const fonting& f, log::buffer_logger& logger)
+void gui_logger::draw(const font_settings& fonting, log::buffer_logger& logger)
 {
 	if (ImGui::Button("clear logs")) {
 		logger.clear();
@@ -52,7 +53,7 @@ void gui_logger::draw(const fonting& f, log::buffer_logger& logger)
 		copy_to_clipboard(logger.messages());
 
 	if (ImGui::BeginChild("logs", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar)) {
-		const auto _1 = f.scoped_monospaced_font();
+		const auto _1 = fonting.scoped_monospaced_font();
 		const auto _2 = aux::scoped_text_color_override(IM_COL32(255, 255, 255, 255));
 
 		auto last_severity = log::severity::info;

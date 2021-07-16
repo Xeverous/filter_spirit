@@ -9,9 +9,20 @@
 #include <optional>
 #include <string>
 
+namespace fs::lang::loot {
+
+struct item_database;
+class generator;
+
+}
+
+namespace fs::network { struct cache; }
+
 namespace fs::gui {
 
-class fonting;
+class font_settings;
+class network_settings;
+struct gui_settings;
 
 class filter_state_mediator
 {
@@ -55,7 +66,11 @@ public:
 		return _filter_representation.has_value() ? &*_filter_representation : nullptr;
 	}
 
-	void draw_interface(application& app);
+	void draw(
+		const gui_settings& settings,
+		const lang::loot::item_database& db,
+		lang::loot::generator& gen,
+		network::cache& network_cache);
 
 	// template method pattern
 	virtual void draw_interface_save_filter(const lang::item_filter& filter, log::logger& logger) = 0;
@@ -65,15 +80,18 @@ protected:
 	filter_state_mediator& operator=(filter_state_mediator&& other) noexcept = default;
 
 	// template method pattern
-	virtual void draw_interface_logs_derived(gui_logger& gl, const fonting& f) = 0;
-	virtual void draw_interface_derived(application& app) = 0;
+	virtual void draw_interface_logs_derived(gui_logger& gl, const font_settings& fonting) = 0;
+	virtual void draw_interface_derived(const network_settings& networking, network::cache& cache) = 0;
 
 	void new_filter_representation(std::optional<lang::item_filter> filter_representation);
 
 private:
 	void draw_interface_filter_representation();
-	void draw_interface_logs(application& app);
-	void draw_interface_loot(application& app);
+	void draw_interface_logs(const font_settings& fonting);
+	void draw_interface_loot(
+		const font_settings& fonting,
+		const lang::loot::item_database& db,
+		lang::loot::generator& gen);
 
 	source_state _source; // first step
 	// << possible intermediate data in derived types >>

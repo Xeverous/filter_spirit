@@ -2,7 +2,7 @@
 
 namespace fs::gui {
 
-class theming
+class theme_settings
 {
 public:
 	void draw_theme_selection_ui();

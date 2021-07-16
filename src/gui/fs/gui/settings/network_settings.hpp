@@ -6,7 +6,7 @@
 
 namespace fs::gui {
 
-class networking
+class network_settings
 {
 public:
 	void draw_interface();

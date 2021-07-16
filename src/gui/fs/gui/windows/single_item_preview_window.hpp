@@ -14,9 +14,14 @@ public:
 	{
 	}
 
-	void draw_contents() override;
+	void draw()
+	{
+		draw_window([this]() { draw_impl(); });
+	}
 
 private:
+	void draw_impl();
+
 	std::array<char, 64> _item_name_buf = { "Item Preview" };
 };
 

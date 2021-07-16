@@ -10,7 +10,7 @@
 namespace fs::gui {
 
 class filter_state_mediator;
-class fonting;
+class font_settings;
 
 /**
  * @class represents text input to the program
@@ -27,7 +27,7 @@ public:
 
 	void open_source_edit();
 
-	void draw_interface(const fonting& f, filter_state_mediator& mediator);
+	void draw_interface(const font_settings& fonting, filter_state_mediator& mediator);
 
 	const std::string* source() const
 	{

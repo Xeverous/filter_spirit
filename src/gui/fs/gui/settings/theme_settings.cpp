@@ -1,4 +1,4 @@
-#include <fs/gui/settings/theming.hpp>
+#include <fs/gui/settings/theme_settings.hpp>
 
 #include <imgui.h>
 
@@ -454,7 +454,7 @@ const std::array<theme_data, 8> themes = {
 
 namespace fs::gui {
 
-void theming::draw_theme_selection_ui()
+void theme_settings::draw_theme_selection_ui()
 {
 	if (ImGui::BeginCombo("Color theme", current_theme_name())) {
 		for (int i = 0; i < num_themes(); ++i) {
@@ -470,17 +470,17 @@ void theming::draw_theme_selection_ui()
 	}
 }
 
-int theming::num_themes() const noexcept
+int theme_settings::num_themes() const noexcept
 {
 	return static_cast<int>(themes.size());
 }
 
-void theming::apply_current_theme() const
+void theme_settings::apply_current_theme() const
 {
 	themes[_current_theme_index].theme_func();
 }
 
-const char* theming::current_theme_name() const noexcept
+const char* theme_settings::current_theme_name() const noexcept
 {
 	return themes[current_theme_index()].name;
 }

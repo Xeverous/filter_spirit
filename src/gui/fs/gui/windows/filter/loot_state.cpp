@@ -1,13 +1,14 @@
 #include <fs/gui/windows/filter/loot_state.hpp>
 #include <fs/gui/windows/filter/item_tooltip.hpp>
 #include <fs/gui/windows/filter/filter_state_mediator.hpp>
-#include <fs/gui/application.hpp>
-#include <fs/gui/settings/fonting.hpp>
+#include <fs/gui/settings/font_settings.hpp>
 #include <fs/gui/auxiliary/widgets.hpp>
 #include <fs/gui/auxiliary/raii.hpp>
 #include <fs/gui/auxiliary/colors.hpp>
 #include <fs/lang/keywords.hpp>
 #include <fs/lang/limits.hpp>
+#include <fs/lang/loot/item_database.hpp>
+#include <fs/lang/loot/generator.hpp>
 #include <fs/utility/assert.hpp>
 
 #include <imgui.h>
@@ -23,15 +24,15 @@ using namespace fs;
 class item_label_data
 {
 public:
-	item_label_data(const lang::item& itm, int font_size, const gui::fonting& f)
+	item_label_data(const lang::item& itm, int font_size, const gui::font_settings& fonting)
 	{
 		if (itm.name)
-			_first_line_size = gui::aux::measure_text_line(*itm.name, font_size, f.filter_preview_font(font_size));
+			_first_line_size = gui::aux::measure_text_line(*itm.name, font_size, fonting.filter_preview_font(font_size));
 
 		const int sz = lang::snprintf_dropped_item_label(_second_line_buf.data(), _second_line_buf.size(), itm);
 		FS_ASSERT_MSG(sz >= 0, "snprintf should not return an error");
 		(void) sz; // shut warning if assert does not use variable
-		_second_line_size = gui::aux::measure_text_line(_second_line_buf.data(), font_size, f.filter_preview_font(font_size));
+		_second_line_size = gui::aux::measure_text_line(_second_line_buf.data(), font_size, fonting.filter_preview_font(font_size));
 
 		_whole_size = {
 			std::max(_first_line_size.x, _second_line_size.x) + 2.0f * padding_x,
@@ -209,7 +210,7 @@ void draw_item_label(
 	const item_label_data& ild,
 	const lang::item& itm,
 	const lang::item_filtering_result& result,
-	const gui::fonting& f)
+	const gui::font_settings& fonting)
 {
 	const ImVec2 item_size = ild.whole_size();
 	const ImVec2 item_end(item_begin.x + item_size.x, item_begin.y + item_size.y);
@@ -221,7 +222,7 @@ void draw_item_label(
 		draw_list->AddRect(item_begin, item_end, to_imgui_color((*result.style.border_color).c));
 
 	const auto font_size = result.style.font_size.size.value;
-	const auto fnt = f.filter_preview_font(font_size);
+	const auto fnt = fonting.filter_preview_font(font_size);
 
 	auto y = item_begin.y;
 
@@ -327,14 +328,12 @@ void loot_slider_range::draw(const char* str)
 		std::swap(min(), max());
 }
 
-void loot_state::draw_interface(application& app, filter_state_mediator& mediator)
+void loot_state::draw_interface(
+	const font_settings& fonting,
+	const lang::loot::item_database& db,
+	lang::loot::generator& gen,
+	filter_state_mediator& mediator)
 {
-	const std::optional<lang::loot::item_database>& database = app.item_database();
-	if (!database) {
-		ImGui::TextWrapped("Item database failed to load. Loot generation not available.");
-		return;
-	}
-
 	if (ImGui::Button("Clear"))
 		clear_items(mediator);
 
@@ -349,16 +348,15 @@ void loot_state::draw_interface(application& app, filter_state_mediator& mediato
 		aux::on_hover_text_tooltip("Shuffle items when new ones are generated.");
 	}
 
-	draw_loot_canvas(app.font_settings(), mediator);
+	draw_loot_canvas(fonting, mediator);
 
 	ImGui::BeginChild("loot buttons");
 
-	const lang::loot::item_database& db = *database;
 	draw_loot_settings_global();
-	draw_loot_buttons_currency        (db, app.loot_generator());
-	draw_loot_buttons_specific_classes(db, app.loot_generator());
-	draw_loot_buttons_gems            (db, app.loot_generator());
-	draw_loot_buttons_equipment       (db, app.loot_generator());
+	draw_loot_buttons_currency        (db, gen);
+	draw_loot_buttons_specific_classes(db, gen);
+	draw_loot_buttons_gems            (db, gen);
+	draw_loot_buttons_equipment       (db, gen);
 
 	ImGui::EndChild();
 
@@ -377,7 +375,7 @@ void loot_state::draw_interface(application& app, filter_state_mediator& mediato
 		}
 
 		if (_shuffle_loot)
-			std::shuffle(_items.begin(), _items.end(), app.loot_generator().rng());
+			std::shuffle(_items.begin(), _items.end(), gen.rng());
 
 		_last_items_size = _items.size();
 		mediator.on_loot_change();
@@ -596,7 +594,7 @@ void loot_state::draw_loot_buttons_equipment(const lang::loot::item_database& db
 	ImGui::EndChild();
 }
 
-void loot_state::draw_loot_canvas(const fonting& f, filter_state_mediator& mediator)
+void loot_state::draw_loot_canvas(const font_settings& fonting, filter_state_mediator& mediator)
 {
 	const ImVec2 canvas_begin = ImGui::GetCursorScreenPos(); // in screen coordinates
 	const ImVec2 canvas_size(ImGui::GetContentRegionAvail().x, ImGui::GetFontSize() * 8.0f);
@@ -606,7 +604,7 @@ void loot_state::draw_loot_canvas(const fonting& f, filter_state_mediator& media
 	draw_list->AddRectFilled(canvas_begin, canvas_end, IM_COL32(50, 50, 50, 255)); // draw background
 	draw_list->AddRect(canvas_begin, canvas_end, IM_COL32(255, 255, 255, 255)); // draw border
 
-	draw_item_labels(canvas_begin, canvas_end, f);
+	draw_item_labels(canvas_begin, canvas_end, fonting);
 
 	/*
 	 * The line below has multiple purposes:
@@ -636,7 +634,7 @@ void loot_state::draw_loot_canvas(const fonting& f, filter_state_mediator& media
 		if (!_items.empty())
 			ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeAll); // this lasts only 1 frame
 
-		on_canvas_hover(io.MousePos, f);
+		on_canvas_hover(io.MousePos, fonting);
 	}
 
 	// block from top because items are being rendered top-to-bottom
@@ -645,7 +643,7 @@ void loot_state::draw_loot_canvas(const fonting& f, filter_state_mediator& media
 		_canvas_offset_y = 0.0f;
 }
 
-void loot_state::draw_item_labels(ImVec2 canvas_begin, ImVec2 canvas_end, const fonting& f)
+void loot_state::draw_item_labels(ImVec2 canvas_begin, ImVec2 canvas_end, const font_settings& fonting)
 {
 	ImDrawList* const draw_list = ImGui::GetWindowDrawList();
 	draw_list->PushClipRect(canvas_begin, canvas_end, true);
@@ -661,7 +659,7 @@ void loot_state::draw_item_labels(ImVec2 canvas_begin, ImVec2 canvas_end, const 
 				continue;
 			}
 
-			const item_label_data ild(itm.itm, style.style.font_size.size.value, f);
+			const item_label_data ild(itm.itm, style.style.font_size.size.value, fonting);
 			const ImVec2 item_size = ild.whole_size();
 
 			// If the item does not fit in the current row...
@@ -680,7 +678,7 @@ void loot_state::draw_item_labels(ImVec2 canvas_begin, ImVec2 canvas_end, const 
 			if (item_begin.y > canvas_end.y)
 				break; // stop the loop - no more items in visible canvas area
 
-			draw_item_label(item_begin, ild, itm.itm, *itm.filtering_result, f);
+			draw_item_label(item_begin, ild, itm.itm, *itm.filtering_result, fonting);
 
 			itm.drawing = aux::rect{item_begin, item_size};
 
@@ -692,7 +690,7 @@ void loot_state::draw_item_labels(ImVec2 canvas_begin, ImVec2 canvas_end, const 
 	draw_list->PopClipRect();
 }
 
-void loot_state::on_canvas_hover(ImVec2 mouse_position, const fonting& f)
+void loot_state::on_canvas_hover(ImVec2 mouse_position, const font_settings& fonting)
 {
 	const looted_item* const ptr = find_item_by_mouse_position(_items, mouse_position);
 	if (ptr == nullptr)
@@ -700,7 +698,7 @@ void loot_state::on_canvas_hover(ImVec2 mouse_position, const fonting& f)
 
 	const auto& itm = *ptr;
 	if (itm.filtering_result)
-		draw_item_tooltip(itm.itm, *itm.filtering_result, f);
+		draw_item_tooltip(itm.itm, *itm.filtering_result, fonting);
 }
 
 void loot_state::on_canvas_right_click(ImVec2 mouse_position, filter_state_mediator& mediator)

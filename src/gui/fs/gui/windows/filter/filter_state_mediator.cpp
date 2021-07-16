@@ -1,5 +1,5 @@
 #include <fs/gui/windows/filter/filter_state_mediator.hpp>
-#include <fs/gui/application.hpp>
+#include <fs/gui/gui_settings.hpp>
 #include <fs/utility/file.hpp>
 
 #include <utility>
@@ -66,19 +66,23 @@ void filter_state_mediator::on_filter_results_clear()
 	_debug_state.invalidate();
 }
 
-void filter_state_mediator::draw_interface(application& app)
+void filter_state_mediator::draw(
+	const gui_settings& settings,
+	const lang::loot::item_database& db,
+	lang::loot::generator& gen,
+	network::cache& network_cache)
 {
 	ImGui::Columns(2, nullptr, false);
 
-	_source.draw_interface(app.font_settings(), *this);
-	draw_interface_derived(app);
+	_source.draw_interface(settings.fonting, *this);
+	draw_interface_derived(settings.networking, network_cache);
 	draw_interface_filter_representation();
-	draw_interface_logs(app);
+	draw_interface_logs(settings.fonting);
 
 	ImGui::NextColumn();
 
-	draw_interface_loot(app);
-	_debug_state.draw_interface(app.font_settings(), parse_metadata());
+	draw_interface_loot(settings.fonting, db, gen);
+	_debug_state.draw_interface(settings.fonting, parse_metadata());
 }
 
 void filter_state_mediator::draw_interface_filter_representation()
@@ -94,14 +98,17 @@ void filter_state_mediator::draw_interface_filter_representation()
 	}
 }
 
-void filter_state_mediator::draw_interface_logs(application& app)
+void filter_state_mediator::draw_interface_logs(const font_settings& fonting)
 {
 	if (ImGui::CollapsingHeader("Logs", ImGuiTreeNodeFlags_DefaultOpen)) {
-		draw_interface_logs_derived(_logger, app.font_settings());
+		draw_interface_logs_derived(_logger, fonting);
 	}
 }
 
-void filter_state_mediator::draw_interface_loot(application& app)
+void filter_state_mediator::draw_interface_loot(
+	const font_settings& fonting,
+	const lang::loot::item_database& db,
+	lang::loot::generator& gen)
 {
 	std::array<char, 64> loot_status_str_buf;
 	if (const auto& str = "Loot preview & filter debug"; _loot_state.num_items() > 0u) {
@@ -129,7 +136,7 @@ void filter_state_mediator::draw_interface_loot(application& app)
 		FS_ASSERT(_source.source() != nullptr);
 
 		_loot_state.update_items(*_filter_representation);
-		_loot_state.draw_interface(app, *this);
+		_loot_state.draw_interface(fonting, db, gen, *this);
 	}
 }
 

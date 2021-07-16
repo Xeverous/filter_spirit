@@ -153,12 +153,12 @@ void spirit_filter_state_mediator::refresh_filter_representation(
 	new_filter_representation(generator::make_item_filter(*spirit_filter, item_price_data));
 }
 
-void spirit_filter_state_mediator::draw_interface_derived(application& app)
+void spirit_filter_state_mediator::draw_interface_derived(const network_settings& networking, network::cache& cache)
 {
 	draw_interface_parsed_spirit_filter();
 	draw_interface_spirit_filter_symbols();
 	draw_interface_spirit_filter();
-	_market_data.draw_interface(app, *this);
+	_market_data.draw_interface(networking, cache, *this);
 }
 
 void spirit_filter_state_mediator::draw_interface_save_filter(const lang::item_filter& filter, log::logger& logger)
@@ -167,11 +167,11 @@ void spirit_filter_state_mediator::draw_interface_save_filter(const lang::item_f
 		save_filter(_market_data.price_report().metadata, filter, logger);
 }
 
-void spirit_filter_state_mediator::draw_interface_logs_derived(gui_logger& gl, const fonting& f)
+void spirit_filter_state_mediator::draw_interface_logs_derived(gui_logger& gl, const font_settings& fonting)
 {
 	FS_ASSERT(_logger_ptr != nullptr);
 	(*_logger_ptr)([&](log::buffer_logger& bl) {
-		gl.draw(f, bl);
+		gl.draw(fonting, bl);
 	});
 }
 

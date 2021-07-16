@@ -4,6 +4,7 @@
 #include <fs/lang/item.hpp>
 #include <fs/lang/item_filter.hpp>
 #include <fs/lang/loot/generator.hpp>
+#include <fs/lang/loot/item_database.hpp>
 #include <fs/utility/assert.hpp>
 
 #include <imgui.h>
@@ -17,6 +18,7 @@
 namespace fs::gui {
 
 class filter_state_mediator;
+class font_settings;
 
 struct looted_item
 {
@@ -137,13 +139,16 @@ private:
 	lang::loot::range _limit;
 };
 
-class application;
-class fonting;
+class fonting_settings;
 
 class loot_state : public lang::loot::item_receiver
 {
 public:
-	void draw_interface(application& app, filter_state_mediator& mediator);
+	void draw_interface(
+		const font_settings& fonting,
+		const lang::loot::item_database& db,
+		lang::loot::generator& gen,
+		filter_state_mediator& mediator);
 
 	void update_items(const lang::item_filter& filter); // apply filter to items without style
 	void refilter_items(const lang::item_filter& filter, filter_state_mediator& mediator); // apply filter to every item
@@ -171,9 +176,9 @@ public:
 	}
 
 private:
-	void draw_loot_canvas(const fonting& f, filter_state_mediator& mediator);
-	void draw_item_labels(ImVec2 canvas_begin, ImVec2 canvas_end, const fonting& f);
-	void on_canvas_hover(ImVec2 mouse_position, const fonting& f);
+	void draw_loot_canvas(const font_settings& fonting, filter_state_mediator& mediator);
+	void draw_item_labels(ImVec2 canvas_begin, ImVec2 canvas_end, const font_settings& fonting);
+	void on_canvas_hover(ImVec2 mouse_position, const font_settings& fonting);
 	void on_canvas_right_click(ImVec2 mouse_position, filter_state_mediator& mediator);
 
 	void draw_loot_settings_global();

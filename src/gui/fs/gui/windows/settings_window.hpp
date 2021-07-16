@@ -1,35 +1,36 @@
 #pragma once
 
 #include <fs/gui/imgui_window.hpp>
-#include <fs/gui/auxiliary/color_convert.hpp>
+#include <fs/gui/gui_settings.hpp>
 
-#include <Magnum/Math/Color.h>
+#ifdef CORRADE_TARGET_ANDROID
+#include <Magnum/Platform/AndroidApplication.h>
+#elif defined(CORRADE_TARGET_EMSCRIPTEN)
+#include <Magnum/Platform/EmscriptenApplication.h>
+#else
+#include <Magnum/Platform/Sdl2Application.h>
+#endif
 
 namespace fs::gui {
-
-class application;
 
 class settings_window : public imgui_window
 {
 public:
-	settings_window(application& app)
-	: imgui_window("Settings")
-	, _application(app)
-	{
-	}
+	settings_window()
+	: imgui_window("Settings") {}
 
-	int min_frame_time_ms() const
-	{
-		return _min_frame_time_ms;
-	}
+	      gui_settings& settings()       { return _settings; }
+	const gui_settings& settings() const { return _settings; }
 
-protected:
-	void draw_contents() override;
+	void draw(Magnum::Platform::Application& application)
+	{
+		draw_window([this, &application]() { draw_impl(application); });
+	}
 
 private:
-	application& _application;
-	Magnum::Color3 _clear_color = aux::from_rgb(0x1f1f1f);
-	int _min_frame_time_ms = 16; // 16ms per frame, roughly 60 FPS
+	void draw_impl(Magnum::Platform::Application& application);
+
+	gui_settings _settings;
 };
 
 }

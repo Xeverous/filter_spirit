@@ -1,6 +1,6 @@
 #include <fs/gui/windows/filter/filter_state_mediator.hpp>
 #include <fs/gui/windows/filter/source_state.hpp>
-#include <fs/gui/settings/fonting.hpp>
+#include <fs/gui/settings/font_settings.hpp>
 #include <fs/gui/auxiliary/widgets.hpp>
 #include <fs/utility/file.hpp>
 #include <fs/utility/assert.hpp>
@@ -13,7 +13,7 @@ constexpr auto popup_text_input_title = "Filter source - text edit";
 
 namespace fs::gui {
 
-void source_state::draw_interface(const fonting& f, filter_state_mediator& mediator)
+void source_state::draw_interface(const font_settings& fonting, filter_state_mediator& mediator)
 {
 	if (ImGui::CollapsingHeader("Source", ImGuiTreeNodeFlags_DefaultOpen)) {
 #ifndef __EMSCRIPTEN__
@@ -75,7 +75,7 @@ void source_state::draw_interface(const fonting& f, filter_state_mediator& media
 		}
 
 		{
-			auto _ = f.scoped_monospaced_font();
+			auto _ = fonting.scoped_monospaced_font();
 			_text_input.draw({-1.0f, -1.0f}); // fill remaining space
 		}
 

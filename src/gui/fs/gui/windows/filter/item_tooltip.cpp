@@ -1,5 +1,5 @@
 #include <fs/gui/windows/filter/item_tooltip.hpp>
-#include <fs/gui/settings/fonting.hpp>
+#include <fs/gui/settings/font_settings.hpp>
 #include <fs/gui/auxiliary/widgets.hpp>
 #include <fs/gui/auxiliary/colors.hpp>
 #include <fs/lang/item.hpp>
@@ -9,18 +9,18 @@
 
 namespace fs::gui {
 
-float get_item_tooltip_first_column_width(const gui::fonting& f)
+float get_item_tooltip_first_column_width(const font_settings& fonting)
 {
 	return gui::aux::measure_text_line(
 			lang::keywords::rf::enchantment_passive_node,
-			f.monospaced_font_size(),
-			f.monospaced_font()
-		).x + f.monospaced_font_size() * 2.0f;
+			fonting.monospaced_font_size(),
+			fonting.monospaced_font()
+		).x + fonting.monospaced_font_size() * 2.0f;
 }
 
 constexpr auto str_not_implemented = "NOT IMPLEMENTED";
 
-float get_item_tooltip_second_column_width(const lang::item& itm, const gui::fonting& f)
+float get_item_tooltip_second_column_width(const lang::item& itm, const font_settings& fonting)
 {
 	const char* longest_second_column_str = str_not_implemented;
 	std::size_t largest_second_column_str_size = std::strlen(str_not_implemented);
@@ -35,9 +35,9 @@ float get_item_tooltip_second_column_width(const lang::item& itm, const gui::fon
 
 	return gui::aux::measure_text_line(
 			longest_second_column_str,
-			f.monospaced_font_size(),
-			f.monospaced_font()
-		).x + f.monospaced_font_size() * 2.0f;
+			fonting.monospaced_font_size(),
+			fonting.monospaced_font()
+		).x + fonting.monospaced_font_size() * 2.0f;
 }
 
 void draw_item_tooltip_first_column()
@@ -177,12 +177,12 @@ void draw_item_tooltip_second_column(const lang::item& itm)
 }
 
 // TODO draw also applied filter rules
-void draw_item_tooltip(const lang::item& itm, const lang::item_filtering_result& /* result */, const gui::fonting& f)
+void draw_item_tooltip(const lang::item& itm, const lang::item_filtering_result& /* result */, const font_settings& fonting)
 {
-	const auto _1 = f.scoped_monospaced_font();
+	const auto _1 = fonting.scoped_monospaced_font();
 
-	const auto first_column_width = get_item_tooltip_first_column_width(f);
-	const auto second_column_width = get_item_tooltip_second_column_width(itm, f);
+	const auto first_column_width = get_item_tooltip_first_column_width(fonting);
+	const auto second_column_width = get_item_tooltip_second_column_width(itm, fonting);
 
 	ImGui::SetNextWindowSize(ImVec2(first_column_width + second_column_width, 0));
 	gui::aux::scoped_tooltip _2;

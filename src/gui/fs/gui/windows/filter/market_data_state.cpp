@@ -1,7 +1,7 @@
 #include <fs/gui/windows/filter/market_data_state.hpp>
 #include <fs/gui/windows/filter/spirit_filter_state_mediator.hpp>
+#include <fs/gui/settings/network_settings.hpp>
 #include <fs/gui/auxiliary/widgets.hpp>
-#include <fs/gui/application.hpp>
 #include <fs/network/ggg/download_data.hpp>
 #include <fs/network/ggg/parse_data.hpp>
 #include <fs/utility/assert.hpp>
@@ -50,7 +50,10 @@ float calculate_progress(std::size_t done, std::size_t size)
 
 namespace fs::gui {
 
-void market_data_state::refresh_item_price_report(application& app, spirit_filter_state_mediator& mediator)
+void market_data_state::refresh_item_price_report(
+	const network_settings& settings,
+	network::item_price_report_cache& cache,
+	spirit_filter_state_mediator& mediator)
 {
 	if (!_selected_league) {
 		_price_report = {};
@@ -58,8 +61,7 @@ void market_data_state::refresh_item_price_report(application& app, spirit_filte
 		return;
 	}
 
-	auto& cache = app.price_report_cache();
-	const auto max_market_data_age = app.network_settings().max_market_data_age();
+	const auto max_market_data_age = settings.max_market_data_age();
 	std::optional<lang::market::item_price_report> opt_price_report = cache.find_in_memory_cache(
 		*_selected_league, _selected_api, max_market_data_age);
 	if (opt_price_report) {
@@ -80,7 +82,7 @@ void market_data_state::refresh_item_price_report(application& app, spirit_filte
 			league = *_selected_league,
 			api = _selected_api,
 			max_age = max_market_data_age,
-			settings = app.network_settings().download_settings(),
+			settings = settings.download_settings(),
 			download_info = _price_report_download_info,
 			logger = mediator.share_logger()]()
 		{
@@ -90,7 +92,7 @@ void market_data_state::refresh_item_price_report(application& app, spirit_filte
 	_price_report_download_running = true;
 }
 
-void market_data_state::refresh_available_leagues(application& app, spirit_filter_state_mediator& mediator)
+void market_data_state::refresh_available_leagues(const network_settings& settings, spirit_filter_state_mediator& mediator)
 {
 	if (_leagues_download_running)
 		return;
@@ -100,7 +102,7 @@ void market_data_state::refresh_available_leagues(application& app, spirit_filte
 
 	_leagues_future = std::async(
 		std::launch::async, [
-			settings = app.network_settings().download_settings(),
+			settings = settings.download_settings(),
 			download_info = _price_report_download_info,
 			logger = mediator.share_logger()]()
 		{
@@ -114,20 +116,20 @@ void market_data_state::refresh_available_leagues(application& app, spirit_filte
 	_leagues_download_running = true;
 }
 
-void market_data_state::check_downloads(application& app, spirit_filter_state_mediator& mediator)
+void market_data_state::check_downloads(const network_settings& settings, network::cache& cache, spirit_filter_state_mediator& mediator)
 {
 	if (_leagues_download_running) {
 		if (utility::is_ready(_leagues_future)) {
 			try {
 				_available_leagues = _leagues_future.get();
-				app.leagues_cache().set_leagues(_available_leagues);
+				cache.leagues.set_leagues(_available_leagues);
 				mediator.logger().info() << "League data download complete.\n";
 			}
 			catch (const std::exception& e) {
 				mediator.logger().error() << "League download failed: " << e.what() << "\n";
 			}
 			_leagues_download_running = false;
-			on_league_change(app, mediator);
+			on_league_change(settings, cache.item_price_reports, mediator);
 		}
 	}
 
@@ -141,14 +143,14 @@ void market_data_state::check_downloads(application& app, spirit_filter_state_me
 				mediator.logger().error() << "Market data download failed: " << e.what() << "\n";
 			}
 			_price_report_download_running = false;
-			refresh_item_price_report(app, mediator);
+			refresh_item_price_report(settings, cache.item_price_reports, mediator);
 		}
 	}
 }
 
-void market_data_state::draw_interface(application& app, spirit_filter_state_mediator& mediator)
+void market_data_state::draw_interface(const network_settings& settings, network::cache& cache, spirit_filter_state_mediator& mediator)
 {
-	check_downloads(app, mediator);
+	check_downloads(settings, cache, mediator);
 
 	if (!ImGui::CollapsingHeader("Market data", ImGuiTreeNodeFlags_DefaultOpen))
 		return;
@@ -158,7 +160,7 @@ void market_data_state::draw_interface(application& app, spirit_filter_state_med
 			if (ImGui::Selectable(lang::to_string(dst), _selected_api == dst, flags))
 			{
 				_selected_api = dst;
-				on_api_change(app, mediator);
+				on_api_change(settings, cache.item_price_reports, mediator);
 			}
 		};
 
@@ -180,7 +182,7 @@ void market_data_state::draw_interface(application& app, spirit_filter_state_med
 		for (const auto& league : _available_leagues) {
 			if (ImGui::Selectable(league.name.c_str(), league.name == _selected_league)) {
 				_selected_league = league.name;
-				on_league_change(app, mediator);
+				on_league_change(settings, cache.item_price_reports, mediator);
 			}
 		}
 
@@ -194,7 +196,7 @@ void market_data_state::draw_interface(application& app, spirit_filter_state_med
 	}
 	else {
 		if (ImGui::Button("Refresh"))
-			refresh_available_leagues(app, mediator);
+			refresh_available_leagues(settings, mediator);
 	}
 
 	ImGui::Text("Status: ");
