@@ -231,6 +231,19 @@ namespace common
 		bool required;
 	};
 
+	struct switch_drop_sound_action : x3::position_tagged
+	{
+		auto& operator=(lang::switch_drop_sound sds)
+		{
+			value = sds;
+			return *this;
+		}
+
+		auto get_value() const { return value; }
+
+		lang::switch_drop_sound value;
+	};
+
 	struct continue_statement : x3::position_tagged
 	{
 		void get_value() const {}
@@ -537,18 +550,7 @@ namespace sf
 		sequence seq;
 	};
 
-	struct switch_drop_sound_action : x3::position_tagged
-	{
-		auto& operator=(bool value)
-		{
-			enable = value;
-			return *this;
-		}
-
-		bool get_value() const { return enable; }
-
-		bool enable;
-	};
+	using switch_drop_sound_action = common::switch_drop_sound_action;
 
 	struct action : x3::variant<
 			set_color_action,
@@ -816,18 +818,7 @@ namespace rf
 		boost::optional<integer_literal> volume;
 	};
 
-	struct switch_drop_sound_action : x3::position_tagged
-	{
-		auto& operator=(bool value)
-		{
-			enable = value;
-			return *this;
-		}
-
-		bool get_value() const { return enable; }
-
-		bool enable;
-	};
+	using switch_drop_sound_action = common::switch_drop_sound_action;
 
 	struct minimap_icon_action : x3::position_tagged
 	{

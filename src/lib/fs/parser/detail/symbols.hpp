@@ -237,6 +237,20 @@ namespace rf
 	};
 	const color_actions_ color_actions;
 
+	struct switch_drop_sound_actions_ : x3::symbols<lang::switch_drop_sound>
+	{
+		switch_drop_sound_actions_()
+		{
+			add
+				(lang::keywords::rf::enable_drop_sound,           lang::switch_drop_sound{true,  false})
+				(lang::keywords::rf::disable_drop_sound,          lang::switch_drop_sound{false, false})
+				(lang::keywords::rf::enable_drop_sound_if_alert,  lang::switch_drop_sound{true,  true})
+				(lang::keywords::rf::disable_drop_sound_if_alert, lang::switch_drop_sound{false, true})
+			;
+		}
+	};
+	const switch_drop_sound_actions_ switch_drop_sound_actions;
+
 	struct play_alert_sound_actions_ : x3::symbols<bool>
 	{
 		play_alert_sound_actions_()

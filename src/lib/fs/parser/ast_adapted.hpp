@@ -31,6 +31,12 @@
 // using boost::fusion::operator<<;
 // using boost::fusion::operators::operator<<;
 
+// -------- common --------
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::lang::switch_drop_sound,
+	enable, if_alert_sound)
+
 // -------- spirit filter --------
 
 // ---- whitespace ----

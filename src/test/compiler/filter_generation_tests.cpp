@@ -1483,6 +1483,13 @@ DropLevel >= 10 {
 	}
 
 	Rarity >= Rare
+	ItemLevel >= 75 {
+		SetFontSize 40
+		DisableDropSoundIfAlertSound
+		Show
+	}
+
+	Rarity >= Rare
 	ItemLevel >= 70 {
 		SetFontSize 40
 		DisableDropSound
@@ -1499,6 +1506,7 @@ DropLevel >= 10 {
 	Show
 }
 
+EnableDropSoundIfAlertSound
 Hide
 )");
 			const std::string_view expected_filter =
@@ -1507,6 +1515,13 @@ R"(Hide
 	DropLevel >= 10
 	SetFontSize 35
 	EnableDropSound
+
+Show
+	ItemLevel >= 75
+	DropLevel >= 10
+	Rarity >= Rare
+	SetFontSize 40
+	DisableDropSoundIfAlertSound
 
 Show
 	ItemLevel >= 70
@@ -1529,6 +1544,7 @@ Show
 
 Hide
 	SetFontSize 30
+	EnableDropSoundIfAlertSound
 
 )";
 

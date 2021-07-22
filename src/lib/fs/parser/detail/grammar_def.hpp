@@ -156,6 +156,12 @@ namespace common
 	const auto exact_matching_policy_expression_def = ("==" > x3::attr(true)) | ("=" > x3::attr(false)) | x3::attr(false);
 	BOOST_SPIRIT_DEFINE(exact_matching_policy_expression)
 
+	// ---- actions ----
+
+	const switch_drop_sound_action_type switch_drop_sound_action = "switch drop sound action";
+	const auto switch_drop_sound_action_def = make_keyword(symbols::rf::switch_drop_sound_actions);
+	BOOST_SPIRIT_DEFINE(switch_drop_sound_action)
+
 	// ---- statements ----
 
 	const static_visibility_statement_type static_visibility_statement = "static visibility statement";
@@ -327,11 +333,7 @@ namespace sf
 	const auto set_alert_sound_action_def = make_keyword(lang::keywords::sf::set_alert_sound) > sequence;
 	BOOST_SPIRIT_DEFINE(set_alert_sound_action)
 
-	const switch_drop_sound_action_type switch_drop_sound_action = "switch drop sound action";
-	const auto switch_drop_sound_action_def =
-		(make_keyword(lang::keywords::rf::enable_drop_sound)  > x3::attr(true)) |
-		(make_keyword(lang::keywords::rf::disable_drop_sound) > x3::attr(false));
-	BOOST_SPIRIT_DEFINE(switch_drop_sound_action)
+	// switch_drop_sound_action in common
 
 	const action_type action = "action";
 	const auto action_def =
@@ -342,7 +344,7 @@ namespace sf
 		| play_alert_sound_action
 		| custom_alert_sound_action
 		| set_alert_sound_action
-		| switch_drop_sound_action;
+		| common::switch_drop_sound_action;
 	BOOST_SPIRIT_DEFINE(action)
 
 	// ---- filter structure ----
@@ -504,11 +506,7 @@ namespace rf
 		> -common::integer_literal; // volume (optional token)
 	BOOST_SPIRIT_DEFINE(custom_alert_sound_action)
 
-	const switch_drop_sound_action_type switch_drop_sound_action = "switch drop sound action";
-	const auto switch_drop_sound_action_def =
-		(make_keyword(lang::keywords::rf::enable_drop_sound)  > x3::attr(true)) |
-		(make_keyword(lang::keywords::rf::disable_drop_sound) > x3::attr(false));
-	BOOST_SPIRIT_DEFINE(switch_drop_sound_action)
+	// switch_drop_sound_action in common
 
 	const minimap_icon_action_type minimap_icon_action = "minimap icon action";
 	const auto minimap_icon_action_def = make_keyword(lang::keywords::rf::minimap_icon) > literal_sequence;
@@ -524,7 +522,7 @@ namespace rf
 		| set_font_size_action
 		| play_alert_sound_action
 		| custom_alert_sound_action
-		| switch_drop_sound_action
+		| common::switch_drop_sound_action
 		| minimap_icon_action
 		| play_effect_action;
 	BOOST_SPIRIT_DEFINE(action)

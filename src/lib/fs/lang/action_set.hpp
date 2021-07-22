@@ -164,13 +164,13 @@ inline bool operator!=(alert_sound_action lhs, alert_sound_action rhs)
 
 struct switch_drop_sound_action
 {
-	bool enable; // this is not a lang type because it is implied by keyword, not by value
+	switch_drop_sound action;
 	position_tag origin;
 };
 
 inline bool operator==(switch_drop_sound_action lhs, switch_drop_sound_action rhs)
 {
-	return lhs.enable == rhs.enable;
+	return lhs.action == rhs.action;
 }
 
 inline bool operator!=(switch_drop_sound_action lhs, switch_drop_sound_action rhs)

@@ -94,6 +94,8 @@ namespace common
 	struct comparison_operator_expression_class  : error_on_error, annotate_on_success {};
 	struct exact_matching_policy_expression_class: error_on_error, annotate_on_success {};
 
+	struct switch_drop_sound_action_class        : error_on_error, annotate_on_success {};
+
 	struct static_visibility_statement_class     : error_on_error, annotate_on_success {};
 	struct continue_statement_class              : error_on_error, annotate_on_success {};
 }
@@ -148,7 +150,7 @@ namespace sf
 	struct play_alert_sound_action_class         : error_on_error, annotate_on_success {};
 	struct custom_alert_sound_action_class       : error_on_error, annotate_on_success {};
 	struct set_alert_sound_action_class          : error_on_error, annotate_on_success {};
-	struct switch_drop_sound_action_class        : error_on_error, annotate_on_success {};
+	// switch_drop_sound_action_class in common
 	struct action_class                          : error_on_error, annotate_on_success {};
 
 	// ---- filter structure ----
@@ -197,7 +199,7 @@ namespace rf
 	struct set_font_size_action_class            : error_on_error, annotate_on_success {};
 	struct play_alert_sound_action_class         : error_on_error, annotate_on_success {};
 	struct custom_alert_sound_action_class       : error_on_error, annotate_on_success {};
-	struct switch_drop_sound_action_class        : error_on_error, annotate_on_success {};
+	// switch_drop_sound_action_class in common
 	struct minimap_icon_action_class             : error_on_error, annotate_on_success {};
 	struct play_effect_action_class              : error_on_error, annotate_on_success {};
 
@@ -290,6 +292,11 @@ namespace common
 
 	using exact_matching_policy_expression_type = x3::rule<exact_matching_policy_expression_class, ast::common::exact_matching_policy>;
 	BOOST_SPIRIT_DECLARE(exact_matching_policy_expression_type)
+
+	// ---- actions ----
+
+	using switch_drop_sound_action_type = x3::rule<switch_drop_sound_action_class, ast::common::switch_drop_sound_action>;
+	BOOST_SPIRIT_DECLARE(switch_drop_sound_action_type)
 
 	// ---- filter structure ----
 
@@ -398,8 +405,7 @@ namespace sf
 	using set_alert_sound_action_type = x3::rule<set_alert_sound_action_class, ast::sf::set_alert_sound_action>;
 	BOOST_SPIRIT_DECLARE(set_alert_sound_action_type)
 
-	using switch_drop_sound_action_type = x3::rule<switch_drop_sound_action_class, ast::sf::switch_drop_sound_action>;
-	BOOST_SPIRIT_DECLARE(switch_drop_sound_action_type)
+	// switch_drop_sound_action_type in common
 
 	using action_type = x3::rule<action_class, ast::sf::action>;
 	BOOST_SPIRIT_DECLARE(action_type)
@@ -485,7 +491,7 @@ namespace rf
 	using set_font_size_action_type                  = x3::rule<set_font_size_action_class,               ast::rf::set_font_size_action>;
 	using play_alert_sound_action_type               = x3::rule<play_alert_sound_action_class,            ast::rf::play_alert_sound_action>;
 	using custom_alert_sound_action_type             = x3::rule<custom_alert_sound_action_class,          ast::rf::custom_alert_sound_action>;
-	using switch_drop_sound_action_type              = x3::rule<switch_drop_sound_action_class,           ast::rf::switch_drop_sound_action>;
+	// switch_drop_sound_action_type in common
 	using minimap_icon_action_type                   = x3::rule<minimap_icon_action_class,                ast::rf::minimap_icon_action>;
 	using play_effect_action_type                    = x3::rule<play_effect_action_class,                 ast::rf::play_effect_action>;
 	BOOST_SPIRIT_DECLARE(
@@ -493,7 +499,6 @@ namespace rf
 		set_font_size_action_type,
 		play_alert_sound_action_type,
 		custom_alert_sound_action_type,
-		switch_drop_sound_action_type,
 		minimap_icon_action_type,
 		play_effect_action_type
 	)

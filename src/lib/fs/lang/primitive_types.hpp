@@ -207,4 +207,17 @@ struct string
 inline bool operator==(const string& lhs, const string& rhs) noexcept { return lhs.value == rhs.value; }
 inline bool operator!=(const string& lhs, const string& rhs) noexcept { return !(lhs == rhs); }
 
+// values are implied by keywords {Enable|Disable}DropSound{IfAlertSound|}
+struct switch_drop_sound
+{
+	bool enable;
+	bool if_alert_sound;
+};
+
+inline bool operator==(switch_drop_sound lhs, switch_drop_sound rhs) noexcept
+{
+	return lhs.enable == rhs.enable && lhs.if_alert_sound == rhs.if_alert_sound;
+}
+inline bool operator!=(switch_drop_sound lhs, switch_drop_sound rhs) noexcept { return !(lhs == rhs); }
+
 } // namespace fs::lang

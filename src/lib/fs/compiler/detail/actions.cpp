@@ -728,7 +728,7 @@ spirit_filter_add_action(
 			return spirit_filter_add_set_alert_sound_action(st, a, symbols, set, diagnostics);
 		},
 		[&](const ast::sf::switch_drop_sound_action& a) {
-			set.switch_drop_sound = lang::switch_drop_sound_action{a.enable, parser::position_tag_of(action)};
+			set.switch_drop_sound = lang::switch_drop_sound_action{a.value, parser::position_tag_of(action)};
 			return true;
 		}
 	));
@@ -768,7 +768,7 @@ real_filter_add_action(
 		},
 		[&](const ast::rf::switch_drop_sound_action& action) {
 			return real_filter_add_action_impl(
-				lang::switch_drop_sound_action{action.enable, parser::position_tag_of(action)},
+				lang::switch_drop_sound_action{action.value, parser::position_tag_of(action)},
 				set.switch_drop_sound,
 				diagnostics);
 		}

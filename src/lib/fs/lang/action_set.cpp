@@ -123,10 +123,22 @@ void output_switch_drop_sound(
 	if (!action)
 		return;
 
-	output_stream
-		<< '\t'
-		<< ((*action).enable ? kw::enable_drop_sound : kw::disable_drop_sound)
-		<< '\n';
+	output_stream << '\t';
+
+	if (const lang::switch_drop_sound& sds = (*action).action; sds.enable) {
+		if (sds.if_alert_sound)
+			output_stream << kw::enable_drop_sound_if_alert;
+		else
+			output_stream << kw::enable_drop_sound;
+	}
+	else {
+		if (sds.if_alert_sound)
+			output_stream << kw::disable_drop_sound_if_alert;
+		else
+			output_stream << kw::disable_drop_sound;
+	}
+
+	output_stream << '\n';
 }
 
 void output_suit(lang::suit_type s, std::ostream& output_stream)
