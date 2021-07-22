@@ -326,7 +326,12 @@ namespace sf
 	BOOST_SPIRIT_DEFINE(play_alert_sound_action)
 
 	const custom_alert_sound_action_type custom_alert_sound_action = "custom alert sound action";
-	const auto custom_alert_sound_action_def = make_keyword(lang::keywords::rf::custom_alert_sound) > sequence;
+	const auto custom_alert_sound_action_def =
+		(
+			(make_keyword(lang::keywords::rf::custom_alert_sound_optional) > x3::attr(true))
+			| (make_keyword(lang::keywords::rf::custom_alert_sound) > x3::attr(false))
+		)
+		> sequence;
 	BOOST_SPIRIT_DEFINE(custom_alert_sound_action)
 
 	const set_alert_sound_action_type set_alert_sound_action = "set alert sound action";
@@ -501,7 +506,10 @@ namespace rf
 
 	const custom_alert_sound_action_type custom_alert_sound_action = "custom alert sound action";
 	const auto custom_alert_sound_action_def =
-		make_keyword(lang::keywords::rf::custom_alert_sound)
+		(
+			(make_keyword(lang::keywords::rf::custom_alert_sound_optional) > x3::attr(true))
+			| (make_keyword(lang::keywords::rf::custom_alert_sound) > x3::attr(false))
+		)
 		> common::string_literal
 		> -common::integer_literal; // volume (optional token)
 	BOOST_SPIRIT_DEFINE(custom_alert_sound_action)

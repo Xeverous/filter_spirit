@@ -1456,6 +1456,12 @@ CustomAlertSound "pop.wav"
 
 CustomAlertSound "pop.wav" 123
 { Show }
+
+CustomAlertSoundOptional "pop.wav"
+{ Show }
+
+CustomAlertSoundOptional "pop.wav" 123
+{ Show }
 )");
 			const std::string_view expected_filter =
 R"(Show
@@ -1463,6 +1469,12 @@ R"(Show
 
 Show
 	CustomAlertSound "pop.wav" 123
+
+Show
+	CustomAlertSoundOptional "pop.wav"
+
+Show
+	CustomAlertSoundOptional "pop.wav" 123
 
 )";
 

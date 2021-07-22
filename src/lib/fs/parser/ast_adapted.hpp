@@ -107,6 +107,10 @@ BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::sf::play_alert_sound_action,
 	positional, seq)
 
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::sf::custom_alert_sound_action,
+	optional, seq)
+
 // ---- filter structure ----
 
 BOOST_FUSION_ADAPT_STRUCT(
@@ -169,7 +173,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::rf::custom_alert_sound_action,
-	path, volume)
+	optional, path, volume)
 
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::rf::filter_block,

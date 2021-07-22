@@ -526,14 +526,7 @@ namespace sf
 
 	struct custom_alert_sound_action : x3::position_tagged
 	{
-		auto& operator=(sequence s)
-		{
-			seq = std::move(s);
-			return *this;
-		}
-
-		const auto& get_value() const { return seq; }
-
+		bool optional;
 		sequence seq;
 	};
 
@@ -814,6 +807,7 @@ namespace rf
 
 	struct custom_alert_sound_action : x3::position_tagged
 	{
+		bool optional;
 		string_literal path;
 		boost::optional<integer_literal> volume;
 	};

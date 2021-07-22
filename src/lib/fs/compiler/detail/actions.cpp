@@ -223,12 +223,13 @@ make_builtin_alert_sound(
 [[nodiscard]] boost::optional<lang::custom_alert_sound>
 make_custom_alert_sound(
 	settings /* st */,
+	bool optional,
 	const lang::single_object& sobj,
 	diagnostics_container& diagnostics)
 {
 	return detail::get_as<lang::string>(sobj, diagnostics)
-		.map([](lang::string str) {
-			return lang::custom_alert_sound{std::move(str)};
+		.map([&](lang::string str) {
+			return lang::custom_alert_sound{optional, std::move(str)};
 		});
 }
 
@@ -445,7 +446,7 @@ spirit_filter_add_custom_alert_sound_action(
 	return detail::evaluate_sequence(st, action.seq, symbols, 1, 2, diagnostics)
 		.flat_map([&](lang::object obj) -> boost::optional<lang::alert_sound> {
 			FS_ASSERT(obj.values.size() == 1u || obj.values.size() == 2u);
-			auto cas = make_custom_alert_sound(st, obj.values[0], diagnostics);
+			auto cas = make_custom_alert_sound(st, action.optional, obj.values[0], diagnostics);
 
 			boost::optional<lang::volume> vol = lang::volume{};
 			if (obj.values.size() == 2u) {
@@ -479,11 +480,12 @@ spirit_filter_add_set_alert_sound_action(
 		.flat_map([&](lang::object obj) -> boost::optional<lang::alert_sound> {
 			FS_ASSERT(obj.values.size() == 1u || obj.values.size() == 2u);
 
-			// SetAlertSound always generates non-positional sounds, hence the false
+			// SetAlertSound always generates non-positional built-in sounds, hence the false
 			diagnostics_container diagnostics_builtin;
 			auto builtin_alert = make_builtin_alert_sound(st, false, obj.values[0], diagnostics_builtin);
+			// SetAlertSound always generates non-optional custom sounds, hence the false
 			diagnostics_container diagnostics_custom;
-			auto custom_alert = make_custom_alert_sound(st, obj.values[0], diagnostics_custom);
+			auto custom_alert = make_custom_alert_sound(st, false, obj.values[0], diagnostics_custom);
 
 			boost::optional<lang::volume> vol = lang::volume{};
 			diagnostics_container diagnostics_volume;
@@ -683,7 +685,7 @@ real_filter_add_custom_alert_sound_action(
 		.map([&](lang::volume vol) {
 			return real_filter_add_action_impl(
 				lang::alert_sound_action{
-					lang::alert_sound{lang::custom_alert_sound{detail::evaluate(action.path)}, vol},
+					lang::alert_sound{lang::custom_alert_sound{action.optional, detail::evaluate(action.path)}, vol},
 					parser::position_tag_of(action)
 				},
 				target,

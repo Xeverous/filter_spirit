@@ -43,7 +43,7 @@ void output_builtin_alert_sound_id(
 	output_stream << ' ';
 
 	std::visit(utility::visitor{
-		[&output_stream](lang::none sound_id) {
+		[&output_stream](lang::none /* sound_id */) {
 			output_stream << kw::none;
 		},
 		[&output_stream](lang::integer sound_id) {
@@ -106,7 +106,12 @@ void output_alert_sound(
 			output_builtin_alert_sound_id(sound.sound_id, output_stream);
 		},
 		[&output_stream](const lang::custom_alert_sound& sound) {
-			output_stream << kw::custom_alert_sound << " \"" << sound.path.value << '\"';
+			if (sound.optional)
+				output_stream << kw::custom_alert_sound_optional;
+			else
+				output_stream << kw::custom_alert_sound;
+
+			output_stream << " \"" << sound.path.value << '\"';
 		}
 	}, as.sound);
 

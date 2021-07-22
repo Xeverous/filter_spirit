@@ -314,7 +314,7 @@ $z = 4W 0 6 RGB
 			{
 				expect_alert_sound_impl(
 					"CustomAlertSound " + expression,
-					lang::alert_sound{lang::custom_alert_sound{path}, lang::volume{volume}});
+					lang::alert_sound{lang::custom_alert_sound{false, path}, lang::volume{volume}});
 			}
 		};
 

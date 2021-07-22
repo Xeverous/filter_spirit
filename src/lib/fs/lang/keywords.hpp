@@ -87,6 +87,7 @@ namespace rf
 	constexpr auto enable_drop_sound_if_alert  = "EnableDropSoundIfAlertSound";
 	constexpr auto disable_drop_sound_if_alert = "DisableDropSoundIfAlertSound";
 	constexpr auto custom_alert_sound          = "CustomAlertSound";
+	constexpr auto custom_alert_sound_optional = "CustomAlertSoundOptional";
 	constexpr auto minimap_icon                = "MinimapIcon";
 	constexpr auto play_effect                 = "PlayEffect";
 
