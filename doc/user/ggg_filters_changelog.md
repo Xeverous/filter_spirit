@@ -6,6 +6,15 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 
 *newest at the top*
 
+### 3.15 (Expedition) - [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3147480)
+
+- [patch notes](https://www.pathofexile.com/forum/view-thread/3147479)
+- [balance manifesto](https://www.pathofexile.com/forum/view-thread/3147157)
+- [gem information](https://www.pathofexile.com/forum/view-thread/3147751)
+- New actions: `CustomAlertSoundOptional`, `DisableDropSoundIfAlertSound` and `EnableDropSoundIfAlertSound` (described in other documentation)
+- Removal of item class `"Critical Utility Flasks"` (now Diamond Flasks are `"Utility Flasks"`)
+- Class names have been standarized to use plural forms
+
 ### 3.14.1c (or maybe earlier)
 
 - undocumented change: filters stopped accepting `""` and `"Microtransactions"` item classes

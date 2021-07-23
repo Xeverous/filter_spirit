@@ -180,8 +180,10 @@ SetFontSize              Integer
 PlayAlertSound           (Integer | ShaperVoiceLine) [Integer]
 PlayAlertSoundPositional (Integer | ShaperVoiceLine) [Integer]
 
-# path can be absolute or just the file name
+# path can be absolute or just the file name, second token is volume
 CustomAlertSound         String [Integer]
+# same as above but if the file does not exist, no sound is played
+CustomAlertSoundOptional String [Integer]
 
 # Some items always play specific built-in sounds,
 # even if you don't specify anything.
@@ -189,6 +191,11 @@ CustomAlertSound         String [Integer]
 DisableDropSound
 # ...and this action enables it back.
 EnableDropSound
+
+# As above, but these only have an effect
+# if any alert sound has been specified
+EnableDropSoundIfAlertSound
+DisableDropSoundIfAlertSound
 
 SetMinimapIcon           Integer Suit Shape
 
