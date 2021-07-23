@@ -1,5 +1,12 @@
 # Filter Spirit changelog
 
+## version 1.2.1 (23.07.2021)
+
+- added support for `CustomAlertSoundOptional`, `EnableDropSoundIfAlertSound` and `DisableDropSoundIfAlertSound`
+- updated code which handles poe.ninja data (fixes some items not appearing and some warnings)
+- example filter template - league update and color improvements
+- minor inside improvements (preparations for better UI)
+
 ## version 1.2.0 (16.04.2021)
 
 - Real filter parser improvements:
