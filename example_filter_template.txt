@@ -145,6 +145,7 @@ $font_quest              = $font_max
 $font_contract           = $font_mid
 $font_blueprint          = $font_high
 $font_heist_gear         = $font_mid
+$font_experimented_base  = $font_max
 $font_influence_high     = $font_high
 $font_influence_mid      = $font_mid
 $font_influence_low      = $font_low
@@ -243,6 +244,7 @@ $alert_base_crafting       = $alert_common
 $alert_base_chance         = $alert_common
 $alert_fractured_item      = $alert_very_specific
 $alert_synthesised_item    = $alert_very_specific
+$alert_experimented_base   = $alert_very_specific
 $alert_veiled_item         = $alert_common
 $alert_metamorph           = $alert_common
 $alert_heist_target        = $alert_very_specific
@@ -698,7 +700,7 @@ Class == "Stackable Currency" {
 		Show
 	}
 
-	BaseType == "Divine Orb" "Veiled Chaos Orb" "Chaos Orb" "Gemcutter's Prism" "Stacked Deck" "Simple Sextant" "Prime Sextant" "Awakened Sextant" "Exalted Shard" "Orb of Annulment" "Harbinger's Orb" "Ancient Orb" "Ancient Shard" "Facetor's Lens" "Infused Engineer's Orb" "Orb of Unmaking" "Ritual Splinter" "Ritual Vessel" "Crescent Splinter"
+	BaseType == "Divine Orb" "Veiled Chaos Orb" "Chaos Orb" "Gemcutter's Prism" "Stacked Deck" "Simple Sextant" "Prime Sextant" "Awakened Sextant" "Elevated Sextant" "Exalted Shard" "Orb of Annulment" "Harbinger's Orb" "Ancient Orb" "Ancient Shard" "Facetor's Lens" "Infused Engineer's Orb" "Orb of Unmaking" "Ritual Splinter" "Ritual Vessel" "Crescent Splinter"
 	{
 		Expand $actions_currency_mid
 		Show
@@ -823,7 +825,7 @@ Class == "Stackable Currency" {
 		SetTextColor $color_heist
 		SetBorderColor $color_heist
 		SetFontSize $font_currency_low
-		SetAlertSound $alert_currency_low
+		SetAlertSound $alert_currency_very_low
 		ShowHide $show_rogue_markers
 	}
 
@@ -1018,6 +1020,12 @@ Class == "Stackable Currency" {
 	{
 		Expand $actions_currency_mid
 		SetAlertSound $alert_undroppable
+		Show
+	}
+
+	BaseType == "Imprint"
+	{
+		Expand $actions_currency_mid
 		Show
 	}
 
@@ -1691,8 +1699,9 @@ Class == "Divination Card" {
 		Price < $cfg_cards_high_min_value
 		Price >= $cfg_cards_mid_min_value
 		{
-			SetTextColor $color_card
+			SetTextColor $color_black
 			SetBorderColor $color_card
+			SetBackgroundColor $color_card
 			SetFontSize $font_card_mid
 			SetAlertSound $alert_card_mid
 			PlayEffect $beam_card
@@ -1971,6 +1980,18 @@ Rarity <= Rare {
 		SetBackgroundColor $color_synthesised_item
 		SetAlertSound $alert_synthesised_item
 		ShowDiscard $show_gear_synthesised
+	}
+
+	# experimented bases (Heist exclusive)
+	# these only drop from curio displays so we can always
+	# highlight them because it was player's choice to take them
+	BaseType == "Assembler Wand" "Congregator Wand" "Accumulator Wand" "Hollowpoint Dagger" "Pressurised Dagger" "Pneumatic Dagger" "Flickerflame Blade" "Flashfire Blade" "Infernal Blade" "Shadow Fangs" "Malign Fangs" "Void Fangs" "Maltreatment Axe" "Disapprobation Axe" "Psychotic Axe" "Fickle Spiritblade" "Capricious Spiritblade" "Anarchic Spiritblade" "Flare Mace" "Crack Mace" "Boom Mace" "Oscillating Sceptre" "Stabilising Sceptre" "Alternating Sceptre" "Hedron Bow" "Foundry Bow" "Solarine Bow" "Transformer Staff" "Reciprocation Staff" "Battery Staff" "Capacity Rod" "Potentiality Rod" "Eventuality Rod" "Prime Cleaver" "Honed Cleaver" "Apex Cleaver" "Rebuking Blade" "Blasting Blade" "Banishing Blade" "Blunt Force Condenser" "Crushing Force Magnifier" "Impact Force Propagator" "Exhausting Spirit Shield" "Subsuming Spirit Shield" "Transfer-attuned Spirit Shield" "Endothermic Buckler" "Polar Buckler" "Cold-attuned Buckler" "Exothermic Tower Shield" "Magmatic Tower Shield" "Heat-attuned Tower Shield" "Micro-Distillery Belt" "Mechalarm Belt" "Astrolabe Amulet" "Simplex Amulet" "Cogwork Ring" "Geodesic Ring" {
+		SetTextColor $color_black
+		SetBackgroundColor $color_heist
+		SetBorderColor $color_heist
+		SetAlertSound $alert_experimented_base
+		SetFontSize $font_experimented_base
+		Show
 	}
 
 	# pricing machinery for bases
