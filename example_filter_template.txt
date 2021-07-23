@@ -223,7 +223,7 @@ $alert_gem_alternate       = $alert_extraordinary
 $alert_gem_drop_only       = $alert_uncommon
 $alert_gem_high            = $alert_high
 $alert_gem_mid             = $alert_mid
-$alert_gem_20_level        = $alert_uncommon
+$alert_gem_20_lvl          = $alert_uncommon
 $alert_gem_20_quality      = $alert_uncommon
 $alert_gem_non_0_quality   = $alert_frequent
 $alert_oil_high            = $alert_high
@@ -301,7 +301,7 @@ $icon_gem_alternate   = 0 Green Diamond
 $icon_gem_drop_only   = 2 Green Diamond
 $icon_gem_high        = 0 Green Circle
 $icon_gem_mid         = 2 Green Circle
-$icon_gem_20_level    = 0 Green Circle
+$icon_gem_20_lvl      = 0 Green Circle
 $icon_gem_20_quality  = 0 Green Circle
 $icon_unique_high     = 0 Brown Triangle
 $icon_unique_mid      = 2 Brown Triangle
@@ -687,7 +687,7 @@ $show_gear_any_normal = False
 $cfg_gear_show_4_link_max_area_lvl = 67
 $cfg_gear_show_3_link_max_area_lvl = 30
 # Show absolutely any equippable gear untill speciied AreaLevel
-$cfg_gear_show_all_max_area_level = 15
+$cfg_gear_show_all_max_area_lvl = 15
 
 # this will apply globally to ALL blocks, unless overriden
 SetBackgroundColor $color_black
@@ -1231,8 +1231,8 @@ Class == "Active Skill Gems" "Support Skill Gems" {
 
 	GemLevel >= 20 {
 		SetBackgroundColor $color_white
-		SetAlertSound $alert_gem_20_level
-		MinimapIcon $icon_gem_20_level
+		SetAlertSound $alert_gem_20_lvl
+		MinimapIcon $icon_gem_20_lvl
 		Show
 	}
 
@@ -2191,7 +2191,7 @@ LinkedSockets 3 {
 
 # show everything at the start of the game
 # at this point you may want to pickup magic and rare items
-AreaLevel <= $cfg_gear_show_all_max_area_level {
+AreaLevel <= $cfg_gear_show_all_max_area_lvl {
 	Show
 }
 
