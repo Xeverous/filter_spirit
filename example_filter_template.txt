@@ -1290,7 +1290,7 @@ BaseType == "Gavel" "Stone Hammer" "Rock Breaker" {
 }
 
 # harbinger unique pieces
-Class == "Piece" {
+Class == "Pieces" {
 	SetTextColor $color_unique
 	SetBorderColor $color_unique
 	SetFontSize $font_max
@@ -1379,7 +1379,7 @@ BaseType == "Stone of Passage" "Flashpowder Keg" {
 	Show
 }
 
-Class == "Atlas Region Upgrade Item" {
+Class == "Atlas Region Upgrade Items" {
 	SetTextColor $color_white
 	SetBorderColor $color_atlas
 	SetBackgroundColor $color_atlas
@@ -1640,7 +1640,7 @@ Class == "Misc Map Items" {
 
 # note: Izaro will speak upon key drops
 # sound alerts here may feel like unnecessary noise
-Class == "Labyrinth Item"
+Class == "Labyrinth Items"
 BaseType == "Golden Key" "Treasure Key" "Silver Key" {
 	SetTextColor $color_black
 	SetBackgroundColor $color_labyrinth
