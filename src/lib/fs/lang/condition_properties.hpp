@@ -28,7 +28,12 @@ enum class numeric_comparison_condition_property
 	map_tier,
 	area_level,
 	corrupted_mods,
-	enchantment_passive_num
+	enchantment_passive_num,
+	base_defence_percentile,
+	base_armour,
+	base_evasion,
+	base_energy_shield,
+	base_ward
 };
 
 // conditions which work with array of strings
@@ -63,7 +68,9 @@ enum class boolean_condition_property
 	elder_map,
 	blighted_map,
 	replica,
-	alternate_quality
+	alternate_quality,
+	scourged,
+	uber_blighted_map
 };
 
 } // namespace fs::lang

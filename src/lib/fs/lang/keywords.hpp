@@ -59,6 +59,13 @@ namespace rf
 	constexpr auto replica          = "Replica";
 	constexpr auto alternate_quality = "AlternateQuality";
 	constexpr auto gem_quality_type = "GemQualityType";
+	constexpr auto base_defence_percentile = "BaseDefencePercentile";
+	constexpr auto base_armour      = "BaseArmour";
+	constexpr auto base_evasion     = "BaseEvasion";
+	constexpr auto base_energy_shield = "BaseEnergyShield";
+	constexpr auto base_ward        = "BaseWard";
+	constexpr auto scourged         = "Scourged";
+	constexpr auto uber_blighted_map = "UberBlightedMap";
 
 	constexpr auto r = 'R';
 	constexpr auto g = 'G';

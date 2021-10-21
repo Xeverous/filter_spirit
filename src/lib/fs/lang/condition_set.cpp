@@ -325,6 +325,11 @@ void condition_set::generate(std::ostream& output_stream) const
 	output_range_condition(area_level,     kw::area_level,     output_stream);
 	output_range_condition(corrupted_mods, kw::corrupted_mods, output_stream);
 	output_range_condition(enchantment_passive_num, kw::enchantment_passive_num, output_stream);
+	output_range_condition(base_defence_percentile, kw::base_defence_percentile, output_stream);
+	output_range_condition(base_armour,    kw::base_armour,    output_stream);
+	output_range_condition(base_evasion,   kw::base_evasion,   output_stream);
+	output_range_condition(base_energy_shield, kw::base_energy_shield, output_stream);
+	output_range_condition(base_ward,      kw::base_ward,      output_stream);
 
 	output_gem_quality_type_condition(gem_quality_type, output_stream);
 
@@ -344,6 +349,8 @@ void condition_set::generate(std::ostream& output_stream) const
 	output_boolean_condition(is_blighted_map,      kw::blighted_map,      output_stream);
 	output_boolean_condition(is_replica,           kw::replica,           output_stream);
 	output_boolean_condition(is_alternate_quality, kw::alternate_quality, output_stream);
+	output_boolean_condition(is_scourged,          kw::scourged,          output_stream);
+	output_boolean_condition(is_uber_blighted_map, kw::uber_blighted_map, output_stream);
 
 	output_strings_condition(class_,                   kw::class_,                   output_stream);
 	output_strings_condition(base_type,                kw::base_type,                output_stream);
@@ -359,12 +366,9 @@ void condition_set::generate(std::ostream& output_stream) const
 bool condition_set::is_valid() const
 {
 	const auto is_valid_strings = [](const std::vector<lang::string>& strings) {
-		// empty list of allowed values: there are no items that can match this block
-		// game client will not accept an empty list so return that the block is invalid
-		if (strings.empty())
-			return false;
-
-		return true;
+		// list of allowed values must be non-empty to be accepted by in-game filter
+		// otherwise the empty condition would not make sense
+		return !strings.empty();
 	};
 	const auto is_valid_strings_condition = [&](const std::optional<strings_condition>& condition) {
 		// no condition: ok, we just don't require item to have this property

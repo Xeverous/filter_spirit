@@ -156,6 +156,11 @@ namespace rf
 				(lang::keywords::rf::area_level,     lang::numeric_comparison_condition_property::area_level)
 				(lang::keywords::rf::corrupted_mods, lang::numeric_comparison_condition_property::corrupted_mods)
 				(lang::keywords::rf::enchantment_passive_num, lang::numeric_comparison_condition_property::enchantment_passive_num)
+				(lang::keywords::rf::base_defence_percentile, lang::numeric_comparison_condition_property::base_defence_percentile)
+				(lang::keywords::rf::base_armour,    lang::numeric_comparison_condition_property::base_armour)
+				(lang::keywords::rf::base_evasion,   lang::numeric_comparison_condition_property::base_evasion)
+				(lang::keywords::rf::base_energy_shield, lang::numeric_comparison_condition_property::base_energy_shield)
+				(lang::keywords::rf::base_ward,      lang::numeric_comparison_condition_property::base_ward)
 			;
 		}
 	};
@@ -217,6 +222,8 @@ namespace rf
 				(lang::keywords::rf::blighted_map,      lang::boolean_condition_property::blighted_map)
 				(lang::keywords::rf::replica,           lang::boolean_condition_property::replica)
 				(lang::keywords::rf::alternate_quality, lang::boolean_condition_property::alternate_quality)
+				(lang::keywords::rf::scourged,          lang::boolean_condition_property::scourged)
+				(lang::keywords::rf::uber_blighted_map, lang::boolean_condition_property::uber_blighted_map)
 			;
 		}
 	};

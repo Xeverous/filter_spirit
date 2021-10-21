@@ -243,6 +243,11 @@ struct condition_set
 	integer_range_condition area_level;
 	integer_range_condition corrupted_mods;
 	integer_range_condition enchantment_passive_num;
+	integer_range_condition base_defence_percentile;
+	integer_range_condition base_armour;
+	integer_range_condition base_evasion;
+	integer_range_condition base_energy_shield;
+	integer_range_condition base_ward;
 	std::optional<boolean_condition> is_identified;
 	std::optional<boolean_condition> is_corrupted;
 	std::optional<boolean_condition> is_mirrored;
@@ -256,6 +261,8 @@ struct condition_set
 	std::optional<boolean_condition> is_blighted_map;
 	std::optional<boolean_condition> is_replica;
 	std::optional<boolean_condition> is_alternate_quality;
+	std::optional<boolean_condition> is_scourged;
+	std::optional<boolean_condition> is_uber_blighted_map;
 };
 
 class condition_match_result
@@ -340,6 +347,11 @@ struct condition_set_match_result
 			&& is_not_failure_range(area_level)
 			&& is_not_failure_range(corrupted_mods)
 			&& is_not_failure_range(enchantment_passive_num)
+			&& is_not_failure_range(base_defence_percentile)
+			&& is_not_failure_range(base_armour)
+			&& is_not_failure_range(base_evasion)
+			&& is_not_failure_range(base_energy_shield)
+			&& is_not_failure_range(base_ward)
 			&& is_not_failure(class_)
 			&& is_not_failure(base_type)
 			&& is_not_failure(sockets)
@@ -362,7 +374,9 @@ struct condition_set_match_result
 			&& is_not_failure(is_elder_map)
 			&& is_not_failure(is_blighted_map)
 			&& is_not_failure(is_replica)
-			&& is_not_failure(is_alternate_quality);
+			&& is_not_failure(is_alternate_quality)
+			&& is_not_failure(is_scourged)
+			&& is_not_failure(is_uber_blighted_map);
 	}
 
 	range_condition_match_result item_level;
@@ -378,6 +392,11 @@ struct condition_set_match_result
 	range_condition_match_result area_level;
 	range_condition_match_result corrupted_mods;
 	range_condition_match_result enchantment_passive_num;
+	range_condition_match_result base_defence_percentile;
+	range_condition_match_result base_armour;
+	range_condition_match_result base_evasion;
+	range_condition_match_result base_energy_shield;
+	range_condition_match_result base_ward;
 	std::optional<condition_match_result> class_;
 	std::optional<condition_match_result> base_type;
 	std::optional<condition_match_result> sockets;
@@ -401,6 +420,8 @@ struct condition_set_match_result
 	std::optional<condition_match_result> is_blighted_map;
 	std::optional<condition_match_result> is_replica;
 	std::optional<condition_match_result> is_alternate_quality;
+	std::optional<condition_match_result> is_scourged;
+	std::optional<condition_match_result> is_uber_blighted_map;
 };
 
 struct autogen_condition

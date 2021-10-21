@@ -1402,6 +1402,44 @@ Show
 			BOOST_TEST(compare_strings(expected_filter, actual_filter));
 		}
 
+		BOOST_AUTO_TEST_CASE(scourge_new_conditions)
+		{
+			const std::string actual_filter = generate_filter(minimal_input() + R"(
+BaseDefencePercentile >= 90 { Show }
+BaseArmour            > 500 { Show }
+BaseEvasion           > 500 { Show }
+BaseEnergyShield      > 200 { Show }
+BaseWard              >  50 { Show }
+Scourged               True { Show }
+UberBlightedMap        True { Show }
+)");
+			const std::string_view expected_filter =
+R"(Show
+	BaseDefencePercentile >= 90
+
+Show
+	BaseArmour > 500
+
+Show
+	BaseEvasion > 500
+
+Show
+	BaseEnergyShield > 200
+
+Show
+	BaseWard > 50
+
+Show
+	Scourged True
+
+Show
+	UberBlightedMap True
+
+)";
+
+			BOOST_TEST(compare_strings(expected_filter, actual_filter));
+		}
+
 		BOOST_AUTO_TEST_CASE(shaper_voice_lines)
 		{
 			const std::string actual_filter = generate_filter(minimal_input() + R"(

@@ -95,6 +95,11 @@ MapTier               [CMP] Integer+
 AreaLevel             [CMP] Integer+
 CorruptedMods         [CMP] Integer+
 EnchantmentPassiveNum [CMP] Integer+
+BaseDefencePercentile [CMP] Integer+
+BaseArmour            [CMP] Integer+
+BaseEvasion           [CMP] Integer+
+BaseEnergyShield      [CMP] Integer+
+BaseWard              [CMP] Integer+
 
 Class                  [EQ] String+
 BaseType               [EQ] String+
@@ -123,6 +128,8 @@ ElderMap         Boolean
 BlightedMap      Boolean
 Replica          Boolean
 AlternateQuality Boolean
+Scourged         Boolean
+UberBlightedMap  Boolean
 ```
 
 Note: numeric and `Rarity` conditions can accept multiple values, but there is no practicaly point in doing so. You can cover any range with 2 lines using different comparisons, which is much better than manually specifying all possible values in 1 line. Additionally, current FS implementation does not support this and will error on more than 1 value (this is true both for real filters and filter templates).

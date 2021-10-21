@@ -139,6 +139,21 @@ add_numeric_comparison_condition(
 		case lang::numeric_comparison_condition_property::enchantment_passive_num: {
 			return add_range_condition(cmp, intgr, condition_origin, set.enchantment_passive_num, diagnostics);
 		}
+		case lang::numeric_comparison_condition_property::base_defence_percentile: {
+			return add_range_condition(cmp, intgr, condition_origin, set.base_defence_percentile, diagnostics);
+		}
+		case lang::numeric_comparison_condition_property::base_armour: {
+			return add_range_condition(cmp, intgr, condition_origin, set.base_armour, diagnostics);
+		}
+		case lang::numeric_comparison_condition_property::base_evasion: {
+			return add_range_condition(cmp, intgr, condition_origin, set.base_evasion, diagnostics);
+		}
+		case lang::numeric_comparison_condition_property::base_energy_shield: {
+			return add_range_condition(cmp, intgr, condition_origin, set.base_energy_shield, diagnostics);
+		}
+		case lang::numeric_comparison_condition_property::base_ward: {
+			return add_range_condition(cmp, intgr, condition_origin, set.base_ward, diagnostics);
+		}
 	}
 
 	push_error_internal_compiler_error(__func__, condition_origin, diagnostics);
@@ -460,6 +475,18 @@ add_boolean_condition(
 			return add_non_range_condition(
 				lang::boolean_condition{boolean, condition_origin},
 				condition_set.is_alternate_quality,
+				diagnostics);
+		}
+		case lang::boolean_condition_property::scourged: {
+			return add_non_range_condition(
+				lang::boolean_condition{boolean, condition_origin},
+				condition_set.is_scourged,
+				diagnostics);
+		}
+		case lang::boolean_condition_property::uber_blighted_map: {
+			return add_non_range_condition(
+				lang::boolean_condition{boolean, condition_origin},
+				condition_set.is_uber_blighted_map,
 				diagnostics);
 		}
 	}
