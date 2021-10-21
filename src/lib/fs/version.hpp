@@ -16,7 +16,7 @@ struct version_triplet
 
 constexpr version_triplet current() noexcept
 {
-	return {1, 2, 1};
+	return {1, 2, 2};
 }
 
 // C++20: use operator<=>
