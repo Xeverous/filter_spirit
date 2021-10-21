@@ -6,6 +6,16 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 
 *newest at the top*
 
+### 3.16 (Scourge) - [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3187476)
+
+- New conditions: `BaseDefencePercentile`, `BaseArmour`, `BaseEvasion`, `BaseEnergyShield`, `BaseWard`, `Scourged`, `UberBlightedMap`
+- [patch notes](https://www.pathofexile.com/forum/view-thread/3186390)
+- [recent topics](https://www.pathofexile.com/forum/view-thread/3174380)
+- [gem information](https://www.pathofexile.com/forum/view-thread/3187742)
+- [atlas information](https://www.pathofexile.com/forum/view-thread/3187176)
+- [list of teasers](https://www.pathofexile.com/forum/view-thread/3184585)
+- [ascendancy changes](https://www.pathofexile.com/forum/view-thread/3187468)
+
 ### 3.15 (Expedition) - [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3147480)
 
 - [patch notes](https://www.pathofexile.com/forum/view-thread/3147479)

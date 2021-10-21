@@ -1,5 +1,17 @@
 # Filter Spirit changelog
 
+## version 1.2.2 (21.10.2021)
+
+Implemented new conditions:
+
+- `BaseDefencePercentile`
+- `BaseArmour`
+- `BaseEnergyShield`
+- `BaseEvasion`
+- `BaseWard`
+- `Scourged`
+- `UberBlightedMap`
+
 ## version 1.2.1 (23.07.2021)
 
 - added support for `CustomAlertSoundOptional`, `EnableDropSoundIfAlertSound` and `DisableDropSoundIfAlertSound`
