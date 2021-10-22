@@ -23,6 +23,7 @@ $color_error               = $color_red
 $color_normal              = 200 200 200
 $color_magic               = 136 136 255
 $color_rare                = 255 255 119
+$color_base_defence        =  60  97  92
 $color_rare_good_base      =   0  96   0
 $color_rare_chance         = 255 255 153 # ilvl 59-
 $color_rare_chaos          = $color_rare # ilvl 60-74
@@ -52,6 +53,7 @@ $color_quest               =  74 230  58
 $color_card                = 100 210 255
 $color_gem                 =  27 162 155
 $color_corrupted           = 255 127 127
+$color_scourged            = 210 112   0
 $color_sacrifice           = 127  63   0
 $color_mortal              =  60 150   0
 $color_heist               = 204 130 130
@@ -137,6 +139,7 @@ $font_unique             = $font_max
 $font_6_socket           = $font_max
 $font_6_link             = $font_max
 $font_5_link             = $font_max
+$font_base_defence       = $font_max
 $font_divine_vessel      = $font_max
 $font_breachstone        = $font_max
 $font_emblem             = $font_max
@@ -244,6 +247,8 @@ $alert_talisman_rare       = $alert_check_required
 $alert_talisman_other      = $alert_check_required
 $alert_base_crafting       = $alert_common
 $alert_base_chance         = $alert_common
+$alert_base_defence        = $alert_uncommon
+$alert_scourged            = None
 $alert_fractured_item      = $alert_very_specific
 $alert_synthesised_item    = $alert_very_specific
 $alert_experimented_base   = $alert_very_specific
@@ -275,6 +280,7 @@ $beam_gem             = Green
 $beam_unique          = Brown
 $beam_6_link          = Red
 $beam_map             = Grey
+$beam_base_defence    = Grey
 $beam_influence       = Pink
 $beam_ultimatum       = Orange
 
@@ -309,6 +315,7 @@ $icon_gem_20_quality  = 0 Green Circle
 $icon_unique_high     = 0 Brown Triangle
 $icon_unique_mid      = 2 Brown Triangle
 $icon_6_link          = 0 Red Hexagon
+$icon_base_defence    = 0 Grey Square
 $icon_ultimatum       = 0 Orange Triangle
 $icon_error           = 0 Red Square
 
@@ -427,6 +434,14 @@ $blocks_gem_quality_price = {
 	}
 }
 
+$actions_base_defence = {
+	SetBackgroundColor $color_base_defence
+	SetFontSize $font_base_defence
+	SetAlertSound $alert_base_defence
+	PlayEffect $beam_base_defence
+	MinimapIcon $icon_base_defence
+}
+
 $actions_influence_high = {
 	SetBackgroundColor $color_influence_high
 	SetFontSize $font_influence_high
@@ -527,13 +542,13 @@ $show_currency_low = True
 $show_currency_very_low = True
 $show_currency_low_shards = True
 $show_rogue_markers = True
-# Show 4 worst breach spliters and 3 worst legion splinters
+# Show 4 worst breach splinters and 3 worst legion splinters
 # Other splinters are always shown
-$show_low_splinters = False
+$show_low_splinters = True
 
 $cards_stack_size_1 = "Chaotic Disposition" "The Void" "Divine Justice" "The Cartographer" "The Heroic Shot" "Society's Remorse"
 # These cards will be always shown, regardless of their reported value
-$cfg_cards_always_show_names = $cards_stack_size_1 "Humility" "Loyalty" "Lucky Connections" "Lucky Deck" "No Traces" "The Catalyst" "The Encroaching Darkness" "The Gemcutter" "The Innocent" "The Inventor" "The Master Artisan" "The Obscured" "The Risk" "The Survivalist" "The Wrath" "Three Faces in the Dark" "Vinia's Token" "Coveted Possession" "Sambodhi's Vow" "The Tinkerer's Table" "Monochrome" "Cameria's Cut" "Buried Treasure" "Last Hope" "The Journey" "The Fool" "Underground Forest" "The Deal" "Vinia's Token" "Demigod's Wager" "More is Never Enough" "The Union" "The Seeker" "The Sephirot"
+$cfg_cards_always_show_names = $cards_stack_size_1 "Humility" "Loyalty" "Lucky Connections" "Lucky Deck" "No Traces" "The Catalyst" "The Encroaching Darkness" "The Gemcutter" "The Innocent" "The Inventor" "The Master Artisan" "The Obscured" "The Risk" "The Survivalist" "The Wrath" "Three Faces in the Dark" "Vinia's Token" "Coveted Possession" "Sambodhi's Vow" "The Tinkerer's Table" "Monochrome" "Cameria's Cut" "Buried Treasure" "Last Hope" "The Journey" "The Fool" "Underground Forest" "The Deal" "Vinia's Token" "Demigod's Wager" "More is Never Enough" "The Union" "The Seeker" "The Sephirot" "A Sea of Blue"
 $cfg_cards_high_min_value = 100
 $cfg_cards_mid_min_value = 10
 $cfg_cards_low_min_value = 1
@@ -635,9 +650,11 @@ $show_jewels_basic = True
 $show_gear_fractured = True
 $show_gear_synthesised = True
 $show_gear_breach_ring = True
+$show_gear_scourged = True
 $show_gear_corrupted = False
 $show_5_link = True # (6Ls are always shown)
 $show_6_socket = True
+$show_gear_base_defence = True
 $cfg_influence_high_min_value = 100
 $cfg_influence_mid_min_value = 10
 $cfg_influence_low_min_value = 1
@@ -664,7 +681,12 @@ $show_gear_enchanted_other = False
 # These are highest bases for each attribute combination.
 # Rare items on these bases will get a different background color, final Show/Hide is unaffected.
 # If you don't like this feature, just set the variable below to None or show variable to False.
-$cfg_good_base_names = "Stygian Vise" "Eternal Burgonet" "Lion Pelt" "Hubris Circlet" "Nightmare Bascinet" "Titan Gauntlets" "Slink Gloves" "Sorcerer Gloves" "Dragonscale Gauntlets" "Titan Greaves" "Slink Boots" "Sorcerer Boots" "Dragonscale Boots" "Assassin's Boots" "Glorious Plate" "Assassin's Garb" "Vaal Regalia" "Titanium Spirit Shield" "Harbinger Bow" "Ambusher" "Ezomyte Dagger" "Platinum Kris" "Imperial Skean" "Demon Dagger" "Void Sceptre" "Sambar Sceptre" "Profane Wand" "Prophecy Wand" "Tornado Wand" "Opal Wand" "Imbued Wand" "Demon's Horn" "Steel Ring" "Opal Ring" "Blue Pearl Amulet" "Marble Amulet" "Crystal Belt" "Bone Helmet" "Two-Toned Boots" "Spiked Gloves" "Gripped Gloves" "Fingerless Silk Gloves"
+$cfg_t1_base_names = "Stygian Vise" "Eternal Burgonet" "Lion Pelt" "Hubris Circlet" "Nightmare Bascinet" "Titan Gauntlets" "Slink Gloves" "Sorcerer Gloves" "Dragonscale Gauntlets" "Titan Greaves" "Slink Boots" "Sorcerer Boots" "Dragonscale Boots" "Assassin's Boots" "Glorious Plate" "Assassin's Garb" "Vaal Regalia" "Titanium Spirit Shield" "Harbinger Bow" "Ambusher" "Ezomyte Dagger" "Platinum Kris" "Imperial Skean" "Demon Dagger" "Void Sceptre" "Sambar Sceptre" "Profane Wand" "Prophecy Wand" "Tornado Wand" "Opal Wand" "Imbued Wand" "Demon's Horn"
+$cfg_atlas_base_names = "Apothecary's Gloves" "Fingerless Silk Gloves" "Fugitive Boots" "Gripped Gloves" "Spiked Gloves" "Two-Toned Boots" "Convoking Wand" "Bone Helmet" "Artillery Quiver" "Marble Amulet" "Seaglass Amulet" "Blue Pearl Amulet" "Iolite Ring" "Vanguard Belt" "Crystal Belt" "Cerulean Ring" "Opal Ring" "Steel Ring" "Vermillion Ring" "Unset Amulet"
+$cfg_good_base_names = $cfg_t1_base_names $cfg_atlas_base_names
+$cfg_base_defence_base_names = $cfg_t1_base_names $cfg_atlas_base_names
+$cfg_base_defence_percentile_min_value = 90
+$cfg_base_defence_percentile_min_ilvl = 84
 $show_gear_rare_good_base = True
 # Like $cfg_good_base_names but actually affects final Show/Hide.
 # You might want to set it to $cfg_good_base_names and/or add own preferred bases.
@@ -698,12 +720,13 @@ SetBackgroundColor $color_black
 Class == "Stackable Currency" {
 	SetBackgroundColor $color_black
 
-	BaseType == "Exalted Orb" "Mirror of Kalandra" "Eternal Orb" "Albino Rhoa Feather" "Mirror Shard" "Crusader's Exalted Orb" "Redeemer's Exalted Orb" "Hunter's Exalted Orb" "Warlord's Exalted Orb" "Awakener's Orb" "Maven's Orb" "Prime Regrading Lens" "Secondary Regrading Lens" "Tempering Orb" "Tailoring Orb" {
+	BaseType == "Exalted Orb" "Mirror of Kalandra" "Eternal Orb" "Albino Rhoa Feather" "Mirror Shard" "Crusader's Exalted Orb" "Redeemer's Exalted Orb" "Hunter's Exalted Orb" "Warlord's Exalted Orb" "Awakener's Orb" "Maven's Orb" "Prime Regrading Lens" "Secondary Regrading Lens" "Tempering Orb" "Tailoring Orb" "Sacred Orb" "Tainted Exalted Orb" "Tainted Divine Teardrop"
+	{
 		Expand $actions_currency_high
 		Show
 	}
 
-	BaseType == "Divine Orb" "Veiled Chaos Orb" "Chaos Orb" "Gemcutter's Prism" "Stacked Deck" "Simple Sextant" "Prime Sextant" "Awakened Sextant" "Elevated Sextant" "Exalted Shard" "Orb of Annulment" "Harbinger's Orb" "Ancient Orb" "Ancient Shard" "Facetor's Lens" "Infused Engineer's Orb" "Orb of Unmaking" "Ritual Splinter" "Ritual Vessel" "Crescent Splinter"
+	BaseType == "Divine Orb" "Veiled Chaos Orb" "Chaos Orb" "Gemcutter's Prism" "Stacked Deck" "Simple Sextant" "Prime Sextant" "Awakened Sextant" "Elevated Sextant" "Exalted Shard" "Orb of Annulment" "Harbinger's Orb" "Ancient Orb" "Ancient Shard" "Facetor's Lens" "Infused Engineer's Orb" "Orb of Unmaking" "Ritual Splinter" "Ritual Vessel" "Crescent Splinter" "Tainted Blessing" "Tainted Chromatic Orb" "Tainted Orb of Fusing" "Tainted Jeweller's Orb" "Tainted Blacksmith's Whetstone" "Tainted Armourer's Scrap" "Tainted Chaos Orb" "Tainted Mythic Orb" "Tainted Blessing"
 	{
 		Expand $actions_currency_mid
 		Show
@@ -1016,6 +1039,9 @@ Class == "Stackable Currency" {
 	{
 		SetTextColor $color_blight
 		SetBorderColor $color_error
+		SetFontSize $font_oil_mid
+		SetAlertSound $alert_oil_mid
+		PlayEffect $beam_blight Temp
 		Show
 	}
 
@@ -2012,6 +2038,14 @@ Rarity <= Rare {
 		Show
 	}
 
+	ItemLevel $cfg_base_craft_min_ilvl
+	BaseDefencePercentile >= $cfg_base_defence_percentile_min_value
+	BaseType == $cfg_base_defence_base_names
+	{
+		Expand $actions_base_defence
+		ShowHide $show_gear_base_defence
+	}
+
 	# pricing machinery for bases
 	Autogen bases {
 		HasInfluence == Shaper {
@@ -2123,6 +2157,12 @@ Rarity <= Rare {
 		SetFontSize $font_6_socket
 		SetAlertSound $alert_6_socket
 		ShowDiscard $show_6_socket
+	}
+
+	Scourged True {
+		SetBackgroundColor $color_scourged
+		SetAlertSound $alert_scourged
+		ShowHide $show_gear_scourged
 	}
 
 	Corrupted True {
