@@ -1923,6 +1923,10 @@ Rarity <= Rare {
 	# these blocks only set styles (or not if discarded)
 	Sockets < 6
 	SocketGroup RGB {
+		SetBorderColor $color_chromatic_big
+		ShowDiscard $show_gear_chrome_big
+		Continue
+
 		Width 2
 		Height <= 2 {
 			SetBorderColor $color_chromatic_small
@@ -1936,10 +1940,6 @@ Rarity <= Rare {
 			ShowDiscard $show_gear_chrome_small
 			Continue
 		}
-
-		SetBorderColor $color_chromatic_big
-		ShowDiscard $show_gear_chrome_big
-		Continue
 	}
 
 	AnyEnchantment True {
