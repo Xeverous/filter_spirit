@@ -6,12 +6,13 @@ If you ever worked with web stuff - a perfect analogy is that Filter Spirit is t
 
 ## news
 
-**Ultimatum update with significant new features has been released!** (no icon though, can someone make me a logo?)
-[DOWNLOAD HERE](https://github.com/Xeverous/filter_spirit/releases)
+**Scourge update released** - [DOWNLOAD HERE](https://github.com/Xeverous/filter_spirit/releases)
 
 As of now, the tool supports all possible conditions and actions except few corner cases which are described in `doc/known_issues`.
 
 Message me ([/u/Xeverous](https://old.reddit.com/user/Xeverous/) on reddit or Xeverous#2151 on Discord) if you are interested in it or have any questions/suggestions/whatever. You can also open an issue.
+
+I'm currently focused on a different project so generally FS has low priority. This can change if you contact me though.
 
 ___
 
@@ -19,10 +20,13 @@ poe.watch is dead - only poe.ninja generation will work. Original author passed 
 
 ___
 
-Thanks to some users, I'm thinking of these program interface opportunities:
+Plans for the future:
 
-- Visual Studio Code plugin that uses FS in the background.
-- WASM-compiled build, hosted on a static GitHub Pages website (some work already in progress, JavaScript help needed).
+- poe.watch support
+- support for cluster jewel pricing in filter template code
+- Visual Studio Code plugin that uses FS in the background
+- UI overhaul
+- WASM-compiled build, hosted on a static GitHub Pages website (some work already in progress, JavaScript help needed)
 
 Please contact me if you are familiar with web-related technologies and would like to help in making these.
 
