@@ -113,8 +113,8 @@ $font_essence_special    = $font_high
 $font_essence_other      = $font_currency_mid
 $font_card_high          = $font_high
 $font_card_mid           = $font_mid
-$font_card_low           = $font_low
-$font_card_very_low      = $font_very_low
+$font_card_low           = $font_mid
+$font_card_very_low      = $font_low
 $font_gem_awakened       = $font_max
 $font_gem_alternate      = $font_max
 $font_gem_drop_only      = 38
@@ -287,9 +287,11 @@ $beam_ultimatum       = Orange
 $icon_quest_item      = 0 Green Pentagon
 $icon_fishing_rod     = 0 White Star
 $icon_currency_high   = 0 Yellow Star
-$icon_currency_mid    = 2 Yellow Star
+$icon_currency_mid    = 1 Yellow Star
+$icon_currency_low    = 2 Yellow Star
 $icon_card_high       = 0 Blue Square
-$icon_card_mid        = 2 Blue Square
+$icon_card_mid        = 1 Blue Square
+$icon_card_low        = 2 Blue Square
 $icon_oil_high        = 0 Orange Raindrop
 $icon_oil_mid         = 2 Orange Raindrop
 $icon_reliquary       = $icon_currency_high
@@ -344,6 +346,7 @@ $actions_currency_low = {
 	SetFontSize $font_currency_low
 	SetAlertSound $alert_currency_low
 	PlayEffect $beam_currency
+	MinimapIcon $icon_currency_low
 }
 
 $actions_currency_very_low = {
@@ -654,7 +657,7 @@ $show_gear_scourged = True
 $show_gear_corrupted = False
 $show_5_link = True # (6Ls are always shown)
 $show_6_socket = True
-$show_gear_base_defence = True
+$show_gear_base_defence = False
 $cfg_influence_high_min_value = 100
 $cfg_influence_mid_min_value = 10
 $cfg_influence_low_min_value = 1
