@@ -2046,7 +2046,7 @@ Rarity <= Rare {
 	BaseType == $cfg_base_defence_base_names
 	{
 		Expand $actions_base_defence
-		ShowHide $show_gear_base_defence
+		ShowDiscard $show_gear_base_defence
 	}
 
 	# pricing machinery for bases
