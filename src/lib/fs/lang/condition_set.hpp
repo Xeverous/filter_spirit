@@ -247,6 +247,8 @@ struct condition_set
 	integer_range_condition base_evasion;
 	integer_range_condition base_energy_shield;
 	integer_range_condition base_ward;
+	integer_range_condition has_searing_exarch_implicit;
+	integer_range_condition has_eater_of_worlds_implicit;
 	std::optional<boolean_condition> is_identified;
 	std::optional<boolean_condition> is_corrupted;
 	std::optional<boolean_condition> is_mirrored;
@@ -351,6 +353,8 @@ struct condition_set_match_result
 			&& is_not_failure_range(base_evasion)
 			&& is_not_failure_range(base_energy_shield)
 			&& is_not_failure_range(base_ward)
+			&& is_not_failure_range(has_searing_exarch_implicit)
+			&& is_not_failure_range(has_eater_of_worlds_implicit)
 			&& is_not_failure(class_)
 			&& is_not_failure(base_type)
 			&& is_not_failure(sockets)
@@ -395,6 +399,8 @@ struct condition_set_match_result
 	range_condition_match_result base_evasion;
 	range_condition_match_result base_energy_shield;
 	range_condition_match_result base_ward;
+	range_condition_match_result has_searing_exarch_implicit;
+	range_condition_match_result has_eater_of_worlds_implicit;
 	std::optional<condition_match_result> class_;
 	std::optional<condition_match_result> base_type;
 	std::optional<condition_match_result> sockets;

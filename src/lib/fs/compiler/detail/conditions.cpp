@@ -154,6 +154,12 @@ add_numeric_comparison_condition(
 		case lang::numeric_comparison_condition_property::base_ward: {
 			return add_range_condition(cmp, intgr, condition_origin, set.base_ward, diagnostics);
 		}
+		case lang::numeric_comparison_condition_property::has_searing_exarch_implicit: {
+			return add_range_condition(cmp, intgr, condition_origin, set.has_searing_exarch_implicit, diagnostics);
+		}
+		case lang::numeric_comparison_condition_property::has_eater_of_worlds_implicit: {
+			return add_range_condition(cmp, intgr, condition_origin, set.has_eater_of_worlds_implicit, diagnostics);
+		}
 	}
 
 	push_error_internal_compiler_error(__func__, condition_origin, diagnostics);
