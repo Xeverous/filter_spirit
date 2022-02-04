@@ -65,6 +65,8 @@ namespace rf
 	constexpr auto base_ward        = "BaseWard";
 	constexpr auto scourged         = "Scourged";
 	constexpr auto uber_blighted_map = "UberBlightedMap";
+	constexpr auto has_searing_exarch_implicit  = "HasSearingExarchImplicit";
+	constexpr auto has_eater_of_worlds_implicit = "HasEaterOfWorldsImplicit";
 
 	constexpr auto r = 'R';
 	constexpr auto g = 'G';

@@ -312,24 +312,26 @@ const lang::string* strings_condition::find_match(std::string_view value) const
 
 void condition_set::generate(std::ostream& output_stream) const
 {
-	output_range_condition(item_level,     kw::item_level,     output_stream);
-	output_range_condition(drop_level,     kw::drop_level,     output_stream);
-	output_range_condition(quality,        kw::quality,        output_stream);
-	output_range_condition(rarity,         kw::rarity,         output_stream);
-	output_range_condition(linked_sockets, kw::linked_sockets, output_stream);
-	output_range_condition(height,         kw::height,         output_stream);
-	output_range_condition(width,          kw::width,          output_stream);
-	output_range_condition(stack_size,     kw::stack_size,     output_stream);
-	output_range_condition(gem_level,      kw::gem_level,      output_stream);
-	output_range_condition(map_tier,       kw::map_tier,       output_stream);
-	output_range_condition(area_level,     kw::area_level,     output_stream);
-	output_range_condition(corrupted_mods, kw::corrupted_mods, output_stream);
-	output_range_condition(enchantment_passive_num, kw::enchantment_passive_num, output_stream);
-	output_range_condition(base_defence_percentile, kw::base_defence_percentile, output_stream);
-	output_range_condition(base_armour,    kw::base_armour,    output_stream);
-	output_range_condition(base_evasion,   kw::base_evasion,   output_stream);
-	output_range_condition(base_energy_shield, kw::base_energy_shield, output_stream);
-	output_range_condition(base_ward,      kw::base_ward,      output_stream);
+	output_range_condition(item_level,                   kw::item_level,                   output_stream);
+	output_range_condition(drop_level,                   kw::drop_level,                   output_stream);
+	output_range_condition(quality,                      kw::quality,                      output_stream);
+	output_range_condition(rarity,                       kw::rarity,                       output_stream);
+	output_range_condition(linked_sockets,               kw::linked_sockets,               output_stream);
+	output_range_condition(height,                       kw::height,                       output_stream);
+	output_range_condition(width,                        kw::width,                        output_stream);
+	output_range_condition(stack_size,                   kw::stack_size,                   output_stream);
+	output_range_condition(gem_level,                    kw::gem_level,                    output_stream);
+	output_range_condition(map_tier,                     kw::map_tier,                     output_stream);
+	output_range_condition(area_level,                   kw::area_level,                   output_stream);
+	output_range_condition(corrupted_mods,               kw::corrupted_mods,               output_stream);
+	output_range_condition(enchantment_passive_num,      kw::enchantment_passive_num,      output_stream);
+	output_range_condition(base_defence_percentile,      kw::base_defence_percentile,      output_stream);
+	output_range_condition(base_armour,                  kw::base_armour,                  output_stream);
+	output_range_condition(base_evasion,                 kw::base_evasion,                 output_stream);
+	output_range_condition(base_energy_shield,           kw::base_energy_shield,           output_stream);
+	output_range_condition(base_ward,                    kw::base_ward,                    output_stream);
+	output_range_condition(has_searing_exarch_implicit,  kw::has_searing_exarch_implicit,  output_stream);
+	output_range_condition(has_eater_of_worlds_implicit, kw::has_eater_of_worlds_implicit, output_stream);
 
 	output_gem_quality_type_condition(gem_quality_type, output_stream);
 

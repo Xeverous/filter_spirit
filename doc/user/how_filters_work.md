@@ -100,6 +100,8 @@ BaseArmour            [CMP] Integer+
 BaseEvasion           [CMP] Integer+
 BaseEnergyShield      [CMP] Integer+
 BaseWard              [CMP] Integer+
+HasSearingExarchImplicit [CMP] Integer+
+HasEaterOfWorldsImplicit [CMP] Integer+
 
 Class                  [EQ] String+
 BaseType               [EQ] String+

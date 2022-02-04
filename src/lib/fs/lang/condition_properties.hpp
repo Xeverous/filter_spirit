@@ -33,7 +33,9 @@ enum class numeric_comparison_condition_property
 	base_armour,
 	base_evasion,
 	base_energy_shield,
-	base_ward
+	base_ward,
+	has_searing_exarch_implicit,
+	has_eater_of_worlds_implicit
 };
 
 // conditions which work with array of strings

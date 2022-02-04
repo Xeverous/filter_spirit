@@ -1440,6 +1440,32 @@ Show
 			BOOST_TEST(compare_strings(expected_filter, actual_filter));
 		}
 
+		BOOST_AUTO_TEST_CASE(siege_of_the_atlas_new_conditions)
+		{
+			const std::string actual_filter = generate_filter(minimal_input() + R"(
+HasSearingExarchImplicit    5 { Show }
+HasSearingExarchImplicit >= 4 { Show }
+HasEaterOfWorldsImplicit    6 { Show }
+HasEaterOfWorldsImplicit >  4 { Show }
+)");
+			const std::string_view expected_filter =
+R"(Show
+	HasSearingExarchImplicit = 5
+
+Show
+	HasSearingExarchImplicit >= 4
+
+Show
+	HasEaterOfWorldsImplicit = 6
+
+Show
+	HasEaterOfWorldsImplicit > 4
+
+)";
+
+			BOOST_TEST(compare_strings(expected_filter, actual_filter));
+		}
+
 		BOOST_AUTO_TEST_CASE(shaper_voice_lines)
 		{
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
