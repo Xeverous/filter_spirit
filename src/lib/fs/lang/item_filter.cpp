@@ -130,27 +130,6 @@ test_ranged_strings_condition(
 }
 
 [[nodiscard]] std::optional<condition_match_result>
-test_prophecy_condition(
-	const std::optional<strings_condition>& opt_condition,
-	const item& itm)
-{
-	if (!opt_condition)
-		return std::nullopt;
-	/*
-	 * Prophecy condition is a bit different. It is not a boolean condition nor does it check
-	 * for "Prophecy" class. Instead it treats the item base type name as the prophecy name.
-	 * If the item is an itemised prophecy, then the base type is compared (as if in BaseType
-	 * condition), otherwise condition fails.
-	 */
-	const strings_condition& condition = *opt_condition;
-
-	if (!itm.is_prophecy)
-		return condition_match_result::failure(condition.origin);
-
-	return test_strings_condition_impl(condition, itm.base_type);
-}
-
-[[nodiscard]] std::optional<condition_match_result>
 test_influences_condition(
 	const std::optional<influences_condition>& opt_condition,
 	influence_info item_influence)
@@ -469,8 +448,6 @@ item_style default_item_style(const item& itm)
 		result.text_color = color_action{color{integer{ 14}, integer{186}, integer{255}, integer{255}}, {}};
 	else if (itm.class_ == item_class_names::gems_active || itm.class_ == item_class_names::gems_support)
 		result.text_color = color_action{color{integer{ 27}, integer{162}, integer{155}, integer{255}}, {}};
-	else if (itm.is_prophecy)
-		result.text_color = color_action{color{integer{181}, integer{ 75}, integer{255}, integer{255}}, {}};
 	else if (itm.class_ == item_class_names::quest_items)
 		result.text_color = color_action{color{integer{ 74}, integer{230}, integer{ 58}, integer{255}}, {}};
 	// maps are both in these class names and in rarities - border color is the same as text color
@@ -586,8 +563,6 @@ item_filtering_result pass_item_through_filter(const item& itm, const item_filte
 
 		cs_result.has_explicit_mod         = test_ranged_strings_condition(cs.has_explicit_mod,  itm.explicit_mods);
 		cs_result.has_enchantment          = test_ranged_strings_condition(cs.has_enchantment,   itm.enchantments_labyrinth);
-
-		cs_result.prophecy = test_prophecy_condition(cs.prophecy, itm);
 
 		cs_result.has_influence = test_influences_condition(cs.has_influence, itm.influence);
 

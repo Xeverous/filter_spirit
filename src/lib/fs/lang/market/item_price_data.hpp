@@ -67,7 +67,6 @@ struct base : elementary_item
 };
 
 bool is_undroppable_unique(std::string_view name) noexcept;
-bool is_drop_disabled_prophecy(std::string_view name) noexcept;
 
 // unlinked uniques
 struct unique_item_price_data
@@ -114,7 +113,6 @@ struct item_price_data
 	std::vector<elementary_item> incubators;
 	std::vector<elementary_item> essences;
 	std::vector<elementary_item> fossils;
-	std::vector<elementary_item> prophecies;
 	std::vector<elementary_item> resonators;
 	std::vector<elementary_item> scarabs;
 	std::vector<elementary_item> helmet_enchants;

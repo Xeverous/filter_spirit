@@ -26,12 +26,12 @@ Given that:
 These are not bugs, but may be viewed as such if understood incorrectly.
 
 - Resonators fall into `"Delve Stackable Socketable Currency"`, `"Stackable Socketable Currency"`, `"Socketable Currency"` and `"Currency"` class conditions but not into `"Stackable Currency"`. This may seem inconsistent with how other supersets of item classes are handled - other supersets either do work (`"Axes"` vs `"Two Hand Axes"`) or error when loading (`"Two Axes"`). This is because some strings may be substrings of another class name - if unsure about class name validity use `==` and the game client will error if it is not a proper full class name.
-- There is no `"Currency"` class. All semingly such items are classified exactly as `"Stackable Currency"`, even if they do not stack in game (eg Prophecies). Note that `Class "Currency"` works because it uses substring-based matching by default - `Class == "Currency"` will fail.
+- There is no `"Currency"` class. All semingly such items are classified exactly as `"Stackable Currency"`, even if they do not stack in game (e.g. now removed Prophecies). Note that `Class "Currency"` works because it uses substring-based matching by default - `Class == "Currency"` will fail.
 
 Other:
 
 - Quest items must be filtered with an explicit item class (`Class "Quest Items"`). This is intended, not a bug.
-- Disabled Prophecies cannot drop and cannot be filtered. Also intended.
+- Disabled Prophecies cannot drop and cannot be filtered. Also intended. As of 3.17 (Siege of the Atlas) prophecy content has been removed.
 
 ## bugs
 

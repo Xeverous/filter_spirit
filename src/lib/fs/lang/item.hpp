@@ -24,7 +24,6 @@ namespace item_class_names {
 	constexpr auto scrolls_generic            = currency_stackable;
 	constexpr auto scrolls_harbinger          = currency_stackable;
 	constexpr auto remnant_of_corruption      = currency_stackable;
-	constexpr auto prophecies                 = currency_stackable;
 	constexpr auto essences                   = currency_stackable;
 	constexpr auto fossils                    = currency_stackable;
 	constexpr auto oils                       = currency_stackable;
@@ -506,7 +505,6 @@ struct item
 	// these 2 should be overwritten whenever an item is created - size 0x0 makes no sense
 	int height = 0;
 	int width  = 0;
-	bool is_prophecy = false; // if true, base type has an additional meaning (Prophecy condition)
 
 	/*
 	 * "seemingly optional" fields

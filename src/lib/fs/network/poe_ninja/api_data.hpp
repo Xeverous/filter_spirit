@@ -28,7 +28,6 @@ struct api_item_price_data
 	std::string resonator;
 	std::string essence;
 	std::string divination_card;
-	std::string prophecy;
 	std::string skill_gem;
 	std::string base_type;
 	std::string helmet_enchant;

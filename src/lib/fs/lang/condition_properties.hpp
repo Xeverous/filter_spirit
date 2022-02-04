@@ -42,7 +42,6 @@ enum class string_array_condition_property
 {
 	class_,
 	base_type,
-	prophecy,
 	enchantment_passive_node
 };
 

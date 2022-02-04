@@ -173,7 +173,6 @@ namespace rf
 			add
 				(lang::keywords::rf::class_,                   lang::string_array_condition_property::class_)
 				(lang::keywords::rf::base_type,                lang::string_array_condition_property::base_type)
-				(lang::keywords::rf::prophecy,                 lang::string_array_condition_property::prophecy)
 				(lang::keywords::rf::enchantment_passive_node, lang::string_array_condition_property::enchantment_passive_node)
 			;
 		}
@@ -332,7 +331,6 @@ namespace sf
 				(lang::keywords::sf::fragments,     fs::lang::item_category::fragments)
 				(lang::keywords::sf::delirium_orbs, fs::lang::item_category::delirium_orbs)
 				(lang::keywords::sf::cards,         fs::lang::item_category::cards)
-				(lang::keywords::sf::prophecies,    fs::lang::item_category::prophecies)
 				(lang::keywords::sf::essences,      fs::lang::item_category::essences)
 				(lang::keywords::sf::fossils,       fs::lang::item_category::fossils)
 				(lang::keywords::sf::resonators,    fs::lang::item_category::resonators)

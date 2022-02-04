@@ -302,10 +302,6 @@ make_filter_block(
 			result_block.conditions.base_type = make_condition_base_type_basic(item_price_data.divination_cards);
 			result_block.conditions.class_ = make_condition_class(cn::divination_card);
 			break;
-		case lang::item_category::prophecies:
-			result_block.conditions.prophecy = make_condition_base_type_basic(item_price_data.prophecies);
-			result_block.conditions.class_ = make_condition_class(cn::prophecies);
-			break;
 		case lang::item_category::essences:
 			result_block.conditions.base_type = make_condition_base_type_basic(item_price_data.essences);
 			result_block.conditions.class_ = make_condition_class(cn::essences);

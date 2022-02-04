@@ -41,7 +41,6 @@ download_item_price_data(
 		ITEM_OVERVIEW_LINK(Resonator)       + league_encoded,
 		ITEM_OVERVIEW_LINK(Essence)         + league_encoded,
 		ITEM_OVERVIEW_LINK(DivinationCard)  + league_encoded,
-		ITEM_OVERVIEW_LINK(Prophecy)        + league_encoded,
 		ITEM_OVERVIEW_LINK(SkillGem)        + league_encoded,
 		ITEM_OVERVIEW_LINK(BaseType)        + league_encoded,
 		ITEM_OVERVIEW_LINK(HelmetEnchant)   + league_encoded,
@@ -64,7 +63,7 @@ download_item_price_data(
 	// d (data) is not needed, we ignore it
 	#define MOVE_RESULT_N(z, n, d) std::move(result.results[n].data),
 	return api_item_price_data {
-		BOOST_PP_REPEAT(22, MOVE_RESULT_N,)
+		BOOST_PP_REPEAT(21, MOVE_RESULT_N,)
 	};
 	#undef MOVE_RESULT_N
 }

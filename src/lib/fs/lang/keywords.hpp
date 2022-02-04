@@ -36,7 +36,6 @@ namespace rf
 	constexpr auto width            = "Width";
 	constexpr auto has_explicit_mod = "HasExplicitMod";
 	constexpr auto has_enchantment  = "HasEnchantment";
-	constexpr auto prophecy         = "Prophecy";
 	constexpr auto has_influence    = "HasInfluence";
 	constexpr auto stack_size       = "StackSize";
 	constexpr auto gem_level        = "GemLevel";
@@ -178,7 +177,6 @@ namespace sf
 	constexpr auto bases           = "bases";
 	constexpr auto cards           = "cards";           // 2.0 - The Awakening (Warbands + Tempest)
 	// constexpr auto enchants_helmet = "enchants_helmet"; // 2.2 - Perandus league (also Ascendancy)
-	constexpr auto prophecies      = "prophecies";      // 2.3 - Prophecy league
 	constexpr auto essences        = "essences";        // 2.4 - Essence league (also Atlas of Worlds)
 	constexpr auto leaguestones    = "leaguestones";    // 2.6 - Legacy league
 	// constexpr auto pieces       = "pieces";          // 3.0 - Harbinger league (also Fall of Oriath) (merged into uniques)

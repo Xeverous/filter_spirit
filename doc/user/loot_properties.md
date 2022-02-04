@@ -70,7 +70,7 @@ This includes:
 - Harvest currency (`Facetor's Lens`, `Infused Engineer's Orb`)
 - Ritual currency (`Ritual Splinter`, `Ritual Vessel`) but not `Blood-filled Vessel`
 - Heist currency (`Prime Regrading Lens`, `Secondary Regrading Lens`, `Tempering Orb`, `Tailoring Orb`, `Rogue's Marker`)
-- itemised prophecies
+- ~~itemised prophecies~~ (removed in 3.17)
 - `Stacked Deck`
 
 Notes:
@@ -78,9 +78,8 @@ Notes:
 - High `DropLevel` does not strictly correlate with currency value. Some low-value currencies require high drop levels (`Simple Sextant` - `68`) and some high-value currencies require low drop levels (`Exalted Orb` - `35`).
 - In Harvest league it was possible to obtain specific currency (`Gemcutter's Prism`) in stack size of `0`. Item filters correctly detect this.
 - Anything that can stack (outside special stash tabs) is `"Stackable Currency"`.
-- Some items can not stack (`Facetor's Lens`, prophecies) but still are classified as such. This is intentional (see point below).
-- There is no `"Currency"` class. All are `"Stackable Currency"`. `Class "Currency"` works because without `==` it requires only a substring match, not a 1:1 match.
-- Prophecies can be caught by `Prophecy` condition which works for them the same way as `BaseType`.
+- Some items can not stack (e.g. `Facetor's Lens`) but still are classified as such. This is intentional (see point below).
+- There is no `"Currency"` class. All are `"Stackable Currency"`. `Class "Currency"` works because without `==` it requires only a substring match, not an exact match.
 
 ```
 DropLevel >= 1 # many are 1 but also many start at very high levels

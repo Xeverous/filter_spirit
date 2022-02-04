@@ -44,63 +44,44 @@ auto make_undroppable_uniques()
 		"The Vinktar Square",
 
 		// fated uniques (Prophecy upgrade only)
-		"Amplification Rod",
-		"Asenath's Chant",
-		"Atziri's Reflection",
-		"Cameria's Avarice",
-		"Chaber Cairn",
+		// as of 3.17, prophecy content no longer exists
+		// some items were brought to core drop pool, some become legacy
+		
+		// list of legacy items
 		"Corona Solaris",
-		"Cragfall",
 		"Crystal Vault",
-		"Death's Opus",
 		"Deidbellow",
-		"Doedre's Malevolence",
-		"Doomfletch's Prism",
-		"Dreadbeak",
 		"Dreadsurge",
-		"Duskblight",
 		"Ezomyte Hold",
 		"Fox's Fortune",
-		"Frostferno",
-		"Geofri's Devotion",
-		"Geofri's Legacy",
 		"Greedtrap",
-		"Hrimburn",
 		"Hrimnor's Dirge",
-		"Hyrri's Demise",
 		"Kaltensoul",
-		"Kaom's Way",
 		"Karui Charge",
-		"Malachai's Awakening",
 		"Martyr's Crown",
 		"Mirebough",
 		"Ngamahu Tiki",
 		"Panquetzaliztli",
-		"Queen's Escape",
 		"Realm Ender",
 		"Sanguine Gambol",
 		"Shavronne's Gambit",
 		"Silverbough",
 		"Sunspite",
-		"The Cauteriser",
-		"The Dancing Duo",
 		"The Effigon",
 		"The Gryphon",
-		"The Iron Fortress",
-		"The Nomad",
 		"The Oak",
-		"The Signal Fire",
-		"The Stormwall",
-		"The Tactician",
-		"The Tempest",
-		"Thirst for Horrors",
-		"Timetwist",
 		"Voidheart",
 		"Wall of Brambles",
-		"Whakatutuki o Matua",
-		"Wildwrap",
-		"Windshriek",
-		"Winterweave",
+		
+		// other prophecy-related changes
+		"Bloodboil", // renamed to Winterweave
+		"Thirst for Horrors",
+		"Cragfall",
+		"Geofri's Legacy",
+		"Iron Heart",
+		"The Dancing Duo",
+		"Timetwist",
+		"Atziri's Mirror", // fated version made Uber Atziri drop in 3.17
 
 		// blessed uniques (Breach Blessing upgrade only)
 		"Xoph's Nurture",
@@ -248,7 +229,6 @@ void compare_item_price_data(
 	run_compare_elementary(lhs.incubators, rhs.incubators, "incubators");
 	run_compare_elementary(lhs.essences, rhs.essences, "essences");
 	run_compare_elementary(lhs.fossils, rhs.fossils, "fossils");
-	run_compare_elementary(lhs.prophecies, rhs.prophecies, "prophecies");
 	run_compare_elementary(lhs.resonators, rhs.resonators, "resonators");
 	run_compare_elementary(lhs.scarabs, rhs.scarabs, "scarabs");
 
@@ -268,37 +248,6 @@ namespace fs::lang::market
 bool is_undroppable_unique(std::string_view name) noexcept
 {
 	return std::binary_search(undroppable_uniques.begin(), undroppable_uniques.end(), name);
-}
-
-bool is_drop_disabled_prophecy(std::string_view name) noexcept
-{
-	const auto disabled_prophecies = {
-		"Ancient Rivalries",
-		"A Gracious Master",
-		"The Aesthete's Spirit",
-		"Brothers in Arms",
-		"Echoes of Mutation",
-		"Echoes of Lost Love",
-		"The Emperor's Trove",
-		"The Blacksmith"
-	};
-
-	/*
-	 * String-contains (instead of operator== is used) because:
-	 * - APIs may report prophecies with extra string content (A Master Seeks Help
-	 *   is a prime example - some tools add a master name in parenthesis)
-	 * - Some prophecies are a part of a chain (e.g. Ancient Rivalries I, II, III, IV)
-	 * - Filters detect prophecies in a weird way which makes me wonder what
-	 *   extra information BaseType carries in its string
-	 *   - Class == "Stackable Currency"
-	 *   - BaseType "Prophecy"
-	 *   - Prophecy == <actual name>
-	 */
-	for (auto prophecy : disabled_prophecies)
-		if (utility::contains(name, prophecy))
-			return true;
-
-	return false;
 }
 
 bool item_price_data::load_and_parse(
@@ -378,7 +327,6 @@ log::message_stream& operator<<(log::message_stream& stream, const item_price_da
 		"\tincubators      : " << ipd.incubators.size() << "\n"
 		"\tessences        : " << ipd.essences.size() << "\n"
 		"\tfossils         : " << ipd.fossils.size() << "\n"
-		"\tprophecies      : " << ipd.prophecies.size() << "\n"
 		"\tresonators      : " << ipd.resonators.size() << "\n"
 		"\tscarabs         : " << ipd.scarabs.size() << "\n"
 		// not supported (yet)
@@ -424,7 +372,6 @@ void item_price_data::sort()
 	std::sort(incubators.begin(),       incubators.end(),       compare_by_name_asc);
 	std::sort(essences.begin(),         essences.end(),         compare_by_name_asc);
 	std::sort(fossils.begin(),          fossils.end(),          compare_by_name_asc);
-	std::sort(prophecies.begin(),       prophecies.end(),       compare_by_name_asc);
 	std::sort(resonators.begin(),       resonators.end(),       compare_by_name_asc);
 	std::sort(scarabs.begin(),          scarabs.end(),          compare_by_name_asc);
 	std::sort(helmet_enchants.begin(),  helmet_enchants.end(),  compare_by_name_asc);

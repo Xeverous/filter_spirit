@@ -8,7 +8,6 @@ namespace fs::lang
 		fragments,
 		delirium_orbs,
 		cards,
-		prophecies,
 		essences,
 		fossils,
 		resonators,

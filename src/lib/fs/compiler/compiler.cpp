@@ -374,8 +374,6 @@ verify_autogen(
 			return verify_autogen_singular(autogen.origin, conditions, cn::essences,           diagnostics);
 		case cat_t::cards:
 			return verify_autogen_singular(autogen.origin, conditions, cn::divination_card,    diagnostics);
-		case cat_t::prophecies:
-			return verify_autogen_singular(autogen.origin, conditions, cn::prophecies,         diagnostics);
 		case cat_t::vials:
 			return verify_autogen_singular(autogen.origin, conditions, cn::vials,              diagnostics);
 

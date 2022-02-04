@@ -226,12 +226,6 @@ add_string_array_condition(
 				set.base_type,
 				diagnostics);
 		}
-		case lang::string_array_condition_property::prophecy: {
-			return add_non_range_condition(
-				lang::strings_condition{std::move(strings), is_exact_match, condition_origin},
-				set.prophecy,
-				diagnostics);
-		}
 		case lang::string_array_condition_property::enchantment_passive_node: {
 			return add_non_range_condition(
 				lang::strings_condition{std::move(strings), is_exact_match, condition_origin},

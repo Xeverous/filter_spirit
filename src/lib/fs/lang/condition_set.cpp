@@ -354,7 +354,6 @@ void condition_set::generate(std::ostream& output_stream) const
 
 	output_strings_condition(class_,                   kw::class_,                   output_stream);
 	output_strings_condition(base_type,                kw::base_type,                output_stream);
-	output_strings_condition(prophecy,                 kw::prophecy,                 output_stream);
 	output_strings_condition(enchantment_passive_node, kw::enchantment_passive_node, output_stream);
 
 	output_ranged_strings_condition(has_explicit_mod,  kw::has_explicit_mod,         output_stream);
@@ -387,7 +386,6 @@ bool condition_set::is_valid() const
 
 	return is_valid_strings_condition(class_)
 		&& is_valid_strings_condition(base_type)
-		&& is_valid_strings_condition(prophecy)
 		&& is_valid_strings_condition(enchantment_passive_node)
 		&& is_valid_ranged_strings_condition(has_explicit_mod)
 		&& is_valid_ranged_strings_condition(has_enchantment);

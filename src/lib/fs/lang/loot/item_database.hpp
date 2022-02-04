@@ -148,7 +148,6 @@ struct map_fragments_database
 	std::vector<elementary_item> uber_elder_fragments;
 	std::vector<elementary_item> atziri_fragments;
 	std::vector<elementary_item> uber_atziri_fragments;
-	std::vector<elementary_item> prophecy_fragments; // aka Pale Court keys
 	std::vector<elementary_item> legion_fragments; // aka Emblems
 	std::vector<elementary_item> breachstones;
 

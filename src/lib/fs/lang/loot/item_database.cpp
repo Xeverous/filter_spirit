@@ -724,6 +724,7 @@ bool item_database::parse(std::string_view items_metadata_json, log::logger& log
 					utility::starts_with(filename, "BreachFragment") /* skip old Breachstones */
 					|| utility::ends_with(filename, "Complete") /* skip complete sets */
 					|| utility::starts_with(filename, "ProphecyFragment") /* skip old prophecy keys */
+					|| utility::starts_with(filename, "CurrencyProphecyFragment") /* skip - prophecy content was removed in 3.17 */
 					|| utility::starts_with(filename, "ShaperFragment") /* skip old Shaper fragments */
 					|| utility::starts_with(filename, "VaalFragment") /* skip old Atziri and Ubr Atziri fragments */
 					|| filename == "FragmentPantheonFlask" /* skip old Divine Vessel */)
@@ -756,9 +757,6 @@ bool item_database::parse(std::string_view items_metadata_json, log::logger& log
 				}
 				else if (utility::starts_with(filename, "CurrencyUberElderFragment")) {
 					map_fragments.uber_elder_fragments.push_back(std::move(*elem_item));
-				}
-				else if (utility::starts_with(filename, "CurrencyProphecyFragment")) {
-					map_fragments.prophecy_fragments.push_back(std::move(*elem_item));
 				}
 				else if (utility::starts_with(filename, "CurrencyLegionFragment")) {
 					map_fragments.legion_fragments.push_back(std::move(*elem_item));
@@ -932,7 +930,6 @@ log::message_stream& operator<<(log::message_stream& stream, const item_database
 		"uber elder fragments: " << db.map_fragments.uber_elder_fragments.size() << "\n"
 		"atziri fragments: " << db.map_fragments.atziri_fragments.size() << "\n"
 		"uber atziri fragments: " << db.map_fragments.uber_atziri_fragments.size() << "\n"
-		"prophecy fragments: " << db.map_fragments.prophecy_fragments.size() << "\n"
 		"legion fragments: " << db.map_fragments.legion_fragments.size() << "\n"
 		"breachstones: " << db.map_fragments.breachstones.size() << "\n"
 		"simulacrum: " << log_opt(db.map_fragments.simulacrum) << "\n"

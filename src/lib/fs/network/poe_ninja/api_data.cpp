@@ -17,7 +17,6 @@ constexpr auto filename_fossil = "Fossil.json";
 constexpr auto filename_resonator = "Resonator.json";
 constexpr auto filename_essence = "Essence.json";
 constexpr auto filename_divination_card = "DivinationCard.json";
-constexpr auto filename_prophecy = "Prophecy.json";
 constexpr auto filename_skill_gem = "SkillGem.json";
 constexpr auto filename_base_type = "BaseType.json";
 constexpr auto filename_helmet_enchant = "HelmetEnchant.json";
@@ -46,7 +45,6 @@ namespace fs::network::poe_ninja
 	MACRO(resonator, filename_resonator) \
 	MACRO(essence, filename_essence) \
 	MACRO(divination_card, filename_divination_card) \
-	MACRO(prophecy, filename_prophecy) \
 	MACRO(skill_gem, filename_skill_gem) \
 	MACRO(base_type, filename_base_type) \
 	MACRO(helmet_enchant, filename_helmet_enchant) \

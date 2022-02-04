@@ -67,7 +67,6 @@ void draw_item_tooltip_first_column()
 	ImGui::Text("%s:", kw::enchantment_passive_node);
 	ImGui::TextDisabled("HasAnnointment:");
 
-	ImGui::Text("%s:", kw::prophecy);
 	ImGui::Text("%s:", kw::identified);
 	ImGui::Text("%s:", kw::corrupted);
 	ImGui::Text("%s:", kw::mirrored);
@@ -145,15 +144,6 @@ void draw_item_tooltip_second_column(const lang::item& itm)
 	ImGui::TextDisabled(str_not_implemented);
 	ImGui::TextDisabled(str_not_implemented);
 	ImGui::TextDisabled(str_not_implemented);
-
-	if (itm.is_prophecy) {
-		// string here because filters expect this string
-		// for unknown reason, Prophecy is not a boolean condition
-		ImGui::TextUnformatted(itm.base_type.c_str());
-	}
-	else {
-		ImGui::TextUnformatted("-");
-	}
 
 	const auto output_boolean = [](bool value) {
 		namespace kw = lang::keywords::rf;

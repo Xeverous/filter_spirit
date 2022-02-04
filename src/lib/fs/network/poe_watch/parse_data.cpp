@@ -32,7 +32,7 @@ BETTER_ENUM(frame_type, int,
 	currency,
 	divination_card,
 	quest_item,
-	prophecy,
+	prophecy, // prophecy content was removed but keeping identifier for order
 	relic,
 	// should be last
 	unknown)
@@ -102,8 +102,6 @@ namespace categories // avoids name conflicts with types in lang namespace
 		std::optional<int> series;
 		std::optional<int> tier;
 	};
-
-	struct prophecy {};
 
 	BETTER_ENUM(weapon_type, int,
 		bow,
@@ -184,7 +182,6 @@ using item_category_variant = std::variant<
 	categories::gem,
 	categories::jewel,
 	categories::map,
-	categories::prophecy,
 	categories::weapon,
 	categories::base,
 	categories::beast>;
@@ -245,7 +242,6 @@ log::message_stream& operator<<(log::message_stream& stream, const item& item)
 			log_optional("\ttier  : ", map.tier);
 			log_optional("\tseries: ", map.series);
 		},
-		[&](categories::prophecy)        { stream << "prophecy\n"; },
 		[&](categories::weapon)          { stream << "weapon\n"; },
 		[&](categories::base base) {
 			stream << "base:\n"
@@ -433,9 +429,6 @@ item_category_variant parse_item_category(const nlohmann::json& entry)
 		const auto tier   = get_optional_subelement<int>(entry, "mapTier");
 
 		return categories::map{json_to_enum<categories::map_type>(group), series, tier};
-	}
-	if (category_str == "prophecy") {
-		return categories::prophecy{};
 	}
 	if (category_str == "weapon") {
 		return categories::weapon{json_to_enum<categories::weapon_type>(group)};
@@ -713,10 +706,6 @@ parse_item_price_data(
 			result.divination_cards.push_back(lang::market::divination_card{
 				elementary_item{price_data, std::move(itm.name)},
 				itm.max_stack_size.value_or(1)});
-			continue;
-		}
-		else if (std::holds_alternative<categories::prophecy>(itm.category)) {
-			result.prophecies.push_back(elementary_item{price_data, std::move(itm.name)});
 			continue;
 		}
 		else if (std::holds_alternative<categories::map>(itm.category)) {

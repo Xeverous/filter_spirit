@@ -284,7 +284,6 @@ void debug_state::recompute(const parser::parse_metadata& metadata)
 		color_line_by_condition_result(cs.socket_group,             metadata, _line_colors);
 		color_line_by_condition_result(cs.has_explicit_mod,         metadata, _line_colors);
 		color_line_by_condition_result(cs.has_enchantment,          metadata, _line_colors);
-		color_line_by_condition_result(cs.prophecy,                 metadata, _line_colors);
 		color_line_by_condition_result(cs.enchantment_passive_node, metadata, _line_colors);
 		color_line_by_condition_result(cs.enchantment_passive_num,  metadata, _line_colors);
 		color_line_by_condition_result(cs.has_influence,            metadata, _line_colors);

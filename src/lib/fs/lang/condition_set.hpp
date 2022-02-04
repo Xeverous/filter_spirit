@@ -233,7 +233,6 @@ struct condition_set
 	integer_range_condition width;
 	std::optional<ranged_strings_condition> has_explicit_mod;
 	std::optional<ranged_strings_condition> has_enchantment;
-	std::optional<strings_condition> prophecy;
 	std::optional<strings_condition> enchantment_passive_node;
 	std::optional<influences_condition> has_influence;
 	std::optional<gem_quality_type_condition> gem_quality_type;
@@ -358,7 +357,6 @@ struct condition_set_match_result
 			&& is_not_failure(socket_group)
 			&& is_not_failure(has_explicit_mod)
 			&& is_not_failure(has_enchantment)
-			&& is_not_failure(prophecy)
 			&& is_not_failure(enchantment_passive_node)
 			&& is_not_failure(has_influence)
 			&& is_not_failure(gem_quality_type)
@@ -403,7 +401,6 @@ struct condition_set_match_result
 	std::optional<condition_match_result> socket_group;
 	std::optional<condition_match_result> has_explicit_mod;
 	std::optional<condition_match_result> has_enchantment;
-	std::optional<condition_match_result> prophecy;
 	std::optional<condition_match_result> enchantment_passive_node;
 	std::optional<condition_match_result> has_influence;
 	std::optional<condition_match_result> gem_quality_type;

@@ -103,7 +103,6 @@ BaseWard              [CMP] Integer+
 
 Class                  [EQ] String+
 BaseType               [EQ] String+
-Prophecy               [EQ] String+
 EnchantmentPassiveNode [EQ] String+
 HasInfluence           [EQ] None | Influence+
 
