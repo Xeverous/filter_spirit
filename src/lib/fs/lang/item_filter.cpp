@@ -560,6 +560,7 @@ item_filtering_result pass_item_through_filter(const item& itm, const item_filte
 		cs_result.class_                   = test_strings_condition(cs.class_,                   itm.class_);
 		cs_result.base_type                = test_strings_condition(cs.base_type,                itm.base_type);
 		cs_result.enchantment_passive_node = test_strings_condition(cs.enchantment_passive_node, itm.enchantments_passive_nodes);
+		cs_result.archnemesis_mod          = test_strings_condition(cs.archnemesis_mod,          itm.archnemesis_mods);
 
 		cs_result.has_explicit_mod         = test_ranged_strings_condition(cs.has_explicit_mod,  itm.explicit_mods);
 		cs_result.has_enchantment          = test_ranged_strings_condition(cs.has_enchantment,   itm.enchantments_labyrinth);

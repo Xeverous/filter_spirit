@@ -1447,6 +1447,8 @@ HasSearingExarchImplicit    5 { Show }
 HasSearingExarchImplicit >= 4 { Show }
 HasEaterOfWorldsImplicit    6 { Show }
 HasEaterOfWorldsImplicit >  4 { Show }
+
+ArchnemesisMod "Toxic" "Hasted" { Hide }
 )");
 			const std::string_view expected_filter =
 R"(Show
@@ -1460,6 +1462,9 @@ Show
 
 Show
 	HasEaterOfWorldsImplicit > 4
+
+Hide
+	ArchnemesisMod "Toxic" "Hasted"
 
 )";
 

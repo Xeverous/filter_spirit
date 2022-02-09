@@ -238,6 +238,12 @@ add_string_array_condition(
 				set.enchantment_passive_node,
 				diagnostics);
 		}
+		case lang::string_array_condition_property::archnemesis_mod: {
+			return add_non_range_condition(
+				lang::strings_condition{std::move(strings), is_exact_match, condition_origin},
+				set.archnemesis_mod,
+				diagnostics);
+		}
 	}
 
 	push_error_internal_compiler_error(__func__, condition_origin, diagnostics);

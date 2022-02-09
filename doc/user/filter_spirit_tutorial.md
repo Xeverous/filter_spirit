@@ -720,6 +720,7 @@ Price           [CMP] Integer
 Class                  [EQ] (None | String)+
 BaseType               [EQ] (None | String)+
 EnchantmentPassiveNode [EQ] (None | String)+
+ArchnemesisMod         [EQ] (None | String)+
 
 HasExplicitMod         [==] | CMPInteger (None | String)+
 HasEnchantment         [==] | CMPInteger (None | String)+

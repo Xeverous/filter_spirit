@@ -62,6 +62,7 @@ namespace item_class_names {
 	constexpr auto piece                      = "Piece";
 	constexpr auto maps                       = "Maps";
 	constexpr auto pantheon_soul              = "Pantheon Soul";
+	constexpr auto archnemesis_mod            = "Archnemesis Mod";
 
 	// equipment - main parts
 	constexpr auto eq_gloves = "Gloves";
@@ -539,6 +540,7 @@ struct item
 	std::vector<std::string> explicit_mods = {};
 	std::vector<std::string> enchantments_labyrinth = {};
 	std::vector<std::string> enchantments_passive_nodes = {};
+	std::vector<std::string> archnemesis_mods = {};
 	std::vector<std::string> annointments = {};
 	int corrupted_mods = 0;
 	int stack_size = sentinel_stack_size;

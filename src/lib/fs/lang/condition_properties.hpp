@@ -44,7 +44,8 @@ enum class string_array_condition_property
 {
 	class_,
 	base_type,
-	enchantment_passive_node
+	enchantment_passive_node,
+	archnemesis_mod
 };
 
 // conditions which work with array of strings AND optionally a comparison

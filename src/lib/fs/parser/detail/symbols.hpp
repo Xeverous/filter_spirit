@@ -176,6 +176,7 @@ namespace rf
 				(lang::keywords::rf::class_,                   lang::string_array_condition_property::class_)
 				(lang::keywords::rf::base_type,                lang::string_array_condition_property::base_type)
 				(lang::keywords::rf::enchantment_passive_node, lang::string_array_condition_property::enchantment_passive_node)
+				(lang::keywords::rf::archnemesis_mod,          lang::string_array_condition_property::archnemesis_mod)
 			;
 		}
 	};

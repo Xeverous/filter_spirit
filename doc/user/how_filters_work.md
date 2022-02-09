@@ -106,6 +106,7 @@ HasEaterOfWorldsImplicit [CMP] Integer+
 Class                  [EQ] String+
 BaseType               [EQ] String+
 EnchantmentPassiveNode [EQ] String+
+ArchnemesisMod         [EQ] String+
 HasInfluence           [EQ] None | Influence+
 
 HasExplicitMod         [==] | CMPInteger String+
