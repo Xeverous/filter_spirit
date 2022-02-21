@@ -1,5 +1,15 @@
 # Filter Spirit changelog
 
+## version 1.4.2 (09.02.2022)
+
+- added missing support for `ArchnemesisMod` condition
+
+## version 1.3.2 (04.02.2022)
+
+- implemented support for `HasSearingExarchImplicit` condition
+- implemented support for `HasEaterOfWorldsImplicit` condition
+- removed prophecy content and support for it
+
 ## version 1.2.2 (21.10.2021)
 
 Implemented new conditions:

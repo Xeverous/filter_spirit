@@ -6,6 +6,19 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 
 *newest at the top*
 
+### 3.17 (Archnemesis + Siege of the Atlas) [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3230194)
+
+- New conditions: `HasSearingExarchImplicit`, `HasSearingExarchImplicit` and `ArchnemesisMod`
+- [patch notes](https://www.pathofexile.com/forum/view-thread/3229187)
+- [gem information](https://www.pathofexile.com/forum/view-thread/3229646)
+- [announcement post](https://www.pathofexile.com/forum/view-thread/3229084)
+- [list of teasers](https://www.pathofexile.com/forum/view-thread/3228003)
+
+### 3.16.0b
+
+- [patch notes](https://www.pathofexile.com/forum/view-thread/3193737)
+- *Fixed a bug where Item Filters would incorrectly assign Weapons and Jewellery a BaseDefencePercentile value of 0 rather than 100.*
+
 ### 3.16 (Scourge) - [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3187476)
 
 - New conditions: `BaseDefencePercentile`, `BaseArmour`, `BaseEvasion`, `BaseEnergyShield`, `BaseWard`, `Scourged`, `UberBlightedMap`
@@ -15,6 +28,11 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 - [atlas information](https://www.pathofexile.com/forum/view-thread/3187176)
 - [list of teasers](https://www.pathofexile.com/forum/view-thread/3184585)
 - [ascendancy changes](https://www.pathofexile.com/forum/view-thread/3187468)
+
+### 3.15.0d
+
+- [patch notes](https://www.pathofexile.com/forum/view-thread/3152771)
+- *Rapier One Hand Swords are once again classified as Thrusting One Hand Swords. Their Weapon Range is again 14 (instead of 11). Please update your item filters!*
 
 ### 3.15 (Expedition) - [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3147480)
 
