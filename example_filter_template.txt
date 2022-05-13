@@ -62,6 +62,7 @@ $color_harbinger           =  64 255 255
 $color_talisman            =  50 130  50
 $color_metamorph           =  25 181  25
 $color_archnemesis         = $color_perandus
+$color_sentinel            = $color_harvest
 $color_currency_high       = $color_red
 $color_currency_mid        = 249 150  25
 $color_currency_low        = 213 159   0
@@ -144,6 +145,7 @@ $font_emblem             = $font_max
 $font_labyrinth          = $font_max
 $font_metamorph          = $font_max
 $font_archnemesis        = $font_max
+$font_sentinel           = $font_max
 $font_quest              = $font_max
 $font_contract           = $font_mid
 $font_blueprint          = $font_high
@@ -252,6 +254,7 @@ $alert_experimented_base   = $alert_very_specific
 $alert_veiled_item         = $alert_common
 $alert_metamorph           = $alert_common
 $alert_archnemesis         = $alert_common
+$alert_sentinel            = $alert_common
 $alert_heist_target        = $alert_very_specific
 $alert_heist_gear          = $alert_common
 $alert_contract            = $alert_common
@@ -710,6 +713,12 @@ Class == "Stackable Currency" {
 	}
 
 	BaseType == "Divine Orb" "Veiled Chaos Orb" "Chaos Orb" "Gemcutter's Prism" "Stacked Deck" "Awakened Sextant" "Elevated Sextant" "Exalted Shard" "Orb of Annulment" "Harbinger's Orb" "Ancient Orb" "Ancient Shard" "Facetor's Lens" "Infused Engineer's Orb" "Orb of Unmaking" "Ritual Splinter" "Ritual Vessel" "Crescent Splinter" "Tainted Blessing" "Tainted Chromatic Orb" "Tainted Orb of Fusing" "Tainted Jeweller's Orb" "Tainted Blacksmith's Whetstone" "Tainted Armourer's Scrap" "Tainted Chaos Orb" "Tainted Mythic Orb" "Tainted Blessing" "Tainted Exalted Orb" "Sacred Orb" "Lesser Eldritch Ember" "Greater Eldritch Ember" "Grand Eldritch Ember" "Lesser Eldritch Ichor" "Greater Eldritch Ichor" "Grand Eldritch Ichor" "Eldritch Chaos Orb" "Eldritch Exalted Orb" "Eldritch Orb of Annulment"
+	{
+		Expand $actions_currency_mid
+		Show
+	}
+
+	BaseType == "Power Core" "Transforming Power Core" "Amplifying Power Core" "Augmenting Power Core" "Armour Recombinator" "Weapon Recombinator" "Jewellery Recombinator"
 	{
 		Expand $actions_currency_mid
 		Show
@@ -1182,7 +1191,7 @@ Class == "Active Skill Gems" "Support Skill Gems" {
 		Show
 	}
 
-	BaseType == "Empower Support" "Enhance Support" "Enlighten Support" "Portal" "Vaal Breach" {
+	BaseType == "Empower Support" "Enhance Support" "Enlighten Support" "Portal" "Vaal Breach" "Awakened Enlighten Support" "Awakened Enhance Support" "Awakened Empower Support" {
 		SetFontSize $font_gem_drop_only
 		SetAlertSound $alert_gem_drop_only
 		MinimapIcon $icon_gem_drop_only
@@ -1619,6 +1628,15 @@ Class == "Metamorph Sample" {
 	SetBackgroundColor $color_black
 	SetFontSize $font_metamorph
 	SetAlertSound $alert_metamorph
+	Show
+}
+
+Class == "Sentinel Drone" {
+	SetTextColor $color_sentinel
+	SetBorderColor $color_sentinel
+	SetBackgroundColor $color_black
+	SetFontSize $font_sentinel
+	SetAlertSound $alert_sentinel
 	Show
 }
 
