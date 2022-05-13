@@ -6,7 +6,7 @@ If you ever worked with web stuff - a perfect analogy is that Filter Spirit is t
 
 ## news
 
-**Scourge update released** - [DOWNLOAD HERE](https://github.com/Xeverous/filter_spirit/releases)
+**Archnemesis (3.17) update released** - [DOWNLOAD HERE](https://github.com/Xeverous/filter_spirit/releases). No update needed for **Sentinel (3.18)** - no changes in the program, only within filter templates.
 
 As of now, the tool supports all possible conditions and actions except few corner cases which are described in `doc/known_issues`.
 

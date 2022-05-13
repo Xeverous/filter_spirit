@@ -6,6 +6,13 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 
 *newest at the top*
 
+### 3.18 (Sentintel) [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3265282)
+
+- New awakened exceptional gems, cards, quest items, currency and sentinels (no new features in filters)
+- [patch notes](https://www.pathofexile.com/forum/view-thread/3264788)
+- [announcement post](https://www.pathofexile.com/forum/view-thread/3264698)
+- [list of teasers](https://www.pathofexile.com/forum/view-thread/3265256)
+
 ### 3.17 (Archnemesis + Siege of the Atlas) [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3230194)
 
 - New conditions: `HasSearingExarchImplicit`, `HasSearingExarchImplicit` and `ArchnemesisMod`
