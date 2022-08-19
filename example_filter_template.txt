@@ -668,7 +668,7 @@ $show_gear_enchanted_other = False
 # Rare items on these bases will get a different background color, final Show/Hide is unaffected.
 # If you don't like this feature, just set the variable below to None or show variable to False.
 $cfg_t1_base_names = "Stygian Vise" "Eternal Burgonet" "Lion Pelt" "Hubris Circlet" "Nightmare Bascinet" "Titan Gauntlets" "Slink Gloves" "Sorcerer Gloves" "Dragonscale Gauntlets" "Titan Greaves" "Slink Boots" "Sorcerer Boots" "Dragonscale Boots" "Assassin's Boots" "Glorious Plate" "Assassin's Garb" "Vaal Regalia" "Titanium Spirit Shield" "Harbinger Bow" "Ambusher" "Ezomyte Dagger" "Platinum Kris" "Imperial Skean" "Demon Dagger" "Void Sceptre" "Sambar Sceptre" "Profane Wand" "Prophecy Wand" "Tornado Wand" "Opal Wand" "Imbued Wand" "Demon's Horn"
-$cfg_atlas_base_names = "Apothecary's Gloves" "Fingerless Silk Gloves" "Fugitive Boots" "Gripped Gloves" "Spiked Gloves" "Two-Toned Boots" "Convoking Wand" "Bone Helmet" "Artillery Quiver" "Marble Amulet" "Seaglass Amulet" "Blue Pearl Amulet" "Iolite Ring" "Vanguard Belt" "Crystal Belt" "Cerulean Ring" "Opal Ring" "Steel Ring" "Vermillion Ring" "Unset Amulet"
+$cfg_atlas_base_names = "Apothecary's Gloves" "Fingerless Silk Gloves" "Fugitive Boots" "Gripped Gloves" "Spiked Gloves" "Two-Toned Boots" "Convoking Wand" "Bone Helmet" "Artillery Quiver" "Marble Amulet" "Seaglass Amulet" "Blue Pearl Amulet" "Iolite Ring" "Vanguard Belt" "Crystal Belt" "Cerulean Ring" "Opal Ring" "Steel Ring" "Vermillion Ring" "Unset Amulet" "Dusk Ring" "Penumbra Ring" "Gloam Ring" "Tenebrous Ring" "Shadowed Ring" "Bone Ring"
 $cfg_good_base_names = $cfg_t1_base_names $cfg_atlas_base_names
 $cfg_base_defence_base_names = $cfg_t1_base_names $cfg_atlas_base_names
 $cfg_base_defence_percentile_min_value = 90
@@ -706,19 +706,19 @@ SetBackgroundColor $color_black
 Class == "Stackable Currency" {
 	SetBackgroundColor $color_black
 
-	BaseType == "Exalted Orb" "Mirror of Kalandra" "Eternal Orb" "Albino Rhoa Feather" "Mirror Shard" "Crusader's Exalted Orb" "Redeemer's Exalted Orb" "Hunter's Exalted Orb" "Warlord's Exalted Orb" "Awakener's Orb" "Prime Regrading Lens" "Secondary Regrading Lens" "Tempering Orb" "Tailoring Orb" "Tainted Divine Teardrop" "Exceptional Eldritch Ember" "Exceptional Eldritch Ichor" "Orb of Conflict" "Orb of Dominance"
+	BaseType == "Divine Orb" "Mirror of Kalandra" "Eternal Orb" "Albino Rhoa Feather" "Mirror Shard" "Crusader's Exalted Orb" "Redeemer's Exalted Orb" "Hunter's Exalted Orb" "Warlord's Exalted Orb" "Awakener's Orb" "Prime Regrading Lens" "Secondary Regrading Lens" "Tempering Orb" "Tailoring Orb" "Tainted Divine Teardrop" "Exceptional Eldritch Ember" "Exceptional Eldritch Ichor" "Orb of Conflict" "Orb of Dominance"
 	{
 		Expand $actions_currency_high
 		Show
 	}
 
-	BaseType == "Divine Orb" "Veiled Chaos Orb" "Chaos Orb" "Gemcutter's Prism" "Stacked Deck" "Awakened Sextant" "Elevated Sextant" "Exalted Shard" "Orb of Annulment" "Harbinger's Orb" "Ancient Orb" "Ancient Shard" "Facetor's Lens" "Infused Engineer's Orb" "Orb of Unmaking" "Ritual Splinter" "Ritual Vessel" "Crescent Splinter" "Tainted Blessing" "Tainted Chromatic Orb" "Tainted Orb of Fusing" "Tainted Jeweller's Orb" "Tainted Blacksmith's Whetstone" "Tainted Armourer's Scrap" "Tainted Chaos Orb" "Tainted Mythic Orb" "Tainted Blessing" "Tainted Exalted Orb" "Sacred Orb" "Lesser Eldritch Ember" "Greater Eldritch Ember" "Grand Eldritch Ember" "Lesser Eldritch Ichor" "Greater Eldritch Ichor" "Grand Eldritch Ichor" "Eldritch Chaos Orb" "Eldritch Exalted Orb" "Eldritch Orb of Annulment"
+	BaseType == "Exalted Orb" "Veiled Chaos Orb" "Chaos Orb" "Gemcutter's Prism" "Stacked Deck" "Awakened Sextant" "Elevated Sextant" "Exalted Shard" "Orb of Annulment" "Harbinger's Orb" "Ancient Orb" "Ancient Shard" "Facetor's Lens" "Infused Engineer's Orb" "Orb of Unmaking" "Ritual Splinter" "Ritual Vessel" "Crescent Splinter" "Tainted Blessing" "Tainted Chromatic Orb" "Tainted Orb of Fusing" "Tainted Jeweller's Orb" "Tainted Blacksmith's Whetstone" "Tainted Armourer's Scrap" "Tainted Chaos Orb" "Tainted Mythic Orb" "Tainted Blessing" "Tainted Exalted Orb" "Sacred Orb" "Lesser Eldritch Ember" "Greater Eldritch Ember" "Grand Eldritch Ember" "Lesser Eldritch Ichor" "Greater Eldritch Ichor" "Grand Eldritch Ichor" "Eldritch Chaos Orb" "Eldritch Exalted Orb" "Eldritch Orb of Annulment"
 	{
 		Expand $actions_currency_mid
 		Show
 	}
 
-	BaseType == "Power Core" "Transforming Power Core" "Amplifying Power Core" "Augmenting Power Core" "Armour Recombinator" "Weapon Recombinator" "Jewellery Recombinator"
+	BaseType == "Armour Recombinator" "Weapon Recombinator" "Jewellery Recombinator"
 	{
 		Expand $actions_currency_mid
 		Show
@@ -973,6 +973,16 @@ Class == "Stackable Currency" {
 	# Expedition currency
 	BaseType "Enkindling Orb" "Instilling Orb" "Exotic Coinage" "Scrap Metal" "Astragali" "Burial Medallion" "Lesser Broken Circle Artifact" "Greater Broken Circle Artifact" "Grand Broken Circle Artifact" "Exceptional Broken Circle Artifact" "Lesser Black Scythe Artifact" "Greater Black Scythe Artifact" "Grand Black Scythe Artifact" "Exceptional Black Scythe Artifact" "Lesser Order Artifact" "Greater Order Artifact" "Grand Order Artifact" "Exceptional Order Artifact" "Lesser Sun Artifact" "Greater Sun Artifact" "Grand Sun Artifact" "Exceptional Sun Artifact" {
 		Expand $actions_currency_mid
+		Show
+	}
+
+	# 3.19 reworked Harvest - make each of respective color?
+	BaseType "Crystalized Lifeforce" {
+		SetBorderColor $color_white
+		SetTextColor $color_white
+		SetBackgroundColor $color_harvest
+		SetFontSize $font_max
+		SetAlertSound $alert_currency_mid
 		Show
 	}
 
@@ -1241,6 +1251,7 @@ BaseType == "Gavel" "Stone Hammer" "Rock Breaker" {
 }
 
 # harbinger unique pieces
+# and 3.19 Ultimatum Aspect
 Class == "Pieces" {
 	SetTextColor $color_unique
 	SetBorderColor $color_unique
@@ -1540,9 +1551,20 @@ Class == "Leaguestones" {
 
 Class == "Misc Map Items" {
 	SetFontSize $font_max
-	# reliquary keys from Legacy ("Ancient") and Delve ("Timeworn")
+	# reliquary keys from Legacy ("Ancient") and Delve ("Timeworn") leagues
 	# ...and any future reliquary keys
-	BaseType "Reliquary Key" {
+	BaseType == "Ancient Reliquary Key" "Timeworn Reliquary Key" {
+		SetBorderColor 204 153 0
+		SetTextColor $color_white
+		SetBackgroundColor 204 153 0
+		SetAlertSound $alert_reliquary
+		PlayEffect $beam_reliquary
+		MinimapIcon $icon_reliquary
+		Show
+	}
+
+	# keys from 3.19 (Lake of Kalandra)
+	BaseType == "Forgotten Reliquary Key" "Visceral Reliquary Key" "Shiny Reliquary Key" "Archive Reliquary Key" "Oubliette Reliquary Key" "Cosmic Reliquary Key" "Decaying Reliquary Key" {
 		SetBorderColor 204 153 0
 		SetTextColor $color_white
 		SetBackgroundColor 204 153 0
@@ -1589,6 +1611,23 @@ Class == "Misc Map Items" {
 		SetAlertSound $alert_undroppable
 		Show
 	}
+
+	BaseType == "Mirrored Tablet" {
+		SetBorderColor $color_white
+		SetBackgroundColor $color_black
+		SetTextColor $color_white
+		SetAlertSound $alert_very_specific
+		Show
+	}
+}
+
+Class == "Memory" {
+	SetTextColor $color_black
+	SetBorderColor $color_black
+	SetBackgroundColor $color_atlas
+	SetFontSize $font_max
+	SetAlertSound $alert_very_specific
+	Show
 }
 
 # note: Izaro will speak upon key drops
@@ -1628,15 +1667,6 @@ Class == "Metamorph Sample" {
 	SetBackgroundColor $color_black
 	SetFontSize $font_metamorph
 	SetAlertSound $alert_metamorph
-	Show
-}
-
-Class == "Sentinel Drone" {
-	SetTextColor $color_sentinel
-	SetBorderColor $color_sentinel
-	SetBackgroundColor $color_black
-	SetFontSize $font_sentinel
-	SetAlertSound $alert_sentinel
 	Show
 }
 
@@ -1757,6 +1787,11 @@ Class == "Maps" {
 		# for filters, there is no better way to detect an Elder guardian
 		MapTier >= 14
 		HasInfluence Elder {
+			Show
+		}
+
+		# 3.19 new Ultimatum boss map
+		BaseType == "Engraved Ultimatum" {
 			Show
 		}
 	}
