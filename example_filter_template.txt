@@ -15,7 +15,7 @@
 # other types: sorry, not possible; search for variable usage and edit filter structure
 
 $color_white               = 255 255 255
-$color_black               =   0   0   0
+$color_black               =   0   0   0 255
 $color_red                 = 255   0   0
 $color_golden              = 240 200 150
 $color_error               = $color_red
@@ -160,26 +160,41 @@ $font_dominance_low      = $font_mid
 $font_influence_very_low = $font_very_low
 $font_influence_unknown  = $font_influence_mid
 
+$alert_mlg_airhorn       = "mlg_airhorn.mp3"
+$alert_airhorn           = "airhorn.mp3" # mid
+$alert_wow               = "wow.mp3"
+$alert_hitmarker         = "hitmarker.wav" # frequent
+$alert_uhh               = "uhh.mp3" # check_required
+$alert_intervention      = "intervention.mp3" # alert_6_socket
+$alert_john_cena_earrape = "john_cena_earrape.mp3"
+$alert_metal_gear        = "metal_gear.mp3"
+$alert_whip              = "whip.mp3"
+$alert_wombo_combo       = "wombo_combo.flac" # alert_high
+$alert_triggered         = "triggered.mp3"
+$alert_flash_mid         = "33_summonerspell_base_flash_oc_0.wav"
+$alert_flash_low         = "32_summonerspell_base_flash_oc_0.wav"
+$alert_yoink             = "Halo_Reach_-_Yoink_Sound_Effect.mp3" 300
+
 # items that drop only under certain conditions
-$alert_very_specific       = 1
+$alert_very_specific       = 1 300
 # item value - low uncertainty
-$alert_high                = 6
-$alert_mid                 = 2
-$alert_low                 = $alert_mid
+$alert_high                = $alert_wombo_combo 300
+$alert_mid                 = $alert_flash_mid 300
+$alert_low                 = $alert_flash_low 300
 # item value - high uncertainty
-$alert_extraordinary       = 5
-$alert_uncommon            = $alert_high
-$alert_common              = $alert_mid
-$alert_frequent            = None
+$alert_extraordinary       = $alert_john_cena_earrape 300
+$alert_uncommon            = $alert_mlg_airhorn 300
+$alert_common              = $alert_airhorn 50
+$alert_frequent            = $alert_hitmarker 300
 # value can not be easily determined
-$alert_check_required      = 3
+$alert_check_required      = $alert_intervention 300
 # some items can only be created by players
 $alert_undroppable         = $alert_high
-$alert_map_high            = 5
-$alert_map_low             = 4
-$alert_leveling            = 12
+$alert_map_high            = $alert_metal_gear 300
+$alert_map_low             = $alert_whip 300
+$alert_leveling            = 12 300
 # I have yet to see someone who likes 15
-$alert_error               = 15
+$alert_error               = $alert_triggered 300
 
 $alert_pale_court          = $alert_very_specific
 $alert_lab_offering        = $alert_very_specific
@@ -233,8 +248,8 @@ $alert_gem_non_0_quality   = $alert_frequent
 $alert_oil_high            = $alert_high
 $alert_oil_mid             = $alert_mid
 $alert_atlas_upgrade       = $alert_very_specific
-$alert_map_blight          = $alert_uncommon
-$alert_map_guardian        = $alert_map_high
+$alert_map_blight          = $alert_yoink
+$alert_map_guardian        = $alert_yoink
 $alert_map_enchanted       = $alert_map_high
 $alert_map_red             = $alert_map_high
 $alert_map_yellow          = $alert_map_low
@@ -322,6 +337,7 @@ $icon_6_link          = 0 Red Hexagon
 $icon_base_defence    = 0 Grey Square
 $icon_ultimatum       = 0 Orange Triangle
 $icon_error           = 0 Red Square
+$icon_harvest         = 2 Blue Circle
 
 $actions_currency_high = {
 	SetTextColor $color_golden
@@ -553,10 +569,10 @@ $show_low_splinters = True
 
 $cards_stack_size_1 = "Chaotic Disposition" "The Void" "Divine Justice" "The Cartographer" "The Heroic Shot" "Society's Remorse"
 # These cards will be always shown, regardless of their reported value
-$cfg_cards_always_show_names = $cards_stack_size_1 "Humility" "Loyalty" "Lucky Connections" "Lucky Deck" "No Traces" "The Catalyst" "The Encroaching Darkness" "The Gemcutter" "The Innocent" "The Inventor" "The Master Artisan" "The Obscured" "The Risk" "The Survivalist" "The Wrath" "Three Faces in the Dark" "Vinia's Token" "Coveted Possession" "Sambodhi's Vow" "The Tinkerer's Table" "Monochrome" "Cameria's Cut" "Buried Treasure" "Last Hope" "The Journey" "The Fool" "Underground Forest" "The Deal" "Vinia's Token" "Demigod's Wager" "More is Never Enough" "The Union" "The Seeker" "The Sephirot" "A Sea of Blue"
+$cfg_cards_always_show_names = $cards_stack_size_1 "Humility" "Loyalty" "Lucky Connections" "Lucky Deck" "No Traces" "The Encroaching Darkness" "The Innocent" "The Inventor" "The Master Artisan" "The Obscured" "The Risk" "The Survivalist" "The Wrath" "Three Faces in the Dark" "Vinia's Token" "Coveted Possession" "Sambodhi's Vow" "The Tinkerer's Table" "Monochrome" "Cameria's Cut" "Buried Treasure" "Last Hope" "The Journey" "The Fool" "Underground Forest" "The Deal" "Vinia's Token" "Demigod's Wager" "More is Never Enough" "The Union" "The Seeker" "The Sephirot" "A Sea of Blue"
 $cfg_cards_high_min_value = 100
 $cfg_cards_mid_min_value = 10
-$cfg_cards_low_min_value = 1
+$cfg_cards_low_min_value = 2
 $show_cards_mid = True
 $show_cards_low = True
 $show_cards_very_low = False
@@ -613,7 +629,7 @@ $cfg_uniques_low_min_value = 1
 
 $show_flasks_utility = True
 $show_flasks_20q = True
-$show_flasks_other = True
+$show_flasks_other = False
 
 # Chisel recipe
 $show_hammers = False
@@ -638,15 +654,15 @@ $show_gear_synthesised = True
 $show_gear_breach_ring = True
 $show_gear_scourged = True
 $show_gear_corrupted = False
-$show_5_link = True # (6Ls are always shown)
+$show_5_link = False # (6Ls are always shown)
 $show_6_socket = True
 $show_gear_base_defence = False
 $cfg_influence_high_min_value = 100
-$cfg_influence_mid_min_value = 10
-$cfg_influence_low_min_value = 1
+$cfg_influence_mid_min_value = 20
+$cfg_influence_low_min_value = 5
 $show_influence_mid = True
-$show_influence_low = False
-$show_influence_very_low = False
+$show_influence_low = True
+$show_influence_very_low = True
 $cfg_gear_veiled_always_show_mods = "Elreon's Veiled"
 $show_gear_veiled = True
 # Items with Incursion and Bestiary mods always drop as identified rare items.
@@ -691,8 +707,8 @@ $cfg_base_chance_names = None
 $show_gear_identified_magic = False
 $show_gear_identified_rare = False
 # You generally want to set these to False once you reach maps
-$show_gear_any_rare = True
-$show_gear_any_magic = True
+$show_gear_any_rare = False
+$show_gear_any_magic = False
 $show_gear_any_normal = False
 # Show any equippable gear with specific links untill specified AreaLevel
 $cfg_gear_show_4_link_max_area_lvl = 67
@@ -977,12 +993,13 @@ Class == "Stackable Currency" {
 	}
 
 	# 3.19 reworked Harvest - make each of respective color?
-	BaseType "Crystalized Lifeforce" {
-		SetBorderColor $color_white
-		SetTextColor $color_white
+	BaseType "Crystallised Lifeforce" {
+		SetBorderColor $color_harvest
+		SetTextColor $color_black
 		SetBackgroundColor $color_harvest
 		SetFontSize $font_max
 		SetAlertSound $alert_currency_mid
+		MinimapIcon $icon_harvest
 		Show
 	}
 
@@ -1784,9 +1801,9 @@ Class == "Maps" {
 			Show
 		}
 
-		# for filters, there is no better way to detect an Elder guardian
+		# for filters, there is no better way to detect a map with a boss
 		MapTier >= 14
-		HasInfluence Elder {
+		HasInfluence Elder Crusader Redeemer Hunter Warlord {
 			Show
 		}
 

@@ -6,6 +6,15 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 
 *newest at the top*
 
+### 3.19 (Lake of Kalandra) [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3294085)
+
+- New cards, ring bases and wand bases
+- Reworked harvest - pickupable lifeforce
+- New map pieces and related misc items
+- Removed Sentinel drones and power cores
+- [patch notes](https://www.pathofexile.com/forum/view-thread/3293287)
+- [balance manifesto](https://www.pathofexile.com/forum/view-thread/3292308)
+
 ### 3.18 (Sentintel) [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3265282)
 
 - New awakened exceptional gems, cards, quest items, currency and sentinels (no new features in filters)
