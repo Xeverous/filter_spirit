@@ -629,7 +629,7 @@ $cfg_uniques_low_min_value = 1
 
 $show_flasks_utility = True
 $show_flasks_20q = True
-$show_flasks_other = False
+$show_flasks_other = True
 
 # Chisel recipe
 $show_hammers = False
@@ -654,7 +654,7 @@ $show_gear_synthesised = True
 $show_gear_breach_ring = True
 $show_gear_scourged = True
 $show_gear_corrupted = False
-$show_5_link = False # (6Ls are always shown)
+$show_5_link = True # (6Ls are always shown)
 $show_6_socket = True
 $show_gear_base_defence = False
 $cfg_influence_high_min_value = 100
@@ -707,8 +707,8 @@ $cfg_base_chance_names = None
 $show_gear_identified_magic = False
 $show_gear_identified_rare = False
 # You generally want to set these to False once you reach maps
-$show_gear_any_rare = False
-$show_gear_any_magic = False
+$show_gear_any_rare = True
+$show_gear_any_magic = True
 $show_gear_any_normal = False
 # Show any equippable gear with specific links untill specified AreaLevel
 $cfg_gear_show_4_link_max_area_lvl = 67
