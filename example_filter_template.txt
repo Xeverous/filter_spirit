@@ -57,6 +57,7 @@ $color_scourged            = 210 112   0
 $color_sacrifice           = 127  63   0
 $color_mortal              =  60 150   0
 $color_heist               = 204 130 130
+$color_sanctum             = $color_heist
 $color_expedition          =   0 105 255
 $color_harbinger           =  64 255 255
 $color_talisman            =  50 130  50
@@ -149,6 +150,7 @@ $font_sentinel           = $font_max
 $font_quest              = $font_max
 $font_contract           = $font_mid
 $font_blueprint          = $font_high
+$font_sanctum_relic      = $font_high
 $font_heist_gear         = $font_mid
 $font_experimented_base  = $font_max
 $font_logbook            = $font_max
@@ -274,6 +276,7 @@ $alert_heist_target        = $alert_very_specific
 $alert_heist_gear          = $alert_common
 $alert_contract            = $alert_common
 $alert_blueprint           = $alert_common
+$alert_sanctum_relic       = $alert_very_specific
 $alert_logbook             = $alert_uncommon
 $alert_quest_item          = $alert_very_specific
 $alert_influence_high      = $alert_extraordinary
@@ -722,13 +725,13 @@ SetBackgroundColor $color_black
 Class == "Stackable Currency" {
 	SetBackgroundColor $color_black
 
-	BaseType == "Divine Orb" "Mirror of Kalandra" "Eternal Orb" "Albino Rhoa Feather" "Mirror Shard" "Crusader's Exalted Orb" "Redeemer's Exalted Orb" "Hunter's Exalted Orb" "Warlord's Exalted Orb" "Awakener's Orb" "Prime Regrading Lens" "Secondary Regrading Lens" "Tempering Orb" "Tailoring Orb" "Tainted Divine Teardrop" "Exceptional Eldritch Ember" "Exceptional Eldritch Ichor" "Orb of Conflict" "Orb of Dominance"
+	BaseType == "Divine Orb" "Mirror of Kalandra" "Eternal Orb" "Albino Rhoa Feather" "Mirror Shard" "Crusader's Exalted Orb" "Redeemer's Exalted Orb" "Hunter's Exalted Orb" "Warlord's Exalted Orb" "Awakener's Orb" "Prime Regrading Lens" "Secondary Regrading Lens" "Tempering Orb" "Tailoring Orb" "Tainted Divine Teardrop" "Exceptional Eldritch Ember" "Exceptional Eldritch Ichor" "Orb of Conflict" "Orb of Dominance" "Fracturing Orb"
 	{
 		Expand $actions_currency_high
 		Show
 	}
 
-	BaseType == "Exalted Orb" "Veiled Chaos Orb" "Chaos Orb" "Gemcutter's Prism" "Stacked Deck" "Awakened Sextant" "Elevated Sextant" "Exalted Shard" "Orb of Annulment" "Harbinger's Orb" "Ancient Orb" "Ancient Shard" "Facetor's Lens" "Infused Engineer's Orb" "Orb of Unmaking" "Ritual Splinter" "Ritual Vessel" "Crescent Splinter" "Tainted Blessing" "Tainted Chromatic Orb" "Tainted Orb of Fusing" "Tainted Jeweller's Orb" "Tainted Blacksmith's Whetstone" "Tainted Armourer's Scrap" "Tainted Chaos Orb" "Tainted Mythic Orb" "Tainted Blessing" "Tainted Exalted Orb" "Sacred Orb" "Lesser Eldritch Ember" "Greater Eldritch Ember" "Grand Eldritch Ember" "Lesser Eldritch Ichor" "Greater Eldritch Ichor" "Grand Eldritch Ichor" "Eldritch Chaos Orb" "Eldritch Exalted Orb" "Eldritch Orb of Annulment"
+	BaseType == "Exalted Orb" "Veiled Chaos Orb" "Chaos Orb" "Gemcutter's Prism" "Stacked Deck" "Awakened Sextant" "Elevated Sextant" "Exalted Shard" "Orb of Annulment" "Harbinger's Orb" "Ancient Orb" "Ancient Shard" "Facetor's Lens" "Infused Engineer's Orb" "Orb of Unmaking" "Ritual Splinter" "Ritual Vessel" "Crescent Splinter" "Tainted Blessing" "Tainted Chromatic Orb" "Tainted Orb of Fusing" "Tainted Jeweller's Orb" "Tainted Blacksmith's Whetstone" "Tainted Armourer's Scrap" "Tainted Chaos Orb" "Tainted Mythic Orb" "Tainted Blessing" "Tainted Exalted Orb" "Sacred Orb" "Lesser Eldritch Ember" "Greater Eldritch Ember" "Grand Eldritch Ember" "Lesser Eldritch Ichor" "Greater Eldritch Ichor" "Grand Eldritch Ichor" "Eldritch Chaos Orb" "Eldritch Exalted Orb" "Eldritch Orb of Annulment" "Fracturing Shard"
 	{
 		Expand $actions_currency_mid
 		Show
@@ -1080,6 +1083,15 @@ Class == "Heist Cloak" "Heist Brooch" "Heist Tool" "Heist Gear" {
 	SetBackgroundColor $color_black
 	SetAlertSound $alert_heist_gear
 	SetFontSize $font_heist_gear
+	Show
+}
+
+Class == "Relic" "Sanctified Relic" {
+	SetTextColor $color_black
+	SetBackgroundColor $color_sanctum
+	SetBorderColor $color_sanctum
+	SetAlertSound $alert_sanctum_relic
+	SetFontSize $font_sanctum_relic
 	Show
 }
 
