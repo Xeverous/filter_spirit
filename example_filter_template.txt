@@ -1861,6 +1861,22 @@ Class == "Maps" {
 	ShowHide $show_maps_white
 }
 
+Rarity <= Rare {
+	FracturedItem True {
+		SetTextColor $color_black
+		SetBackgroundColor $color_fractured_item
+		SetAlertSound $alert_fractured_item
+		ShowDiscard $show_gear_fractured
+	}
+
+	SynthesisedItem True {
+		SetTextColor $color_black
+		SetBackgroundColor $color_synthesised_item
+		SetAlertSound $alert_synthesised_item
+		ShowDiscard $show_gear_synthesised
+	}
+}
+
 # Cluster jewels are complex to price
 # worse, there is no tool that offers an API to download prices
 # https://www.reddit.com/r/pathofexile/comments/lj49zm/i_made_a_cheat_sheet_on_how_to_price_cluster/
@@ -2021,20 +2037,6 @@ Rarity <= Rare {
 			Show
 			Continue
 		}
-	}
-
-	FracturedItem True {
-		SetTextColor $color_black
-		SetBackgroundColor $color_fractured_item
-		SetAlertSound $alert_fractured_item
-		ShowDiscard $show_gear_fractured
-	}
-
-	SynthesisedItem True {
-		SetTextColor $color_black
-		SetBackgroundColor $color_synthesised_item
-		SetAlertSound $alert_synthesised_item
-		ShowDiscard $show_gear_synthesised
 	}
 
 	# experimented bases (Heist exclusive)
