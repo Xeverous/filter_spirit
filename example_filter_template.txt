@@ -1006,6 +1006,15 @@ Class == "Stackable Currency" {
 		Show
 	}
 
+	BaseType "Lycia's Invocation" {
+		SetTextColor $color_black
+		SetBackgroundColor $color_sanctum
+		SetBorderColor $color_sanctum
+		SetAlertSound $alert_currency_mid
+		SetFontSize $font_max
+		Show
+	}
+
 	BaseType "Net" "Cartographer's Seal"
 	{
 		Expand $actions_currency_mid
