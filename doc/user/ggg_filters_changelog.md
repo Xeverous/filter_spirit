@@ -6,6 +6,13 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 
 *newest at the top*
 
+### 3.20 (The Forbidden Sanctum) [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3324656)
+
+- New gems, cards, currency
+- New item class: Relics
+- [3.20.1 Item Filter update](https://www.pathofexile.com/forum/view-thread/3331539) - Invocations
+- [patch notes](https://www.pathofexile.com/forum/view-thread/3323944)
+
 ### 3.19 (Lake of Kalandra) [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3294085)
 
 - New cards, ring bases and wand bases
