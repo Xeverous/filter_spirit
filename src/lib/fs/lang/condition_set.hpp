@@ -265,6 +265,8 @@ struct condition_set
 	std::optional<boolean_condition> is_alternate_quality;
 	std::optional<boolean_condition> is_scourged;
 	std::optional<boolean_condition> is_uber_blighted_map;
+	std::optional<boolean_condition> has_implicit_mod;
+	std::optional<boolean_condition> has_crucible_passive_tree;
 };
 
 class condition_match_result
@@ -380,7 +382,9 @@ struct condition_set_match_result
 			&& is_not_failure(is_replica)
 			&& is_not_failure(is_alternate_quality)
 			&& is_not_failure(is_scourged)
-			&& is_not_failure(is_uber_blighted_map);
+			&& is_not_failure(is_uber_blighted_map)
+			&& is_not_failure(has_implicit_mod)
+			&& is_not_failure(has_crucible_passive_tree);
 	}
 
 	range_condition_match_result item_level;
@@ -428,6 +432,8 @@ struct condition_set_match_result
 	std::optional<condition_match_result> is_alternate_quality;
 	std::optional<condition_match_result> is_scourged;
 	std::optional<condition_match_result> is_uber_blighted_map;
+	std::optional<condition_match_result> has_implicit_mod;
+	std::optional<condition_match_result> has_crucible_passive_tree;
 };
 
 struct autogen_condition

@@ -72,7 +72,9 @@ enum class boolean_condition_property
 	replica,
 	alternate_quality,
 	scourged,
-	uber_blighted_map
+	uber_blighted_map,
+	has_implicit_mod,
+	has_crucible_passive_tree
 };
 
 } // namespace fs::lang

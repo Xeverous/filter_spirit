@@ -227,6 +227,8 @@ namespace rf
 				(lang::keywords::rf::alternate_quality, lang::boolean_condition_property::alternate_quality)
 				(lang::keywords::rf::scourged,          lang::boolean_condition_property::scourged)
 				(lang::keywords::rf::uber_blighted_map, lang::boolean_condition_property::uber_blighted_map)
+				(lang::keywords::rf::has_implicit_mod,  lang::boolean_condition_property::has_implicit_mod)
+				(lang::keywords::rf::has_crucible_passive_tree, lang::boolean_condition_property::has_crucible_passive_tree)
 			;
 		}
 	};

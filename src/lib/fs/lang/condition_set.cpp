@@ -338,21 +338,23 @@ void condition_set::generate(std::ostream& output_stream) const
 	output_socket_spec_condition(false, sockets,      output_stream);
 	output_socket_spec_condition(true,  socket_group, output_stream);
 
-	output_boolean_condition(is_identified,        kw::identified,        output_stream);
-	output_boolean_condition(is_corrupted,         kw::corrupted,         output_stream);
-	output_boolean_condition(is_mirrored,          kw::mirrored,          output_stream);
-	output_boolean_condition(is_elder_item,        kw::elder_item,        output_stream);
-	output_boolean_condition(is_shaper_item,       kw::shaper_item,       output_stream);
-	output_boolean_condition(is_fractured_item,    kw::fractured_item,    output_stream);
-	output_boolean_condition(is_synthesised_item,  kw::synthesised_item,  output_stream);
-	output_boolean_condition(is_enchanted,         kw::any_enchantment,   output_stream);
-	output_boolean_condition(is_shaped_map,        kw::shaped_map,        output_stream);
-	output_boolean_condition(is_elder_map,         kw::elder_map,         output_stream);
-	output_boolean_condition(is_blighted_map,      kw::blighted_map,      output_stream);
-	output_boolean_condition(is_replica,           kw::replica,           output_stream);
-	output_boolean_condition(is_alternate_quality, kw::alternate_quality, output_stream);
-	output_boolean_condition(is_scourged,          kw::scourged,          output_stream);
-	output_boolean_condition(is_uber_blighted_map, kw::uber_blighted_map, output_stream);
+	output_boolean_condition(is_identified,             kw::identified,                output_stream);
+	output_boolean_condition(is_corrupted,              kw::corrupted,                 output_stream);
+	output_boolean_condition(is_mirrored,               kw::mirrored,                  output_stream);
+	output_boolean_condition(is_elder_item,             kw::elder_item,                output_stream);
+	output_boolean_condition(is_shaper_item,            kw::shaper_item,               output_stream);
+	output_boolean_condition(is_fractured_item,         kw::fractured_item,            output_stream);
+	output_boolean_condition(is_synthesised_item,       kw::synthesised_item,          output_stream);
+	output_boolean_condition(is_enchanted,              kw::any_enchantment,           output_stream);
+	output_boolean_condition(is_shaped_map,             kw::shaped_map,                output_stream);
+	output_boolean_condition(is_elder_map,              kw::elder_map,                 output_stream);
+	output_boolean_condition(is_blighted_map,           kw::blighted_map,              output_stream);
+	output_boolean_condition(is_replica,                kw::replica,                   output_stream);
+	output_boolean_condition(is_alternate_quality,      kw::alternate_quality,         output_stream);
+	output_boolean_condition(is_scourged,               kw::scourged,                  output_stream);
+	output_boolean_condition(is_uber_blighted_map,      kw::uber_blighted_map,         output_stream);
+	output_boolean_condition(has_implicit_mod,          kw::has_implicit_mod,          output_stream);
+	output_boolean_condition(has_crucible_passive_tree, kw::has_crucible_passive_tree, output_stream);
 
 	output_strings_condition(class_,                   kw::class_,                   output_stream);
 	output_strings_condition(base_type,                kw::base_type,                output_stream);

@@ -68,6 +68,8 @@ namespace rf
 	constexpr auto has_searing_exarch_implicit  = "HasSearingExarchImplicit";
 	constexpr auto has_eater_of_worlds_implicit = "HasEaterOfWorldsImplicit";
 	constexpr auto archnemesis_mod  = "ArchnemesisMod";
+	constexpr auto has_implicit_mod = "HasImplicitMod";
+	constexpr auto has_crucible_passive_tree = "HasCruciblePassiveTree";
 
 	constexpr auto r = 'R';
 	constexpr auto g = 'G';

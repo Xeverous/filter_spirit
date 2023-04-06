@@ -495,6 +495,18 @@ add_boolean_condition(
 				condition_set.is_uber_blighted_map,
 				diagnostics);
 		}
+		case lang::boolean_condition_property::has_implicit_mod: {
+			return add_non_range_condition(
+				lang::boolean_condition{boolean, condition_origin},
+				condition_set.has_implicit_mod,
+				diagnostics);
+		}
+		case lang::boolean_condition_property::has_crucible_passive_tree: {
+			return add_non_range_condition(
+				lang::boolean_condition{boolean, condition_origin},
+				condition_set.has_crucible_passive_tree,
+				diagnostics);
+		}
 	}
 
 	push_error_internal_compiler_error(__func__, condition_origin, diagnostics);
