@@ -1,5 +1,9 @@
 # Filter Spirit changelog
 
+## version 1.5.2 (06.04.2023)
+
+- added support for 2 conditions introduced in Crucible league: `HasImplicitMod` and `HasCruciblePassiveTree`
+
 ## version 1.4.2 (09.02.2022)
 
 - added missing support for `ArchnemesisMod` condition
