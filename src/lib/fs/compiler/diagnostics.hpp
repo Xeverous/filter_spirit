@@ -12,7 +12,7 @@
 
 namespace fs::parser {
 
-class parse_metadata;
+struct parse_metadata;
 
 }
 
