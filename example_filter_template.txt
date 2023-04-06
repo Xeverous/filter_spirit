@@ -743,6 +743,12 @@ Class == "Stackable Currency" {
 		Show
 	}
 
+	BaseType == "Igneous Geode" "Crystalline Geode" "Magmatic Ore"
+	{
+		Expand $actions_currency_mid
+		Show
+	}
+
 	BaseType "Delirium Orb" "Catalyst" "Surveyor's Compass" "Charged Compass" "Oil Extractor" "Scouting Report"
 	{
 		Expand $actions_currency_mid
@@ -1509,15 +1515,6 @@ Class == "Map Fragments"
 		SetAlertSound $alert_fragment_sacred_blossom
 	}
 
-	BaseType "Breachstone" {
-		SetTextColor $color_breach
-		SetBorderColor $color_breach
-		SetBackgroundColor $color_white
-		SetFontSize $font_breachstone
-		SetAlertSound $alert_breachstone
-		Show
-	}
-
 	BaseType "Emblem" {
 		SetTextColor $color_legion
 		SetBorderColor $color_legion
@@ -1575,6 +1572,15 @@ Class == "Map Fragments"
 		Show
 	}
 
+	Show
+}
+
+Class == "Breachstone" {
+	SetTextColor $color_breach
+	SetBorderColor $color_breach
+	SetBackgroundColor $color_white
+	SetFontSize $font_breachstone
+	SetAlertSound $alert_breachstone
 	Show
 }
 
