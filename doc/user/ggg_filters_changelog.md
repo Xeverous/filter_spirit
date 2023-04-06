@@ -6,6 +6,12 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 
 *newest at the top*
 
+### 3.21 (Crucible) [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3362077)
+
+- New gems, cards, currency and other items
+- Breachstones are now a separate item class (instead of "Map Fragments")
+- [patch notes](https://www.pathofexile.com/forum/view-thread/3361403)
+
 ### 3.20 (The Forbidden Sanctum) [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3324656)
 
 - New gems, cards, currency
