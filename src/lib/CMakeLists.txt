@@ -175,6 +175,9 @@ target_compile_options(filter_spirit
 		$<$<CXX_COMPILER_ID:MSVC>:/W4>
 )
 
+# Boost date time library can be made header-only (since 1.73 it's always header-only)
+target_compile_definitions(filter_spirit PUBLIC BOOST_DATE_TIME_NO_LIB)
+
 if(FILTER_SPIRIT_PLATFORM STREQUAL "win7")
 	target_compile_definitions(filter_spirit PUBLIC FILTER_SPIRIT_PLATFORM_WINDOWS)
 elseif(FILTER_SPIRIT_PLATFORM STREQUAL "sdl2")
