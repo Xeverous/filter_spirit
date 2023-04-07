@@ -15,7 +15,7 @@
 # other types: sorry, not possible; search for variable usage and edit filter structure
 
 $color_white               = 255 255 255
-$color_black               =   0   0   0 255
+$color_black               =   0   0   0
 $color_red                 = 255   0   0
 $color_golden              = 240 200 150
 $color_error               = $color_red
@@ -162,41 +162,26 @@ $font_dominance_low      = $font_mid
 $font_influence_very_low = $font_very_low
 $font_influence_unknown  = $font_influence_mid
 
-$alert_mlg_airhorn       = "mlg_airhorn.mp3"
-$alert_airhorn           = "airhorn.mp3" # mid
-$alert_wow               = "wow.mp3"
-$alert_hitmarker         = "hitmarker.wav" # frequent
-$alert_uhh               = "uhh.mp3" # check_required
-$alert_intervention      = "intervention.mp3" # alert_6_socket
-$alert_john_cena_earrape = "john_cena_earrape.mp3"
-$alert_metal_gear        = "metal_gear.mp3"
-$alert_whip              = "whip.mp3"
-$alert_wombo_combo       = "wombo_combo.flac" # alert_high
-$alert_triggered         = "triggered.mp3"
-$alert_flash_mid         = "33_summonerspell_base_flash_oc_0.wav"
-$alert_flash_low         = "32_summonerspell_base_flash_oc_0.wav"
-$alert_yoink             = "Halo_Reach_-_Yoink_Sound_Effect.mp3" 300
-
 # items that drop only under certain conditions
-$alert_very_specific       = 1 300
+$alert_very_specific       = 1
 # item value - low uncertainty
-$alert_high                = $alert_wombo_combo 300
-$alert_mid                 = $alert_flash_mid 300
-$alert_low                 = $alert_flash_low 300
+$alert_high                = 6
+$alert_mid                 = 2
+$alert_low                 = $alert_mid
 # item value - high uncertainty
-$alert_extraordinary       = $alert_john_cena_earrape 300
-$alert_uncommon            = $alert_mlg_airhorn 300
-$alert_common              = $alert_airhorn 50
-$alert_frequent            = $alert_hitmarker 300
+$alert_extraordinary       = 5
+$alert_uncommon            = $alert_high
+$alert_common              = $alert_mid
+$alert_frequent            = None
 # value can not be easily determined
-$alert_check_required      = $alert_intervention 300
+$alert_check_required      = 3
 # some items can only be created by players
 $alert_undroppable         = $alert_high
-$alert_map_high            = $alert_metal_gear 300
-$alert_map_low             = $alert_whip 300
-$alert_leveling            = 12 300
+$alert_map_high            = 5
+$alert_map_low             = 4
+$alert_leveling            = 12
 # I have yet to see someone who likes 15
-$alert_error               = $alert_triggered 300
+$alert_error               = 15
 
 $alert_pale_court          = $alert_very_specific
 $alert_lab_offering        = $alert_very_specific
@@ -250,8 +235,8 @@ $alert_gem_non_0_quality   = $alert_frequent
 $alert_oil_high            = $alert_high
 $alert_oil_mid             = $alert_mid
 $alert_atlas_upgrade       = $alert_very_specific
-$alert_map_blight          = $alert_yoink
-$alert_map_guardian        = $alert_yoink
+$alert_map_blight          = $alert_uncommon
+$alert_map_guardian        = $alert_map_high
 $alert_map_enchanted       = $alert_map_high
 $alert_map_red             = $alert_map_high
 $alert_map_yellow          = $alert_map_low
