@@ -1607,17 +1607,6 @@ Class == "Misc Map Items" {
 		Show
 	}
 
-	# keys from 3.19 (Lake of Kalandra)
-	BaseType == "Forgotten Reliquary Key" "Visceral Reliquary Key" "Shiny Reliquary Key" "Archive Reliquary Key" "Oubliette Reliquary Key" "Cosmic Reliquary Key" "Decaying Reliquary Key" {
-		SetBorderColor 204 153 0
-		SetTextColor $color_white
-		SetBackgroundColor 204 153 0
-		SetAlertSound $alert_reliquary
-		PlayEffect $beam_reliquary
-		MinimapIcon $icon_reliquary
-		Show
-	}
-
 	BaseType == "Writhing Invitation" "Screaming Invitation" "Polaric Invitation" "Incandescent Invitation" {
 		SetBorderColor 204 153 0
 		SetTextColor $color_white
@@ -1661,6 +1650,30 @@ Class == "Misc Map Items" {
 		SetBackgroundColor $color_black
 		SetTextColor $color_white
 		SetAlertSound $alert_very_specific
+		Show
+	}
+}
+
+Class == "Vault Key" {
+	# keys from 3.19 (Lake of Kalandra)
+	BaseType == "Forgotten Reliquary Key" "Visceral Reliquary Key" "Shiny Reliquary Key" "Archive Reliquary Key" "Oubliette Reliquary Key" "Cosmic Reliquary Key" "Decaying Reliquary Key" {
+		SetBorderColor 204 153 0
+		SetTextColor $color_white
+		SetBackgroundColor 204 153 0
+		SetAlertSound $alert_reliquary
+		PlayEffect $beam_reliquary
+		MinimapIcon $icon_reliquary
+		Show
+	}
+
+	# keys from 3.20 (The Forbidden Sanctum)
+	BaseType == "Voidborn Reliquary Key" {
+		SetBorderColor 204 153 0
+		SetTextColor $color_white
+		SetBackgroundColor 204 153 0
+		SetAlertSound $alert_reliquary
+		PlayEffect $beam_reliquary
+		MinimapIcon $icon_reliquary
 		Show
 	}
 }

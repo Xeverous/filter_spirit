@@ -10,6 +10,7 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 
 - New gems, cards, currency and other items
 - Breachstones are now a separate item class (instead of "Map Fragments")
+- Some Reliquary keys have different item classes now: https://www.pathofexile.com/forum/view-thread/3324396#THU6
 - [patch notes](https://www.pathofexile.com/forum/view-thread/3361403)
 
 ### 3.20 (The Forbidden Sanctum) [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3324656)
