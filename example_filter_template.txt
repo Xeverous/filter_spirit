@@ -1086,15 +1086,6 @@ Class == "Heist Cloak" "Heist Brooch" "Heist Tool" "Heist Gear" {
 	Show
 }
 
-Class == "Relic" "Sanctified Relic" {
-	SetTextColor $color_black
-	SetBackgroundColor $color_sanctum
-	SetBorderColor $color_sanctum
-	SetAlertSound $alert_sanctum_relic
-	SetFontSize $font_sanctum_relic
-	Show
-}
-
 Class == "Expedition Logbook" {
 	SetTextColor $color_black
 	SetBorderColor $color_expedition
@@ -1709,17 +1700,6 @@ Class == "Metamorph Sample" {
 	SetBackgroundColor $color_black
 	SetFontSize $font_metamorph
 	SetAlertSound $alert_metamorph
-	Show
-}
-
-# Archnemesis Mods can be filtered by name.
-# For example, ArchnemesisMod "Hasted" or ArchnemesisMod "Toxic"
-Class == "Archnemesis Mod" {
-	SetTextColor $color_archnemesis
-	SetBorderColor $color_archnemesis
-	SetBackgroundColor $color_black
-	SetFontSize $font_archnemesis
-	SetAlertSound $alert_archnemesis
 	Show
 }
 
