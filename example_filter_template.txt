@@ -151,6 +151,7 @@ $font_quest              = $font_max
 $font_contract           = $font_mid
 $font_blueprint          = $font_high
 $font_sanctum_relic      = $font_high
+$font_sanctum_research   = $font_high
 $font_heist_gear         = $font_mid
 $font_experimented_base  = $font_max
 $font_logbook            = $font_max
@@ -177,8 +178,10 @@ $alert_frequent            = None
 $alert_check_required      = 3
 # some items can only be created by players
 $alert_undroppable         = $alert_high
+# maps - people quickly lose interest in low tiers
 $alert_map_high            = 5
 $alert_map_low             = 4
+# other
 $alert_leveling            = 12
 # I have yet to see someone who likes 15
 $alert_error               = 15
@@ -262,6 +265,7 @@ $alert_heist_gear          = $alert_common
 $alert_contract            = $alert_common
 $alert_blueprint           = $alert_common
 $alert_sanctum_relic       = $alert_very_specific
+$alert_sanctum_research    = $alert_uncommon
 $alert_logbook             = $alert_uncommon
 $alert_quest_item          = $alert_very_specific
 $alert_influence_high      = $alert_extraordinary
@@ -324,6 +328,8 @@ $icon_unique_mid      = 2 Brown Triangle
 $icon_6_link          = 0 Red Hexagon
 $icon_base_defence    = 0 Grey Square
 $icon_ultimatum       = 0 Orange Triangle
+$icon_logbook         = 0 Cyan Square
+$icon_sanctum_research= 0 Brown Square
 $icon_error           = 0 Red Square
 $icon_harvest         = 2 Blue Circle
 
@@ -557,7 +563,7 @@ $show_low_splinters = True
 
 $cards_stack_size_1 = "Chaotic Disposition" "The Void" "Divine Justice" "The Cartographer" "The Heroic Shot" "Society's Remorse"
 # These cards will be always shown, regardless of their reported value
-$cfg_cards_always_show_names = $cards_stack_size_1 "Humility" "Loyalty" "Lucky Connections" "Lucky Deck" "No Traces" "The Encroaching Darkness" "The Innocent" "The Inventor" "The Master Artisan" "The Obscured" "The Risk" "The Survivalist" "The Wrath" "Three Faces in the Dark" "Vinia's Token" "Coveted Possession" "Sambodhi's Vow" "The Tinkerer's Table" "Monochrome" "Cameria's Cut" "Buried Treasure" "Last Hope" "The Journey" "The Fool" "Underground Forest" "The Deal" "Vinia's Token" "Demigod's Wager" "More is Never Enough" "The Union" "The Seeker" "The Sephirot" "A Sea of Blue"
+$cfg_cards_always_show_names = $cards_stack_size_1 "Humility" "Loyalty" "Lucky Connections" "Lucky Deck" "No Traces" "The Encroaching Darkness" "The Innocent" "The Inventor" "The Master Artisan" "The Obscured" "The Risk" "The Survivalist" "The Wrath" "Three Faces in the Dark" "Vinia's Token" "Coveted Possession" "Sambodhi's Vow" "The Tinkerer's Table" "Monochrome" "Cameria's Cut" "Buried Treasure" "Last Hope" "The Journey" "The Fool" "Underground Forest" "The Deal" "Demigod's Wager" "More is Never Enough" "The Union" "The Seeker" "The Sephirot" "A Sea of Blue"
 $cfg_cards_high_min_value = 100
 $cfg_cards_mid_min_value = 10
 $cfg_cards_low_min_value = 2
@@ -728,7 +734,13 @@ Class == "Stackable Currency" {
 		Show
 	}
 
-	BaseType == "Igneous Geode" "Crystalline Geode" "Magmatic Ore"
+	BaseType "Hinekora's Lock" "Loyalty Tatto of" "Honoured Tattoo" "Omen of Connections"
+	{
+		Expand $actions_currency_high
+		Show
+	}
+
+	BaseType "Silver Coin" "Tatto of the" "Omen of"
 	{
 		Expand $actions_currency_mid
 		Show
@@ -1086,12 +1098,32 @@ Class == "Heist Cloak" "Heist Brooch" "Heist Tool" "Heist Gear" {
 	Show
 }
 
+Class == "Sanctum Research" {
+	SetTextColor $color_black
+	SetBackgroundColor $color_sanctum
+	SetBorderColor $color_sanctum
+	SetAlertSound $alert_sanctum_research
+	SetFontSize $font_sanctum_research
+	MinimapIcon $icon_sanctum_research
+	Show
+}
+
+Class == "Relic" {
+	SetTextColor $color_black
+	SetBackgroundColor $color_sanctum
+	SetBorderColor $color_sanctum
+	SetAlertSound $alert_sanctum_relic
+	SetFontSize $font_sanctum_relic
+	Show
+}
+
 Class == "Expedition Logbook" {
 	SetTextColor $color_black
 	SetBorderColor $color_expedition
 	SetBackgroundColor $color_expedition
 	SetAlertSound $alert_logbook
 	SetFontSize $font_logbook
+	MinimapIcon $icon_logbook
 	Show
 }
 
@@ -1118,7 +1150,7 @@ Class == "Expedition Logbook" {
 # - any with quality >= 20
 # - any with quality > 0
 # - any
-Class == "Active Skill Gems" "Support Skill Gems" {
+Class == "Skill Gems" "Support Gems" {
 	Autogen gems {
 		GemLevel 1
 		Corrupted False
