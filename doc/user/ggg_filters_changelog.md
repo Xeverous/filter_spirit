@@ -6,6 +6,12 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 
 *newest at the top*
 
+### 3.22 (Trial of the Ancestors) [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3410483)
+
+- New gems, cards, currency and other items
+- Adjusted gem class names
+- [patch notes](https://www.pathofexile.com/forum/view-thread/3409617)
+
 ### 3.21 (Crucible) [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3362077)
 
 - New gems, cards, currency and other items
