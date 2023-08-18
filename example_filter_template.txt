@@ -734,13 +734,13 @@ Class == "Stackable Currency" {
 		Show
 	}
 
-	BaseType "Hinekora's Lock" "Loyalty Tatto of" "Honoured Tattoo" "Omen of Connections"
+	BaseType "Hinekora's Lock" "Loyalty Tatto" "Honoured Tattoo" "Omen of Connections"
 	{
 		Expand $actions_currency_high
 		Show
 	}
 
-	BaseType "Silver Coin" "Tatto of the" "Omen of"
+	BaseType "Silver Coin" "Tatto" "Omen of"
 	{
 		Expand $actions_currency_mid
 		Show
