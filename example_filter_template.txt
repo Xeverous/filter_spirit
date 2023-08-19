@@ -84,6 +84,7 @@ $color_influence_mid       = 192   0  95
 $color_influence_low       = 127   0  63
 $color_dominance_low       = $color_dominance_high
 $color_influence_very_low  = $color_influence_low
+$color_reliquary           = 204 153 0
 
 $color_influence_unknown   = 150 100 180
 $color_gear_special_mods   = 255   0 127
@@ -304,7 +305,7 @@ $icon_card_mid        = 1 Blue Square
 $icon_card_low        = 2 Blue Square
 $icon_oil_high        = 0 Orange Raindrop
 $icon_oil_mid         = 2 Orange Raindrop
-$icon_reliquary       = $icon_currency_high
+$icon_reliquary       = 0 Brown Star
 $icon_atlas_upgrade   = 0 Purple Cross
 $icon_map_guardian    = 0 White Cross
 $icon_map_red         = 2 White Cross
@@ -1603,17 +1604,6 @@ Class == "Leaguestones" {
 
 Class == "Misc Map Items" {
 	SetFontSize $font_max
-	# reliquary keys from Legacy ("Ancient") and Delve ("Timeworn") leagues
-	# ...and any future reliquary keys
-	BaseType == "Ancient Reliquary Key" "Timeworn Reliquary Key" {
-		SetBorderColor 204 153 0
-		SetTextColor $color_white
-		SetBackgroundColor 204 153 0
-		SetAlertSound $alert_reliquary
-		PlayEffect $beam_reliquary
-		MinimapIcon $icon_reliquary
-		Show
-	}
 
 	BaseType == "Writhing Invitation" "Screaming Invitation" "Polaric Invitation" "Incandescent Invitation" {
 		SetBorderColor 204 153 0
@@ -1663,25 +1653,27 @@ Class == "Misc Map Items" {
 }
 
 Class == "Vault Key" {
+	SetBorderColor $color_reliquary
+	SetTextColor $color_white
+	SetBackgroundColor $color_reliquary
+	SetFontSize $font_max
+	SetAlertSound $alert_reliquary
+	PlayEffect $beam_reliquary
+	MinimapIcon $icon_reliquary
+
 	# keys from 3.19 (Lake of Kalandra)
 	BaseType == "Forgotten Reliquary Key" "Visceral Reliquary Key" "Shiny Reliquary Key" "Archive Reliquary Key" "Oubliette Reliquary Key" "Cosmic Reliquary Key" "Decaying Reliquary Key" {
-		SetBorderColor 204 153 0
-		SetTextColor $color_white
-		SetBackgroundColor 204 153 0
-		SetAlertSound $alert_reliquary
-		PlayEffect $beam_reliquary
-		MinimapIcon $icon_reliquary
 		Show
 	}
 
 	# keys from 3.20 (The Forbidden Sanctum)
 	BaseType == "Voidborn Reliquary Key" {
-		SetBorderColor 204 153 0
-		SetTextColor $color_white
-		SetBackgroundColor 204 153 0
-		SetAlertSound $alert_reliquary
-		PlayEffect $beam_reliquary
-		MinimapIcon $icon_reliquary
+		Show
+	}
+
+	# reliquary keys from Legacy ("Ancient") and Delve ("Timeworn") leagues
+	# ...and any future reliquary keys
+	BaseType == "Ancient Reliquary Key" "Timeworn Reliquary Key" {
 		Show
 	}
 }
