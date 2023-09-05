@@ -564,7 +564,7 @@ $show_low_splinters = True
 
 $cards_stack_size_1 = "Chaotic Disposition" "The Void" "Divine Justice" "The Cartographer" "The Heroic Shot" "Society's Remorse"
 # These cards will be always shown, regardless of their reported value
-$cfg_cards_always_show_names = $cards_stack_size_1 "Humility" "Loyalty" "Lucky Connections" "Lucky Deck" "No Traces" "The Encroaching Darkness" "The Innocent" "The Inventor" "The Obscured" "The Risk" "The Survivalist" "The Wrath" "Three Faces in the Dark" "Vinia's Token" "Coveted Possession" "Sambodhi's Vow" "The Tinkerer's Table" "Monochrome" "Cameria's Cut" "Buried Treasure" "Last Hope" "The Journey" "The Fool" "Underground Forest" "The Deal" "Demigod's Wager" "More is Never Enough" "The Union" "The Seeker" "The Sephirot" "A Sea of Blue" "Man With Bear" "Ever-Changing" "The Finishing Touch"
+$cfg_cards_always_show_names = $cards_stack_size_1 "Humility" "Loyalty" "Lucky Connections" "Lucky Deck" "No Traces" "The Encroaching Darkness" "The Innocent" "The Inventor" "The Obscured" "The Risk" "The Survivalist" "The Wrath" "Three Faces in the Dark" "Vinia's Token" "Coveted Possession" "Sambodhi's Vow" "Monochrome" "Cameria's Cut" "Buried Treasure" "Last Hope" "The Journey" "The Fool" "Underground Forest" "The Deal" "Demigod's Wager" "More is Never Enough" "The Union" "The Seeker" "The Sephirot" "A Sea of Blue" "Man With Bear" "Ever-Changing" "The Finishing Touch"
 $cfg_cards_high_min_value = 100
 $cfg_cards_mid_min_value = 10
 $cfg_cards_low_min_value = 2
