@@ -74,7 +74,8 @@ enum class boolean_condition_property
 	scourged,
 	uber_blighted_map,
 	has_implicit_mod,
-	has_crucible_passive_tree
+	has_crucible_passive_tree,
+	transfigured_gem
 };
 
 } // namespace fs::lang

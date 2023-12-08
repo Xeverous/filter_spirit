@@ -25,7 +25,6 @@ using object_variant = std::variant<
 	shape,
 	suit,
 	shaper_voice_line,
-	gem_quality_type,
 	string
 >;
 
@@ -41,7 +40,6 @@ BETTER_ENUM(object_type, int,
 	shape,
 	suit,
 	shaper_voice_line,
-	gem_quality_type,
 	string)
 
 
@@ -122,8 +120,6 @@ namespace detail {
 	object_type object_type_of_impl<suit>() noexcept { return object_type::suit; }
 	template <> constexpr
 	object_type object_type_of_impl<shaper_voice_line>() noexcept { return object_type::shaper_voice_line; }
-	template <> constexpr
-	object_type object_type_of_impl<gem_quality_type>() noexcept { return object_type::gem_quality_type; }
 	template <> constexpr
 	object_type object_type_of_impl<string>() noexcept { return object_type::string; }
 }

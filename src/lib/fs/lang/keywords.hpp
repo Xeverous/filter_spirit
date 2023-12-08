@@ -57,7 +57,6 @@ namespace rf
 	constexpr auto enchantment_passive_num  = "EnchantmentPassiveNum";
 	constexpr auto replica          = "Replica";
 	constexpr auto alternate_quality = "AlternateQuality";
-	constexpr auto gem_quality_type = "GemQualityType";
 	constexpr auto base_defence_percentile = "BaseDefencePercentile";
 	constexpr auto base_armour      = "BaseArmour";
 	constexpr auto base_evasion     = "BaseEvasion";
@@ -70,6 +69,7 @@ namespace rf
 	constexpr auto archnemesis_mod  = "ArchnemesisMod";
 	constexpr auto has_implicit_mod = "HasImplicitMod";
 	constexpr auto has_crucible_passive_tree = "HasCruciblePassiveTree";
+	constexpr auto transfigured_gem = "TransfiguredGem";
 
 	constexpr auto r = 'R';
 	constexpr auto g = 'G';
@@ -149,12 +149,6 @@ namespace rf
 	constexpr auto redeemer    = "Redeemer";
 	constexpr auto hunter      = "Hunter";
 	constexpr auto warlord     = "Warlord";
-
-	// quality type names - used by GemQualityType
-	constexpr auto superior   = "Superior";
-	constexpr auto divergent  = "Divergent";
-	constexpr auto anomalous  = "Anomalous";
-	constexpr auto phantasmal = "Phantasmal";
 
 	constexpr auto temp = "Temp";
 	constexpr auto none = "None";

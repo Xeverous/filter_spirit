@@ -215,37 +215,13 @@ parse_gems(std::string_view json_str, log::logger& logger)
 {
 	std::vector<lang::market::gem> result;
 
-	auto is_alternate_quality_gem = [](const nlohmann::json& item) {
-		const std::string& name = get_item_property_name(item);
-
-		if (utility::contains(name, lang::keywords::rf::divergent))
-			return true;
-
-		if (utility::contains(name, lang::keywords::rf::anomalous))
-			return true;
-
-		if (utility::contains(name, lang::keywords::rf::phantasmal))
-			return true;
-
-		return false;
-	};
-
 	for_each_item(json_str, logger, [&](const nlohmann::json& item) {
-		/*
-		 * Skip any alternate quality gems because:
-		 * - filters recognize such items with AlternateQuality property
-		 * - gem's BaseType can not contain quality name
-		 *
-		 * Thus, currently it is easier to simply not support alternate quality gems.
-		 */
-		if (!is_alternate_quality_gem(item)) {
-			result.emplace_back(
-				get_elementary_item_data(item),
-				item.at("gemLevel").get<int>(),
-				get_item_property_gem_quality(item),
-				get_item_property_corrupted(item)
-			);
-		}
+		result.emplace_back(
+			get_elementary_item_data(item),
+			item.at("gemLevel").get<int>(),
+			get_item_property_gem_quality(item),
+			get_item_property_corrupted(item)
+		);
 	});
 
 	return result;

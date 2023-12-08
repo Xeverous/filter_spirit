@@ -229,6 +229,7 @@ namespace rf
 				(lang::keywords::rf::uber_blighted_map, lang::boolean_condition_property::uber_blighted_map)
 				(lang::keywords::rf::has_implicit_mod,  lang::boolean_condition_property::has_implicit_mod)
 				(lang::keywords::rf::has_crucible_passive_tree, lang::boolean_condition_property::has_crucible_passive_tree)
+				(lang::keywords::rf::transfigured_gem,  lang::boolean_condition_property::transfigured_gem)
 			;
 		}
 	};
@@ -294,20 +295,6 @@ namespace rf
 		}
 	};
 	const shaper_voice_lines_ shaper_voice_lines;
-
-	struct gem_quality_types_ : x3::symbols<lang::gem_quality_type_type>
-	{
-		gem_quality_types_()
-		{
-			add
-				(lang::keywords::rf::superior,   lang::gem_quality_type_type::superior)
-				(lang::keywords::rf::divergent,  lang::gem_quality_type_type::divergent)
-				(lang::keywords::rf::anomalous,  lang::gem_quality_type_type::anomalous)
-				(lang::keywords::rf::phantasmal, lang::gem_quality_type_type::phantasmal)
-			;
-		}
-	};
-	const gem_quality_types_ gem_quality_types;
 
 	// ---- filter structure ----
 

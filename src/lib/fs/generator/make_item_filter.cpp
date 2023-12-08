@@ -349,12 +349,6 @@ make_filter_block(
 					autogen.condition.origin
 				};
 			}
-			if (!result_block.conditions.gem_quality_type) {
-				result_block.conditions.gem_quality_type = lang::gem_quality_type_condition{
-					{lang::gem_quality_type{lang::gem_quality_type_type::superior, autogen.condition.origin}},
-					autogen.condition.origin
-				};
-			}
 			break;
 		case lang::item_category::bases:
 			result_block.conditions.base_type = make_strings_condition_bases(

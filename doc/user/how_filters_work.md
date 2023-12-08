@@ -59,7 +59,6 @@ expression(s) | type | notes
 `Circle`, `Diamond`, `Hexagon`, `Square`, `Star`, `Triangle`, `Cross`, `Moon`, `Raindrop`, `Kite`, `Pentagon`, `UpsideDownHouse` | Shape |
 `Red`, `Green`, `Blue`, `White`, `Brown`, `Yellow`, `Cyan`, `Grey`, `Orange`, `Pink`, `Purple` | Suit |
 `ShMirror`, `ShExalted`, `ShDivine`, `ShGeneral`, `ShRegal`, `ShChaos`, `ShFusing`, `ShAlchemy`, `ShVaal`, `ShBlessed` | ShaperVoiceLine
-`Superior`, `Divergent`, `Anomalous`, `Phantasmal` | `QualityType` |
 `Shaper`, `Elder`, `Crusader`, `Redeemer`, `Hunter`, `Warlord` | Influence |
 `""`, `"abc"`, `"Leather Belt"` | String | UTF-8 encoding, line breaking characters (LF and CR) not allowed between quotes
 
@@ -112,8 +111,6 @@ HasInfluence           [EQ] None | Influence+
 HasExplicitMod         [==] | CMPInteger String+
 HasEnchantment         [==] | CMPInteger String+
 
-GemQualityType QualityType
-
 Sockets     [CMP] SS+
 SocketGroup [CMP] SS+
 
@@ -134,6 +131,7 @@ Scourged               Boolean
 UberBlightedMap        Boolean
 HasImplicitMod         Boolean
 HasCruciblePassiveTree Boolean
+TransfiguredGem        Boolean
 ```
 
 Note: numeric and `Rarity` conditions can accept multiple values, but there is no practicaly point in doing so. You can cover any range with 2 lines using different comparisons, which is much better than manually specifying all possible values in 1 line. Additionally, current FS implementation does not support this and will error on more than 1 value (this is true both for real filters and filter templates).

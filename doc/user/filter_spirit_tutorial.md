@@ -788,7 +788,6 @@ Some autogenerations place additional requirements:
   - `GemLevel` condition must be present. The stricter it is, the better.
   - `Quality` condition must be present. The stricter it is, the better.
   - `Corrupted` condition must be present.
-  - `GemQualityType` condition must either not exist or allow `Superior`.
 - `bases`:
   - `ItemLevel` condition must be present. The stricter it is, the better.
   - `HasInfluence ==` condition must be present.
@@ -801,9 +800,6 @@ Some autogenerations place additional requirements:
 Some implementation notes:
 
 - `scarabs` also report bestiary lures (both have class `"Map Fragments"`)
-- `gems` do not report alternate quality gems, for these reasons:
-  - prices are unstable, often with low confidence
-  - filters do not recognize alternate quality gems by the name (`BaseType == "Divergent Berserk"` is not accepted); instead they use `GemQualityType` condition
 
 Examples:
 

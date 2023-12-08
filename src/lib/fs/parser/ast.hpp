@@ -160,19 +160,6 @@ namespace common
 		lang::shaper_voice_line_type value;
 	};
 
-	struct gem_quality_type_literal : x3::position_tagged
-	{
-		auto& operator=(lang::gem_quality_type_type type)
-		{
-			value = type;
-			return *this;
-		}
-
-		auto get_value() const { return value; }
-
-		lang::gem_quality_type_type value;
-	};
-
 	struct temp_literal : x3::position_tagged
 	{
 		void get_value() const {}
@@ -190,7 +177,6 @@ namespace common
 		suit_literal,
 		influence_literal,
 		shaper_voice_line_literal,
-		gem_quality_type_literal,
 		temp_literal,
 		none_literal,
 		socket_spec_literal,
@@ -428,19 +414,6 @@ namespace sf
 		sequence seq;
 	};
 
-	struct gem_quality_type_condition : x3::position_tagged
-	{
-		auto& operator=(sequence s)
-		{
-			seq = std::move(s);
-			return *this;
-		}
-
-		const auto& get_value() const { return seq; }
-
-		sequence seq;
-	};
-
 	struct socket_spec_condition : x3::position_tagged
 	{
 		bool links_matter;
@@ -462,7 +435,6 @@ namespace sf
 			string_array_condition,
 			ranged_string_array_condition,
 			has_influence_condition,
-			gem_quality_type_condition,
 			socket_spec_condition,
 			boolean_condition
 		>, x3::position_tagged
@@ -656,7 +628,6 @@ namespace rf
 	using string_literal = common::string_literal;
 	using influence_literal = common::influence_literal;
 	using shaper_voice_line_literal = common::shaper_voice_line_literal;
-	using gem_quality_type_literal = common::gem_quality_type_literal;
 	using none_literal = common::none_literal;
 
 	struct color_literal : x3::position_tagged
@@ -738,19 +709,6 @@ namespace rf
 		influence_spec spec;
 	};
 
-	struct gem_quality_type_condition : x3::position_tagged
-	{
-		auto& operator=(literal_sequence seq)
-		{
-			literals = std::move(seq);
-			return *this;
-		}
-
-		const auto& get_value() const { return literals; }
-
-		literal_sequence literals;
-	};
-
 	struct socket_spec_condition : x3::position_tagged
 	{
 		bool links_matter;
@@ -770,7 +728,6 @@ namespace rf
 		string_array_condition,
 		ranged_string_array_condition,
 		has_influence_condition,
-		gem_quality_type_condition,
 		socket_spec_condition,
 		boolean_condition
 	>, x3::position_tagged

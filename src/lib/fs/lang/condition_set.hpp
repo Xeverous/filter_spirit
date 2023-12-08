@@ -165,14 +165,6 @@ struct boolean_condition
 	position_tag origin;
 };
 
-struct gem_quality_type_condition
-{
-	using container_type = boost::container::small_vector<gem_quality_type, 4>;
-
-	container_type values;
-	position_tag origin;
-};
-
 struct socket_spec_condition
 {
 	using container_type = boost::container::small_vector<socket_spec, 6>;
@@ -236,7 +228,6 @@ struct condition_set
 	std::optional<strings_condition> enchantment_passive_node;
 	std::optional<strings_condition> archnemesis_mod;
 	std::optional<influences_condition> has_influence;
-	std::optional<gem_quality_type_condition> gem_quality_type;
 	integer_range_condition stack_size;
 	integer_range_condition gem_level;
 	integer_range_condition map_tier;
@@ -267,6 +258,7 @@ struct condition_set
 	std::optional<boolean_condition> is_uber_blighted_map;
 	std::optional<boolean_condition> has_implicit_mod;
 	std::optional<boolean_condition> has_crucible_passive_tree;
+	std::optional<boolean_condition> transfigured_gem;
 };
 
 class condition_match_result
@@ -367,7 +359,6 @@ struct condition_set_match_result
 			&& is_not_failure(enchantment_passive_node)
 			&& is_not_failure(archnemesis_mod)
 			&& is_not_failure(has_influence)
-			&& is_not_failure(gem_quality_type)
 			&& is_not_failure(is_identified)
 			&& is_not_failure(is_corrupted)
 			&& is_not_failure(is_mirrored)
@@ -384,7 +375,8 @@ struct condition_set_match_result
 			&& is_not_failure(is_scourged)
 			&& is_not_failure(is_uber_blighted_map)
 			&& is_not_failure(has_implicit_mod)
-			&& is_not_failure(has_crucible_passive_tree);
+			&& is_not_failure(has_crucible_passive_tree)
+			&& is_not_failure(transfigured_gem);
 	}
 
 	range_condition_match_result item_level;
@@ -416,7 +408,6 @@ struct condition_set_match_result
 	std::optional<condition_match_result> enchantment_passive_node;
 	std::optional<condition_match_result> archnemesis_mod;
 	std::optional<condition_match_result> has_influence;
-	std::optional<condition_match_result> gem_quality_type;
 	std::optional<condition_match_result> is_identified;
 	std::optional<condition_match_result> is_corrupted;
 	std::optional<condition_match_result> is_mirrored;
@@ -434,6 +425,7 @@ struct condition_set_match_result
 	std::optional<condition_match_result> is_uber_blighted_map;
 	std::optional<condition_match_result> has_implicit_mod;
 	std::optional<condition_match_result> has_crucible_passive_tree;
+	std::optional<condition_match_result> transfigured_gem;
 };
 
 struct autogen_condition

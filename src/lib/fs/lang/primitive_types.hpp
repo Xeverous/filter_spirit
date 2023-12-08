@@ -172,32 +172,6 @@ struct shaper_voice_line
 inline bool operator==(shaper_voice_line lhs, shaper_voice_line rhs) noexcept { return lhs.value == rhs.value; }
 inline bool operator!=(shaper_voice_line lhs, shaper_voice_line rhs) noexcept { return !(lhs == rhs); }
 
-enum class gem_quality_type_type { superior, divergent, anomalous, phantasmal };
-struct gem_quality_type
-{
-	gem_quality_type_type value;
-	position_tag origin = {};
-};
-
-inline const char* to_c_str(gem_quality_type_type gqt)
-{
-	namespace kw = keywords::rf;
-
-	if (gqt == gem_quality_type_type::superior)
-		return kw::superior;
-	else if (gqt == gem_quality_type_type::divergent)
-		return kw::divergent;
-	else if (gqt == gem_quality_type_type::anomalous)
-		return kw::anomalous;
-	else if (gqt == gem_quality_type_type::phantasmal)
-		return kw::phantasmal;
-	else
-		return "?";
-}
-
-inline bool operator==(gem_quality_type lhs, gem_quality_type rhs) noexcept { return lhs.value == rhs.value; }
-inline bool operator!=(gem_quality_type lhs, gem_quality_type rhs) noexcept { return !(lhs == rhs); }
-
 struct string
 {
 	std::string value;

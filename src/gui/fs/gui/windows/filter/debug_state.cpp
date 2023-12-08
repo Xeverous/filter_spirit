@@ -287,7 +287,6 @@ void debug_state::recompute(const parser::parse_metadata& metadata)
 		color_line_by_condition_result(cs.enchantment_passive_node, metadata, _line_colors);
 		color_line_by_condition_result(cs.enchantment_passive_num,  metadata, _line_colors);
 		color_line_by_condition_result(cs.has_influence,            metadata, _line_colors);
-		color_line_by_condition_result(cs.gem_quality_type,         metadata, _line_colors);
 		color_line_by_condition_result(cs.is_identified,            metadata, _line_colors);
 		color_line_by_condition_result(cs.is_corrupted,             metadata, _line_colors);
 		color_line_by_condition_result(cs.is_mirrored,              metadata, _line_colors);
