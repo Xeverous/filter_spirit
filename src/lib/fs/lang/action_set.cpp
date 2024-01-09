@@ -321,21 +321,4 @@ void action_set::override_with(const action_set& other)
 		play_effect = *other.play_effect;
 }
 
-bool operator==(const action_set& lhs, const action_set& rhs)
-{
-	return lhs.set_border_color == rhs.set_border_color
-		&& lhs.set_text_color == rhs.set_text_color
-		&& lhs.set_background_color == rhs.set_background_color
-		&& lhs.set_font_size == rhs.set_font_size
-		&& lhs.play_alert_sound == rhs.play_alert_sound
-		&& lhs.switch_drop_sound == rhs.switch_drop_sound
-		&& lhs.minimap_icon == rhs.minimap_icon
-		&& lhs.play_effect == rhs.play_effect;
-}
-
-bool operator!=(const action_set& lhs, const action_set& rhs)
-{
-	return !(lhs == rhs);
-}
-
 }

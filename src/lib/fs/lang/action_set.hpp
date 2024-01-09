@@ -3,6 +3,10 @@
 #include <fs/lang/primitive_types.hpp>
 #include <fs/lang/position_tag.hpp>
 
+#include <boost/fusion/include/adapt_struct.hpp>
+#include <boost/fusion/sequence/comparison/equal_to.hpp>
+#include <boost/fusion/sequence/comparison/not_equal_to.hpp>
+
 #include <utility>
 #include <tuple>
 #include <iosfwd>
@@ -313,7 +317,15 @@ struct action_set
 	std::optional<play_effect_action> play_effect;
 };
 
-bool operator==(const action_set& lhs, const action_set& rhs);
-bool operator!=(const action_set& lhs, const action_set& rhs);
-
 }
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::lang::action_set,
+	set_border_color,
+	set_text_color,
+	set_background_color,
+	set_font_size,
+	play_alert_sound,
+	switch_drop_sound,
+	minimap_icon,
+	play_effect)
