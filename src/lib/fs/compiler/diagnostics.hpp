@@ -8,6 +8,7 @@
 #include <boost/container/small_vector.hpp>
 #include <boost/optional.hpp>
 
+#include <algorithm>
 #include <variant>
 
 namespace fs::parser {
@@ -17,6 +18,25 @@ struct parse_metadata;
 }
 
 namespace fs::compiler {
+
+enum class processing_status
+{
+	ok,              // everything went right
+	warning,         // things might be wrong but the state is valid
+	non_fatal_error, // things are wrong and the state is only partially valid
+	fatal_error      // things are wrong and processing can not continue
+};
+
+constexpr bool is_error(processing_status status)
+{
+	return status == processing_status::non_fatal_error || status == processing_status::fatal_error;
+}
+
+// returns worse status among supplied arguments
+constexpr processing_status combine_statuses(processing_status lhs, processing_status rhs)
+{
+	return static_cast<processing_status>(std::max(static_cast<int>(lhs), static_cast<int>(rhs)));
+}
 
 enum class diagnostic_message_severity
 {
@@ -35,6 +55,9 @@ enum class diagnostic_message_id
 {
 	name_already_exists,
 	no_such_name,
+	unknown_expression,
+	invalid_expression,
+	unknown_statement,
 	invalid_amount_of_arguments,
 	invalid_integer_value,
 	type_mismatch,
@@ -177,23 +200,49 @@ inline void push_error_name_already_exists(
 	diagnostics.push_back(make_error(diagnostic_message_id::name_already_exists, duplicate_origin, "name already exists"));
 	diagnostics.push_back(make_note_first_defined_here(existing_origin));
 }
+
 inline void push_error_no_such_name(
 	lang::position_tag name_origin,
 	diagnostics_container& diagnostics)
 {
 	diagnostics.push_back(make_error(diagnostic_message_id::no_such_name, name_origin, "no such name has been defined"));
 }
+
+inline void push_error_unknown_expression(
+	lang::position_tag expression_origin,
+	diagnostics_container& diagnostics)
+{
+	diagnostics.push_back(make_error(diagnostic_message_id::unknown_expression, expression_origin, "unknown expression"));
+}
+
+inline void push_error_invalid_expression(
+	lang::position_tag expression_origin,
+	std::string_view explanation,
+	diagnostics_container& diagnostics)
+{
+	diagnostics.push_back(make_error(diagnostic_message_id::invalid_expression, expression_origin, "invalid expression: ", explanation));
+}
+
+inline void push_error_unknown_statement(
+	lang::position_tag statement_origin,
+	diagnostics_container& diagnostics)
+{
+	diagnostics.push_back(make_error(diagnostic_message_id::unknown_statement, statement_origin, "unknown statement"));
+}
+
 void push_error_invalid_integer_value(
 	int min,
 	int max,
 	lang::integer actual,
 	diagnostics_container& diagnostics);
+
 void push_error_invalid_amount_of_arguments(
 	int expected_min,
 	boost::optional<int> expected_max,
 	int actual,
 	lang::position_tag origin,
 	diagnostics_container& diagnostics);
+
 inline void push_error_lower_bound_redefinition(
 	lang::position_tag redefinition,
 	lang::position_tag original,
@@ -201,6 +250,7 @@ inline void push_error_lower_bound_redefinition(
 {
 	detail::push_error_bound_redefinition(true, redefinition, original, diagnostics);
 }
+
 inline void push_error_upper_bound_redefinition(
 	lang::position_tag redefinition,
 	lang::position_tag original,
@@ -208,11 +258,13 @@ inline void push_error_upper_bound_redefinition(
 {
 	detail::push_error_bound_redefinition(false, redefinition, original, diagnostics);
 }
+
 void push_error_type_mismatch(
 	lang::object_type expected,
 	lang::object_type actual,
 	lang::position_tag origin,
 	diagnostics_container& diagnostics);
+
 inline void push_error_recursion_limit_reached(
 	lang::position_tag origin,
 	diagnostics_container& diagnostics)
@@ -222,15 +274,18 @@ inline void push_error_recursion_limit_reached(
 		origin,
 		"recursion limit reached - you very likely made recursive tree which never ends"));
 }
+
 void push_error_internal_compiler_error(
 	std::string_view function_name,
 	lang::position_tag origin,
 	diagnostics_container& diagnostics);
+
 void push_error_autogen_incompatible_condition(
 	lang::position_tag autogen_origin,
 	lang::position_tag condition_origin,
 	std::string required_matching_value,
 	diagnostics_container& diagnostics);
+
 void push_error_autogen_missing_condition(
 	lang::position_tag visibility_origin,
 	lang::position_tag autogen_origin,

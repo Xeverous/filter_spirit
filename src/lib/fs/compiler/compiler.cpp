@@ -514,7 +514,7 @@ evaluate_name_as_tree(
  *
  * Thus, it is better to leave it as it is.
  */
-[[nodiscard]] bool
+[[nodiscard]] processing_status
 compile_statements_recursively_impl(
 	settings st,
 	const std::vector<ast::sf::statement>& statements,
@@ -526,36 +526,42 @@ compile_statements_recursively_impl(
 	std::vector<lang::position_tag>& expand_stack,
 	int recursion_depth)
 {
+	auto final_status = processing_status::ok;
+
 	for (const ast::sf::statement& statement : statements) {
-		bool result = statement.apply_visitor(x3::make_lambda_visitor<bool>(
+		auto status = statement.apply_visitor(x3::make_lambda_visitor<processing_status>(
 			[&](const ast::sf::expand_statement& statement) {
 				if (statement.seq.size() != 1u) {
 					push_error_invalid_amount_of_arguments(
 						1, 1, statement.seq.size(), parser::position_tag_of(statement.seq), diagnostics);
-					return false;
+					return processing_status::non_fatal_error;
 				}
 
 				const ast::sf::primitive_value& primitive = statement.seq.front();
-				return primitive.apply_visitor(x3::make_lambda_visitor<bool>(
+				return primitive.apply_visitor(x3::make_lambda_visitor<processing_status>(
+					[&](const ast::common::unknown_expression& expr) {
+						push_error_unknown_expression(parser::position_tag_of(expr), diagnostics);
+						return processing_status::non_fatal_error;
+					},
 					[&](const ast::common::literal_expression& expr) {
 						diagnostics.push_back(make_error(
 							dmid::type_mismatch,
 							parser::position_tag_of(expr),
-							"type mismatch, expected named subtree but got a literal expression"));
-						return false;
+							"type mismatch, expected a block but got a literal expression"));
+						return processing_status::non_fatal_error;
 					},
 					[&](const ast::sf::name& name) {
 						if (recursion_depth == st.max_recursion_depth) {
 							push_error_recursion_limit_reached(parser::position_tag_of(statement), diagnostics);
-							return false;
+							return processing_status::fatal_error;
 						}
 
 						const named_tree* tree = evaluate_name_as_tree(name, symbols, diagnostics);
 						if (!tree)
-							return false;
+							return processing_status::non_fatal_error;
 
 						expand_stack.push_back(parser::position_tag_of(statement));
-						const bool result = compile_statements_recursively_impl(
+						const auto status = compile_statements_recursively_impl(
 							st,
 							tree->statements,
 							symbols,
@@ -566,17 +572,21 @@ compile_statements_recursively_impl(
 							expand_stack,
 							recursion_depth + 1);
 						expand_stack.pop_back();
-						return result;
+						return status;
 					}
 				));
 			},
 			[&](const ast::sf::action& action) {
-				return detail::spirit_filter_add_action(st, action, symbols, actions, diagnostics);
+				// TODO implement processing_status deeper
+				if (detail::spirit_filter_add_action(st, action, symbols, actions, diagnostics))
+					return processing_status::ok; // may actually be warning
+				else
+					return processing_status::non_fatal_error;
 			},
 			[&](const ast::sf::behavior_statement& bs) {
 				boost::optional<lang::item_visibility> visibility = evaluate(st, bs.visibility, symbols, diagnostics);
 				if (!visibility)
-					return false;
+					return processing_status::non_fatal_error;
 
 				boost::optional<lang::spirit_item_filter_block> block = make_spirit_filter_block(
 					st,
@@ -588,52 +598,57 @@ compile_statements_recursively_impl(
 
 				if (block) {
 					blocks.push_back(std::move(*block));
-					return true;
+					return processing_status::ok;
 				}
 				else {
-					return false;
+					return processing_status::non_fatal_error;
 				}
 			},
 			[&](const ast::sf::rule_block& nested_block) {
 				if (recursion_depth == st.max_recursion_depth) {
 					push_error_recursion_limit_reached(parser::position_tag_of(nested_block), diagnostics);
-					return false;
+					return processing_status::fatal_error;
 				}
 
 				// explicitly make copies of parent conditions and actions - the call stack will preserve
 				// old instances while nested blocks can add additional ones that have limited lifetime
 				lang::spirit_condition_set nested_conditions = conditions;
 
-				if (detail::spirit_filter_add_conditions(
-					st, nested_block.conditions, symbols, nested_conditions, diagnostics))
-				{
-					lang::action_set nested_actions = actions;
-					return compile_statements_recursively_impl(
-						st,
-						nested_block.statements,
-						symbols,
-						nested_conditions,
-						nested_actions,
-						blocks,
-						diagnostics,
-						expand_stack,
-						recursion_depth + 1);
-				}
-				else {
-					return false;
-				}
-			}));
+				const bool status = detail::spirit_filter_add_conditions(
+					st, nested_block.conditions, symbols, nested_conditions, diagnostics);
+				if (!status)
+					return processing_status::non_fatal_error;
 
-		if (!result) {
+				lang::action_set nested_actions = actions;
+				return compile_statements_recursively_impl(
+					st,
+					nested_block.statements,
+					symbols,
+					nested_conditions,
+					nested_actions,
+					blocks,
+					diagnostics,
+					expand_stack,
+					recursion_depth + 1);
+			},
+			[&](const ast::sf::unknown_statement& statement) {
+				push_error_unknown_statement(parser::position_tag_of(statement.name), diagnostics);
+				return processing_status::non_fatal_error;
+			}
+		));
+
+		if (status != processing_status::ok) {
 			for (lang::position_tag origin : expand_stack)
 				diagnostics.push_back(make_note_minor(origin, "happened inside expansion"));
 		}
 
-		if (!result && st.error_handling.stop_on_error)
-			return false;
+		if (is_error(status) && st.error_handling.stop_on_error)
+			return status;
+
+		final_status = combine_statuses(final_status, status);
 	}
 
-	return true;
+	return final_status;
 }
 
 [[nodiscard]] boost::optional<std::vector<lang::spirit_item_filter_block>>
@@ -648,15 +663,19 @@ compile_statements_recursively(
 	lang::spirit_condition_set root_conditions;
 	lang::action_set root_actions;
 	std::vector<lang::spirit_item_filter_block> blocks;
-	std::vector<lang::position_tag> expand_stack;
+	std::vector<lang::position_tag> expand_stack; // for recursive diagnostics
 
-	const bool success = compile_statements_recursively_impl(
+	const processing_status status = compile_statements_recursively_impl(
 		st, statements, symbols, root_conditions, root_actions, blocks, diagnostics, expand_stack, 1);
 
-	if (success)
-		return blocks;
-	else
+	// This is the place where non-fatal errors are no longer tolerable.
+	// The entire filter has already been processed (with all possible warnings and (non-)fatal errors).
+	// The user should see a lot of diagnostics at this point but should not be allowed to continue with invalid state.
+	// Returning filter blocks constructed from (non-)fatal errors can produce invalid filtering results.
+	if (is_error(status))
 		return boost::none;
+	else
+		return blocks;
 }
 
 } // namespace

@@ -312,42 +312,4 @@ namespace rf
 	const visibility_literals_ visibility_literals;
 } // namespace rf
 
-// symbols used exclusively in spirit filter template language
-namespace sf
-{
-	struct item_categories_ : x3::symbols<lang::item_category>
-	{
-		item_categories_()
-		{
-			add
-				(lang::keywords::sf::currency,      fs::lang::item_category::currency)
-				(lang::keywords::sf::fragments,     fs::lang::item_category::fragments)
-				(lang::keywords::sf::delirium_orbs, fs::lang::item_category::delirium_orbs)
-				(lang::keywords::sf::cards,         fs::lang::item_category::cards)
-				(lang::keywords::sf::essences,      fs::lang::item_category::essences)
-				(lang::keywords::sf::fossils,       fs::lang::item_category::fossils)
-				(lang::keywords::sf::resonators,    fs::lang::item_category::resonators)
-				(lang::keywords::sf::scarabs,       fs::lang::item_category::scarabs)
-				(lang::keywords::sf::incubators,    fs::lang::item_category::incubators)
-				(lang::keywords::sf::oils,          fs::lang::item_category::oils)
-				(lang::keywords::sf::vials,         fs::lang::item_category::vials)
-				(lang::keywords::sf::gems,          fs::lang::item_category::gems)
-				(lang::keywords::sf::bases,         fs::lang::item_category::bases)
-				(lang::keywords::sf::uniques_eq_unambiguous,     fs::lang::item_category::uniques_eq_unambiguous)
-				(lang::keywords::sf::uniques_eq_ambiguous,       fs::lang::item_category::uniques_eq_ambiguous)
-				(lang::keywords::sf::uniques_flasks_unambiguous, fs::lang::item_category::uniques_flasks_unambiguous)
-				(lang::keywords::sf::uniques_flasks_ambiguous,   fs::lang::item_category::uniques_flasks_ambiguous)
-				(lang::keywords::sf::uniques_jewels_unambiguous, fs::lang::item_category::uniques_jewels_unambiguous)
-				(lang::keywords::sf::uniques_jewels_ambiguous,   fs::lang::item_category::uniques_jewels_ambiguous)
-				(lang::keywords::sf::uniques_maps_unambiguous,   fs::lang::item_category::uniques_maps_unambiguous)
-				(lang::keywords::sf::uniques_maps_ambiguous,     fs::lang::item_category::uniques_maps_ambiguous)
-
-				// not supported (yet)
-				// (lang::keywords::sf::enchants_helmet, fs::lang::item_category::enchants_helmet)
-			;
-		}
-	};
-	const item_categories_ item_categories;
-} // namespace sf
-
 } // namespace fs::parser::detail::symbols

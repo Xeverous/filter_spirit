@@ -92,6 +92,7 @@ namespace common
 	struct literal_expression_class              : error_on_error, annotate_on_success {};
 	struct comparison_operator_expression_class  : error_on_error, annotate_on_success {};
 	struct exact_matching_policy_expression_class: error_on_error, annotate_on_success {};
+	struct unknown_expression_class              : error_on_error, annotate_on_success {};
 
 	struct switch_drop_sound_action_class        : error_on_error, annotate_on_success {};
 
@@ -115,7 +116,6 @@ namespace sf
 
 	// ---- expressions ----
 
-	struct item_category_expression_class        : error_on_error, annotate_on_success {};
 	struct primitive_value_class                 : error_on_error, annotate_on_success {};
 	struct sequence_class                        : error_on_error, annotate_on_success {};
 	struct statement_list_expression_class       : error_on_error, annotate_on_success {};
@@ -158,6 +158,7 @@ namespace sf
 	struct dynamic_visibility_statement_class    : error_on_error, annotate_on_success {};
 	struct visibility_statement_class            : error_on_error, annotate_on_success {};
 	struct behavior_statement_class              : error_on_error, annotate_on_success {};
+	struct unknown_statement_class               : error_on_error, annotate_on_success {};
 	struct statement_class                       : error_on_error, annotate_on_success {};
 	struct rule_block_class                      : error_on_error, annotate_on_success {};
 	struct filter_structure_class                : error_on_error, annotate_on_success {};
@@ -287,6 +288,9 @@ namespace common
 	using exact_matching_policy_expression_type = x3::rule<exact_matching_policy_expression_class, ast::common::exact_matching_policy>;
 	BOOST_SPIRIT_DECLARE(exact_matching_policy_expression_type)
 
+	using unknown_expression_type = x3::rule<unknown_expression_class, ast::common::unknown_expression>;
+	BOOST_SPIRIT_DECLARE(unknown_expression_type)
+
 	// ---- actions ----
 
 	using switch_drop_sound_action_type = x3::rule<switch_drop_sound_action_class, ast::common::switch_drop_sound_action>;
@@ -317,9 +321,6 @@ namespace sf
 	// (all in common)
 
 	// ---- expressions ----
-
-	using item_category_expression_type = x3::rule<item_category_expression_class, ast::sf::item_category_expression>;
-	BOOST_SPIRIT_DECLARE(item_category_expression_type)
 
 	using primitive_value_type = x3::rule<primitive_value_class, ast::sf::primitive_value>;
 	BOOST_SPIRIT_DECLARE(primitive_value_type)
@@ -417,6 +418,9 @@ namespace sf
 
 	using behavior_statement_type = x3::rule<behavior_statement_class, ast::sf::behavior_statement>;
 	BOOST_SPIRIT_DECLARE(behavior_statement_type)
+
+	using unknown_statement_type = x3::rule<unknown_statement_class, ast::sf::unknown_statement>;
+	BOOST_SPIRIT_DECLARE(unknown_statement_type)
 
 	using statement_type = x3::rule<statement_class, ast::sf::statement>;
 	BOOST_SPIRIT_DECLARE(statement_type)

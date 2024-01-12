@@ -217,6 +217,19 @@ namespace common
 		bool required;
 	};
 
+	struct unknown_expression : x3::position_tagged
+	{
+		unknown_expression& operator=(std::string str)
+		{
+			value = std::move(str);
+			return *this;
+		}
+
+		const std::string& get_value() const { return value; }
+
+		std::string value;
+	};
+
 	struct switch_drop_sound_action : x3::position_tagged
 	{
 		auto& operator=(lang::switch_drop_sound sds)
@@ -261,6 +274,8 @@ namespace sf
 
 	using identifier = common::identifier;
 
+	// "$" followed by identifier
+	// TODO rename to something more precise?
 	struct name : x3::position_tagged
 	{
 		auto& operator=(identifier id)
@@ -280,20 +295,7 @@ namespace sf
 
 	// ---- expressions ----
 
-	struct item_category_expression : x3::position_tagged
-	{
-		auto& operator=(lang::item_category cat)
-		{
-			category = cat;
-			return *this;
-		}
-
-		auto get_value() const { return category; }
-
-		lang::item_category category;
-	};
-
-	struct primitive_value : x3::variant<name, common::literal_expression>, x3::position_tagged
+	struct primitive_value : x3::variant<name, common::literal_expression, common::unknown_expression>, x3::position_tagged
 	{
 		using base_type::base_type;
 		using base_type::operator=;
@@ -303,6 +305,7 @@ namespace sf
 
 	struct statement;
 
+	// TODO rename to block_of_statements?
 	struct statement_list_expression : std::vector<statement>, x3::position_tagged {};
 
 	struct value_expression : x3::variant<
@@ -363,15 +366,15 @@ namespace sf
 
 	struct autogen_condition : x3::position_tagged
 	{
-		auto& operator=(item_category_expression expr)
+		auto& operator=(common::string_literal autogen_name)
 		{
-			cat_expr = expr;
+			name = std::move(autogen_name);
 			return *this;
 		}
 
-		auto get_value() const { return cat_expr; }
+		const auto& get_value() const { return name; }
 
-		item_category_expression cat_expr;
+		common::string_literal name;
 	};
 
 	struct price_comparison_condition : x3::position_tagged
@@ -584,6 +587,13 @@ namespace sf
 		boost::optional<continue_statement> continue_;
 	};
 
+	struct unknown_statement : x3::position_tagged
+	{
+		common::identifier name;
+		common::comparison_operator_expression comparison_type;
+		sequence seq;
+	};
+
 	// rule_block defined earlier than statement due to circular dependency
 	// note: we could use x3::forward_ast but it would have a worse memory layout
 	struct rule_block : x3::position_tagged
@@ -596,7 +606,8 @@ namespace sf
 			expand_statement,
 			action,
 			behavior_statement,
-			rule_block
+			rule_block,
+			unknown_statement
 		>, x3::position_tagged
 	{
 		using base_type::base_type;

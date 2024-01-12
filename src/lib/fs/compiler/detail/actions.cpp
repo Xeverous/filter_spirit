@@ -263,7 +263,7 @@ make_volume(
 
 // ---- spirit filter helpers ----
 
-[[nodiscard]] bool
+[[nodiscard]] processing_status
 spirit_filter_add_set_color_action_impl(
 	lang::color_action_type action_type,
 	lang::color_action action,
@@ -273,23 +273,23 @@ spirit_filter_add_set_color_action_impl(
 	switch (action_type) {
 		case lang::color_action_type::set_border_color: {
 			set.set_border_color = action;
-			return true;
+			return processing_status::ok;
 		}
 		case lang::color_action_type::set_text_color: {
 			set.set_text_color = action;
-			return true;
+			return processing_status::ok;
 		}
 		case lang::color_action_type::set_background_color: {
 			set.set_background_color = action;
-			return true;
+			return processing_status::ok;
 		}
 	}
 
 	push_error_internal_compiler_error(__func__, action.origin, diagnostics);
-	return false;
+	return processing_status::fatal_error;
 }
 
-[[nodiscard]] bool
+[[nodiscard]] processing_status
 spirit_filter_add_set_color_action(
 	settings st,
 	const ast::sf::set_color_action& action,
@@ -324,7 +324,7 @@ spirit_filter_add_set_color_action(
 			auto act = lang::color_action{color, parser::position_tag_of(action)};
 			return spirit_filter_add_set_color_action_impl(action.action_type, act, set, diagnostics);
 		})
-		.value_or(false);
+		.value_or(processing_status::non_fatal_error);
 }
 
 [[nodiscard]] bool
@@ -709,7 +709,7 @@ spirit_filter_add_action(
 {
 	return action.apply_visitor(x3::make_lambda_visitor<bool>(
 		[&](const ast::sf::set_color_action& a) {
-			return spirit_filter_add_set_color_action(st, a, symbols, set, diagnostics);
+			return !is_error(spirit_filter_add_set_color_action(st, a, symbols, set, diagnostics));
 		},
 		[&](const ast::sf::set_font_size_action& a) {
 			return spirit_filter_add_set_font_size_action(st, a, symbols, set, diagnostics);

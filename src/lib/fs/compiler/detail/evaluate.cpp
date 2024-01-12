@@ -200,7 +200,10 @@ evaluate_sequence(
 	for (const ast::sf::primitive_value& primitive : sequence) {
 		using result_type = boost::optional<lang::object>;
 
-		result_type result = primitive.apply_visitor(x3::make_lambda_visitor<result_type>(
+		auto result = primitive.apply_visitor(x3::make_lambda_visitor<result_type>(
+			[&](const ast::sf::name& name) {
+				return evaluate_name_as_object(name, symbols, diagnostics);
+			},
 			[&](const ast::common::literal_expression& expr) -> result_type {
 				return evaluate(st, expr, diagnostics)
 					.map([&](lang::single_object so) {
@@ -208,8 +211,9 @@ evaluate_sequence(
 					}
 				);
 			},
-			[&](const ast::sf::name& name) {
-				return evaluate_name_as_object(name, symbols, diagnostics);
+			[&](const ast::common::unknown_expression& expr) -> result_type {
+				push_error_unknown_expression(parser::position_tag_of(expr), diagnostics);
+				return boost::none;
 			}
 		));
 

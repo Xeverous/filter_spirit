@@ -151,6 +151,10 @@ namespace common
 	const auto exact_matching_policy_expression_def = ("==" > x3::attr(true)) | ("=" > x3::attr(false)) | x3::attr(false);
 	BOOST_SPIRIT_DEFINE(exact_matching_policy_expression)
 
+	const unknown_expression_type unknown_expression = "unknown expression";
+	const auto unknown_expression_def = x3::lexeme[*(x3::alnum | x3::char_('_'))];
+	BOOST_SPIRIT_DEFINE(unknown_expression)
+
 	// ---- actions ----
 
 	const switch_drop_sound_action_type switch_drop_sound_action = "switch drop sound action";
@@ -183,10 +187,6 @@ namespace sf
 	// (no spirit-filter-specific literal types)
 
 	// ---- expressions ----
-
-	const item_category_expression_type item_category_expression = "item category expression";
-	const auto item_category_expression_def = make_keyword(symbols::sf::item_categories);
-	BOOST_SPIRIT_DEFINE(item_category_expression)
 
 	const primitive_value_type primitive_value = "primitive";
 	const auto primitive_value_def = name | common::literal_expression;
@@ -221,7 +221,7 @@ namespace sf
 	// ---- conditions ----
 
 	const autogen_condition_type autogen_condition = "autogen condition";
-	const auto autogen_condition_def = make_keyword(lang::keywords::sf::autogen) > item_category_expression;
+	const auto autogen_condition_def = make_keyword(lang::keywords::sf::autogen) > common::string_literal;
 	BOOST_SPIRIT_DEFINE(autogen_condition)
 
 	const price_comparison_condition_type price_comparison_condition = "price comparison condition";
@@ -366,10 +366,14 @@ namespace sf
 	const auto behavior_statement_def = visibility_statement > -common::continue_statement;
 	BOOST_SPIRIT_DEFINE(behavior_statement)
 
+	const unknown_statement_type unknown_statement = "unknown/invalid statement";
+	const auto unknown_statement_def = common::identifier > common::comparison_operator_expression > sequence;
+	BOOST_SPIRIT_DEFINE(unknown_statement)
+
 	// moved here due to circular dependency
 	const rule_block_type rule_block = "rule block";
 
-	const auto statement_def = expand_statement | action | behavior_statement | rule_block;
+	const auto statement_def = expand_statement | action | behavior_statement | rule_block | unknown_statement;
 	BOOST_SPIRIT_DEFINE(statement)
 
 	const auto rule_block_def = (*condition >> x3::lit('{')) > *statement > x3::lit('}');

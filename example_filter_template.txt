@@ -794,7 +794,7 @@ Class == "Stackable Currency" {
 		Show
 	}
 
-	Autogen fossils {
+	Autogen "fossils" {
 		Price >= $cfg_fossils_high_min_value {
 			Expand $actions_currency_high
 			Show
@@ -825,7 +825,7 @@ Class == "Stackable Currency" {
 	}
 
 	# always show vials because they are pretty rare drop, from specific boss in specific place
-	Autogen vials {
+	Autogen "vials" {
 		Price >= $cfg_vials_high_min_value {
 			Expand $actions_currency_high
 			Show
@@ -938,7 +938,7 @@ Class == "Stackable Currency" {
 		}
 	}
 
-	Autogen oils
+	Autogen "oils"
 	{
 		Price >= $cfg_oils_high_min_value
 		{
@@ -1152,7 +1152,7 @@ Class == "Expedition Logbook" {
 # - any with quality > 0
 # - any
 Class == "Skill Gems" "Support Gems" {
-	Autogen gems {
+	Autogen "gems" {
 		GemLevel 1
 		Corrupted False
 		BaseType "Awakened"
@@ -1334,10 +1334,10 @@ Rarity Unique {
 
 	{
 		SetAlertSound $alert_unique_unknown
-		Autogen uniques_eq_ambiguous     { Show }
-		Autogen uniques_flasks_ambiguous { Show }
-		Autogen uniques_jewels_ambiguous { Show }
-		Autogen uniques_maps_ambiguous   { Show }
+		Autogen "uniques_eq_ambiguous"     { Show }
+		Autogen "uniques_flasks_ambiguous" { Show }
+		Autogen "uniques_jewels_ambiguous" { Show }
+		Autogen "uniques_maps_ambiguous"   { Show }
 	}
 
 	Price >= $cfg_uniques_high_min_value
@@ -1347,10 +1347,10 @@ Rarity Unique {
 		PlayEffect $beam_unique
 		MinimapIcon $icon_unique_high
 
-		Autogen uniques_eq_unambiguous     { Show }
-		Autogen uniques_flasks_unambiguous { Show }
-		Autogen uniques_jewels_unambiguous { Show }
-		Autogen uniques_maps_unambiguous   { Show }
+		Autogen "uniques_eq_unambiguous"     { Show }
+		Autogen "uniques_flasks_unambiguous" { Show }
+		Autogen "uniques_jewels_unambiguous" { Show }
+		Autogen "uniques_maps_unambiguous"   { Show }
 	}
 
 	Price < $cfg_uniques_high_min_value
@@ -1361,19 +1361,19 @@ Rarity Unique {
 		PlayEffect $beam_unique
 		MinimapIcon $icon_unique_mid
 
-		Autogen uniques_eq_unambiguous     { Show }
-		Autogen uniques_flasks_unambiguous { Show }
-		Autogen uniques_jewels_unambiguous { Show }
-		Autogen uniques_maps_unambiguous   { Show }
+		Autogen "uniques_eq_unambiguous"     { Show }
+		Autogen "uniques_flasks_unambiguous" { Show }
+		Autogen "uniques_jewels_unambiguous" { Show }
+		Autogen "uniques_maps_unambiguous"   { Show }
 	}
 
 	Price < $cfg_uniques_mid_min_value
 	Price >= $cfg_uniques_low_min_value
 	{
-		Autogen uniques_eq_unambiguous     { Show }
-		Autogen uniques_flasks_unambiguous { Show }
-		Autogen uniques_jewels_unambiguous { Show }
-		Autogen uniques_maps_unambiguous   { Show }
+		Autogen "uniques_eq_unambiguous"     { Show }
+		Autogen "uniques_flasks_unambiguous" { Show }
+		Autogen "uniques_jewels_unambiguous" { Show }
+		Autogen "uniques_maps_unambiguous"   { Show }
 	}
 
 	# note that APIs may not list all possible uniques
@@ -1407,7 +1407,7 @@ Class == "Map Fragments"
 {
 	# scarabs by default get border color 200 200 200
 	# we override it in all tiers to prevent mismatched colors
-	Autogen scarabs
+	Autogen "scarabs"
 	{
 		Price >= $cfg_scarabs_high_min_value
 		{
@@ -1749,7 +1749,7 @@ Class == "Divination Card" {
 		Show
 	}
 
-	Autogen cards
+	Autogen "cards"
 	{
 		Price >= $cfg_cards_high_min_value
 		{
@@ -2077,7 +2077,7 @@ Rarity <= Rare {
 	}
 
 	# pricing machinery for bases
-	Autogen bases {
+	Autogen "bases" {
 		HasInfluence == Shaper {
 			Expand $blocks_influence_ilvl
 		}

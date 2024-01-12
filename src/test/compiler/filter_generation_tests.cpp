@@ -1619,7 +1619,7 @@ Hide
 			ipd.divination_cards.push_back(divination_card{price_data{1000, false}, "The Doctor", 8});
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
 Class "Divination Card"
-Autogen cards {
+Autogen "cards" {
 	Price >= 100
 	{ Show }
 

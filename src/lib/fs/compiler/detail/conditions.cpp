@@ -928,8 +928,13 @@ spirit_filter_add_conditions(
 	for (const ast::sf::condition& condition : conditions) {
 		const bool condition_result = condition.apply_visitor(x3::make_lambda_visitor<bool>(
 			[&](const ast::sf::autogen_condition& cond) {
+				auto category = lang::item_category::_from_string_nothrow(cond.name.c_str());
+				if (!category) {
+					push_error_invalid_expression(parser::position_tag_of(cond.name), "invalid autogeneration", diagnostics);
+				}
+
 				return add_non_range_condition(
-					lang::autogen_condition{cond.cat_expr.category, parser::position_tag_of(cond)},
+					lang::autogen_condition{*category, parser::position_tag_of(cond)},
 					set.autogen,
 					diagnostics);
 			},

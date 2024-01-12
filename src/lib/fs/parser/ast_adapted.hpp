@@ -122,6 +122,10 @@ BOOST_FUSION_ADAPT_STRUCT(
 	visibility, continue_)
 
 BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::sf::unknown_statement,
+	name, comparison_type, seq)
+
+BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::sf::rule_block,
 	conditions, statements)
 

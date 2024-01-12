@@ -1,9 +1,11 @@
 #pragma once
 
+#include <fs/utility/better_enum.hpp>
+
 namespace fs::lang
 {
-	enum class item_category
-	{
+	// TODO remove and replace with Autogen "string"
+	BETTER_ENUM(item_category, int,
 		currency,
 		fragments,
 		delirium_orbs,
@@ -30,20 +32,19 @@ namespace fs::lang
 		uniques_maps_ambiguous
 
 		// not supported (yet)
-		// enchants_helmet
 		// invitations
-	};
+	)
 
 	inline bool is_uniques_category(item_category cat) noexcept
 	{
 		return
-			   cat == item_category::uniques_eq_unambiguous
-			|| cat == item_category::uniques_eq_ambiguous
-			|| cat == item_category::uniques_flasks_unambiguous
-			|| cat == item_category::uniques_flasks_ambiguous
-			|| cat == item_category::uniques_jewels_unambiguous
-			|| cat == item_category::uniques_jewels_ambiguous
-			|| cat == item_category::uniques_maps_unambiguous
-			|| cat == item_category::uniques_maps_ambiguous;
+			   cat == +item_category::uniques_eq_unambiguous
+			|| cat == +item_category::uniques_eq_ambiguous
+			|| cat == +item_category::uniques_flasks_unambiguous
+			|| cat == +item_category::uniques_flasks_ambiguous
+			|| cat == +item_category::uniques_jewels_unambiguous
+			|| cat == +item_category::uniques_jewels_ambiguous
+			|| cat == +item_category::uniques_maps_unambiguous
+			|| cat == +item_category::uniques_maps_ambiguous;
 	}
 }
