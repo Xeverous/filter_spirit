@@ -248,6 +248,104 @@ $xyz = $non_existent_obj
 			compare_diagnostics(patterns, diagnostics, parse_data.metadata);
 		}
 
+		BOOST_AUTO_TEST_CASE(invalid_statement_action_after_condition)
+		{
+			const std::string input_str = minimal_input() + R"(
+Class == "Skill Gems" {
+	SetTextColor 0 255 0
+	Show
+}
+
+Class == "Support Gems"
+SetTextColor 0 240 0
+Show
+)";
+			const std::string_view input = input_str;
+			const parser::parsed_spirit_filter parse_data = parse(input);
+			const diagnostics_container diagnostics = expect_error_when_compiling(parse_data.ast);
+
+			const std::string_view expected_expression = search(input, "SetTextColor 0 240 0").result();
+
+			std::vector<diagnostic_message_pattern> patterns = {
+				diagnostic_message_pattern{dms::error, dmid::invalid_statement, expected_expression, {"action"}},
+			};
+
+			compare_diagnostics(patterns, diagnostics, parse_data.metadata);
+		}
+
+		BOOST_AUTO_TEST_CASE(invalid_statement_expansion_after_condition)
+		{
+			const std::string input_str = minimal_input() + R"(
+$x = {
+	SetTextColor 0 255 0
+}
+
+Class == "Skill Gems" {
+	Expand $x
+	Show
+}
+
+Class == "Support Gems"
+Expand $x
+Show
+)";
+			const std::string_view input = input_str;
+			const parser::parsed_spirit_filter parse_data = parse(input);
+			const diagnostics_container diagnostics = expect_error_when_compiling(parse_data.ast);
+
+			const std::string_view expected_expression = search(input, "Expand $x").next().result();
+
+			std::vector<diagnostic_message_pattern> patterns = {
+				diagnostic_message_pattern{dms::error, dmid::invalid_statement, expected_expression, {"expansion"}},
+			};
+
+			compare_diagnostics(patterns, diagnostics, parse_data.metadata);
+		}
+
+		BOOST_AUTO_TEST_CASE(invalid_statement_visibility_after_condition)
+		{
+			const std::string input_str = minimal_input() + R"(
+Class == "Skill Gems" {
+	Show
+}
+
+Class == "Support Gems"
+Hide
+)";
+			const std::string_view input = input_str;
+			const parser::parsed_spirit_filter parse_data = parse(input);
+			const diagnostics_container diagnostics = expect_error_when_compiling(parse_data.ast);
+
+			const std::string_view expected_expression = search(input, "Hide").result();
+
+			std::vector<diagnostic_message_pattern> patterns = {
+				diagnostic_message_pattern{dms::error, dmid::invalid_statement, expected_expression, {"visibility"}},
+			};
+
+			compare_diagnostics(patterns, diagnostics, parse_data.metadata);
+		}
+
+		BOOST_AUTO_TEST_CASE(unknown_statement)
+		{
+			const std::string input_str = minimal_input() + R"(
+Class == "Skill Gems" {
+	UnknownStatement True
+	Show
+}
+)";
+			const std::string_view input = input_str;
+			const parser::parsed_spirit_filter parse_data = parse(input);
+			const diagnostics_container diagnostics = expect_error_when_compiling(parse_data.ast);
+
+			const std::string_view expected_expression = search(input, "UnknownStatement").result();
+
+			std::vector<diagnostic_message_pattern> patterns = {
+				diagnostic_message_pattern{dms::error, dmid::unknown_statement, expected_expression, {}},
+			};
+
+			compare_diagnostics(patterns, diagnostics, parse_data.metadata);
+		}
+
 		BOOST_AUTO_TEST_CASE(condition_redefinition)
 		{
 			const std::string input_str = minimal_input() + R"(

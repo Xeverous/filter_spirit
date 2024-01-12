@@ -66,7 +66,7 @@ struct structure_printer
 		else
 		{
 			tab(indent);
-			std::cout << "(empty)\n";
+			std::cout << boost::typeindex::type_id<T>().pretty_name() << "{ (empty) }\n";
 		}
 	}
 
@@ -148,7 +148,7 @@ struct structure_printer
 	template <typename T = void>
 	void operator()(...) const
 	{
-		static_assert(sizeof(T) == 0, "Missing overload for some T");
+		static_assert(sizeof(T) == 0, "Missing overload for some T or missing include for fusion types adaptations");
 	}
 
 	static

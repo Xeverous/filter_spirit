@@ -58,6 +58,7 @@ enum class diagnostic_message_id
 	unknown_expression,
 	invalid_expression,
 	unknown_statement,
+	invalid_statement,
 	invalid_amount_of_arguments,
 	invalid_integer_value,
 	type_mismatch,
@@ -228,6 +229,14 @@ inline void push_error_unknown_statement(
 	diagnostics_container& diagnostics)
 {
 	diagnostics.push_back(make_error(diagnostic_message_id::unknown_statement, statement_origin, "unknown statement"));
+}
+
+inline void push_error_invalid_statement(
+	lang::position_tag statement_origin,
+	std::string_view explanation,
+	diagnostics_container& diagnostics)
+{
+	diagnostics.push_back(make_error(diagnostic_message_id::invalid_statement, statement_origin, "invalid statement: ", explanation));
 }
 
 void push_error_invalid_integer_value(

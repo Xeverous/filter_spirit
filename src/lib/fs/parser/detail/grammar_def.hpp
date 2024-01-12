@@ -373,10 +373,10 @@ namespace sf
 	// moved here due to circular dependency
 	const rule_block_type rule_block = "rule block";
 
-	const auto statement_def = expand_statement | action | behavior_statement | rule_block | unknown_statement;
+	const auto statement_def = condition | action | expand_statement | behavior_statement | rule_block | unknown_statement;
 	BOOST_SPIRIT_DEFINE(statement)
 
-	const auto rule_block_def = (*condition >> x3::lit('{')) > *statement > x3::lit('}');
+	const auto rule_block_def = x3::lit('{') > *statement > x3::lit('}');
 	BOOST_SPIRIT_DEFINE(rule_block)
 
 	const filter_structure_type filter_structure = "filter structure";

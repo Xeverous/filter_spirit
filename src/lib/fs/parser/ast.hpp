@@ -596,15 +596,12 @@ namespace sf
 
 	// rule_block defined earlier than statement due to circular dependency
 	// note: we could use x3::forward_ast but it would have a worse memory layout
-	struct rule_block : x3::position_tagged
-	{
-		std::vector<condition> conditions;
-		std::vector<statement> statements;
-	};
+	struct rule_block : std::vector<statement>, x3::position_tagged {};
 
 	struct statement : x3::variant<
-			expand_statement,
+			condition,
 			action,
+			expand_statement,
 			behavior_statement,
 			rule_block,
 			unknown_statement

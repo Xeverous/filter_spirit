@@ -292,7 +292,7 @@ Show
 		const sf::ast_type ast = parse(input).ast;
 
 		const std::vector<sf::statement>& statements = ast.statements;
-		BOOST_TEST_REQUIRE(static_cast<int>(statements.size()) == 3);
+		BOOST_TEST_REQUIRE(static_cast<int>(statements.size()) == 4); // SetBackgroundColor, Class, {}, Show
 		/**
 		 * Testing anything deeper turned out to be more of a maintenance burden than profit.
 		 * Filter generation tests already cover this functionality. The parser's private AST

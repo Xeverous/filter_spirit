@@ -126,10 +126,6 @@ BOOST_FUSION_ADAPT_STRUCT(
 	name, comparison_type, seq)
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::sf::rule_block,
-	conditions, statements)
-
-BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::sf::filter_structure,
 	definitions, statements)
 

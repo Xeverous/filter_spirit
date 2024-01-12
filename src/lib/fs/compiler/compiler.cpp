@@ -527,10 +527,49 @@ compile_statements_recursively_impl(
 	int recursion_depth)
 {
 	auto final_status = processing_status::ok;
+	// Conditions can only be followed by a nested block
+	bool condition_present = false;
+	// explicitly make copies of parent conditions and actions - the call stack will preserve
+	// old instances while nested blocks can add additional ones that have limited lifetime
+	lang::spirit_condition_set nested_conditions = conditions;
 
 	for (const ast::sf::statement& statement : statements) {
 		auto status = statement.apply_visitor(x3::make_lambda_visitor<processing_status>(
+			[&](const ast::sf::condition& cond) {
+				condition_present = true;
+
+				const bool status = detail::spirit_filter_add_condition(
+					st, cond, symbols, nested_conditions, diagnostics);
+
+				if (status)
+					return processing_status::ok;
+				else
+					return processing_status::non_fatal_error;
+			},
+			[&](const ast::sf::action& action) {
+				if (condition_present) {
+					push_error_invalid_statement(
+						parser::position_tag_of(action),
+						"action after condition - place it before condition or inside condition's block",
+						diagnostics);
+					return processing_status::non_fatal_error;
+				}
+
+				// TODO implement processing_status deeper
+				if (detail::spirit_filter_add_action(st, action, symbols, actions, diagnostics))
+					return processing_status::ok; // may actually be warning
+				else
+					return processing_status::non_fatal_error;
+			},
 			[&](const ast::sf::expand_statement& statement) {
+				if (condition_present) {
+					push_error_invalid_statement(
+						parser::position_tag_of(statement),
+						"expansion after condition - place it before condition or inside condition's block",
+						diagnostics);
+					return processing_status::non_fatal_error;
+				}
+
 				if (statement.seq.size() != 1u) {
 					push_error_invalid_amount_of_arguments(
 						1, 1, statement.seq.size(), parser::position_tag_of(statement.seq), diagnostics);
@@ -576,14 +615,15 @@ compile_statements_recursively_impl(
 					}
 				));
 			},
-			[&](const ast::sf::action& action) {
-				// TODO implement processing_status deeper
-				if (detail::spirit_filter_add_action(st, action, symbols, actions, diagnostics))
-					return processing_status::ok; // may actually be warning
-				else
-					return processing_status::non_fatal_error;
-			},
 			[&](const ast::sf::behavior_statement& bs) {
+				if (condition_present) {
+					push_error_invalid_statement(
+						parser::position_tag_of(bs),
+						"visibility statement after condition - place it before condition or inside condition's block",
+						diagnostics);
+					return processing_status::non_fatal_error;
+				}
+
 				boost::optional<lang::item_visibility> visibility = evaluate(st, bs.visibility, symbols, diagnostics);
 				if (!visibility)
 					return processing_status::non_fatal_error;
@@ -610,19 +650,11 @@ compile_statements_recursively_impl(
 					return processing_status::fatal_error;
 				}
 
-				// explicitly make copies of parent conditions and actions - the call stack will preserve
-				// old instances while nested blocks can add additional ones that have limited lifetime
-				lang::spirit_condition_set nested_conditions = conditions;
-
-				const bool status = detail::spirit_filter_add_conditions(
-					st, nested_block.conditions, symbols, nested_conditions, diagnostics);
-				if (!status)
-					return processing_status::non_fatal_error;
-
 				lang::action_set nested_actions = actions;
-				return compile_statements_recursively_impl(
+
+				const auto status = compile_statements_recursively_impl(
 					st,
-					nested_block.statements,
+					nested_block,
 					symbols,
 					nested_conditions,
 					nested_actions,
@@ -630,6 +662,12 @@ compile_statements_recursively_impl(
 					diagnostics,
 					expand_stack,
 					recursion_depth + 1);
+
+				// conditions used for the nested block, restore them to the state from the parent block
+				nested_conditions = conditions;
+				condition_present = false;
+
+				return status;
 			},
 			[&](const ast::sf::unknown_statement& statement) {
 				push_error_unknown_statement(parser::position_tag_of(statement.name), diagnostics);

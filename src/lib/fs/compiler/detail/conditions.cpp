@@ -916,68 +916,51 @@ namespace fs::compiler::detail
 {
 
 bool
-spirit_filter_add_conditions(
+spirit_filter_add_condition(
 	settings st,
-	const std::vector<ast::sf::condition>& conditions,
+	const ast::sf::condition& condition,
 	const symbol_table& symbols,
 	lang::spirit_condition_set& set,
 	diagnostics_container& diagnostics)
 {
-	int failed_conditions = 0;
-
-	for (const ast::sf::condition& condition : conditions) {
-		const bool condition_result = condition.apply_visitor(x3::make_lambda_visitor<bool>(
-			[&](const ast::sf::autogen_condition& cond) {
-				auto category = lang::item_category::_from_string_nothrow(cond.name.c_str());
-				if (!category) {
-					push_error_invalid_expression(parser::position_tag_of(cond.name), "invalid autogeneration", diagnostics);
-				}
-
-				return add_non_range_condition(
-					lang::autogen_condition{*category, parser::position_tag_of(cond)},
-					set.autogen,
-					diagnostics);
-			},
-			[&](const ast::sf::price_comparison_condition& cond) {
-				return spirit_filter_add_price_comparison_condition(st, cond, symbols, set, diagnostics);
-			},
-			[&](const ast::sf::rarity_comparison_condition& cond) {
-				return spirit_filter_add_rarity_comparison_condition(st, cond, symbols, set.conditions, diagnostics);
-			},
-			[&](const ast::sf::numeric_comparison_condition& cond) {
-				return spirit_filter_add_numeric_comparison_condition(st, cond, symbols, set.conditions, diagnostics);
-			},
-			[&](const ast::sf::string_array_condition& cond) {
-				return spirit_filter_add_string_array_condition(st, cond, symbols, set.conditions, diagnostics);
-			},
-			[&](const ast::sf::ranged_string_array_condition& cond) {
-				return spirit_filter_add_ranged_string_array_condition(st, cond, symbols, set.conditions, diagnostics);
-			},
-			[&](const ast::sf::has_influence_condition& cond) {
-				return spirit_filter_add_has_influence_condition(st, cond, symbols, set.conditions, diagnostics);
-			},
-			[&](const ast::sf::socket_spec_condition& cond) {
-				return spirit_filter_add_socket_spec_condition(st, cond, symbols, set.conditions, diagnostics);
-			},
-			[&](const ast::sf::boolean_condition& cond) {
-				return spirit_filter_add_boolean_condition(st, cond, symbols, set.conditions, diagnostics);
+	return condition.apply_visitor(x3::make_lambda_visitor<bool>(
+		[&](const ast::sf::autogen_condition& cond) {
+			auto category = lang::item_category::_from_string_nothrow(cond.name.c_str());
+			if (!category) {
+				push_error_invalid_expression(parser::position_tag_of(cond.name), "invalid autogeneration", diagnostics);
 			}
-		));
 
-		if (!condition_result) {
-			++failed_conditions;
-
-			if (st.error_handling.stop_on_error) {
-				diagnostics.push_back(make_note_minor(boost::none, "failed conditions: ", std::to_string(failed_conditions)));
-				return false;
-			}
+			return add_non_range_condition(
+				lang::autogen_condition{*category, parser::position_tag_of(cond)},
+				set.autogen,
+				diagnostics
+			);
+		},
+		[&](const ast::sf::price_comparison_condition& cond) {
+			return spirit_filter_add_price_comparison_condition(st, cond, symbols, set, diagnostics);
+		},
+		[&](const ast::sf::rarity_comparison_condition& cond) {
+			return spirit_filter_add_rarity_comparison_condition(st, cond, symbols, set.conditions, diagnostics);
+		},
+		[&](const ast::sf::numeric_comparison_condition& cond) {
+			return spirit_filter_add_numeric_comparison_condition(st, cond, symbols, set.conditions, diagnostics);
+		},
+		[&](const ast::sf::string_array_condition& cond) {
+			return spirit_filter_add_string_array_condition(st, cond, symbols, set.conditions, diagnostics);
+		},
+		[&](const ast::sf::ranged_string_array_condition& cond) {
+			return spirit_filter_add_ranged_string_array_condition(st, cond, symbols, set.conditions, diagnostics);
+		},
+		[&](const ast::sf::has_influence_condition& cond) {
+			return spirit_filter_add_has_influence_condition(st, cond, symbols, set.conditions, diagnostics);
+		},
+		[&](const ast::sf::socket_spec_condition& cond) {
+			return spirit_filter_add_socket_spec_condition(st, cond, symbols, set.conditions, diagnostics);
+		},
+		[&](const ast::sf::boolean_condition& cond) {
+			return spirit_filter_add_boolean_condition(st, cond, symbols, set.conditions, diagnostics);
 		}
-	}
-
-	if (failed_conditions > 0)
-		diagnostics.push_back(make_note_minor(boost::none, "failed conditions: ", std::to_string(failed_conditions)));
-
-	return true;
+	));
 }
 
 bool

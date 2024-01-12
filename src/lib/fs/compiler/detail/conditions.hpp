@@ -10,9 +10,9 @@ namespace fs::compiler::detail
 {
 
 [[nodiscard]] bool
-spirit_filter_add_conditions(
+spirit_filter_add_condition(
 	settings st,
-	const std::vector<parser::ast::sf::condition>& conditions,
+	const parser::ast::sf::condition& condition,
 	const symbol_table& symbols,
 	lang::spirit_condition_set& condition_set,
 	diagnostics_container& diagnostics);
