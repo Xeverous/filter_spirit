@@ -72,12 +72,12 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 			const std::vector<parser::ast::sf::definition>& defs,
 			const parser::parsed_spirit_filter& parse_data)
 		{
-			compiler::diagnostics_container diagnostics;
+			compiler::diagnostics_store diagnostics;
 			boost::optional<compiler::symbol_table> symbols = resolve_symbols(defs, diagnostics);
 
-			if (compiler::has_errors(diagnostics)) {
+			if (diagnostics.has_errors()) {
 				log::string_logger logger;
-				compiler::output_diagnostics(diagnostics, parse_data.metadata, logger);
+				diagnostics.output_diagnostics(parse_data.metadata, logger);
 				BOOST_FAIL("resolve_symbols failed but should not:\n" << logger.str());
 			}
 
@@ -91,13 +91,13 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 			const parser::parsed_spirit_filter& parse_data,
 			const compiler::symbol_table& symbols)
 		{
-			compiler::diagnostics_container diagnostics;
+			compiler::diagnostics_store diagnostics;
 			boost::optional<lang::spirit_item_filter> spirit_filter =
 				compiler::compile_spirit_filter_statements(compiler::settings{}, top_level_statements, symbols, diagnostics);
 
-			if (compiler::has_errors(diagnostics)) {
+			if (diagnostics.has_errors()) {
 				log::string_logger logger;
-				compiler::output_diagnostics(diagnostics, parse_data.metadata, logger);
+				diagnostics.output_diagnostics(parse_data.metadata, logger);
 				BOOST_FAIL("building spirit filter blocks failed but should not:\n" << logger.str());
 			}
 

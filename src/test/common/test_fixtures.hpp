@@ -28,7 +28,7 @@ protected:
 	resolve_symbols(
 		compiler::settings st,
 		const std::vector<parser::ast::sf::definition>& defs,
-		compiler::diagnostics_container& diagnostics)
+		compiler::diagnostics_store& diagnostics)
 	{
 		return compiler::resolve_spirit_filter_symbols(st, defs, diagnostics);
 	}
@@ -37,7 +37,7 @@ protected:
 	boost::optional<compiler::symbol_table>
 	resolve_symbols(
 		const std::vector<parser::ast::sf::definition>& defs,
-		compiler::diagnostics_container& diagnostics)
+		compiler::diagnostics_store& diagnostics)
 	{
 		return resolve_symbols(compiler::settings{}, defs, diagnostics);
 	}

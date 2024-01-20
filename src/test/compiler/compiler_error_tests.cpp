@@ -25,7 +25,7 @@ namespace fs::test
 {
 
 using compiler::diagnostic_message;
-using compiler::diagnostics_container;
+using compiler::diagnostics_store;
 using dmid = compiler::diagnostic_message_id;
 using dms = compiler::diagnostic_message_severity;
 
@@ -34,10 +34,10 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 	BOOST_AUTO_TEST_CASE(minimal_input_resolve_constants)
 	{
 		const parser::parsed_spirit_filter parse_data = parse(minimal_input());
-		diagnostics_container diagnostics;
+		diagnostics_store diagnostics;
 		const boost::optional<compiler::symbol_table> symbols =
 			resolve_symbols(parse_data.ast.definitions, diagnostics);
-		BOOST_TEST_REQUIRE(!compiler::has_errors(diagnostics));
+		BOOST_TEST_REQUIRE(!diagnostics.has_errors());
 		BOOST_TEST_REQUIRE(symbols.has_value());
 		BOOST_TEST((*symbols).objects.empty());
 		BOOST_TEST((*symbols).trees.empty());
@@ -54,25 +54,25 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 	class compiler_error_fixture : public compiler_fixture
 	{
 	protected:
-		static diagnostics_container expect_error_when_resolving_symbols(
+		static diagnostics_store expect_error_when_resolving_symbols(
 			const std::vector<parser::ast::sf::definition>& defs)
 		{
-			diagnostics_container diagnostics;
+			diagnostics_store diagnostics;
 			resolve_symbols(defs, diagnostics);
-			BOOST_TEST_REQUIRE(compiler::has_errors(diagnostics));
+			BOOST_TEST_REQUIRE(diagnostics.has_errors());
 			return diagnostics;
 		}
 
-		static diagnostics_container expect_error_when_compiling(
+		static diagnostics_store expect_error_when_compiling(
 			const parser::ast::sf::filter_structure& fs)
 		{
 			compiler::settings st;
-			diagnostics_container diagnostics;
+			diagnostics_store diagnostics;
 			const boost::optional<compiler::symbol_table> symbols = resolve_symbols(st, fs.definitions, diagnostics);
-			BOOST_TEST(!compiler::has_warnings_or_errors(diagnostics));
+			BOOST_TEST(!diagnostics.has_warnings_or_errors());
 			BOOST_TEST_REQUIRE(symbols.has_value());
 			(void) compiler::compile_spirit_filter_statements(st, fs.statements, *symbols, diagnostics);
-			BOOST_TEST(compiler::has_errors(diagnostics));
+			BOOST_TEST(diagnostics.has_errors());
 			return diagnostics;
 		}
 	};
@@ -87,12 +87,12 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 
 	void compare_diagnostics(
 		std::vector<diagnostic_message_pattern> patterns,
-		const diagnostics_container& diagnostics,
+		const diagnostics_store& diagnostics,
 		const parser::parse_metadata& metadata)
 	{
 		auto dump_diagnostics = [&]() {
 			log::string_logger logger;
-			compiler::output_diagnostics(diagnostics, metadata, logger);
+			diagnostics.output_diagnostics(metadata, logger);
 			return logger.str();
 		};
 
@@ -143,7 +143,7 @@ $xyz = 3
 )";
 			const std::string_view input = input_str;
 			const parser::parsed_spirit_filter parse_data = parse(input);
-			const diagnostics_container diagnostics = expect_error_when_resolving_symbols(parse_data.ast.definitions);
+			const diagnostics_store diagnostics = expect_error_when_resolving_symbols(parse_data.ast.definitions);
 
 			auto xyz_search = search(input, "$xyz");
 			const std::string_view expected_original_name = xyz_search.result();
@@ -165,7 +165,7 @@ $xyz = $non_existent_obj
 )";
 			const std::string_view input = input_str;
 			const parser::parsed_spirit_filter parse_data = parse(input);
-			const diagnostics_container diagnostics = expect_error_when_resolving_symbols(parse_data.ast.definitions);
+			const diagnostics_store diagnostics = expect_error_when_resolving_symbols(parse_data.ast.definitions);
 
 			const std::string_view expected_name = search(input, "$non_existent_obj").result();
 
@@ -181,7 +181,7 @@ $xyz = $non_existent_obj
 			const std::string input_str = minimal_input() + R"(PlayAlertSound 11 22 33)";
 			const std::string_view input = input_str;
 			const parser::parsed_spirit_filter parse_data = parse(input);
-			const diagnostics_container diagnostics = expect_error_when_compiling(parse_data.ast);
+			const diagnostics_store diagnostics = expect_error_when_compiling(parse_data.ast);
 
 			const std::string_view expected_arguments = search(input, "11 22 33").result();
 
@@ -199,7 +199,7 @@ $xyz = $non_existent_obj
 			const std::string input_str = minimal_input() + R"(MinimapIcon 3 Brown Circle)";
 			const std::string_view input = input_str;
 			const parser::parsed_spirit_filter parse_data = parse(input);
-			const diagnostics_container diagnostics = expect_error_when_compiling(parse_data.ast);
+			const diagnostics_store diagnostics = expect_error_when_compiling(parse_data.ast);
 
 			const std::string_view expected_argument = search(input, "3").result();
 
@@ -217,7 +217,7 @@ $xyz = $non_existent_obj
 			const std::string input_str = minimal_input() + R"(BaseType 123 {})";
 			const std::string_view input = input_str;
 			const parser::parsed_spirit_filter parse_data = parse(input);
-			const diagnostics_container diagnostics = expect_error_when_compiling(parse_data.ast);
+			const diagnostics_store diagnostics = expect_error_when_compiling(parse_data.ast);
 
 			const std::string_view expected_expression = search(input, "123").result();
 
@@ -235,7 +235,7 @@ $xyz = $non_existent_obj
 			const std::string input_str = minimal_input() + R"(HasInfluence Shaper Shaper {})";
 			const std::string_view input = input_str;
 			const parser::parsed_spirit_filter parse_data = parse(input);
-			const diagnostics_container diagnostics = expect_error_when_compiling(parse_data.ast);
+			const diagnostics_store diagnostics = expect_error_when_compiling(parse_data.ast);
 
 			const std::string_view expected_first = search(input, "Shaper").result();
 			const std::string_view expected_second = search(input, "Shaper").next().result();
@@ -262,7 +262,7 @@ Show
 )";
 			const std::string_view input = input_str;
 			const parser::parsed_spirit_filter parse_data = parse(input);
-			const diagnostics_container diagnostics = expect_error_when_compiling(parse_data.ast);
+			const diagnostics_store diagnostics = expect_error_when_compiling(parse_data.ast);
 
 			const std::string_view expected_expression = search(input, "SetTextColor 0 240 0").result();
 
@@ -291,7 +291,7 @@ Show
 )";
 			const std::string_view input = input_str;
 			const parser::parsed_spirit_filter parse_data = parse(input);
-			const diagnostics_container diagnostics = expect_error_when_compiling(parse_data.ast);
+			const diagnostics_store diagnostics = expect_error_when_compiling(parse_data.ast);
 
 			const std::string_view expected_expression = search(input, "Expand $x").next().result();
 
@@ -314,7 +314,7 @@ Hide
 )";
 			const std::string_view input = input_str;
 			const parser::parsed_spirit_filter parse_data = parse(input);
-			const diagnostics_container diagnostics = expect_error_when_compiling(parse_data.ast);
+			const diagnostics_store diagnostics = expect_error_when_compiling(parse_data.ast);
 
 			const std::string_view expected_expression = search(input, "Hide").result();
 
@@ -335,7 +335,7 @@ Class == "Skill Gems" {
 )";
 			const std::string_view input = input_str;
 			const parser::parsed_spirit_filter parse_data = parse(input);
-			const diagnostics_container diagnostics = expect_error_when_compiling(parse_data.ast);
+			const diagnostics_store diagnostics = expect_error_when_compiling(parse_data.ast);
 
 			const std::string_view expected_expression = search(input, "UnknownStatement").result();
 
@@ -356,7 +356,7 @@ Class "Gloves"
 )";
 			const std::string_view input = input_str;
 			const parser::parsed_spirit_filter parse_data = parse(input);
-			const diagnostics_container diagnostics = expect_error_when_compiling(parse_data.ast);
+			const diagnostics_store diagnostics = expect_error_when_compiling(parse_data.ast);
 
 			const std::string_view expected_original = search(input, "Class \"Boots\"").result();
 			const std::string_view expected_redef = search(input, "Class \"Gloves\"").result();
@@ -378,7 +378,7 @@ Quality > 0
 )";
 			const std::string_view input = input_str;
 			const parser::parsed_spirit_filter parse_data = parse(input);
-			const diagnostics_container diagnostics = expect_error_when_compiling(parse_data.ast);
+			const diagnostics_store diagnostics = expect_error_when_compiling(parse_data.ast);
 
 			const std::string_view expected_original = search(input, "Quality = 10").result();
 			const std::string_view expected_redef = search(input, "Quality > 0").result();
@@ -398,7 +398,7 @@ PlayAlertSound True
 )";
 			const std::string_view input = input_str;
 			const parser::parsed_spirit_filter parse_data = parse(input);
-			const diagnostics_container diagnostics = expect_error_when_compiling(parse_data.ast);
+			const diagnostics_store diagnostics = expect_error_when_compiling(parse_data.ast);
 
 			const std::string_view expected_origin = search(input, "True").result();
 
@@ -422,7 +422,7 @@ SetAlertSound 17
 )";
 			const std::string_view input = input_str;
 			const parser::parsed_spirit_filter parse_data = parse(input);
-			const diagnostics_container diagnostics = expect_error_when_compiling(parse_data.ast);
+			const diagnostics_store diagnostics = expect_error_when_compiling(parse_data.ast);
 
 			const std::string_view expected_origin = search(input, "17").result();
 

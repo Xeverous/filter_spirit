@@ -7,13 +7,9 @@ namespace fs::compiler
 
 using dmid = diagnostic_message_id;
 
-void push_error_invalid_integer_value(
-	int min,
-	int max,
-	lang::integer actual,
-	diagnostics_container& diagnostics)
+void diagnostics_store::push_error_invalid_integer_value(int min, int max, lang::integer actual)
 {
-	diagnostics.push_back(make_error(
+	messages.push_back(make_error(
 		dmid::invalid_integer_value,
 		actual.origin,
 		"invalid integer value, expected value in range ",
@@ -24,15 +20,14 @@ void push_error_invalid_integer_value(
 		std::to_string(actual.value)));
 }
 
-void push_error_invalid_amount_of_arguments(
+void diagnostics_store::push_error_invalid_amount_of_arguments(
 	int expected_min,
 	boost::optional<int> expected_max,
 	int actual,
-	lang::position_tag origin,
-	diagnostics_container& diagnostics)
+	lang::position_tag origin)
 {
 	if (expected_max) {
-		diagnostics.push_back(make_error(
+		messages.push_back(make_error(
 			dmid::invalid_amount_of_arguments,
 			origin,
 			"invalid amount of arguments, expected from ",
@@ -43,7 +38,7 @@ void push_error_invalid_amount_of_arguments(
 			std::to_string(actual)));
 	}
 	else {
-		diagnostics.push_back(make_error(
+		messages.push_back(make_error(
 			dmid::invalid_amount_of_arguments,
 			origin,
 			"invalid amount of arguments, expected at least ",
@@ -53,29 +48,21 @@ void push_error_invalid_amount_of_arguments(
 	}
 }
 
-void detail::push_error_bound_redefinition(
-	bool is_lower,
-	lang::position_tag redefinition,
-	lang::position_tag original,
-	diagnostics_container& diagnostics)
+void diagnostics_store::push_error_bound_redefinition(bool is_lower, lang::position_tag redefinition, lang::position_tag original)
 {
 	const auto id = is_lower ? dmid::lower_bound_redefinition : dmid::upper_bound_redefinition;
 	const auto str = is_lower ? "lower" : "upper";
-	diagnostics.push_back(make_error(
+	messages.push_back(make_error(
 		id,
 		redefinition,
 		str,
 		" bound redefinition (the same bound for comparison can not be specified again in the same block or nested blocks)"));
-	diagnostics.push_back(make_note_first_defined_here(original));
+	messages.push_back(make_note_first_defined_here(original));
 }
 
-void push_error_type_mismatch(
-	lang::object_type expected,
-	lang::object_type actual,
-	lang::position_tag origin,
-	diagnostics_container& diagnostics)
+void diagnostics_store::push_error_type_mismatch(lang::object_type expected, lang::object_type actual, lang::position_tag origin)
 {
-	diagnostics.push_back(make_error(
+	messages.push_back(make_error(
 		dmid::type_mismatch,
 		origin,
 		"type mismatch in expression, expected expression of type '",
@@ -85,12 +72,9 @@ void push_error_type_mismatch(
 		"'"));
 }
 
-void push_error_internal_compiler_error(
-	std::string_view function_name,
-	lang::position_tag origin,
-	diagnostics_container& diagnostics)
+void diagnostics_store::push_error_internal_compiler_error(std::string_view function_name, lang::position_tag origin)
 {
-	diagnostics.push_back(make_error(
+	messages.push_back(make_error(
 		dmid::internal_compiler_error,
 		origin,
 		log::strings::internal_compiler_error,
@@ -100,38 +84,33 @@ void push_error_internal_compiler_error(
 		log::strings::request_bug_report));
 }
 
-void push_error_autogen_incompatible_condition(
+void diagnostics_store::push_error_autogen_incompatible_condition(
 	lang::position_tag autogen_origin,
 	lang::position_tag condition_origin,
-	std::string required_matching_value,
-	diagnostics_container& diagnostics)
+	std::string required_matching_value)
 {
-	diagnostics.push_back(make_error(
+	messages.push_back(make_error(
 		dmid::autogen_incompatible_condition,
 		condition_origin,
 		"autogen-incompatible condition: it should either not exist or allow value ",
 		std::move(required_matching_value)));
-	diagnostics.push_back(make_note_minor(autogen_origin, "autogeneration specified here"));
+	messages.push_back(make_note_minor(autogen_origin, "autogeneration specified here"));
 }
 
-void push_error_autogen_missing_condition(
+void diagnostics_store::push_error_autogen_missing_condition(
 	lang::position_tag visibility_origin,
 	lang::position_tag autogen_origin,
-	std::string_view required_condition,
-	diagnostics_container& diagnostics)
+	std::string_view required_condition)
 {
-	diagnostics.push_back(make_error(
+	messages.push_back(make_error(
 		dmid::autogen_missing_condition,
 		visibility_origin,
 		"autogen with missing condition: ",
 		required_condition));
-	diagnostics.push_back(make_note_minor(autogen_origin, "autogeneration specified here"));
+	messages.push_back(make_note_minor(autogen_origin, "autogeneration specified here"));
 }
 
-void output_diagnostics(
-	const diagnostics_container& messages,
-	const parser::parse_metadata& metadata,
-	log::logger& logger)
+void diagnostics_store::output_diagnostics(const parser::parse_metadata& metadata, log::logger& logger) const
 {
 	for (const diagnostic_message& msg : messages) {
 		const log::severity s =

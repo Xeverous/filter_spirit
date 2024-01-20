@@ -15,13 +15,13 @@ spirit_filter_add_condition(
 	const parser::ast::sf::condition& condition,
 	const symbol_table& symbols,
 	lang::spirit_condition_set& condition_set,
-	diagnostics_container& diagnostics);
+	diagnostics_store& diagnostics);
 
 [[nodiscard]] bool
 real_filter_add_condition(
 	settings st,
 	const parser::ast::rf::condition& condition,
 	lang::condition_set& condition_set,
-	diagnostics_container& diagnostics);
+	diagnostics_store& diagnostics);
 
 }

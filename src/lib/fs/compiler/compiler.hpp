@@ -17,19 +17,19 @@ namespace fs::compiler
 resolve_spirit_filter_symbols(
 	settings st,
 	const std::vector<parser::ast::sf::definition>& definitions,
-	diagnostics_container& diagnostics);
+	diagnostics_store& diagnostics);
 
 [[nodiscard]] boost::optional<lang::spirit_item_filter>
 compile_spirit_filter_statements(
 	settings st,
 	const std::vector<parser::ast::sf::statement>& statements,
 	const symbol_table& symbols,
-	diagnostics_container& diagnostics);
+	diagnostics_store& diagnostics);
 
 [[nodiscard]] boost::optional<lang::item_filter>
 compile_real_filter(
 	settings st,
 	const parser::ast::rf::ast_type& ast,
-	diagnostics_container& diagnostics);
+	diagnostics_store& diagnostics);
 
 }

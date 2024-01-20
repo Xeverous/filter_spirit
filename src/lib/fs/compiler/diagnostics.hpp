@@ -9,6 +9,7 @@
 #include <boost/optional.hpp>
 
 #include <algorithm>
+#include <iterator>
 #include <variant>
 
 namespace fs::parser {
@@ -181,156 +182,136 @@ make_note_attempt_description(Strings&&... strings)
 	return make_note(diagnostic_message_id::attempt_description, boost::none, std::forward<Strings>(strings)...);
 }
 
-using diagnostics_container = boost::container::small_vector<diagnostic_message, 4>;
+class diagnostics_store
+{
+public:
+	using container_type = boost::container::small_vector<diagnostic_message, 4>;
 
-namespace detail {
+	std::size_t size() const
+	{
+		return messages.size();
+	}
 
+	const diagnostic_message& operator[](std::size_t n) const
+	{
+		return messages[n];
+	}
+
+	bool has_errors() const
+	{
+		for (const auto& msg : messages)
+			if (msg.severity == diagnostic_message_severity::error)
+				return true;
+
+		return false;
+	}
+
+	bool has_warnings() const
+	{
+		for (const auto& msg : messages)
+			if (msg.severity == diagnostic_message_severity::error)
+				return true;
+
+		return false;
+	}
+
+	bool has_warnings_or_errors() const
+	{
+		for (const auto& msg : messages)
+			if (msg.severity == diagnostic_message_severity::warning || msg.severity == diagnostic_message_severity::error)
+				return true;
+
+		return false;
+	}
+
+	void move_messages_from(diagnostics_store& other)
+	{
+		std::move(other.messages.begin(), other.messages.end(), std::back_inserter(messages));
+	}
+
+	void output_diagnostics(const parser::parse_metadata& metadata, log::logger& logger) const;
+
+	// ---- helper functions ----
+
+	void push_message(diagnostic_message message)
+	{
+		messages.push_back(std::move(message));
+	}
+
+	void push_error_name_already_exists(lang::position_tag duplicate_origin, lang::position_tag existing_origin)
+	{
+		messages.push_back(make_error(diagnostic_message_id::name_already_exists, duplicate_origin, "name already exists"));
+		messages.push_back(make_note_first_defined_here(existing_origin));
+	}
+
+	void push_error_no_such_name(lang::position_tag name_origin)
+	{
+		messages.push_back(make_error(diagnostic_message_id::no_such_name, name_origin, "no such name has been defined"));
+	}
+
+	void push_error_unknown_expression(lang::position_tag expression_origin)
+	{
+		messages.push_back(make_error(diagnostic_message_id::unknown_expression, expression_origin, "unknown expression"));
+	}
+
+	void push_error_invalid_expression(lang::position_tag expression_origin, std::string_view explanation)
+	{
+		messages.push_back(make_error(diagnostic_message_id::invalid_expression, expression_origin, "invalid expression: ", explanation));
+	}
+
+	void push_error_unknown_statement(lang::position_tag statement_origin)
+	{
+		messages.push_back(make_error(diagnostic_message_id::unknown_statement, statement_origin, "unknown statement"));
+	}
+
+	void push_error_invalid_statement(lang::position_tag statement_origin, std::string_view explanation)
+	{
+		messages.push_back(make_error(diagnostic_message_id::invalid_statement, statement_origin, "invalid statement: ", explanation));
+	}
+
+	void push_error_invalid_integer_value(int min, int max, lang::integer actual);
+
+	void push_error_invalid_amount_of_arguments(int expected_min, boost::optional<int> expected_max, int actual, lang::position_tag origin);
+
+	void push_error_lower_bound_redefinition(lang::position_tag redefinition, lang::position_tag original)
+	{
+		push_error_bound_redefinition(true, redefinition, original);
+	}
+
+	void push_error_upper_bound_redefinition(lang::position_tag redefinition, lang::position_tag original)
+	{
+		push_error_bound_redefinition(false, redefinition, original);
+	}
+
+	void push_error_type_mismatch(lang::object_type expected, lang::object_type actual, lang::position_tag origin);
+
+	void push_error_recursion_limit_reached(lang::position_tag origin)
+	{
+		messages.push_back(make_error(
+			diagnostic_message_id::recursion_limit_reached,
+			origin,
+			"recursion limit reached - you very likely made recursive tree which never ends"));
+	}
+
+	void push_error_internal_compiler_error(std::string_view function_name, lang::position_tag origin);
+
+	void push_error_autogen_incompatible_condition(
+		lang::position_tag autogen_origin,
+		lang::position_tag condition_origin,
+		std::string required_matching_value);
+
+	void push_error_autogen_missing_condition(
+		lang::position_tag visibility_origin,
+		lang::position_tag autogen_origin,
+		std::string_view missing_condition);
+
+private:
 	void push_error_bound_redefinition(
 		bool is_lower,
 		lang::position_tag redefinition,
-		lang::position_tag original,
-		diagnostics_container& diagnostics);
+		lang::position_tag original);
 
-}
-
-inline void push_error_name_already_exists(
-	lang::position_tag duplicate_origin,
-	lang::position_tag existing_origin,
-	diagnostics_container& diagnostics)
-{
-	diagnostics.push_back(make_error(diagnostic_message_id::name_already_exists, duplicate_origin, "name already exists"));
-	diagnostics.push_back(make_note_first_defined_here(existing_origin));
-}
-
-inline void push_error_no_such_name(
-	lang::position_tag name_origin,
-	diagnostics_container& diagnostics)
-{
-	diagnostics.push_back(make_error(diagnostic_message_id::no_such_name, name_origin, "no such name has been defined"));
-}
-
-inline void push_error_unknown_expression(
-	lang::position_tag expression_origin,
-	diagnostics_container& diagnostics)
-{
-	diagnostics.push_back(make_error(diagnostic_message_id::unknown_expression, expression_origin, "unknown expression"));
-}
-
-inline void push_error_invalid_expression(
-	lang::position_tag expression_origin,
-	std::string_view explanation,
-	diagnostics_container& diagnostics)
-{
-	diagnostics.push_back(make_error(diagnostic_message_id::invalid_expression, expression_origin, "invalid expression: ", explanation));
-}
-
-inline void push_error_unknown_statement(
-	lang::position_tag statement_origin,
-	diagnostics_container& diagnostics)
-{
-	diagnostics.push_back(make_error(diagnostic_message_id::unknown_statement, statement_origin, "unknown statement"));
-}
-
-inline void push_error_invalid_statement(
-	lang::position_tag statement_origin,
-	std::string_view explanation,
-	diagnostics_container& diagnostics)
-{
-	diagnostics.push_back(make_error(diagnostic_message_id::invalid_statement, statement_origin, "invalid statement: ", explanation));
-}
-
-void push_error_invalid_integer_value(
-	int min,
-	int max,
-	lang::integer actual,
-	diagnostics_container& diagnostics);
-
-void push_error_invalid_amount_of_arguments(
-	int expected_min,
-	boost::optional<int> expected_max,
-	int actual,
-	lang::position_tag origin,
-	diagnostics_container& diagnostics);
-
-inline void push_error_lower_bound_redefinition(
-	lang::position_tag redefinition,
-	lang::position_tag original,
-	diagnostics_container& diagnostics)
-{
-	detail::push_error_bound_redefinition(true, redefinition, original, diagnostics);
-}
-
-inline void push_error_upper_bound_redefinition(
-	lang::position_tag redefinition,
-	lang::position_tag original,
-	diagnostics_container& diagnostics)
-{
-	detail::push_error_bound_redefinition(false, redefinition, original, diagnostics);
-}
-
-void push_error_type_mismatch(
-	lang::object_type expected,
-	lang::object_type actual,
-	lang::position_tag origin,
-	diagnostics_container& diagnostics);
-
-inline void push_error_recursion_limit_reached(
-	lang::position_tag origin,
-	diagnostics_container& diagnostics)
-{
-	diagnostics.push_back(make_error(
-		diagnostic_message_id::recursion_limit_reached,
-		origin,
-		"recursion limit reached - you very likely made recursive tree which never ends"));
-}
-
-void push_error_internal_compiler_error(
-	std::string_view function_name,
-	lang::position_tag origin,
-	diagnostics_container& diagnostics);
-
-void push_error_autogen_incompatible_condition(
-	lang::position_tag autogen_origin,
-	lang::position_tag condition_origin,
-	std::string required_matching_value,
-	diagnostics_container& diagnostics);
-
-void push_error_autogen_missing_condition(
-	lang::position_tag visibility_origin,
-	lang::position_tag autogen_origin,
-	std::string_view missing_condition,
-	diagnostics_container& diagnostics);
-
-inline bool has_errors(const diagnostics_container& messages)
-{
-	for (const auto& msg : messages)
-		if (msg.severity == diagnostic_message_severity::error)
-			return true;
-
-	return false;
-}
-
-inline bool has_warnings(const diagnostics_container& messages)
-{
-	for (const auto& msg : messages)
-		if (msg.severity == diagnostic_message_severity::error)
-			return true;
-
-	return false;
-}
-
-inline bool has_warnings_or_errors(const diagnostics_container& messages)
-{
-	for (const auto& msg : messages)
-		if (msg.severity == diagnostic_message_severity::warning || msg.severity == diagnostic_message_severity::error)
-			return true;
-
-	return false;
-}
-
-void output_diagnostics(
-	const diagnostics_container& messages,
-	const parser::parse_metadata& metadata,
-	log::logger& logger);
+	container_type messages;
+};
 
 } // namespace fs::compiler

@@ -28,11 +28,11 @@ lang::item_filter parse_real_filter(std::string_view source)
 	BOOST_TEST_REQUIRE(std::holds_alternative<parser::parsed_real_filter>(result));
 
 	const auto& parsed_filter = std::get<parser::parsed_real_filter>(result);
-	compiler::diagnostics_container diagnostics;
+	compiler::diagnostics_store diagnostics;
 	boost::optional<lang::item_filter> filter = compiler::compile_real_filter(compiler::settings{}, parsed_filter.ast, diagnostics);
-	if (compiler::has_errors(diagnostics) || !filter) {
+	if (diagnostics.has_errors() || !filter) {
 		log::string_logger log;
-		compiler::output_diagnostics(diagnostics, parsed_filter.metadata, log);
+		diagnostics.output_diagnostics(parsed_filter.metadata, log);
 		BOOST_FAIL("Filter compilation failed: " << log.str());
 	}
 	BOOST_TEST_REQUIRE(filter.has_value());

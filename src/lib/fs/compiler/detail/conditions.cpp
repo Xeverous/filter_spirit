@@ -33,18 +33,18 @@ add_range_condition(
 	T value,
 	lang::position_tag condition_origin,
 	lang::range_condition<T>& target,
-	diagnostics_container& diagnostics)
+	diagnostics_store& diagnostics)
 {
 	switch (comparison_type) {
 		case lang::comparison_type::equal_soft:
 		case lang::comparison_type::equal_hard: {
 			if (target.lower_bound.has_value()) {
-				push_error_lower_bound_redefinition(condition_origin, (*target.lower_bound).origin, diagnostics);
+				diagnostics.push_error_lower_bound_redefinition(condition_origin, (*target.lower_bound).origin);
 				return false;
 			}
 
 			if (target.upper_bound.has_value()) {
-				push_error_upper_bound_redefinition(condition_origin, (*target.upper_bound).origin, diagnostics);
+				diagnostics.push_error_upper_bound_redefinition(condition_origin, (*target.upper_bound).origin);
 				return false;
 			}
 
@@ -53,7 +53,7 @@ add_range_condition(
 		}
 		case lang::comparison_type::less: {
 			if (target.upper_bound.has_value()) {
-				push_error_upper_bound_redefinition(condition_origin, (*target.upper_bound).origin, diagnostics);
+				diagnostics.push_error_upper_bound_redefinition(condition_origin, (*target.upper_bound).origin);
 				return false;
 			}
 
@@ -62,7 +62,7 @@ add_range_condition(
 		}
 		case lang::comparison_type::less_equal: {
 			if (target.upper_bound.has_value()) {
-				push_error_upper_bound_redefinition(condition_origin, (*target.upper_bound).origin, diagnostics);
+				diagnostics.push_error_upper_bound_redefinition(condition_origin, (*target.upper_bound).origin);
 				return false;
 			}
 
@@ -71,7 +71,7 @@ add_range_condition(
 		}
 		case lang::comparison_type::greater: {
 			if (target.lower_bound.has_value()) {
-				push_error_lower_bound_redefinition(condition_origin, (*target.lower_bound).origin, diagnostics);
+				diagnostics.push_error_lower_bound_redefinition(condition_origin, (*target.lower_bound).origin);
 				return false;
 			}
 
@@ -80,7 +80,7 @@ add_range_condition(
 		}
 		case lang::comparison_type::greater_equal: {
 			if (target.lower_bound.has_value()) {
-				push_error_lower_bound_redefinition(condition_origin, (*target.lower_bound).origin, diagnostics);
+				diagnostics.push_error_lower_bound_redefinition(condition_origin, (*target.lower_bound).origin);
 				return false;
 			}
 
@@ -89,7 +89,7 @@ add_range_condition(
 		}
 	}
 
-	push_error_internal_compiler_error(__func__, condition_origin, diagnostics);
+	diagnostics.push_error_internal_compiler_error(__func__, condition_origin);
 	return false;
 }
 
@@ -100,7 +100,7 @@ add_numeric_comparison_condition(
 	lang::integer intgr,
 	lang::position_tag condition_origin,
 	lang::condition_set& set,
-	diagnostics_container& diagnostics)
+	diagnostics_store& diagnostics)
 {
 	switch (property) {
 		case lang::numeric_comparison_condition_property::item_level: {
@@ -162,7 +162,7 @@ add_numeric_comparison_condition(
 		}
 	}
 
-	push_error_internal_compiler_error(__func__, condition_origin, diagnostics);
+	diagnostics.push_error_internal_compiler_error(__func__, condition_origin);
 	return false;
 }
 
@@ -171,14 +171,14 @@ template <typename Condition>
 add_non_range_condition(
 	Condition condition,
 	std::optional<Condition>& target,
-	diagnostics_container& diagnostics)
+	diagnostics_store& diagnostics)
 {
 	if (target.has_value()) {
-		diagnostics.push_back(make_error(
+		diagnostics.push_message(make_error(
 			dmid::condition_redefinition,
 			condition.origin,
 			"condition redefinition (the same condition can not be specified again in the same block or nested blocks)"));
-		diagnostics.push_back(make_note_first_defined_here((*target).origin));
+		diagnostics.push_message(make_note_first_defined_here((*target).origin));
 		return false;
 	}
 
@@ -192,7 +192,7 @@ add_ranged_strings_condition(
 	lang::comparison_type cmp,
 	boost::optional<lang::integer> intgr,
 	std::optional<lang::ranged_strings_condition>& target,
-	diagnostics_container& diagnostics)
+	diagnostics_store& diagnostics)
 {
 	lang::integer_range_condition integer_cond;
 	if (intgr.has_value()) {
@@ -217,7 +217,7 @@ add_string_array_condition(
 	bool is_exact_match,
 	lang::position_tag condition_origin,
 	lang::condition_set& set,
-	diagnostics_container& diagnostics)
+	diagnostics_store& diagnostics)
 {
 	switch (property) {
 		case lang::string_array_condition_property::class_: {
@@ -246,7 +246,7 @@ add_string_array_condition(
 		}
 	}
 
-	push_error_internal_compiler_error(__func__, condition_origin, diagnostics);
+	diagnostics.push_error_internal_compiler_error(__func__, condition_origin);
 	return false;
 }
 
@@ -259,21 +259,21 @@ add_ranged_string_array_condition(
 	boost::optional<lang::integer> integer,
 	lang::position_tag condition_origin,
 	lang::condition_set& set,
-	diagnostics_container& diagnostics)
+	diagnostics_store& diagnostics)
 {
 	auto push_error_invalid_ranged_strings_condition = [&](boost::optional<lang::position_tag> integer_origin) {
-		diagnostics.push_back(make_error(
+		diagnostics.push_message(make_error(
 			dmid::invalid_ranged_strings_condition,
 			condition_origin,
 			"invalid ranged strings array condition"));
 		if (lang::is_valid(comparison_origin)) {
-			diagnostics.push_back(make_note(
+			diagnostics.push_message(make_note(
 				dmid::minor_note,
 				comparison_origin,
 				"only == is allowed to be without a number"));
 		}
 		if (integer_origin) {
-			diagnostics.push_back(make_note(
+			diagnostics.push_message(make_note(
 				dmid::minor_note,
 				*integer_origin,
 				"if an integer is present, it must be preceded by a comparison operator"));
@@ -321,7 +321,7 @@ add_ranged_string_array_condition(
 		}
 	}
 
-	push_error_internal_compiler_error(__func__, condition_origin, diagnostics);
+	diagnostics.push_error_internal_compiler_error(__func__, condition_origin);
 	return false;
 }
 
@@ -346,13 +346,13 @@ add_has_influence_condition(
 	bool is_exact_match,
 	lang::position_tag origin,
 	std::optional<lang::influences_condition>& target,
-	diagnostics_container& diagnostics)
+	diagnostics_store& diagnostics)
 {
 	for (std::size_t i = 0; i < influences.size(); ++i) {
 		for (std::size_t j = 0; j < influences.size(); ++j) {
 			if (j != i && influences[i] == influences[j]) {
-				diagnostics.push_back(make_error(dmid::duplicate_influence, influences[j].origin, "duplicate influence"));
-				diagnostics.push_back(make_note_first_defined_here(influences[i].origin));
+				diagnostics.push_message(make_error(dmid::duplicate_influence, influences[j].origin, "duplicate influence"));
+				diagnostics.push_message(make_note_first_defined_here(influences[i].origin));
 
 				if (st.error_handling.stop_on_error)
 					return false;
@@ -390,7 +390,7 @@ add_socket_spec_condition(
 	bool links_matter,
 	lang::socket_spec_condition condition,
 	lang::condition_set& set,
-	diagnostics_container& diagnostics)
+	diagnostics_store& diagnostics)
 {
 	auto& target = links_matter ? set.socket_group : set.sockets;
 	return add_non_range_condition(condition, target, diagnostics);
@@ -402,7 +402,7 @@ add_boolean_condition(
 	lang::position_tag condition_origin,
 	lang::boolean_condition_property property,
 	lang::condition_set& condition_set,
-	diagnostics_container& diagnostics)
+	diagnostics_store& diagnostics)
 {
 	switch (property) {
 		case lang::boolean_condition_property::identified: {
@@ -515,7 +515,7 @@ add_boolean_condition(
 		}
 	}
 
-	push_error_internal_compiler_error(__func__, condition_origin, diagnostics);
+	diagnostics.push_error_internal_compiler_error(__func__, condition_origin);
 	return false;
 }
 
@@ -527,7 +527,7 @@ spirit_filter_add_price_comparison_condition(
 	const ast::sf::price_comparison_condition& condition,
 	const symbol_table& symbols,
 	lang::spirit_condition_set& set,
-	diagnostics_container& diagnostics)
+	diagnostics_store& diagnostics)
 {
 	return detail::evaluate_sequence(st, condition.seq, symbols, 1, 1, diagnostics)
 		.flat_map([&](lang::object obj) {
@@ -551,7 +551,7 @@ spirit_filter_add_rarity_comparison_condition(
 	const ast::sf::rarity_comparison_condition& condition,
 	const symbol_table& symbols,
 	lang::condition_set& set,
-	diagnostics_container& diagnostics)
+	diagnostics_store& diagnostics)
 {
 	return detail::evaluate_sequence(st, condition.seq, symbols, 1, 1, diagnostics)
 		.flat_map([&](lang::object obj) {
@@ -575,7 +575,7 @@ spirit_filter_add_numeric_comparison_condition(
 	const ast::sf::numeric_comparison_condition& condition,
 	const symbol_table& symbols,
 	lang::condition_set& set,
-	diagnostics_container& diagnostics)
+	diagnostics_store& diagnostics)
 {
 	return detail::evaluate_sequence(st, condition.seq, symbols, 1, 1, diagnostics)
 		.flat_map([&](lang::object obj) {
@@ -598,7 +598,7 @@ spirit_filter_add_numeric_comparison_condition(
 spirit_filter_make_string_array(
 	settings st,
 	const lang::object& obj,
-	diagnostics_container& diagnostics)
+	diagnostics_store& diagnostics)
 {
 	str_vec_t strings;
 
@@ -606,7 +606,7 @@ spirit_filter_make_string_array(
 		// skip "None"s - they may come from variables
 		// if an object is not none - ignore the problem and move forward
 		// because of ignoring all logs are thrown away
-		diagnostics_container diagnostics_none;
+		diagnostics_store diagnostics_none;
 		if (detail::get_as<lang::none>(sobj, diagnostics_none).has_value())
 			continue;
 
@@ -627,7 +627,7 @@ spirit_filter_add_string_array_condition(
 	const ast::sf::string_array_condition& condition,
 	const symbol_table& symbols,
 	lang::condition_set& set,
-	diagnostics_container& diagnostics)
+	diagnostics_store& diagnostics)
 {
 	return detail::evaluate_sequence(st, condition.seq, symbols, 1, boost::none, diagnostics)
 		.flat_map([&](lang::object obj) -> boost::optional<str_vec_t> {
@@ -651,7 +651,7 @@ spirit_filter_add_ranged_string_array_condition(
 	const ast::sf::ranged_string_array_condition& condition,
 	const symbol_table& symbols,
 	lang::condition_set& set,
-	diagnostics_container& diagnostics)
+	diagnostics_store& diagnostics)
 {
 	return detail::evaluate_sequence(st, condition.seq, symbols, 1, boost::none, diagnostics)
 		.flat_map([&](lang::object obj) -> boost::optional<str_vec_t> {
@@ -677,12 +677,12 @@ spirit_filter_add_has_influence_condition(
 	const ast::sf::has_influence_condition& condition,
 	const symbol_table& symbols,
 	lang::condition_set& set,
-	diagnostics_container& diagnostics)
+	diagnostics_store& diagnostics)
 {
 	return detail::evaluate_sequence(st, condition.seq, symbols, 1, lang::limits::max_filter_influences, diagnostics)
 		.flat_map([&](lang::object obj) -> boost::optional<influences_container> {
 			if (obj.values.size() == 1u) {
-				diagnostics_container diagnostics_none; // ignore logs and move on if get_as<none> fails
+				diagnostics_store diagnostics_none; // ignore logs and move on if get_as<none> fails
 				if (detail::get_as<lang::none>(obj.values.front(), diagnostics_none).has_value())
 					return influences_container();
 			}
@@ -718,7 +718,7 @@ spirit_filter_add_socket_spec_condition(
 	const ast::sf::socket_spec_condition& condition,
 	const symbol_table& symbols,
 	lang::condition_set& set,
-	diagnostics_container& diagnostics)
+	diagnostics_store& diagnostics)
 {
 	using specs_t = lang::socket_spec_condition::container_type;
 	return detail::evaluate_sequence(st, condition.seq, symbols, 1, boost::none, diagnostics)
@@ -756,7 +756,7 @@ spirit_filter_add_boolean_condition(
 	const ast::sf::boolean_condition& condition,
 	const symbol_table& symbols,
 	lang::condition_set& condition_set,
-	diagnostics_container& diagnostics)
+	diagnostics_store& diagnostics)
 {
 	return detail::evaluate_sequence(st, condition.seq, symbols, 1, 1, diagnostics)
 		.flat_map([&](lang::object obj) {
@@ -780,7 +780,7 @@ spirit_filter_add_boolean_condition(
 real_filter_add_numeric_comparison_condition(
 	ast::rf::numeric_condition numeric_condition,
 	lang::condition_set& set,
-	diagnostics_container& diagnostics)
+	diagnostics_store& diagnostics)
 {
 	const lang::integer intgr = detail::evaluate(numeric_condition.integer);
 	const auto origin = parser::position_tag_of(numeric_condition);
@@ -803,7 +803,7 @@ real_filter_make_string_array(
 real_filter_add_string_array_condition(
 	const parser::ast::rf::string_array_condition& condition,
 	lang::condition_set& set,
-	diagnostics_container& diagnostics)
+	diagnostics_store& diagnostics)
 {
 	str_vec_t strings = real_filter_make_string_array(condition.strings);
 	const bool exact_match = condition.exact_match.required;
@@ -815,7 +815,7 @@ real_filter_add_string_array_condition(
 real_filter_add_ranged_string_array_condition(
 	const parser::ast::rf::ranged_string_array_condition& condition,
 	lang::condition_set& set,
-	diagnostics_container& diagnostics)
+	diagnostics_store& diagnostics)
 {
 	return add_ranged_string_array_condition(
 		condition.property,
@@ -832,7 +832,7 @@ real_filter_add_ranged_string_array_condition(
 real_filter_make_influences_container(
 	const ast::rf::influence_spec& spec,
 	lang::position_tag condition_origin,
-	diagnostics_container& diagnostics)
+	diagnostics_store& diagnostics)
 {
 	using result_type = boost::optional<influences_container>;
 
@@ -841,8 +841,8 @@ real_filter_make_influences_container(
 			const auto num_inf = static_cast<int>(array.size());
 
 			if (num_inf < 1 || num_inf > lang::limits::max_filter_influences) {
-				push_error_invalid_amount_of_arguments(
-					1, lang::limits::max_filter_influences, num_inf, condition_origin, diagnostics);
+				diagnostics.push_error_invalid_amount_of_arguments(
+					1, lang::limits::max_filter_influences, num_inf, condition_origin);
 				return boost::none;
 			}
 
@@ -864,7 +864,7 @@ real_filter_add_has_influence_condition(
 	settings st,
 	const ast::rf::has_influence_condition& condition,
 	std::optional<lang::influences_condition>& target,
-	diagnostics_container& diagnostics)
+	diagnostics_store& diagnostics)
 {
 	const auto condition_origin = parser::position_tag_of(condition);
 	return real_filter_make_influences_container(condition.spec, condition_origin, diagnostics)
@@ -885,7 +885,7 @@ real_filter_add_socket_spec_condition(
 	settings st,
 	const ast::rf::socket_spec_condition& condition,
 	lang::condition_set& set,
-	diagnostics_container& diagnostics)
+	diagnostics_store& diagnostics)
 {
 	lang::socket_spec_condition::container_type specs;
 
@@ -921,13 +921,13 @@ spirit_filter_add_condition(
 	const ast::sf::condition& condition,
 	const symbol_table& symbols,
 	lang::spirit_condition_set& set,
-	diagnostics_container& diagnostics)
+	diagnostics_store& diagnostics)
 {
 	return condition.apply_visitor(x3::make_lambda_visitor<bool>(
 		[&](const ast::sf::autogen_condition& cond) {
 			auto category = lang::item_category::_from_string_nothrow(cond.name.c_str());
 			if (!category) {
-				push_error_invalid_expression(parser::position_tag_of(cond.name), "invalid autogeneration", diagnostics);
+				diagnostics.push_error_invalid_expression(parser::position_tag_of(cond.name), "invalid autogeneration");
 			}
 
 			return add_non_range_condition(
@@ -968,7 +968,7 @@ real_filter_add_condition(
 	settings st,
 	const parser::ast::rf::condition& condition,
 	lang::condition_set& condition_set,
-	diagnostics_container& diagnostics)
+	diagnostics_store& diagnostics)
 {
 	return condition.apply_visitor(x3::make_lambda_visitor<bool>(
 		[&](const ast::rf::rarity_condition& cond) {

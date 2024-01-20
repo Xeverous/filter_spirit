@@ -28,7 +28,7 @@ struct symbol_table
 	[[nodiscard]] bool add_symbol( // defined in compiler.cpp
 		settings st,
 		const parser::ast::sf::constant_definition& def,
-		diagnostics_container& diagnostics);
+		diagnostics_store& diagnostics);
 
 	[[nodiscard]] bool empty() const
 	{

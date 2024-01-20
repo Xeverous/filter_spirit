@@ -18,14 +18,14 @@ make_integer_in_range(
 	lang::integer int_obj,
 	int min_allowed_value,
 	int max_allowed_value,
-	diagnostics_container& diagnostics);
+	diagnostics_store& diagnostics);
 
 [[nodiscard]] boost::optional<lang::socket_spec>
 make_socket_spec(
 	settings st,
 	const std::string& raw,
 	lang::position_tag origin,
-	diagnostics_container& diagnostics);
+	diagnostics_store& diagnostics);
 
 [[nodiscard]] inline lang::string
 evaluate(const parser::ast::rf::string& str)
@@ -103,13 +103,13 @@ evaluate(parser::ast::common::none_literal nl)
 evaluate(
 	settings st,
 	const parser::ast::common::socket_spec_literal& literal,
-	diagnostics_container& diagnostics);
+	diagnostics_store& diagnostics);
 
 [[nodiscard]] boost::optional<lang::single_object>
 evaluate(
 	settings st,
 	const parser::ast::common::literal_expression& expression,
-	diagnostics_container& diagnostics);
+	diagnostics_store& diagnostics);
 
 [[nodiscard]] boost::optional<lang::object>
 evaluate_sequence(
@@ -118,7 +118,7 @@ evaluate_sequence(
 	const symbol_table& symbols,
 	int min_allowed_elements,
 	boost::optional<int> max_allowed_elements,
-	diagnostics_container& diagnostics);
+	diagnostics_store& diagnostics);
 
 [[nodiscard]] boost::optional<lang::object>
 evaluate_literal_sequence(
@@ -126,16 +126,16 @@ evaluate_literal_sequence(
 	const parser::ast::rf::literal_sequence& sequence,
 	int min_allowed_elements,
 	boost::optional<int> max_allowed_elements,
-	diagnostics_container& diagnostics);
+	diagnostics_store& diagnostics);
 
 template <typename T>
 [[nodiscard]] boost::optional<T>
 get_as(
 	const lang::single_object& sobj,
-	diagnostics_container& diagnostics)
+	diagnostics_store& diagnostics)
 {
 	if (!std::holds_alternative<T>(sobj.value)) {
-		push_error_type_mismatch(lang::object_type_of<T>(), sobj.type(), sobj.origin, diagnostics);
+		diagnostics.push_error_type_mismatch(lang::object_type_of<T>(), sobj.type(), sobj.origin);
 		return boost::none;
 	}
 
@@ -145,11 +145,11 @@ get_as(
 [[nodiscard]] boost::optional<lang::fractional>
 get_as_fractional(
 	const lang::single_object& sobj,
-	diagnostics_container& diagnostics);
+	diagnostics_store& diagnostics);
 
 [[nodiscard]] boost::optional<lang::socket_spec>
 get_as_socket_spec(
 	const lang::single_object& sobj,
-	diagnostics_container& diagnostics);
+	diagnostics_store& diagnostics);
 
 } // namespace fs::compiler::detail
