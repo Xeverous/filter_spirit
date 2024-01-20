@@ -90,7 +90,7 @@ void spirit_filter_state_mediator::on_parsed_spirit_filter_change(const parser::
 	boost::optional<compiler::symbol_table> result = compiler::resolve_spirit_filter_symbols(
 		{}, parsed_spirit_filter->ast.definitions, diagnostics);
 
-	compiler::output_diagnostics(diagnostics, parsed_spirit_filter->metadata, logger());
+	compiler::output_messages(diagnostics, parsed_spirit_filter->metadata, logger());
 
 	if (result)
 		logger().info() << "Resolving definitions successful.";
@@ -117,7 +117,7 @@ void spirit_filter_state_mediator::on_spirit_filter_symbols_change(
 	boost::optional<lang::spirit_item_filter> result = compiler::compile_spirit_filter_statements(
 		{}, parsed_spirit_filter->ast.statements, *spirit_filter_symbols, diagnostics);
 
-	compiler::output_diagnostics(diagnostics, parsed_spirit_filter->metadata, logger());
+	compiler::output_messages(diagnostics, parsed_spirit_filter->metadata, logger());
 
 	if (result)
 		logger().info() << "Compilation successful.";

@@ -92,7 +92,7 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 	{
 		auto dump_diagnostics = [&]() {
 			log::string_logger logger;
-			diagnostics.output_diagnostics(metadata, logger);
+			diagnostics.output_messages(metadata, logger);
 			return logger.str();
 		};
 

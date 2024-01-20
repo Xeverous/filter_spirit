@@ -229,7 +229,7 @@ public:
 		std::move(other.messages.begin(), other.messages.end(), std::back_inserter(messages));
 	}
 
-	void output_diagnostics(const parser::parse_metadata& metadata, log::logger& logger) const;
+	void output_messages(const parser::parse_metadata& metadata, log::logger& logger) const;
 
 	// ---- helper functions ----
 

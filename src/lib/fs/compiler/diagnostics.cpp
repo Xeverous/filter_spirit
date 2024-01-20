@@ -110,7 +110,7 @@ void diagnostics_store::push_error_autogen_missing_condition(
 	messages.push_back(make_note_minor(autogen_origin, "autogeneration specified here"));
 }
 
-void diagnostics_store::output_diagnostics(const parser::parse_metadata& metadata, log::logger& logger) const
+void diagnostics_store::output_messages(const parser::parse_metadata& metadata, log::logger& logger) const
 {
 	for (const diagnostic_message& msg : messages) {
 		const log::severity s =
