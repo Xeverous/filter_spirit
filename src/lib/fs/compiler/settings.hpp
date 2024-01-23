@@ -11,8 +11,9 @@ struct error_handling_settings
 
 struct settings
 {
+	bool ruthless_mode = false;
+	bool print_ast = false;
 	error_handling_settings error_handling;
-	int max_recursion_depth = 128;
 };
 
 }

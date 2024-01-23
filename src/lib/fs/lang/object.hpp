@@ -4,7 +4,6 @@
 #include <fs/utility/better_enum.hpp>
 #include <fs/lang/position_tag.hpp>
 #include <fs/lang/primitive_types.hpp>
-#include <fs/lang/queries.hpp>
 
 #include <boost/container/small_vector.hpp>
 

@@ -120,7 +120,7 @@ template <typename T, typename = void>
 struct has_begin_end : detail::has_begin_end_impl<T> {};
 
 template <typename T>
-constexpr bool has_begin_end_v = has_begin_end<T>::value;
+inline constexpr bool has_begin_end_v = has_begin_end<T>::value;
 
 
 
@@ -128,13 +128,13 @@ template <typename T, typename = void>
 struct has_container_member_types : detail::has_container_member_types_impl<T> {};
 
 template <typename T>
-constexpr bool has_container_member_types_v = has_container_member_types<T>::value;
+inline constexpr bool has_container_member_types_v = has_container_member_types<T>::value;
 
 template <typename T>
-constexpr bool is_iterable_v = has_begin_end_v<T>;
+inline constexpr bool is_iterable_v = has_begin_end_v<T>;
 
 template <typename T>
-constexpr bool is_container_v = has_begin_end_v<T> && has_container_member_types_v<T>;
+inline constexpr bool is_container_v = has_begin_end_v<T> && has_container_member_types_v<T>;
 
 
 
@@ -142,7 +142,7 @@ template <typename T, typename = void>
 struct has_pointer_semantics : detail::has_pointer_semantics_impl<T> {};
 
 template <typename T>
-constexpr bool has_pointer_semantics_v = has_pointer_semantics<T>::value;
+inline constexpr bool has_pointer_semantics_v = has_pointer_semantics<T>::value;
 
 
 
@@ -150,7 +150,7 @@ template <typename T, typename = void>
 struct is_printable : detail::is_printable_impl<T> {};
 
 template <typename T>
-constexpr bool is_printable_v = is_printable<T>::value;
+inline constexpr bool is_printable_v = is_printable<T>::value;
 
 
 
@@ -161,7 +161,7 @@ template <typename... Ts>
 struct variant_size<std::variant<Ts...>> : std::integral_constant<std::size_t, sizeof...(Ts)> {};
 
 template <typename... Ts>
-constexpr auto variant_size_v = variant_size<Ts...>::value;
+inline constexpr auto variant_size_v = variant_size<Ts...>::value;
 
 
 
@@ -169,7 +169,7 @@ template <typename T, typename Variant>
 struct is_variant_alternative : detail::is_variant_alternative_impl<T, Variant> {};
 
 template <typename T, typename Variant>
-constexpr bool is_variant_alternative_v = is_variant_alternative<T, Variant>::value;
+inline constexpr bool is_variant_alternative_v = is_variant_alternative<T, Variant>::value;
 
 
 
@@ -177,13 +177,13 @@ template <typename T, typename = void>
 struct has_non_void_get_value : detail::has_non_void_get_value_impl<T> {};
 
 template <typename T>
-constexpr bool has_non_void_get_value_v = has_non_void_get_value<T>::value;
+inline constexpr bool has_non_void_get_value_v = has_non_void_get_value<T>::value;
 
 template <typename T, typename = void>
 struct has_void_get_value : detail::has_void_get_value_impl<T> {};
 
 template <typename T>
-constexpr bool has_void_get_value_v = has_void_get_value<T>::value;
+inline constexpr bool has_void_get_value_v = has_void_get_value<T>::value;
 
 
 
@@ -194,7 +194,7 @@ template <typename T>
 struct has_value_member<T, std::void_t<decltype(std::declval<T>().value)>> : std::true_type {};
 
 template <typename T>
-constexpr bool has_value_member_v = has_value_member<T>::value;
+inline constexpr bool has_value_member_v = has_value_member<T>::value;
 
 
 
@@ -205,7 +205,7 @@ template <typename T>
 struct has_origin_member<T, std::void_t<decltype(std::declval<T>().origin)>> : std::true_type {};
 
 template <typename T>
-constexpr bool has_origin_member_v = has_origin_member<T>::value;
+inline constexpr bool has_origin_member_v = has_origin_member<T>::value;
 
 
 

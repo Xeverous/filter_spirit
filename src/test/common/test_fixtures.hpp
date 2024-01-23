@@ -24,7 +24,7 @@ class compiler_fixture : public parser_fixture
 {
 protected:
 	static
-	boost::optional<compiler::symbol_table>
+	std::optional<compiler::symbol_table>
 	resolve_symbols(
 		compiler::settings st,
 		const std::vector<parser::ast::sf::definition>& defs,
@@ -34,7 +34,7 @@ protected:
 	}
 
 	static
-	boost::optional<compiler::symbol_table>
+	std::optional<compiler::symbol_table>
 	resolve_symbols(
 		const std::vector<parser::ast::sf::definition>& defs,
 		compiler::diagnostics_store& diagnostics)

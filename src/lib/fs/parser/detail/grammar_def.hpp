@@ -143,16 +143,29 @@ namespace common
 		| common::string_literal;
 	BOOST_SPIRIT_DEFINE(literal_expression)
 
-	const comparison_operator_expression_type comparison_operator_expression = "comparison operator";
-	const auto comparison_operator_expression_def = symbols::rf::comparison_operators | x3::attr(lang::comparison_type::equal_soft);
-	BOOST_SPIRIT_DEFINE(comparison_operator_expression)
+	const comparison_operator_type comparison_operator = "comparison operator";
+	const auto comparison_operator_def = symbols::rf::comparison_operators;
+	BOOST_SPIRIT_DEFINE(comparison_operator)
 
-	const exact_matching_policy_expression_type exact_matching_policy_expression = "exact matching policy expression";
-	const auto exact_matching_policy_expression_def = ("==" > x3::attr(true)) | ("=" > x3::attr(false)) | x3::attr(false);
-	BOOST_SPIRIT_DEFINE(exact_matching_policy_expression)
+	const comparison_expression_type comparison_expression = "comparison expression";
+	const auto comparison_expression_def =
+		// lexeme because
+		// "< 3" has to be parsed as comparison(<, null) + value(3)
+		// "<3"  has to be parsed as comparison(<, 3)
+		x3::lexeme[comparison_operator > -integer_literal]
+		// when on the implicit default (=), any integer that follows should be a value (not a part of the comparison)
+		| (
+			x3::attr(ast::common::comparison_operator::implicit_default())
+			> x3::attr(boost::optional<ast::common::integer_literal>{})
+		);
+	BOOST_SPIRIT_DEFINE(comparison_expression)
 
+	// Blacklist approach turned out to be very unstable (frequent endless loop or recursion). Thus,
+	// approaches such as x3::lexeme[+(!x3::space - x3::lit('#') - x3::lit('{') - x3::lit('}') - x3::eoi)]
+	// are discouraged due to instability and maintenance effort (need to take care of all special tokens).
+	// Whitelist approach will not accept that much but is stable and easy to understand and test.
 	const unknown_expression_type unknown_expression = "unknown expression";
-	const auto unknown_expression_def = x3::lexeme[*(x3::alnum | x3::char_('_'))];
+	const auto unknown_expression_def = x3::lexeme[+(x3::alnum | x3::char_('_'))];
 	BOOST_SPIRIT_DEFINE(unknown_expression)
 
 	// ---- actions ----
@@ -172,6 +185,114 @@ namespace common
 	BOOST_SPIRIT_DEFINE(continue_statement)
 } // namespace common
 
+namespace rf
+{
+	using common::make_keyword;
+
+	// ---- literal types ----
+
+	const color_literal_type color_literal = "color literal";
+	const auto color_literal_def =
+		  common::integer_literal
+		> common::integer_literal
+		> common::integer_literal
+		> -common::integer_literal;
+	BOOST_SPIRIT_DEFINE(color_literal)
+
+	const string_type string = "string";
+	const auto string_def = common::string_literal | common::identifier;
+	BOOST_SPIRIT_DEFINE(string)
+
+	const string_array_type string_array = "1 or more strings";
+	const auto string_array_def = x3::skip(common::non_eol_whitespace)[+string];
+	BOOST_SPIRIT_DEFINE(string_array)
+
+	const influence_literal_array_type influence_literal_array = "1 or more influence literals";
+	const auto influence_literal_array_def = +common::influence_literal;
+	BOOST_SPIRIT_DEFINE(influence_literal_array)
+
+	const influence_spec_type influence_spec = "influence spec";
+	const auto influence_spec_def = common::none_literal | influence_literal_array;
+	BOOST_SPIRIT_DEFINE(influence_spec)
+
+	// ---- expressions ----
+
+	const literal_sequence_type literal_sequence = "literal sequence";
+	const auto literal_sequence_def = x3::skip(common::non_eol_whitespace)[+common::literal_expression];
+	BOOST_SPIRIT_DEFINE(literal_sequence)
+
+	// ---- conditions ----
+
+	const condition_type condition = "condition";
+	const auto condition_def =
+		make_keyword(symbols::rf::official_condition_properties)
+		> common::comparison_expression
+		> rf::literal_sequence;
+	BOOST_SPIRIT_DEFINE(condition)
+
+	// ---- actions ----
+
+	const color_action_type color_action = "color action";
+	const auto color_action_def = make_keyword(symbols::rf::color_actions) > color_literal;
+	BOOST_SPIRIT_DEFINE(color_action)
+
+	const set_font_size_action_type set_font_size_action = "font size action";
+	const auto set_font_size_action_def = make_keyword(lang::keywords::rf::set_font_size) > common::integer_literal;
+	BOOST_SPIRIT_DEFINE(set_font_size_action)
+
+	const play_alert_sound_action_type play_alert_sound_action = "play alert sound action";
+	const auto play_alert_sound_action_def =
+		make_keyword(symbols::rf::play_alert_sound_actions)
+		> common::literal_expression
+		> -common::integer_literal; // volume (optional token)
+	BOOST_SPIRIT_DEFINE(play_alert_sound_action)
+
+	const custom_alert_sound_action_type custom_alert_sound_action = "custom alert sound action";
+	const auto custom_alert_sound_action_def =
+		(
+			(make_keyword(lang::keywords::rf::custom_alert_sound_optional) > x3::attr(true))
+			| (make_keyword(lang::keywords::rf::custom_alert_sound) > x3::attr(false))
+		)
+		> common::string_literal
+		> -common::integer_literal; // volume (optional token)
+	BOOST_SPIRIT_DEFINE(custom_alert_sound_action)
+
+	// switch_drop_sound_action in common
+
+	const minimap_icon_action_type minimap_icon_action = "minimap icon action";
+	const auto minimap_icon_action_def = make_keyword(lang::keywords::rf::minimap_icon) > literal_sequence;
+	BOOST_SPIRIT_DEFINE(minimap_icon_action)
+
+	const play_effect_action_type play_effect_action = "play effct action";
+	const auto play_effect_action_def = make_keyword(lang::keywords::rf::play_effect) > literal_sequence;
+	BOOST_SPIRIT_DEFINE(play_effect_action)
+
+	const action_type action = "action";
+	const auto action_def =
+		color_action
+		| set_font_size_action
+		| play_alert_sound_action
+		| custom_alert_sound_action
+		| common::switch_drop_sound_action
+		| minimap_icon_action
+		| play_effect_action;
+	BOOST_SPIRIT_DEFINE(action)
+
+	// ---- filter structure ----
+
+	const rule_type rule = "rule";
+	const auto rule_def = condition | action | common::continue_statement;
+	BOOST_SPIRIT_DEFINE(rule)
+
+	const filter_block_type filter_block = "filter block";
+	const auto filter_block_def = common::static_visibility_statement > *rule;
+	BOOST_SPIRIT_DEFINE(filter_block)
+
+	const grammar_type grammar = "code";
+	const auto grammar_def = *filter_block > x3::eoi;
+	BOOST_SPIRIT_DEFINE(grammar)
+} // namespace rf
+
 namespace sf
 {
 	using common::make_keyword;
@@ -189,7 +310,7 @@ namespace sf
 	// ---- expressions ----
 
 	const primitive_value_type primitive_value = "primitive";
-	const auto primitive_value_def = name | common::literal_expression;
+	const auto primitive_value_def = name | common::literal_expression | common::unknown_expression;
 	BOOST_SPIRIT_DEFINE(primitive_value)
 
 	const sequence_type sequence = "sequence";
@@ -227,70 +348,22 @@ namespace sf
 	const price_comparison_condition_type price_comparison_condition = "price comparison condition";
 	const auto price_comparison_condition_def =
 		make_keyword(lang::keywords::sf::price)
-		> common::comparison_operator_expression
+		> common::comparison_expression
 		> sequence;
 	BOOST_SPIRIT_DEFINE(price_comparison_condition)
 
-	const rarity_comparison_condition_type rarity_comparison_condition = "rarity comparison condition";
-	const auto rarity_comparison_condition_def =
-		make_keyword(lang::keywords::rf::rarity)
-		> common::comparison_operator_expression
+	const official_condition_type official_condition = "condition (official)";
+	const auto official_condition_def =
+		make_keyword(symbols::rf::official_condition_properties)
+		> common::comparison_expression
 		> sequence;
-	BOOST_SPIRIT_DEFINE(rarity_comparison_condition)
-
-	const numeric_comparison_condition_type numeric_comparison_condition = "numeric comparison condition";
-	const auto numeric_comparison_condition_def =
-		make_keyword(symbols::rf::numeric_comparison_condition_properties)
-		> common::comparison_operator_expression
-		> sequence;
-	BOOST_SPIRIT_DEFINE(numeric_comparison_condition)
-
-	const string_array_condition_type string_array_condition = "string array condition";
-	const auto string_array_condition_def =
-		make_keyword(symbols::rf::string_array_condition_properties)
-		> common::exact_matching_policy_expression
-		> sequence;
-	BOOST_SPIRIT_DEFINE(string_array_condition)
-
-	const ranged_string_array_condition_type ranged_string_array_condition = "ranged string array condition";
-	const auto ranged_string_array_condition_def =
-		make_keyword(symbols::rf::ranged_string_array_condition_properties)
-		> common::comparison_operator_expression
-		> -common::integer_literal
-		> sequence;
-	BOOST_SPIRIT_DEFINE(ranged_string_array_condition)
-
-	const has_influence_condition_type has_influence_condition = "has influence condition";
-	const auto has_influence_condition_def =
-		make_keyword(lang::keywords::rf::has_influence)
-		> common::exact_matching_policy_expression
-		> sequence;
-	BOOST_SPIRIT_DEFINE(has_influence_condition)
-
-	const socket_spec_condition_type socket_spec_condition = "socket spec condition";
-	const auto socket_spec_condition_def =
-		make_keyword(symbols::rf::socket_spec_condition_properties)
-		> common::comparison_operator_expression
-		> sequence;
-	BOOST_SPIRIT_DEFINE(socket_spec_condition)
-
-	const boolean_condition_type boolean_condition = "boolean condition";
-	const auto boolean_condition_def =
-		make_keyword(symbols::rf::boolean_condition_properties)
-		> sequence;
-	BOOST_SPIRIT_DEFINE(boolean_condition)
+	BOOST_SPIRIT_DEFINE(official_condition)
 
 	const condition_type condition = "condition";
 	const auto condition_def =
 		  autogen_condition
 		| price_comparison_condition
-		| rarity_comparison_condition
-		| numeric_comparison_condition
-		| string_array_condition
-		| ranged_string_array_condition
-		| has_influence_condition
-		| socket_spec_condition
-		| boolean_condition;
+		| official_condition;
 	BOOST_SPIRIT_DEFINE(condition)
 
 	// ---- actions ----
@@ -367,7 +440,7 @@ namespace sf
 	BOOST_SPIRIT_DEFINE(behavior_statement)
 
 	const unknown_statement_type unknown_statement = "unknown/invalid statement";
-	const auto unknown_statement_def = common::identifier > common::comparison_operator_expression > sequence;
+	const auto unknown_statement_def = common::identifier > common::comparison_expression > sequence;
 	BOOST_SPIRIT_DEFINE(unknown_statement)
 
 	// moved here due to circular dependency
@@ -388,155 +461,5 @@ namespace sf
 	BOOST_SPIRIT_DEFINE(grammar)
 
 } // namespace sf
-
-namespace rf
-{
-	using common::make_keyword;
-
-	// ---- literal types ----
-
-	const color_literal_type color_literal = "color literal";
-	const auto color_literal_def =
-		  common::integer_literal
-		> common::integer_literal
-		> common::integer_literal
-		> -common::integer_literal;
-	BOOST_SPIRIT_DEFINE(color_literal)
-
-	const string_type string = "string";
-	const auto string_def = common::string_literal | common::identifier;
-	BOOST_SPIRIT_DEFINE(string)
-
-	const string_array_type string_array = "1 or more strings";
-	const auto string_array_def = x3::skip(common::non_eol_whitespace)[+string];
-	BOOST_SPIRIT_DEFINE(string_array)
-
-	const influence_literal_array_type influence_literal_array = "1 or more influence literals";
-	const auto influence_literal_array_def = +common::influence_literal;
-	BOOST_SPIRIT_DEFINE(influence_literal_array)
-
-	const influence_spec_type influence_spec = "influence spec";
-	const auto influence_spec_def = common::none_literal | influence_literal_array;
-	BOOST_SPIRIT_DEFINE(influence_spec)
-
-	// ---- expressions ----
-
-	const literal_sequence_type literal_sequence = "literal sequence";
-	const auto literal_sequence_def = x3::skip(common::non_eol_whitespace)[+common::literal_expression];
-	BOOST_SPIRIT_DEFINE(literal_sequence)
-
-	// ---- conditions ----
-
-	const rarity_condition_type rarity_condition = "rarity condition";
-	const auto rarity_condition_def = make_keyword(lang::keywords::rf::rarity) > common::comparison_operator_expression > common::rarity_literal;
-	BOOST_SPIRIT_DEFINE(rarity_condition)
-
-	const numeric_condition_type numeric_condition = "numeric condition";
-	const auto numeric_condition_def =
-		make_keyword(symbols::rf::numeric_comparison_condition_properties) > common::comparison_operator_expression > common::integer_literal;
-	BOOST_SPIRIT_DEFINE(numeric_condition)
-
-	const string_array_condition_type string_array_condition = "string array condition";
-	const auto string_array_condition_def =
-		make_keyword(symbols::rf::string_array_condition_properties) > common::exact_matching_policy_expression > string_array;
-	BOOST_SPIRIT_DEFINE(string_array_condition)
-
-	const ranged_string_array_condition_type ranged_string_array_condition = "ranged string array condition";
-	const auto ranged_string_array_condition_def =
-		make_keyword(symbols::rf::ranged_string_array_condition_properties)
-		> common::comparison_operator_expression
-		> -common::integer_literal
-		> string_array;
-	BOOST_SPIRIT_DEFINE(ranged_string_array_condition)
-
-	const has_influence_condition_type has_influence_condition = "has influence condition";
-	const auto has_influence_condition_def =
-		make_keyword(lang::keywords::rf::has_influence) > common::exact_matching_policy_expression > influence_spec;
-	BOOST_SPIRIT_DEFINE(has_influence_condition)
-
-	const socket_spec_condition_type socket_spec_condition = "socket spec condition";
-	const auto socket_spec_condition_def =
-		make_keyword(symbols::rf::socket_spec_condition_properties)
-		> common::comparison_operator_expression
-		> literal_sequence;
-	BOOST_SPIRIT_DEFINE(socket_spec_condition)
-
-	const boolean_condition_type boolean_condition = "boolean condition";
-	const auto boolean_condition_def = make_keyword(symbols::rf::boolean_condition_properties) > common::boolean_literal;
-	BOOST_SPIRIT_DEFINE(boolean_condition)
-
-	const condition_type condition = "condition";
-	const auto condition_def =
-		rarity_condition
-		| numeric_condition
-		| string_array_condition
-		| ranged_string_array_condition
-		| has_influence_condition
-		| socket_spec_condition
-		| boolean_condition;
-	BOOST_SPIRIT_DEFINE(condition)
-
-	// ---- actions ----
-
-	const color_action_type color_action = "color action";
-	const auto color_action_def = make_keyword(symbols::rf::color_actions) > color_literal;
-	BOOST_SPIRIT_DEFINE(color_action)
-
-	const set_font_size_action_type set_font_size_action = "font size action";
-	const auto set_font_size_action_def = make_keyword(lang::keywords::rf::set_font_size) > common::integer_literal;
-	BOOST_SPIRIT_DEFINE(set_font_size_action)
-
-	const play_alert_sound_action_type play_alert_sound_action = "play alert sound action";
-	const auto play_alert_sound_action_def =
-		make_keyword(symbols::rf::play_alert_sound_actions)
-		> common::literal_expression
-		> -common::integer_literal; // volume (optional token)
-	BOOST_SPIRIT_DEFINE(play_alert_sound_action)
-
-	const custom_alert_sound_action_type custom_alert_sound_action = "custom alert sound action";
-	const auto custom_alert_sound_action_def =
-		(
-			(make_keyword(lang::keywords::rf::custom_alert_sound_optional) > x3::attr(true))
-			| (make_keyword(lang::keywords::rf::custom_alert_sound) > x3::attr(false))
-		)
-		> common::string_literal
-		> -common::integer_literal; // volume (optional token)
-	BOOST_SPIRIT_DEFINE(custom_alert_sound_action)
-
-	// switch_drop_sound_action in common
-
-	const minimap_icon_action_type minimap_icon_action = "minimap icon action";
-	const auto minimap_icon_action_def = make_keyword(lang::keywords::rf::minimap_icon) > literal_sequence;
-	BOOST_SPIRIT_DEFINE(minimap_icon_action)
-
-	const play_effect_action_type play_effect_action = "play effct action";
-	const auto play_effect_action_def = make_keyword(lang::keywords::rf::play_effect) > literal_sequence;
-	BOOST_SPIRIT_DEFINE(play_effect_action)
-
-	const action_type action = "action";
-	const auto action_def =
-		color_action
-		| set_font_size_action
-		| play_alert_sound_action
-		| custom_alert_sound_action
-		| common::switch_drop_sound_action
-		| minimap_icon_action
-		| play_effect_action;
-	BOOST_SPIRIT_DEFINE(action)
-
-	// ---- filter structure ----
-
-	const rule_type rule = "rule";
-	const auto rule_def = condition | action | common::continue_statement;
-	BOOST_SPIRIT_DEFINE(rule)
-
-	const filter_block_type filter_block = "filter block";
-	const auto filter_block_def = common::static_visibility_statement > *rule;
-	BOOST_SPIRIT_DEFINE(filter_block)
-
-	const grammar_type grammar = "code";
-	const auto grammar_def = *filter_block > x3::eoi;
-	BOOST_SPIRIT_DEFINE(grammar)
-} // namespace rf
 
 } // namespace fs::parser::detail

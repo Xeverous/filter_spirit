@@ -50,6 +50,11 @@ struct annotate_on_success
 	{
 		position_cache_type& positions = x3::get<position_cache_tag>(context).get();
 		positions.annotate(ast, first, last);
+
+		// uncomment for parser debug
+		// std::cout << "parsed: " << boost::typeindex::type_id<T>().pretty_name() << "\n";
+		// std::cout << "length: " << last - first << "\n";
+		// std::cout << "text  : " << utility::make_string_view(first, last) << "\n";
 	}
 };
 
@@ -90,8 +95,8 @@ namespace common
 	struct none_literal_class                    : error_on_error, annotate_on_success {};
 
 	struct literal_expression_class              : error_on_error, annotate_on_success {};
-	struct comparison_operator_expression_class  : error_on_error, annotate_on_success {};
-	struct exact_matching_policy_expression_class: error_on_error, annotate_on_success {};
+	struct comparison_operator_class             : error_on_error, annotate_on_success {};
+	struct comparison_expression_class           : error_on_error, annotate_on_success {};
 	struct unknown_expression_class              : error_on_error, annotate_on_success {};
 
 	struct switch_drop_sound_action_class        : error_on_error, annotate_on_success {};
@@ -99,6 +104,44 @@ namespace common
 	struct static_visibility_statement_class     : error_on_error, annotate_on_success {};
 	struct continue_statement_class              : error_on_error, annotate_on_success {};
 }
+
+namespace rf
+{
+	// ---- literal types ----
+
+	struct color_literal_class                   : error_on_error, annotate_on_success {};
+	struct string_class                          : error_on_error, annotate_on_success {};
+	struct icon_literal_class                    : error_on_error, annotate_on_success {};
+	struct string_array_class                    : error_on_error, annotate_on_success {};
+	struct influence_literal_array_class         : error_on_error, annotate_on_success {};
+	struct influence_spec_class                  : error_on_error, annotate_on_success {};
+
+	// ---- expression ----
+
+	struct literal_sequence_class                : error_on_error, annotate_on_success {};
+
+	// ---- conditions ----
+
+	struct condition_class                       : error_on_error, annotate_on_success {};
+
+	// ---- actions ----
+
+	struct color_action_class                    : error_on_error, annotate_on_success {};
+	struct set_font_size_action_class            : error_on_error, annotate_on_success {};
+	struct play_alert_sound_action_class         : error_on_error, annotate_on_success {};
+	struct custom_alert_sound_action_class       : error_on_error, annotate_on_success {};
+	// switch_drop_sound_action_class in common
+	struct minimap_icon_action_class             : error_on_error, annotate_on_success {};
+	struct play_effect_action_class              : error_on_error, annotate_on_success {};
+	struct action_class                          : error_on_error, annotate_on_success {};
+
+	// ---- filter structure ----
+
+	struct rule_class                            : error_on_error, annotate_on_success {};
+	struct static_visibility_statement_class     : error_on_error, annotate_on_success {};
+	struct filter_block_class                    : error_on_error, annotate_on_success {};
+	struct grammar_class                         : error_on_error, annotate_on_success {};
+} // namespace rf
 
 namespace sf
 {
@@ -130,13 +173,7 @@ namespace sf
 
 	struct autogen_condition_class               : error_on_error, annotate_on_success {};
 	struct price_comparison_condition_class      : error_on_error, annotate_on_success {};
-	struct rarity_comparison_condition_class     : error_on_error, annotate_on_success {};
-	struct numeric_comparison_condition_class    : error_on_error, annotate_on_success {};
-	struct string_array_condition_class          : error_on_error, annotate_on_success {};
-	struct ranged_string_array_condition_class   : error_on_error, annotate_on_success {};
-	struct has_influence_condition_class         : error_on_error, annotate_on_success {};
-	struct socket_spec_condition_class           : error_on_error, annotate_on_success {};
-	struct boolean_condition_class               : error_on_error, annotate_on_success {};
+	struct official_condition_class              : error_on_error, annotate_on_success {};
 	struct condition_class                       : error_on_error, annotate_on_success {};
 
 	// ---- actions ----
@@ -165,51 +202,6 @@ namespace sf
 
 	struct grammar_class                         : error_on_error, annotate_on_success {};
 } // namespace sf
-
-namespace rf
-{
-	// ---- literal types ----
-
-	struct color_literal_class                   : error_on_error, annotate_on_success {};
-	struct string_class                          : error_on_error, annotate_on_success {};
-	struct icon_literal_class                    : error_on_error, annotate_on_success {};
-	struct string_array_class                    : error_on_error, annotate_on_success {};
-	struct influence_literal_array_class         : error_on_error, annotate_on_success {};
-	struct influence_spec_class                  : error_on_error, annotate_on_success {};
-
-	// ---- expression ----
-
-	struct literal_sequence_class                : error_on_error, annotate_on_success {};
-
-	// ---- conditions ----
-
-	struct rarity_condition_class                : error_on_error, annotate_on_success {};
-	struct numeric_condition_class               : error_on_error, annotate_on_success {};
-	struct string_array_condition_class          : error_on_error, annotate_on_success {};
-	struct ranged_string_array_condition_class   : error_on_error, annotate_on_success {};
-	struct has_influence_condition_class         : error_on_error, annotate_on_success {};
-	struct socket_spec_condition_class           : error_on_error, annotate_on_success {};
-	struct boolean_condition_class               : error_on_error, annotate_on_success {};
-
-	// ---- actions ----
-
-	struct color_action_class                    : error_on_error, annotate_on_success {};
-	struct set_font_size_action_class            : error_on_error, annotate_on_success {};
-	struct play_alert_sound_action_class         : error_on_error, annotate_on_success {};
-	struct custom_alert_sound_action_class       : error_on_error, annotate_on_success {};
-	// switch_drop_sound_action_class in common
-	struct minimap_icon_action_class             : error_on_error, annotate_on_success {};
-	struct play_effect_action_class              : error_on_error, annotate_on_success {};
-
-	// ---- filter structure ----
-
-	struct condition_class                       : error_on_error, annotate_on_success {};
-	struct action_class                          : error_on_error, annotate_on_success {};
-	struct rule_class                            : error_on_error, annotate_on_success {};
-	struct static_visibility_statement_class     : error_on_error, annotate_on_success {};
-	struct filter_block_class                    : error_on_error, annotate_on_success {};
-	struct grammar_class                         : error_on_error, annotate_on_success {};
-} // namespace rf
 
 namespace common
 {
@@ -282,11 +274,11 @@ namespace common
 	using literal_expression_type = x3::rule<literal_expression_class, ast::common::literal_expression>;
 	BOOST_SPIRIT_DECLARE(literal_expression_type)
 
-	using comparison_operator_expression_type = x3::rule<comparison_operator_expression_class, ast::common::comparison_operator_expression>;
-	BOOST_SPIRIT_DECLARE(comparison_operator_expression_type)
+	using comparison_operator_type = x3::rule<comparison_operator_class, ast::common::comparison_operator>;
+	BOOST_SPIRIT_DECLARE(comparison_operator_type)
 
-	using exact_matching_policy_expression_type = x3::rule<exact_matching_policy_expression_class, ast::common::exact_matching_policy>;
-	BOOST_SPIRIT_DECLARE(exact_matching_policy_expression_type)
+	using comparison_expression_type = x3::rule<comparison_expression_class, ast::common::comparison_expression>;
+	BOOST_SPIRIT_DECLARE(comparison_expression_type)
 
 	using unknown_expression_type = x3::rule<unknown_expression_class, ast::common::unknown_expression>;
 	BOOST_SPIRIT_DECLARE(unknown_expression_type)
@@ -304,6 +296,68 @@ namespace common
 	using continue_statement_type = x3::rule<continue_statement_class, ast::common::continue_statement>;
 	BOOST_SPIRIT_DECLARE(continue_statement_type)
 } // namespace common
+
+namespace rf
+{
+	// ---- literal types ----
+
+	using color_literal_type = x3::rule<color_literal_class, ast::rf::color_literal>;
+	BOOST_SPIRIT_DECLARE(color_literal_type)
+
+	using string_type = x3::rule<string_class, ast::rf::string>;
+	BOOST_SPIRIT_DECLARE(string_type)
+
+	using string_array_type = x3::rule<string_array_class, ast::rf::string_array>;
+	BOOST_SPIRIT_DECLARE(string_array_type)
+
+	using influence_literal_array_type = x3::rule<influence_literal_array_class, ast::rf::influence_literal_array>;
+	BOOST_SPIRIT_DECLARE(influence_literal_array_type)
+
+	using influence_spec_type = x3::rule<influence_spec_class, ast::rf::influence_spec>;
+	BOOST_SPIRIT_DECLARE(influence_spec_type)
+
+	// ---- expressions ----
+
+	using literal_sequence_type               = x3::rule<literal_sequence_class,            ast::rf::literal_sequence>;
+
+	// ---- conditions ----
+
+	using condition_type                      = x3::rule<condition_class,                   ast::rf::condition>;
+	BOOST_SPIRIT_DECLARE(condition_type)
+
+	// ---- actions ----
+
+	using color_action_type                          = x3::rule<color_action_class,                       ast::rf::color_action>;
+	using set_font_size_action_type                  = x3::rule<set_font_size_action_class,               ast::rf::set_font_size_action>;
+	using play_alert_sound_action_type               = x3::rule<play_alert_sound_action_class,            ast::rf::play_alert_sound_action>;
+	using custom_alert_sound_action_type             = x3::rule<custom_alert_sound_action_class,          ast::rf::custom_alert_sound_action>;
+	// switch_drop_sound_action_type in common
+	using minimap_icon_action_type                   = x3::rule<minimap_icon_action_class,                ast::rf::minimap_icon_action>;
+	using play_effect_action_type                    = x3::rule<play_effect_action_class,                 ast::rf::play_effect_action>;
+	using action_type                                = x3::rule<action_class,                             ast::rf::action>;
+	BOOST_SPIRIT_DECLARE(
+		color_action_type,
+		set_font_size_action_type,
+		play_alert_sound_action_type,
+		custom_alert_sound_action_type,
+		minimap_icon_action_type,
+		play_effect_action_type,
+		action_type
+	)
+
+	// ---- filter structure ----
+
+	using rule_type                           = x3::rule<rule_class,                        ast::rf::rule>;
+	using static_visibility_statement_type    = x3::rule<static_visibility_statement_class, ast::rf::static_visibility_statement>;
+	using filter_block_type                   = x3::rule<filter_block_class,                ast::rf::filter_block>;
+	using grammar_type                        = x3::rule<grammar_class,                     ast::rf::ast_type>;
+	BOOST_SPIRIT_DECLARE(
+		rule_type,
+		static_visibility_statement_type,
+		filter_block_type,
+		grammar_type
+	)
+} // namespace rf
 
 namespace sf
 {
@@ -350,26 +404,8 @@ namespace sf
 	using price_comparison_condition_type = x3::rule<price_comparison_condition_class, ast::sf::price_comparison_condition>;
 	BOOST_SPIRIT_DECLARE(price_comparison_condition_type)
 
-	using rarity_comparison_condition_type = x3::rule<rarity_comparison_condition_class, ast::sf::rarity_comparison_condition>;
-	BOOST_SPIRIT_DECLARE(rarity_comparison_condition_type)
-
-	using numeric_comparison_condition_type = x3::rule<numeric_comparison_condition_class, ast::sf::numeric_comparison_condition>;
-	BOOST_SPIRIT_DECLARE(numeric_comparison_condition_type)
-
-	using string_array_condition_type = x3::rule<string_array_condition_class, ast::sf::string_array_condition>;
-	BOOST_SPIRIT_DECLARE(string_array_condition_type)
-
-	using ranged_string_array_condition_type = x3::rule<ranged_string_array_condition_class, ast::sf::ranged_string_array_condition>;
-	BOOST_SPIRIT_DECLARE(ranged_string_array_condition_type)
-
-	using has_influence_condition_type = x3::rule<has_influence_condition_class, ast::sf::has_influence_condition>;
-	BOOST_SPIRIT_DECLARE(has_influence_condition_type)
-
-	using socket_spec_condition_type = x3::rule<socket_spec_condition_class, ast::sf::socket_spec_condition>;
-	BOOST_SPIRIT_DECLARE(socket_spec_condition_type)
-
-	using boolean_condition_type = x3::rule<boolean_condition_class, ast::sf::boolean_condition>;
-	BOOST_SPIRIT_DECLARE(boolean_condition_type)
+	using official_condition_type = x3::rule<official_condition_class, ast::sf::official_condition>;
+	BOOST_SPIRIT_DECLARE(official_condition_type)
 
 	using condition_type = x3::rule<condition_class, ast::sf::condition>;
 	BOOST_SPIRIT_DECLARE(condition_type)
@@ -436,87 +472,9 @@ namespace sf
 
 } // namespace sf
 
-namespace rf
-{
-	// ---- literal types ----
-
-	using color_literal_type = x3::rule<color_literal_class, ast::rf::color_literal>;
-	BOOST_SPIRIT_DECLARE(color_literal_type)
-
-	using string_type = x3::rule<string_class, ast::rf::string>;
-	BOOST_SPIRIT_DECLARE(string_type)
-
-	using string_array_type = x3::rule<string_array_class, ast::rf::string_array>;
-	BOOST_SPIRIT_DECLARE(string_array_type)
-
-	using influence_literal_array_type = x3::rule<influence_literal_array_class, ast::rf::influence_literal_array>;
-	BOOST_SPIRIT_DECLARE(influence_literal_array_type)
-
-	using influence_spec_type = x3::rule<influence_spec_class, ast::rf::influence_spec>;
-	BOOST_SPIRIT_DECLARE(influence_spec_type)
-
-	// ---- expressions ----
-
-	using literal_sequence_type               = x3::rule<literal_sequence_class,            ast::rf::literal_sequence>;
-
-	// ---- conditions ----
-
-	using rarity_condition_type               = x3::rule<rarity_condition_class,              ast::rf::rarity_condition>;
-	using numeric_condition_type              = x3::rule<numeric_condition_class,             ast::rf::numeric_condition>;
-	using string_array_condition_type         = x3::rule<string_array_condition_class,        ast::rf::string_array_condition>;
-	using ranged_string_array_condition_type  = x3::rule<ranged_string_array_condition_class, ast::rf::ranged_string_array_condition>;
-	using has_influence_condition_type        = x3::rule<has_influence_condition_class,       ast::rf::has_influence_condition>;
-	using socket_spec_condition_type          = x3::rule<socket_spec_condition_class,         ast::rf::socket_spec_condition>;
-	using boolean_condition_type              = x3::rule<boolean_condition_class,             ast::rf::boolean_condition>;
-	BOOST_SPIRIT_DECLARE(
-		rarity_condition_type,
-		numeric_condition_type,
-		string_array_condition_type,
-		ranged_string_array_condition_type,
-		has_influence_condition_type,
-		socket_spec_condition_type,
-		boolean_condition_type
-	)
-
-	// ---- actions ----
-
-	using color_action_type                          = x3::rule<color_action_class,                       ast::rf::color_action>;
-	using set_font_size_action_type                  = x3::rule<set_font_size_action_class,               ast::rf::set_font_size_action>;
-	using play_alert_sound_action_type               = x3::rule<play_alert_sound_action_class,            ast::rf::play_alert_sound_action>;
-	using custom_alert_sound_action_type             = x3::rule<custom_alert_sound_action_class,          ast::rf::custom_alert_sound_action>;
-	// switch_drop_sound_action_type in common
-	using minimap_icon_action_type                   = x3::rule<minimap_icon_action_class,                ast::rf::minimap_icon_action>;
-	using play_effect_action_type                    = x3::rule<play_effect_action_class,                 ast::rf::play_effect_action>;
-	BOOST_SPIRIT_DECLARE(
-		color_action_type,
-		set_font_size_action_type,
-		play_alert_sound_action_type,
-		custom_alert_sound_action_type,
-		minimap_icon_action_type,
-		play_effect_action_type
-	)
-
-	// ---- filter structure ----
-
-	using condition_type                      = x3::rule<condition_class,                   ast::rf::condition>;
-	using action_type                         = x3::rule<action_class,                      ast::rf::action>;
-	using rule_type                           = x3::rule<rule_class,                        ast::rf::rule>;
-	using static_visibility_statement_type    = x3::rule<static_visibility_statement_class, ast::rf::static_visibility_statement>;
-	using filter_block_type                   = x3::rule<filter_block_class,                ast::rf::filter_block>;
-	using grammar_type                        = x3::rule<grammar_class,                     ast::rf::ast_type>;
-	BOOST_SPIRIT_DECLARE(
-		condition_type,
-		action_type,
-		rule_type,
-		static_visibility_statement_type,
-		filter_block_type,
-		grammar_type
-	)
-} // namespace rf
-
-skipper_type sf_skipper();
 skipper_type rf_skipper();
-sf::grammar_type sf_grammar();
+skipper_type sf_skipper();
 rf::grammar_type rf_grammar();
+sf::grammar_type sf_grammar();
 
 } // namespace fs::parser::detail

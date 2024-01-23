@@ -219,7 +219,7 @@ rarity_type roll_non_unique_rarity(double rarity, std::mt19937& rng)
 }
 
 template <typename Iterator, typename RandomNumberGenerator>
-std::size_t roll_index_using_weights(Iterator weights_first, Iterator weights_last, RandomNumberGenerator& rng)
+int roll_index_using_weights(Iterator weights_first, Iterator weights_last, RandomNumberGenerator& rng)
 {
 	using weight_t = typename std::iterator_traits<Iterator>::value_type;
 	static_assert(std::is_integral_v<weight_t>);
@@ -233,7 +233,7 @@ std::size_t roll_index_using_weights(Iterator weights_first, Iterator weights_la
 	if (sums.back() == 0)
 		return 0;
 
-	std::size_t result = 0;
+	int result = 0;
 	const weight_t roll = std::uniform_int_distribution<weight_t>(static_cast<weight_t>(1), sums.back())(rng);
 	for (weight_t sub_sum : sums) {
 		if (roll <= sub_sum)
@@ -296,8 +296,8 @@ equipment_class_selection roll_equipment_class(const equippable_item_database& d
 		weights.fishing_rods
 	};
 
-	const std::size_t index = roll_index_using_weights(weights_array.begin(), weights_array.end(), rng);
-	return list.begin()[index];
+	const auto index = roll_index_using_weights(weights_array.begin(), weights_array.end(), rng);
+	return *(list.begin() + index);
 }
 
 std::optional<lang::influence_type> roll_influence(influence_weights weights, std::mt19937& rng)
@@ -307,7 +307,7 @@ std::optional<lang::influence_type> roll_influence(influence_weights weights, st
 		weights.crusader, weights.redeemer, weights.hunter, weights.warlord
 	};
 
-	const std::size_t index = roll_index_using_weights(weights_array.begin(), weights_array.end(), rng);
+	const auto index = roll_index_using_weights(weights_array.begin(), weights_array.end(), rng);
 
 	if (index == 0)
 		return std::nullopt;
@@ -378,13 +378,13 @@ int roll_sockets_amount(int max_base_sockets, int item_level, std::mt19937& rng)
 
 	if (max_base_sockets == 4) {
 		const std::array<int, 4> weights = { 100, 90, 80, 30 };
-		std::size_t idx = roll_index_using_weights(weights.begin(), weights.begin() + max_actual, rng);
-		return static_cast<int>(idx) + 1; // add 1 to convert 0-based index into sockets which begin at 1
+		const auto idx = roll_index_using_weights(weights.begin(), weights.begin() + max_actual, rng);
+		return idx + 1; // add 1 to convert 0-based index into sockets which begin at 1
 	}
 	else {
 		const std::array<int, 6> weights = { 50, 120, 100, 30, 5, 1 };
-		std::size_t idx = roll_index_using_weights(weights.begin(), weights.begin() + max_actual, rng);
-		return static_cast<int>(idx) + 1; // add 1 to convert 0-based index into sockets which begin at 1
+		const auto idx = roll_index_using_weights(weights.begin(), weights.begin() + max_actual, rng);
+		return idx + 1; // add 1 to convert 0-based index into sockets which begin at 1
 	}
 }
 
@@ -406,7 +406,7 @@ socket_color roll_socket_color(int req_str, int req_dex, int req_int, std::mt199
 	 */
 	constexpr int c = 14;
 	const std::array<int, 3> weights = { req_str + c, req_dex + c, req_int + c };
-	const int roll = roll_index_using_weights(weights.begin(), weights.end(), rng);
+	const auto roll = roll_index_using_weights(weights.begin(), weights.end(), rng);
 
 	if (roll == 0)
 		return socket_color::r;
@@ -431,7 +431,7 @@ socket_info roll_links_and_colors(int sockets, int req_str, int req_dex, int req
 
 	while (sockets > 0) {
 		const auto idx = roll_index_using_weights(weights.begin(), weights.begin() + sockets, rng);
-		const auto linked_together = static_cast<int>(idx) + 1;
+		const auto linked_together = idx + 1;
 		sockets -= linked_together;
 
 		linked_sockets ls;
@@ -473,7 +473,7 @@ std::vector<std::string> roll_explicit_mods_impl(int num_mods)
 {
 	// not very realistic but correctly generating rare item mods can be a separate project on its own...
 	std::vector<std::string> result;
-	result.reserve(num_mods);
+	result.reserve(static_cast<std::size_t>(num_mods));
 
 	for (int i = 0; i < num_mods; ++i)
 		result.push_back("explicit item mod #" + std::to_string(i + 1));
@@ -494,7 +494,7 @@ std::vector<std::string> roll_explicit_mods_rare_6(std::mt19937& rng)
 {
 	// well known data that chances for 4/5/6 mods are: 8/12, 3/12, and 1/12
 	const std::array<int, 3> weights = { 8, 3, 1 };
-	const std::size_t roll = roll_index_using_weights(weights.begin(), weights.end(), rng);
+	const auto roll = roll_index_using_weights(weights.begin(), weights.end(), rng);
 	return roll_explicit_mods_impl(roll + 4);
 }
 
@@ -593,7 +593,7 @@ item equippable_item_to_item(
 
 void corrupt_gem(item& itm, std::mt19937& rng)
 {
-	itm.is_corrupted = true;
+	itm.corruption_status = corruption_status_t::corrupted;
 	// see generator::generate_gems why it supports only 3 of 4 corruption variants
 	const int roll = roll_in_range({0, 2}, rng);
 
@@ -629,7 +629,7 @@ void identify_unique_piece(item& itm, const unique_piece& piece)
 
 void corrupt_unique_piece(item& itm, const unique_piece& piece)
 {
-	itm.is_corrupted = true;
+	itm.corruption_status = corruption_status_t::corrupted;
 	identify_unique_piece(itm, piece);
 }
 
@@ -652,7 +652,7 @@ void corrupt_equippable_item(
 	if (!itm.is_identified)
 		identify_equippable_item(itm, suffix_name_pool, rng);
 
-	itm.is_corrupted = true;
+	itm.corruption_status = corruption_status_t::corrupted;
 
 	/*
 	 * Corruption implementation assumptions:
@@ -672,8 +672,8 @@ void corrupt_equippable_item(
 		if (itm.sockets.sockets() == 0)
 			return; // do nothing, no sockets to change to white
 
-		boost::container::static_vector<int, 6> socket_indexes;
-		for (int i = 0; i < itm.sockets.sockets(); ++i) {
+		boost::container::static_vector<std::size_t, 6> socket_indexes;
+		for (std::size_t i = 0; i < static_cast<std::size_t>(itm.sockets.sockets()); ++i) {
 			const socket_color color = itm.sockets[i];
 			FS_ASSERT_MSG(color != socket_color::d, "equipment should never have delve sockets");
 
@@ -770,7 +770,7 @@ void generate_gem(
 	itm.gem_level = roll_gem_level(level, gm->max_level, rng);
 	itm.quality = roll_quality(quality, rng);
 	if (is_vaal_gem) // vaal gems are always corrupted
-		itm.is_corrupted = true;
+		itm.corruption_status = corruption_status_t::corrupted;
 
 	if (roll_percent(chance_to_corrupt, rng))
 		corrupt_gem(itm, rng);

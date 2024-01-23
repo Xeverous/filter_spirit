@@ -1,7 +1,7 @@
 #include "common/test_fixtures.hpp"
 #include "common/string_operations.hpp"
 
-#include <fs/generator/common.hpp>
+#include <fs/compiler/compiler.hpp>
 #include <fs/log/string_logger.hpp>
 #include <fs/lang/market/item_price_data.hpp>
 
@@ -20,8 +20,8 @@ std::string generate_filter(
 	const fs::lang::market::item_price_data& ipd = {})
 {
 	fs::log::string_logger logger;
-	std::optional<std::string> filter = fs::generator::parse_compile_generate_spirit_filter_no_preamble(
-		input, ipd, fs::generator::settings{}, logger);
+	std::optional<std::string> filter = fs::compiler::parse_compile_generate_spirit_filter_without_preamble(
+		input, ipd, fs::compiler::settings{}, logger);
 	BOOST_TEST_REQUIRE(filter.has_value(), "filter generation failed:\n" << logger.str());
 	return *filter;
 }
@@ -120,10 +120,10 @@ EnchantmentPassiveNum <= 9
 )");
 			const std::string_view expected_filter =
 R"(Show
-	Quality > 0
-	Width = 1
-	EnchantmentPassiveNum <= 9
 	BaseType "Vaal"
+	Quality > 0
+	Width 1
+	EnchantmentPassiveNum <= 9
 
 )";
 
@@ -167,6 +167,39 @@ Show
 Show
 	ItemLevel < 60
 	SetTextColor 3 3 3
+	Continue
+
+)";
+
+			BOOST_TEST(compare_strings(expected_filter, actual_filter));
+		}
+
+		BOOST_AUTO_TEST_CASE(range_condition_min_max)
+		{
+			const std::string actual_filter = generate_filter(minimal_input() + R"(
+ItemLevel >= 85 75 80 {
+	SetTextColor 1 1 1
+	Show
+	Continue
+}
+
+ItemLevel >= 65 60 70
+ItemLevel < 70 75 65 {
+	SetTextColor 2 2 2
+	Show
+	Continue
+}
+)");
+			const std::string_view expected_filter =
+R"(Show
+	ItemLevel >= 75
+	SetTextColor 1 1 1
+	Continue
+
+Show
+	ItemLevel >= 60
+	ItemLevel < 75
+	SetTextColor 2 2 2
 	Continue
 
 )";
@@ -260,10 +293,10 @@ SocketGroup >= 1 2 3R AA 3D 5GBW { Show }
 )");
 			const std::string_view expected_filter =
 R"(Show
-	Sockets = 1 2 3R AA 3D 5GBW
+	Sockets 1 2 3R AA 3D 5GBW
 
 Show
-	Sockets = 1 2 3R AA 3D 5GBW
+	Sockets 1 2 3R AA 3D 5GBW
 
 Show
 	Sockets == 1 2 3R AA 3D 5GBW
@@ -272,10 +305,10 @@ Show
 	Sockets >= 1 2 3R AA 3D 5GBW
 
 Show
-	SocketGroup = 1 2 3R AA 3D 5GBW
+	SocketGroup 1 2 3R AA 3D 5GBW
 
 Show
-	SocketGroup = 1 2 3R AA 3D 5GBW
+	SocketGroup 1 2 3R AA 3D 5GBW
 
 Show
 	SocketGroup == 1 2 3R AA 3D 5GBW
@@ -330,7 +363,7 @@ Rarity Rare {
 )");
 			const std::string_view expected_filter =
 R"(Show
-	Rarity = Rare
+	Rarity Rare
 	SetBorderColor 1 2 3
 	SetTextColor 1 2 3
 	SetFontSize 36
@@ -366,7 +399,7 @@ Show
 )");
 			const std::string_view expected_filter =
 R"(Show
-	Rarity = Rare
+	Rarity Rare
 	SetBorderColor 11 22 33
 	SetTextColor 1 2 3
 	SetFontSize 36
@@ -416,15 +449,15 @@ Show
 )");
 			const std::string_view expected_filter =
 R"(Show
-	Quality = 20
-	Rarity = Rare
+	Rarity Rare
+	Quality 20
 	SetBorderColor 1 2 3
 	SetTextColor 100 100 100
 	SetBackgroundColor 50 50 50
 	SetFontSize 42
 
 Show
-	Rarity = Rare
+	Rarity Rare
 	SetBorderColor 11 22 33
 	SetTextColor 11 22 33
 	SetFontSize 42
@@ -482,81 +515,81 @@ Rarity Rare {
 )");
 			const std::string_view expected_filter =
 R"(Show
-	Rarity = Normal
+	Rarity Normal
+	SocketGroup RGB
+	Width 2
 	Height <= 2
-	Width = 2
-	SocketGroup = RGB
 	SetBorderColor 175 255 200
 	SetTextColor 200 200 200
 
 Show
-	Rarity = Normal
+	Rarity Normal
+	SocketGroup RGB
+	Width 1
 	Height <= 4
-	Width = 1
-	SocketGroup = RGB
 	SetBorderColor 175 255 200
 	SetTextColor 200 200 200
 
 Show
-	Rarity = Normal
-	SocketGroup = RGB
+	Rarity Normal
+	SocketGroup RGB
 	SetBorderColor 128 128 192
 	SetTextColor 200 200 200
 
 Show
-	Rarity = Normal
+	Rarity Normal
 	SetTextColor 200 200 200
 
 Show
-	Rarity = Magic
+	Rarity Magic
+	SocketGroup RGB
+	Width 2
 	Height <= 2
-	Width = 2
-	SocketGroup = RGB
 	SetBorderColor 175 255 200
 	SetTextColor 136 136 255
 
 Show
-	Rarity = Magic
+	Rarity Magic
+	SocketGroup RGB
+	Width 1
 	Height <= 4
-	Width = 1
-	SocketGroup = RGB
 	SetBorderColor 175 255 200
 	SetTextColor 136 136 255
 
 Show
-	Rarity = Magic
-	SocketGroup = RGB
+	Rarity Magic
+	SocketGroup RGB
 	SetBorderColor 128 128 192
 	SetTextColor 136 136 255
 
 Show
-	Rarity = Magic
+	Rarity Magic
 	SetTextColor 136 136 255
 
 Show
-	Rarity = Rare
+	Rarity Rare
+	SocketGroup RGB
+	Width 2
 	Height <= 2
-	Width = 2
-	SocketGroup = RGB
 	SetBorderColor 175 255 200
 	SetTextColor 255 255 119
 
 Show
-	Rarity = Rare
+	Rarity Rare
+	SocketGroup RGB
+	Width 1
 	Height <= 4
-	Width = 1
-	SocketGroup = RGB
 	SetBorderColor 175 255 200
 	SetTextColor 255 255 119
 
 Show
-	Rarity = Rare
-	SocketGroup = RGB
+	Rarity Rare
+	SocketGroup RGB
 	SetBorderColor 128 128 192
 	SetTextColor 255 255 119
 
 Show
-	Rarity = Rare
+	Rarity Rare
 	SetTextColor 255 255 119
 
 )";
@@ -586,8 +619,8 @@ Show
 )");
 			const std::string_view expected_filter =
 R"(Show
-	Width > 1
 	BaseType "Vaal"
+	Width > 1
 	SetBorderColor 11 22 38
 	SetBackgroundColor 11 22 38
 	SetFontSize 38
@@ -627,9 +660,9 @@ Show
 )");
 			const std::string_view expected_filter =
 R"(Show
-	Quality > 0
 	Class "Boots"
 	BaseType "Dragonscale Boots" "Sorcerer Boots"
+	Quality > 0
 	SetBorderColor 255 255 255
 	SetBackgroundColor 0 0 0
 	PlayAlertSound 1
@@ -718,27 +751,27 @@ Rarity Rare {
 )");
 			const std::string_view expected_filter =
 R"(Show
-	Rarity = Normal
 	BaseType "Gavel" "Stone Hammer" "Rock Breaker"
+	Rarity Normal
 	SetTextColor 255 255 255
 	SetBackgroundColor 162 85 0
 
 Show
+	BaseType "Gavel" "Stone Hammer" "Rock Breaker"
+	Rarity Magic
 	Quality > 12
-	Rarity = Magic
-	BaseType "Gavel" "Stone Hammer" "Rock Breaker"
 	SetTextColor 255 255 255
 	SetBackgroundColor 162 85 0
 
 Show
+	BaseType "Gavel" "Stone Hammer" "Rock Breaker"
+	Rarity Rare
 	Quality > 16
-	Rarity = Rare
-	BaseType "Gavel" "Stone Hammer" "Rock Breaker"
 	SetTextColor 255 255 255
 	SetBackgroundColor 162 85 0
 
 Show
-	Rarity = Rare
+	Rarity Rare
 
 )";
 
@@ -776,7 +809,7 @@ Rarity Rare {
 )");
 			const std::string_view expected_filter =
 R"(Show
-	Rarity = Rare
+	Rarity Rare
 
 )";
 
@@ -847,21 +880,21 @@ Hide
 )");
 			const std::string_view expected_filter =
 R"(Hide
-	ItemLevel < 70
 	DropLevel >= 10
+	ItemLevel < 70
 	SetFontSize 35
 	Continue
 
 Show
-	ItemLevel >= 70
 	DropLevel >= 10
 	Rarity >= Rare
+	ItemLevel >= 70
 	SetFontSize 40
 	Continue
 
 Show
 	DropLevel >= 10
-	Sockets = 6
+	Sockets 6
 	SetFontSize 35
 	PlayEffect Blue
 	Continue
@@ -917,15 +950,15 @@ Hide
 )");
 			const std::string_view expected_filter =
 R"(Hide
-	ItemLevel < 70
 	DropLevel >= 10
+	ItemLevel < 70
 	MinimapIcon -1
 	PlayEffect None
 
 Show
-	ItemLevel >= 70
 	DropLevel >= 10
 	Rarity >= Rare
+	ItemLevel >= 70
 	SetFontSize 40
 	DisableDropSound
 	MinimapIcon 1 Green Raindrop
@@ -933,7 +966,7 @@ Show
 
 Show
 	DropLevel >= 10
-	Sockets = 6
+	Sockets 6
 	MinimapIcon -1
 	PlayEffect None
 	Continue
@@ -1125,132 +1158,132 @@ R"(Show
 	Continue
 
 Show
-	ItemLevel = 1
+	ItemLevel 1
 	PlayAlertSound 1 100
 	Continue
 
 Show
-	ItemLevel = 2
+	ItemLevel 2
 	PlayAlertSound 2
 	Continue
 
 Show
-	ItemLevel = 3
+	ItemLevel 3
 	PlayAlertSound ShGeneral 300
 	Continue
 
 Show
-	ItemLevel = 4
+	ItemLevel 4
 	PlayAlertSound ShGeneral
 	Continue
 
 Show
-	ItemLevel = 5
+	ItemLevel 5
 	PlayAlertSound None
 	Continue
 
 Show
-	ItemLevel = 6
+	ItemLevel 6
 	PlayAlertSound None
 	Continue
 
 Show
-	ItemLevel = 1
+	ItemLevel 1
 	PlayAlertSoundPositional 1 100
 	Continue
 
 Show
-	ItemLevel = 2
+	ItemLevel 2
 	PlayAlertSoundPositional 2
 	Continue
 
 Show
-	ItemLevel = 3
+	ItemLevel 3
 	PlayAlertSoundPositional ShGeneral 300
 	Continue
 
 Show
-	ItemLevel = 4
+	ItemLevel 4
 	PlayAlertSoundPositional ShGeneral
 	Continue
 
 Show
-	ItemLevel = 5
+	ItemLevel 5
 	PlayAlertSoundPositional None
 	Continue
 
 Show
-	ItemLevel = 6
+	ItemLevel 6
 	PlayAlertSoundPositional None
 	Continue
 
 Show
-	ItemLevel = 7
+	ItemLevel 7
 	CustomAlertSound ""
 	Continue
 
 Show
-	ItemLevel = 8
+	ItemLevel 8
 	CustomAlertSound ""
 	Continue
 
 Show
-	ItemLevel = 9
+	ItemLevel 9
 	CustomAlertSound "None"
 	Continue
 
 Show
-	ItemLevel = 10
+	ItemLevel 10
 	CustomAlertSound "None"
 	Continue
 
 Show
-	ItemLevel = 1
+	ItemLevel 1
 	PlayAlertSound 1 100
 	Continue
 
 Show
-	ItemLevel = 2
+	ItemLevel 2
 	PlayAlertSound 2
 	Continue
 
 Show
-	ItemLevel = 3
+	ItemLevel 3
 	PlayAlertSound ShGeneral 300
 	Continue
 
 Show
-	ItemLevel = 4
+	ItemLevel 4
 	PlayAlertSound ShGeneral
 	Continue
 
 Show
-	ItemLevel = 5
+	ItemLevel 5
 	PlayAlertSound None
 	Continue
 
 Show
-	ItemLevel = 6
+	ItemLevel 6
 	PlayAlertSound None
 	Continue
 
 Show
-	ItemLevel = 7
+	ItemLevel 7
 	CustomAlertSound ""
 	Continue
 
 Show
-	ItemLevel = 8
+	ItemLevel 8
 	CustomAlertSound ""
 	Continue
 
 Show
-	ItemLevel = 9
+	ItemLevel 9
 	CustomAlertSound "None"
 	Continue
 
 Show
-	ItemLevel = 10
+	ItemLevel 10
 	CustomAlertSound "None"
 	Continue
 
@@ -1319,9 +1352,9 @@ AlternateQuality True {
 )");
 			const std::string_view expected_filter =
 R"(Show
+	BaseType "Something"
 	Replica True
 	AlternateQuality True
-	BaseType "Something"
 
 )";
 
@@ -1426,13 +1459,13 @@ ArchnemesisMod "Toxic" "Hasted" { Hide }
 )");
 			const std::string_view expected_filter =
 R"(Show
-	HasSearingExarchImplicit = 5
+	HasSearingExarchImplicit 5
 
 Show
 	HasSearingExarchImplicit >= 4
 
 Show
-	HasEaterOfWorldsImplicit = 6
+	HasEaterOfWorldsImplicit 6
 
 Show
 	HasEaterOfWorldsImplicit > 4
@@ -1566,28 +1599,28 @@ Hide
 )");
 			const std::string_view expected_filter =
 R"(Hide
-	ItemLevel < 70
 	DropLevel >= 10
+	ItemLevel < 70
 	SetFontSize 35
 	EnableDropSound
 
 Show
-	ItemLevel >= 75
 	DropLevel >= 10
 	Rarity >= Rare
+	ItemLevel >= 75
 	SetFontSize 40
 	DisableDropSoundIfAlertSound
 
 Show
-	ItemLevel >= 70
 	DropLevel >= 10
 	Rarity >= Rare
+	ItemLevel >= 70
 	SetFontSize 40
 	DisableDropSound
 
 Show
 	DropLevel >= 10
-	Sockets = 6
+	Sockets 6
 	SetFontSize 35
 	PlayEffect Blue
 	Continue

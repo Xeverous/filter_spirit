@@ -5,7 +5,6 @@
 #include <fs/compiler/compiler.hpp>
 #include <fs/compiler/diagnostics.hpp>
 #include <fs/compiler/symbol_table.hpp>
-#include <fs/generator/make_item_filter.hpp>
 #include <fs/lang/position_tag.hpp>
 #include <fs/log/string_logger.hpp>
 #include <fs/utility/visitor.hpp>
@@ -73,7 +72,7 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 			const parser::parsed_spirit_filter& parse_data)
 		{
 			compiler::diagnostics_store diagnostics;
-			boost::optional<compiler::symbol_table> symbols = resolve_symbols(defs, diagnostics);
+			std::optional<compiler::symbol_table> symbols = resolve_symbols(defs, diagnostics);
 
 			if (diagnostics.has_errors()) {
 				log::string_logger logger;
@@ -92,7 +91,7 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 			const compiler::symbol_table& symbols)
 		{
 			compiler::diagnostics_store diagnostics;
-			boost::optional<lang::spirit_item_filter> spirit_filter =
+			std::optional<lang::spirit_item_filter> spirit_filter =
 				compiler::compile_spirit_filter_statements(compiler::settings{}, top_level_statements, symbols, diagnostics);
 
 			if (diagnostics.has_errors()) {
@@ -102,7 +101,7 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 			}
 
 			BOOST_TEST_REQUIRE(spirit_filter.has_value());
-			return generator::make_item_filter(*spirit_filter, /* empty item price data */ {});
+			return compiler::make_item_filter(*spirit_filter, /* empty item price data */ {});
 		}
 	};
 

@@ -4,11 +4,12 @@
 #include <fs/lang/position_tag.hpp>
 #include <fs/lang/keywords.hpp>
 
-#include <tuple>
-#include <string>
+#include <functional>
 #include <optional>
-#include <variant>
+#include <string>
 #include <string_view>
+#include <tuple>
+#include <variant>
 
 namespace fs::lang
 {
@@ -66,7 +67,13 @@ struct fractional
 	position_tag origin = {};
 };
 
-inline bool operator==(fractional lhs, fractional rhs) noexcept { return lhs.value == rhs.value; }
+// Comparing floating-points directly triggers -Wfloat-equal warning.
+// Since this program does not use any floating point computations,
+// and really wants to compare floats directly for test implementation,
+// silence it by using standard library which emits no warnings.
+// https://stackoverflow.com/questions/43604873
+inline bool compare_doubles(double lhs, double rhs) { return std::equal_to<double>{}(lhs, rhs); }
+inline bool operator==(fractional lhs, fractional rhs) noexcept { return compare_doubles(lhs.value, rhs.value); }
 inline bool operator!=(fractional lhs, fractional rhs) noexcept { return !(lhs == rhs); }
 
 struct socket_spec
@@ -110,6 +117,40 @@ struct influence
 
 inline bool operator==(influence lhs, influence rhs) noexcept { return lhs.value == rhs.value; }
 inline bool operator!=(influence lhs, influence rhs) noexcept { return !(lhs == rhs); }
+
+struct influence_spec
+{
+	constexpr bool is_none() const noexcept
+	{
+		return none && !(shaper || elder || crusader || redeemer || hunter || warlord);
+	}
+
+	// existence of origins imply value
+	std::optional<position_tag> shaper;
+	std::optional<position_tag> elder;
+	std::optional<position_tag> crusader;
+	std::optional<position_tag> redeemer;
+	std::optional<position_tag> hunter;
+	std::optional<position_tag> warlord;
+	std::optional<position_tag> none;
+};
+
+constexpr bool operator==(influence_spec lhs, influence_spec rhs) noexcept
+{
+	return
+		   lhs.shaper.has_value()   == rhs.shaper.has_value()
+		&& lhs.elder.has_value()    == rhs.elder.has_value()
+		&& lhs.crusader.has_value() == rhs.crusader.has_value()
+		&& lhs.redeemer.has_value() == rhs.redeemer.has_value()
+		&& lhs.hunter.has_value()   == rhs.hunter.has_value()
+		&& lhs.warlord.has_value()  == rhs.warlord.has_value()
+		&& lhs.none.has_value()     == rhs.none.has_value();
+}
+
+constexpr bool operator!=(influence_spec lhs, influence_spec rhs) noexcept
+{
+	return !(lhs == rhs);
+}
 
 enum class rarity_type { normal, magic, rare, unique };
 struct rarity

@@ -43,16 +43,19 @@ target_sources(filter_spirit
 		fs/compiler/compiler.cpp
 		fs/compiler/diagnostics.cpp
 		fs/compiler/detail/actions.cpp
+		fs/compiler/detail/actions.hpp
+		fs/compiler/detail/autogen.cpp
+		fs/compiler/detail/autogen.hpp
 		fs/compiler/detail/conditions.cpp
+		fs/compiler/detail/conditions.hpp
 		fs/compiler/detail/evaluate.cpp
-		fs/generator/common.cpp
-		fs/generator/generator.cpp
-		fs/generator/make_item_filter.cpp
+		fs/compiler/detail/evaluate.hpp
+		fs/compiler/detail/types.hpp
 		fs/lang/loot/item_database.cpp
 		fs/lang/loot/generator.cpp
 		fs/lang/market/item_price_data.cpp
 		fs/lang/action_set.cpp
-		fs/lang/condition_set.cpp
+		fs/lang/conditions.cpp
 		fs/lang/item_filter.cpp
 		fs/lang/object.cpp
 		fs/lang/data_source_type.cpp
@@ -72,23 +75,16 @@ target_sources(filter_spirit
 		fs/network/ggg/parse_data.cpp
 		fs/network/item_price_report.cpp
 	PUBLIC
-		fs/compiler/detail/actions.hpp
-		fs/compiler/detail/conditions.hpp
-		fs/compiler/detail/evaluate.hpp
 		fs/compiler/compiler.hpp
 		fs/compiler/diagnostics.hpp
 		fs/compiler/symbol_table.hpp
-		fs/generator/make_item_filter.hpp
-		fs/generator/common.hpp
-		fs/generator/generator.hpp
-		fs/generator/settings.hpp
 		fs/lang/loot/item_database.hpp
 		fs/lang/loot/generator.hpp
 		fs/lang/market/item_price_data.hpp
 		fs/lang/action_properties.hpp
 		fs/lang/action_set.hpp
 		fs/lang/condition_properties.hpp
-		fs/lang/condition_set.hpp
+		fs/lang/conditions.hpp
 		fs/lang/data_source_type.hpp
 		fs/lang/item.hpp
 		fs/lang/item.cpp
@@ -99,7 +95,7 @@ target_sources(filter_spirit
 		fs/lang/object.hpp
 		fs/lang/position_tag.hpp
 		fs/lang/primitive_types.hpp
-		fs/lang/queries.hpp
+		fs/lang/autogen_categories.hpp
 		fs/lang/influence_info.hpp
 		fs/log/string_logger.hpp
 		fs/log/buffer_logger.hpp
@@ -135,6 +131,7 @@ target_sources(filter_spirit
 		fs/utility/algorithm.hpp
 		fs/utility/better_enum.hpp
 		fs/utility/dump_json.hpp
+		fs/utility/exceptions.hpp
 		fs/utility/file.hpp
 		fs/utility/holds_alternative.hpp
 		fs/utility/type_traits.hpp
@@ -170,8 +167,19 @@ target_compile_features(filter_spirit
 # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=92145
 target_compile_options(filter_spirit
 	PRIVATE
-		$<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -Wpedantic -Wno-deprecated-copy -ffast-math>
-		$<$<CXX_COMPILER_ID:Clang>:-Wall -Wpedantic -ffast-math>
+		# GCC's -Wconvertion is too aggressive with no way to silence it
+		$<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -Wpedantic -Wno-deprecated-copy -ffast-math
+			-Wsuggest-attribute=noreturn -Wduplicated-branches -Wduplicated-cond -Wfloat-equal
+			-Wenum-conversion -Wsign-conversion -Wlogical-op -Wmissing-declarations
+			-Wmismatched-tags -Wextra-semi -Wsuggest-override -Wsuggest-final-types>
+		$<$<CXX_COMPILER_ID:Clang>:-Wall -Wextra -Wpedantic -Wdeprecated -Wdocumentation -ffast-math
+			-Wabstract-vbase-init -Wanon-enum-enum-conversion -Warray-bounds-pointer-arithmetic
+			-Wconversion -Wbad-function-cast -Wcast-qual -Wzero-as-null-pointer-constant
+			-Wconditional-uninitialized -Wextra-semi -Wextra-semi-stmt -Wfloat-equal
+			-Widiomatic-parentheses -Wimplicit-fallthrough -Wmissing-noreturn -Wmissing-variable-declarations
+			-Wnewline-eof -Wnon-virtual-dtor -Wsuggest-override -Wundefined-reinterpret-cast
+			-Wunneeded-internal-declaration -Wunreachable-code-aggressive -Wunsupported-dll-base-class-template>
+		# not tried, likely many disables missing
 		$<$<CXX_COMPILER_ID:MSVC>:/W4>
 )
 

@@ -13,11 +13,11 @@ namespace fs::parser::detail
 namespace common {
 	BOOST_SPIRIT_INSTANTIATE(skipper_type, iterator_type, x3::unused_type)
 }
-namespace sf {
+namespace rf {
 	BOOST_SPIRIT_INSTANTIATE(grammar_type, iterator_type, context_type)
 }
-namespace rf {
-	BOOST_SPIRIT_INSTANTIATE(rf::grammar_type, iterator_type, context_type)
+namespace sf {
+	BOOST_SPIRIT_INSTANTIATE(grammar_type, iterator_type, context_type)
 }
 /*
  * If you are getting error: 'undefined reference to bool fs::parser::parse_rule[...]'
@@ -35,24 +35,24 @@ namespace rf {
 // int y = iterator_type{};
 // int z = context_type{};
 
-skipper_type sf_skipper()
-{
-	return common::whitespace;
-}
-
 skipper_type rf_skipper()
 {
 	return common::whitespace;
 }
 
-sf::grammar_type sf_grammar()
+skipper_type sf_skipper()
 {
-	return sf::grammar;
+	return common::whitespace;
 }
 
 rf::grammar_type rf_grammar()
 {
 	return rf::grammar;
+}
+
+sf::grammar_type sf_grammar()
+{
+	return sf::grammar;
 }
 
 }

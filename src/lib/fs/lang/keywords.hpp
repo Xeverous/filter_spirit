@@ -71,6 +71,10 @@ namespace rf
 	constexpr auto has_crucible_passive_tree = "HasCruciblePassiveTree";
 	constexpr auto transfigured_gem = "TransfiguredGem";
 
+	// removed conditions
+	constexpr auto prophecy         = "Prophecy";
+	constexpr auto gem_quality_type = "GemQualityType";
+
 	constexpr auto r = 'R';
 	constexpr auto g = 'G';
 	constexpr auto b = 'B';

@@ -1,6 +1,6 @@
 #include "core.hpp"
 
-#include <fs/generator/common.hpp>
+#include <fs/compiler/compiler.hpp>
 #include <fs/network/item_price_report.hpp>
 #include <fs/network/ggg/download_data.hpp>
 #include <fs/network/ggg/parse_data.hpp>
@@ -19,7 +19,7 @@ bool generate_item_filter_impl(
 	const lang::market::item_price_report& report,
 	const std::filesystem::path& source_filepath,
 	const std::filesystem::path& output_filepath,
-	fs::generator::settings st,
+	fs::compiler::settings st,
 	log::logger& logger)
 {
 	std::optional<std::string> source_file_content = utility::load_file(source_filepath, logger);
@@ -27,7 +27,7 @@ bool generate_item_filter_impl(
 	if (!source_file_content)
 		return false;
 
-	std::optional<std::string> filter_content = generator::parse_compile_generate_spirit_filter(
+	std::optional<std::string> filter_content = compiler::parse_compile_generate_spirit_filter_with_preamble(
 		*source_file_content, report, st, logger);
 
 	if (!filter_content)
@@ -106,7 +106,7 @@ bool generate_item_filter(
 	const std::optional<lang::market::item_price_report>& report,
 	const boost::optional<std::string>& input_path,
 	const boost::optional<std::string>& output_path,
-	fs::generator::settings st,
+	fs::compiler::settings st,
 	fs::log::logger& logger)
 {
 	if (!report) {

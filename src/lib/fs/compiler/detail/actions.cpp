@@ -62,7 +62,7 @@ make_enabled_minimap_icon(
 	diagnostics_store& diagnostics)
 {
 	if (size.value != 0 && size.value != 1 && size.value != 2) {
-		diagnostics.push_error_invalid_integer_value(0, 2, size);
+		diagnostics.push_error_value_out_of_range(0, 2, size);
 		return boost::none;
 	}
 
@@ -75,8 +75,8 @@ make_minimap_icon(
 	const lang::object& obj,
 	diagnostics_store& diagnostics)
 {
-	FS_ASSERT(obj.values.size() >= 1u);
-	FS_ASSERT(obj.values.size() <= 3u);
+	if (!detail::check_object_size(obj, 1, 3, diagnostics))
+		return boost::none;
 
 	return detail::get_as<lang::integer>(obj.values[0], diagnostics)
 		.flat_map([&](lang::integer icon_size) -> boost::optional<lang::minimap_icon>
@@ -114,8 +114,8 @@ make_play_effect(
 	const lang::object& obj,
 	diagnostics_store& diagnostics)
 {
-	FS_ASSERT(obj.values.size() >= 1u);
-	FS_ASSERT(obj.values.size() <= 2u);
+	if (!detail::check_object_size(obj, 1, 2, diagnostics))
+		return boost::none;
 
 	diagnostics_store diagnostics_none;
 	auto none = detail::get_as<lang::none>(obj.values[0], diagnostics_none);
@@ -261,7 +261,7 @@ make_volume(
 
 // ---- spirit filter helpers ----
 
-[[nodiscard]] processing_status
+[[nodiscard]] bool
 spirit_filter_add_set_color_action_impl(
 	lang::color_action_type action_type,
 	lang::color_action action,
@@ -271,23 +271,23 @@ spirit_filter_add_set_color_action_impl(
 	switch (action_type) {
 		case lang::color_action_type::set_border_color: {
 			set.set_border_color = action;
-			return processing_status::ok;
+			return true;
 		}
 		case lang::color_action_type::set_text_color: {
 			set.set_text_color = action;
-			return processing_status::ok;
+			return true;
 		}
 		case lang::color_action_type::set_background_color: {
 			set.set_background_color = action;
-			return processing_status::ok;
+			return true;
 		}
 	}
 
 	diagnostics.push_error_internal_compiler_error(__func__, action.origin);
-	return processing_status::fatal_error;
+	return false;
 }
 
-[[nodiscard]] processing_status
+[[nodiscard]] bool
 spirit_filter_add_set_color_action(
 	settings st,
 	const ast::sf::set_color_action& action,
@@ -295,10 +295,10 @@ spirit_filter_add_set_color_action(
 	lang::action_set& set,
 	diagnostics_store& diagnostics)
 {
-	return detail::evaluate_sequence(st, action.seq, symbols, 3, 4, diagnostics)
+	return detail::evaluate_sequence(st, action.seq, symbols, diagnostics)
 		.flat_map([&](lang::object obj) -> boost::optional<lang::color> {
-			const auto num_values = obj.values.size();
-			FS_ASSERT(num_values == 3u || num_values == 4u);
+			if (!detail::check_object_size(obj, 3, 4, diagnostics))
+				return boost::none;
 
 			const auto r = detail::get_as<lang::integer>(obj.values[0], diagnostics);
 			const auto g = detail::get_as<lang::integer>(obj.values[1], diagnostics);
@@ -307,7 +307,7 @@ spirit_filter_add_set_color_action(
 			if (!r || !g || !b)
 				return boost::none;
 
-			if (num_values == 4u) {
+			if (obj.values.size() == 4u) {
 				return detail::get_as<lang::integer>(obj.values[3], diagnostics)
 					.flat_map([&](lang::integer a) {
 						return make_color(st, *r, *g, *b, a, diagnostics);
@@ -322,7 +322,7 @@ spirit_filter_add_set_color_action(
 			auto act = lang::color_action{color, parser::position_tag_of(action)};
 			return spirit_filter_add_set_color_action_impl(action.action_type, act, set, diagnostics);
 		})
-		.value_or(processing_status::non_fatal_error);
+		.value_or(false);
 }
 
 [[nodiscard]] bool
@@ -333,9 +333,11 @@ spirit_filter_add_set_font_size_action(
 	lang::action_set& set,
 	diagnostics_store& diagnostics)
 {
-	return detail::evaluate_sequence(st, action.seq, symbols, 1, 1, diagnostics)
-		.flat_map([&](lang::object obj) {
-			FS_ASSERT(obj.values.size() == 1u);
+	return detail::evaluate_sequence(st, action.seq, symbols, diagnostics)
+		.flat_map([&](lang::object obj) -> boost::optional<lang::integer> {
+			if (!detail::check_object_size(obj, 1, 1, diagnostics))
+				return boost::none;
+
 			return detail::get_as<lang::integer>(obj.values[0], diagnostics);
 		})
 		.map([&](lang::integer font_size) {
@@ -344,7 +346,7 @@ spirit_filter_add_set_font_size_action(
 			{
 				diagnostics.push_message(make_diagnostic_message(
 					make_warning_severity(st.error_handling),
-					dmid::font_size_outside_range,
+					dmid::value_out_of_range,
 					font_size.origin,
 					"font size outside allowed range (",
 					std::to_string(lang::limits::min_filter_font_size),
@@ -370,7 +372,7 @@ spirit_filter_add_minimap_icon_action(
 	lang::action_set& set,
 	diagnostics_store& diagnostics)
 {
-	return detail::evaluate_sequence(st, action.seq, symbols, 1, 3, diagnostics)
+	return detail::evaluate_sequence(st, action.seq, symbols, diagnostics)
 		.flat_map([&](lang::object obj) {
 			return make_minimap_icon(st, obj, diagnostics);
 		})
@@ -389,7 +391,7 @@ spirit_filter_add_play_effect_action(
 	lang::action_set& set,
 	diagnostics_store& diagnostics)
 {
-	return detail::evaluate_sequence(st, action.seq, symbols, 1, 2, diagnostics)
+	return detail::evaluate_sequence(st, action.seq, symbols, diagnostics)
 		.flat_map([&](lang::object obj) {
 			return make_play_effect(st, obj, diagnostics);
 		})
@@ -408,9 +410,11 @@ spirit_filter_add_play_alert_sound_action(
 	lang::action_set& set,
 	diagnostics_store& diagnostics)
 {
-	return detail::evaluate_sequence(st, action.seq, symbols, 1, 2, diagnostics)
+	return detail::evaluate_sequence(st, action.seq, symbols, diagnostics)
 		.flat_map([&](lang::object obj) -> boost::optional<lang::alert_sound> {
-			FS_ASSERT(obj.values.size() == 1u || obj.values.size() == 2u);
+			if (!detail::check_object_size(obj, 1, 2, diagnostics))
+				return boost::none;
+
 			auto bas = make_builtin_alert_sound(st, action.positional, obj.values[0], diagnostics);
 
 			boost::optional<lang::volume> vol = lang::volume{};
@@ -441,9 +445,11 @@ spirit_filter_add_custom_alert_sound_action(
 	lang::action_set& set,
 	diagnostics_store& diagnostics)
 {
-	return detail::evaluate_sequence(st, action.seq, symbols, 1, 2, diagnostics)
+	return detail::evaluate_sequence(st, action.seq, symbols, diagnostics)
 		.flat_map([&](lang::object obj) -> boost::optional<lang::alert_sound> {
-			FS_ASSERT(obj.values.size() == 1u || obj.values.size() == 2u);
+			if (!detail::check_object_size(obj, 1, 2, diagnostics))
+				return boost::none;
+
 			auto cas = make_custom_alert_sound(st, action.optional, obj.values[0], diagnostics);
 
 			boost::optional<lang::volume> vol = lang::volume{};
@@ -474,9 +480,10 @@ spirit_filter_add_set_alert_sound_action(
 	lang::action_set& set,
 	diagnostics_store& diagnostics)
 {
-	return detail::evaluate_sequence(st, action.seq, symbols, 1, 2, diagnostics)
+	return detail::evaluate_sequence(st, action.seq, symbols, diagnostics)
 		.flat_map([&](lang::object obj) -> boost::optional<lang::alert_sound> {
-			FS_ASSERT(obj.values.size() == 1u || obj.values.size() == 2u);
+			if (!detail::check_object_size(obj, 1, 2, diagnostics))
+				return boost::none;
 
 			// SetAlertSound always generates non-positional built-in sounds, hence the false
 			diagnostics_store diagnostics_builtin;
@@ -599,7 +606,7 @@ real_filter_add_minimap_icon_action(
 	std::optional<lang::minimap_icon_action>& target,
 	diagnostics_store& diagnostics)
 {
-	return detail::evaluate_literal_sequence(st, action.literals, 1, 3, diagnostics)
+	return detail::evaluate_literal_sequence(st, action.literals, diagnostics)
 		.flat_map([&](lang::object obj) {
 			return make_minimap_icon(st, obj, diagnostics);
 		})
@@ -619,7 +626,7 @@ real_filter_add_play_effect_action(
 	std::optional<lang::play_effect_action>& target,
 	diagnostics_store& diagnostics)
 {
-	return detail::evaluate_literal_sequence(st, action.literals, 1, 2, diagnostics)
+	return detail::evaluate_literal_sequence(st, action.literals, diagnostics)
 		.flat_map([&](lang::object obj) {
 			return make_play_effect(st, obj, diagnostics);
 		})
@@ -707,7 +714,7 @@ spirit_filter_add_action(
 {
 	return action.apply_visitor(x3::make_lambda_visitor<bool>(
 		[&](const ast::sf::set_color_action& a) {
-			return !is_error(spirit_filter_add_set_color_action(st, a, symbols, set, diagnostics));
+			return spirit_filter_add_set_color_action(st, a, symbols, set, diagnostics);
 		},
 		[&](const ast::sf::set_font_size_action& a) {
 			return spirit_filter_add_set_font_size_action(st, a, symbols, set, diagnostics);

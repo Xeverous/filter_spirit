@@ -17,6 +17,7 @@
 namespace fs::lang
 {
 
+// https://www.poewiki.net/wiki/Item_class
 namespace item_class_names {
 
 	// core
@@ -35,9 +36,9 @@ namespace item_class_names {
 	constexpr auto stacked_deck               = currency_stackable;
 	constexpr auto resonators                 = "Delve Stackable Socketable Currency";
 	constexpr auto divination_card            = "Divination Card";
-	constexpr auto incubator                  = "Incubator";
-	constexpr auto gems_active                = "Active Skill Gems";
-	constexpr auto gems_support               = "Support Skill Gems";
+	constexpr auto incubator                  = "Incubator"; // TODO why not plural?
+	constexpr auto gems_active                = "Skill Gems";
+	constexpr auto gems_support               = "Support Gems";
 	constexpr auto quest_items                = "Quest Items";
 	constexpr auto labyrinth_item             = "Labyrinth Item";
 	constexpr auto labyrinth_trinket          = "Labyrinth Trinket";
@@ -262,6 +263,7 @@ enum class item_validity
 	identified_without_name,
 	unidentified_with_name,
 	unidentified_with_explicit_mods,
+	synthesised_without_implicit,
 	normal_rarity_with_name,
 	nonnormal_rarity_without_name,
 	non_unique_replica,
@@ -311,7 +313,7 @@ struct linked_sockets
 
 	int count_of(socket_color color) const
 	{
-		return std::count(sockets.begin(), sockets.end(), color);
+		return static_cast<int>(std::count(sockets.begin(), sockets.end(), color));
 	}
 
 	int count_red()   const { return count_of(socket_color::r); }
@@ -332,7 +334,7 @@ struct socket_info
 		int result = 0;
 
 		for (const auto& group : groups)
-			result = std::max<int>(result, group.sockets.size());
+			result = std::max(result, static_cast<int>(group.sockets.size()));
 
 		return result;
 	}
@@ -341,7 +343,7 @@ struct socket_info
 	int sockets() const noexcept
 	{
 		return std::accumulate(groups.begin(), groups.end(), 0,
-			[](int sum, const linked_sockets& s){ return sum + s.sockets.size(); });
+			[](int sum, const linked_sockets& s){ return sum + static_cast<int>(s.sockets.size()); });
 	}
 
 	int count_of(socket_color c) const noexcept
@@ -428,6 +430,13 @@ void traverse_sockets(socket_info info, OnSocket on_socket, OnLink on_link)
 	}
 }
 
+enum class corruption_status_t { normal, corrupted, scourged };
+
+// none can mean non-blighted map but also not a map item
+enum class blight_map_status_t { none, blighted, uber_blighted };
+
+enum class exarch_or_eater_implicit_t { none = 0, lesser = 1, greater = 2, grand = 3, exceptional = 4, exquisite = 5, perfect = 6 };
+
 /**
  * @class describes properties of a dropped item
  */
@@ -481,6 +490,9 @@ struct item
 		if (!explicit_mods.empty() && is_identified == false)
 			return item_validity::unidentified_with_explicit_mods;
 
+		if (is_synthesised && !has_non_atlas_implicit_mod)
+			return item_validity::synthesised_without_implicit;
+
 		if (stack_size <= 0 || stack_size > max_stack_size)
 			return item_validity::invalid_stack_size;
 
@@ -494,6 +506,34 @@ struct item
 			return item_validity::non_unique_replica;
 
 		return item_validity::valid;
+	}
+
+	bool is_corrupted() const { return corruption_status != corruption_status_t::normal; }
+	bool is_scourged() const { return corruption_status == corruption_status_t::scourged; }
+
+	int linked_sockets() const { return sockets.links(); }
+
+	bool is_blighted_map() const { return blight_map_status != blight_map_status_t::none; }
+	bool is_uber_blighted_map() const { return blight_map_status == blight_map_status_t::uber_blighted; }
+
+	bool has_implicit_mod() const
+	{
+		return has_non_atlas_implicit_mod
+			|| exarch_implicit != exarch_or_eater_implicit_t::none
+			|| eater_implicit != exarch_or_eater_implicit_t::none;
+	}
+
+	int implicit_exarch_value() const { return static_cast<int>(exarch_implicit); }
+	int implicit_eater_value() const { return static_cast<int>(eater_implicit); }
+
+	bool is_shaper_item() const { return influence.shaper; }
+	bool is_elder_item() const { return influence.elder; }
+
+	bool has_enchantment() const
+	{
+		return enchantment_labyrinth.has_value()
+			|| enchantment_cluster_jewel.has_value()
+			|| !enchantments_other.empty();
 	}
 
 	/*
@@ -530,34 +570,61 @@ struct item
 	static constexpr auto sentinel_stack_size = 1;
 	static constexpr auto sentinel_gem_level  = 0;
 	static constexpr auto sentinel_map_tier   = 0;
+	static constexpr auto sentinel_base_defence_percentile = 100;
+	static constexpr auto sentinel_enchantment_passive_num = 0;
 
+	// common and fundamental
 	int item_level = sentinel_item_level;
 	int drop_level = sentinel_drop_level;
 	int quality = sentinel_quality;
-	rarity_type rarity_ = sentinel_rarity;
-	socket_info sockets = {};
-	std::vector<std::string> explicit_mods = {};
-	std::vector<std::string> enchantments_labyrinth = {};
-	std::vector<std::string> enchantments_passive_nodes = {};
-	std::vector<std::string> archnemesis_mods = {};
-	std::vector<std::string> annointments = {};
-	int corrupted_mods = 0;
 	int stack_size = sentinel_stack_size;
 	int max_stack_size = sentinel_stack_size; // filters do not support this property
+	rarity_type rarity_ = sentinel_rarity;
+	socket_info sockets = {};
+
+	// defence
+	int base_armour = 0;
+	int base_evasion = 0;
+	int base_energy_shield = 0;
+	int base_ward = 0;
+	int base_defence_percentile = sentinel_base_defence_percentile;
+
+	// mods - implicit
+	corruption_status_t corruption_status = corruption_status_t::normal;
+	int corrupted_mods = 0;
+	bool has_non_atlas_implicit_mod = false;
+	exarch_or_eater_implicit_t exarch_implicit = exarch_or_eater_implicit_t::none;
+	exarch_or_eater_implicit_t eater_implicit = exarch_or_eater_implicit_t::none;
+	// mods - explicit
+	std::vector<std::string> explicit_mods = {};
+	// mods - other
+	std::optional<std::string> archnemesis_mod;
+	influence_info influence = {};
+
+	// enchants
+	std::optional<std::string> enchantment_labyrinth;
+	std::optional<std::string> enchantment_cluster_jewel = {}; // only the effect, e.g. "Damage over Time"
+	std::vector<std::string> enchantments_other = {}; // Annointments and Flask Enchants
+	int enchantment_passive_num = sentinel_enchantment_passive_num;
+
+	// gem
 	int gem_level = sentinel_gem_level;
 	int max_gem_level = sentinel_gem_level; // filters do not support this property
+
+	// map
 	int map_tier = sentinel_map_tier;
+	blight_map_status_t blight_map_status = blight_map_status_t::none;
+
+	// boolean
 	bool is_identified = false;
-	bool is_corrupted = false;
 	bool is_mirrored = false;
-	bool is_fractured_item = false;
-	bool is_synthesised_item = false;
+	bool is_fractured = false;
+	bool is_synthesised = false;
 	bool is_shaped_map = false;
 	bool is_elder_map = false;
-	bool is_blighted_map = false;
 	bool is_replica = false;
-	bool is_alternate_quality = false;
-	influence_info influence = {};
+	bool has_crucible_passive_tree = false;
+	bool is_transfigured_gem = false;
 
 	// A logic-irrelevant field. Only for the user.
 	std::string description;

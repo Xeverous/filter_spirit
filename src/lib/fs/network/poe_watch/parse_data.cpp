@@ -345,7 +345,7 @@ frame_type parse_item_frame(const nlohmann::json& json)
 	if (!json.is_number())
 		return frame_type::unknown;
 
-	const auto val = json.get<int>();
+	const auto val = json.get<std::size_t>();
 	const auto maybe_enum = frame_type::_from_index_nothrow(val);
 
 	if (maybe_enum)

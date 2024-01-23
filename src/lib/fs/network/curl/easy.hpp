@@ -6,6 +6,7 @@
 #include <curl/curl.h>
 
 #include <cstring>
+#include <utility>
 #include <optional>
 #include <system_error>
 
@@ -15,16 +16,35 @@ namespace fs::network::curl
 class string
 {
 public:
-	string(char* str)
+	string(char* str = nullptr)
 	: _str(str)
 	{
-		FS_ASSERT(_str != nullptr);
-		_len = std::strlen(_str);
+		if (_str)
+			_len = std::strlen(_str);
 	}
 
 	~string()
 	{
 		curl_free(_str);
+	}
+
+	string(const string& other) = delete;
+	string(string&& other) noexcept
+	{
+		swap(*this, other);
+	}
+
+	string& operator=(const string& other) = delete;
+	string& operator=(string&& other) noexcept
+	{
+		swap(*this, other);
+		return *this;
+	}
+
+	friend void swap(string& lhs, string& rhs) noexcept
+	{
+		std::swap(lhs._str, rhs._str);
+		std::swap(lhs._len, rhs._len);
 	}
 
 	const char* c_str() const noexcept
@@ -43,8 +63,8 @@ public:
 	}
 
 private:
-	char* _str;
-	std::size_t _len;
+	char* _str = nullptr;
+	std::size_t _len = 0;
 };
 
 using write_callback_fn = auto (char*, size_t, size_t, void*) -> size_t;
@@ -68,7 +88,7 @@ public:
 	std::optional<string> url_encode(std::string_view sv) const
 	{
 		// no idea why curl's URL escaping requires a handle
-		char* encoded = curl_easy_escape(_handle, sv.data(), sv.size());
+		char* encoded = curl_easy_escape(_handle, sv.data(), static_cast<int>(sv.size()));
 		if (encoded == nullptr) {
 			// throw std::runtime_error(std::string("url encoding of '").append(sv).append("' failed"));
 			return std::nullopt;

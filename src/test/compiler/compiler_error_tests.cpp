@@ -19,7 +19,6 @@
 #include <exception>
 
 namespace ut = boost::unit_test;
-namespace tt = boost::test_tools;
 
 namespace fs::test
 {
@@ -35,7 +34,7 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 	{
 		const parser::parsed_spirit_filter parse_data = parse(minimal_input());
 		diagnostics_store diagnostics;
-		const boost::optional<compiler::symbol_table> symbols =
+		const std::optional<compiler::symbol_table> symbols =
 			resolve_symbols(parse_data.ast.definitions, diagnostics);
 		BOOST_TEST_REQUIRE(!diagnostics.has_errors());
 		BOOST_TEST_REQUIRE(symbols.has_value());
@@ -68,11 +67,11 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 		{
 			compiler::settings st;
 			diagnostics_store diagnostics;
-			const boost::optional<compiler::symbol_table> symbols = resolve_symbols(st, fs.definitions, diagnostics);
+			const std::optional<compiler::symbol_table> symbols = resolve_symbols(st, fs.definitions, diagnostics);
 			BOOST_TEST(!diagnostics.has_warnings_or_errors());
 			BOOST_TEST_REQUIRE(symbols.has_value());
 			(void) compiler::compile_spirit_filter_statements(st, fs.statements, *symbols, diagnostics);
-			BOOST_TEST(diagnostics.has_errors());
+			BOOST_TEST(diagnostics.has_warnings_or_errors());
 			return diagnostics;
 		}
 	};
@@ -176,6 +175,25 @@ $xyz = $non_existent_obj
 			compare_diagnostics(patterns, diagnostics, parse_data.metadata);
 		}
 
+		BOOST_AUTO_TEST_CASE(unknown_expression)
+		{
+			const std::string input_str = minimal_input() + R"(
+$val = NoSuchKeyword
+)";
+			const std::string_view input = input_str;
+			const parser::parsed_spirit_filter parse_data = parse(input);
+			const diagnostics_store diagnostics = expect_error_when_resolving_symbols(parse_data.ast.definitions);
+
+			const std::string_view expected_error = search(input, "NoSuchKeyword").result();
+
+			std::vector<diagnostic_message_pattern> patterns = {
+				// currently socket_spec alternative takes priority over any possible unknown expression
+				diagnostic_message_pattern{dms::error, dmid::invalid_socket_spec, expected_error, {}}
+			};
+
+			compare_diagnostics(patterns, diagnostics, parse_data.metadata);
+		}
+
 		BOOST_AUTO_TEST_CASE(invalid_amount_of_arguments)
 		{
 			const std::string input_str = minimal_input() + R"(PlayAlertSound 11 22 33)";
@@ -204,7 +222,7 @@ $xyz = $non_existent_obj
 			const std::string_view expected_argument = search(input, "3").result();
 
 			std::vector<diagnostic_message_pattern> patterns = {
-				diagnostic_message_pattern{dms::error, dmid::invalid_integer_value, expected_argument, {
+				diagnostic_message_pattern{dms::error, dmid::value_out_of_range, expected_argument, {
 					"0 - 2", "got 3"
 				}}
 			};
@@ -241,7 +259,7 @@ $xyz = $non_existent_obj
 			const std::string_view expected_second = search(input, "Shaper").next().result();
 
 			std::vector<diagnostic_message_pattern> patterns = {
-				diagnostic_message_pattern{dms::error, dmid::duplicate_influence, expected_second, {}},
+				diagnostic_message_pattern{dms::warning, dmid::duplicate_influence, expected_second, {}},
 				diagnostic_message_pattern{dms::note, dmid::minor_note, expected_first, {}}
 			};
 
@@ -349,17 +367,17 @@ Class == "Skill Gems" {
 		BOOST_AUTO_TEST_CASE(condition_redefinition)
 		{
 			const std::string input_str = minimal_input() + R"(
-Class "Boots"
-BaseType "Dragonscale"
-Class "Gloves"
+Corrupted False
+Mirrored True
+Corrupted True
 {}
 )";
 			const std::string_view input = input_str;
 			const parser::parsed_spirit_filter parse_data = parse(input);
 			const diagnostics_store diagnostics = expect_error_when_compiling(parse_data.ast);
 
-			const std::string_view expected_original = search(input, "Class \"Boots\"").result();
-			const std::string_view expected_redef = search(input, "Class \"Gloves\"").result();
+			const std::string_view expected_original = search(input, "Corrupted False").result();
+			const std::string_view expected_redef = search(input, "Corrupted True").result();
 
 			std::vector<diagnostic_message_pattern> patterns = {
 				diagnostic_message_pattern{dms::error, dmid::condition_redefinition, expected_redef, {}},
@@ -370,6 +388,50 @@ Class "Gloves"
 		}
 
 		BOOST_AUTO_TEST_CASE(lower_bound_redefinition)
+		{
+			const std::string input_str = minimal_input() + R"(
+Quality > 10
+Quality >= 5
+{}
+)";
+			const std::string_view input = input_str;
+			const parser::parsed_spirit_filter parse_data = parse(input);
+			const diagnostics_store diagnostics = expect_error_when_compiling(parse_data.ast);
+
+			const std::string_view expected_original = search(input, "Quality > 10").result();
+			const std::string_view expected_redef = search(input, "Quality >= 5").result();
+
+			std::vector<diagnostic_message_pattern> patterns = {
+				diagnostic_message_pattern{dms::error, dmid::lower_bound_redefinition, expected_redef, {}},
+				diagnostic_message_pattern{dms::note, dmid::minor_note, expected_original, {}}
+			};
+
+			compare_diagnostics(patterns, diagnostics, parse_data.metadata);
+		}
+
+		BOOST_AUTO_TEST_CASE(upper_bound_redefinition)
+		{
+			const std::string input_str = minimal_input() + R"(
+Quality < 10
+Quality <= 5
+{}
+)";
+			const std::string_view input = input_str;
+			const parser::parsed_spirit_filter parse_data = parse(input);
+			const diagnostics_store diagnostics = expect_error_when_compiling(parse_data.ast);
+
+			const std::string_view expected_original = search(input, "Quality < 10").result();
+			const std::string_view expected_redef = search(input, "Quality <= 5").result();
+
+			std::vector<diagnostic_message_pattern> patterns = {
+				diagnostic_message_pattern{dms::error, dmid::upper_bound_redefinition, expected_redef, {}},
+				diagnostic_message_pattern{dms::note, dmid::minor_note, expected_original, {}}
+			};
+
+			compare_diagnostics(patterns, diagnostics, parse_data.metadata);
+		}
+
+		BOOST_AUTO_TEST_CASE(condition_after_equality)
 		{
 			const std::string input_str = minimal_input() + R"(
 Quality = 10
@@ -384,8 +446,97 @@ Quality > 0
 			const std::string_view expected_redef = search(input, "Quality > 0").result();
 
 			std::vector<diagnostic_message_pattern> patterns = {
-				diagnostic_message_pattern{dms::error, dmid::lower_bound_redefinition, expected_redef, {}},
+				diagnostic_message_pattern{dms::error, dmid::condition_after_equality, expected_redef, {}},
 				diagnostic_message_pattern{dms::note, dmid::minor_note, expected_original, {}}
+			};
+
+			compare_diagnostics(patterns, diagnostics, parse_data.metadata);
+		}
+
+		BOOST_AUTO_TEST_CASE(dead_condition)
+		{
+			const std::string input_str = minimal_input() + R"(
+Prophecy ""
+GemQualityType ""
+AlternateQuality True
+ArchnemesisMod "Toxic"
+{}
+)";
+			const std::string_view input = input_str;
+			const parser::parsed_spirit_filter parse_data = parse(input);
+			const diagnostics_store diagnostics = expect_error_when_compiling(parse_data.ast);
+
+			const std::string_view expected_prop = search(input, "Prophecy").result();
+			const std::string_view expected_gem = search(input, "GemQualityType").result();
+			const std::string_view expected_quality = search(input, "AlternateQuality True").result();
+			const std::string_view expected_arch = search(input, "ArchnemesisMod \"Toxic\"").result();
+
+			std::vector<diagnostic_message_pattern> patterns = {
+				diagnostic_message_pattern{dms::error, dmid::dead_condition, expected_prop, {}},
+				diagnostic_message_pattern{dms::error, dmid::dead_condition, expected_gem, {}},
+				diagnostic_message_pattern{dms::warning, dmid::dead_condition, expected_quality, {}},
+				diagnostic_message_pattern{dms::warning, dmid::dead_condition, expected_arch, {}}
+			};
+
+			compare_diagnostics(patterns, diagnostics, parse_data.metadata);
+		}
+
+		BOOST_AUTO_TEST_CASE(unknown_invalid_expression)
+		{
+			const std::string input_str = minimal_input() + R"(
+Class >=3 "Helmet"
+Autogen "Stuff"
+ItemLevel > 0xFF
+{}
+)";
+			const std::string_view input = input_str;
+			const parser::parsed_spirit_filter parse_data = parse(input);
+			const diagnostics_store diagnostics = expect_error_when_compiling(parse_data.ast);
+
+			const std::string_view expected_error_class = search(input, "3").result();
+			const std::string_view expected_error_autogen = search(input, "\"Stuff\"").result();
+			const std::string_view expected_error_ilvl = search(input, "xFF").result();
+
+			std::vector<diagnostic_message_pattern> patterns = {
+				diagnostic_message_pattern{dms::error, dmid::invalid_expression, expected_error_class, {}},
+				diagnostic_message_pattern{dms::error, dmid::invalid_expression, expected_error_autogen, {}},
+				// currently socket_spec alternative takes priority over any possible unknown expression
+				diagnostic_message_pattern{dms::error, dmid::invalid_socket_spec, expected_error_ilvl, {}}
+			};
+
+			compare_diagnostics(patterns, diagnostics, parse_data.metadata);
+		}
+
+		BOOST_AUTO_TEST_CASE(invalid_operator)
+		{
+			const std::string input_str = minimal_input() + R"(
+Identified >= False
+HasInfluence != Shaper
+Class <= "Belt"
+HasExplicitMod != "Veiled" # != is not supported
+HasExplicitMod >= "Veiled" # only equality may skip count
+Price != 10
+{}
+)";
+			const std::string_view input = input_str;
+			const parser::parsed_spirit_filter parse_data = parse(input);
+			const diagnostics_store diagnostics = expect_error_when_compiling(parse_data.ast);
+
+			const std::string_view expected_error_id = search(input, ">=").result();
+			const std::string_view expected_error_infl = search(input, "!=").result();
+			const std::string_view expected_error_class = search(input, "<=").result();
+			const std::string_view expected_error_mod1 = search(input, "!=").next().result();
+			const std::string_view expected_error_mod2 = search(input, ">=").next().result();
+			const std::string_view expected_error_price = search(input, "!=").next().result();
+
+			std::vector<diagnostic_message_pattern> patterns = {
+				// price is first because it is analyzed immediately (not stored for later processing)
+				diagnostic_message_pattern{dms::error, dmid::invalid_operator, expected_error_id, {}},
+				diagnostic_message_pattern{dms::error, dmid::invalid_operator, expected_error_infl, {}},
+				diagnostic_message_pattern{dms::error, dmid::invalid_operator, expected_error_class, {}},
+				diagnostic_message_pattern{dms::error, dmid::invalid_operator, expected_error_mod1, {}},
+				diagnostic_message_pattern{dms::error, dmid::invalid_operator, expected_error_mod2, {}},
+				diagnostic_message_pattern{dms::error, dmid::invalid_operator, expected_error_price, {}},
 			};
 
 			compare_diagnostics(patterns, diagnostics, parse_data.metadata);
@@ -435,9 +586,61 @@ SetAlertSound 17
 				diagnostic_message_pattern{dms::note, dmid::attempt_description, boost::none, {
 					lang::keywords::rf::play_alert_sound
 				}},
-				diagnostic_message_pattern{dms::error, dmid::invalid_integer_value, expected_origin, {
+				diagnostic_message_pattern{dms::error, dmid::value_out_of_range, expected_origin, {
 					"1 - 16", "got 17"
 				}}
+			};
+
+			compare_diagnostics(patterns, diagnostics, parse_data.metadata);
+		}
+
+		BOOST_AUTO_TEST_CASE(invalid_play_effect)
+		{
+			const std::string input_str = minimal_input() + R"(
+PlayEffect Temp
+)";
+			const std::string_view input = input_str;
+			const parser::parsed_spirit_filter parse_data = parse(input);
+			const diagnostics_store diagnostics = expect_error_when_compiling(parse_data.ast);
+
+			const std::string_view expected_origin = search(input, "Temp").result();
+
+			std::vector<diagnostic_message_pattern> patterns = {
+				diagnostic_message_pattern{dms::error, dmid::invalid_play_effect, expected_origin, {}},
+				diagnostic_message_pattern{dms::note, dmid::attempt_description, boost::none, {}},
+				diagnostic_message_pattern{dms::error, dmid::type_mismatch, expected_origin, {}},
+				diagnostic_message_pattern{dms::note, dmid::attempt_description, boost::none, {}},
+				diagnostic_message_pattern{dms::error, dmid::type_mismatch, expected_origin, {}}
+			};
+
+			compare_diagnostics(patterns, diagnostics, parse_data.metadata);
+		}
+
+		BOOST_AUTO_TEST_CASE(autogen)
+		{
+			const std::string input_str = minimal_input() + R"(
+Price > 10 {
+	Show
+}
+
+Autogen "oils" {
+	Hide
+}
+)";
+			const std::string_view input = input_str;
+			const parser::parsed_spirit_filter parse_data = parse(input);
+			const diagnostics_store diagnostics = expect_error_when_compiling(parse_data.ast);
+
+			const std::string_view expected_price_error = search(input, "Show").result();
+			const std::string_view expected_price_origin = search(input, "Price > 10").result();
+			const std::string_view expected_autogen_error = search(input, "Hide").result();
+			const std::string_view expected_autogen_origin = search(input, "Autogen \"oils\"").result();
+
+			std::vector<diagnostic_message_pattern> patterns = {
+				diagnostic_message_pattern{dms::error, dmid::price_without_autogen, expected_price_error, {}},
+				diagnostic_message_pattern{dms::note, dmid::minor_note, expected_price_origin, {}},
+				diagnostic_message_pattern{dms::warning, dmid::autogen_without_price, expected_autogen_error, {}},
+				diagnostic_message_pattern{dms::note, dmid::minor_note, expected_autogen_origin, {}}
 			};
 
 			compare_diagnostics(patterns, diagnostics, parse_data.metadata);

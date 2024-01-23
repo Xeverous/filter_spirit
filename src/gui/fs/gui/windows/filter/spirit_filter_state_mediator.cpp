@@ -24,8 +24,7 @@ void save_filter(const lang::market::item_price_metadata& metadata, const lang::
 	if (path == nullptr)
 		return;
 
-	std::string output_content = generator::item_filter_to_string(filter);
-	generator::prepend_metadata(metadata, output_content);
+	std::string output_content = compiler::item_filter_to_string_with_preamble(filter, metadata);
 
 	std::filesystem::path output_filepath(path);
 	if (utility::save_file(output_filepath, output_content, logger))

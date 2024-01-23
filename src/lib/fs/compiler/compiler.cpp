@@ -1,378 +1,40 @@
+#include <fs/parser/parser.hpp>
+#include <fs/parser/ast_adapted.hpp> // required adaptation info for log::structure_printer
 #include <fs/compiler/compiler.hpp>
+#include <fs/compiler/detail/autogen.hpp>
 #include <fs/compiler/detail/evaluate.hpp>
 #include <fs/compiler/detail/actions.hpp>
 #include <fs/compiler/detail/conditions.hpp>
 #include <fs/lang/item_filter.hpp>
 #include <fs/lang/item.hpp>
 #include <fs/lang/keywords.hpp>
+#include <fs/log/structure_printer.hpp>
 #include <fs/utility/assert.hpp>
 #include <fs/utility/string_helpers.hpp>
 #include <fs/utility/monadic.hpp>
+#include <fs/version.hpp>
 
 #include <boost/spirit/home/x3/support/utility/lambda_visitor.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
+#include <iterator>
 #include <optional>
+#include <sstream>
 
-namespace
-{
-
-using namespace fs;
-using namespace fs::compiler;
-
-using dmid = diagnostic_message_id;
+namespace fs::compiler {
 
 namespace ast = fs::parser::ast;
-namespace x3 = boost::spirit::x3;
+using parser::position_tag_of;
+using boost::spirit::x3::make_lambda_visitor;
 
-// ---- resolve_spirit_filter_symbols helpers ----
-
-[[nodiscard]] bool
-verify_string_condition_allows_value(
-	lang::position_tag autogen_origin,
-	const std::optional<lang::strings_condition>& opt_condition,
-	std::string_view str,
-	diagnostics_store& diagnostics)
-{
-	if (!opt_condition)
-		return true;
-
-	const auto& condition = *opt_condition;
-	if (condition.find_match(str) != nullptr)
-		return true;
-
-	diagnostics.push_error_autogen_incompatible_condition(
-		autogen_origin,
-		condition.origin,
-		std::string("\"").append(str).append("\""));
-	return false;
-}
-
-std::string to_std_string(int value)
-{
-	return std::to_string(value);
-}
-
-std::string to_std_string(lang::rarity_type value)
-{
-	return std::string(lang::to_string_view(value));
-}
-
-template <typename T, typename U>
-[[nodiscard]] bool
-verify_range_condition_allows_value(
-	lang::position_tag autogen_origin,
-	lang::range_condition<T> condition,
-	U value,
-	diagnostics_store& diagnostics)
-{
-	auto result = true;
-
-	if (condition.lower_bound && !condition.test_lower_bound(value)) {
-		diagnostics.push_error_autogen_incompatible_condition(
-			autogen_origin,
-			(*condition.lower_bound).origin,
-			to_std_string(value));
-		result = false;
-	}
-
-	if (condition.upper_bound && !condition.test_upper_bound(value)) {
-		diagnostics.push_error_autogen_incompatible_condition(
-			autogen_origin,
-			(*condition.upper_bound).origin,
-			to_std_string(value));
-		result = false;
-	}
-
-	return result;
-}
-
-[[nodiscard]] bool
-verify_boolean_condition_allows_value(
-	lang::position_tag autogen_origin,
-	const std::optional<lang::boolean_condition>& opt_condition,
-	bool value,
-	diagnostics_store& diagnostics)
-{
-	if (!opt_condition)
-		return true;
-
-	const auto& condition = *opt_condition;
-	if (condition.value.value == value)
-		return true;
-
-	diagnostics.push_error_autogen_incompatible_condition(
-		autogen_origin,
-		condition.origin,
-		std::string(lang::to_string_view(value)));
-	return false;
-}
-
-[[nodiscard]] bool
-verify_integer_range_condition_exists(
-	lang::position_tag visibility_origin,
-	lang::position_tag autogen_origin,
-	lang::integer_range_condition condition,
-	std::string_view condition_keyword,
-	diagnostics_store& diagnostics)
-{
-	if (condition.has_bound())
-		return true;
-
-	diagnostics.push_error_autogen_missing_condition(visibility_origin, autogen_origin, condition_keyword);
-	return false;
-}
-
-[[nodiscard]] bool
-verify_boolean_condition_exists(
-	lang::position_tag visibility_origin,
-	lang::position_tag autogen_origin,
-	const std::optional<lang::boolean_condition>& opt_condition,
-	std::string_view condition_keyword,
-	diagnostics_store& diagnostics)
-{
-	if (opt_condition)
-		return true;
-
-	diagnostics.push_error_autogen_missing_condition(visibility_origin, autogen_origin, condition_keyword);
-	return false;
-}
-
-[[nodiscard]] bool
-verify_autogen_singular(
-	lang::position_tag autogen_origin,
-	const lang::condition_set& conditions,
-	std::string_view class_name,
-	diagnostics_store& diagnostics)
-{
-	auto result = true;
-
-	if (!verify_string_condition_allows_value(autogen_origin, conditions.class_, class_name, diagnostics))
-		result = false;
-
-	if (!verify_range_condition_allows_value(autogen_origin, conditions.rarity, lang::item::sentinel_rarity, diagnostics))
-		result = false;
-
-	if (!verify_range_condition_allows_value(autogen_origin, conditions.item_level, lang::item::sentinel_item_level, diagnostics))
-		result = false;
-
-	if (!verify_range_condition_allows_value(autogen_origin, conditions.quality, lang::item::sentinel_quality, diagnostics))
-		result = false;
-
-	if (!verify_range_condition_allows_value(autogen_origin, conditions.linked_sockets, 0, diagnostics))
-		result = false;
-
-	if (!verify_range_condition_allows_value(autogen_origin, conditions.height, 1, diagnostics))
-		result = false;
-
-	if (!verify_range_condition_allows_value(autogen_origin, conditions.width, 1, diagnostics))
-		result = false;
-
-	if (!verify_range_condition_allows_value(autogen_origin, conditions.gem_level, lang::item::sentinel_gem_level, diagnostics))
-		result = false;
-
-	if (!verify_range_condition_allows_value(autogen_origin, conditions.map_tier, lang::item::sentinel_map_tier, diagnostics))
-		result = false;
-
-	if (!verify_range_condition_allows_value(autogen_origin, conditions.corrupted_mods, 0, diagnostics))
-		result = false;
-
-	if (!verify_range_condition_allows_value(autogen_origin, conditions.enchantment_passive_num, 0, diagnostics))
-		result = false;
-
-	if (!verify_boolean_condition_allows_value(autogen_origin, conditions.is_enchanted, false, diagnostics))
-		result = false;
-
-	if (!verify_boolean_condition_allows_value(autogen_origin, conditions.is_identified, false, diagnostics))
-		result = false;
-
-	if (!verify_boolean_condition_allows_value(autogen_origin, conditions.is_corrupted, false, diagnostics))
-		result = false;
-
-	if (!verify_boolean_condition_allows_value(autogen_origin, conditions.is_mirrored, false, diagnostics))
-		result = false;
-
-	if (!verify_boolean_condition_allows_value(autogen_origin, conditions.is_elder_item, false, diagnostics))
-		result = false;
-
-	if (!verify_boolean_condition_allows_value(autogen_origin, conditions.is_shaper_item, false, diagnostics))
-		result = false;
-
-	if (!verify_boolean_condition_allows_value(autogen_origin, conditions.is_fractured_item, false, diagnostics))
-		result = false;
-
-	if (!verify_boolean_condition_allows_value(autogen_origin, conditions.is_synthesised_item, false, diagnostics))
-		result = false;
-
-	if (!verify_boolean_condition_allows_value(autogen_origin, conditions.is_shaped_map, false, diagnostics))
-		result = false;
-
-	if (!verify_boolean_condition_allows_value(autogen_origin, conditions.is_elder_map, false, diagnostics))
-		result = false;
-
-	if (!verify_boolean_condition_allows_value(autogen_origin, conditions.is_blighted_map, false, diagnostics))
-		result = false;
-
-	if (!verify_boolean_condition_allows_value(autogen_origin, conditions.is_replica, false, diagnostics))
-		result = false;
-
-	if (!verify_boolean_condition_allows_value(autogen_origin, conditions.is_alternate_quality, false, diagnostics))
-		result = false;
-
-	return result;
-}
-
-[[nodiscard]] bool
-verify_autogen_gems(
-	lang::position_tag visibility_origin,
-	lang::position_tag autogen_origin,
-	const lang::condition_set& conditions,
-	diagnostics_store& diagnostics)
-{
-	auto result = true;
-
-	if (!verify_integer_range_condition_exists(
-		visibility_origin, autogen_origin, conditions.gem_level, lang::keywords::rf::gem_level, diagnostics))
-	{
-		result = false;
-	}
-
-	if (!verify_integer_range_condition_exists(
-		visibility_origin, autogen_origin, conditions.quality, lang::keywords::rf::quality, diagnostics))
-	{
-		result = false;
-	}
-
-	if (!verify_boolean_condition_exists(
-		visibility_origin, autogen_origin, conditions.is_corrupted, lang::keywords::rf::corrupted, diagnostics))
-	{
-		result = false;
-	}
-
-	return result;
-}
-
-[[nodiscard]] bool
-verify_autogen_bases(
-	lang::position_tag visibility_origin,
-	lang::position_tag autogen_origin,
-	const lang::condition_set& conditions,
-	diagnostics_store& diagnostics)
-{
-	auto result = true;
-
-	if (!verify_range_condition_allows_value(autogen_origin, conditions.rarity, lang::rarity_type::normal, diagnostics))
-		result = false;
-
-	if (!verify_range_condition_allows_value(autogen_origin, conditions.rarity, lang::rarity_type::magic, diagnostics))
-		result = false;
-
-	if (!verify_range_condition_allows_value(autogen_origin, conditions.rarity, lang::rarity_type::rare, diagnostics))
-		result = false;
-
-	if (!verify_boolean_condition_allows_value(autogen_origin, conditions.is_corrupted, false, diagnostics))
-		result = false;
-
-	if (!verify_boolean_condition_allows_value(autogen_origin, conditions.is_mirrored, false, diagnostics))
-		result = false;
-
-	if (!verify_integer_range_condition_exists(
-		visibility_origin, autogen_origin, conditions.item_level, lang::keywords::rf::item_level, diagnostics))
-	{
-		result = false;
-	}
-
-	if (!conditions.has_influence) {
-		diagnostics.push_error_autogen_missing_condition(visibility_origin, autogen_origin, lang::keywords::rf::has_influence);
-		result = false;
-	}
-	else if (!(*conditions.has_influence).exact_match_required) {
-		diagnostics.push_message(make_error(
-			dmid::autogen_incompatible_condition,
-			(*conditions.has_influence).origin,
-			"autogen-incompatible condition: HasInflunce needs to have strict matching (\"==\")"));
-		diagnostics.push_message(make_note_minor(autogen_origin, "autogeneration specified here"));
-		result = false;
-	}
-
-	return result;
-}
-
-[[nodiscard]] bool
-verify_autogen_uniques(
-	lang::position_tag autogen_origin,
-	const lang::condition_set& conditions,
-	diagnostics_store& diagnostics)
-{
-	/*
-	 * Uniques are pretty unique so we are not checking any conditions
-	 * besides rarity - uniques may contain very unusual values within
-	 * certain properties (corruption, enchant, links, sockets, mods, etc)
-	 */
-	return verify_range_condition_allows_value(autogen_origin, conditions.rarity, lang::rarity_type::unique, diagnostics);
-}
-
-[[nodiscard]] bool
-verify_autogen(
-	lang::autogen_condition autogen,
-	const lang::condition_set& conditions,
-	lang::position_tag visibility_origin,
-	diagnostics_store& diagnostics)
-{
-	switch (autogen.category) {
-		using cat_t = lang::item_category;
-		namespace cn = lang::item_class_names;
-
-		case cat_t::currency:
-			return verify_autogen_singular(autogen.origin, conditions, cn::currency_stackable, diagnostics);
-		case cat_t::fragments:
-			return verify_autogen_singular(autogen.origin, conditions, cn::map_fragments,      diagnostics);
-		case cat_t::delirium_orbs:
-			return verify_autogen_singular(autogen.origin, conditions, cn::delirium_orbs,      diagnostics);
-		case cat_t::oils:
-			return verify_autogen_singular(autogen.origin, conditions, cn::oils,               diagnostics);
-		case cat_t::incubators:
-			return verify_autogen_singular(autogen.origin, conditions, cn::incubator,          diagnostics);
-		case cat_t::scarabs:
-			return verify_autogen_singular(autogen.origin, conditions, cn::scarabs,            diagnostics);
-		case cat_t::fossils:
-			return verify_autogen_singular(autogen.origin, conditions, cn::fossils,            diagnostics);
-		case cat_t::resonators:
-			return verify_autogen_singular(autogen.origin, conditions, cn::resonators,         diagnostics);
-		case cat_t::essences:
-			return verify_autogen_singular(autogen.origin, conditions, cn::essences,           diagnostics);
-		case cat_t::cards:
-			return verify_autogen_singular(autogen.origin, conditions, cn::divination_card,    diagnostics);
-		case cat_t::vials:
-			return verify_autogen_singular(autogen.origin, conditions, cn::vials,              diagnostics);
-
-		case cat_t::gems:
-			return verify_autogen_gems(visibility_origin, autogen.origin, conditions, diagnostics);
-
-		case cat_t::bases:
-			return verify_autogen_bases(visibility_origin, autogen.origin, conditions, diagnostics);
-
-		case cat_t::uniques_eq_unambiguous:
-		case cat_t::uniques_eq_ambiguous:
-		case cat_t::uniques_flasks_unambiguous:
-		case cat_t::uniques_flasks_ambiguous:
-		case cat_t::uniques_jewels_unambiguous:
-		case cat_t::uniques_jewels_ambiguous:
-		case cat_t::uniques_maps_unambiguous:
-		case cat_t::uniques_maps_ambiguous:
-			return verify_autogen_uniques(autogen.origin, conditions, diagnostics);
-	}
-
-	// failed to cover given category - add internal error and return failure
-	diagnostics.push_error_internal_compiler_error(__func__, autogen.origin);
-	return false;
-}
+namespace {
 
 [[nodiscard]] lang::item_visibility
-evaluate(parser::ast::common::static_visibility_statement visibility)
+evaluate(ast::common::static_visibility_statement visibility)
 {
 	return lang::item_visibility{
 		visibility.show ? lang::item_visibility_policy::show : lang::item_visibility_policy::hide,
-		parser::position_tag_of(visibility)
+		position_tag_of(visibility)
 	};
 }
 
@@ -398,16 +60,16 @@ fold_booleans_using_and(const lang::object& obj, diagnostics_store& diagnostics)
 [[nodiscard]] boost::optional<lang::item_visibility>
 evaluate(
 	settings st,
-	parser::ast::sf::dynamic_visibility_statement visibility,
+	ast::sf::dynamic_visibility_statement visibility,
 	const symbol_table& symbols,
 	diagnostics_store& diagnostics)
 {
-	return detail::evaluate_sequence(st, visibility.seq, symbols, 1, boost::none, diagnostics)
+	return detail::evaluate_sequence(st, visibility.seq, symbols, diagnostics)
 		.flat_map([&](lang::object obj) {
 			return fold_booleans_using_and(obj, diagnostics);
 		})
 		.map([&](lang::boolean b) {
-			const lang::position_tag origin = parser::position_tag_of(visibility);
+			const lang::position_tag origin = position_tag_of(visibility);
 			if (b.value) {
 				return lang::item_visibility{lang::item_visibility_policy::show, origin};
 			}
@@ -423,59 +85,63 @@ evaluate(
 [[nodiscard]] boost::optional<lang::item_visibility>
 evaluate(
 	settings st,
-	parser::ast::sf::visibility_statement visibility,
+	ast::sf::visibility_statement visibility,
 	const symbol_table& symbols,
 	diagnostics_store& diagnostics)
 {
-	return visibility.apply_visitor(x3::make_lambda_visitor<boost::optional<lang::item_visibility>>(
-		[](parser::ast::common::static_visibility_statement visibility) { return evaluate(visibility); },
-		[&](parser::ast::sf::dynamic_visibility_statement visibility) { return evaluate(st, visibility, symbols, diagnostics); }
+	return visibility.apply_visitor(make_lambda_visitor<boost::optional<lang::item_visibility>>(
+		[](ast::common::static_visibility_statement visibility) { return evaluate(visibility); },
+		[&](ast::sf::dynamic_visibility_statement visibility) { return evaluate(st, visibility, symbols, diagnostics); }
 	));
 }
 
 [[nodiscard]] boost::optional<lang::spirit_item_filter_block>
 make_spirit_filter_block(
-	settings /* st */,
+	settings st,
 	lang::item_visibility visibility,
-	lang::spirit_condition_set conditions,
+	detail::spirit_protoconditions conditions,
 	lang::action_set actions,
 	lang::block_continuation continuation,
 	diagnostics_store& diagnostics)
 {
-	if (conditions.price.has_bound() && !conditions.autogen.has_value()) {
-		std::optional<lang::position_tag> price_first_origin = conditions.price.first_origin();
+	if (conditions.price_range.has_bound() && !conditions.autogen.has_value()) {
+		std::optional<lang::position_tag> price_first_origin = conditions.price_range.first_origin();
 		FS_ASSERT_MSG(
 			price_first_origin.has_value(),
 			"Price condition has a bound. It must have at least 1 origin.");
 		diagnostics.push_message(make_error(
-			dmid::price_without_autogen,
+			diagnostic_message_id::price_without_autogen,
 			visibility.origin,
 			"generation of a block with price bound has missing autogeneration specifier"));
 		diagnostics.push_message(make_note_minor(*price_first_origin, "price bound specified here"));
-		if (auto price_second_origin = conditions.price.second_origin(); price_second_origin.has_value()) {
+		if (auto price_second_origin = conditions.price_range.second_origin(); price_second_origin.has_value()) {
 			diagnostics.push_message(make_note_minor(*price_second_origin, "another price bound specified here"));
 		}
 		return boost::none;
 	}
 
-	std::optional<lang::autogen_extension> autogen;
+	std::optional<lang::autogen_extension> result_autogen;
 	if (conditions.autogen) {
-		if (verify_autogen(*conditions.autogen, conditions.conditions, visibility.origin, diagnostics)) {
-			autogen = lang::autogen_extension{conditions.price, *conditions.autogen};
-		}
-		else {
+		const detail::autogen_protocondition& autogen = *conditions.autogen;
+
+		auto func = detail::make_autogen_func(
+			st, conditions.official, conditions.price_range, autogen, visibility.origin, diagnostics);
+		// If the user specified autogeneration, func creation should succeed.
+		// Otherwise the entire block is invalid and thus none is returned.
+		if (!func)
 			return boost::none;
-		}
+
+		result_autogen = lang::autogen_extension{std::move(func), conditions.price_range, autogen.origin};
 	}
 
 	return lang::spirit_item_filter_block{
 		lang::item_filter_block(
 			visibility,
-			std::move(conditions.conditions),
+			std::move(conditions.official),
 			std::move(actions),
 			continuation
 		),
-		autogen};
+		std::move(result_autogen)};
 }
 
 [[nodiscard]] lang::block_continuation
@@ -483,7 +149,7 @@ to_block_continuation(
 	boost::optional<ast::common::continue_statement> statement)
 {
 	if (statement)
-		return lang::block_continuation{parser::position_tag_of(*statement)};
+		return lang::block_continuation{position_tag_of(*statement)};
 	else
 		return lang::block_continuation{std::nullopt};
 }
@@ -496,7 +162,7 @@ evaluate_name_as_tree(
 {
 	const auto it = symbols.trees.find(name.value.value);
 	if (it == symbols.trees.end()) {
-		diagnostics.push_error_no_such_name(parser::position_tag_of(name));
+		diagnostics.push_error_no_such_name(position_tag_of(name));
 		return nullptr;
 	}
 
@@ -510,101 +176,75 @@ evaluate_name_as_tree(
  *
  * Thus, it is better to leave it as it is.
  */
-[[nodiscard]] processing_status
+[[nodiscard]] bool
 compile_statements_recursively_impl(
 	settings st,
 	const std::vector<ast::sf::statement>& statements,
 	const symbol_table& symbols,
-	lang::spirit_condition_set& conditions,
+	detail::spirit_protoconditions& conditions,
 	lang::action_set& actions,
 	std::vector<lang::spirit_item_filter_block>& blocks,
-	diagnostics_store& diagnostics,
-	std::vector<lang::position_tag>& expand_stack,
-	int recursion_depth)
+	diagnostics_store& diagnostics)
 {
-	auto final_status = processing_status::ok;
 	// Conditions can only be followed by a nested block
 	bool condition_present = false;
 	// explicitly make copies of parent conditions and actions - the call stack will preserve
 	// old instances while nested blocks can add additional ones that have limited lifetime
-	lang::spirit_condition_set nested_conditions = conditions;
+	detail::spirit_protoconditions nested_conditions = conditions;
 
 	for (const ast::sf::statement& statement : statements) {
-		auto status = statement.apply_visitor(x3::make_lambda_visitor<processing_status>(
+		auto status = statement.apply_visitor(make_lambda_visitor<bool>(
 			[&](const ast::sf::condition& cond) {
 				condition_present = true;
-
-				const bool status = detail::spirit_filter_add_condition(
+				return detail::spirit_filter_add_condition(
 					st, cond, symbols, nested_conditions, diagnostics);
-
-				if (status)
-					return processing_status::ok;
-				else
-					return processing_status::non_fatal_error;
 			},
 			[&](const ast::sf::action& action) {
 				if (condition_present) {
 					diagnostics.push_error_invalid_statement(
-						parser::position_tag_of(action),
+						position_tag_of(action),
 						"action after condition - place it before condition or inside condition's block");
-					return processing_status::non_fatal_error;
+					return false;
 				}
 
-				// TODO implement processing_status deeper
-				if (detail::spirit_filter_add_action(st, action, symbols, actions, diagnostics))
-					return processing_status::ok; // may actually be warning
-				else
-					return processing_status::non_fatal_error;
+				return detail::spirit_filter_add_action(st, action, symbols, actions, diagnostics);
 			},
 			[&](const ast::sf::expand_statement& statement) {
 				if (condition_present) {
 					diagnostics.push_error_invalid_statement(
-						parser::position_tag_of(statement),
+						position_tag_of(statement),
 						"expansion after condition - place it before condition or inside condition's block");
-					return processing_status::non_fatal_error;
+					return false;
 				}
 
 				if (statement.seq.size() != 1u) {
 					diagnostics.push_error_invalid_amount_of_arguments(
-						1, 1, statement.seq.size(), parser::position_tag_of(statement.seq));
-					return processing_status::non_fatal_error;
+						1, 1, static_cast<int>(statement.seq.size()), position_tag_of(statement.seq));
+					return false;
 				}
 
 				const ast::sf::primitive_value& primitive = statement.seq.front();
-				return primitive.apply_visitor(x3::make_lambda_visitor<processing_status>(
+				return primitive.apply_visitor(make_lambda_visitor<bool>(
 					[&](const ast::common::unknown_expression& expr) {
-						diagnostics.push_error_unknown_expression(parser::position_tag_of(expr));
-						return processing_status::non_fatal_error;
+						diagnostics.push_error_unknown_expression(position_tag_of(expr));
+						return false;
 					},
 					[&](const ast::common::literal_expression& expr) {
 						diagnostics.push_message(make_error(
-							dmid::type_mismatch,
-							parser::position_tag_of(expr),
+							diagnostic_message_id::type_mismatch,
+							position_tag_of(expr),
 							"type mismatch, expected a block but got a literal expression"));
-						return processing_status::non_fatal_error;
+						return false;
 					},
 					[&](const ast::sf::name& name) {
-						if (recursion_depth == st.max_recursion_depth) {
-							diagnostics.push_error_recursion_limit_reached(parser::position_tag_of(statement));
-							return processing_status::fatal_error;
-						}
-
 						const named_tree* tree = evaluate_name_as_tree(name, symbols, diagnostics);
 						if (!tree)
-							return processing_status::non_fatal_error;
+							return false;
 
-						expand_stack.push_back(parser::position_tag_of(statement));
+						diagnostics.push_layer(position_tag_of(statement));
 						const auto status = compile_statements_recursively_impl(
-							st,
-							tree->statements,
-							symbols,
-							conditions,
-							actions,
-							blocks,
-							diagnostics,
-							expand_stack,
-							recursion_depth + 1);
-						expand_stack.pop_back();
+							st, tree->statements, symbols, conditions, actions, blocks, diagnostics);
+						diagnostics.pop_layer();
 						return status;
 					}
 				));
@@ -612,14 +252,14 @@ compile_statements_recursively_impl(
 			[&](const ast::sf::behavior_statement& bs) {
 				if (condition_present) {
 					diagnostics.push_error_invalid_statement(
-						parser::position_tag_of(bs),
+						position_tag_of(bs),
 						"visibility statement after condition - place it before condition or inside condition's block");
-					return processing_status::non_fatal_error;
+					return false;
 				}
 
 				boost::optional<lang::item_visibility> visibility = evaluate(st, bs.visibility, symbols, diagnostics);
 				if (!visibility)
-					return processing_status::non_fatal_error;
+					return false;
 
 				boost::optional<lang::spirit_item_filter_block> block = make_spirit_filter_block(
 					st,
@@ -629,32 +269,17 @@ compile_statements_recursively_impl(
 					to_block_continuation(bs.continue_),
 					diagnostics);
 
-				if (block) {
-					blocks.push_back(std::move(*block));
-					return processing_status::ok;
-				}
-				else {
-					return processing_status::non_fatal_error;
-				}
+				if (!block)
+					return false;
+
+				blocks.push_back(std::move(*block));
+				return true;
 			},
 			[&](const ast::sf::rule_block& nested_block) {
-				if (recursion_depth == st.max_recursion_depth) {
-					diagnostics.push_error_recursion_limit_reached(parser::position_tag_of(nested_block));
-					return processing_status::fatal_error;
-				}
-
 				lang::action_set nested_actions = actions;
 
 				const auto status = compile_statements_recursively_impl(
-					st,
-					nested_block,
-					symbols,
-					nested_conditions,
-					nested_actions,
-					blocks,
-					diagnostics,
-					expand_stack,
-					recursion_depth + 1);
+					st, nested_block, symbols, nested_conditions, nested_actions, blocks, diagnostics);
 
 				// conditions used for the nested block, restore them to the state from the parent block
 				nested_conditions = conditions;
@@ -663,23 +288,33 @@ compile_statements_recursively_impl(
 				return status;
 			},
 			[&](const ast::sf::unknown_statement& statement) {
-				diagnostics.push_error_unknown_statement(parser::position_tag_of(statement.name));
-				return processing_status::non_fatal_error;
+				const auto dead_conditions = {
+					lang::keywords::rf::prophecy, lang::keywords::rf::gem_quality_type
+				};
+
+				for (auto cond : dead_conditions) {
+					if (statement.name.value == cond) {
+						diagnostics.push_error_dead_condition(
+							position_tag_of(statement.name), "this condition no longer exists");
+						return false;
+					}
+				}
+
+				diagnostics.push_error_unknown_statement(position_tag_of(statement.name));
+				return false;
 			}
 		));
 
-		if (status != processing_status::ok) {
-			for (lang::position_tag origin : expand_stack)
+		if (!status) {
+			for (lang::position_tag origin : diagnostics.layers())
 				diagnostics.push_message(make_note_minor(origin, "happened inside expansion"));
 		}
 
-		if (is_error(status) && st.error_handling.stop_on_error)
-			return status;
-
-		final_status = combine_statuses(final_status, status);
+		if (!status && st.error_handling.stop_on_error)
+			return false;
 	}
 
-	return final_status;
+	return true;
 }
 
 [[nodiscard]] boost::optional<std::vector<lang::spirit_item_filter_block>>
@@ -691,53 +326,118 @@ compile_statements_recursively(
 {
 	// start with empty conditions and actions
 	// that's the default state before any nesting
-	lang::spirit_condition_set root_conditions;
+	detail::spirit_protoconditions root_conditions;
 	lang::action_set root_actions;
 	std::vector<lang::spirit_item_filter_block> blocks;
-	std::vector<lang::position_tag> expand_stack; // for recursive diagnostics
 
-	const processing_status status = compile_statements_recursively_impl(
-		st, statements, symbols, root_conditions, root_actions, blocks, diagnostics, expand_stack, 1);
+	const auto status = compile_statements_recursively_impl(
+		st, statements, symbols, root_conditions, root_actions, blocks, diagnostics);
 
 	// This is the place where non-fatal errors are no longer tolerable.
 	// The entire filter has already been processed (with all possible warnings and (non-)fatal errors).
 	// The user should see a lot of diagnostics at this point but should not be allowed to continue with invalid state.
 	// Returning filter blocks constructed from (non-)fatal errors can produce invalid filtering results.
-	if (is_error(status))
-		return boost::none;
-	else
+	if (status)
 		return blocks;
+	else
+		return boost::none;
+}
+
+std::string make_preamble(const lang::market::item_price_metadata& metadata)
+{
+	std::string preamble =
+R"(# autogenerated by Filter Spirit - an advanced item filter generator for Path of Exile
+# Write filters in an enhanced language with the ability to query item prices. Refresh whenever you want.
+#
+# read tutorial, browse documentation, ask questions, report bugs on: github.com/Xeverous/filter_spirit
+#
+# or contact directly:
+#     reddit : /u/Xeverous
+#     Discord: Xeverous_2151
+#     in game: pathofexile.com/account/view-profile/Xeverous
+#
+# Generation info:
+)";
+	preamble +=
+"#     Filter Spirit version     : " + to_string(version::current()) + "\n"
+"#     filter generation date    : " + utility::ptime_to_pretty_string(boost::posix_time::microsec_clock::universal_time()) + "\n"
+"#     item price data downloaded: " + utility::ptime_to_pretty_string(metadata.download_date) + "\n"
+"#     item price data from      : " + std::string(lang::to_string(metadata.data_source)) + "\n"
+"#     item price data for league: " + metadata.league_name + "\n"
+"#\n"
+"# May the drops be with you.\n"
+"\n";
+
+	return preamble;
+}
+
+std::optional<lang::spirit_item_filter> parse_and_compile_spirit_filter(
+	std::string_view input,
+	settings st,
+	log::logger& logger)
+{
+	logger.info() << "Parsing filter template...\n";
+	std::variant<parser::parsed_spirit_filter, parser::parse_failure_data> parse_result = parser::parse_spirit_filter(input);
+
+	if (std::holds_alternative<parser::parse_failure_data>(parse_result)) {
+		parser::print_parse_errors(std::get<parser::parse_failure_data>(parse_result), logger);
+		return std::nullopt;
+	}
+
+	logger.info() << "Parse successful.\n";
+	const auto& parse_data = std::get<parser::parsed_spirit_filter>(parse_result);
+
+	if (st.print_ast)
+		log::structure_printer()(parse_data.ast);
+
+	logger.info() << "Resolving filter template symbols...\n";
+
+	diagnostics_store diagnostics_symbols;
+	const std::optional<symbol_table> symbols =
+		resolve_spirit_filter_symbols(st, parse_data.ast.definitions, diagnostics_symbols);
+	diagnostics_symbols.output_messages(parse_data.metadata, logger);
+
+	if (!symbols)
+		return std::nullopt;
+
+	logger.info() << "Symbols resolved.\n";
+	logger.info() << "Compiling filter template...\n";
+
+	diagnostics_store diagnostics_spirit_filter;
+	std::optional<lang::spirit_item_filter> spirit_filter =
+		compile_spirit_filter_statements(st, parse_data.ast.statements, *symbols, diagnostics_spirit_filter);
+	diagnostics_spirit_filter.output_messages(parse_data.metadata, logger);
+
+	return spirit_filter;
 }
 
 } // namespace
 
-namespace fs::compiler
-{
-
+// placed in this file to reuse code and avoid creating symbol_table.cpp for just 1 function
 bool
 symbol_table::add_symbol(
 	settings st,
 	const ast::sf::constant_definition& def,
 	diagnostics_store& diagnostics)
 {
-	const lang::position_tag definition_origin = parser::position_tag_of(def.value_name);
+	const lang::position_tag definition_origin = position_tag_of(def.value_name);
 	const std::string& name = def.value_name.value.value;
 
 	if (const auto it = objects.find(name); it != objects.end()) {
-		const lang::position_tag existing_origin = parser::position_tag_of(it->second.name_origin);
+		const lang::position_tag existing_origin = position_tag_of(it->second.name_origin);
 		diagnostics.push_error_name_already_exists(existing_origin, definition_origin);
 		return false;
 	}
 
 	if (const auto it = trees.find(name); it != trees.end()) {
-		const lang::position_tag existing_origin = parser::position_tag_of(it->second.name_origin);
+		const lang::position_tag existing_origin = position_tag_of(it->second.name_origin);
 		diagnostics.push_error_name_already_exists(existing_origin, definition_origin);
 		return false;
 	}
 
-	return def.value.apply_visitor(x3::make_lambda_visitor<bool>(
+	return def.value.apply_visitor(make_lambda_visitor<bool>(
 		[&](const ast::sf::sequence& seq) {
-			return detail::evaluate_sequence(st, seq, *this, 1, boost::none, diagnostics)
+			return detail::evaluate_sequence(st, seq, *this, diagnostics)
 				.map([&](lang::object obj) {
 					const bool success = objects.emplace(
 						name,
@@ -757,46 +457,10 @@ symbol_table::add_symbol(
 	));
 }
 
-boost::optional<symbol_table>
-resolve_spirit_filter_symbols(
-	settings st,
-	const std::vector<parser::ast::sf::definition>& definitions,
-	diagnostics_store& diagnostics)
-{
-	symbol_table symbols;
-
-	for (const auto& def : definitions) {
-		const bool result = symbols.add_symbol(st, def.def, diagnostics);
-
-		if (!result && st.error_handling.stop_on_error)
-			return boost::none;
-	}
-
-	return symbols;
-}
-
-boost::optional<lang::spirit_item_filter>
-compile_spirit_filter_statements(
-	settings st,
-	const std::vector<ast::sf::statement>& statements,
-	const symbol_table& symbols,
-	diagnostics_store& diagnostics)
-{
-	boost::optional<std::vector<lang::spirit_item_filter_block>> blocks =
-		compile_statements_recursively(st, statements, symbols, diagnostics);
-
-	// This function is the point when we want to stop proceeding on any errors.
-	// Otherwise the returned filter could contain broken state.
-	if (!blocks || diagnostics.has_errors())
-		return boost::none;
-
-	return lang::spirit_item_filter{std::move(*blocks)};
-}
-
-boost::optional<lang::item_filter>
+std::optional<lang::item_filter>
 compile_real_filter(
 	settings st,
-	const parser::ast::rf::ast_type& ast,
+	const ast::rf::ast_type& ast,
 	diagnostics_store& diagnostics)
 {
 	lang::item_filter filter;
@@ -807,17 +471,17 @@ compile_real_filter(
 			lang::item_filter_block filter_block(evaluate(block.visibility));
 
 			for (const auto& rule : block.rules) {
-				const bool result = rule.apply_visitor(x3::make_lambda_visitor<bool>(
-					[&](const parser::ast::rf::condition& c) {
+				const bool result = rule.apply_visitor(make_lambda_visitor<bool>(
+					[&](const ast::rf::condition& c) {
 						return detail::real_filter_add_condition(
 							st, c, filter_block.conditions, diagnostics);
 					},
-					[&](const parser::ast::rf::action& a) {
+					[&](const ast::rf::action& a) {
 						return detail::real_filter_add_action(
 							st, a, filter_block.actions, diagnostics);
 					},
-					[&](parser::ast::rf::continue_statement cont) {
-						filter_block.continuation.origin = parser::position_tag_of(cont);
+					[&](ast::rf::continue_statement cont) {
+						filter_block.continuation.origin = position_tag_of(cont);
 						return true;
 					}
 				));
@@ -832,10 +496,134 @@ compile_real_filter(
 		if (filter_block)
 			filter.blocks.push_back(std::move(*filter_block));
 		else if (st.error_handling.stop_on_error)
-			return boost::none;
+			return std::nullopt;
 	}
 
+	if (!diagnostics.is_ok(st.error_handling.treat_warnings_as_errors))
+		return std::nullopt;
+
 	return filter;
+}
+
+std::optional<symbol_table>
+resolve_spirit_filter_symbols(
+	settings st,
+	const std::vector<ast::sf::definition>& definitions,
+	diagnostics_store& diagnostics)
+{
+	symbol_table symbols;
+
+	for (const auto& def : definitions) {
+		const bool result = symbols.add_symbol(st, def.def, diagnostics);
+
+		if (!result && st.error_handling.stop_on_error)
+			return std::nullopt;
+	}
+
+	return symbols;
+}
+
+std::optional<lang::spirit_item_filter>
+compile_spirit_filter_statements(
+	settings st,
+	const std::vector<ast::sf::statement>& statements,
+	const symbol_table& symbols,
+	diagnostics_store& diagnostics)
+{
+	boost::optional<std::vector<lang::spirit_item_filter_block>> blocks =
+		compile_statements_recursively(st, statements, symbols, diagnostics);
+
+	// This function is the point when we want to stop proceeding on any errors.
+	// Otherwise the returned filter could contain broken state.
+	if (!blocks)
+		return std::nullopt;
+
+	if (!diagnostics.is_ok(st.error_handling.treat_warnings_as_errors))
+		return std::nullopt;
+
+	return lang::spirit_item_filter{std::move(*blocks)};
+}
+
+lang::item_filter
+make_item_filter(
+	const lang::spirit_item_filter& filter_template,
+	const lang::market::item_price_data& item_price_data)
+{
+	std::vector<lang::item_filter_block> result_blocks;
+	result_blocks.reserve(filter_template.blocks.size());
+
+	for (const lang::spirit_item_filter_block& block : filter_template.blocks) {
+		if (block.autogen) {
+			const auto& autogen = *block.autogen;
+
+			lang::block_generation_info block_gen_info{
+				block.block.visibility,
+				block.block.actions,
+				block.block.continuation,
+				autogen.origin,
+				autogen.price_range
+			};
+
+			autogen.blocks_generator(block_gen_info, item_price_data, std::back_inserter(result_blocks));
+		}
+		else {
+			result_blocks.push_back(block.block);
+		}
+	}
+
+	return lang::item_filter{std::move(result_blocks)};
+}
+
+std::string item_filter_to_string_without_preamble(const lang::item_filter& filter)
+{
+	std::stringstream ss;
+
+	for (const lang::item_filter_block& block : filter.blocks)
+		block.print(ss);
+
+	return ss.str();
+}
+
+std::string
+item_filter_to_string_with_preamble(
+	const lang::item_filter& filter,
+	const lang::market::item_price_metadata& item_price_metadata)
+{
+	return make_preamble(item_price_metadata) + item_filter_to_string_without_preamble(filter);
+}
+
+std::optional<std::string> parse_compile_generate_spirit_filter_without_preamble(
+	std::string_view input,
+	const lang::market::item_price_data& item_price_data,
+	settings st,
+	log::logger& logger)
+{
+	logger.info() << "" << item_price_data; // add << "" to workaround calling <<(rvalue, item_price_data)
+
+	std::optional<fs::lang::spirit_item_filter> spirit_filter = parse_and_compile_spirit_filter(input, st, logger);
+
+	if (!spirit_filter)
+		return std::nullopt;
+
+	lang::item_filter filter = make_item_filter(*spirit_filter, item_price_data);
+	logger.info() << "Compilation successful.\n";
+
+	return item_filter_to_string_without_preamble(filter);
+}
+
+std::optional<std::string> parse_compile_generate_spirit_filter_with_preamble(
+	std::string_view input,
+	const lang::market::item_price_report& report,
+	settings st,
+	log::logger& logger)
+{
+	std::optional<std::string> maybe_filter =
+		parse_compile_generate_spirit_filter_without_preamble(input, report.data, st, logger);
+
+	if (!maybe_filter)
+		return std::nullopt;
+
+	return make_preamble(report.metadata) + std::move(*maybe_filter);
 }
 
 }

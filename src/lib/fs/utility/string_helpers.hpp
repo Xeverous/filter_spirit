@@ -10,7 +10,7 @@ namespace fs::utility
 
 [[nodiscard]] std::string ptime_to_pretty_string(boost::posix_time::ptime time);
 
-inline bool starts_with(std::string_view source, std::string_view fragment) noexcept
+[[nodiscard]] inline bool starts_with(std::string_view source, std::string_view fragment) noexcept
 {
 	if (source.size() < fragment.size())
 		return false;
@@ -22,22 +22,41 @@ inline bool starts_with(std::string_view source, std::string_view fragment) noex
 	return true;
 }
 
-inline bool ends_with(std::string_view source, std::string_view fragment) noexcept
+[[nodiscard]] inline bool ends_with(std::string_view source, std::string_view fragment) noexcept
 {
 	if (source.size() < fragment.size())
 		return false;
 
-	for (std::string_view::size_type i = 0; i < fragment.size(); ++i)
+	for (std::string_view::difference_type i = 0; i < static_cast<decltype(i)>(fragment.size()); ++i)
 		if (*(source.rbegin() + i) != *(fragment.rbegin() + i))
 			return false;
 
 	return true;
 }
 
-inline bool contains(std::string_view source, std::string_view fragment) noexcept
+[[nodiscard]] inline bool contains(std::string_view source, std::string_view fragment) noexcept
 {
 	return source.find(fragment) != std::string_view::npos;
 }
+
+/**
+ * @brief A function specifically for comparing strings with filter condition values.
+ * @param value item's property value
+ * @param requirement value from the filter
+ * @param exact_match_required set to true if filter condition has ==
+ * @details https://www.poewiki.net/wiki/Version_3.10.2b
+ * You can now filter for items without being required to use special alphanumeric
+ * characters, such as "Maelstrom Staff" rather than "Maelström Staff".
+ *
+ * If @p requirement does not contain diacritics it can still match @p value
+ * which has them. Not in the reverse way. Both must be valid UTF-8.
+ *
+ * This function implements support only for specific UTF-8 characters
+ * that appear in the game. Full Unicode comparison is not performed.
+ */
+[[nodiscard]] bool
+compare_strings_ignore_diacritics(
+	std::string_view value, std::string_view requirement, bool exact_match_required);
 
 /**
  * @brief find line break in range [@p first, @p last)

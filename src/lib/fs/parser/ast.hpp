@@ -8,7 +8,7 @@
 #include <fs/lang/primitive_types.hpp>
 #include <fs/lang/action_properties.hpp>
 #include <fs/lang/condition_properties.hpp>
-#include <fs/lang/queries.hpp>
+#include <fs/lang/autogen_categories.hpp>
 
 #include <boost/optional.hpp>
 #include <boost/spirit/home/x3/support/ast/variant.hpp>
@@ -189,10 +189,16 @@ namespace common
 		using base_type::operator=;
 	};
 
-	// < or > or <= or >= or = or nothing (defaults to =)
-	struct comparison_operator_expression : x3::position_tagged
+	struct comparison_operator : x3::position_tagged
 	{
-		comparison_operator_expression& operator=(lang::comparison_type ct)
+		static comparison_operator implicit_default()
+		{
+			comparison_operator result;
+			result.value = lang::comparison_type::equal;
+			return result;
+		}
+
+		comparison_operator& operator=(lang::comparison_type ct)
 		{
 			value = ct;
 			return *this;
@@ -203,32 +209,13 @@ namespace common
 		lang::comparison_type value;
 	};
 
-	// optional == token
-	struct exact_matching_policy : x3::position_tagged
+	struct comparison_expression : x3::position_tagged
 	{
-		exact_matching_policy& operator=(bool v)
-		{
-			required = v;
-			return *this;
-		}
-
-		bool get_value() const { return required; }
-
-		bool required;
+		comparison_operator operator_;
+		boost::optional<integer_literal> integer;
 	};
 
-	struct unknown_expression : x3::position_tagged
-	{
-		unknown_expression& operator=(std::string str)
-		{
-			value = std::move(str);
-			return *this;
-		}
-
-		const std::string& get_value() const { return value; }
-
-		std::string value;
-	};
+	struct unknown_expression : std::string, x3::position_tagged {};
 
 	struct switch_drop_sound_action : x3::position_tagged
 	{
@@ -262,6 +249,166 @@ namespace common
 	};
 }
 
+// tokens that exist only in real filters
+namespace rf
+{
+	using identifier = common::identifier;
+
+	using boolean_literal = common::boolean_literal;
+	using integer_literal = common::integer_literal;
+	using floating_point_literal = common::floating_point_literal;
+	using socket_spec_literal = common::socket_spec_literal;
+	using suit_literal = common::suit_literal;
+	using shape_literal = common::shape_literal;
+	using rarity_literal = common::rarity_literal;
+	using string_literal = common::string_literal;
+	using influence_literal = common::influence_literal;
+	using shaper_voice_line_literal = common::shaper_voice_line_literal;
+	using none_literal = common::none_literal;
+
+	struct color_literal : x3::position_tagged
+	{
+		integer_literal r;
+		integer_literal g;
+		integer_literal b;
+		boost::optional<integer_literal> a;
+	};
+
+	struct string : x3::position_tagged
+	{
+		auto& operator=(common::string_literal str)
+		{
+			value = std::move(static_cast<std::string&>(str));
+			return *this;
+		}
+
+		auto& operator=(common::identifier str)
+		{
+			value = std::move(str.value);
+			return *this;
+		}
+
+		const auto& get_value() const { return value; }
+
+		std::string value;
+	};
+
+	struct string_array : std::vector<string>, x3::position_tagged {};
+	struct influence_literal_array : std::vector<influence_literal>, x3::position_tagged {};
+
+	struct influence_spec : x3::variant<
+		influence_literal_array,
+		none_literal
+	>, x3::position_tagged
+	{
+		using base_type::base_type;
+		using base_type::operator=;
+	};
+
+	using literal_expression = common::literal_expression;
+	struct literal_sequence : std::vector<literal_expression>, x3::position_tagged {};
+
+	struct condition : x3::position_tagged
+	{
+		lang::official_condition_property property;
+		common::comparison_expression comparison;
+		literal_sequence seq;
+	};
+
+	struct color_action : x3::position_tagged
+	{
+		lang::color_action_type action;
+		color_literal color;
+	};
+
+	struct set_font_size_action : x3::position_tagged
+	{
+		auto& operator=(integer_literal il)
+		{
+			font_size = il;
+			return *this;
+		}
+
+		const auto& get_value() const { return font_size; }
+
+		integer_literal font_size;
+	};
+
+	struct play_alert_sound_action : x3::position_tagged
+	{
+		bool positional;
+		literal_expression id;
+		boost::optional<integer_literal> volume;
+	};
+
+	struct custom_alert_sound_action : x3::position_tagged
+	{
+		bool optional;
+		string_literal path;
+		boost::optional<integer_literal> volume;
+	};
+
+	using switch_drop_sound_action = common::switch_drop_sound_action;
+
+	struct minimap_icon_action : x3::position_tagged
+	{
+		auto& operator=(literal_sequence seq)
+		{
+			literals = std::move(seq);
+			return *this;
+		}
+
+		const auto& get_value() const { return literals; }
+
+		literal_sequence literals;
+	};
+
+	struct play_effect_action : x3::position_tagged
+	{
+		auto& operator=(literal_sequence seq)
+		{
+			literals = std::move(seq);
+			return *this;
+		}
+
+		const auto& get_value() const { return literals; }
+
+		literal_sequence literals;
+	};
+
+	struct action : x3::variant<
+		color_action,
+		set_font_size_action,
+		play_alert_sound_action,
+		custom_alert_sound_action,
+		switch_drop_sound_action,
+		minimap_icon_action,
+		play_effect_action
+	>, x3::position_tagged
+	{
+		using base_type::base_type;
+		using base_type::operator=;
+	};
+
+	using continue_statement = common::continue_statement;
+
+	struct rule : x3::variant<condition, action, continue_statement>, x3::position_tagged
+	{
+		using base_type::base_type;
+		using base_type::operator=;
+	};
+
+	using static_visibility_statement = common::static_visibility_statement;
+
+	struct filter_block : x3::position_tagged
+	{
+		static_visibility_statement visibility;
+		std::vector<rule> rules;
+	};
+
+	using ast_type = std::vector<filter_block>;
+} // namespace rf
+
 // tokens that exist only in spirit filter
 namespace sf
 {
@@ -275,7 +422,6 @@ namespace sf
 	using identifier = common::identifier;
 
 	// "$" followed by identifier
-	// TODO rename to something more precise?
 	struct name : x3::position_tagged
 	{
 		auto& operator=(identifier id)
@@ -305,7 +451,6 @@ namespace sf
 
 	struct statement;
 
-	// TODO rename to block_of_statements?
 	struct statement_list_expression : std::vector<statement>, x3::position_tagged {};
 
 	struct value_expression : x3::variant<
@@ -361,8 +506,12 @@ namespace sf
 
 	// ---- conditions ----
 
-	using comparison_operator_expression = common::comparison_operator_expression;
-	using exact_matching_policy = common::exact_matching_policy;
+	struct official_condition : x3::position_tagged
+	{
+		lang::official_condition_property property;
+		common::comparison_expression comparison;
+		sequence seq;
+	};
 
 	struct autogen_condition : x3::position_tagged
 	{
@@ -379,67 +528,14 @@ namespace sf
 
 	struct price_comparison_condition : x3::position_tagged
 	{
-		comparison_operator_expression comparison_type;
-		sequence seq;
-	};
-
-	struct rarity_comparison_condition : x3::position_tagged
-	{
-		comparison_operator_expression comparison_type;
-		sequence seq;
-	};
-
-	struct numeric_comparison_condition : x3::position_tagged
-	{
-		lang::numeric_comparison_condition_property property;
-		comparison_operator_expression comparison_type;
-		sequence seq;
-	};
-
-	struct string_array_condition : x3::position_tagged
-	{
-		lang::string_array_condition_property property;
-		exact_matching_policy exact_match;
-		sequence seq;
-	};
-
-	struct ranged_string_array_condition : x3::position_tagged
-	{
-		lang::ranged_string_array_condition_property property;
-		comparison_operator_expression comparison_type;
-		boost::optional<common::integer_literal> integer;
-		sequence seq;
-	};
-
-	struct has_influence_condition : x3::position_tagged
-	{
-		exact_matching_policy exact_match;
-		sequence seq;
-	};
-
-	struct socket_spec_condition : x3::position_tagged
-	{
-		bool links_matter;
-		comparison_operator_expression comparison_type;
-		sequence seq;
-	};
-
-	struct boolean_condition : x3::position_tagged
-	{
-		lang::boolean_condition_property property;
+		common::comparison_expression comparison;
 		sequence seq;
 	};
 
 	struct condition : x3::variant<
 			autogen_condition,
 			price_comparison_condition,
-			rarity_comparison_condition,
-			numeric_comparison_condition,
-			string_array_condition,
-			ranged_string_array_condition,
-			has_influence_condition,
-			socket_spec_condition,
-			boolean_condition
+			official_condition
 		>, x3::position_tagged
 	{
 		using base_type::base_type;
@@ -590,7 +686,7 @@ namespace sf
 	struct unknown_statement : x3::position_tagged
 	{
 		common::identifier name;
-		common::comparison_operator_expression comparison_type;
+		common::comparison_expression comparison;
 		sequence seq;
 	};
 
@@ -620,223 +716,6 @@ namespace sf
 	using ast_type = filter_structure;
 
 } // namespace sf
-
-// tokens that exist only in real filters
-namespace rf
-{
-	using identifier = common::identifier;
-
-	using boolean_literal = common::boolean_literal;
-	using integer_literal = common::integer_literal;
-	using floating_point_literal = common::floating_point_literal;
-	using socket_spec_literal = common::socket_spec_literal;
-	using suit_literal = common::suit_literal;
-	using shape_literal = common::shape_literal;
-	using rarity_literal = common::rarity_literal;
-	using string_literal = common::string_literal;
-	using influence_literal = common::influence_literal;
-	using shaper_voice_line_literal = common::shaper_voice_line_literal;
-	using none_literal = common::none_literal;
-
-	struct color_literal : x3::position_tagged
-	{
-		integer_literal r;
-		integer_literal g;
-		integer_literal b;
-		boost::optional<integer_literal> a;
-	};
-
-	struct string : x3::position_tagged
-	{
-		auto& operator=(common::string_literal str)
-		{
-			value = std::move(static_cast<std::string&>(str));
-			return *this;
-		}
-
-		auto& operator=(common::identifier str)
-		{
-			value = std::move(str.value);
-			return *this;
-		}
-
-		const auto& get_value() const { return value; }
-
-		std::string value;
-	};
-
-	struct string_array : std::vector<string>, x3::position_tagged {};
-	struct influence_literal_array : std::vector<influence_literal>, x3::position_tagged {};
-
-	struct influence_spec : x3::variant<
-		influence_literal_array,
-		none_literal
-	>, x3::position_tagged
-	{
-		using base_type::base_type;
-		using base_type::operator=;
-	};
-
-	using literal_expression = common::literal_expression;
-	struct literal_sequence : std::vector<literal_expression>, x3::position_tagged {};
-
-	using comparison_operator_expression = common::comparison_operator_expression;
-	using exact_matching_policy = common::exact_matching_policy;
-
-	struct rarity_condition : x3::position_tagged
-	{
-		comparison_operator_expression comparison_type;
-		rarity_literal rarity;
-	};
-
-	struct numeric_condition : x3::position_tagged
-	{
-		lang::numeric_comparison_condition_property property;
-		comparison_operator_expression comparison_type;
-		integer_literal integer;
-	};
-
-	struct string_array_condition : x3::position_tagged
-	{
-		lang::string_array_condition_property property;
-		exact_matching_policy exact_match;
-		string_array strings;
-	};
-
-	struct ranged_string_array_condition : x3::position_tagged
-	{
-		lang::ranged_string_array_condition_property property;
-		comparison_operator_expression comparison_type;
-		boost::optional<integer_literal> integer;
-		string_array strings;
-	};
-
-	struct has_influence_condition : x3::position_tagged
-	{
-		exact_matching_policy exact_match;
-		influence_spec spec;
-	};
-
-	struct socket_spec_condition : x3::position_tagged
-	{
-		bool links_matter;
-		comparison_operator_expression comparison_type;
-		literal_sequence literals;
-	};
-
-	struct boolean_condition : x3::position_tagged
-	{
-		lang::boolean_condition_property property;
-		boolean_literal value;
-	};
-
-	struct condition : x3::variant<
-		rarity_condition,
-		numeric_condition,
-		string_array_condition,
-		ranged_string_array_condition,
-		has_influence_condition,
-		socket_spec_condition,
-		boolean_condition
-	>, x3::position_tagged
-	{
-		using base_type::base_type;
-		using base_type::operator=;
-	};
-
-	struct color_action : x3::position_tagged
-	{
-		lang::color_action_type action;
-		color_literal color;
-	};
-
-	struct set_font_size_action : x3::position_tagged
-	{
-		auto& operator=(integer_literal il)
-		{
-			font_size = il;
-			return *this;
-		}
-
-		const auto& get_value() const { return font_size; }
-
-		integer_literal font_size;
-	};
-
-	struct play_alert_sound_action : x3::position_tagged
-	{
-		bool positional;
-		literal_expression id;
-		boost::optional<integer_literal> volume;
-	};
-
-	struct custom_alert_sound_action : x3::position_tagged
-	{
-		bool optional;
-		string_literal path;
-		boost::optional<integer_literal> volume;
-	};
-
-	using switch_drop_sound_action = common::switch_drop_sound_action;
-
-	struct minimap_icon_action : x3::position_tagged
-	{
-		auto& operator=(literal_sequence seq)
-		{
-			literals = std::move(seq);
-			return *this;
-		}
-
-		const auto& get_value() const { return literals; }
-
-		literal_sequence literals;
-	};
-
-	struct play_effect_action : x3::position_tagged
-	{
-		auto& operator=(literal_sequence seq)
-		{
-			literals = std::move(seq);
-			return *this;
-		}
-
-		const auto& get_value() const { return literals; }
-
-		literal_sequence literals;
-	};
-
-	struct action : x3::variant<
-		color_action,
-		set_font_size_action,
-		play_alert_sound_action,
-		custom_alert_sound_action,
-		switch_drop_sound_action,
-		minimap_icon_action,
-		play_effect_action
-	>, x3::position_tagged
-	{
-		using base_type::base_type;
-		using base_type::operator=;
-	};
-
-	using continue_statement = common::continue_statement;
-
-	struct rule : x3::variant<condition, action, continue_statement>, x3::position_tagged
-	{
-		using base_type::base_type;
-		using base_type::operator=;
-	};
-
-	using static_visibility_statement = common::static_visibility_statement;
-
-	struct filter_block : x3::position_tagged
-	{
-		static_visibility_statement visibility;
-		std::vector<rule> rules;
-	};
-
-	using ast_type = std::vector<filter_block>;
-} // namespace rf
 
 } // namespace fs::parser::ast
 

@@ -4,7 +4,6 @@
 #include <fs/lang/condition_properties.hpp>
 #include <fs/lang/primitive_types.hpp>
 #include <fs/lang/keywords.hpp>
-#include <fs/lang/queries.hpp>
 
 #include <boost/spirit/home/x3/string/symbols.hpp>
 
@@ -131,109 +130,88 @@ namespace rf
 			add
 				("<",  lang::comparison_type::less)
 				("<=", lang::comparison_type::less_equal)
-				("=",  lang::comparison_type::equal_soft)
-				("==", lang::comparison_type::equal_hard)
+				("=",  lang::comparison_type::equal)
+				("==", lang::comparison_type::exact_match)
 				(">",  lang::comparison_type::greater)
 				(">=", lang::comparison_type::greater_equal)
+				("!=", lang::comparison_type::not_equal)
+				("!",  lang::comparison_type::not_equal)
 			;
 		}
 	};
 	const comparison_operators_ comparison_operators;
 
-	struct numeric_comparison_condition_properties_ : x3::symbols<lang::numeric_comparison_condition_property>
+	struct official_condition_properties_ : x3::symbols<lang::official_condition_property>
 	{
-		numeric_comparison_condition_properties_()
+		official_condition_properties_()
 		{
-			add
-				(lang::keywords::rf::item_level,                   lang::numeric_comparison_condition_property::item_level)
-				(lang::keywords::rf::drop_level,                   lang::numeric_comparison_condition_property::drop_level)
-				(lang::keywords::rf::quality,                      lang::numeric_comparison_condition_property::quality)
-				(lang::keywords::rf::linked_sockets,               lang::numeric_comparison_condition_property::linked_sockets)
-				(lang::keywords::rf::height,                       lang::numeric_comparison_condition_property::height)
-				(lang::keywords::rf::width,                        lang::numeric_comparison_condition_property::width)
-				(lang::keywords::rf::stack_size,                   lang::numeric_comparison_condition_property::stack_size)
-				(lang::keywords::rf::gem_level,                    lang::numeric_comparison_condition_property::gem_level)
-				(lang::keywords::rf::map_tier,                     lang::numeric_comparison_condition_property::map_tier)
-				(lang::keywords::rf::area_level,                   lang::numeric_comparison_condition_property::area_level)
-				(lang::keywords::rf::corrupted_mods,               lang::numeric_comparison_condition_property::corrupted_mods)
-				(lang::keywords::rf::enchantment_passive_num,      lang::numeric_comparison_condition_property::enchantment_passive_num)
-				(lang::keywords::rf::base_defence_percentile,      lang::numeric_comparison_condition_property::base_defence_percentile)
-				(lang::keywords::rf::base_armour,                  lang::numeric_comparison_condition_property::base_armour)
-				(lang::keywords::rf::base_evasion,                 lang::numeric_comparison_condition_property::base_evasion)
-				(lang::keywords::rf::base_energy_shield,           lang::numeric_comparison_condition_property::base_energy_shield)
-				(lang::keywords::rf::base_ward,                    lang::numeric_comparison_condition_property::base_ward)
-				(lang::keywords::rf::has_searing_exarch_implicit,  lang::numeric_comparison_condition_property::has_searing_exarch_implicit)
-				(lang::keywords::rf::has_eater_of_worlds_implicit, lang::numeric_comparison_condition_property::has_eater_of_worlds_implicit)
-			;
-		}
-	};
-	const numeric_comparison_condition_properties_ numeric_comparison_condition_properties;
+			using property = lang::official_condition_property;
 
-	struct string_array_condition_properties_ : x3::symbols<lang::string_array_condition_property>
-	{
-		string_array_condition_properties_()
-		{
 			add
-				(lang::keywords::rf::class_,                   lang::string_array_condition_property::class_)
-				(lang::keywords::rf::base_type,                lang::string_array_condition_property::base_type)
-				(lang::keywords::rf::enchantment_passive_node, lang::string_array_condition_property::enchantment_passive_node)
-				(lang::keywords::rf::archnemesis_mod,          lang::string_array_condition_property::archnemesis_mod)
-			;
-		}
-	};
-	const string_array_condition_properties_ string_array_condition_properties;
+				// boolean
+				(lang::keywords::rf::identified,                property::identified)
+				(lang::keywords::rf::corrupted,                 property::corrupted)
+				(lang::keywords::rf::mirrored,                  property::mirrored)
+				(lang::keywords::rf::elder_item,                property::elder_item)
+				(lang::keywords::rf::shaper_item,               property::shaper_item)
+				(lang::keywords::rf::fractured_item,            property::fractured_item)
+				(lang::keywords::rf::synthesised_item,          property::synthesised_item)
+				(lang::keywords::rf::any_enchantment,           property::any_enchantment)
+				(lang::keywords::rf::shaped_map,                property::shaped_map)
+				(lang::keywords::rf::elder_map,                 property::elder_map)
+				(lang::keywords::rf::blighted_map,              property::blighted_map)
+				(lang::keywords::rf::replica,                   property::replica)
+				(lang::keywords::rf::scourged,                  property::scourged)
+				(lang::keywords::rf::uber_blighted_map,         property::uber_blighted_map)
+				(lang::keywords::rf::has_implicit_mod,          property::has_implicit_mod)
+				(lang::keywords::rf::has_crucible_passive_tree, property::has_crucible_passive_tree)
+				(lang::keywords::rf::alternate_quality,         property::alternate_quality)
+				(lang::keywords::rf::transfigured_gem,          property::transfigured_gem)
 
-	struct ranged_string_array_condition_properties_ : x3::symbols<lang::ranged_string_array_condition_property>
-	{
-		ranged_string_array_condition_properties_()
-		{
-			add
-				(lang::keywords::rf::has_explicit_mod, lang::ranged_string_array_condition_property::has_explicit_mod)
-				(lang::keywords::rf::has_enchantment,  lang::ranged_string_array_condition_property::has_enchantment)
-			;
-		}
-	};
-	const ranged_string_array_condition_properties_ ranged_string_array_condition_properties;
+				// influence
+				(lang::keywords::rf::has_influence,             property::has_influence)
 
-	struct socket_spec_condition_properties_ : x3::symbols<bool>
-	{
-		socket_spec_condition_properties_()
-		{
-			add
-				(lang::keywords::rf::sockets,      false)
-				(lang::keywords::rf::socket_group, true)
-			;
-		}
-	};
-	const socket_spec_condition_properties_ socket_spec_condition_properties;
+				// rarity
+				(lang::keywords::rf::rarity,                    property::rarity)
 
-	struct boolean_condition_properties_ : x3::symbols<lang::boolean_condition_property>
-	{
-		boolean_condition_properties_()
-		{
-			add
-				(lang::keywords::rf::identified,        lang::boolean_condition_property::identified)
-				(lang::keywords::rf::corrupted,         lang::boolean_condition_property::corrupted)
-				(lang::keywords::rf::mirrored,          lang::boolean_condition_property::mirrored)
-				(lang::keywords::rf::elder_item,        lang::boolean_condition_property::elder_item)
-				(lang::keywords::rf::shaper_item,       lang::boolean_condition_property::shaper_item)
-				(lang::keywords::rf::fractured_item,    lang::boolean_condition_property::fractured_item)
-				(lang::keywords::rf::synthesised_item,  lang::boolean_condition_property::synthesised_item)
-				(lang::keywords::rf::any_enchantment,   lang::boolean_condition_property::any_enchantment)
-				(lang::keywords::rf::shaped_map,        lang::boolean_condition_property::shaped_map)
-				(lang::keywords::rf::elder_map,         lang::boolean_condition_property::elder_map)
-				(lang::keywords::rf::blighted_map,      lang::boolean_condition_property::blighted_map)
-				(lang::keywords::rf::replica,           lang::boolean_condition_property::replica)
-				(lang::keywords::rf::alternate_quality, lang::boolean_condition_property::alternate_quality)
-				(lang::keywords::rf::scourged,          lang::boolean_condition_property::scourged)
-				(lang::keywords::rf::uber_blighted_map, lang::boolean_condition_property::uber_blighted_map)
-				(lang::keywords::rf::has_implicit_mod,  lang::boolean_condition_property::has_implicit_mod)
-				(lang::keywords::rf::has_crucible_passive_tree, lang::boolean_condition_property::has_crucible_passive_tree)
-				(lang::keywords::rf::transfigured_gem,  lang::boolean_condition_property::transfigured_gem)
+				// integer
+				(lang::keywords::rf::item_level,                   property::item_level)
+				(lang::keywords::rf::drop_level,                   property::drop_level)
+				(lang::keywords::rf::quality,                      property::quality)
+				(lang::keywords::rf::linked_sockets,               property::linked_sockets)
+				(lang::keywords::rf::height,                       property::height)
+				(lang::keywords::rf::width,                        property::width)
+				(lang::keywords::rf::stack_size,                   property::stack_size)
+				(lang::keywords::rf::gem_level,                    property::gem_level)
+				(lang::keywords::rf::map_tier,                     property::map_tier)
+				(lang::keywords::rf::area_level,                   property::area_level)
+				(lang::keywords::rf::corrupted_mods,               property::corrupted_mods)
+				(lang::keywords::rf::enchantment_passive_num,      property::enchantment_passive_num)
+				(lang::keywords::rf::base_defence_percentile,      property::base_defence_percentile)
+				(lang::keywords::rf::base_armour,                  property::base_armour)
+				(lang::keywords::rf::base_evasion,                 property::base_evasion)
+				(lang::keywords::rf::base_energy_shield,           property::base_energy_shield)
+				(lang::keywords::rf::base_ward,                    property::base_ward)
+				(lang::keywords::rf::has_searing_exarch_implicit,  property::has_searing_exarch_implicit)
+				(lang::keywords::rf::has_eater_of_worlds_implicit, property::has_eater_of_worlds_implicit)
+
+				// array of strings
+				(lang::keywords::rf::class_,                   property::class_)
+				(lang::keywords::rf::base_type,                property::base_type)
+				(lang::keywords::rf::enchantment_passive_node, property::enchantment_passive_node)
+				(lang::keywords::rf::archnemesis_mod,          property::archnemesis_mod)
+
+				// counted array of strings
+				(lang::keywords::rf::has_explicit_mod, property::has_explicit_mod)
+				(lang::keywords::rf::has_enchantment,  property::has_enchantment)
+
+				// sockets
+				(lang::keywords::rf::sockets,      property::sockets)
+				(lang::keywords::rf::socket_group, property::socket_group)
 			;
 		}
 	};
-	const boolean_condition_properties_ boolean_condition_properties;
+	const official_condition_properties_ official_condition_properties;
 
 	// ---- actions ----
 

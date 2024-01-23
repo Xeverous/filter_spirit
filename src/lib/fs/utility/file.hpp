@@ -3,6 +3,7 @@
 #include <fs/log/logger.hpp>
 
 #include <filesystem>
+#include <optional>
 #include <system_error>
 #include <string>
 #include <string_view>

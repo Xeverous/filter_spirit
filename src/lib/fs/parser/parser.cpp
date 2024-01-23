@@ -83,7 +83,8 @@ namespace fs::parser
 std::vector<detail::range_type> find_lines(detail::iterator_type first, detail::iterator_type last)
 {
 	std::vector<detail::range_type> result;
-	result.reserve((last - first) / 64u); // text length divided by average line length
+	// text length divided by average line length
+	result.reserve(static_cast<std::size_t>((last - first) / 64));
 
 	while (first != last) {
 		const auto line_first = first;
@@ -103,8 +104,8 @@ text_position line_lookup::text_position_for(const char* pos) const
 	if (it == _lines.end())
 		return text_position{_lines.size(), 0u};
 
-	const std::size_t line_number = it - _lines.begin();
-	const std::size_t column = pos - it->begin();
+	const auto line_number = static_cast<std::size_t>(it - _lines.begin());
+	const auto column = static_cast<std::size_t>(pos - it->begin());
 	return text_position{line_number, column};
 }
 

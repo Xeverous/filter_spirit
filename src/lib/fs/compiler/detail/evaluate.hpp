@@ -112,18 +112,21 @@ evaluate(
 	diagnostics_store& diagnostics);
 
 [[nodiscard]] boost::optional<lang::object>
+evaluate_literal_sequence(
+	settings st,
+	const parser::ast::rf::literal_sequence& sequence,
+	diagnostics_store& diagnostics);
+
+[[nodiscard]] boost::optional<lang::object>
 evaluate_sequence(
 	settings st,
 	const parser::ast::sf::sequence& sequence,
 	const symbol_table& symbols,
-	int min_allowed_elements,
-	boost::optional<int> max_allowed_elements,
 	diagnostics_store& diagnostics);
 
-[[nodiscard]] boost::optional<lang::object>
-evaluate_literal_sequence(
-	settings st,
-	const parser::ast::rf::literal_sequence& sequence,
+[[nodiscard]] bool
+check_object_size(
+	const lang::object& obj,
 	int min_allowed_elements,
 	boost::optional<int> max_allowed_elements,
 	diagnostics_store& diagnostics);
@@ -142,13 +145,15 @@ get_as(
 	return std::get<T>(sobj.value);
 }
 
+template <>
 [[nodiscard]] boost::optional<lang::fractional>
-get_as_fractional(
+get_as<lang::fractional>(
 	const lang::single_object& sobj,
 	diagnostics_store& diagnostics);
 
+template <>
 [[nodiscard]] boost::optional<lang::socket_spec>
-get_as_socket_spec(
+get_as<lang::socket_spec>(
 	const lang::single_object& sobj,
 	diagnostics_store& diagnostics);
 

@@ -42,10 +42,87 @@ const char* skip(const char* first, const char* last) noexcept
 	return first;
 }
 
+[[nodiscard]] bool compare_strings_ignore_diacritics_impl(
+	std::string_view value, std::string_view requirement, bool allow_starts_with_match)
+{
+	struct two_byte_letter
+	{
+		char ascii;
+		unsigned char utf8_first_byte;
+		unsigned char utf8_second_byte;
+	};
+
+	const auto letters = {
+		two_byte_letter{'o', static_cast<unsigned char>(0xC3), static_cast<unsigned char>(0xB6)}, // ö
+		two_byte_letter{'O', static_cast<unsigned char>(0xC3), static_cast<unsigned char>(0x96)}  // Ö
+	};
+
+	      auto req_it   = requirement.begin();
+	const auto req_last = requirement.end();
+	      auto val_it   = value.begin();
+	const auto val_last = value.end();
+
+	while (req_it != req_last && val_it != val_last) {
+		if (*req_it == *val_it) {
+			++req_it;
+			++val_it;
+			continue;
+		}
+
+		for (auto letter : letters) {
+			if (*req_it == letter.ascii && static_cast<unsigned char>(*val_it) == letter.utf8_first_byte) {
+				if (++val_it == val_last)
+					return false;
+
+				if (static_cast<unsigned char>(*val_it) == letter.utf8_second_byte) {
+					++req_it;
+					++val_it;
+					continue;
+				}
+				else {
+					return false;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	FS_ASSERT_MSG(req_it == req_last || val_it == val_last, "at least one of iterators should hit end");
+
+	if (val_it == val_last) {
+		// both iterators hit end: exact match (both sequences exhausted)
+		// only val it hit end: no match (requirement not exhausted)
+		return req_it == req_last;
+	}
+
+	// only req it hit end: starts-with match (value starts with requirement)
+	return allow_starts_with_match;
+}
+
 } // namespace
 
 namespace fs::utility
 {
+
+bool compare_strings_ignore_diacritics(
+	std::string_view value, std::string_view requirement, bool exact_match_required)
+{
+	if (requirement.size() > value.size())
+		return false;
+
+	if (exact_match_required)
+		return compare_strings_ignore_diacritics_impl(value, requirement, false);
+
+	while (value.size() >= requirement.size()) {
+		if (compare_strings_ignore_diacritics_impl(value, requirement, true))
+			return true;
+
+		value.remove_prefix(1u);
+	}
+
+	return false;
+}
 
 const char* find_line_end(const char* first, const char* last) noexcept
 {
@@ -125,12 +202,12 @@ std::string_view make_string_view(const char* first, const char* last) noexcept
 	if (first == last)
 		return std::string_view();
 
-	return std::string_view(first, last - first);
+	return std::string_view(first, static_cast<std::size_t>(last - first));
 }
 
 std::string_view ltrim(std::string_view str, char c)
 {
-	std::string_view::difference_type count = 0;
+	std::string_view::size_type count = 0;
 
 	for (char ch : str) {
 		if (ch == c)
@@ -145,7 +222,7 @@ std::string_view ltrim(std::string_view str, char c)
 
 std::string_view rtrim(std::string_view str, char c)
 {
-	std::string_view::difference_type count = 0;
+	std::string_view::size_type count = 0;
 
 	for (auto it = str.rbegin(); it != str.rend(); ++it) {
 		if (*it == c)
@@ -189,9 +266,9 @@ underlined_code code_underliner::next() noexcept
 
 	const char *const indent_first = code_line_first;
 	const char *const indent_last  = skip_indent(code_line_first, code_line_last);
-	const std::size_t indent = indent_last - indent_first;
+	const auto indent = indent_last - indent_first;
 
-	const auto spaces = [&]() -> std::size_t {
+	const auto spaces = [&]() -> std::ptrdiff_t {
 		if (indent_last < underline_first)
 			return underline_first - indent_last;
 		else
@@ -200,11 +277,16 @@ underlined_code code_underliner::next() noexcept
 
 	const char *const underline_line_first = indent_last + spaces;
 	const char *const underline_line_last  = find_line_end(underline_line_first, underline_last);
-	const std::size_t underlines = underline_line_last - underline_line_first;
+	const auto underlines = underline_line_last - underline_line_first;
 
 	code_it = skip_lf_cr(code_line_last, code_last);
 
-	return underlined_code{code_line, indent, spaces, underlines};
+	return underlined_code{
+		code_line,
+		static_cast<std::size_t>(indent),
+		static_cast<std::size_t>(spaces),
+		static_cast<std::size_t>(underlines)
+	};
 }
 
 std::string range_underline_to_string(

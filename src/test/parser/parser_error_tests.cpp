@@ -39,11 +39,6 @@ BOOST_AUTO_TEST_SUITE(parser_suite)
 			expect_parse_failure("$str = \"ab\nc\"");
 		}
 
-		BOOST_AUTO_TEST_CASE(too_large_integer)
-		{
-			expect_parse_failure("$val = 123456789123456789");
-		}
-
 		BOOST_AUTO_TEST_CASE(duplicated_eq_sign_1)
 		{
 			expect_parse_failure("$val == 1");

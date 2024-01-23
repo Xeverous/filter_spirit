@@ -401,55 +401,6 @@ $actions_gem_low = {
 	SetFontSize $font_gem_low
 }
 
-$blocks_gem_price = {
-	Price >= $cfg_gems_high_min_value
-	{
-		Expand $actions_gem_high
-		Show
-	}
-
-	Price < $cfg_gems_high_min_value
-	Price >= $cfg_gems_mid_min_value
-	{
-		Expand $actions_gem_mid
-		ShowDiscard $show_gems_mid
-	}
-
-	Price < $cfg_gems_mid_min_value
-	Price > $cfg_gems_low_min_value
-	{
-		Expand $actions_gem_low
-		ShowDiscard $show_gems_low
-	}
-
-	Price <= $cfg_gems_low_min_value
-	{
-		ShowDiscard $show_gems_very_low
-	}
-}
-
-$blocks_gem_quality_price = {
-	Quality 23 {
-		Expand $blocks_gem_price
-	}
-
-	Quality 22 {
-		Expand $blocks_gem_price
-	}
-
-	Quality 21 {
-		Expand $blocks_gem_price
-	}
-
-	Quality 20 {
-		Expand $blocks_gem_price
-	}
-
-	Quality 0 {
-		Expand $blocks_gem_price
-	}
-}
-
 $actions_base_defence = {
 	SetBackgroundColor $color_base_defence
 	SetFontSize $font_base_defence
@@ -1132,19 +1083,16 @@ Class == "Expedition Logbook" {
 # level: 21 / 20 / 19 / 18
 # quality: 23 / 22 / 21 / 20 / >0
 # corruption: True / False
-# other: Awakened / Vaal / Alternate Quality / Vaal + Alternate Quality
+# other: Awakened / Vaal / Transfigured / Vaal + Transfigured
 # some combinations can not exist:
 # - non-corrupted Vaal
 # - non-corrupted lvl 20+ or quality 20+
-# - Alternate Quality + Awakened
+# - Transfigured + Awakened
 # - Vaal + Awakened
 #
 # This implementation (in order):
-# - autogeneration for any sensible combination (without unknown-value blocks)
-#   - level 1, quality {20, 0}, awakened
-#   - level {21, 20, 19, 18, 1}, quality {23, 22, 21, 20, 0}, corrupted
-#   - level {20, 19, 18, 1}, quality {20, 0}
-# - any Alternate Quality
+# - autogeneration (without unknown-value blocks)
+# - any Transfigured
 # - any Awakened
 # - any drop-only (useful setting for SSF)
 # - any with level >= 20
@@ -1153,88 +1101,36 @@ Class == "Expedition Logbook" {
 # - any
 Class == "Skill Gems" "Support Gems" {
 	Autogen "gems" {
-		GemLevel 1
-		Corrupted False
-		BaseType "Awakened"
+		Price >= $cfg_gems_high_min_value
 		{
-			Quality 20 {
-				Expand $blocks_gem_price
-			}
-
-			Quality 0 {
-				Expand $blocks_gem_price
-			}
+			Expand $actions_gem_high
+			Show
 		}
 
-		Corrupted True {
-			GemLevel 21 {
-				Expand $blocks_gem_quality_price
-			}
-
-			GemLevel 20 {
-				Expand $blocks_gem_quality_price
-			}
-
-			GemLevel 19 {
-				Expand $blocks_gem_quality_price
-			}
-
-			GemLevel 18 {
-				Expand $blocks_gem_quality_price
-			}
-
-			GemLevel 1 {
-				Expand $blocks_gem_quality_price
-			}
+		Price < $cfg_gems_high_min_value
+		Price >= $cfg_gems_mid_min_value
+		{
+			Expand $actions_gem_mid
+			ShowDiscard $show_gems_mid
 		}
 
-		Corrupted False {
-			GemLevel 20 {
-				Quality 20 {
-					Expand $blocks_gem_price
-				}
+		Price < $cfg_gems_mid_min_value
+		Price > $cfg_gems_low_min_value
+		{
+			Expand $actions_gem_low
+			ShowDiscard $show_gems_low
+		}
 
-				Quality 0 {
-					Expand $blocks_gem_price
-				}
-			}
-
-			GemLevel 19 {
-				Quality 20 {
-					Expand $blocks_gem_price
-				}
-
-				Quality 0 {
-					Expand $blocks_gem_price
-				}
-			}
-
-			GemLevel 18 {
-				Quality 20 {
-					Expand $blocks_gem_price
-				}
-
-				Quality 0 {
-					Expand $blocks_gem_price
-				}
-			}
-
-			GemLevel 1 {
-				Quality 20 {
-					Expand $blocks_gem_price
-				}
-
-				Quality 0 {
-					Expand $blocks_gem_price
-				}
-			}
+		Price <= $cfg_gems_low_min_value
+		{
+			ShowDiscard $show_gems_very_low
 		}
 	}
 
 	# next blocks have fixed Show because
 	# if autogeneration did not caught them, they have unknown value
 
-	AlternateQuality True {
+	TransfiguredGem True {
 		SetBackgroundColor $color_white
 		SetTextColor $color_gem
 		SetBorderColor $color_gem

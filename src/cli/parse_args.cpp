@@ -100,14 +100,14 @@ int run(int argc, char* argv[])
 		;
 
 		bool opt_generate = false;
-		fs::generator::settings st;
+		fs::compiler::settings st;
 		po::options_description generation_options("generation options");
 		generation_options.add_options()
 			("generate,g",  po::bool_switch(&opt_generate), "generate an item filter")
 			("print-ast,p", po::bool_switch(&st.print_ast), "print abstract syntax tree (for debug purposes)")
-			("stop-on-error", po::bool_switch(&st.compile_settings.error_handling.stop_on_error),
+			("stop-on-error", po::bool_switch(&st.error_handling.stop_on_error),
 				"stop on first error")
-			("warning-is-error", po::bool_switch(&st.compile_settings.error_handling.treat_warnings_as_errors),
+			("warning-is-error", po::bool_switch(&st.error_handling.treat_warnings_as_errors),
 				"treat warnings as errors")
 		;
 

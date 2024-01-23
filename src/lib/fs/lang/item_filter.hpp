@@ -1,25 +1,26 @@
 #pragma once
 
-#include <fs/lang/condition_set.hpp>
+#include <fs/lang/conditions.hpp>
 #include <fs/lang/action_set.hpp>
-#include <fs/lang/item.hpp>
 
 #include <iosfwd>
 #include <optional>
 #include <vector>
+#include <utility>
+#include <iterator>
+#include <functional>
 
 namespace fs::lang
 {
+
+// ---- block pieces other than conditions and actions ----
+
+struct item;
 
 enum class item_visibility_policy { show, hide, discard };
 
 struct item_visibility
 {
-	item_visibility(item_visibility_policy policy, position_tag origin)
-	: policy(policy), origin(origin)
-	{
-	}
-
 	item_visibility_policy policy;
 	position_tag origin;
 };
@@ -29,56 +30,88 @@ struct block_continuation
 	std::optional<position_tag> origin;
 };
 
+enum class block_match_status { success, failure_mismatch, failure_invalid_block };
+
+struct block_match_result
+{
+	bool is_successful() const { return status == block_match_status::success; }
+
+	block_match_status status = block_match_status::failure_invalid_block;
+	std::optional<position_tag> continue_origin;
+	std::vector<condition_match_result> match_results;
+};
+
+// ---- real_filter_representation ----
+
 struct item_filter_block
 {
 	item_filter_block(item_visibility visibility)
 	: visibility(visibility)
-	{
-	}
+	{}
 
 	item_filter_block(
 		item_visibility visibility,
-		condition_set conditions,
+		official_conditions conditions,
 		action_set actions,
 		block_continuation continuation)
 	: visibility(visibility)
-	, conditions(conditions)
-	, actions(actions)
+	, conditions(std::move(conditions))
+	, actions(std::move(actions))
 	, continuation(continuation)
+	{}
+
+	bool is_valid() const
 	{
+		return conditions.is_valid() && visibility.policy != item_visibility_policy::discard;
 	}
 
-	void generate(std::ostream& output_stream) const;
+	block_match_result test_item(const item& itm, int area_level) const;
+
+	void print(std::ostream& output_stream) const;
 
 	item_visibility visibility;
-	condition_set conditions;
+	official_conditions conditions;
 	action_set actions;
 	block_continuation continuation;
 };
 
+struct item_filter
+{
+	std::vector<item_filter_block> blocks;
+};
+
+// ---- pieces for spirit filter ----
+
+namespace market { struct item_price_data; }
+
+struct block_generation_info
+{
+	item_visibility visibility;
+	action_set actions;
+	block_continuation continuation;
+	position_tag autogen_origin;
+	price_range_condition price_range;
+};
+
+using blocks_generator_func_type = void (
+	const block_generation_info&,
+	const market::item_price_data&,
+	std::back_insert_iterator<std::vector<item_filter_block>>
+);
+
 struct autogen_extension
 {
-	fractional_range_condition price_range;
-	autogen_condition condition;
+	std::function<blocks_generator_func_type> blocks_generator; // should never be empty
+	price_range_condition price_range;
+	position_tag origin;
 };
+
+// ---- spirit_filter_representation ----
 
 struct spirit_item_filter_block
 {
 	item_filter_block block;
-
-	// spirit filter extensions
 	std::optional<autogen_extension> autogen;
-};
-
-/**
- * @class a core type representing item filter
- *
- * @details This is a result of the parsers and a type
- * used in various debugging functionalities
- */
-struct item_filter
-{
-	std::vector<item_filter_block> blocks;
 };
 
 struct spirit_item_filter
@@ -86,13 +119,14 @@ struct spirit_item_filter
 	std::vector<spirit_item_filter_block> blocks;
 };
 
+// ---- types for item filtering ----
+
 struct item_visibility_style
 {
 	bool show;
 	position_tag origin;
 };
 
-// all of the styles applied to an item after filtering
 struct item_style
 {
 	item_style();
@@ -111,18 +145,12 @@ struct item_style
 	std::optional<play_effect_action> play_effect;
 };
 
-struct block_match_result
-{
-	std::optional<lang::position_tag> continue_origin;
-	condition_set_match_result condition_set_result;
-};
-
 struct item_filtering_result
 {
-	// final style applied to the item
 	item_style style;
 
-	// each element represents a match attempt against next filter block
+	// Each element represents a match attempt against subsequent filter block.
+	// size() may be smaller than filter's size() because filtering stops on first non-continue match.
 	std::vector<block_match_result> match_history;
 };
 

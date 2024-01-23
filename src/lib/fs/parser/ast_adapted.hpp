@@ -37,6 +37,36 @@ BOOST_FUSION_ADAPT_STRUCT(
 	fs::lang::switch_drop_sound,
 	enable, if_alert_sound)
 
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::common::comparison_expression,
+	operator_, integer)
+
+// -------- real filter --------
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::rf::color_literal,
+	r, g, b, a)
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::rf::condition,
+	property, comparison, seq)
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::rf::color_action,
+	action, color)
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::rf::play_alert_sound_action,
+	positional, id, volume)
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::rf::custom_alert_sound_action,
+	optional, path, volume)
+
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::rf::filter_block,
+	visibility, rules)
+
 // -------- spirit filter --------
 
 // ---- whitespace ----
@@ -67,35 +97,11 @@ BOOST_FUSION_ADAPT_STRUCT(
 
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::sf::price_comparison_condition,
-	comparison_type, seq)
+	comparison, seq)
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::sf::rarity_comparison_condition,
-	comparison_type, seq)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::sf::numeric_comparison_condition,
-	property, comparison_type, seq)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::sf::string_array_condition,
-	property, exact_match, seq)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::sf::ranged_string_array_condition,
-	property, comparison_type, integer, seq)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::sf::has_influence_condition,
-	exact_match, seq)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::sf::socket_spec_condition,
-	links_matter, comparison_type, seq)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::sf::boolean_condition,
-	property, seq)
+	fs::parser::ast::sf::official_condition,
+	property, comparison, seq)
 
 // ---- actions ----
 
@@ -123,58 +129,8 @@ BOOST_FUSION_ADAPT_STRUCT(
 
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::sf::unknown_statement,
-	name, comparison_type, seq)
+	name, comparison, seq)
 
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::sf::filter_structure,
 	definitions, statements)
-
-// -------- real filter --------
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::rf::color_literal,
-	r, g, b, a)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::rf::rarity_condition,
-	comparison_type, rarity)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::rf::numeric_condition,
-	property, comparison_type, integer)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::rf::string_array_condition,
-	property, exact_match, strings)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::rf::ranged_string_array_condition,
-	property, comparison_type, integer, strings)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::rf::has_influence_condition,
-	exact_match, spec)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::rf::socket_spec_condition,
-	links_matter, comparison_type, literals)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::rf::boolean_condition,
-	property, value)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::rf::color_action,
-	action, color)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::rf::play_alert_sound_action,
-	positional, id, volume)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::rf::custom_alert_sound_action,
-	optional, path, volume)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::rf::filter_block,
-	visibility, rules)

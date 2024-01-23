@@ -31,7 +31,7 @@ std::string load_file(const std::filesystem::path& path, std::error_code& ec)
 	}
 
 	std::string file_contents(file_size, '\0');
-	file.read(file_contents.data(), file_size);
+	file.read(file_contents.data(), static_cast<std::streamsize>(file_size));
 	return file_contents;
 }
 
@@ -58,7 +58,7 @@ std::error_code save_file(const std::filesystem::path& path, std::string_view fi
 	if (!file.good())
 		return std::make_error_code(std::io_errc::stream);
 
-	file.write(file_contents.data(), file_contents.size());
+	file.write(file_contents.data(), static_cast<std::streamsize>(file_contents.size()));
 	return {};
 }
 

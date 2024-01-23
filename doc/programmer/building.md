@@ -29,6 +29,8 @@ Note that:
 
 Bolded dependencies need to be build. Rest are header-only libraries.
 
+For Ubuntu-derived distros install OpenSSL this way: `sudo apt install libssl-dev`.
+
 ## invokation
 
 Just use CMake as it is supposed to be used:

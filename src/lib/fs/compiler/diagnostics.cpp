@@ -7,10 +7,10 @@ namespace fs::compiler
 
 using dmid = diagnostic_message_id;
 
-void diagnostics_store::push_error_invalid_integer_value(int min, int max, lang::integer actual)
+void diagnostics_store::push_error_value_out_of_range(int min, int max, lang::integer actual)
 {
-	messages.push_back(make_error(
-		dmid::invalid_integer_value,
+	push_message(make_error(
+		dmid::value_out_of_range,
 		actual.origin,
 		"invalid integer value, expected value in range ",
 		std::to_string(min),
@@ -27,7 +27,7 @@ void diagnostics_store::push_error_invalid_amount_of_arguments(
 	lang::position_tag origin)
 {
 	if (expected_max) {
-		messages.push_back(make_error(
+		push_message(make_error(
 			dmid::invalid_amount_of_arguments,
 			origin,
 			"invalid amount of arguments, expected from ",
@@ -38,7 +38,7 @@ void diagnostics_store::push_error_invalid_amount_of_arguments(
 			std::to_string(actual)));
 	}
 	else {
-		messages.push_back(make_error(
+		push_message(make_error(
 			dmid::invalid_amount_of_arguments,
 			origin,
 			"invalid amount of arguments, expected at least ",
@@ -52,17 +52,17 @@ void diagnostics_store::push_error_bound_redefinition(bool is_lower, lang::posit
 {
 	const auto id = is_lower ? dmid::lower_bound_redefinition : dmid::upper_bound_redefinition;
 	const auto str = is_lower ? "lower" : "upper";
-	messages.push_back(make_error(
+	push_message(make_error(
 		id,
 		redefinition,
 		str,
 		" bound redefinition (the same bound for comparison can not be specified again in the same block or nested blocks)"));
-	messages.push_back(make_note_first_defined_here(original));
+	push_message(make_note_first_defined_here(original));
 }
 
 void diagnostics_store::push_error_type_mismatch(lang::object_type expected, lang::object_type actual, lang::position_tag origin)
 {
-	messages.push_back(make_error(
+	push_message(make_error(
 		dmid::type_mismatch,
 		origin,
 		"type mismatch in expression, expected expression of type '",
@@ -74,7 +74,7 @@ void diagnostics_store::push_error_type_mismatch(lang::object_type expected, lan
 
 void diagnostics_store::push_error_internal_compiler_error(std::string_view function_name, lang::position_tag origin)
 {
-	messages.push_back(make_error(
+	push_message(make_error(
 		dmid::internal_compiler_error,
 		origin,
 		log::strings::internal_compiler_error,
@@ -87,14 +87,25 @@ void diagnostics_store::push_error_internal_compiler_error(std::string_view func
 void diagnostics_store::push_error_autogen_incompatible_condition(
 	lang::position_tag autogen_origin,
 	lang::position_tag condition_origin,
-	std::string required_matching_value)
+	std::string_view required_matching_value)
 {
-	messages.push_back(make_error(
+	push_message(make_error(
 		dmid::autogen_incompatible_condition,
 		condition_origin,
 		"autogen-incompatible condition: it should either not exist or allow value ",
 		std::move(required_matching_value)));
-	messages.push_back(make_note_minor(autogen_origin, "autogeneration specified here"));
+	push_message(make_note_minor(autogen_origin, "autogeneration specified here"));
+}
+
+void diagnostics_store::push_error_autogen_forbidden_condition(
+	lang::position_tag autogen_origin,
+	lang::position_tag condition_origin)
+{
+	push_message(make_error(
+		dmid::autogen_forbidden_condition,
+		condition_origin,
+		"autogen-forbidden condition: it should not be present for this autogen"));
+	push_message(make_note_minor(autogen_origin, "autogeneration specified here"));
 }
 
 void diagnostics_store::push_error_autogen_missing_condition(
@@ -102,17 +113,17 @@ void diagnostics_store::push_error_autogen_missing_condition(
 	lang::position_tag autogen_origin,
 	std::string_view required_condition)
 {
-	messages.push_back(make_error(
+	push_message(make_error(
 		dmid::autogen_missing_condition,
 		visibility_origin,
 		"autogen with missing condition: ",
 		required_condition));
-	messages.push_back(make_note_minor(autogen_origin, "autogeneration specified here"));
+	push_message(make_note_minor(autogen_origin, "autogeneration specified here"));
 }
 
 void diagnostics_store::output_messages(const parser::parse_metadata& metadata, log::logger& logger) const
 {
-	for (const diagnostic_message& msg : messages) {
+	for (const diagnostic_message& msg : m_messages) {
 		const log::severity s =
 			msg.severity == diagnostic_message_severity::error   ? log::severity::error   :
 			msg.severity == diagnostic_message_severity::warning ? log::severity::warning :

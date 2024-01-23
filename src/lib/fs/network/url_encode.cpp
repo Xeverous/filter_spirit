@@ -5,13 +5,13 @@
 namespace
 {
 
-std::pair<unsigned char, unsigned char> hexchar(unsigned char c)
+std::pair<char, char> hexchar(char c)
 {
-	unsigned char hex1 = c / 16;
-	unsigned char hex2 = c % 16;
+	unsigned char hex1 = static_cast<unsigned char>(c) / 16u;
+	unsigned char hex2 = static_cast<unsigned char>(c) % 16u;
 	hex1 += hex1 <= 9 ? '0' : 'a' - 10;
 	hex2 += hex2 <= 9 ? '0' : 'a' - 10;
-	return {hex1, hex2};
+	return {static_cast<char>(hex1), static_cast<char>(hex2)};
 }
 
 }
