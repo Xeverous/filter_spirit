@@ -5,6 +5,10 @@ build/
 *.code-workspace
 .vscode/
 
+# Visual Studio Code clangd plugin
+.cache/
+compile_commands.json
+
 # Eclipse project files
 .project
 .cproject
