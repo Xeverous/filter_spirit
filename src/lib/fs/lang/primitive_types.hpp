@@ -14,14 +14,6 @@
 namespace fs::lang
 {
 
-/*
- * Some types have defaulted origin to make braced-init
- * possible with less arguments than the number of members.
- *
- * Other members are left without any "= init" to force
- * correct initialization in code by issuing compiler warnings.
- */
-
 struct none
 {
 	position_tag origin;
@@ -41,7 +33,7 @@ inline bool operator!=(temp, temp) noexcept { return false; }
 struct boolean
 {
 	bool value;
-	position_tag origin = {};
+	position_tag origin;
 };
 
 inline std::string_view to_string_view(bool value) noexcept
@@ -55,7 +47,7 @@ inline bool operator!=(boolean lhs, boolean rhs) noexcept { return !(lhs == rhs)
 struct integer
 {
 	int value;
-	position_tag origin = {};
+	position_tag origin;
 };
 
 inline bool operator==(integer lhs, integer rhs) noexcept { return lhs.value == rhs.value; }
@@ -64,7 +56,7 @@ inline bool operator!=(integer lhs, integer rhs) noexcept { return !(lhs == rhs)
 struct fractional
 {
 	double value;
-	position_tag origin = {};
+	position_tag origin;
 };
 
 // Comparing floating-points directly triggers -Wfloat-equal warning.
@@ -112,7 +104,7 @@ enum class influence_type { shaper, elder, crusader, redeemer, hunter, warlord }
 struct influence
 {
 	influence_type value;
-	position_tag origin = {};
+	position_tag origin;
 };
 
 inline bool operator==(influence lhs, influence rhs) noexcept { return lhs.value == rhs.value; }
@@ -156,7 +148,7 @@ enum class rarity_type { normal, magic, rare, unique };
 struct rarity
 {
 	rarity_type value;
-	position_tag origin = {};
+	position_tag origin;
 };
 
 inline std::string_view to_string_view(rarity_type rarity_)
@@ -217,7 +209,7 @@ inline std::string_view to_string_view(shape_type s)
 struct shape
 {
 	shape_type value;
-	position_tag origin = {};
+	position_tag origin;
 };
 
 inline bool operator==(shape lhs, shape rhs) noexcept { return lhs.value == rhs.value; }
@@ -259,7 +251,7 @@ inline std::string_view to_string_view(suit_type s)
 struct suit
 {
 	suit_type value;
-	position_tag origin = {};
+	position_tag origin;
 };
 
 inline bool operator==(suit lhs, suit rhs) noexcept { return lhs.value == rhs.value; }
@@ -298,7 +290,7 @@ inline std::string_view to_string_view(shaper_voice_line_type voice_line)
 struct shaper_voice_line
 {
 	shaper_voice_line_type value;
-	position_tag origin = {};
+	position_tag origin;
 };
 
 inline bool operator==(shaper_voice_line lhs, shaper_voice_line rhs) noexcept { return lhs.value == rhs.value; }
@@ -307,7 +299,7 @@ inline bool operator!=(shaper_voice_line lhs, shaper_voice_line rhs) noexcept { 
 struct string
 {
 	std::string value;
-	position_tag origin = {};
+	position_tag origin;
 };
 
 inline bool operator==(const string& lhs, const string& rhs) noexcept { return lhs.value == rhs.value; }

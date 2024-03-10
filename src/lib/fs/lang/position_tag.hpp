@@ -8,6 +8,8 @@ namespace fs::lang {
 
 using position_tag = boost::spirit::x3::position_tagged;
 
+inline position_tag no_origin() { return {}; }
+
 inline position_tag merge_origins(position_tag first, position_tag last)
 {
 	FS_ASSERT(first.id_last <= last.id_first);

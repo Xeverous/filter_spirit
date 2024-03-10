@@ -1,9 +1,9 @@
-#include <algorithm>
 #include <fs/lang/item_filter.hpp>
 #include <fs/lang/keywords.hpp>
 #include <fs/utility/assert.hpp>
 #include <fs/utility/type_traits.hpp>
 
+#include <algorithm>
 #include <utility>
 #include <ostream>
 #include <type_traits>
@@ -13,6 +13,11 @@ namespace fs::lang
 
 namespace
 {
+
+lang::integer make_int(int val)
+{
+	return integer{val, no_origin()};
+};
 
 item_style default_item_style(const item& itm)
 {
@@ -26,20 +31,20 @@ item_style default_item_style(const item& itm)
 	item_style result;
 
 	if (itm.rarity_ == rarity_type::magic)
-		result.text_color = color_action{color{integer{136}, integer{136}, integer{255}, integer{255}}, {}};
+		result.text_color = color_action{color{make_int(136), make_int(136), make_int(255), make_int(255)}, no_origin()};
 	else if (itm.rarity_ == rarity_type::rare)
-		result.text_color = color_action{color{integer{255}, integer{255}, integer{119}, integer{255}}, {}};
+		result.text_color = color_action{color{make_int(255), make_int(255), make_int(119), make_int(255)}, no_origin()};
 	else if (itm.rarity_ == rarity_type::unique)
-		result.text_color = color_action{color{integer{175}, integer{ 96}, integer{ 37}, integer{255}}, {}};
+		result.text_color = color_action{color{make_int(175), make_int( 96), make_int( 37), make_int(255)}, no_origin()};
 
 	if (itm.class_ == item_class_names::currency_stackable || itm.class_ == item_class_names::resonators)
-		result.text_color = color_action{color{integer{170}, integer{158}, integer{130}, integer{255}}, {}};
+		result.text_color = color_action{color{make_int(170), make_int(158), make_int(130), make_int(255)}, no_origin()};
 	else if (itm.class_ == item_class_names::divination_card)
-		result.text_color = color_action{color{integer{ 14}, integer{186}, integer{255}, integer{255}}, {}};
+		result.text_color = color_action{color{make_int( 14), make_int(186), make_int(255), make_int(255)}, no_origin()};
 	else if (itm.class_ == item_class_names::gems_active || itm.class_ == item_class_names::gems_support)
-		result.text_color = color_action{color{integer{ 27}, integer{162}, integer{155}, integer{255}}, {}};
+		result.text_color = color_action{color{make_int( 27), make_int(162), make_int(155), make_int(255)}, no_origin()};
 	else if (itm.class_ == item_class_names::quest_items)
-		result.text_color = color_action{color{integer{ 74}, integer{230}, integer{ 58}, integer{255}}, {}};
+		result.text_color = color_action{color{make_int( 74), make_int(230), make_int( 58), make_int(255)}, no_origin()};
 	// maps are both in these class names and in rarities - border color is the same as text color
 	else if (itm.class_ == item_class_names::maps || itm.class_ == item_class_names::map_fragments)
 		result.border_color = result.text_color;
@@ -86,12 +91,12 @@ void item_filter_block::print(std::ostream& output_stream) const
 }
 
 item_style::item_style()
-: visibility{true, {}}
+: visibility{true, no_origin()}
 // initial color values taken from:
 // https://www.reddit.com/r/pathofexile/comments/f2t4tz/inconsistencies_in_new_filter_syntaxes/fjvo44v/
-, text_color  {color{integer{200}, integer{200}, integer{200}, integer{255}}, {}}
-, background_color{color{integer{0}, integer{0}, integer{0}, integer{240}}, {}}
-, font_size{integer{32}, {}}
+, text_color      {color{make_int(200), make_int(200), make_int(200), make_int(255)}, no_origin()}
+, background_color{color{make_int(  0), make_int(  0), make_int(  0), make_int(240)}, no_origin()}
+, font_size{make_int(32), no_origin()}
 {
 }
 

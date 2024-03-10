@@ -13,9 +13,6 @@ namespace fs::lang
 
 struct color
 {
-	color(integer r, integer g, integer b, std::optional<integer> a = std::nullopt)
-	: r(r), g(g), b(b), a(a) {}
-
 	integer r;
 	integer g;
 	integer b;
@@ -48,10 +45,6 @@ inline bool operator!=(font_size_action lhs, font_size_action rhs) { return !(lh
 
 struct enabled_play_effect
 {
-	// TODO check if all manually-written ctors are actually needed (can initialize subvariants?)
-	enabled_play_effect(suit s, bool is_temporary)
-	: color(s), is_temporary(is_temporary) {}
-
 	suit color;
 	bool is_temporary;
 };
@@ -113,15 +106,6 @@ inline bool operator!=(minimap_icon_action lhs, minimap_icon_action rhs) { retur
 
 struct builtin_alert_sound_id
 {
-	explicit builtin_alert_sound_id(integer id)
-	: id(id) {}
-
-	explicit builtin_alert_sound_id(shaper_voice_line svl)
-	: id(svl) {}
-
-	explicit builtin_alert_sound_id(none n)
-	: id(n) {}
-
 	std::variant<integer, shaper_voice_line, none> id;
 };
 
@@ -130,9 +114,6 @@ inline bool operator!=(builtin_alert_sound_id lhs, builtin_alert_sound_id rhs) {
 
 struct builtin_alert_sound
 {
-	builtin_alert_sound(bool is_positional, builtin_alert_sound_id sound_id)
-	: is_positional(is_positional), sound_id(sound_id) {}
-
 	bool is_disabled() const { return std::holds_alternative<none>(sound_id.id); }
 
 	bool is_positional; // this is not a lang type because it is implied by keyword, not by value
@@ -147,9 +128,6 @@ inline bool operator!=(builtin_alert_sound lhs, builtin_alert_sound rhs) { retur
 
 struct custom_alert_sound
 {
-	custom_alert_sound(bool is_optional, string path)
-	: is_optional(is_optional), path(std::move(path)) {}
-
 	bool is_disabled() const { return path.value.empty() || path.value == "None"; }
 
 	bool is_optional; // this is not a lang type because it is implied by keyword, not by value
@@ -164,12 +142,6 @@ inline bool operator!=(const custom_alert_sound& lhs, const custom_alert_sound& 
 
 struct alert_sound_action
 {
-	// alert_sound(builtin_alert_sound sound, std::optional<integer> volume)
-	// : sound(sound), volume(volume) {}
-
-	// alert_sound(custom_alert_sound sound, std::optional<integer> volume)
-	// : sound(std::move(sound)), volume(volume) {}
-
 	bool is_disabled() const
 	{
 		return std::visit([](auto sound) { return sound.is_disabled(); }, sound);

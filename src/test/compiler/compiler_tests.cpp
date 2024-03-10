@@ -20,6 +20,8 @@ namespace ut = boost::unit_test;
 namespace fs::test
 {
 
+using lang::no_origin;
+
 // note: object's internal origin is not checked
 // use the second pair element
 void expect_object(
@@ -131,40 +133,40 @@ $string         = "Leather Belt"
 			const compiler::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.definitions, parse_data);
 
 			expect_object(symbols, lookup_data, "none", search(input, "$none").result(),
-				{{lang::none{}, search(input, "None").result()}}
+				{{lang::none{no_origin()}, search(input, "None").result()}}
 			);
 			expect_object(symbols, lookup_data, "temp", search(input, "$temp").result(),
-				{{lang::temp{}, search(input, "Temp").result()}}
+				{{lang::temp{no_origin()}, search(input, "Temp").result()}}
 			);
 			expect_object(symbols, lookup_data, "boolean", search(input, "$boolean").result(),
-				{{lang::boolean{false}, search(input, "False").result()}}
+				{{lang::boolean{false, no_origin()}, search(input, "False").result()}}
 			);
 			expect_object(symbols, lookup_data, "fractional", search(input, "$fractional").result(),
-				{{lang::fractional{3.5}, search(input, "3.5").result()}}
+				{{lang::fractional{3.5, no_origin()}, search(input, "3.5").result()}}
 			);
 			expect_object(symbols, lookup_data, "integer", search(input, "$integer").result(),
-				{{lang::integer{123}, search(input, "123").result()}}
+				{{lang::integer{123, no_origin()}, search(input, "123").result()}}
 			);
 			expect_object(symbols, lookup_data, "socket_spec", search(input, "$socket_spec").result(),
-				{{lang::socket_spec{5, 1, 1, 1}, search(input, "5RGB").result()}}
+				{{lang::socket_spec{5, 1, 1, 1, 0, 0, 0, no_origin()}, search(input, "5RGB").result()}}
 			);
 			expect_object(symbols, lookup_data, "influence", search(input, "$influence").result(),
-				{{lang::influence{lang::influence_type::elder}, search(input, "Elder").result()}}
+				{{lang::influence{lang::influence_type::elder, no_origin()}, search(input, "Elder").result()}}
 			);
 			expect_object(symbols, lookup_data, "rarity", search(input, "$rarity").result(),
-				{{lang::rarity{lang::rarity_type::rare}, search(input, "Rare").result()}}
+				{{lang::rarity{lang::rarity_type::rare, no_origin()}, search(input, "Rare").result()}}
 			);
 			expect_object(symbols, lookup_data, "shape", search(input, "$shape").result(),
-				{{lang::shape{lang::shape_type::hexagon}, search(input, "Hexagon").result()}}
+				{{lang::shape{lang::shape_type::hexagon, no_origin()}, search(input, "Hexagon").result()}}
 			);
 			expect_object(symbols, lookup_data, "suit", search(input, "$suit").result(),
-				{{lang::suit{lang::suit_type::yellow}, search(input, "Yellow").result()}}
+				{{lang::suit{lang::suit_type::yellow, no_origin()}, search(input, "Yellow").result()}}
 			);
 			expect_object(symbols, lookup_data, "shaper_voice", search(input, "$shaper_voice").result(),
-				{{lang::shaper_voice_line{lang::shaper_voice_line_type::chaos}, search(input, "ShChaos").result()}}
+				{{lang::shaper_voice_line{lang::shaper_voice_line_type::chaos, no_origin()}, search(input, "ShChaos").result()}}
 			);
 			expect_object(symbols, lookup_data, "string", search(input, "$string").result(),
-				{{lang::string{"Leather Belt"}, search(input, "\"Leather Belt\"").result()}}
+				{{lang::string{"Leather Belt", no_origin()}, search(input, "\"Leather Belt\"").result()}}
 			);
 		}
 
@@ -183,23 +185,23 @@ $z = 6 7 8 9
 
 			expect_object(
 				symbols, lookup_data, "x", search(input, "$x").result(), {
-					{lang::integer{1}, search(input, "1").result()},
-					{lang::integer{2}, search(input, "2").result()}
+					{lang::integer{1, no_origin()}, search(input, "1").result()},
+					{lang::integer{2, no_origin()}, search(input, "2").result()}
 				}
 			);
 			expect_object(
 				symbols, lookup_data, "y", search(input, "$y").result(), {
-					{lang::integer{3}, search(input, "3").result()},
-					{lang::integer{4}, search(input, "4").result()},
-					{lang::integer{5}, search(input, "5").result()},
+					{lang::integer{3, no_origin()}, search(input, "3").result()},
+					{lang::integer{4, no_origin()}, search(input, "4").result()},
+					{lang::integer{5, no_origin()}, search(input, "5").result()},
 				}
 			);
 			expect_object(
 				symbols, lookup_data, "z", search(input, "$z").result(), {
-					{lang::integer{6}, search(input, "6").result()},
-					{lang::integer{7}, search(input, "7").result()},
-					{lang::integer{8}, search(input, "8").result()},
-					{lang::integer{9}, search(input, "9").result()}
+					{lang::integer{6, no_origin()}, search(input, "6").result()},
+					{lang::integer{7, no_origin()}, search(input, "7").result()},
+					{lang::integer{8, no_origin()}, search(input, "8").result()},
+					{lang::integer{9, no_origin()}, search(input, "9").result()}
 				}
 			);
 		}
@@ -218,21 +220,21 @@ $z = 4W 0 6 RGB
 
 			expect_object(
 				symbols, lookup_data, "x", search(input, "$x").result(), {
-					{lang::integer{1}, search(input, "1").result()},
+					{lang::integer{1, no_origin()}, search(input, "1").result()},
 					{lang::socket_spec{std::nullopt, 2}, search(input, "RR").result()}
 				}
 			);
 			expect_object(
 				symbols, lookup_data, "y", search(input, "$y").result(), {
 					{lang::socket_spec{3, 0, 3}, search(input, "3GGG").result()},
-					{lang::integer{2}, search(input, "2").result()},
+					{lang::integer{2, no_origin()}, search(input, "2").result()},
 				}
 			);
 			expect_object(
 				symbols, lookup_data, "z", search(input, "$z").result(), {
 					{lang::socket_spec{4, 0, 0, 0, 1}, search(input, "4W").result()},
-					{lang::integer{0}, search(input, "0").result()},
-					{lang::integer{6}, search(input, "6").result()},
+					{lang::integer{0, no_origin()}, search(input, "0").result()},
+					{lang::integer{6, no_origin()}, search(input, "6").result()},
 					{lang::socket_spec{std::nullopt, 1, 1, 1}, search(input, "RGB").result()}
 				}
 			);
@@ -322,32 +324,40 @@ $z = 4W 0 6 RGB
 
 			BOOST_AUTO_TEST_CASE(builtin_sound_id_integer)
 			{
-				expect_builtin_alert_sound("1", lang::builtin_alert_sound_id{integer{1}});
+				expect_builtin_alert_sound("1", lang::builtin_alert_sound_id{integer{1, no_origin()}});
 			}
 
 			BOOST_AUTO_TEST_CASE(builtin_sound_id_and_volume_integer)
 			{
-				expect_builtin_alert_sound("1 300", lang::builtin_alert_sound_id{integer{1}}, integer{300});
+				expect_builtin_alert_sound(
+					"1 300", lang::builtin_alert_sound_id{integer{1, no_origin()}}, integer{300, no_origin()});
 			}
 
 			BOOST_AUTO_TEST_CASE(builtin_sound_id_shaper)
 			{
-				expect_builtin_alert_sound("ShGeneral", lang::builtin_alert_sound_id{shaper_voice_line{shaper_voice_line_type::general}});
+				expect_builtin_alert_sound(
+					"ShGeneral",
+					lang::builtin_alert_sound_id{shaper_voice_line{shaper_voice_line_type::general, no_origin()}});
 			}
 
 			BOOST_AUTO_TEST_CASE(builtin_sound_id_and_volume_shaper)
 			{
-				expect_builtin_alert_sound("ShGeneral 300", lang::builtin_alert_sound_id{shaper_voice_line{shaper_voice_line_type::general}}, integer{300});
+				expect_builtin_alert_sound(
+					"ShGeneral 300",
+					lang::builtin_alert_sound_id{
+						shaper_voice_line{shaper_voice_line_type::general, no_origin()}
+					},
+					integer{300, no_origin()});
 			}
 
 			BOOST_AUTO_TEST_CASE(custom_path)
 			{
-				expect_custom_alert_sound("\"pop.wav\"", string{"pop.wav"});
+				expect_custom_alert_sound("\"pop.wav\"", string{"pop.wav", no_origin()});
 			}
 
 			BOOST_AUTO_TEST_CASE(custom_path_and_volume)
 			{
-				expect_custom_alert_sound("\"pop.wav\" 123", string{"pop.wav"}, integer{123});
+				expect_custom_alert_sound("\"pop.wav\" 123", string{"pop.wav", no_origin()}, integer{123, no_origin()});
 			}
 
 		BOOST_AUTO_TEST_SUITE_END()

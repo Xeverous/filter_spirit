@@ -64,7 +64,7 @@ make_color(
 		return lang::color{*result_r, *result_g, *result_b, alpha};
 	}
 	else {
-		return lang::color{*result_r, *result_g, *result_b};
+		return lang::color{*result_r, *result_g, *result_b, std::nullopt};
 	}
 }
 
@@ -208,7 +208,7 @@ make_builtin_alert_sound_id(
 
 	if (none_sound_id.has_value()) {
 		diagnostics.move_messages_from(diagnostics_none);
-		return lang::builtin_alert_sound_id(*none_sound_id);
+		return lang::builtin_alert_sound_id{*none_sound_id};
 	}
 	else if (integer_sound_id.has_value()) {
 		diagnostics.move_messages_from(diagnostics_integer);
@@ -223,7 +223,7 @@ make_builtin_alert_sound_id(
 	}
 	else if (shaper_sound_id.has_value()) {
 		diagnostics.move_messages_from(diagnostics_shaper);
-		return lang::builtin_alert_sound_id(*shaper_sound_id);
+		return lang::builtin_alert_sound_id{*shaper_sound_id};
 	}
 	else {
 		// main error
