@@ -207,8 +207,6 @@ evaluate_sequence(
 	const symbol_table& symbols,
 	diagnostics_store& diagnostics)
 {
-	FS_ASSERT(!sequence.empty());
-
 	lang::object::container_type seq_values;
 	seq_values.reserve(sequence.size());
 
