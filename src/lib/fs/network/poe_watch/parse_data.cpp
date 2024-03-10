@@ -657,8 +657,8 @@ parse_item_price_data(
 				continue;
 			}
 
-			// poe.ninja reports Harbinger pieces as unique items - make poe.watch consistent with it
-			// TODO test how Harbinger pieces are recognized by the item filter (are they of unique rarity? are they currency?)
+			// poe.ninja reports Harbinger pieces as unique items - this is consistent with how filters see them
+			// poe.watch reports them as currency items instead - add them to uniques
 			if (std::holds_alternative<categories::currency>(itm.category)) {
 				const auto& currency = std::get<categories::currency>(itm.category);
 
