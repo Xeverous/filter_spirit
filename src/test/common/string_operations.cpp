@@ -20,6 +20,8 @@ void find_and_print_mismatched_line(
 	const auto actual_last  = actual.data() + actual.size();
 	const auto [expected_it, actual_it] = std::mismatch(expected_first, expected_last, actual_first, actual_last);
 
+	ss << "Mismatch position: " << expected_it - expected_first << "\n";
+
 	// add 1 because line numbering starts at 1
 	const auto line_number = std::count(actual_first, actual_it, '\n') + 1;
 	ss << "on line " << line_number << " (expected/actual):\n";
@@ -37,7 +39,10 @@ void find_and_print_mismatched_line(
 		for (auto it = line_first; it != pos; ++it)
 			ss << (*it == '\t' ? '\t' : ' ');
 
-		ss << "^\n";
+		if (pos == last)
+			ss << "^(end of text)\n";
+		else
+			ss << "^\n";
 	};
 
 	print_line(expected_first, expected_it, expected_last);
@@ -93,8 +98,8 @@ boost::test_tools::predicate_result compare_ranges(
 
 	boost::test_tools::predicate_result result(false);
 	result.message()
-		<< "EXPECTED:\n" << fs::utility::range_underline_to_string(whole_input, expected)
-		<< "ACTUAL:\n" << fs::utility::range_underline_to_string(whole_input, actual);
+		<< "EXPECTED:\n" << utility::range_underline_to_string(whole_input, expected)
+		<< "ACTUAL:\n" << utility::range_underline_to_string(whole_input, actual);
 	return result;
 }
 
