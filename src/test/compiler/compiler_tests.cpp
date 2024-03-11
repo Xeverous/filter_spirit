@@ -37,9 +37,9 @@ void expect_object(
 
 	const compiler::named_object& named_object = it->second;
 	const lang::object& actual_obj = named_object.object_instance;
-	const std::string_view all_code = lookup_data.get_view_of_whole_content();
+	const std::string_view all_code = lookup_data.whole_text();
 
-	const std::string_view actual_name_origin = lookup_data.position_of(named_object.name_origin);
+	const std::string_view actual_name_origin = lookup_data.text_of(named_object.name_origin);
 	BOOST_TEST(compare_ranges(expected_name_origin, actual_name_origin, all_code));
 
 	BOOST_TEST_REQUIRE(
@@ -48,7 +48,7 @@ void expect_object(
 
 	for (std::size_t i = 0; i < actual_obj.values.size(); ++i) {
 		const auto expected_origin = expected_obj.begin()[i].second;
-		const auto actual_origin = lookup_data.position_of(actual_obj.values[i].origin);
+		const auto actual_origin = lookup_data.text_of(actual_obj.values[i].origin);
 		BOOST_TEST(compare_ranges(expected_origin, actual_origin, all_code));
 
 		if (expected_obj.begin()[i].first != actual_obj.values[i].value) {

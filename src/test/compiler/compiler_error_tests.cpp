@@ -107,12 +107,12 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 			BOOST_TEST(expected.id == actual.id);
 
 			const boost::optional<std::string_view> actual_underline =
-				actual.origin.map([&](lang::position_tag origin) { return metadata.lookup.position_of(origin); });
+				actual.origin.map([&](lang::position_tag origin) { return metadata.lookup.text_of(origin); });
 
 			if (expected.underline != actual_underline) {
 				if (expected.underline.has_value() && actual_underline.has_value()) {
 					// if both underlines have value, use a dedicated comparison code
-					BOOST_TEST(compare_ranges(*expected.underline, *actual_underline, metadata.lookup.get_view_of_whole_content()));
+					BOOST_TEST(compare_ranges(*expected.underline, *actual_underline, metadata.lookup.whole_text()));
 				}
 				else {
 					BOOST_ERROR("underlines differ, "

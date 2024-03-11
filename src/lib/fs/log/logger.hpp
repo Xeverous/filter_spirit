@@ -50,66 +50,31 @@ public:
 
 	void print_line_number(int line_number);
 
+	// example output: line 12: expected '}' here
 	template <typename... Printable>
-	void print_line_number_with_description(
-		int line_number,
-		Printable&&... printable);
+	void print_line_number_with_description(int line_number, Printable&&... printable);
 
 	/**
-	 * @details print error with detailed code information
-	 * @param all_code range of all code, used to calculate line number (do not trim it)
-	 * @param code_to_underline fragment of code to underline, must be a subview of @p all_code
-	 * @param description anything accepted by logger, used as error description
-	 *
-	 * @details example:
-	 *
-	 *     line 12: expected object of type 'int', got 'array'
-	 *     const white = RGB([2, 5, 5], 255, 255)
-	 *                       ~~~~~~~~~
-	 */
-	template <typename... Printable>
-	void print_line_number_with_description_and_underlined_code(
-		std::string_view all_code,
-		std::string_view code_to_underline,
-		Printable&&... description);
-	/**
-	 * @details print error with detailed code information
-	 * @param all_code range of all code, used to calculate line number (do not trim it)
-	 * @param point character to point out, must be in range of @p all_code, may point at line break
-	 * @param description anything accepted by logger, used as error description
-	 *
-	 * @details example:
-	 *
-	 *     line 12: expected '}' here
-	 *     {
-	 *     ^
-	 */
-	template <typename... Printable>
-	void print_line_number_with_description_and_pointed_code(
-		std::string_view all_code,
-		const char* point,
-		Printable&&... description);
-	/**
 	 * @brief print code with underlined part
-	 * @param all_code all code to search for line breaks
-	 * @param code_to_underline code to underline, must be a subview of @p all_code, may span multiple lines
+	 * @param surrounding_lines code to search for line breaks
+	 * @param code_to_underline code to underline, must be a subview of @p surrounding_lines, may span multiple lines
 	 * @details example:
 	 *
 	 *     const white = RGB([2, 5, 5], 255, 255)
 	 *                       ~~~~~~~~~
 	 */
-	void print_underlined_code(std::string_view all_code, std::string_view code_to_underline);
+	void print_underlined_code(std::string_view surrounding_lines, std::string_view code_to_underline);
 	void print_underlined_code(utility::underlined_code uc, char underline_char = '~');
 	/**
 	 * @brief print code with a pointed character
-	 * @param all_code all code to search for line breaks
-	 * @param character_to_underline character to point out, must be in range of @p all_code, may point at line break
+	 * @param surrounding_lines code to search for line breaks
+	 * @param character_to_underline character to point out, must be in range of @p surrounding_lines, may point at line break
 	 * @details example:
 	 *
 	 *     }
 	 *     ^
 	 */
-	void print_pointed_code(std::string_view all_code, const char* character_to_underline);
+	void print_pointed_code(std::string_view surrounding_lines, const char* character_to_underline);
 
 private:
 	message_stream()
@@ -194,30 +159,6 @@ void message_stream::print_line_number_with_description(
 {
 	print_line_number(line_number);
 	(*this << ... << std::forward<Printable>(printable)) << '\n';
-}
-
-template <typename... Printable>
-void message_stream::print_line_number_with_description_and_underlined_code(
-	std::string_view all_code,
-	std::string_view code_to_underline,
-	Printable&&... description)
-{
-	print_line_number_with_description(
-		utility::count_lines(all_code.data(), code_to_underline.data()),
-		std::forward<Printable>(description)...);
-	print_underlined_code(all_code, code_to_underline);
-}
-
-template <typename... Printable>
-void message_stream::print_line_number_with_description_and_pointed_code(
-	std::string_view all_code,
-	const char* point,
-	Printable&&... description)
-{
-	print_line_number_with_description(
-		utility::count_lines(all_code.data(), point),
-		std::forward<Printable>(description)...);
-	print_pointed_code(all_code, point);
 }
 
 namespace strings

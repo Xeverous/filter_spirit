@@ -123,7 +123,6 @@ target_sources(filter_spirit
 		fs/parser/detail/grammar.hpp
 		fs/parser/detail/grammar_def.hpp
 		fs/parser/detail/symbols.hpp
-		fs/parser/error.hpp
 		fs/parser/parser.hpp
 		fs/utility/assert.hpp
 		fs/utility/math.hpp

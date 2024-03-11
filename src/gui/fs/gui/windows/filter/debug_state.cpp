@@ -29,7 +29,7 @@ std::size_t origins_line_number(
 	const parser::parse_metadata& metadata,
 	const lang::position_tag origin)
 {
-	const std::string_view sv = metadata.lookup.position_of(origin);
+	const std::string_view sv = metadata.lookup.text_of(origin);
 	const parser::text_range r = metadata.lines.text_range_for(sv);
 	return r.first.line_number;
 }

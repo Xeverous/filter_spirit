@@ -106,15 +106,15 @@ class code_underliner
 {
 public:
 	// will produce 1+ usable next()
-	code_underliner(std::string_view all_code, std::string_view code_to_underline);
+	code_underliner(std::string_view surrounding_code, std::string_view code_to_underline);
 	// will produce only 1 usable next()
-	code_underliner(std::string_view all_code, const char* character_to_underline);
+	code_underliner(std::string_view surrounding_code, const char* character_to_underline);
 
 	underlined_code next() noexcept;
 
 private:
-	const char *const all_first;
-	const char *const all_last;
+	const char *const surrounding_first;
+	const char *const surrounding_last;
 	const char *const underline_first;
 	const char *const underline_last;
 	const char *      code_it;
@@ -122,7 +122,7 @@ private:
 };
 
 std::string range_underline_to_string(
-	std::string_view all_code,
+	std::string_view surrounding_code,
 	std::string_view code_to_underline);
 
 }

@@ -240,18 +240,18 @@ std::string_view trim(std::string_view str, char c)
 	return rtrim(ltrim(str, c), c);
 }
 
-code_underliner::code_underliner(std::string_view all_code, std::string_view code_to_underline)
-: all_first(all_code.data())
-, all_last (all_code.data() + all_code.size())
+code_underliner::code_underliner(std::string_view surrounding_code, std::string_view code_to_underline)
+: surrounding_first(surrounding_code.data())
+, surrounding_last (surrounding_code.data() + surrounding_code.size())
 , underline_first(code_to_underline.data())
 , underline_last (code_to_underline.data() + code_to_underline.size())
-, code_it   (find_line_beginning_backward(all_first, underline_first))
-, code_last (find_line_end(underline_last, all_last))
+, code_it  (find_line_beginning_backward(surrounding_first, underline_first))
+, code_last(find_line_end(underline_last, surrounding_last))
 {
 }
 
-code_underliner::code_underliner(std::string_view all_code, const char* character_to_underline)
-: code_underliner(all_code, std::string_view(character_to_underline, 1u))
+code_underliner::code_underliner(std::string_view surrounding_code, const char* character_to_underline)
+: code_underliner(surrounding_code, std::string_view(character_to_underline, 1u))
 {
 }
 
@@ -261,7 +261,7 @@ underlined_code code_underliner::next() noexcept
 		return underlined_code{};
 
 	const char *const code_line_first = code_it;
-	const char *const code_line_last  = find_line_end(code_line_first, all_last);
+	const char *const code_line_last  = find_line_end(code_line_first, surrounding_last);
 	const auto code_line = utility::make_string_view(code_line_first, code_line_last);
 
 	const char *const indent_first = code_line_first;
@@ -290,14 +290,14 @@ underlined_code code_underliner::next() noexcept
 }
 
 std::string range_underline_to_string(
-	std::string_view all_code,
+	std::string_view surrounding_code,
 	std::string_view code_to_underline)
 {
 	std::string result;
 	// result.size() is always >= code_to_underline.size()
 	result.reserve(code_to_underline.size());
 
-	code_underliner cu(all_code, code_to_underline);
+	code_underliner cu(surrounding_code, code_to_underline);
 
 	for (auto underlined_code = cu.next(); underlined_code; underlined_code = cu.next()) {
 		result.append(underlined_code.code_line);

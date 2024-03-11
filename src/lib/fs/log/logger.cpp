@@ -55,18 +55,18 @@ void message_stream::print_underlined_code(utility::underlined_code uc, char und
 	self << '\n';
 }
 
-void message_stream::print_underlined_code(std::string_view all_code, std::string_view code_to_underline)
+void message_stream::print_underlined_code(std::string_view surrounding_lines, std::string_view code_to_underline)
 {
-	utility::code_underliner cu(all_code, code_to_underline);
+	utility::code_underliner cu(surrounding_lines, code_to_underline);
 
 	for (auto underlined_code = cu.next(); underlined_code; underlined_code = cu.next()) {
 		print_underlined_code(underlined_code);
 	}
 }
 
-void message_stream::print_pointed_code(std::string_view all_code, const char* character_to_underline)
+void message_stream::print_pointed_code(std::string_view surrounding_lines, const char* character_to_underline)
 {
-	print_underlined_code(utility::code_underliner(all_code, character_to_underline).next(), '^');
+	print_underlined_code(utility::code_underliner(surrounding_lines, character_to_underline).next(), '^');
 }
 
 }

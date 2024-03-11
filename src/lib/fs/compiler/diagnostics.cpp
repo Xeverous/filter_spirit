@@ -93,7 +93,7 @@ void diagnostics_store::push_error_autogen_incompatible_condition(
 		dmid::autogen_incompatible_condition,
 		condition_origin,
 		"autogen-incompatible condition: it should either not exist or allow value ",
-		std::move(required_matching_value)));
+		required_matching_value));
 	push_message(make_note_minor(autogen_origin, "autogeneration specified here"));
 }
 
@@ -132,11 +132,9 @@ void diagnostics_store::output_messages(const parser::parse_metadata& metadata, 
 		auto stream = logger.message(s);
 
 		if (msg.origin) {
-			// TODO optimize print code to use parser::line_lookup
-			stream.print_line_number_with_description_and_underlined_code(
-				metadata.lookup.get_view_of_whole_content(),
-				metadata.lookup.position_of(*msg.origin),
-				msg.description);
+			parser::underlined_text ut = metadata.get_underlined_text(*msg.origin);
+			stream.print_line_number_with_description(static_cast<int>(ut.context.line_number), msg.description);
+			stream.print_underlined_code(ut.context.surrounding_lines, ut.underline);
 		}
 		else {
 			stream << msg.description;
