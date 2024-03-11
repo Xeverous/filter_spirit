@@ -36,7 +36,9 @@ struct gem : elementary_item
 
 struct map : elementary_item
 {
-	// int map_tier; // TODO: Metadata does not contain such information, parse MapSeriesTiers.dat
+	// Metadata does not contain such information.
+	// It would require to parse MapSeriesTiers.dat but tiers change every league.
+	// int map_tier; // (not implementing currently)
 };
 
 struct resonator : currency_item
