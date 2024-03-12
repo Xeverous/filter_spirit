@@ -186,11 +186,13 @@ namespace common
 	const auto unknown_expression_def = x3::lexeme[+(x3::alnum | x3::char_('_'))];
 	BOOST_SPIRIT_DEFINE(unknown_expression)
 
+	// ---- conditions ----
+
+	// (none)
+
 	// ---- actions ----
 
-	const switch_drop_sound_action_type switch_drop_sound_action = "switch drop sound action";
-	const auto switch_drop_sound_action_def = make_keyword(symbols::rf::switch_drop_sound_actions);
-	BOOST_SPIRIT_DEFINE(switch_drop_sound_action)
+	// (none)
 
 	// ---- statements ----
 
@@ -209,29 +211,9 @@ namespace rf
 
 	// ---- literal types ----
 
-	const color_literal_type color_literal = "color literal";
-	const auto color_literal_def =
-		  common::integer_literal
-		> common::integer_literal
-		> common::integer_literal
-		> -common::integer_literal;
-	BOOST_SPIRIT_DEFINE(color_literal)
-
 	const string_type string = "string";
 	const auto string_def = common::string_literal | common::identifier;
 	BOOST_SPIRIT_DEFINE(string)
-
-	const string_array_type string_array = "1 or more strings";
-	const auto string_array_def = x3::skip(common::non_eol_whitespace)[+string];
-	BOOST_SPIRIT_DEFINE(string_array)
-
-	const influence_literal_array_type influence_literal_array = "1 or more influence literals";
-	const auto influence_literal_array_def = +common::influence_literal;
-	BOOST_SPIRIT_DEFINE(influence_literal_array)
-
-	const influence_spec_type influence_spec = "influence spec";
-	const auto influence_spec_def = common::none_literal | influence_literal_array;
-	BOOST_SPIRIT_DEFINE(influence_spec)
 
 	// ---- expressions ----
 
@@ -250,50 +232,8 @@ namespace rf
 
 	// ---- actions ----
 
-	const color_action_type color_action = "color action";
-	const auto color_action_def = make_keyword(symbols::rf::color_actions) > color_literal;
-	BOOST_SPIRIT_DEFINE(color_action)
-
-	const set_font_size_action_type set_font_size_action = "font size action";
-	const auto set_font_size_action_def = make_keyword(lang::keywords::rf::set_font_size) > common::integer_literal;
-	BOOST_SPIRIT_DEFINE(set_font_size_action)
-
-	const play_alert_sound_action_type play_alert_sound_action = "play alert sound action";
-	const auto play_alert_sound_action_def =
-		make_keyword(symbols::rf::play_alert_sound_actions)
-		> common::literal_expression
-		> -common::integer_literal; // volume (optional token)
-	BOOST_SPIRIT_DEFINE(play_alert_sound_action)
-
-	const custom_alert_sound_action_type custom_alert_sound_action = "custom alert sound action";
-	const auto custom_alert_sound_action_def =
-		(
-			(make_keyword(lang::keywords::rf::custom_alert_sound_optional) > x3::attr(true))
-			| (make_keyword(lang::keywords::rf::custom_alert_sound) > x3::attr(false))
-		)
-		> common::string_literal
-		> -common::integer_literal; // volume (optional token)
-	BOOST_SPIRIT_DEFINE(custom_alert_sound_action)
-
-	// switch_drop_sound_action in common
-
-	const minimap_icon_action_type minimap_icon_action = "minimap icon action";
-	const auto minimap_icon_action_def = make_keyword(lang::keywords::rf::minimap_icon) > literal_sequence;
-	BOOST_SPIRIT_DEFINE(minimap_icon_action)
-
-	const play_effect_action_type play_effect_action = "play effct action";
-	const auto play_effect_action_def = make_keyword(lang::keywords::rf::play_effect) > literal_sequence;
-	BOOST_SPIRIT_DEFINE(play_effect_action)
-
 	const action_type action = "action";
-	const auto action_def =
-		color_action
-		| set_font_size_action
-		| play_alert_sound_action
-		| custom_alert_sound_action
-		| common::switch_drop_sound_action
-		| minimap_icon_action
-		| play_effect_action;
+	const auto action_def = make_keyword(symbols::rf::official_action_properties) > rf::literal_sequence;
 	BOOST_SPIRIT_DEFINE(action)
 
 	// ---- filter structure ----
@@ -386,51 +326,16 @@ namespace sf
 
 	// ---- actions ----
 
-	const set_color_action_type set_color_action = "set color action";
-	const auto set_color_action_def = make_keyword(symbols::rf::color_actions) > sequence;
-	BOOST_SPIRIT_DEFINE(set_color_action)
-
-	const set_font_size_action_type set_font_size_action = "set font size action";
-	const auto set_font_size_action_def = make_keyword(lang::keywords::rf::set_font_size) > sequence;
-	BOOST_SPIRIT_DEFINE(set_font_size_action)
-
-	const minimap_icon_action_type minimap_icon_action = "minimap icon action";
-	const auto minimap_icon_action_def = make_keyword(lang::keywords::rf::minimap_icon) > sequence;
-	BOOST_SPIRIT_DEFINE(minimap_icon_action)
-
-	const play_effect_action_type play_effect_action = "play effect action";
-	const auto play_effect_action_def = make_keyword(lang::keywords::rf::play_effect) > sequence;
-	BOOST_SPIRIT_DEFINE(play_effect_action)
-
-	const play_alert_sound_action_type play_alert_sound_action = "play alert sound action";
-	const auto play_alert_sound_action_def = make_keyword(symbols::rf::play_alert_sound_actions) > sequence;
-	BOOST_SPIRIT_DEFINE(play_alert_sound_action)
-
-	const custom_alert_sound_action_type custom_alert_sound_action = "custom alert sound action";
-	const auto custom_alert_sound_action_def =
-		(
-			(make_keyword(lang::keywords::rf::custom_alert_sound_optional) > x3::attr(true))
-			| (make_keyword(lang::keywords::rf::custom_alert_sound) > x3::attr(false))
-		)
-		> sequence;
-	BOOST_SPIRIT_DEFINE(custom_alert_sound_action)
-
 	const set_alert_sound_action_type set_alert_sound_action = "set alert sound action";
 	const auto set_alert_sound_action_def = make_keyword(lang::keywords::sf::set_alert_sound) > sequence;
 	BOOST_SPIRIT_DEFINE(set_alert_sound_action)
 
-	// switch_drop_sound_action in common
+	const official_action_type official_action = "action (official)";
+	const auto official_action_def = make_keyword(symbols::rf::official_action_properties) > sequence;
+	BOOST_SPIRIT_DEFINE(official_action)
 
 	const action_type action = "action";
-	const auto action_def =
-		  set_color_action
-		| set_font_size_action
-		| minimap_icon_action
-		| play_effect_action
-		| play_alert_sound_action
-		| custom_alert_sound_action
-		| set_alert_sound_action
-		| common::switch_drop_sound_action;
+	const auto action_def = official_action | set_alert_sound_action;
 	BOOST_SPIRIT_DEFINE(action)
 
 	// ---- filter structure ----

@@ -2,13 +2,9 @@
 
 #include <fs/lang/primitive_types.hpp>
 #include <fs/lang/position_tag.hpp>
-
-#include <boost/fusion/include/adapt_struct.hpp>
-#include <boost/fusion/sequence/comparison/equal_to.hpp>
-#include <boost/fusion/sequence/comparison/not_equal_to.hpp>
+#include <fs/lang/keywords.hpp>
 
 #include <utility>
-#include <tuple>
 #include <iosfwd>
 #include <optional>
 
@@ -26,12 +22,11 @@ struct color
 	std::optional<integer> a;
 };
 
-inline bool operator==(color lhs, color rhs) noexcept
+inline bool operator==(color lhs, color rhs)
 {
-	return std::tie(lhs.r, lhs.g, lhs.b, lhs.a) == std::tie(rhs.r, rhs.g, rhs.b, rhs.a);
+	return lhs.r == rhs.r && lhs.g == rhs.g && lhs.b == rhs.b && lhs.a == rhs.a;
 }
-inline bool operator!=(color lhs, color rhs) noexcept { return !(lhs == rhs); }
-
+inline bool operator!=(color lhs, color rhs) { return !(lhs == rhs); }
 
 struct color_action
 {
@@ -39,15 +34,8 @@ struct color_action
 	position_tag origin;
 };
 
-inline bool operator==(color_action lhs, color_action rhs)
-{
-	return lhs.c == rhs.c;
-}
-
-inline bool operator!=(color_action lhs, color_action rhs)
-{
-	return !(lhs == rhs);
-}
+inline bool operator==(color_action lhs, color_action rhs) { return lhs.c == rhs.c; }
+inline bool operator!=(color_action lhs, color_action rhs) { return !(lhs == rhs); }
 
 struct font_size_action
 {
@@ -55,15 +43,73 @@ struct font_size_action
 	position_tag origin;
 };
 
-inline bool operator==(font_size_action lhs, font_size_action rhs)
-{
-	return lhs.size == rhs.size;
-}
+inline bool operator==(font_size_action lhs, font_size_action rhs) { return lhs.size == rhs.size; }
+inline bool operator!=(font_size_action lhs, font_size_action rhs) { return !(lhs == rhs); }
 
-inline bool operator!=(font_size_action lhs, font_size_action rhs)
+struct enabled_play_effect
 {
-	return !(lhs == rhs);
+	// TODO check if all manually-written ctors are actually needed (can initialize subvariants?)
+	enabled_play_effect(suit s, bool is_temporary)
+	: color(s), is_temporary(is_temporary) {}
+
+	suit color;
+	bool is_temporary;
+};
+
+inline bool operator==(enabled_play_effect lhs, enabled_play_effect rhs)
+{
+	return lhs.color == rhs.color && lhs.is_temporary == rhs.is_temporary;
 }
+inline bool operator!=(enabled_play_effect lhs, enabled_play_effect rhs) { return !(lhs == rhs); }
+
+struct disabled_play_effect
+{
+	none none_;
+};
+
+inline bool operator==(disabled_play_effect lhs, disabled_play_effect rhs) { return lhs.none_ == rhs.none_; }
+inline bool operator!=(disabled_play_effect lhs, disabled_play_effect rhs) { return !(lhs == rhs); }
+
+struct play_effect_action
+{
+	std::variant<enabled_play_effect, disabled_play_effect> effect;
+	position_tag origin;
+};
+
+inline bool operator==(play_effect_action lhs, play_effect_action rhs) { return lhs.effect == rhs.effect; }
+inline bool operator!=(play_effect_action lhs, play_effect_action rhs) { return !(lhs == rhs); }
+
+struct enabled_minimap_icon
+{
+	integer size;
+	suit color;
+	shape shape_;
+};
+
+inline bool operator==(enabled_minimap_icon lhs, enabled_minimap_icon rhs)
+{
+	return lhs.size == rhs.size && lhs.color == rhs.color && lhs.shape_ == rhs.shape_;
+}
+inline bool operator!=(enabled_minimap_icon lhs, enabled_minimap_icon rhs) { return !(lhs == rhs); }
+
+struct disabled_minimap_icon
+{
+	position_tag sentinel_origin;
+};
+
+inline bool operator==(disabled_minimap_icon /* lhs */, disabled_minimap_icon /* rhs */) { return true; }
+inline bool operator!=(disabled_minimap_icon lhs, disabled_minimap_icon rhs) { return !(lhs == rhs); }
+
+struct minimap_icon_action
+{
+	static constexpr int sentinel_cancel_value = -1;
+
+	std::variant<enabled_minimap_icon, disabled_minimap_icon> icon;
+	position_tag origin;
+};
+
+inline bool operator==(minimap_icon_action lhs, minimap_icon_action rhs) { return lhs.icon == rhs.icon; }
+inline bool operator!=(minimap_icon_action lhs, minimap_icon_action rhs) { return !(lhs == rhs); }
 
 struct builtin_alert_sound_id
 {
@@ -79,15 +125,8 @@ struct builtin_alert_sound_id
 	std::variant<integer, shaper_voice_line, none> id;
 };
 
-inline bool operator==(builtin_alert_sound_id lhs, builtin_alert_sound_id rhs)
-{
-	return lhs.id == rhs.id;
-}
-
-inline bool operator!=(builtin_alert_sound_id lhs, builtin_alert_sound_id rhs)
-{
-	return !(lhs == rhs);
-}
+inline bool operator==(builtin_alert_sound_id lhs, builtin_alert_sound_id rhs) { return lhs.id == rhs.id; }
+inline bool operator!=(builtin_alert_sound_id lhs, builtin_alert_sound_id rhs) { return !(lhs == rhs); }
 
 struct builtin_alert_sound
 {
@@ -100,41 +139,36 @@ struct builtin_alert_sound
 	builtin_alert_sound_id sound_id;
 };
 
-inline bool operator==(builtin_alert_sound lhs, builtin_alert_sound rhs) noexcept
+inline bool operator==(builtin_alert_sound lhs, builtin_alert_sound rhs)
 {
-	return std::tie(lhs.is_positional, lhs.sound_id) == std::tie(rhs.is_positional, rhs.sound_id);
+	return lhs.is_positional == rhs.is_positional && lhs.sound_id == rhs.sound_id;
 }
-inline bool operator!=(builtin_alert_sound lhs, builtin_alert_sound rhs) noexcept { return !(lhs == rhs); }
+inline bool operator!=(builtin_alert_sound lhs, builtin_alert_sound rhs) { return !(lhs == rhs); }
 
 struct custom_alert_sound
 {
-	custom_alert_sound(bool optional, string path)
-	: optional(optional), path(std::move(path)) {}
+	custom_alert_sound(bool is_optional, string path)
+	: is_optional(is_optional), path(std::move(path)) {}
 
 	bool is_disabled() const { return path.value.empty() || path.value == "None"; }
 
-	bool optional; // this is not a lang type because it is implied by keyword, not by value
+	bool is_optional; // this is not a lang type because it is implied by keyword, not by value
 	string path;
 };
 
-inline bool operator==(const custom_alert_sound& lhs, const custom_alert_sound& rhs) noexcept { return lhs.path == rhs.path; }
-inline bool operator!=(const custom_alert_sound& lhs, const custom_alert_sound& rhs) noexcept { return !(lhs == rhs); }
-
-struct volume
+inline bool operator==(const custom_alert_sound& lhs, const custom_alert_sound& rhs)
 {
-	std::optional<integer> value;
-};
+	return lhs.path == rhs.path && lhs.is_optional == rhs.is_optional;
+}
+inline bool operator!=(const custom_alert_sound& lhs, const custom_alert_sound& rhs) { return !(lhs == rhs); }
 
-inline bool operator==(const volume& lhs, const volume& rhs) noexcept { return lhs.value == rhs.value; }
-inline bool operator!=(const volume& lhs, const volume& rhs) noexcept { return !(lhs == rhs); }
-
-struct alert_sound
+struct alert_sound_action
 {
-	alert_sound(builtin_alert_sound sound, volume vol)
-	: sound(sound), vol(vol) {}
+	// alert_sound(builtin_alert_sound sound, std::optional<integer> volume)
+	// : sound(sound), volume(volume) {}
 
-	alert_sound(custom_alert_sound sound, volume vol)
-	: sound(std::move(sound)), vol(vol) {}
+	// alert_sound(custom_alert_sound sound, std::optional<integer> volume)
+	// : sound(std::move(sound)), volume(volume) {}
 
 	bool is_disabled() const
 	{
@@ -142,157 +176,24 @@ struct alert_sound
 	}
 
 	std::variant<builtin_alert_sound, custom_alert_sound> sound;
-	volume vol;
-};
-
-inline bool operator==(const alert_sound& lhs, const alert_sound& rhs) noexcept
-{
-	return std::tie(lhs.sound, lhs.vol) == std::tie(rhs.sound, rhs.vol);
-}
-inline bool operator!=(const alert_sound& lhs, const alert_sound& rhs) noexcept { return !(lhs == rhs); }
-
-struct alert_sound_action
-{
-	alert_sound alert;
+	std::optional<integer> volume;
 	position_tag origin;
 };
 
-inline bool operator==(alert_sound_action lhs, alert_sound_action rhs)
+inline bool operator==(const alert_sound_action& lhs, const alert_sound_action& rhs)
 {
-	return lhs.alert == rhs.alert;
+	return lhs.sound == rhs.sound && lhs.volume == rhs.volume;
 }
-
-inline bool operator!=(alert_sound_action lhs, alert_sound_action rhs)
-{
-	return !(lhs == rhs);
-}
+inline bool operator!=(const alert_sound_action& lhs, const alert_sound_action& rhs) { return !(lhs == rhs); }
 
 struct switch_drop_sound_action
 {
-	switch_drop_sound action;
+	bool enable;
 	position_tag origin;
 };
 
-inline bool operator==(switch_drop_sound_action lhs, switch_drop_sound_action rhs)
-{
-	return lhs.action == rhs.action;
-}
-
-inline bool operator!=(switch_drop_sound_action lhs, switch_drop_sound_action rhs)
-{
-	return !(lhs == rhs);
-}
-
-struct enabled_minimap_icon
-{
-	enabled_minimap_icon(integer size, suit color, shape shape_)
-	: size(size), color(color), shape_(shape_) {}
-
-	integer size;
-	suit color;
-	shape shape_;
-};
-
-inline bool operator==(enabled_minimap_icon lhs, enabled_minimap_icon rhs) noexcept
-{
-	return std::tie(lhs.size, lhs.color, lhs.shape_) == std::tie(rhs.size, rhs.color, rhs.shape_);
-}
-inline bool operator!=(enabled_minimap_icon lhs, enabled_minimap_icon rhs) noexcept { return !(lhs == rhs); }
-
-struct disabled_minimap_icon
-{
-	position_tag sentinel_origin;
-};
-
-inline bool operator==(disabled_minimap_icon /* lhs */, disabled_minimap_icon /* rhs */) noexcept
-{
-	return true;
-}
-inline bool operator!=(disabled_minimap_icon lhs, disabled_minimap_icon rhs) noexcept { return !(lhs == rhs); }
-
-struct minimap_icon
-{
-	static constexpr int sentinel_cancel_value = -1;
-
-	std::variant<enabled_minimap_icon, disabled_minimap_icon> icon;
-	position_tag expr_origin;
-};
-
-inline bool operator==(minimap_icon lhs, minimap_icon rhs) noexcept
-{
-	return lhs.icon == rhs.icon;
-}
-inline bool operator!=(minimap_icon lhs, minimap_icon rhs) noexcept { return !(lhs == rhs); }
-
-struct minimap_icon_action
-{
-	minimap_icon icon;
-	position_tag origin;
-};
-
-inline bool operator==(minimap_icon_action lhs, minimap_icon_action rhs)
-{
-	return lhs.icon == rhs.icon;
-}
-
-inline bool operator!=(minimap_icon_action lhs, minimap_icon_action rhs)
-{
-	return !(lhs == rhs);
-}
-
-struct enabled_play_effect
-{
-	enabled_play_effect(suit s, bool is_temporary)
-	: color(s), is_temporary(is_temporary) {}
-
-	suit color;
-	bool is_temporary;
-};
-
-inline bool operator==(enabled_play_effect lhs, enabled_play_effect rhs) noexcept
-{
-	return std::tie(lhs.color, lhs.is_temporary) == std::tie(rhs.color, rhs.is_temporary);
-}
-inline bool operator!=(enabled_play_effect lhs, enabled_play_effect rhs) noexcept { return !(lhs == rhs); }
-
-struct disabled_play_effect
-{
-	none none_;
-};
-
-inline bool operator==(disabled_play_effect lhs, disabled_play_effect rhs) noexcept
-{
-	return lhs.none_ == rhs.none_;
-}
-inline bool operator!=(disabled_play_effect lhs, disabled_play_effect rhs) noexcept { return !(lhs == rhs); }
-
-struct play_effect
-{
-	std::variant<enabled_play_effect, disabled_play_effect> effect;
-	position_tag origin;
-};
-
-inline bool operator==(play_effect lhs, play_effect rhs) noexcept
-{
-	return lhs.effect == rhs.effect;
-}
-inline bool operator!=(play_effect lhs, play_effect rhs) noexcept { return !(lhs == rhs); }
-
-struct play_effect_action
-{
-	play_effect effect;
-	position_tag origin;
-};
-
-inline bool operator==(play_effect_action lhs, play_effect_action rhs)
-{
-	return lhs.effect == rhs.effect;
-}
-
-inline bool operator!=(play_effect_action lhs, play_effect_action rhs)
-{
-	return !(lhs == rhs);
-}
+inline bool operator==(switch_drop_sound_action lhs, switch_drop_sound_action rhs) { return lhs.enable == rhs.enable; }
+inline bool operator!=(switch_drop_sound_action lhs, switch_drop_sound_action rhs) { return !(lhs == rhs); }
 
 /**
  * @class a type describing all of the given filter block actions
@@ -305,27 +206,31 @@ struct action_set
 {
 	void override_with(const action_set& other);
 
-	void generate(std::ostream& output_stream) const;
+	void print(std::ostream& output_stream) const;
 
-	std::optional<color_action> set_border_color;
-	std::optional<color_action> set_text_color;
-	std::optional<color_action> set_background_color;
-	std::optional<font_size_action> set_font_size;
-	std::optional<alert_sound_action> play_alert_sound;
-	std::optional<switch_drop_sound_action> switch_drop_sound;
+	std::optional<color_action> text_color;
+	std::optional<color_action> border_color;
+	std::optional<color_action> background_color;
+	std::optional<font_size_action> font_size;
+	std::optional<play_effect_action> effect;
 	std::optional<minimap_icon_action> minimap_icon;
-	std::optional<play_effect_action> play_effect;
+	std::optional<alert_sound_action> alert_sound;
+	std::optional<switch_drop_sound_action> switch_drop_sound;
+	std::optional<switch_drop_sound_action> switch_drop_sound_if_alert_sound;
 };
 
+inline bool operator==(const action_set& lhs, const action_set& rhs)
+{
+	return lhs.text_color == rhs.text_color
+		&& lhs.border_color == rhs.border_color
+		&& lhs.background_color == rhs.background_color
+		&& lhs.font_size == rhs.font_size
+		&& lhs.effect == rhs.effect
+		&& lhs.minimap_icon == rhs.minimap_icon
+		&& lhs.alert_sound == rhs.alert_sound
+		&& lhs.switch_drop_sound == rhs.switch_drop_sound
+		&& lhs.switch_drop_sound_if_alert_sound == rhs.switch_drop_sound_if_alert_sound;
 }
+inline bool operator!=(const action_set& lhs, const action_set& rhs) { return !(lhs == rhs); }
 
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::lang::action_set,
-	set_border_color,
-	set_text_color,
-	set_background_color,
-	set_font_size,
-	play_alert_sound,
-	switch_drop_sound,
-	minimap_icon,
-	play_effect)
+}

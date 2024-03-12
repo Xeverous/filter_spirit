@@ -42,7 +42,7 @@ test_condition(std::string condition, const lang::item& itm)
 	const std::string filter_source = "Show\n\t" + condition + "\n\tPlayEffect Yellow";
 	const lang::item_filter filter = parse_real_filter(filter_source);
 	const lang::item_filtering_result result = lang::pass_item_through_filter(itm, filter, 1);
-	return result.style.play_effect.has_value();
+	return result.style.effect.has_value();
 }
 
 [[nodiscard]] bool

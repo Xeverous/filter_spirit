@@ -76,6 +76,7 @@ struct error_on_error
 // rule IDs
 // use multiple inheritance to add more handlers
 // rules which do not have any handlers can use forward declared types
+// TODO merge all into 1 type? check spirit X3 documentation
 
 namespace common
 {
@@ -98,8 +99,6 @@ namespace common
 	struct comparison_expression_class           : error_on_error, annotate_on_success {};
 	struct unknown_expression_class              : error_on_error, annotate_on_success {};
 
-	struct switch_drop_sound_action_class        : error_on_error, annotate_on_success {};
-
 	struct static_visibility_statement_class     : error_on_error, annotate_on_success {};
 	struct continue_statement_class              : error_on_error, annotate_on_success {};
 }
@@ -108,12 +107,7 @@ namespace rf
 {
 	// ---- literal types ----
 
-	struct color_literal_class                   : error_on_error, annotate_on_success {};
 	struct string_class                          : error_on_error, annotate_on_success {};
-	struct icon_literal_class                    : error_on_error, annotate_on_success {};
-	struct string_array_class                    : error_on_error, annotate_on_success {};
-	struct influence_literal_array_class         : error_on_error, annotate_on_success {};
-	struct influence_spec_class                  : error_on_error, annotate_on_success {};
 
 	// ---- expression ----
 
@@ -125,13 +119,6 @@ namespace rf
 
 	// ---- actions ----
 
-	struct color_action_class                    : error_on_error, annotate_on_success {};
-	struct set_font_size_action_class            : error_on_error, annotate_on_success {};
-	struct play_alert_sound_action_class         : error_on_error, annotate_on_success {};
-	struct custom_alert_sound_action_class       : error_on_error, annotate_on_success {};
-	// switch_drop_sound_action_class in common
-	struct minimap_icon_action_class             : error_on_error, annotate_on_success {};
-	struct play_effect_action_class              : error_on_error, annotate_on_success {};
 	struct action_class                          : error_on_error, annotate_on_success {};
 
 	// ---- filter structure ----
@@ -177,14 +164,8 @@ namespace sf
 
 	// ---- actions ----
 
-	struct set_color_action_class                : error_on_error, annotate_on_success {};
-	struct set_font_size_action_class            : error_on_error, annotate_on_success {};
-	struct minimap_icon_action_class             : error_on_error, annotate_on_success {};
-	struct play_effect_action_class              : error_on_error, annotate_on_success {};
-	struct play_alert_sound_action_class         : error_on_error, annotate_on_success {};
-	struct custom_alert_sound_action_class       : error_on_error, annotate_on_success {};
 	struct set_alert_sound_action_class          : error_on_error, annotate_on_success {};
-	// switch_drop_sound_action_class in common
+	struct official_action_class                 : error_on_error, annotate_on_success {};
 	struct action_class                          : error_on_error, annotate_on_success {};
 
 	// ---- filter structure ----
@@ -285,10 +266,13 @@ namespace common
 	using unknown_expression_type = x3::rule<unknown_expression_class, ast::common::unknown_expression>;
 	BOOST_SPIRIT_DECLARE(unknown_expression_type)
 
+	// ---- conditions ----
+
+	// (none)
+
 	// ---- actions ----
 
-	using switch_drop_sound_action_type = x3::rule<switch_drop_sound_action_class, ast::common::switch_drop_sound_action>;
-	BOOST_SPIRIT_DECLARE(switch_drop_sound_action_type)
+	// (none)
 
 	// ---- filter structure ----
 
@@ -303,20 +287,8 @@ namespace rf
 {
 	// ---- literal types ----
 
-	using color_literal_type = x3::rule<color_literal_class, ast::rf::color_literal>;
-	BOOST_SPIRIT_DECLARE(color_literal_type)
-
 	using string_type = x3::rule<string_class, ast::rf::string>;
 	BOOST_SPIRIT_DECLARE(string_type)
-
-	using string_array_type = x3::rule<string_array_class, ast::rf::string_array>;
-	BOOST_SPIRIT_DECLARE(string_array_type)
-
-	using influence_literal_array_type = x3::rule<influence_literal_array_class, ast::rf::influence_literal_array>;
-	BOOST_SPIRIT_DECLARE(influence_literal_array_type)
-
-	using influence_spec_type = x3::rule<influence_spec_class, ast::rf::influence_spec>;
-	BOOST_SPIRIT_DECLARE(influence_spec_type)
 
 	// ---- expressions ----
 
@@ -329,23 +301,8 @@ namespace rf
 
 	// ---- actions ----
 
-	using color_action_type                          = x3::rule<color_action_class,                       ast::rf::color_action>;
-	using set_font_size_action_type                  = x3::rule<set_font_size_action_class,               ast::rf::set_font_size_action>;
-	using play_alert_sound_action_type               = x3::rule<play_alert_sound_action_class,            ast::rf::play_alert_sound_action>;
-	using custom_alert_sound_action_type             = x3::rule<custom_alert_sound_action_class,          ast::rf::custom_alert_sound_action>;
-	// switch_drop_sound_action_type in common
-	using minimap_icon_action_type                   = x3::rule<minimap_icon_action_class,                ast::rf::minimap_icon_action>;
-	using play_effect_action_type                    = x3::rule<play_effect_action_class,                 ast::rf::play_effect_action>;
-	using action_type                                = x3::rule<action_class,                             ast::rf::action>;
-	BOOST_SPIRIT_DECLARE(
-		color_action_type,
-		set_font_size_action_type,
-		play_alert_sound_action_type,
-		custom_alert_sound_action_type,
-		minimap_icon_action_type,
-		play_effect_action_type,
-		action_type
-	)
+	using action_type                         = x3::rule<action_class,                      ast::rf::action>;
+	BOOST_SPIRIT_DECLARE(action_type)
 
 	// ---- filter structure ----
 
@@ -414,28 +371,11 @@ namespace sf
 
 	// ---- actions ----
 
-	using set_color_action_type = x3::rule<set_color_action_class, ast::sf::set_color_action>;
-	BOOST_SPIRIT_DECLARE(set_color_action_type)
-
-	using set_font_size_action_type = x3::rule<set_font_size_action_class, ast::sf::set_font_size_action>;
-	BOOST_SPIRIT_DECLARE(set_font_size_action_type)
-
-	using minimap_icon_action_type = x3::rule<minimap_icon_action_class, ast::sf::minimap_icon_action>;
-	BOOST_SPIRIT_DECLARE(minimap_icon_action_type)
-
-	using play_effect_action_type = x3::rule<play_effect_action_class, ast::sf::play_effect_action>;
-	BOOST_SPIRIT_DECLARE(play_effect_action_type)
-
-	using play_alert_sound_action_type = x3::rule<play_alert_sound_action_class, ast::sf::play_alert_sound_action>;
-	BOOST_SPIRIT_DECLARE(play_alert_sound_action_type)
-
-	using custom_alert_sound_action_type = x3::rule<custom_alert_sound_action_class, ast::sf::custom_alert_sound_action>;
-	BOOST_SPIRIT_DECLARE(custom_alert_sound_action_type)
-
 	using set_alert_sound_action_type = x3::rule<set_alert_sound_action_class, ast::sf::set_alert_sound_action>;
 	BOOST_SPIRIT_DECLARE(set_alert_sound_action_type)
 
-	// switch_drop_sound_action_type in common
+	using official_action_type = x3::rule<official_action_class, ast::sf::official_action>;
+	BOOST_SPIRIT_DECLARE(official_action_type)
 
 	using action_type = x3::rule<action_class, ast::sf::action>;
 	BOOST_SPIRIT_DECLARE(action_type)

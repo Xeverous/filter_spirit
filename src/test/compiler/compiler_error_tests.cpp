@@ -585,15 +585,15 @@ SetAlertSound 17
 			std::vector<diagnostic_message_pattern> patterns = {
 				diagnostic_message_pattern{dms::error, dmid::invalid_set_alert_sound, expected_origin, {}},
 				diagnostic_message_pattern{dms::note, dmid::attempt_description, boost::none, {
-					lang::keywords::rf::custom_alert_sound
-				}},
-				diagnostic_message_pattern{dms::error, dmid::type_mismatch, expected_origin, {}},
-				diagnostic_message_pattern{dms::note, dmid::attempt_description, boost::none, {
 					lang::keywords::rf::play_alert_sound
 				}},
 				diagnostic_message_pattern{dms::error, dmid::value_out_of_range, expected_origin, {
 					"1 - 16", "got 17"
-				}}
+				}},
+				diagnostic_message_pattern{dms::note, dmid::attempt_description, boost::none, {
+					lang::keywords::rf::custom_alert_sound
+				}},
+				diagnostic_message_pattern{dms::error, dmid::type_mismatch, expected_origin, {}}
 			};
 
 			compare_diagnostics(patterns, diagnostics, parse_data.metadata);

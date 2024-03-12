@@ -91,20 +91,20 @@ namespace rf
 	constexpr auto false_  = "False";
 
 	// actions
-	constexpr auto set_border_color            = "SetBorderColor";
-	constexpr auto set_text_color              = "SetTextColor";
-	constexpr auto set_background_color        = "SetBackgroundColor";
-	constexpr auto set_font_size               = "SetFontSize";
-	constexpr auto play_alert_sound            = "PlayAlertSound";
-	constexpr auto play_alert_sound_positional = "PlayAlertSoundPositional";
-	constexpr auto enable_drop_sound           = "EnableDropSound";
-	constexpr auto disable_drop_sound          = "DisableDropSound";
-	constexpr auto enable_drop_sound_if_alert  = "EnableDropSoundIfAlertSound";
-	constexpr auto disable_drop_sound_if_alert = "DisableDropSoundIfAlertSound";
-	constexpr auto custom_alert_sound          = "CustomAlertSound";
-	constexpr auto custom_alert_sound_optional = "CustomAlertSoundOptional";
-	constexpr auto minimap_icon                = "MinimapIcon";
-	constexpr auto play_effect                 = "PlayEffect";
+	constexpr auto set_text_color                    = "SetTextColor";
+	constexpr auto set_background_color              = "SetBackgroundColor";
+	constexpr auto set_border_color                  = "SetBorderColor";
+	constexpr auto set_font_size                     = "SetFontSize";
+	constexpr auto play_effect                       = "PlayEffect";
+	constexpr auto minimap_icon                      = "MinimapIcon";
+	constexpr auto play_alert_sound                  = "PlayAlertSound";
+	constexpr auto play_alert_sound_positional       = "PlayAlertSoundPositional";
+	constexpr auto custom_alert_sound                = "CustomAlertSound";
+	constexpr auto custom_alert_sound_optional       = "CustomAlertSoundOptional";
+	constexpr auto disable_drop_sound                = "DisableDropSound";
+	constexpr auto enable_drop_sound                 = "EnableDropSound";
+	constexpr auto disable_drop_sound_if_alert_sound = "DisableDropSoundIfAlertSound";
+	constexpr auto enable_drop_sound_if_alert_sound  = "EnableDropSoundIfAlertSound";
 
 	// color names - used by BeamEffect and MinimapIcon
 	constexpr auto red    = "Red";

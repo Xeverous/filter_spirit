@@ -67,7 +67,7 @@ void item_filter_block::print(std::ostream& output_stream) const
 	output_stream << '\n';
 
 	conditions.print(output_stream);
-	actions.generate(output_stream);
+	actions.print(output_stream);
 
 	if (continuation.origin)
 		output_stream << '\t' << keywords::rf::continue_ << '\n';
@@ -87,29 +87,32 @@ item_style::item_style()
 
 void item_style::override_with(const action_set& actions)
 {
-	if (actions.set_border_color)
-		border_color = *actions.set_border_color;
+	if (actions.text_color)
+		text_color = *actions.text_color;
 
-	if (actions.set_text_color)
-		text_color = *actions.set_text_color;
+	if (actions.border_color)
+		border_color = *actions.border_color;
 
-	if (actions.set_background_color)
-		background_color = *actions.set_background_color;
+	if (actions.background_color)
+		background_color = *actions.background_color;
 
-	if (actions.set_font_size)
-		font_size = *actions.set_font_size;
+	if (actions.font_size)
+		font_size = *actions.font_size;
 
-	if (actions.play_alert_sound)
-		play_alert_sound = *actions.play_alert_sound;
-
-	if (actions.switch_drop_sound)
-		switch_drop_sound = *actions.switch_drop_sound;
+	if (actions.effect)
+		effect = *actions.effect;
 
 	if (actions.minimap_icon)
 		minimap_icon = *actions.minimap_icon;
 
-	if (actions.play_effect)
-		play_effect = *actions.play_effect;
+	if (actions.alert_sound)
+		alert_sound = *actions.alert_sound;
+
+	if (actions.switch_drop_sound)
+		switch_drop_sound = *actions.switch_drop_sound;
+
+	if (actions.switch_drop_sound_if_alert_sound)
+		switch_drop_sound_if_alert_sound = *actions.switch_drop_sound_if_alert_sound;
 }
 
 block_match_result item_filter_block::test_item(const item& itm, int area_level) const

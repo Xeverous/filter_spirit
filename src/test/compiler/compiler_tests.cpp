@@ -243,8 +243,8 @@ $z = 4W 0 6 RGB
 		private:
 			static
 			void test_alert_sound(
-				const lang::alert_sound& expected_alert_sound,
-				const lang::alert_sound& actual_alert_sound)
+				const lang::alert_sound_action& expected_alert_sound,
+				const lang::alert_sound_action& actual_alert_sound)
 			{
 				std::visit(utility::visitor{
 					[&](const lang::builtin_alert_sound& expected)
@@ -266,13 +266,13 @@ $z = 4W 0 6 RGB
 					}
 				}, expected_alert_sound.sound);
 
-				BOOST_TEST((actual_alert_sound.vol == expected_alert_sound.vol));
+				BOOST_TEST((actual_alert_sound.volume == expected_alert_sound.volume));
 			}
 
 			static
 			void expect_alert_sound_impl(
 				std::string action,
-				const lang::alert_sound& expected_value)
+				const lang::alert_sound_action& expected_value)
 			{
 				const std::string input_str = minimal_input() + action + "\nShow";
 				const std::string_view input = input_str;
@@ -284,10 +284,9 @@ $z = 4W 0 6 RGB
 				BOOST_TEST_REQUIRE(static_cast<int>(filter.blocks.size()) == 1);
 				const lang::item_filter_block& block = filter.blocks[0];
 				BOOST_TEST((block.visibility.policy == lang::item_visibility_policy::show));
-				const std::optional<lang::alert_sound_action>& maybe_alert_sound_action = block.actions.play_alert_sound;
+				const std::optional<lang::alert_sound_action>& maybe_alert_sound_action = block.actions.alert_sound;
 				BOOST_TEST_REQUIRE(maybe_alert_sound_action.has_value());
-				const lang::alert_sound& alert_sound = (*maybe_alert_sound_action).alert;
-				test_alert_sound(expected_value, alert_sound);
+				test_alert_sound(expected_value, *maybe_alert_sound_action);
 			}
 
 		public:
@@ -299,10 +298,10 @@ $z = 4W 0 6 RGB
 			{
 				expect_alert_sound_impl(
 					"PlayAlertSound " + expression,
-					lang::alert_sound{lang::builtin_alert_sound{false, sound_id}, lang::volume{volume}});
+					lang::alert_sound_action{lang::builtin_alert_sound{false, sound_id}, volume, {}});
 				expect_alert_sound_impl(
 					"PlayAlertSoundPositional " + expression,
-					lang::alert_sound{lang::builtin_alert_sound{true, sound_id}, lang::volume{volume}});
+					lang::alert_sound_action{lang::builtin_alert_sound{true, sound_id}, volume, {}});
 			}
 
 			static
@@ -313,7 +312,7 @@ $z = 4W 0 6 RGB
 			{
 				expect_alert_sound_impl(
 					"CustomAlertSound " + expression,
-					lang::alert_sound{lang::custom_alert_sound{false, path}, lang::volume{volume}});
+					lang::alert_sound_action{lang::custom_alert_sound{false, path}, volume, {}});
 			}
 		};
 

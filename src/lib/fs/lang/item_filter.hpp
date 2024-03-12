@@ -135,14 +135,15 @@ struct item_style
 
 	item_visibility_style visibility;
 
-	std::optional<color_action> border_color;
 	color_action text_color;
+	std::optional<color_action> border_color;
 	color_action background_color;
 	font_size_action font_size;
-	std::optional<alert_sound_action> play_alert_sound;
-	std::optional<switch_drop_sound_action> switch_drop_sound;
+	std::optional<play_effect_action> effect;
 	std::optional<minimap_icon_action> minimap_icon;
-	std::optional<play_effect_action> play_effect;
+	std::optional<alert_sound_action> alert_sound;
+	std::optional<switch_drop_sound_action> switch_drop_sound;
+	std::optional<switch_drop_sound_action> switch_drop_sound_if_alert_sound;
 };
 
 struct item_filtering_result

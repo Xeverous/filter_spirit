@@ -215,44 +215,31 @@ namespace rf
 
 	// ---- actions ----
 
-	struct color_actions_ : x3::symbols<lang::color_action_type>
+	struct official_action_properties_ : x3::symbols<lang::official_action_property>
 	{
-		color_actions_()
+		official_action_properties_()
 		{
-			add
-				(lang::keywords::rf::set_border_color,     lang::color_action_type::set_border_color)
-				(lang::keywords::rf::set_text_color,       lang::color_action_type::set_text_color)
-				(lang::keywords::rf::set_background_color, lang::color_action_type::set_background_color)
-			;
-		}
-	};
-	const color_actions_ color_actions;
+			using property = lang::official_action_property;
 
-	struct switch_drop_sound_actions_ : x3::symbols<lang::switch_drop_sound>
-	{
-		switch_drop_sound_actions_()
-		{
 			add
-				(lang::keywords::rf::enable_drop_sound,           lang::switch_drop_sound{true,  false})
-				(lang::keywords::rf::disable_drop_sound,          lang::switch_drop_sound{false, false})
-				(lang::keywords::rf::enable_drop_sound_if_alert,  lang::switch_drop_sound{true,  true})
-				(lang::keywords::rf::disable_drop_sound_if_alert, lang::switch_drop_sound{false, true})
+				(lang::keywords::rf::set_text_color,                    property::set_text_color)
+				(lang::keywords::rf::set_background_color,              property::set_background_color)
+				(lang::keywords::rf::set_border_color,                  property::set_border_color)
+				(lang::keywords::rf::set_font_size,                     property::set_font_size)
+				(lang::keywords::rf::play_effect,                       property::play_effect)
+				(lang::keywords::rf::minimap_icon,                      property::minimap_icon)
+				(lang::keywords::rf::play_alert_sound,                  property::play_alert_sound)
+				(lang::keywords::rf::play_alert_sound_positional,       property::play_alert_sound_positional)
+				(lang::keywords::rf::custom_alert_sound,                property::custom_alert_sound)
+				(lang::keywords::rf::custom_alert_sound_optional,       property::custom_alert_sound_optional)
+				(lang::keywords::rf::disable_drop_sound,                property::disable_drop_sound)
+				(lang::keywords::rf::enable_drop_sound,                 property::enable_drop_sound)
+				(lang::keywords::rf::disable_drop_sound_if_alert_sound, property::disable_drop_sound_if_alert_sound)
+				(lang::keywords::rf::enable_drop_sound_if_alert_sound,  property::enable_drop_sound_if_alert_sound)
 			;
 		}
 	};
-	const switch_drop_sound_actions_ switch_drop_sound_actions;
-
-	struct play_alert_sound_actions_ : x3::symbols<bool>
-	{
-		play_alert_sound_actions_()
-		{
-			add
-				(lang::keywords::rf::play_alert_sound,            false)
-				(lang::keywords::rf::play_alert_sound_positional, true)
-			;
-		}
-	};
-	const play_alert_sound_actions_ play_alert_sound_actions;
+	const official_action_properties_ official_action_properties;
 
 	struct shaper_voice_lines_ : x3::symbols<lang::shaper_voice_line_type>
 	{

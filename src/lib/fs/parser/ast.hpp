@@ -217,19 +217,6 @@ namespace common
 
 	struct unknown_expression : std::string, x3::position_tagged {};
 
-	struct switch_drop_sound_action : x3::position_tagged
-	{
-		auto& operator=(lang::switch_drop_sound sds)
-		{
-			value = sds;
-			return *this;
-		}
-
-		auto get_value() const { return value; }
-
-		lang::switch_drop_sound value;
-	};
-
 	struct continue_statement : x3::position_tagged
 	{
 		void get_value() const {}
@@ -266,14 +253,7 @@ namespace rf
 	using shaper_voice_line_literal = common::shaper_voice_line_literal;
 	using none_literal = common::none_literal;
 
-	struct color_literal : x3::position_tagged
-	{
-		integer_literal r;
-		integer_literal g;
-		integer_literal b;
-		boost::optional<integer_literal> a;
-	};
-
+	// TODO test that real filters support unquoted strings
 	struct string : x3::position_tagged
 	{
 		auto& operator=(common::string_literal str)
@@ -293,18 +273,6 @@ namespace rf
 		std::string value;
 	};
 
-	struct string_array : std::vector<string>, x3::position_tagged {};
-	struct influence_literal_array : std::vector<influence_literal>, x3::position_tagged {};
-
-	struct influence_spec : x3::variant<
-		influence_literal_array,
-		none_literal
-	>, x3::position_tagged
-	{
-		using base_type::base_type;
-		using base_type::operator=;
-	};
-
 	using literal_expression = common::literal_expression;
 	struct literal_sequence : std::vector<literal_expression>, x3::position_tagged {};
 
@@ -315,79 +283,10 @@ namespace rf
 		literal_sequence seq;
 	};
 
-	struct color_action : x3::position_tagged
+	struct action : x3::position_tagged
 	{
-		lang::color_action_type action;
-		color_literal color;
-	};
-
-	struct set_font_size_action : x3::position_tagged
-	{
-		auto& operator=(integer_literal il)
-		{
-			font_size = il;
-			return *this;
-		}
-
-		const auto& get_value() const { return font_size; }
-
-		integer_literal font_size;
-	};
-
-	struct play_alert_sound_action : x3::position_tagged
-	{
-		bool positional;
-		literal_expression id;
-		boost::optional<integer_literal> volume;
-	};
-
-	struct custom_alert_sound_action : x3::position_tagged
-	{
-		bool optional;
-		string_literal path;
-		boost::optional<integer_literal> volume;
-	};
-
-	using switch_drop_sound_action = common::switch_drop_sound_action;
-
-	struct minimap_icon_action : x3::position_tagged
-	{
-		auto& operator=(literal_sequence seq)
-		{
-			literals = std::move(seq);
-			return *this;
-		}
-
-		const auto& get_value() const { return literals; }
-
-		literal_sequence literals;
-	};
-
-	struct play_effect_action : x3::position_tagged
-	{
-		auto& operator=(literal_sequence seq)
-		{
-			literals = std::move(seq);
-			return *this;
-		}
-
-		const auto& get_value() const { return literals; }
-
-		literal_sequence literals;
-	};
-
-	struct action : x3::variant<
-		color_action,
-		set_font_size_action,
-		play_alert_sound_action,
-		custom_alert_sound_action,
-		switch_drop_sound_action,
-		minimap_icon_action,
-		play_effect_action
-	>, x3::position_tagged
-	{
-		using base_type::base_type;
-		using base_type::operator=;
+		lang::official_action_property property;
+		literal_sequence seq;
 	};
 
 	using continue_statement = common::continue_statement;
@@ -544,60 +443,9 @@ namespace sf
 
 	// ---- actions ----
 
-	struct set_color_action : x3::position_tagged
+	struct official_action : x3::position_tagged
 	{
-		lang::color_action_type action_type;
-		sequence seq;
-	};
-
-	struct set_font_size_action : x3::position_tagged
-	{
-		auto& operator=(sequence s)
-		{
-			seq = std::move(s);
-			return *this;
-		}
-
-		const auto& get_value() const { return seq; }
-
-		sequence seq;
-	};
-
-	struct minimap_icon_action : x3::position_tagged
-	{
-		auto& operator=(sequence s)
-		{
-			seq = std::move(s);
-			return *this;
-		}
-
-		const auto& get_value() const { return seq; }
-
-		sequence seq;
-	};
-
-	struct play_effect_action : x3::position_tagged
-	{
-		auto& operator=(sequence s)
-		{
-			seq = std::move(s);
-			return *this;
-		}
-
-		const auto& get_value() const { return seq; }
-
-		sequence seq;
-	};
-
-	struct play_alert_sound_action : x3::position_tagged
-	{
-		bool positional;
-		sequence seq;
-	};
-
-	struct custom_alert_sound_action : x3::position_tagged
-	{
-		bool optional;
+		lang::official_action_property property;
 		sequence seq;
 	};
 
@@ -614,17 +462,9 @@ namespace sf
 		sequence seq;
 	};
 
-	using switch_drop_sound_action = common::switch_drop_sound_action;
-
 	struct action : x3::variant<
-			set_color_action,
-			set_font_size_action,
-			minimap_icon_action,
-			play_effect_action,
-			play_alert_sound_action,
-			custom_alert_sound_action,
-			set_alert_sound_action,
-			switch_drop_sound_action
+			official_action,
+			set_alert_sound_action
 		>, x3::position_tagged
 	{
 		using base_type::base_type;

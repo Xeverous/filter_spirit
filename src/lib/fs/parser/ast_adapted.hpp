@@ -34,34 +34,18 @@
 // -------- common --------
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::lang::switch_drop_sound,
-	enable, if_alert_sound)
-
-BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::common::comparison_expression,
 	operator_, integer)
 
 // -------- real filter --------
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::rf::color_literal,
-	r, g, b, a)
-
-BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::rf::condition,
 	property, comparison, seq)
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::rf::color_action,
-	action, color)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::rf::play_alert_sound_action,
-	positional, id, volume)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::rf::custom_alert_sound_action,
-	optional, path, volume)
+	fs::parser::ast::rf::action,
+	property, seq)
 
 BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::rf::filter_block,
@@ -106,16 +90,8 @@ BOOST_FUSION_ADAPT_STRUCT(
 // ---- actions ----
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::sf::set_color_action,
-	action_type, seq)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::sf::play_alert_sound_action,
-	positional, seq)
-
-BOOST_FUSION_ADAPT_STRUCT(
-	fs::parser::ast::sf::custom_alert_sound_action,
-	optional, seq)
+	fs::parser::ast::sf::official_action,
+	property, seq)
 
 // ---- filter structure ----
 

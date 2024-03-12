@@ -10,17 +10,17 @@ namespace fs::compiler::detail
 {
 
 [[nodiscard]] bool
-spirit_filter_add_action(
+real_filter_add_action(
 	settings st,
-	const parser::ast::sf::action& action,
-	const symbol_table& symbols,
+	const parser::ast::rf::action& action,
 	lang::action_set& action_set,
 	diagnostics_store& diagnostics);
 
 [[nodiscard]] bool
-real_filter_add_action(
+spirit_filter_add_action(
 	settings st,
-	const parser::ast::rf::action& action,
+	const parser::ast::sf::action& action,
+	const symbol_table& symbols,
 	lang::action_set& action_set,
 	diagnostics_store& diagnostics);
 

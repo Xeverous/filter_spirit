@@ -11,7 +11,6 @@
 #include <string_view>
 
 namespace ut = boost::unit_test;
-namespace tt = boost::test_tools;
 
 namespace {
 
@@ -93,15 +92,27 @@ R"(Show
 		{
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
 SetTextColor 1 2 3
-SetBackgroundColor 11 22 33
+SetBorderColor 11 22 33
+SetBackgroundColor 111 222 233
 SetFontSize 36
+PlayEffect Yellow
+MinimapIcon 2 Cyan UpsideDownHouse
+CustomAlertSoundOptional "ding.wav"
+EnableDropSound
+DisableDropSoundIfAlertSound
 Show
 )");
 			const std::string_view expected_filter =
 R"(Show
 	SetTextColor 1 2 3
-	SetBackgroundColor 11 22 33
+	SetBorderColor 11 22 33
+	SetBackgroundColor 111 222 233
 	SetFontSize 36
+	PlayEffect Yellow
+	MinimapIcon 2 Cyan UpsideDownHouse
+	CustomAlertSoundOptional "ding.wav"
+	EnableDropSound
+	DisableDropSoundIfAlertSound
 
 )";
 
@@ -432,8 +443,8 @@ Rarity Rare
 			const std::string_view expected_filter =
 R"(Show
 	Rarity Rare
-	SetBorderColor 1 2 3
 	SetTextColor 1 2 3
+	SetBorderColor 1 2 3
 	SetFontSize 36
 
 )";
@@ -471,13 +482,13 @@ Show
 			const std::string_view expected_filter =
 R"(Show
 	Rarity Rare
-	SetBorderColor 11 22 33
 	SetTextColor 1 2 3
+	SetBorderColor 11 22 33
 	SetFontSize 36
 
 Show
-	SetBorderColor 11 22 33
 	SetTextColor 1 2 3
+	SetBorderColor 11 22 33
 	SetFontSize 36
 
 )";
@@ -526,20 +537,20 @@ Show
 R"(Show
 	Rarity Rare
 	Quality 20
-	SetBorderColor 1 2 3
 	SetTextColor 100 100 100
+	SetBorderColor 1 2 3
 	SetBackgroundColor 50 50 50
 	SetFontSize 42
 
 Show
 	Rarity Rare
-	SetBorderColor 11 22 33
 	SetTextColor 11 22 33
+	SetBorderColor 11 22 33
 	SetFontSize 42
 
 Show
-	SetBorderColor 1 2 3
 	SetTextColor 1 2 3
+	SetBorderColor 1 2 3
 	SetFontSize 36
 
 )";
@@ -601,22 +612,22 @@ R"(Show
 	SocketGroup RGB
 	Width 2
 	Height <= 2
-	SetBorderColor 175 255 200
 	SetTextColor 200 200 200
+	SetBorderColor 175 255 200
 
 Show
 	Rarity Normal
 	SocketGroup RGB
 	Width 1
 	Height <= 4
-	SetBorderColor 175 255 200
 	SetTextColor 200 200 200
+	SetBorderColor 175 255 200
 
 Show
 	Rarity Normal
 	SocketGroup RGB
-	SetBorderColor 128 128 192
 	SetTextColor 200 200 200
+	SetBorderColor 128 128 192
 
 Show
 	Rarity Normal
@@ -627,22 +638,22 @@ Show
 	SocketGroup RGB
 	Width 2
 	Height <= 2
-	SetBorderColor 175 255 200
 	SetTextColor 136 136 255
+	SetBorderColor 175 255 200
 
 Show
 	Rarity Magic
 	SocketGroup RGB
 	Width 1
 	Height <= 4
-	SetBorderColor 175 255 200
 	SetTextColor 136 136 255
+	SetBorderColor 175 255 200
 
 Show
 	Rarity Magic
 	SocketGroup RGB
-	SetBorderColor 128 128 192
 	SetTextColor 136 136 255
+	SetBorderColor 128 128 192
 
 Show
 	Rarity Magic
@@ -653,22 +664,22 @@ Show
 	SocketGroup RGB
 	Width 2
 	Height <= 2
-	SetBorderColor 175 255 200
 	SetTextColor 255 255 119
+	SetBorderColor 175 255 200
 
 Show
 	Rarity Rare
 	SocketGroup RGB
 	Width 1
 	Height <= 4
-	SetBorderColor 175 255 200
 	SetTextColor 255 255 119
+	SetBorderColor 175 255 200
 
 Show
 	Rarity Rare
 	SocketGroup RGB
-	SetBorderColor 128 128 192
 	SetTextColor 255 255 119
+	SetBorderColor 128 128 192
 
 Show
 	Rarity Rare
@@ -1057,34 +1068,34 @@ Hide
 R"(Hide
 	DropLevel >= 10
 	ItemLevel < 70
-	MinimapIcon -1
 	PlayEffect None
+	MinimapIcon -1
 
 Show
 	DropLevel >= 10
 	Rarity >= Rare
 	ItemLevel >= 70
 	SetFontSize 40
-	DisableDropSound
-	MinimapIcon 1 Green Raindrop
 	PlayEffect Green
+	MinimapIcon 1 Green Raindrop
+	DisableDropSound
 
 Show
 	DropLevel >= 10
 	Sockets 6
-	MinimapIcon -1
 	PlayEffect None
+	MinimapIcon -1
 	Continue
 
 Show
 	DropLevel >= 10
-	EnableDropSound
-	MinimapIcon 1 Green Raindrop
 	PlayEffect Green
+	MinimapIcon 1 Green Raindrop
+	EnableDropSound
 
 Hide
-	MinimapIcon 0 Yellow Star
 	PlayEffect Yellow
+	MinimapIcon 0 Yellow Star
 
 )";
 
