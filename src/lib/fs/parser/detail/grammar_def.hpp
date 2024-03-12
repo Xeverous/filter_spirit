@@ -22,7 +22,7 @@ namespace common
 	// ---- whitespace ----
 
 	const comment_type comment = "comment";
-	const auto comment_def = x3::lit('#') > *(x3::char_ - x3::eol) > (x3::eol | x3::eoi);
+	const auto comment_def = x3::lit('#') > *(x3::char_ - x3::eol) > (x3::eol | &x3::eoi);
 	BOOST_SPIRIT_DEFINE(comment)
 
 	const whitespace_type whitespace = "whitespace";
@@ -32,6 +32,10 @@ namespace common
 	const non_eol_whitespace_type non_eol_whitespace = "non-eol whitespace";
 	const auto non_eol_whitespace_def = x3::space - x3::eol;
 	BOOST_SPIRIT_DEFINE(non_eol_whitespace)
+
+	const end_of_line_type end_of_line = "end of line or file";
+	const auto end_of_line_def = comment | x3::eol | &x3::eoi;
+	BOOST_SPIRIT_DEFINE(end_of_line)
 
 	// ---- fundamental tokens ----
 
@@ -59,6 +63,20 @@ namespace common
 	auto make_keyword(T grammar)
 	{
 		return x3::lexeme[grammar >> not_alnum_or_underscore];
+	}
+
+	/*
+	 * All conditions and most actions require a sequence of tokens.
+	 * Disable eol in skip parser and require eol/eoi to end the sequence
+	 * (for empty sequences it is the only way to know that they have 0 elements).
+	 * This disallows code like "SocketGroup RGB {" but "{" can not be consistently
+	 * put on the same line as many conditions will be very long (especially BaseType).
+	 * TODO the skipper should be moved upwards in the grammar and applied to every command.
+	 */
+	template <typename T>
+	auto make_sequence(T grammar)
+	{
+		return x3::skip(non_eol_whitespace)[*grammar > end_of_line];
 	}
 
 	// ---- literal types ----
@@ -313,8 +331,8 @@ namespace sf
 	const auto primitive_value_def = name | common::literal_expression | common::unknown_expression;
 	BOOST_SPIRIT_DEFINE(primitive_value)
 
-	const sequence_type sequence = "sequence";
-	const auto sequence_def = x3::skip(common::non_eol_whitespace)[+primitive_value];
+	const sequence_type sequence = "list of values";
+	const auto sequence_def = common::make_sequence(primitive_value);
 	BOOST_SPIRIT_DEFINE(sequence)
 
 	// moved here due to circular dependency

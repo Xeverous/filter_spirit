@@ -213,6 +213,9 @@ namespace common
 	using non_eol_whitespace_type = x3::rule<struct non_eol_whitespace_class /*, intentionally nothing */>;
 	BOOST_SPIRIT_DECLARE(non_eol_whitespace_type)
 
+	using end_of_line_type = x3::rule<struct end_of_line_class /*, intentionally nothing */>;
+	BOOST_SPIRIT_DECLARE(end_of_line_type)
+
 	// ---- fundamental tokens ----
 
 	// all comments are ignored

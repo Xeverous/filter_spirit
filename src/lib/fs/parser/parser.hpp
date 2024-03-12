@@ -120,7 +120,12 @@ public:
 	[[nodiscard]]
 	std::string_view text_of(const x3::position_tagged& ast) const
 	{
-		return range_to_text(range_of(ast));
+		auto result = range_to_text(range_of(ast));
+		// Some parsed ASTs will have EOL at the end - remove them.
+		// Having EOLs at the end uglifies diagnostic messages.
+		result = utility::rtrim(result, '\n');
+		result = utility::rtrim(result, '\r');
+		return result;
 	}
 
 private:

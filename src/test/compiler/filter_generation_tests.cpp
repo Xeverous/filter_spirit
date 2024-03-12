@@ -75,7 +75,8 @@ R"(Show
 		BOOST_AUTO_TEST_CASE(single_condition)
 		{
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
-Quality > 0 {
+Quality > 0
+{
 	Show
 }
 )");
@@ -133,20 +134,23 @@ R"(Show
 		BOOST_AUTO_TEST_CASE(range_condition)
 		{
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
-ItemLevel >= 75 {
+ItemLevel >= 75
+{
 	SetTextColor 1 1 1
 	Show
 	Continue
 }
 
 ItemLevel >= 60
-ItemLevel < 75 {
+ItemLevel < 75
+{
 	SetTextColor 2 2 2
 	Show
 	Continue
 }
 
-ItemLevel < 60 {
+ItemLevel < 60
+{
 	SetTextColor 3 3 3
 	Show
 	Continue
@@ -177,14 +181,16 @@ Show
 		BOOST_AUTO_TEST_CASE(range_condition_min_max)
 		{
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
-ItemLevel >= 85 75 80 {
+ItemLevel >= 85 75 80
+{
 	SetTextColor 1 1 1
 	Show
 	Continue
 }
 
 ItemLevel >= 65 60 70
-ItemLevel < 70 75 65 {
+ItemLevel < 70 75 65
+{
 	SetTextColor 2 2 2
 	Show
 	Continue
@@ -215,18 +221,42 @@ $x = None
 Class "Divination Card"
 {
 	# Nones should be skipped
-	BaseType == "The Wolf" $x "The Demon" None { Show }
-	BaseType    "The Wolf" $x "The Demon" None { Show }
+	BaseType == "The Wolf" $x "The Demon" None
+	{
+		Show
+	}
+	BaseType    "The Wolf" $x "The Demon" None
+	{
+		Show
+	}
 
 	# these blocks should not be generated (only Nones)
-	BaseType == None { Show }
-	BaseType    None { Show }
-	BaseType    $x   { Show }
+	BaseType == None
+	{
+		Show
+	}
+	BaseType    None
+	{
+		Show
+	}
+	BaseType    $x
+	{
+		Show
+	}
 }
 
-EnchantmentPassiveNode    "Damage while you have a Herald" { Show }
-EnchantmentPassiveNode =  "Damage while you have a Herald" { Show }
-EnchantmentPassiveNode == "Damage while you have a Herald" { Show }
+EnchantmentPassiveNode    "Damage while you have a Herald"
+{
+	Show
+}
+EnchantmentPassiveNode =  "Damage while you have a Herald"
+{
+	Show
+}
+EnchantmentPassiveNode == "Damage while you have a Herald"
+{
+	Show
+}
 )");
 			const std::string_view expected_filter =
 R"(Show
@@ -256,9 +286,18 @@ Show
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
 BaseType "Leather Belt"
 {
-	HasInfluence    None             { Show }
-	HasInfluence == Crusader Hunter  { Show }
-	HasInfluence    Redeemer Warlord { Show }
+	HasInfluence    None
+	{
+		Show
+	}
+	HasInfluence == Crusader Hunter
+	{
+		Show
+	}
+	HasInfluence    Redeemer Warlord
+	{
+		Show
+	}
 }
 )");
 			const std::string_view expected_filter =
@@ -282,14 +321,38 @@ Show
 		BOOST_AUTO_TEST_CASE(socket_spec_conditions)
 		{
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
-Sockets        1 2 3R AA 3D 5GBW { Show }
-Sockets     =  1 2 3R AA 3D 5GBW { Show }
-Sockets     == 1 2 3R AA 3D 5GBW { Show }
-Sockets     >= 1 2 3R AA 3D 5GBW { Show }
-SocketGroup    1 2 3R AA 3D 5GBW { Show }
-SocketGroup =  1 2 3R AA 3D 5GBW { Show }
-SocketGroup == 1 2 3R AA 3D 5GBW { Show }
-SocketGroup >= 1 2 3R AA 3D 5GBW { Show }
+Sockets        1 2 3R AA 3D 5GBW
+{
+	Show
+}
+Sockets     =  1 2 3R AA 3D 5GBW
+{
+	Show
+}
+Sockets     == 1 2 3R AA 3D 5GBW
+{
+	Show
+}
+Sockets     >= 1 2 3R AA 3D 5GBW
+{
+	Show
+}
+SocketGroup    1 2 3R AA 3D 5GBW
+{
+	Show
+}
+SocketGroup =  1 2 3R AA 3D 5GBW
+{
+	Show
+}
+SocketGroup == 1 2 3R AA 3D 5GBW
+{
+	Show
+}
+SocketGroup >= 1 2 3R AA 3D 5GBW
+{
+	Show
+}
 )");
 			const std::string_view expected_filter =
 R"(Show
@@ -348,16 +411,21 @@ R"(Show
 		{
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
 $x = 1 2 3
-$actions = {
+$actions =
+{
 	SetBorderColor $x
 	SetTextColor $x
 }
 
-$actions_copy = { Expand $actions }
+$actions_copy =
+{
+	Expand $actions
+}
 
 SetFontSize 36
 Expand $actions_copy
-Rarity Rare {
+Rarity Rare
+{
 	Show
 }
 )");
@@ -378,12 +446,14 @@ R"(Show
 $x = 11 22 33
 $y = 1 2 3
 
-$actions1 = {
+$actions1 =
+{
 	SetBorderColor $x
 	SetTextColor $x
 }
 
-$actions2 = {
+$actions2 =
+{
 	SetBorderColor $y
 	Expand $actions1
 	SetTextColor $y
@@ -391,7 +461,8 @@ $actions2 = {
 
 SetFontSize 36
 Expand $actions2
-Rarity Rare {
+Rarity Rare
+{
 	Show
 }
 
@@ -419,23 +490,27 @@ Show
 $x = 11 22 33
 $y = 1 2 3
 
-$actions1 = {
+$actions1 =
+{
 	SetBorderColor $x
 	SetTextColor $x
 	SetFontSize 42
 }
 
-$actions2 = {
+$actions2 =
+{
 	SetBorderColor $y
 	SetTextColor $y
 }
 
 SetFontSize 36
 Expand $actions2
-Rarity Rare {
+Rarity Rare
+{
 	Expand $actions1
 
-	Quality 20 {
+	Quality 20
+	{
 		SetBackgroundColor 50 50 50
 		Expand $actions2
 		SetTextColor 100 100 100
@@ -477,17 +552,21 @@ Show
 $color_chromatic_small = 175 255 200
 $color_chromatic_big   = 128 128 192
 
-$chrome_item_logic = {
-	SocketGroup RGB {
+$chrome_item_logic =
+{
+	SocketGroup RGB
+	{
 		SetBorderColor $color_chromatic_small
 
 		Width 2
-		Height <= 2 {
+		Height <= 2
+		{
 			Show
 		}
 
 		Width 1
-		Height <= 4 {
+		Height <= 4
+		{
 			Show
 		}
 
@@ -498,17 +577,20 @@ $chrome_item_logic = {
 	Show
 }
 
-Rarity Normal {
+Rarity Normal
+{
 	SetTextColor 200 200 200
 	Expand $chrome_item_logic
 }
 
-Rarity Magic {
+Rarity Magic
+{
 	SetTextColor 136 136 255
 	Expand $chrome_item_logic
 }
 
-Rarity Rare {
+Rarity Rare
+{
 	SetTextColor 255 255 119
 	Expand $chrome_item_logic
 }
@@ -605,7 +687,8 @@ $c1 = 1 2 $x
 $c2 = 11 22 $y
 
 BaseType "Vaal"
-Width > 1 {
+Width > 1
+{
 	SetBorderColor $c2
 	SetBackgroundColor $c2
 	SetFontSize $y
@@ -640,12 +723,15 @@ Show
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
 SetBackgroundColor 0 0 0
 
-Class "Boots" {
+Class "Boots"
+{
 	SetBorderColor 1 2 3
 
-	BaseType "Dragonscale Boots" "Sorcerer Boots" {
+	BaseType "Dragonscale Boots" "Sorcerer Boots"
+	{
 		PlayAlertSound 1
-		Quality > 0 {
+		Quality > 0
+		{
 			SetBorderColor 255 255 255
 			Show
 		}
@@ -693,7 +779,8 @@ Show
 PlayAlertSoundPositional 1 300
 Show
 
-Class "Boots" {
+Class "Boots"
+{
 	SetBorderColor 1 2 3
 	CustomAlertSound "pop.wav"
 	Hide
@@ -726,26 +813,31 @@ Show
 $show_rares = True
 $show_hammers = True
 
-BaseType "Gavel" "Stone Hammer" "Rock Breaker" {
+BaseType "Gavel" "Stone Hammer" "Rock Breaker"
+{
 	SetTextColor 255 255 255
 	SetBackgroundColor 162 85 0
 
-	Rarity Normal {
+	Rarity Normal
+	{
 		 ShowDiscard $show_hammers
 	}
 
 	Rarity Magic
-	Quality > 12 {
+	Quality > 12
+	{
 		 ShowDiscard $show_hammers
 	}
 
 	Rarity Rare
-	Quality > 16 {
+	Quality > 16
+	{
 		 ShowDiscard $show_hammers
 	}
 }
 
-Rarity Rare {
+Rarity Rare
+{
 	ShowHide $show_rares
 }
 )");
@@ -784,26 +876,31 @@ Show
 $show_rares = True
 $show_hammers = False
 
-BaseType "Gavel" "Stone Hammer" "Rock Breaker" {
+BaseType "Gavel" "Stone Hammer" "Rock Breaker"
+{
 	SetTextColor 255 255 255
 	SetBackgroundColor 162 85 0
 
-	Rarity Normal {
-		 ShowDiscard $show_hammers
+	Rarity Normal
+	{
+		ShowDiscard $show_hammers
 	}
 
 	Rarity Magic
-	Quality > 12 {
-		 ShowDiscard $show_hammers
+	Quality > 12
+	{
+		ShowDiscard $show_hammers
 	}
 
 	Rarity Rare
-	Quality > 16 {
-		 ShowDiscard $show_hammers
+	Quality > 16
+	{
+		ShowDiscard $show_hammers
 	}
 }
 
-Rarity Rare {
+Rarity Rare
+{
 	ShowHide $show_rares
 }
 )");
@@ -851,22 +948,26 @@ Hide
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
 SetFontSize 30
 
-DropLevel >= 10 {
+DropLevel >= 10
+{
 	SetFontSize 35
 
-	ItemLevel < 70 {
+	ItemLevel < 70
+	{
 		Hide
 		Continue
 	}
 
 	Rarity >= Rare
-	ItemLevel >= 70 {
+	ItemLevel >= 70
+	{
 		SetFontSize 40
 		Show
 		Continue
 	}
 
-	Sockets 6 {
+	Sockets 6
+	{
 		PlayEffect Blue
 		Show
 		Continue
@@ -918,24 +1019,28 @@ Hide
 MinimapIcon 0 Yellow Star
 PlayEffect Yellow
 
-DropLevel >= 10 {
+DropLevel >= 10
+{
 	MinimapIcon 1 Green Raindrop
 	PlayEffect Green
 
-	ItemLevel < 70 {
+	ItemLevel < 70
+	{
 		MinimapIcon -1
 		PlayEffect None
 		Hide
 	}
 
 	Rarity >= Rare
-	ItemLevel >= 70 {
+	ItemLevel >= 70
+	{
 		SetFontSize 40
 		DisableDropSound
 		Show
 	}
 
-	Sockets 6 {
+	Sockets 6
+	{
 		MinimapIcon -1
 		PlayEffect None
 		Show
@@ -993,157 +1098,183 @@ SetAlertSound ShChaos 200
 Show
 Continue
 
-ItemLevel 1 {
+ItemLevel 1
+{
 	PlayAlertSound 1 100
 	Show
 	Continue
 }
 
-ItemLevel 2 {
+ItemLevel 2
+{
 	PlayAlertSound 2
 	Show
 	Continue
 }
 
-ItemLevel 3 {
+ItemLevel 3
+{
 	PlayAlertSound ShGeneral 300
 	Show
 	Continue
 }
 
-ItemLevel 4 {
+ItemLevel 4
+{
 	PlayAlertSound ShGeneral
 	Show
 	Continue
 }
 
-ItemLevel 5 {
+ItemLevel 5
+{
 	PlayAlertSound None 50
 	Show
 	Continue
 }
 
-ItemLevel 6 {
+ItemLevel 6
+{
 	PlayAlertSound None
 	Show
 	Continue
 }
 
-ItemLevel 1 {
+ItemLevel 1
+{
 	PlayAlertSoundPositional 1 100
 	Show
 	Continue
 }
 
-ItemLevel 2 {
+ItemLevel 2
+{
 	PlayAlertSoundPositional 2
 	Show
 	Continue
 }
 
-ItemLevel 3 {
+ItemLevel 3
+{
 	PlayAlertSoundPositional ShGeneral 300
 	Show
 	Continue
 }
 
-ItemLevel 4 {
+ItemLevel 4
+{
 	PlayAlertSoundPositional ShGeneral
 	Show
 	Continue
 }
 
-ItemLevel 5 {
+ItemLevel 5
+{
 	PlayAlertSoundPositional None 50
 	Show
 	Continue
 }
 
-ItemLevel 6 {
+ItemLevel 6
+{
 	PlayAlertSoundPositional None
 	Show
 	Continue
 }
 
-ItemLevel 7 {
+ItemLevel 7
+{
 	CustomAlertSound "" 250
 	Show
 	Continue
 }
 
-ItemLevel 8 {
+ItemLevel 8
+{
 	CustomAlertSound ""
 	Show
 	Continue
 }
 
-ItemLevel 9 {
+ItemLevel 9
+{
 	CustomAlertSound "None" 150
 	Show
 	Continue
 }
 
-ItemLevel 10 {
+ItemLevel 10
+{
 	CustomAlertSound "None"
 	Show
 	Continue
 }
 
-ItemLevel 1 {
+ItemLevel 1
+{
 	SetAlertSound 1 100
 	Show
 	Continue
 }
 
-ItemLevel 2 {
+ItemLevel 2
+{
 	SetAlertSound 2
 	Show
 	Continue
 }
 
-ItemLevel 3 {
+ItemLevel 3
+{
 	SetAlertSound ShGeneral 300
 	Show
 	Continue
 }
 
-ItemLevel 4 {
+ItemLevel 4
+{
 	SetAlertSound ShGeneral
 	Show
 	Continue
 }
 
-ItemLevel 5 {
+ItemLevel 5
+{
 	SetAlertSound None 50
 	Show
 	Continue
 }
 
-ItemLevel 6 {
+ItemLevel 6
+{
 	SetAlertSound None
 	Show
 	Continue
 }
 
-ItemLevel 7 {
+ItemLevel 7
+{
 	SetAlertSound "" 250
 	Show
 	Continue
 }
 
-ItemLevel 8 {
+ItemLevel 8
+{
 	SetAlertSound ""
 	Show
 	Continue
 }
 
-ItemLevel 9 {
+ItemLevel 9
+{
 	SetAlertSound "None" 150
 	Show
 	Continue
 }
 
-ItemLevel 10 {
+ItemLevel 10
+{
 	SetAlertSound "None"
 	Show
 	Continue
@@ -1299,22 +1430,34 @@ Show
 		{
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
 MinimapIcon 0 Cyan Cross
-{ Show }
+{
+	Show
+}
 
 MinimapIcon 1 Grey Moon
-{ Show }
+{
+	Show
+}
 
 MinimapIcon 2 Orange Raindrop
-{ Show }
+{
+	Show
+}
 
 MinimapIcon 0 Pink Kite
-{ Show }
+{
+	Show
+}
 
 MinimapIcon 1 Purple Pentagon
-{ Show }
+{
+	Show
+}
 
 MinimapIcon 2 Cyan UpsideDownHouse
-{ Show }
+{
+	Show
+}
 
 )");
 			const std::string_view expected_filter =
@@ -1346,7 +1489,8 @@ Show
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
 BaseType "Something"
 Replica True
-AlternateQuality True {
+AlternateQuality True
+{
 	Show
 }
 )");
@@ -1364,10 +1508,22 @@ R"(Show
 		BOOST_AUTO_TEST_CASE(ritual_new_ranged_string_array_conditions)
 		{
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
-HasExplicitMod ==  "of Haast" "of Tzteosh" "of Ephij" { Show }
-HasExplicitMod     "of Haast" "of Tzteosh" "of Ephij" { Show }
-HasExplicitMod ==2 "of Haast" "of Tzteosh" "of Ephij" { Show }
-HasExplicitMod >=2 "of Haast" "of Tzteosh" "of Ephij" { Show }
+HasExplicitMod ==  "of Haast" "of Tzteosh" "of Ephij"
+{
+	Show
+}
+HasExplicitMod     "of Haast" "of Tzteosh" "of Ephij"
+{
+	Show
+}
+HasExplicitMod ==2 "of Haast" "of Tzteosh" "of Ephij"
+{
+	Show
+}
+HasExplicitMod >=2 "of Haast" "of Tzteosh" "of Ephij"
+{
+	Show
+}
 )");
 			const std::string_view expected_filter =
 R"(Show
@@ -1390,13 +1546,34 @@ Show
 		BOOST_AUTO_TEST_CASE(scourge_new_conditions)
 		{
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
-BaseDefencePercentile >= 90 { Show }
-BaseArmour            > 500 { Show }
-BaseEvasion           > 500 { Show }
-BaseEnergyShield      > 200 { Show }
-BaseWard              >  50 { Show }
-Scourged               True { Show }
-UberBlightedMap        True { Show }
+BaseDefencePercentile >= 90
+{
+	Show
+}
+BaseArmour            > 500
+{
+	Show
+}
+BaseEvasion           > 500
+{
+	Show
+}
+BaseEnergyShield      > 200
+{
+	Show
+}
+BaseWard              >  50
+{
+	Show
+}
+Scourged               True
+{
+	Show
+}
+UberBlightedMap        True
+{
+	Show
+}
 )");
 			const std::string_view expected_filter =
 R"(Show
@@ -1428,9 +1605,18 @@ Show
 		BOOST_AUTO_TEST_CASE(crucible_and_affliction_new_conditions)
 		{
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
-HasImplicitMod         True { Show }
-HasCruciblePassiveTree True { Show }
-TransfiguredGem        True { Show }
+HasImplicitMod         True
+{
+	Show
+}
+HasCruciblePassiveTree True
+{
+	Show
+}
+TransfiguredGem        True
+{
+	Show
+}
 )");
 			const std::string_view expected_filter =
 R"(Show
@@ -1450,12 +1636,27 @@ Show
 		BOOST_AUTO_TEST_CASE(siege_of_the_atlas_new_conditions)
 		{
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
-HasSearingExarchImplicit    5 { Show }
-HasSearingExarchImplicit >= 4 { Show }
-HasEaterOfWorldsImplicit    6 { Show }
-HasEaterOfWorldsImplicit >  4 { Show }
+HasSearingExarchImplicit    5
+{
+	Show
+}
+HasSearingExarchImplicit >= 4
+{
+	Show
+}
+HasEaterOfWorldsImplicit    6
+{
+	Show
+}
+HasEaterOfWorldsImplicit >  4
+{
+	Show
+}
 
-ArchnemesisMod "Toxic" "Hasted" { Hide }
+ArchnemesisMod "Toxic" "Hasted"
+{
+	Hide
+}
 )");
 			const std::string_view expected_filter =
 R"(Show
@@ -1482,22 +1683,34 @@ Hide
 		{
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
 PlayAlertSound ShExalted
-{ Show }
+{
+	Show
+}
 
 PlayAlertSound ShDivine 250
-{ Show }
+{
+	Show
+}
 
 PlayAlertSoundPositional ShRegal
-{ Show }
+{
+	Show
+}
 
 PlayAlertSoundPositional ShFusing 200
-{ Show }
+{
+	Show
+}
 
 SetAlertSound ShAlchemy
-{ Show }
+{
+	Show
+}
 
 SetAlertSound ShVaal 150
-{ Show }
+{
+	Show
+}
 
 )");
 			const std::string_view expected_filter =
@@ -1528,16 +1741,24 @@ Show
 		{
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
 CustomAlertSound "pop.wav"
-{ Show }
+{
+	Show
+}
 
 CustomAlertSound "pop.wav" 123
-{ Show }
+{
+	Show
+}
 
 CustomAlertSoundOptional "pop.wav"
-{ Show }
+{
+	Show
+}
 
 CustomAlertSoundOptional "pop.wav" 123
-{ Show }
+{
+	Show
+}
 )");
 			const std::string_view expected_filter =
 R"(Show
@@ -1562,29 +1783,34 @@ Show
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
 SetFontSize 30
 
-DropLevel >= 10 {
+DropLevel >= 10
+{
 	SetFontSize 35
 
-	ItemLevel < 70 {
+	ItemLevel < 70
+	{
 		EnableDropSound
 		Hide
 	}
 
 	Rarity >= Rare
-	ItemLevel >= 75 {
+	ItemLevel >= 75
+	{
 		SetFontSize 40
 		DisableDropSoundIfAlertSound
 		Show
 	}
 
 	Rarity >= Rare
-	ItemLevel >= 70 {
+	ItemLevel >= 70
+	{
 		SetFontSize 40
 		DisableDropSound
 		Show
 	}
 
-	Sockets 6 {
+	Sockets 6
+	{
 		PlayEffect Blue
 		Show
 		Continue
@@ -1652,20 +1878,29 @@ Hide
 			ipd.divination_cards.push_back(divination_card{price_data{1000, false}, "The Doctor", 8});
 			const std::string actual_filter = generate_filter(minimal_input() + R"(
 Class "Divination Card"
-Autogen "cards" {
+Autogen "cards"
+{
 	Price >= 100
-	{ Show }
+	{
+		Show
+	}
 
 	Price < 100
 	Price >= 10
-	{ Show }
+	{
+		Show
+	}
 
 	Price < 10
 	Price >= 5
-	{ Show }
+	{
+		Show
+	}
 
 	Price < 5
-	{ Hide }
+	{
+		Hide
+	}
 }
 )", ipd);
 			const std::string_view expected_filter =

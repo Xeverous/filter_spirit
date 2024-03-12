@@ -232,7 +232,7 @@ $val = NoSuchKeyword
 
 		BOOST_AUTO_TEST_CASE(type_mismatch)
 		{
-			const std::string input_str = minimal_input() + R"(BaseType 123 {})";
+			const std::string input_str = minimal_input() + "BaseType 123\n{}";
 			const std::string_view input = input_str;
 			const parser::parsed_spirit_filter parse_data = parse(input);
 			const diagnostics_store diagnostics = expect_error_when_compiling(parse_data.ast);
@@ -250,7 +250,7 @@ $val = NoSuchKeyword
 
 		BOOST_AUTO_TEST_CASE(duplicate_influence)
 		{
-			const std::string input_str = minimal_input() + R"(HasInfluence Shaper Shaper {})";
+			const std::string input_str = minimal_input() + "HasInfluence Shaper Shaper\n{}";
 			const std::string_view input = input_str;
 			const parser::parsed_spirit_filter parse_data = parse(input);
 			const diagnostics_store diagnostics = expect_error_when_compiling(parse_data.ast);
@@ -269,7 +269,8 @@ $val = NoSuchKeyword
 		BOOST_AUTO_TEST_CASE(invalid_statement_action_after_condition)
 		{
 			const std::string input_str = minimal_input() + R"(
-Class == "Skill Gems" {
+Class == "Skill Gems"
+{
 	SetTextColor 0 255 0
 	Show
 }
@@ -294,11 +295,13 @@ Show
 		BOOST_AUTO_TEST_CASE(invalid_statement_expansion_after_condition)
 		{
 			const std::string input_str = minimal_input() + R"(
-$x = {
+$x =
+{
 	SetTextColor 0 255 0
 }
 
-Class == "Skill Gems" {
+Class == "Skill Gems"
+{
 	Expand $x
 	Show
 }
@@ -323,7 +326,8 @@ Show
 		BOOST_AUTO_TEST_CASE(invalid_statement_visibility_after_condition)
 		{
 			const std::string input_str = minimal_input() + R"(
-Class == "Skill Gems" {
+Class == "Skill Gems"
+{
 	Show
 }
 
@@ -346,7 +350,8 @@ Hide
 		BOOST_AUTO_TEST_CASE(unknown_statement)
 		{
 			const std::string input_str = minimal_input() + R"(
-Class == "Skill Gems" {
+Class == "Skill Gems"
+{
 	UnknownStatement True
 	Show
 }
@@ -619,11 +624,13 @@ PlayEffect Temp
 		BOOST_AUTO_TEST_CASE(autogen)
 		{
 			const std::string input_str = minimal_input() + R"(
-Price > 10 {
+Price > 10
+{
 	Show
 }
 
-Autogen "oils" {
+Autogen "oils"
+{
 	Hide
 }
 )";

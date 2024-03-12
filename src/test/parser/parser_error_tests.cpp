@@ -49,11 +49,6 @@ BOOST_AUTO_TEST_SUITE(parser_suite)
 			expect_parse_failure("$val = = 2");
 		}
 
-		BOOST_AUTO_TEST_CASE(missing_value)
-		{
-			expect_parse_failure("$x = \n $y = 2");
-		}
-
 	BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE_END()

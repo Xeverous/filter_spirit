@@ -275,10 +275,12 @@ $Identifiedd = $Corruptedd
 # sample comment
 SetBackgroundColor $color_black
 
-Class "Currency" {
+Class "Currency"
+{
 	SetBorderColor $color_currency
 
-	BaseType $currency_t1 {
+	BaseType $currency_t1
+	{
 		PlayAlertSound $sound_currency
 		Show
 	}
