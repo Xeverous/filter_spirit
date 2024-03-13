@@ -170,7 +170,7 @@ target_compile_options(filter_spirit
 		$<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -Wpedantic -Wno-deprecated-copy -ffast-math
 			-Wsuggest-attribute=noreturn -Wduplicated-branches -Wduplicated-cond -Wfloat-equal
 			-Wenum-conversion -Wsign-conversion -Wlogical-op -Wmissing-declarations
-			-Wmismatched-tags -Wextra-semi -Wsuggest-override -Wsuggest-final-types>
+			-Wmismatched-tags -Wextra-semi -Wsuggest-override>
 		$<$<CXX_COMPILER_ID:Clang>:-Wall -Wextra -Wpedantic -Wdeprecated -Wdocumentation -ffast-math
 			-Wabstract-vbase-init -Wanon-enum-enum-conversion -Warray-bounds-pointer-arithmetic
 			-Wconversion -Wbad-function-cast -Wcast-qual -Wzero-as-null-pointer-constant
