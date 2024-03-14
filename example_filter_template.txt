@@ -437,47 +437,57 @@ $actions_influence_very_low = {
 }
 
 $blocks_influence_price = {
-	Price >= $cfg_influence_high_min_value {
+	Price >= $cfg_influence_high_min_value
+	{
 		Expand $actions_influence_high
 		Show
 	}
 
 	Price < $cfg_influence_high_min_value
-	Price >= $cfg_influence_mid_min_value {
+	Price >= $cfg_influence_mid_min_value
+	{
 		Expand $actions_influence_mid
 		ShowDiscard $show_influence_mid
 	}
 
 	Price < $cfg_influence_mid_min_value
-	Price > $cfg_influence_low_min_value {
+	Price > $cfg_influence_low_min_value
+	{
 		Expand $actions_influence_low
 		ShowDiscard $show_influence_low
 	}
 
-	Price <= $cfg_influence_low_min_value {
+	Price <= $cfg_influence_low_min_value
+	{
 		Expand $actions_influence_very_low
 		ShowDiscard $show_influence_very_low
 	}
 }
 
-$blocks_influence_ilvl = {
-	ItemLevel >= 86 {
+$blocks_influence_ilvl =
+{
+	ItemLevel >= 86
+	{
 		Expand $blocks_influence_price
 	}
 
-	ItemLevel 85 {
+	ItemLevel 85
+	{
 		Expand $blocks_influence_price
 	}
 
-	ItemLevel 84 {
+	ItemLevel 84
+	{
 		Expand $blocks_influence_price
 	}
 
-	ItemLevel 83 {
+	ItemLevel 83
+	{
 		Expand $blocks_influence_price
 	}
 
-	ItemLevel 82 {
+	ItemLevel 82
+	{
 		Expand $blocks_influence_price
 	}
 }
@@ -665,7 +675,8 @@ $cfg_gear_show_all_max_area_lvl = 15
 # this will apply globally to ALL blocks, unless overriden
 SetBackgroundColor $color_black
 
-Class == "Stackable Currency" {
+Class == "Stackable Currency"
+{
 	SetBackgroundColor $color_black
 
 	BaseType == "Divine Orb" "Mirror of Kalandra" "Eternal Orb" "Albino Rhoa Feather" "Mirror Shard" "Crusader's Exalted Orb" "Redeemer's Exalted Orb" "Hunter's Exalted Orb" "Warlord's Exalted Orb" "Awakener's Orb" "Prime Regrading Lens" "Secondary Regrading Lens" "Tempering Orb" "Tailoring Orb" "Tainted Divine Teardrop" "Exceptional Eldritch Ember" "Exceptional Eldritch Ichor" "Orb of Conflict" "Orb of Dominance" "Fracturing Orb" "Fracturing Shard"
@@ -704,38 +715,45 @@ Class == "Stackable Currency" {
 		Show
 	}
 
-	BaseType == "Cartographer's Chisel" "Chromatic Orb" "Jeweller's Orb" "Orb of Alchemy" "Orb of Alteration" "Orb of Fusing" "Orb of Scouring" "Blessed Orb" "Harbinger's Shard" "Orb of Regret" "Regal Orb" "Vaal Orb" "Remnant of Corruption" "Orb of Binding" "Orb of Horizons" "Chaos Shard" "Annulment Shard" {
+	BaseType == "Cartographer's Chisel" "Chromatic Orb" "Jeweller's Orb" "Orb of Alchemy" "Orb of Alteration" "Orb of Fusing" "Orb of Scouring" "Blessed Orb" "Harbinger's Shard" "Orb of Regret" "Regal Orb" "Vaal Orb" "Remnant of Corruption" "Orb of Binding" "Orb of Horizons" "Chaos Shard" "Annulment Shard"
+	{
 		Expand $actions_currency_low
 		ShowHide $show_currency_low
 	}
 
-	BaseType == "Armourer's Scrap" "Blacksmith's Whetstone" "Glassblower's Bauble" "Orb of Transmutation" "Orb of Augmentation" "Orb of Chance" {
+	BaseType == "Armourer's Scrap" "Blacksmith's Whetstone" "Glassblower's Bauble" "Orb of Transmutation" "Orb of Augmentation" "Orb of Chance"
+	{
 		Expand $actions_currency_very_low
 		ShowHide $show_currency_very_low
 	}
 
-	BaseType == "Binding Shard" "Horizon Shard" "Regal Shard" "Alchemy Shard" "Engineer's Orb" {
+	BaseType == "Binding Shard" "Horizon Shard" "Regal Shard" "Alchemy Shard" "Engineer's Orb"
+	{
 		Expand $actions_currency_low_shards
 		ShowHide $show_currency_low_shards
 	}
 
-	BaseType == "Scroll of Wisdom" {
+	BaseType == "Scroll of Wisdom"
+	{
 		SetTextColor 220 195 160
 		SetFontSize $font_scroll
 		ShowHide $show_scrolls_wisdom
 	}
 
-	BaseType == "Portal Scroll" {
+	BaseType == "Portal Scroll"
+	{
 		SetTextColor 162 152 145
 		SetFontSize $font_scroll
 		ShowHide $show_scrolls_portal
 	}
 
-	BaseType == "Transmutation Shard" "Alteration Shard" "Engineer's Shard" "Scroll Fragment" {
+	BaseType == "Transmutation Shard" "Alteration Shard" "Engineer's Shard" "Scroll Fragment"
+	{
 		Hide
 	}
 
-	BaseType == "Time-light Scroll" "Fragmentation Scroll" "Deregulation Scroll" "Electroshock Scroll" "Haemocombustion Scroll" "Specularity Scroll" {
+	BaseType == "Time-light Scroll" "Fragmentation Scroll" "Deregulation Scroll" "Electroshock Scroll" "Haemocombustion Scroll" "Specularity Scroll"
+	{
 		SetBackgroundColor $color_harbinger
 		SetBorderColor $color_harbinger
 		SetTextColor $color_black
@@ -745,75 +763,89 @@ Class == "Stackable Currency" {
 		Show
 	}
 
-	Autogen "fossils" {
-		Price >= $cfg_fossils_high_min_value {
+	Autogen "fossils"
+	{
+		Price >= $cfg_fossils_high_min_value
+		{
 			Expand $actions_currency_high
 			Show
 		}
 
 		Price < $cfg_fossils_high_min_value
-		Price >= $cfg_fossils_mid_min_value {
+		Price >= $cfg_fossils_mid_min_value
+		{
 			Expand $actions_currency_mid
 			ShowHide $show_fossils_mid
 		}
 
 		Price < $cfg_fossils_mid_min_value
-		Price > $cfg_fossils_low_min_value {
+		Price > $cfg_fossils_low_min_value
+		{
 			Expand $actions_currency_low
 			ShowHide $show_fossils_low
 		}
 
-		Price <= $cfg_fossils_low_min_value {
+		Price <= $cfg_fossils_low_min_value
+		{
 			Expand $actions_currency_very_low
 			ShowHide $show_fossils_very_low
 		}
 	}
 
 	# fossils with unknown value
-	BaseType "Fossil" {
+	BaseType "Fossil"
+	{
 		Expand $actions_currency_mid
 		Show
 	}
 
 	# always show vials because they are pretty rare drop, from specific boss in specific place
-	Autogen "vials" {
-		Price >= $cfg_vials_high_min_value {
+	Autogen "vials"
+	{
+		Price >= $cfg_vials_high_min_value
+		{
 			Expand $actions_currency_high
 			Show
 		}
 
 		Price < $cfg_vials_high_min_value
-		Price >= $cfg_vials_mid_min_value {
+		Price >= $cfg_vials_mid_min_value
+		{
 			Expand $actions_currency_mid
 			Show
 		}
 
 		Price < $cfg_vials_mid_min_value
-		Price > $cfg_vials_low_min_value {
+		Price > $cfg_vials_low_min_value
+		{
 			Expand $actions_currency_low
 			Show
 		}
 
-		Price <= $cfg_vials_low_min_value {
+		Price <= $cfg_vials_low_min_value
+		{
 			Expand $actions_currency_very_low
 			Show
 		}
 	}
 
 	# vials with unknown value
-	BaseType "Vial of" {
+	BaseType "Vial of"
+	{
 		Expand $actions_currency_mid
 		Show
 	}
 
-	BaseType == "Perandus Coin" {
+	BaseType == "Perandus Coin"
+	{
 		SetTextColor $color_perandus
 		SetFontSize $font_currency_mid
 		SetAlertSound $alert_perandus
 		Show
 	}
 
-	BaseType == "Rogue's Marker" {
+	BaseType == "Rogue's Marker"
+	{
 		SetTextColor $color_heist
 		SetBorderColor $color_heist
 		SetFontSize $font_currency_low
@@ -839,7 +871,8 @@ Class == "Stackable Currency" {
 		Show
 	}
 
-	BaseType == "Splinter of Xoph" "Splinter of Tul" "Splinter of Esh" "Splinter of Uul-Netol" "Timeless Eternal Empire Splinter" "Timeless Vaal Splinter" "Timeless Karui Splinter" {
+	BaseType == "Splinter of Xoph" "Splinter of Tul" "Splinter of Esh" "Splinter of Uul-Netol" "Timeless Eternal Empire Splinter" "Timeless Vaal Splinter" "Timeless Karui Splinter"
+	{
 		SetTextColor $color_breach
 		SetBorderColor $color_breach
 		SetFontSize $font_currency_mid
@@ -847,7 +880,8 @@ Class == "Stackable Currency" {
 		ShowHide $show_low_splinters
 	}
 
-	BaseType "Splinter" {
+	BaseType "Splinter"
+	{
 		SetTextColor $color_breach
 		SetBorderColor $color_breach
 		SetFontSize $font_currency_high
@@ -855,7 +889,8 @@ Class == "Stackable Currency" {
 		Show
 	}
 
-	BaseType "Blessing" {
+	BaseType "Blessing"
+	{
 		SetTextColor $color_breach
 		SetBorderColor $color_breach
 		SetBackgroundColor $color_white
@@ -882,7 +917,8 @@ Class == "Stackable Currency" {
 			ShowHide $show_essences_special
 		}
 
-		BaseType "Essence" {
+		BaseType "Essence"
+		{
 			SetAlertSound $alert_essence_other
 			SetFontSize $font_essence_other
 			ShowHide $show_essences_other
@@ -945,13 +981,15 @@ Class == "Stackable Currency" {
 	}
 
 	# Expedition currency
-	BaseType "Enkindling Orb" "Instilling Orb" "Exotic Coinage" "Scrap Metal" "Astragali" "Burial Medallion" "Lesser Broken Circle Artifact" "Greater Broken Circle Artifact" "Grand Broken Circle Artifact" "Exceptional Broken Circle Artifact" "Lesser Black Scythe Artifact" "Greater Black Scythe Artifact" "Grand Black Scythe Artifact" "Exceptional Black Scythe Artifact" "Lesser Order Artifact" "Greater Order Artifact" "Grand Order Artifact" "Exceptional Order Artifact" "Lesser Sun Artifact" "Greater Sun Artifact" "Grand Sun Artifact" "Exceptional Sun Artifact" {
+	BaseType "Enkindling Orb" "Instilling Orb" "Exotic Coinage" "Scrap Metal" "Astragali" "Burial Medallion" "Lesser Broken Circle Artifact" "Greater Broken Circle Artifact" "Grand Broken Circle Artifact" "Exceptional Broken Circle Artifact" "Lesser Black Scythe Artifact" "Greater Black Scythe Artifact" "Grand Black Scythe Artifact" "Exceptional Black Scythe Artifact" "Lesser Order Artifact" "Greater Order Artifact" "Grand Order Artifact" "Exceptional Order Artifact" "Lesser Sun Artifact" "Greater Sun Artifact" "Grand Sun Artifact" "Exceptional Sun Artifact"
+	{
 		Expand $actions_currency_mid
 		Show
 	}
 
 	# 3.19 reworked Harvest - make each of respective color?
-	BaseType "Crystallised Lifeforce" {
+	BaseType "Crystallised Lifeforce"
+	{
 		SetBorderColor $color_harvest
 		SetTextColor $color_black
 		SetBackgroundColor $color_harvest
@@ -961,7 +999,8 @@ Class == "Stackable Currency" {
 		Show
 	}
 
-	BaseType "Lycia's Invocation" {
+	BaseType "Lycia's Invocation"
+	{
 		SetTextColor $color_black
 		SetBackgroundColor $color_sanctum
 		SetBorderColor $color_sanctum
@@ -993,18 +1032,21 @@ Class == "Stackable Currency" {
 
 Class == "Delve Stackable Socketable Currency"
 {
-	BaseType == "Prime Chaotic Resonator" "Prime Alchemical Resonator" {
+	BaseType == "Prime Chaotic Resonator" "Prime Alchemical Resonator"
+	{
 		Expand $actions_currency_high
 		Show
 	}
 
-	BaseType "Resonator" {
+	BaseType "Resonator"
+	{
 		Expand $actions_currency_mid
 		Show
 	}
 }
 
-Class == "Incubator" {
+Class == "Incubator"
+{
 	SetTextColor $color_black
 	SetBackgroundColor $color_currency_mid
 	SetFontSize $font_currency_mid
@@ -1014,7 +1056,8 @@ Class == "Incubator" {
 	Show
 }
 
-Class == "Trinkets" "Heist Target" {
+Class == "Trinkets" "Heist Target"
+{
 	SetTextColor $color_black
 	SetBorderColor $color_heist
 	SetBackgroundColor $color_heist
@@ -1023,7 +1066,8 @@ Class == "Trinkets" "Heist Target" {
 	Show
 }
 
-Class == "Blueprint" {
+Class == "Blueprint"
+{
 	SetTextColor $color_black
 	SetBackgroundColor $color_heist
 	SetBorderColor $color_heist
@@ -1032,7 +1076,8 @@ Class == "Blueprint" {
 	Show
 }
 
-Class == "Contract" {
+Class == "Contract"
+{
 	SetTextColor $color_heist
 	SetBorderColor $color_heist
 	SetBackgroundColor $color_black
@@ -1041,7 +1086,8 @@ Class == "Contract" {
 	Show
 }
 
-Class == "Heist Cloak" "Heist Brooch" "Heist Tool" "Heist Gear" {
+Class == "Heist Cloak" "Heist Brooch" "Heist Tool" "Heist Gear"
+{
 	SetTextColor $color_heist
 	SetBorderColor $color_heist
 	SetBackgroundColor $color_black
@@ -1050,7 +1096,8 @@ Class == "Heist Cloak" "Heist Brooch" "Heist Tool" "Heist Gear" {
 	Show
 }
 
-Class == "Sanctum Research" {
+Class == "Sanctum Research"
+{
 	SetTextColor $color_black
 	SetBackgroundColor $color_sanctum
 	SetBorderColor $color_sanctum
@@ -1060,7 +1107,8 @@ Class == "Sanctum Research" {
 	Show
 }
 
-Class == "Relic" {
+Class == "Relic"
+{
 	SetTextColor $color_black
 	SetBackgroundColor $color_sanctum
 	SetBorderColor $color_sanctum
@@ -1069,7 +1117,8 @@ Class == "Relic" {
 	Show
 }
 
-Class == "Expedition Logbook" {
+Class == "Expedition Logbook"
+{
 	SetTextColor $color_black
 	SetBorderColor $color_expedition
 	SetBackgroundColor $color_expedition
@@ -1099,8 +1148,10 @@ Class == "Expedition Logbook" {
 # - any with quality >= 20
 # - any with quality > 0
 # - any
-Class == "Skill Gems" "Support Gems" {
-	Autogen "gems" {
+Class == "Skill Gems" "Support Gems"
+{
+	Autogen "gems"
+	{
 		Price >= $cfg_gems_high_min_value
 		{
 			Expand $actions_gem_high
@@ -1130,7 +1181,8 @@ Class == "Skill Gems" "Support Gems" {
 	# next blocks have fixed Show because
 	# if autogeneration did not caught them, they have unknown value
 
-	TransfiguredGem True {
+	TransfiguredGem True
+	{
 		SetBackgroundColor $color_white
 		SetTextColor $color_gem
 		SetBorderColor $color_gem
@@ -1140,7 +1192,8 @@ Class == "Skill Gems" "Support Gems" {
 		Show
 	}
 
-	BaseType "Awakened" {
+	BaseType "Awakened"
+	{
 		SetBackgroundColor $color_white
 		SetTextColor $color_gem
 		SetBorderColor $color_gem
@@ -1150,28 +1203,32 @@ Class == "Skill Gems" "Support Gems" {
 		Show
 	}
 
-	BaseType == "Empower Support" "Enhance Support" "Enlighten Support" "Portal" "Vaal Breach" "Awakened Enlighten Support" "Awakened Enhance Support" "Awakened Empower Support" {
+	BaseType == "Empower Support" "Enhance Support" "Enlighten Support" "Portal" "Vaal Breach" "Awakened Enlighten Support" "Awakened Enhance Support" "Awakened Empower Support"
+	{
 		SetFontSize $font_gem_drop_only
 		SetAlertSound $alert_gem_drop_only
 		MinimapIcon $icon_gem_drop_only
 		ShowHide $show_gems_drop_only
 	}
 
-	GemLevel >= 20 {
+	GemLevel >= 20
+	{
 		SetBackgroundColor $color_white
 		SetAlertSound $alert_gem_20_lvl
 		MinimapIcon $icon_gem_20_lvl
 		Show
 	}
 
-	Quality >= 20 {
+	Quality >= 20
+	{
 		SetBackgroundColor $color_white
 		SetAlertSound $alert_gem_20_quality
 		MinimapIcon $icon_gem_20_quality
 		Show
 	}
 
-	Quality > 0 {
+	Quality > 0
+	{
 		SetBorderColor $color_gem
 		SetAlertSound $alert_gem_non_0_quality
 		ShowDiscard $show_gems_non_0_quality
@@ -1180,28 +1237,33 @@ Class == "Skill Gems" "Support Gems" {
 	ShowHide $show_gems_other
 }
 
-BaseType == "Gavel" "Stone Hammer" "Rock Breaker" {
+BaseType == "Gavel" "Stone Hammer" "Rock Breaker"
+{
 	SetTextColor $color_white
 	SetBackgroundColor $color_hammer
 
-	Rarity Normal {
+	Rarity Normal
+	{
 		ShowDiscard $show_hammers
 	}
 
 	Rarity Magic
-	Quality > 12 {
+	Quality > 12
+	{
 		ShowDiscard $show_hammers
 	}
 
 	Rarity Rare
-	Quality > 16 {
+	Quality > 16
+	{
 		ShowDiscard $show_hammers
 	}
 }
 
 # harbinger unique pieces
 # and 3.19 Ultimatum Aspect
-Class == "Pieces" {
+Class == "Pieces"
+{
 	SetTextColor $color_unique
 	SetBorderColor $color_unique
 	SetFontSize $font_max
@@ -1212,7 +1274,8 @@ Class == "Pieces" {
 # Tabula Rasa and Skin of the Loyal
 # ...and any unique that drops 6L'd (some league content drops linked uniques)
 Rarity Unique
-LinkedSockets 6 {
+LinkedSockets 6
+{
 	SetTextColor $color_unique
 	SetBorderColor $color_unique
 	SetBackgroundColor $color_white
@@ -1223,17 +1286,30 @@ LinkedSockets 6 {
 	Show
 }
 
-Rarity Unique {
+Rarity Unique
+{
 	SetTextColor $color_unique
 	SetBorderColor $color_unique
 	SetFontSize $font_unique
 
 	{
 		SetAlertSound $alert_unique_unknown
-		Autogen "uniques_eq_ambiguous"     { Show }
-		Autogen "uniques_flasks_ambiguous" { Show }
-		Autogen "uniques_jewels_ambiguous" { Show }
-		Autogen "uniques_maps_ambiguous"   { Show }
+		Autogen "uniques_eq_ambiguous"
+		{
+			Show
+		}
+		Autogen "uniques_flasks_ambiguous"
+		{
+			Show
+		}
+		Autogen "uniques_jewels_ambiguous"
+		{
+			Show
+		}
+		Autogen "uniques_maps_ambiguous"
+		{
+			Show
+		}
 	}
 
 	Price >= $cfg_uniques_high_min_value
@@ -1243,10 +1319,22 @@ Rarity Unique {
 		PlayEffect $beam_unique
 		MinimapIcon $icon_unique_high
 
-		Autogen "uniques_eq_unambiguous"     { Show }
-		Autogen "uniques_flasks_unambiguous" { Show }
-		Autogen "uniques_jewels_unambiguous" { Show }
-		Autogen "uniques_maps_unambiguous"   { Show }
+		Autogen "uniques_eq_unambiguous"
+		{
+			Show
+		}
+		Autogen "uniques_flasks_unambiguous"
+		{
+			Show
+		}
+		Autogen "uniques_jewels_unambiguous"
+		{
+			Show
+		}
+		Autogen "uniques_maps_unambiguous"
+		{
+			Show
+		}
 	}
 
 	Price < $cfg_uniques_high_min_value
@@ -1257,19 +1345,43 @@ Rarity Unique {
 		PlayEffect $beam_unique
 		MinimapIcon $icon_unique_mid
 
-		Autogen "uniques_eq_unambiguous"     { Show }
-		Autogen "uniques_flasks_unambiguous" { Show }
-		Autogen "uniques_jewels_unambiguous" { Show }
-		Autogen "uniques_maps_unambiguous"   { Show }
+		Autogen "uniques_eq_unambiguous"
+		{
+			Show
+		}
+		Autogen "uniques_flasks_unambiguous"
+		{
+			Show
+		}
+		Autogen "uniques_jewels_unambiguous"
+		{
+			Show
+		}
+		Autogen "uniques_maps_unambiguous"
+		{
+			Show
+		}
 	}
 
 	Price < $cfg_uniques_mid_min_value
 	Price >= $cfg_uniques_low_min_value
 	{
-		Autogen "uniques_eq_unambiguous"     { Show }
-		Autogen "uniques_flasks_unambiguous" { Show }
-		Autogen "uniques_jewels_unambiguous" { Show }
-		Autogen "uniques_maps_unambiguous"   { Show }
+		Autogen "uniques_eq_unambiguous"
+		{
+			Show
+		}
+		Autogen "uniques_flasks_unambiguous"
+		{
+			Show
+		}
+		Autogen "uniques_jewels_unambiguous"
+		{
+			Show
+		}
+		Autogen "uniques_maps_unambiguous"
+		{
+			Show
+		}
 	}
 
 	# note that APIs may not list all possible uniques
@@ -1280,7 +1392,8 @@ Rarity Unique {
 }
 
 Class == "Incursion Item"
-BaseType == "Stone of Passage" "Flashpowder Keg" {
+BaseType == "Stone of Passage" "Flashpowder Keg"
+{
 	SetTextColor $color_black
 	SetBackgroundColor $color_incursion
 	SetFontSize $font_max
@@ -1289,7 +1402,8 @@ BaseType == "Stone of Passage" "Flashpowder Keg" {
 	Show
 }
 
-Class == "Atlas Upgrade Items" {
+Class == "Atlas Upgrade Items"
+{
 	SetTextColor $color_white
 	SetBorderColor $color_atlas
 	SetBackgroundColor $color_atlas
@@ -1352,7 +1466,8 @@ Class == "Map Fragments"
 	}
 
 	# scarabs with unknown value
-	BaseType "Scarab" "Lure" {
+	BaseType "Scarab" "Lure"
+	{
 		SetTextColor $color_black
 		SetBorderColor $color_red
 		SetBackgroundColor $color_scarab_mid
@@ -1361,7 +1476,8 @@ Class == "Map Fragments"
 		Show
 	}
 
-	BaseType == "Divine Vessel" {
+	BaseType == "Divine Vessel"
+	{
 		SetTextColor $color_black
 		SetBorderColor $color_black
 		SetBackgroundColor $color_atlas
@@ -1371,7 +1487,8 @@ Class == "Map Fragments"
 	}
 
 	# Normal Atziri
-	BaseType "Sacrifice" {
+	BaseType "Sacrifice"
+	{
 		SetTextColor $color_sacrifice
 		SetBorderColor $color_sacrifice
 		SetFontSize $font_max
@@ -1380,7 +1497,8 @@ Class == "Map Fragments"
 	}
 
 	# Uber Atziri
-	BaseType "Mortal" {
+	BaseType "Mortal"
+	{
 		SetTextColor $color_mortal
 		SetBorderColor $color_mortal
 		SetFontSize $font_max
@@ -1397,22 +1515,31 @@ Class == "Map Fragments"
 
 		# Shaper guardians
 		BaseType == "Fragment of the Phoenix" "Fragment of the Minotaur" "Fragment of the Chimera" "Fragment of the Hydra"
-		{ Show }
+		{
+			Show
+		}
 
 		# Elder guardians
 		BaseType == "Fragment of Enslavement" "Fragment of Eradication" "Fragment of Constriction" "Fragment of Purification"
-		{ Show }
+		{
+			Show
+		}
 
 		# Uber Elder guardians
 		BaseType == "Fragment of Shape" "Fragment of Knowledge" "Fragment of Terror" "Fragment of Emptiness"
-		{ Show }
+		{
+			Show
+		}
 
 		# Conquerors
 		BaseType == "Al-Hezmin's Crest" "Baran's Crest" "Drox's Crest" "Veritania's Crest"
-		{ Show }
+		{
+			Show
+		}
 	}
 
-	BaseType == "Sacred Blossom" {
+	BaseType == "Sacred Blossom"
+	{
 		SetBorderColor $color_white
 		SetTextColor $color_white
 		SetBackgroundColor $color_harvest
@@ -1420,7 +1547,8 @@ Class == "Map Fragments"
 		SetAlertSound $alert_fragment_sacred_blossom
 	}
 
-	BaseType "Emblem" {
+	BaseType "Emblem"
+	{
 		SetTextColor $color_legion
 		SetBorderColor $color_legion
 		SetBackgroundColor $color_white
@@ -1432,7 +1560,8 @@ Class == "Map Fragments"
 	# Simulacrum, Maven's Writ and Blood-filled Vessel do not drop but
 	# better make blocks for them, just in case of inventory missclick etc
 
-	BaseType == "Simulacrum" {
+	BaseType == "Simulacrum"
+	{
 		SetTextColor $color_black
 		SetBorderColor $color_black
 		SetBackgroundColor $color_white
@@ -1441,7 +1570,8 @@ Class == "Map Fragments"
 		Show
 	}
 
-	BaseType == "The Maven's Writ" {
+	BaseType == "The Maven's Writ"
+	{
 		SetTextColor $color_white
 		SetBorderColor $color_atlas
 		SetBackgroundColor $color_atlas
@@ -1450,7 +1580,8 @@ Class == "Map Fragments"
 		Show
 	}
 
-	BaseType == "Blood-filled Vessel" {
+	BaseType == "Blood-filled Vessel"
+	{
 		SetTextColor $color_atlas
 		SetBorderColor $color_atlas
 		SetBackgroundColor $color_white
@@ -1459,7 +1590,8 @@ Class == "Map Fragments"
 		Show
 	}
 
-	BaseType == "Offering to the Goddess" {
+	BaseType == "Offering to the Goddess"
+	{
 		SetBorderColor $color_labyrinth
 		SetTextColor $color_black
 		SetBackgroundColor $color_labyrinth
@@ -1468,7 +1600,8 @@ Class == "Map Fragments"
 		Show
 	}
 
-	BaseType == "Tribute to the Goddess" "Gift to the Goddess" "Dedication to the Goddess" {
+	BaseType == "Tribute to the Goddess" "Gift to the Goddess" "Dedication to the Goddess"
+	{
 		SetTextColor $color_black
 		SetBorderColor $color_harvest
 		SetBackgroundColor $color_harvest
@@ -1480,7 +1613,8 @@ Class == "Map Fragments"
 	Show
 }
 
-Class == "Breachstone" {
+Class == "Breachstone"
+{
 	SetTextColor $color_breach
 	SetBorderColor $color_breach
 	SetBackgroundColor $color_white
@@ -1489,7 +1623,8 @@ Class == "Breachstone" {
 	Show
 }
 
-Class == "Leaguestones" {
+Class == "Leaguestones"
+{
 	SetTextColor $color_black
 	SetBorderColor 235 200 180
 	SetBackgroundColor 235 200 180
@@ -1498,10 +1633,12 @@ Class == "Leaguestones" {
 	Show
 }
 
-Class == "Misc Map Items" {
+Class == "Misc Map Items"
+{
 	SetFontSize $font_max
 
-	BaseType == "Writhing Invitation" "Screaming Invitation" "Polaric Invitation" "Incandescent Invitation" {
+	BaseType == "Writhing Invitation" "Screaming Invitation" "Polaric Invitation" "Incandescent Invitation"
+	{
 		SetBorderColor 204 153 0
 		SetTextColor $color_white
 		SetBackgroundColor 204 153 0
@@ -1511,7 +1648,8 @@ Class == "Misc Map Items" {
 		Show
 	}
 
-	BaseType "Maven's Invitation" {
+	BaseType "Maven's Invitation"
+	{
 		SetBorderColor 204 153 0
 		SetTextColor $color_white
 		SetBackgroundColor 204 153 0
@@ -1521,7 +1659,8 @@ Class == "Misc Map Items" {
 		Show
 	}
 
-	BaseType "Inscribed Ultimatum" {
+	BaseType "Inscribed Ultimatum"
+	{
 		SetBackgroundColor $color_white
 		SetTextColor $color_ultimatum
 		SetBorderColor $color_ultimatum
@@ -1531,7 +1670,8 @@ Class == "Misc Map Items" {
 		Show
 	}
 
-	BaseType "Chronicle of Atzoatl" {
+	BaseType "Chronicle of Atzoatl"
+	{
 		SetBackgroundColor $color_white
 		SetTextColor $color_incursion
 		SetBorderColor $color_incursion
@@ -1539,7 +1679,8 @@ Class == "Misc Map Items" {
 		Show
 	}
 
-	BaseType == "Mirrored Tablet" {
+	BaseType == "Mirrored Tablet"
+	{
 		SetBorderColor $color_white
 		SetBackgroundColor $color_black
 		SetTextColor $color_white
@@ -1548,7 +1689,8 @@ Class == "Misc Map Items" {
 	}
 }
 
-Class == "Vault Key" {
+Class == "Vault Key"
+{
 	SetBorderColor $color_reliquary
 	SetTextColor $color_white
 	SetBackgroundColor $color_reliquary
@@ -1558,23 +1700,27 @@ Class == "Vault Key" {
 	MinimapIcon $icon_reliquary
 
 	# keys from 3.19 (Lake of Kalandra)
-	BaseType == "Forgotten Reliquary Key" "Visceral Reliquary Key" "Shiny Reliquary Key" "Archive Reliquary Key" "Oubliette Reliquary Key" "Cosmic Reliquary Key" "Decaying Reliquary Key" {
+	BaseType == "Forgotten Reliquary Key" "Visceral Reliquary Key" "Shiny Reliquary Key" "Archive Reliquary Key" "Oubliette Reliquary Key" "Cosmic Reliquary Key" "Decaying Reliquary Key"
+	{
 		Show
 	}
 
 	# keys from 3.20 (The Forbidden Sanctum)
-	BaseType == "Voidborn Reliquary Key" {
+	BaseType == "Voidborn Reliquary Key"
+	{
 		Show
 	}
 
 	# reliquary keys from Legacy ("Ancient") and Delve ("Timeworn") leagues
 	# ...and any future reliquary keys
-	BaseType == "Ancient Reliquary Key" "Timeworn Reliquary Key" {
+	BaseType == "Ancient Reliquary Key" "Timeworn Reliquary Key"
+	{
 		Show
 	}
 }
 
-Class == "Memory" {
+Class == "Memory"
+{
 	SetTextColor $color_black
 	SetBorderColor $color_black
 	SetBackgroundColor $color_atlas
@@ -1586,7 +1732,8 @@ Class == "Memory" {
 # note: Izaro will speak upon key drops
 # sound alerts here may feel like unnecessary noise
 Class == "Labyrinth Items"
-BaseType == "Golden Key" "Treasure Key" "Silver Key" {
+BaseType == "Golden Key" "Treasure Key" "Silver Key"
+{
 	SetTextColor $color_black
 	SetBackgroundColor $color_labyrinth
 	SetFontSize $font_labyrinth
@@ -1595,7 +1742,8 @@ BaseType == "Golden Key" "Treasure Key" "Silver Key" {
 }
 
 # lab trinkets (no Izaro quotes on these)
-Class == "Labyrinth Trinket" {
+Class == "Labyrinth Trinket"
+{
 	SetTextColor $color_black
 	SetBackgroundColor $color_labyrinth
 	SetFontSize $font_labyrinth
@@ -1603,7 +1751,8 @@ Class == "Labyrinth Trinket" {
 	Show
 }
 
-Class == "Fishing Rods" {
+Class == "Fishing Rods"
+{
 	SetBorderColor $color_white
 	SetTextColor $color_white
 	SetBackgroundColor $color_red
@@ -1614,7 +1763,8 @@ Class == "Fishing Rods" {
 	Show
 }
 
-Class == "Metamorph Sample" {
+Class == "Metamorph Sample"
+{
 	SetTextColor $color_metamorph
 	SetBorderColor $color_metamorph
 	SetBackgroundColor $color_black
@@ -1623,7 +1773,8 @@ Class == "Metamorph Sample" {
 	Show
 }
 
-Class == "Quest Items" {
+Class == "Quest Items"
+{
 	SetTextColor $color_quest
 	SetBorderColor $color_quest
 	SetBackgroundColor $color_black
@@ -1633,8 +1784,10 @@ Class == "Quest Items" {
 	Show
 }
 
-Class == "Divination Card" {
-	BaseType == $cfg_cards_always_show_names {
+Class == "Divination Card"
+{
+	BaseType == $cfg_cards_always_show_names
+	{
 		PlayEffect $beam_card
 		SetTextColor $color_card
 		SetBorderColor $color_card
@@ -1700,8 +1853,10 @@ Class == "Divination Card" {
 	Show
 }
 
-Class == "Maps" {
-	BlightedMap True {
+Class == "Maps"
+{
+	BlightedMap True
+	{
 		SetTextColor $color_white
 		SetBorderColor $color_white
 		SetBackgroundColor $color_blight
@@ -1722,24 +1877,28 @@ Class == "Maps" {
 		MinimapIcon $icon_map_guardian
 
 		# Shaper guardians are only on specific bases
-		BaseType == "Forge of the Phoenix Map" "Maze of the Minotaur Map" "Pit of the Chimera Map" "Lair of the Hydra Map" {
+		BaseType == "Forge of the Phoenix Map" "Maze of the Minotaur Map" "Pit of the Chimera Map" "Lair of the Hydra Map"
+		{
 			Show
 		}
 
 		# for filters, there is no better way to detect a map with a boss
 		MapTier >= 14
-		HasInfluence Elder Crusader Redeemer Hunter Warlord {
+		HasInfluence Elder Crusader Redeemer Hunter Warlord
+		{
 			Show
 		}
 
 		# 3.19 new Ultimatum boss map
-		BaseType == "Engraved Ultimatum" {
+		BaseType == "Engraved Ultimatum"
+		{
 			Show
 		}
 	}
 
 	# maps with Delirium and Blight encounter
-	AnyEnchantment True {
+	AnyEnchantment True
+	{
 		SetTextColor $color_white
 		SetBorderColor $color_white
 		SetBackgroundColor 127 0 255
@@ -1750,7 +1909,8 @@ Class == "Maps" {
 		Show
 	}
 
-	MapTier >= 11 {
+	MapTier >= 11
+	{
 		SetBorderColor $color_map_red
 		SetBackgroundColor $color_black
 		SetFontSize $font_map_red
@@ -1759,7 +1919,8 @@ Class == "Maps" {
 		ShowHide $show_maps_red
 	}
 
-	MapTier >= 6 {
+	MapTier >= 6
+	{
 		SetBorderColor $color_map_yellow
 		SetBackgroundColor $color_black
 		SetFontSize $font_map_yellow
@@ -1774,15 +1935,18 @@ Class == "Maps" {
 	ShowHide $show_maps_white
 }
 
-Rarity <= Rare {
-	FracturedItem True {
+Rarity <= Rare
+{
+	FracturedItem True
+	{
 		SetTextColor $color_black
 		SetBackgroundColor $color_fractured_item
 		SetAlertSound $alert_fractured_item
 		ShowDiscard $show_gear_fractured
 	}
 
-	SynthesisedItem True {
+	SynthesisedItem True
+	{
 		SetTextColor $color_black
 		SetBackgroundColor $color_synthesised_item
 		SetAlertSound $alert_synthesised_item
@@ -1806,7 +1970,8 @@ Class == "Jewel"
 	SetAlertSound $alert_jewel_cluster
 
 	BaseType "Cluster Jewel"
-	EnchantmentPassiveNode $cfg_jewels_cluster_always_show_enchants {
+	EnchantmentPassiveNode $cfg_jewels_cluster_always_show_enchants
+	{
 		Show
 	}
 
@@ -1822,7 +1987,8 @@ Class == "Jewel"
 		ShowHide $show_jewels_cluster_medium_4_5
 	}
 
-	BaseType "Cluster" {
+	BaseType "Cluster"
+	{
 		ShowHide $show_jewels_cluster_other
 	}
 }
@@ -1831,13 +1997,15 @@ Class == "Abyss Jewel"
 {
 	SetFontSize $font_jewel_abyss
 
-	Rarity Magic {
+	Rarity Magic
+	{
 		SetTextColor $color_magic
 		SetBorderColor $color_magic
 		ShowHide $show_jewels_abyss
 	}
 
-	Rarity Rare {
+	Rarity Rare
+	{
 		SetTextColor $color_rare
 		SetBorderColor $color_rare
 		ShowHide $show_jewels_abyss
@@ -1850,13 +2018,15 @@ Class == "Jewel"
 {
 	SetFontSize $font_jewel_basic
 
-	Rarity Magic {
+	Rarity Magic
+	{
 		SetTextColor $color_magic
 		SetBorderColor $color_magic
 		ShowHide $show_jewels_basic
 	}
 
-	Rarity Rare {
+	Rarity Rare
+	{
 		SetTextColor $color_rare
 		SetBorderColor $color_rare
 		ShowHide $show_jewels_basic
@@ -1866,11 +2036,13 @@ Class == "Jewel"
 }
 
 Class == "Amulets"
-BaseType "Talisman" {
+BaseType "Talisman"
+{
 	SetBackgroundColor $color_talisman
 	SetFontSize $font_talisman
 
-	Rarity Rare {
+	Rarity Rare
+	{
 		SetTextColor $color_rare
 		SetAlertSound $alert_talisman_rare
 		ShowDiscard $show_talismans_rare
@@ -1884,34 +2056,40 @@ BaseType "Talisman" {
 # The block tree below is very sensitive to changes in order.
 # Be careful when changing anything here - you definitely don't want
 # a situation where multi-exalt 6s influenced base gets "just 6s" style.
-Rarity <= Rare {
+Rarity <= Rare
+{
 	# enchants and RGB - part 1/2
 	# these blocks only set styles (or not if discarded)
 	Sockets < 6
-	SocketGroup RGB {
+	SocketGroup RGB
+	{
 		SetBorderColor $color_chromatic_big
 		ShowDiscard $show_gear_chrome_big
 		Continue
 
 		Width 2
-		Height <= 2 {
+		Height <= 2
+		{
 			SetBorderColor $color_chromatic_small
 			ShowDiscard $show_gear_chrome_small
 			Continue
 		}
 
 		Width 1
-		Height <= 4 {
+		Height <= 4
+		{
 			SetBorderColor $color_chromatic_small
 			ShowDiscard $show_gear_chrome_small
 			Continue
 		}
 	}
 
-	AnyEnchantment True {
+	AnyEnchantment True
+	{
 		SetBorderColor $color_white
 
-		Class == "Helmets" {
+		Class == "Helmets"
+		{
 			SetAlertSound $alert_gear_enchanted
 			ShowDiscard $show_gear_enchanted_helmets
 			Continue
@@ -1922,9 +2100,11 @@ Rarity <= Rare {
 		Continue
 	}
 
-	Rarity >= Rare {
+	Rarity >= Rare
+	{
 		# highlight rares with good base
-		BaseType $cfg_good_base_names {
+		BaseType $cfg_good_base_names
+		{
 			SetBackgroundColor $color_rare_good_base
 			ShowDiscard $show_gear_rare_good_base
 			Continue
@@ -1932,20 +2112,23 @@ Rarity <= Rare {
 
 		# set text color to indicate chance/chaos/regal recipe
 
-		ItemLevel >= 75 {
+		ItemLevel >= 75
+		{
 			SetTextColor $color_rare_regal
 			Show
 			Continue
 		}
 
 		ItemLevel < 75
-		ItemLevel >= 60 {
+		ItemLevel >= 60
+		{
 			SetTextColor $color_rare_chaos
 			Show
 			Continue
 		}
 
-		ItemLevel < 60 {
+		ItemLevel < 60
+		{
 			SetTextColor $color_rare_chance
 			Show
 			Continue
@@ -1955,7 +2138,8 @@ Rarity <= Rare {
 	# experimented bases (Heist exclusive)
 	# these only drop from curio displays so we can always
 	# highlight them because it was player's choice to take them
-	BaseType == "Assembler Wand" "Congregator Wand" "Accumulator Wand" "Hollowpoint Dagger" "Pressurised Dagger" "Pneumatic Dagger" "Flickerflame Blade" "Flashfire Blade" "Infernal Blade" "Shadow Fangs" "Malign Fangs" "Void Fangs" "Maltreatment Axe" "Disapprobation Axe" "Psychotic Axe" "Fickle Spiritblade" "Capricious Spiritblade" "Anarchic Spiritblade" "Flare Mace" "Crack Mace" "Boom Mace" "Oscillating Sceptre" "Stabilising Sceptre" "Alternating Sceptre" "Hedron Bow" "Foundry Bow" "Solarine Bow" "Transformer Staff" "Reciprocation Staff" "Battery Staff" "Capacity Rod" "Potentiality Rod" "Eventuality Rod" "Prime Cleaver" "Honed Cleaver" "Apex Cleaver" "Rebuking Blade" "Blasting Blade" "Banishing Blade" "Blunt Force Condenser" "Crushing Force Magnifier" "Impact Force Propagator" "Exhausting Spirit Shield" "Subsuming Spirit Shield" "Transfer-attuned Spirit Shield" "Endothermic Buckler" "Polar Buckler" "Cold-attuned Buckler" "Exothermic Tower Shield" "Magmatic Tower Shield" "Heat-attuned Tower Shield" "Micro-Distillery Belt" "Mechalarm Belt" "Astrolabe Amulet" "Simplex Amulet" "Cogwork Ring" "Geodesic Ring" {
+	BaseType == "Assembler Wand" "Congregator Wand" "Accumulator Wand" "Hollowpoint Dagger" "Pressurised Dagger" "Pneumatic Dagger" "Flickerflame Blade" "Flashfire Blade" "Infernal Blade" "Shadow Fangs" "Malign Fangs" "Void Fangs" "Maltreatment Axe" "Disapprobation Axe" "Psychotic Axe" "Fickle Spiritblade" "Capricious Spiritblade" "Anarchic Spiritblade" "Flare Mace" "Crack Mace" "Boom Mace" "Oscillating Sceptre" "Stabilising Sceptre" "Alternating Sceptre" "Hedron Bow" "Foundry Bow" "Solarine Bow" "Transformer Staff" "Reciprocation Staff" "Battery Staff" "Capacity Rod" "Potentiality Rod" "Eventuality Rod" "Prime Cleaver" "Honed Cleaver" "Apex Cleaver" "Rebuking Blade" "Blasting Blade" "Banishing Blade" "Blunt Force Condenser" "Crushing Force Magnifier" "Impact Force Propagator" "Exhausting Spirit Shield" "Subsuming Spirit Shield" "Transfer-attuned Spirit Shield" "Endothermic Buckler" "Polar Buckler" "Cold-attuned Buckler" "Exothermic Tower Shield" "Magmatic Tower Shield" "Heat-attuned Tower Shield" "Micro-Distillery Belt" "Mechalarm Belt" "Astrolabe Amulet" "Simplex Amulet" "Cogwork Ring" "Geodesic Ring"
+	{
 		SetTextColor $color_black
 		SetBackgroundColor $color_heist
 		SetBorderColor $color_heist
@@ -1973,40 +2157,50 @@ Rarity <= Rare {
 	}
 
 	# pricing machinery for bases
-	Autogen "bases" {
-		HasInfluence == Shaper {
+	Autogen "bases"
+	{
+		HasInfluence == Shaper
+		{
 			Expand $blocks_influence_ilvl
 		}
 
-		HasInfluence == Elder {
+		HasInfluence == Elder
+		{
 			Expand $blocks_influence_ilvl
 		}
 
-		HasInfluence == Crusader {
+		HasInfluence == Crusader
+		{
 			Expand $blocks_influence_ilvl
 		}
 
-		HasInfluence == Redeemer {
+		HasInfluence == Redeemer
+		{
 			Expand $blocks_influence_ilvl
 		}
 
-		HasInfluence == Hunter {
+		HasInfluence == Hunter
+		{
 			Expand $blocks_influence_ilvl
 		}
 
-		HasInfluence == Warlord {
+		HasInfluence == Warlord
+		{
 			Expand $blocks_influence_ilvl
 		}
 
-		HasInfluence == None {
-			ItemLevel >= 86 {
+		HasInfluence == None
+		{
+			ItemLevel >= 86
+			{
 				Expand $blocks_influence_price
 			}
 		}
 	}
 
 	# influenced bases with unknown value
-	HasInfluence Shaper Elder Crusader Redeemer Hunter Warlord {
+	HasInfluence Shaper Elder Crusader Redeemer Hunter Warlord
+	{
 		SetBackgroundColor $color_influence_unknown
 		SetFontSize $font_influence_unknown
 		SetAlertSound $alert_influence_unknown
@@ -2020,8 +2214,14 @@ Rarity <= Rare {
 		PlayEffect $beam_dominance
 		MinimapIcon $icon_dominance_high
 
-		HasSearingExarchImplicit >= 5 { Show }
-		HasEaterOfWorldsImplicit >= 5 { Show }
+		HasSearingExarchImplicit >= 5
+		{
+			Show
+		}
+		HasEaterOfWorldsImplicit >= 5
+		{
+			Show
+		}
 	}
 
 	{
@@ -2029,12 +2229,19 @@ Rarity <= Rare {
 		SetFontSize $font_dominance_low
 		SetAlertSound $alert_dominance_low
 
-		HasSearingExarchImplicit >= 1 { Show }
-		HasEaterOfWorldsImplicit >= 1 { Show }
+		HasSearingExarchImplicit >= 1
+		{
+			Show
+		}
+		HasEaterOfWorldsImplicit >= 1
+		{
+			Show
+		}
 	}
 
 	# random non-unique 6L drops (unique 6L drops handled earlier)
-	LinkedSockets 6 {
+	LinkedSockets 6
+	{
 		SetTextColor $color_white
 		SetBackgroundColor $color_6_link
 		SetFontSize $font_6_link
@@ -2044,7 +2251,8 @@ Rarity <= Rare {
 		Show
 	}
 
-	HasExplicitMod == $cfg_gear_veiled_always_show_mods {
+	HasExplicitMod == $cfg_gear_veiled_always_show_mods
+	{
 		SetTextColor $color_black
 		SetBackgroundColor $color_veiled_item
 		SetBorderColor $color_white
@@ -2052,32 +2260,37 @@ Rarity <= Rare {
 		Show
 	}
 
-	HasExplicitMod "Veil" {
+	HasExplicitMod "Veil"
+	{
 		SetTextColor $color_black
 		SetBackgroundColor $color_veiled_item
 		SetAlertSound $alert_veiled_item
 		ShowDiscard $show_gear_veiled
 	}
 
-	HasExplicitMod == $cfg_gear_mods_incursion {
+	HasExplicitMod == $cfg_gear_mods_incursion
+	{
 		SetBackgroundColor $color_gear_mods_incursion
 		SetAlertSound $alert_gear_mods_incursion
 		ShowDiscard $show_gear_mods_incursion
 	}
 
-	HasExplicitMod == $cfg_gear_mods_bestiary {
+	HasExplicitMod == $cfg_gear_mods_bestiary
+	{
 		SetBackgroundColor $color_gear_mods_bestiary
 		SetAlertSound $alert_gear_mods_bestiary
 		ShowDiscard $show_gear_mods_bestiary
 	}
 
-	HasExplicitMod == $cfg_gear_mods_warband {
+	HasExplicitMod == $cfg_gear_mods_warband
+	{
 		SetBackgroundColor $color_gear_mods_warband
 		SetAlertSound $alert_gear_mods_warband
 		ShowDiscard $show_gear_mods_warband
 	}
 
-	LinkedSockets 5 {
+	LinkedSockets 5
+	{
 		SetTextColor $color_white
 		SetBackgroundColor $color_5_link
 		SetFontSize $font_5_link
@@ -2097,7 +2310,8 @@ Rarity <= Rare {
 		Show
 	}
 
-	Sockets 6 {
+	Sockets 6
+	{
 		SetTextColor $color_white
 		SetBackgroundColor $color_6_socket
 		SetFontSize $font_6_socket
@@ -2105,16 +2319,19 @@ Rarity <= Rare {
 		ShowDiscard $show_6_socket
 	}
 
-	Scourged True {
+	Scourged True
+	{
 		SetBackgroundColor $color_scourged
 		SetAlertSound $alert_scourged
 		ShowHide $show_gear_scourged
 	}
 
-	Corrupted True {
+	Corrupted True
+	{
 		SetBackgroundColor $color_corrupted
 
-		BaseType == "Breach Ring" {
+		BaseType == "Breach Ring"
+		{
 			ShowHide $show_gear_breach_ring
 		}
 
@@ -2125,22 +2342,27 @@ Rarity <= Rare {
 	# these blocks stop filtering to prevent hiding such items
 	# (it's the same code but without styles and Continue)
 	Sockets < 6
-	SocketGroup RGB {
+	SocketGroup RGB
+	{
 		Width 2
-		Height <= 2 {
+		Height <= 2
+		{
 			ShowDiscard $show_gear_chrome_small
 		}
 
 		Width 1
-		Height <= 4 {
+		Height <= 4
+		{
 			ShowDiscard $show_gear_chrome_small
 		}
 
 		ShowDiscard $show_gear_chrome_big
 	}
 
-	AnyEnchantment True {
-		Class == "Helmets" {
+	AnyEnchantment True
+	{
+		Class == "Helmets"
+		{
 			ShowDiscard $show_gear_enchanted_helmets
 		}
 
@@ -2148,7 +2370,8 @@ Rarity <= Rare {
 	}
 
 	Rarity >= Rare
-	BaseType == $cfg_gear_rare_always_show_names {
+	BaseType == $cfg_gear_rare_always_show_names
+	{
 		Show
 	}
 }
@@ -2156,7 +2379,8 @@ Rarity <= Rare {
 Rarity Normal
 Corrupted False
 Mirrored False
-BaseType == $cfg_base_chance_names {
+BaseType == $cfg_base_chance_names
+{
 	SetTextColor $color_black
 	SetBackgroundColor $color_base_chance
 	SetAlertSound $alert_base_chance
@@ -2165,61 +2389,72 @@ BaseType == $cfg_base_chance_names {
 
 Class "Flasks"
 Rarity Normal
-Quality 20 {
+Quality 20
+{
 	SetBorderColor $color_white
 	ShowDiscard $show_flasks_20q
 	Continue
 }
 
-Class == "Utility Flasks" {
+Class == "Utility Flasks"
+{
 	SetTextColor $color_white
 	SetBackgroundColor $color_flask_utility
 	ShowDiscard $show_flasks_utility
 }
 
-Class "Flasks" {
+Class "Flasks"
+{
 	ShowDiscard $show_flasks_other
 }
 
 AreaLevel <= $cfg_gear_show_4_link_max_area_lvl
-LinkedSockets 4 {
+LinkedSockets 4
+{
 	SetAlertSound $alert_leveling
 	Show
 }
 
 AreaLevel <= $cfg_gear_show_3_link_max_area_lvl
-LinkedSockets 3 {
+LinkedSockets 3
+{
 	SetAlertSound $alert_leveling
 	Show
 }
 
 # show everything at the start of the game
 # at this point you may want to pickup magic and rare items
-AreaLevel <= $cfg_gear_show_all_max_area_lvl {
+AreaLevel <= $cfg_gear_show_all_max_area_lvl
+{
 	Show
 }
 
 Rarity Magic
-Identified True {
+Identified True
+{
 	ShowDiscard $show_gear_identified_magic
 }
 
 Rarity Rare
-Identified True {
+Identified True
+{
 	ShowDiscard $show_gear_identified_rare
 }
 
 # at this point all worthwhile items should be sorted out
 # hide all remaining garbage
-Rarity Rare {
+Rarity Rare
+{
 	ShowHide $show_gear_any_rare
 }
 
-Rarity Magic {
+Rarity Magic
+{
 	ShowHide $show_gear_any_magic
 }
 
-Rarity Normal {
+Rarity Normal
+{
 	ShowHide $show_gear_any_normal
 }
 
