@@ -1,7 +1,6 @@
 #pragma once
 
-#include <fs/lang/action_properties.hpp>
-#include <fs/lang/condition_properties.hpp>
+#include <fs/lang/enum_types.hpp>
 #include <fs/lang/primitive_types.hpp>
 #include <fs/lang/keywords.hpp>
 

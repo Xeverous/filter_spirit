@@ -228,8 +228,6 @@ enum class suit_type { red, green, blue, white, brown, yellow, cyan, grey, orang
 
 inline std::string_view to_string_view(suit_type s)
 {
-	namespace kw = keywords::rf;
-
 	switch (s) {
 		case suit_type::red:
 			return keywords::rf::red;

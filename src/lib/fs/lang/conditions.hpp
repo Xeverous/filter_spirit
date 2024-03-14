@@ -1,6 +1,6 @@
 #pragma once
 
-#include <fs/lang/condition_properties.hpp>
+#include <fs/lang/enum_types.hpp>
 #include <fs/lang/primitive_types.hpp>
 #include <fs/lang/position_tag.hpp>
 #include <fs/lang/item.hpp>

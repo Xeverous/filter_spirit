@@ -81,9 +81,8 @@ target_sources(filter_spirit
 		fs/lang/loot/item_database.hpp
 		fs/lang/loot/generator.hpp
 		fs/lang/market/item_price_data.hpp
-		fs/lang/action_properties.hpp
+		fs/lang/enum_types.hpp
 		fs/lang/action_set.hpp
-		fs/lang/condition_properties.hpp
 		fs/lang/conditions.hpp
 		fs/lang/data_source_type.hpp
 		fs/lang/item.hpp
@@ -95,7 +94,6 @@ target_sources(filter_spirit
 		fs/lang/object.hpp
 		fs/lang/position_tag.hpp
 		fs/lang/primitive_types.hpp
-		fs/lang/autogen_categories.hpp
 		fs/lang/influence_info.hpp
 		fs/log/string_logger.hpp
 		fs/log/buffer_logger.hpp

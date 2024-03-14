@@ -1,7 +1,7 @@
 #pragma once
 
 #include <fs/lang/conditions.hpp>
-#include <fs/lang/autogen_categories.hpp>
+#include <fs/lang/enum_types.hpp>
 
 #include <optional>
 

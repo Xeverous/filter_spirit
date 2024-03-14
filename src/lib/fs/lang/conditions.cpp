@@ -1,6 +1,5 @@
 #include <fs/lang/position_tag.hpp>
 #include <fs/lang/primitive_types.hpp>
-#include <fs/lang/condition_properties.hpp>
 #include <fs/lang/conditions.hpp>
 #include <fs/lang/keywords.hpp>
 #include <fs/utility/assert.hpp>

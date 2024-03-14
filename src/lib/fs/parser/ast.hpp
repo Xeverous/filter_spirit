@@ -6,9 +6,7 @@
 #pragma once
 
 #include <fs/lang/primitive_types.hpp>
-#include <fs/lang/action_properties.hpp>
-#include <fs/lang/condition_properties.hpp>
-#include <fs/lang/autogen_categories.hpp>
+#include <fs/lang/enum_types.hpp>
 
 #include <boost/optional.hpp>
 #include <boost/spirit/home/x3/support/ast/variant.hpp>
