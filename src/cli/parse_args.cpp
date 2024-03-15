@@ -32,7 +32,7 @@ void print_help(const boost::program_options::options_description& options)
 		"download API data for future reuse:\n"
 		"./filter_spirit_cli -n \"Standard\" -a 0\n"
 		"generate/refresh an item filter (from specific saved data, never download) (not recommended):\n"
-		"./filter_spirit_cli -r cache/ninja_Standard -g filter_template.txt output.filter\n";
+		"./filter_spirit_cli -d cache/ninja_Standard -g filter_template.txt output.filter\n";
 
 	options.print(std::cout);
 
@@ -40,7 +40,7 @@ void print_help(const boost::program_options::options_description& options)
 		"\n"
 		"Filter Spirit is maintained by Xeverous\n"
 		"view documentation and report bugs/feature requests/questions on github.com/Xeverous/filter_spirit\n"
-		"contact: /u/Xeverous on reddit, Xeverous#2151 on Discord, pathofexile.com/account/view-profile/Xeverous\n";
+		"contact: /u/Xeverous on reddit, Xeverous_2151 on Discord, pathofexile.com/account/view-profile/Xeverous\n";
 }
 
 }
@@ -67,7 +67,7 @@ int run(int argc, char* argv[])
 				"download newest item price data from poe.ninja/api for specified LEAGUE")
 			("empty-data,e",     po::bool_switch(&opt_empty_data),
 				"run with no item price data (all price queries will have no results)")
-			("read,r", po::value(&data_read_dir)->value_name("DIRPATH"),
+			("read-data,d", po::value(&data_read_dir)->value_name("DIRPATH"),
 				"read item price data (JSON files) from specified directory (ignores age option)")
 		;
 
@@ -104,11 +104,12 @@ int run(int argc, char* argv[])
 		po::options_description generation_options("generation options");
 		generation_options.add_options()
 			("generate,g",  po::bool_switch(&opt_generate), "generate an item filter")
-			("print-ast,p", po::bool_switch(&st.print_ast), "print abstract syntax tree (for debug purposes)")
+			("ruthless,r",  po::bool_switch(&st.ruthless_mode), "enable Ruthless-specific filter logic")
 			("stop-on-error", po::bool_switch(&st.error_handling.stop_on_error),
 				"stop on first error")
 			("warning-is-error", po::bool_switch(&st.error_handling.treat_warnings_as_errors),
 				"treat warnings as errors")
+			("print-ast,p", po::bool_switch(&st.print_ast), "print abstract syntax tree (for debug purposes)")
 		;
 
 		boost::optional<std::string> input_path;
