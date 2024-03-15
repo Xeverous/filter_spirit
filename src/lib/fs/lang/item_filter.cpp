@@ -60,10 +60,20 @@ void item_filter_block::print(std::ostream& output_stream) const
 	if (!is_valid())
 		return;
 
-	if (visibility.policy == item_visibility_policy::show)
-		output_stream << keywords::rf::show;
-	else
-		output_stream << keywords::rf::hide;
+	switch (visibility.policy) {
+		case item_visibility_policy::show:
+			output_stream << keywords::rf::show;
+			break;
+		case item_visibility_policy::hide:
+			output_stream << keywords::rf::hide;
+			break;
+		case item_visibility_policy::minimal:
+			output_stream << keywords::rf::minimal;
+			break;
+		case item_visibility_policy::discard:
+			return;
+	}
+
 	output_stream << '\n';
 
 	conditions.print(output_stream);

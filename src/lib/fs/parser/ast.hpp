@@ -222,15 +222,15 @@ namespace common
 
 	struct static_visibility_statement : x3::position_tagged
 	{
-		static_visibility_statement operator=(bool value)
+		static_visibility_statement operator=(lang::item_visibility_policy policy)
 		{
-			show = value;
+			value = policy;
 			return *this;
 		}
 
-		bool get_value() const { return show; }
+		auto get_value() const { return value; }
 
-		bool show;
+		lang::item_visibility_policy value;
 	};
 }
 
@@ -489,15 +489,15 @@ namespace sf
 
 	struct dynamic_visibility_policy : x3::position_tagged
 	{
-		auto& operator=(bool value)
+		auto& operator=(lang::item_visibility_policy policy)
 		{
-			discard = value;
+			value = policy;
 			return *this;
 		}
 
-		bool get_value() const { return discard; }
+		auto get_value() const { return value; }
 
-		bool discard;
+		lang::item_visibility_policy value;
 	};
 
 	struct dynamic_visibility_statement : x3::position_tagged

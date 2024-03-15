@@ -29,13 +29,32 @@ using boost::spirit::x3::make_lambda_visitor;
 
 namespace {
 
-[[nodiscard]] lang::item_visibility
-evaluate(ast::common::static_visibility_statement visibility)
+[[nodiscard]] boost::optional<lang::item_visibility>
+evaluate(settings st, ast::common::static_visibility_statement visibility, diagnostics_store& diagnostics)
 {
-	return lang::item_visibility{
-		visibility.show ? lang::item_visibility_policy::show : lang::item_visibility_policy::hide,
-		position_tag_of(visibility)
-	};
+	if (st.ruthless_mode && visibility.value == lang::item_visibility_policy::hide) {
+		diagnostics.push_error_invalid_statement(
+			position_tag_of(visibility),
+			"Hide is only available in Normal filters - use Minimal in Ruthless");
+
+		if (st.error_handling.stop_on_error)
+			return boost::none;
+		else
+			return lang::item_visibility{lang::item_visibility_policy::minimal, position_tag_of(visibility)};
+	}
+
+	if (!st.ruthless_mode && visibility.value == lang::item_visibility_policy::minimal) {
+		diagnostics.push_error_invalid_statement(
+			position_tag_of(visibility),
+			"Minimal is only available in Ruthless filters - use Hide instead");
+
+		if (st.error_handling.stop_on_error)
+			return boost::none;
+		else
+			return lang::item_visibility{lang::item_visibility_policy::hide, position_tag_of(visibility)};
+	}
+
+	return lang::item_visibility{visibility.value, position_tag_of(visibility)};
 }
 
 [[nodiscard]] boost::optional<lang::boolean>
@@ -64,21 +83,41 @@ evaluate(
 	const symbol_table& symbols,
 	diagnostics_store& diagnostics)
 {
+	lang::item_visibility_policy policy = visibility.policy.value;
+
+	if (st.ruthless_mode && policy == lang::item_visibility_policy::hide) {
+		diagnostics.push_error_invalid_statement(
+			position_tag_of(visibility),
+			"ShowHide is only available in Normal filters - use ShowMinimal in Ruthless");
+
+		if (st.error_handling.stop_on_error)
+			return boost::none;
+		else
+			policy = lang::item_visibility_policy::minimal;
+	}
+
+	if (!st.ruthless_mode && policy == lang::item_visibility_policy::minimal) {
+		diagnostics.push_error_invalid_statement(
+			position_tag_of(visibility),
+			"ShowMinimal is only available in Ruthless filters - use ShowHide instead");
+
+		if (st.error_handling.stop_on_error)
+			return boost::none;
+		else
+			policy = lang::item_visibility_policy::hide;
+	}
+
 	return detail::evaluate_sequence(st, visibility.seq, symbols, diagnostics)
 		.flat_map([&](lang::object obj) {
 			return fold_booleans_using_and(obj, diagnostics);
 		})
 		.map([&](lang::boolean b) {
 			const lang::position_tag origin = position_tag_of(visibility);
-			if (b.value) {
+
+			if (b.value)
 				return lang::item_visibility{lang::item_visibility_policy::show, origin};
-			}
-			else {
-				if (visibility.policy.discard)
-					return lang::item_visibility{lang::item_visibility_policy::discard, origin};
-				else
-					return lang::item_visibility{lang::item_visibility_policy::hide, origin};
-			}
+			else
+				return lang::item_visibility{policy, origin};
 		});
 }
 
@@ -90,7 +129,7 @@ evaluate(
 	diagnostics_store& diagnostics)
 {
 	return visibility.apply_visitor(make_lambda_visitor<boost::optional<lang::item_visibility>>(
-		[](ast::common::static_visibility_statement visibility) { return evaluate(visibility); },
+		[&](ast::common::static_visibility_statement visibility) { return evaluate(st, visibility, diagnostics); },
 		[&](ast::sf::dynamic_visibility_statement visibility) { return evaluate(st, visibility, symbols, diagnostics); }
 	));
 }
@@ -468,7 +507,11 @@ compile_real_filter(
 
 	for (const auto& block : ast) {
 		auto filter_block = [&]() -> boost::optional<lang::item_filter_block> {
-			lang::item_filter_block filter_block(evaluate(block.visibility));
+			auto maybe_visibility = evaluate(st, block.visibility, diagnostics);
+			if (!maybe_visibility)
+				return boost::none;
+
+			lang::item_filter_block filter_block(*maybe_visibility);
 
 			for (const auto& rule : block.rules) {
 				const bool result = rule.apply_visitor(make_lambda_visitor<bool>(

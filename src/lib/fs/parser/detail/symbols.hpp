@@ -262,18 +262,37 @@ namespace rf
 
 	// ---- filter structure ----
 
-	struct visibility_literals_ : x3::symbols<bool>
+	struct static_visibility_literals_ : x3::symbols<lang::item_visibility_policy>
 	{
-		visibility_literals_()
+		static_visibility_literals_()
 		{
 			add
-				(lang::keywords::rf::show, true)
-				(lang::keywords::rf::hide, false)
+				(lang::keywords::rf::show,    lang::item_visibility_policy::show)
+				(lang::keywords::rf::hide,    lang::item_visibility_policy::hide)
+				(lang::keywords::rf::minimal, lang::item_visibility_policy::minimal)
 			;
 		}
 
 	};
-	const visibility_literals_ visibility_literals;
+	const static_visibility_literals_ static_visibility_literals;
 } // namespace rf
+
+namespace sf {
+
+	struct dynamic_visibility_literals_ : x3::symbols<lang::item_visibility_policy>
+	{
+		dynamic_visibility_literals_()
+		{
+			add
+				(lang::keywords::sf::show_hide,    lang::item_visibility_policy::hide)
+				(lang::keywords::sf::show_minimal, lang::item_visibility_policy::minimal)
+				(lang::keywords::sf::show_discard, lang::item_visibility_policy::discard)
+			;
+		}
+
+	};
+	const dynamic_visibility_literals_ dynamic_visibility_literals;
+
+} // namespace sf
 
 } // namespace fs::parser::detail::symbols

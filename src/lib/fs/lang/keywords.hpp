@@ -20,6 +20,7 @@ namespace rf
 	// visibility
 	constexpr auto show = "Show";
 	constexpr auto hide = "Hide";
+	constexpr auto minimal = "Minimal";
 	constexpr auto continue_ = "Continue";
 
 	// conditions
@@ -164,6 +165,7 @@ namespace sf
 	// ---- visibility extensions ----
 
 	constexpr auto show_hide = "ShowHide";
+	constexpr auto show_minimal = "ShowMinimal";
 	constexpr auto show_discard = "ShowDiscard";
 
 	// ---- condition extensions ----

@@ -260,6 +260,16 @@ enum class official_action_property
 	enable_drop_sound_if_alert_sound
 };
 
+// ---- core ----
+
+enum class item_visibility_policy
+{
+	show,
+	hide,    // only in Normal filters
+	minimal, // only in Ruthless filters
+	discard  // only is spirit filters (enable/disable block)
+};
+
 // ---- extensions ----
 
 // TODO rename Autogen names to be easier to understand

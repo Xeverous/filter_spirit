@@ -17,8 +17,6 @@ namespace fs::lang
 
 struct item;
 
-enum class item_visibility_policy { show, hide, discard };
-
 struct item_visibility
 {
 	item_visibility_policy policy;

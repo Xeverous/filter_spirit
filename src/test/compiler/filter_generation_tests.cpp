@@ -12,23 +12,34 @@
 
 namespace ut = boost::unit_test;
 
+namespace fs::test {
 namespace {
 
-std::string generate_filter(
-	std::string_view input,
-	const fs::lang::market::item_price_data& ipd = {})
+std::string generate_filter(compiler::settings st, const lang::market::item_price_data& ipd, std::string_view input)
 {
-	fs::log::string_logger logger;
-	std::optional<std::string> filter = fs::compiler::parse_compile_generate_spirit_filter_without_preamble(
-		input, ipd, fs::compiler::settings{}, logger);
-	BOOST_TEST_REQUIRE(filter.has_value(), "filter generation failed:\n" << logger.str());
+	log::string_logger logger;
+	std::optional<std::string> filter = compiler::parse_compile_generate_spirit_filter_without_preamble(
+		input, ipd, st, logger);
+	BOOST_TEST_REQUIRE(filter.has_value(), "test written incorrectly: filter generation failed:\n" << logger.str());
 	return *filter;
 }
 
+std::string generate_filter(compiler::settings st, std::string_view input)
+{
+	return generate_filter(st, {}, input);
 }
 
-namespace fs::test
+std::string generate_filter(const lang::market::item_price_data& ipd, std::string_view input)
 {
+	return generate_filter({}, ipd, input);
+}
+
+std::string generate_filter(std::string_view input)
+{
+	return generate_filter({}, {}, input);
+}
+
+}
 
 BOOST_AUTO_TEST_SUITE(compiler_suite)
 
@@ -932,10 +943,10 @@ $x2 = True
 $x3 = True
 $xx = $x1 $x2 $x3
 
+ShowDiscard False $xx
 ShowHide $x1 $x2 $x3
 ShowHide $x1 True $x2 True $x3
 ShowHide $xx
-ShowHide False $xx
 ShowHide $x1 True $xx True $x2 False $x3
 )");
 			const std::string_view expected_filter =
@@ -947,7 +958,34 @@ Show
 
 Hide
 
-Hide
+)";
+
+			BOOST_TEST(compare_strings(expected_filter, actual_filter));
+		}
+
+		BOOST_AUTO_TEST_CASE(dynamic_visibility_ruthless)
+		{
+			compiler::settings st;
+			st.ruthless_mode = true;
+
+			const std::string actual_filter = generate_filter(st, minimal_input() + R"(
+$t = True
+$f = False
+
+ShowMinimal $t
+ShowMinimal $f
+ShowDiscard $t
+ShowDiscard $f
+ShowMinimal $f
+)");
+			const std::string_view expected_filter =
+R"(Show
+
+Minimal
+
+Show
+
+Minimal
 
 )";
 
@@ -1887,7 +1925,7 @@ Hide
 			ipd.divination_cards.push_back(divination_card{price_data{10, false}, "A Dab of Ink", 9});
 			ipd.divination_cards.push_back(divination_card{price_data{100, false}, "Abandoned Wealth", 5});
 			ipd.divination_cards.push_back(divination_card{price_data{1000, false}, "The Doctor", 8});
-			const std::string actual_filter = generate_filter(minimal_input() + R"(
+			const std::string actual_filter = generate_filter(ipd, minimal_input() + R"(
 Class "Divination Card"
 Autogen "cards"
 {
@@ -1913,7 +1951,7 @@ Autogen "cards"
 		Hide
 	}
 }
-)", ipd);
+)");
 			const std::string_view expected_filter =
 R"(Show
 	Class == "Divination Card"

@@ -54,18 +54,17 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 	{
 	protected:
 		static diagnostics_store expect_error_when_resolving_symbols(
-			const std::vector<parser::ast::sf::definition>& defs)
+			const std::vector<parser::ast::sf::definition>& defs, compiler::settings st = {})
 		{
 			diagnostics_store diagnostics;
-			resolve_symbols(defs, diagnostics);
+			resolve_symbols(st, defs, diagnostics);
 			BOOST_TEST_REQUIRE(diagnostics.has_errors());
 			return diagnostics;
 		}
 
 		static diagnostics_store expect_error_when_compiling(
-			const parser::ast::sf::filter_structure& fs)
+			const parser::ast::sf::filter_structure& fs, compiler::settings st = {})
 		{
-			compiler::settings st;
 			diagnostics_store diagnostics;
 			const std::optional<compiler::symbol_table> symbols = resolve_symbols(st, fs.definitions, diagnostics);
 			BOOST_TEST(!diagnostics.has_warnings_or_errors());
@@ -261,6 +260,53 @@ $val = NoSuchKeyword
 			std::vector<diagnostic_message_pattern> patterns = {
 				diagnostic_message_pattern{dms::warning, dmid::duplicate_influence, expected_second, {}},
 				diagnostic_message_pattern{dms::note, dmid::minor_note, expected_first, {}}
+			};
+
+			compare_diagnostics(patterns, diagnostics, parse_data.metadata);
+		}
+
+		BOOST_AUTO_TEST_CASE(invalid_statement_minimal_in_normal_filter)
+		{
+			const std::string input_str = minimal_input() + R"(
+Class == "Skill Gems"
+{
+	SetTextColor 0 255 0
+	Minimal
+}
+)";
+			const std::string_view input = input_str;
+			const parser::parsed_spirit_filter parse_data = parse(input);
+			const diagnostics_store diagnostics = expect_error_when_compiling(parse_data.ast);
+
+			const std::string_view expected_expression = search(input, "Minimal").result();
+
+			std::vector<diagnostic_message_pattern> patterns = {
+				diagnostic_message_pattern{dms::error, dmid::invalid_statement, expected_expression, {"Minimal", "Hide"}},
+			};
+
+			compare_diagnostics(patterns, diagnostics, parse_data.metadata);
+		}
+
+		BOOST_AUTO_TEST_CASE(invalid_statement_hide_in_ruthless_filter)
+		{
+			const std::string input_str = minimal_input() + R"(
+Class == "Skill Gems"
+{
+	SetTextColor 0 255 0
+	Hide
+}
+)";
+			const std::string_view input = input_str;
+			const parser::parsed_spirit_filter parse_data = parse(input);
+
+			compiler::settings st;
+			st.ruthless_mode = true;
+			const diagnostics_store diagnostics = expect_error_when_compiling(parse_data.ast, st);
+
+			const std::string_view expected_expression = search(input, "Hide").result();
+
+			std::vector<diagnostic_message_pattern> patterns = {
+				diagnostic_message_pattern{dms::error, dmid::invalid_statement, expected_expression, {"Hide", "Minimal"}},
 			};
 
 			compare_diagnostics(patterns, diagnostics, parse_data.metadata);

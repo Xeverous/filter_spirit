@@ -197,7 +197,7 @@ namespace common
 	// ---- statements ----
 
 	const static_visibility_statement_type static_visibility_statement = "static visibility statement";
-	const auto static_visibility_statement_def = make_keyword(symbols::rf::visibility_literals);
+	const auto static_visibility_statement_def = make_keyword(symbols::rf::static_visibility_literals);
 	BOOST_SPIRIT_DEFINE(static_visibility_statement)
 
 	const continue_statement_type continue_statement = "continue statement";
@@ -345,9 +345,7 @@ namespace sf
 	BOOST_SPIRIT_DEFINE(expand_statement)
 
 	const dynamic_visibility_policy_type dynamic_visibility_policy = "dynamic visivility policy";
-	const auto dynamic_visibility_policy_def =
-		(make_keyword(lang::keywords::sf::show_hide) > x3::attr(false)) |
-		(make_keyword(lang::keywords::sf::show_discard) > x3::attr(true));
+	const auto dynamic_visibility_policy_def = make_keyword(symbols::sf::dynamic_visibility_literals);
 	BOOST_SPIRIT_DEFINE(dynamic_visibility_policy)
 
 	const dynamic_visibility_statement_type dynamic_visibility_statement = "dynamic visibility statement";
