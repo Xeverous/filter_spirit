@@ -23,10 +23,12 @@ using boost::spirit::x3::make_lambda_visitor;
 
 [[nodiscard]] boost::optional<lang::color>
 make_color(
+	settings st,
 	lang::integer r,
 	lang::integer g,
 	lang::integer b,
 	boost::optional<lang::integer> a,
+	bool is_set_text_color,
 	diagnostics_store& diagnostics)
 {
 	const auto result_r = make_integer_in_range(r, 0, 255, diagnostics);
@@ -42,7 +44,24 @@ make_color(
 		if (!result_a)
 			return boost::none;
 
-		return lang::color{*result_r, *result_g, *result_b, *result_a};
+		lang::integer alpha = *result_a;
+		if (is_set_text_color && st.ruthless_mode
+			&& alpha.value < lang::limits::ruthless_min_set_text_color_alpha)
+		{
+			diagnostics.push_error_value_out_of_range(
+				lang::limits::ruthless_min_set_text_color_alpha, 255, alpha);
+			diagnostics.push_message(make_note_minor(
+				alpha.origin,
+				"Ruthless filters require SetTextColor alpha value to be at least ",
+				std::to_string(lang::limits::ruthless_min_set_text_color_alpha)));
+
+			if (st.error_handling.stop_on_error)
+				return boost::none;
+			else
+				alpha.value = lang::limits::ruthless_min_set_text_color_alpha;
+		}
+
+		return lang::color{*result_r, *result_g, *result_b, alpha};
 	}
 	else {
 		return lang::color{*result_r, *result_g, *result_b};
@@ -50,7 +69,7 @@ make_color(
 }
 
 [[nodiscard]] boost::optional<lang::color>
-make_color(const lang::object& obj, diagnostics_store& diagnostics)
+make_color(settings st, const lang::object& obj, bool is_set_text_color, diagnostics_store& diagnostics)
 {
 	if (!check_object_size(obj, 3, 4, diagnostics))
 		return boost::none;
@@ -65,12 +84,12 @@ make_color(const lang::object& obj, diagnostics_store& diagnostics)
 	if (obj.values.size() == 4u) {
 		return get_as<lang::integer>(obj.values[3], diagnostics)
 			.flat_map([&](lang::integer a) {
-				return make_color(*r, *g, *b, a, diagnostics);
+				return make_color(st, *r, *g, *b, a, is_set_text_color, diagnostics);
 			}
 		);
 	}
 	else {
-		return make_color(*r, *g, *b, boost::none, diagnostics);
+		return make_color(st, *r, *g, *b, boost::none, is_set_text_color, diagnostics);
 	}
 
 }
@@ -364,13 +383,14 @@ spirit_filter_make_set_alert_sound_action(
 
 [[nodiscard]] bool
 add_set_color_action(
-	settings /* st */,
+	settings st,
 	const lang::object& obj,
 	lang::position_tag action_origin,
 	std::optional<lang::color_action>& target,
+	bool is_set_text_color,
 	diagnostics_store& diagnostics)
 {
-	auto maybe_color = make_color(obj, diagnostics);
+	auto maybe_color = make_color(st, obj, is_set_text_color, diagnostics);
 	if (!maybe_color)
 		return false;
 
@@ -532,13 +552,13 @@ add_official_action(
 		// text actions
 		case lang::official_action_property::set_text_color:
 			warn_if_action_exists(is_real_filter, action_origin, origin_of(set.text_color), diagnostics);
-			return add_set_color_action(st, obj, action_origin, set.text_color, diagnostics);
+			return add_set_color_action(st, obj, action_origin, set.text_color, true, diagnostics);
 		case lang::official_action_property::set_border_color:
 			warn_if_action_exists(is_real_filter, action_origin, origin_of(set.border_color), diagnostics);
-			return add_set_color_action(st, obj, action_origin, set.border_color, diagnostics);
+			return add_set_color_action(st, obj, action_origin, set.border_color, false, diagnostics);
 		case lang::official_action_property::set_background_color:
 			warn_if_action_exists(is_real_filter, action_origin, origin_of(set.background_color), diagnostics);
-			return add_set_color_action(st, obj, action_origin, set.background_color, diagnostics);
+			return add_set_color_action(st, obj, action_origin, set.background_color, false, diagnostics);
 		// other simple actions
 		case lang::official_action_property::set_font_size:
 			warn_if_action_exists(is_real_filter, action_origin, origin_of(set.font_size), diagnostics);

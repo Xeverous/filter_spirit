@@ -2,6 +2,8 @@
 
 namespace fs::lang::limits
 {
+	// ---- conditions ----
+
 	constexpr auto min_item_width   = 1;
 	constexpr auto max_item_width   = 2;
 
@@ -19,6 +21,10 @@ namespace fs::lang::limits
 
 	constexpr auto max_item_influences = 6;
 	constexpr auto max_filter_influences = 6;
+
+	// ---- actions ----
+
+	constexpr auto ruthless_min_set_text_color_alpha = 80;
 
 	// these are not strictly enforced by the filter
 	// but the game client clamps values in this range

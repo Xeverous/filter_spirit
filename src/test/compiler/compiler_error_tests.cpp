@@ -229,6 +229,34 @@ $val = NoSuchKeyword
 			compare_diagnostics(patterns, diagnostics, parse_data.metadata);
 		}
 
+		BOOST_AUTO_TEST_CASE(invalid_integer_alpha_value_in_ruthless)
+		{
+			const std::string input_str = minimal_input() + R"(
+SetBorderColor 255 255 255 30
+SetTextColor 255 255 255 40
+SetBackgroundColor 0 0 0 50
+)";
+			const std::string_view input = input_str;
+			const parser::parsed_spirit_filter parse_data = parse(input);
+
+			compiler::settings st;
+			st.ruthless_mode = true;
+			const diagnostics_store diagnostics = expect_error_when_compiling(parse_data.ast, st);
+
+			const std::string_view expected_argument = search(input, "40").result();
+
+			std::vector<diagnostic_message_pattern> patterns = {
+				diagnostic_message_pattern{dms::error, dmid::value_out_of_range, expected_argument, {
+					std::to_string(lang::limits::ruthless_min_set_text_color_alpha), "255", "got 40"
+				}},
+				diagnostic_message_pattern{dms::note, dmid::minor_note, expected_argument, {
+					"Ruthless", "SetTextColor", std::to_string(lang::limits::ruthless_min_set_text_color_alpha)
+				}}
+			};
+
+			compare_diagnostics(patterns, diagnostics, parse_data.metadata);
+		}
+
 		BOOST_AUTO_TEST_CASE(type_mismatch)
 		{
 			const std::string input_str = minimal_input() + "BaseType 123\n{}";
