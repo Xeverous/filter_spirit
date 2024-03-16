@@ -126,8 +126,8 @@ make_play_effect_action(
 			FS_ASSERT(num_values == 2u);
 
 			// there is an extra token, it must be "Temp"; if successful map to true
-			return get_as<lang::temp>(obj.values[1], diagnostics)
-				.map([](lang::temp) { return true; });
+			return get_as<lang::temp_type>(obj.values[1], diagnostics)
+				.map([](lang::temp_type) { return true; });
 		}();
 
 		if (!is_temp)

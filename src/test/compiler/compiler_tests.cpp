@@ -136,7 +136,7 @@ $string         = "Leather Belt"
 				{{lang::none_type{no_origin()}, search(input, "None").result()}}
 			);
 			expect_object(symbols, lookup_data, "temp", search(input, "$temp").result(),
-				{{lang::temp{no_origin()}, search(input, "Temp").result()}}
+				{{lang::temp_type{no_origin()}, search(input, "Temp").result()}}
 			);
 			expect_object(symbols, lookup_data, "boolean", search(input, "$boolean").result(),
 				{{lang::boolean{false, no_origin()}, search(input, "False").result()}}

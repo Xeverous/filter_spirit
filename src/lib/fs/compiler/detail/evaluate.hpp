@@ -87,7 +87,7 @@ evaluate(parser::ast::common::influence_literal il)
 	return {il.value, parser::position_tag_of(il)};
 }
 
-[[nodiscard]] inline lang::temp
+[[nodiscard]] inline lang::temp_type
 evaluate(parser::ast::common::temp_literal tl)
 {
 	return {parser::position_tag_of(tl)};

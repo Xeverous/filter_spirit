@@ -22,13 +22,13 @@ struct none_type
 inline bool operator==(none_type, none_type) noexcept { return true; }
 inline bool operator!=(none_type, none_type) noexcept { return false; }
 
-struct temp
+struct temp_type
 {
 	position_tag origin;
 };
 
-inline bool operator==(temp, temp) noexcept { return true; }
-inline bool operator!=(temp, temp) noexcept { return false; }
+inline bool operator==(temp_type, temp_type) noexcept { return true; }
+inline bool operator!=(temp_type, temp_type) noexcept { return false; }
 
 struct boolean
 {
