@@ -1062,6 +1062,51 @@ Hide
 			BOOST_TEST(compare_strings(expected_filter, actual_filter));
 		}
 
+		BOOST_AUTO_TEST_CASE(import_statement)
+		{
+			const std::string actual_filter = generate_filter(minimal_input() + R"(
+SetFontSize 30
+
+DropLevel >= 10
+{
+	Import "MyCustomRules.filter"
+
+	Sockets 6
+	{
+		PlayEffect Blue
+		Show
+		Continue
+	}
+
+	Import "MyOptionalRules.filter" Optional
+}
+
+Import "MyExtraRules.filter"
+
+Hide
+)");
+			const std::string_view expected_filter =
+R"(Import "MyCustomRules.filter"
+
+Show
+	DropLevel >= 10
+	Sockets 6
+	SetFontSize 30
+	PlayEffect Blue
+	Continue
+
+Import "MyOptionalRules.filter" Optional
+
+Import "MyExtraRules.filter"
+
+Hide
+	SetFontSize 30
+
+)";
+
+			BOOST_TEST(compare_strings(expected_filter, actual_filter));
+		}
+
 		BOOST_AUTO_TEST_CASE(disabled_actions)
 		{
 			const std::string actual_filter = generate_filter(minimal_input() + R"(

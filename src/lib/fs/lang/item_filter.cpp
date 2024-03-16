@@ -2,6 +2,7 @@
 #include <fs/lang/keywords.hpp>
 #include <fs/utility/assert.hpp>
 #include <fs/utility/type_traits.hpp>
+#include <fs/utility/visitor.hpp>
 
 #include <algorithm>
 #include <utility>
@@ -14,7 +15,7 @@ namespace fs::lang
 namespace
 {
 
-lang::integer make_int(int val)
+integer make_int(int val)
 {
 	return integer{val, no_origin()};
 };
@@ -60,6 +61,16 @@ item_visibility_style to_item_visibility_style(item_visibility visibility)
 
 } // namespace
 
+void import_block::print(std::ostream& output_stream) const
+{
+	output_stream << keywords::rf::import_ << " \"" << path.value << '\"';
+
+	if (is_optional)
+		output_stream << ' ' << keywords::rf::optional;
+
+	output_stream << "\n\n";
+}
+
 void item_filter_block::print(std::ostream& output_stream) const
 {
 	if (!is_valid())
@@ -88,6 +99,12 @@ void item_filter_block::print(std::ostream& output_stream) const
 		output_stream << '\t' << keywords::rf::continue_ << '\n';
 
 	output_stream << '\n';
+}
+
+void item_filter::print(std::ostream& output_stream) const
+{
+	for (const block_variant& block_variant : blocks)
+		std::visit([&](const auto& block) { block.print(output_stream); }, block_variant);
 }
 
 item_style::item_style()
@@ -132,24 +149,22 @@ void item_style::override_with(const action_set& actions)
 
 block_match_result item_filter_block::test_item(const item& itm, int area_level) const
 {
-	block_match_result result;
-	result.continue_origin = continuation.origin;
+	if (!is_valid())
+		return block_match_result::failure_invalid_block(visibility.origin, continuation.origin);
 
-	if (!is_valid()) {
-		result.status = block_match_status::failure_invalid_block;
-		return result;
-	}
-
+	std::vector<condition_match_result> match_results;
 	for (const auto& cond : conditions.conditions)
-		result.match_results.push_back(cond->test_item(itm, area_level));
+		match_results.push_back(cond->test_item(itm, area_level));
 
 	const bool is_successful = std::all_of(
-		result.match_results.begin(),
-		result.match_results.end(),
+		match_results.begin(),
+		match_results.end(),
 		[](const condition_match_result& result) { return result.is_successful(); });
-	result.status = is_successful ? block_match_status::success : block_match_status::failure_mismatch;
 
-	return result;
+	if (is_successful)
+		return block_match_result::success(visibility.origin, continuation.origin, std::move(match_results));
+	else
+		return block_match_result::failure_mismatch(visibility.origin, continuation.origin, std::move(match_results));
 }
 
 item_filtering_result pass_item_through_filter(const item& itm, const item_filter& filter, int area_level)
@@ -160,23 +175,32 @@ item_filtering_result pass_item_through_filter(const item& itm, const item_filte
 
 	item_style style = default_item_style(itm);
 
-	for (const item_filter_block& block : filter.blocks) {
-		block_match_result block_result = block.test_item(itm, area_level);
+	for (const block_variant& block_variant : filter.blocks) {
+		bool stop_filtering = std::visit(utility::visitor{
+			[&](const import_block& block) {
+				match_history.push_back(block_match_result::ignored_import_block(block.origin));
+				return false;
+			},
+			[&](const item_filter_block& block) {
+				block_match_result block_result = block.test_item(itm, area_level);
 
-		bool stop_filtering = false;
-		if (block_result.is_successful()) {
-			style.override_with(block.actions);
-			style.visibility = to_item_visibility_style(block.visibility);
+				bool stop = false;
+				if (block_result.is_successful()) {
+					style.override_with(block.actions);
+					style.visibility = to_item_visibility_style(block.visibility);
 
-			if (block.continuation.origin) {
-				FS_ASSERT(is_valid(*block.continuation.origin));
+					if (block.continuation.origin) {
+						FS_ASSERT(is_valid(*block.continuation.origin));
+					}
+					else {
+						stop = true;
+					}
+				}
+
+				match_history.push_back(std::move(block_result));
+				return stop;
 			}
-			else {
-				stop_filtering = true;
-			}
-		}
-
-		match_history.push_back(std::move(block_result));
+		}, block_variant);
 
 		if (stop_filtering)
 			break;

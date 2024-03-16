@@ -283,8 +283,10 @@ $z = 4W 0 6 RGB
 					expect_success_when_resolving_symbols(parse_data.ast.definitions, parse_data);
 				const lang::item_filter filter =
 					expect_success_when_building_filter(parse_data.ast.statements, parse_data, symbols);
-				BOOST_TEST_REQUIRE(static_cast<int>(filter.blocks.size()) == 1);
-				const lang::item_filter_block& block = filter.blocks[0];
+				BOOST_TEST_REQUIRE(filter.blocks.size() == 1u);
+				const lang::block_variant& block_variant = filter.blocks[0];
+				BOOST_TEST_REQUIRE(std::holds_alternative<lang::item_filter_block>(block_variant));
+				const auto& block = std::get<lang::item_filter_block>(block_variant);
 				BOOST_TEST((block.visibility.policy == lang::item_visibility_policy::show));
 				const std::optional<lang::alert_sound_action>& maybe_alert_sound_action = block.actions.alert_sound;
 				BOOST_TEST_REQUIRE(maybe_alert_sound_action.has_value());

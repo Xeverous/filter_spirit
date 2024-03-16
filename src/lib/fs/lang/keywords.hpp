@@ -17,11 +17,12 @@ namespace fs::lang::keywords
 // keywords used in real filters and potentially used in spirit filter templates
 namespace rf
 {
-	// visibility
+	// block-level
 	constexpr auto show = "Show";
 	constexpr auto hide = "Hide";
 	constexpr auto minimal = "Minimal";
 	constexpr auto continue_ = "Continue";
+	constexpr auto import_ = "Import";
 
 	// conditions
 	constexpr auto item_level       = "ItemLevel";
@@ -157,6 +158,7 @@ namespace rf
 
 	constexpr auto temp = "Temp";
 	constexpr auto none = "None";
+	constexpr auto optional = "Optional";
 } // namespace rf
 
 // keywords used in spirit filters

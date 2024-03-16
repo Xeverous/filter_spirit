@@ -12,6 +12,7 @@
 #include <fs/utility/assert.hpp>
 #include <fs/utility/string_helpers.hpp>
 #include <fs/utility/monadic.hpp>
+#include <fs/utility/visitor.hpp>
 #include <fs/version.hpp>
 
 #include <boost/spirit/home/x3/support/utility/lambda_visitor.hpp>
@@ -28,6 +29,12 @@ using parser::position_tag_of;
 using boost::spirit::x3::make_lambda_visitor;
 
 namespace {
+
+[[nodiscard]] lang::import_block
+evaluate(const ast::common::import_statement& statement)
+{
+	return lang::import_block{detail::evaluate(statement.path), statement.is_optional, position_tag_of(statement)};
+}
 
 [[nodiscard]] boost::optional<lang::item_visibility>
 evaluate(settings st, ast::common::static_visibility_statement visibility, diagnostics_store& diagnostics)
@@ -222,7 +229,7 @@ compile_statements_recursively_impl(
 	const symbol_table& symbols,
 	detail::spirit_protoconditions& conditions,
 	lang::action_set& actions,
-	std::vector<lang::spirit_item_filter_block>& blocks,
+	std::vector<lang::spirit_block_variant>& blocks,
 	diagnostics_store& diagnostics)
 {
 	// Conditions can only be followed by a nested block
@@ -233,6 +240,10 @@ compile_statements_recursively_impl(
 
 	for (const ast::sf::statement& statement : statements) {
 		auto status = statement.apply_visitor(make_lambda_visitor<bool>(
+			[&](const ast::common::import_statement& statement) {
+				blocks.push_back(lang::spirit_block_variant(evaluate(statement)));
+				return true;
+			},
 			[&](const ast::sf::condition& cond) {
 				condition_present = true;
 				return detail::spirit_filter_add_condition(
@@ -311,7 +322,7 @@ compile_statements_recursively_impl(
 				if (!block)
 					return false;
 
-				blocks.push_back(std::move(*block));
+				blocks.push_back(lang::spirit_block_variant(std::move(*block)));
 				return true;
 			},
 			[&](const ast::sf::rule_block& nested_block) {
@@ -356,7 +367,7 @@ compile_statements_recursively_impl(
 	return true;
 }
 
-[[nodiscard]] boost::optional<std::vector<lang::spirit_item_filter_block>>
+[[nodiscard]] boost::optional<std::vector<lang::spirit_block_variant>>
 compile_statements_recursively(
 	settings st,
 	const std::vector<ast::sf::statement>& statements,
@@ -367,7 +378,7 @@ compile_statements_recursively(
 	// that's the default state before any nesting
 	detail::spirit_protoconditions root_conditions;
 	lang::action_set root_actions;
-	std::vector<lang::spirit_item_filter_block> blocks;
+	std::vector<lang::spirit_block_variant> blocks;
 
 	const auto status = compile_statements_recursively_impl(
 		st, statements, symbols, root_conditions, root_actions, blocks, diagnostics);
@@ -505,39 +516,46 @@ compile_real_filter(
 	lang::item_filter filter;
 	filter.blocks.reserve(ast.size());
 
-	for (const auto& block : ast) {
-		auto filter_block = [&]() -> boost::optional<lang::item_filter_block> {
-			auto maybe_visibility = evaluate(st, block.visibility, diagnostics);
-			if (!maybe_visibility)
-				return boost::none;
+	for (const ast::rf::block_variant& block_variant : ast) {
+		using result_type = boost::optional<lang::block_variant>;
 
-			lang::item_filter_block filter_block(*maybe_visibility);
-
-			for (const auto& rule : block.rules) {
-				const bool result = rule.apply_visitor(make_lambda_visitor<bool>(
-					[&](const ast::rf::condition& c) {
-						return detail::real_filter_add_condition(
-							st, c, filter_block.conditions, diagnostics);
-					},
-					[&](const ast::rf::action& a) {
-						return detail::real_filter_add_action(
-							st, a, filter_block.actions, diagnostics);
-					},
-					[&](ast::rf::continue_statement cont) {
-						filter_block.continuation.origin = position_tag_of(cont);
-						return true;
-					}
-				));
-
-				if (!result && st.error_handling.stop_on_error)
+		auto result_block = block_variant.apply_visitor(make_lambda_visitor<result_type>(
+			[&](const ast::common::import_statement& statement) -> result_type {
+				return lang::block_variant(evaluate(statement));
+			},
+			[&](const ast::rf::filter_block& block) -> result_type {
+				auto maybe_visibility = evaluate(st, block.visibility, diagnostics);
+				if (!maybe_visibility)
 					return boost::none;
+
+				lang::item_filter_block filter_block(*maybe_visibility);
+
+				for (const auto& rule : block.rules) {
+					const bool result = rule.apply_visitor(make_lambda_visitor<bool>(
+						[&](const ast::rf::condition& c) {
+							return detail::real_filter_add_condition(
+								st, c, filter_block.conditions, diagnostics);
+						},
+						[&](const ast::rf::action& a) {
+							return detail::real_filter_add_action(
+								st, a, filter_block.actions, diagnostics);
+						},
+						[&](ast::rf::continue_statement cont) {
+							filter_block.continuation.origin = position_tag_of(cont);
+							return true;
+						}
+					));
+
+					if (!result && st.error_handling.stop_on_error)
+						return boost::none;
+				}
+
+				return lang::block_variant(filter_block);
 			}
+		));
 
-			return filter_block;
-		}();
-
-		if (filter_block)
-			filter.blocks.push_back(std::move(*filter_block));
+		if (result_block)
+			filter.blocks.push_back(std::move(*result_block));
 		else if (st.error_handling.stop_on_error)
 			return std::nullopt;
 	}
@@ -573,7 +591,7 @@ compile_spirit_filter_statements(
 	const symbol_table& symbols,
 	diagnostics_store& diagnostics)
 {
-	boost::optional<std::vector<lang::spirit_item_filter_block>> blocks =
+	boost::optional<std::vector<lang::spirit_block_variant>> blocks =
 		compile_statements_recursively(st, statements, symbols, diagnostics);
 
 	// This function is the point when we want to stop proceeding on any errors.
@@ -592,26 +610,34 @@ make_item_filter(
 	const lang::spirit_item_filter& filter_template,
 	const lang::market::item_price_data& item_price_data)
 {
-	std::vector<lang::item_filter_block> result_blocks;
+	std::vector<lang::block_variant> result_blocks;
 	result_blocks.reserve(filter_template.blocks.size());
 
-	for (const lang::spirit_item_filter_block& block : filter_template.blocks) {
-		if (block.autogen) {
-			const auto& autogen = *block.autogen;
+	for (const lang::spirit_block_variant& block_variant : filter_template.blocks) {
+		std::visit(utility::visitor{
+			[&](const lang::import_block& block) {
+				result_blocks.push_back(lang::block_variant(block));
+			},
+			[&](const lang::spirit_item_filter_block& block) {
+				if (block.autogen) {
+					const auto& autogen = *block.autogen;
 
-			lang::block_generation_info block_gen_info{
-				block.block.visibility,
-				block.block.actions,
-				block.block.continuation,
-				autogen.origin,
-				autogen.price_range
-			};
+					lang::block_generation_info block_gen_info{
+						block.block.visibility,
+						block.block.actions,
+						block.block.continuation,
+						autogen.origin,
+						autogen.price_range
+					};
 
-			autogen.blocks_generator(block_gen_info, item_price_data, std::back_inserter(result_blocks));
-		}
-		else {
-			result_blocks.push_back(block.block);
-		}
+					autogen.blocks_generator(
+						block_gen_info, item_price_data, lang::generated_blocks_consumer{std::ref(result_blocks)});
+				}
+				else {
+					result_blocks.push_back(lang::block_variant(block.block));
+				}
+			}
+		}, block_variant);
 	}
 
 	return lang::item_filter{std::move(result_blocks)};
@@ -620,10 +646,7 @@ make_item_filter(
 std::string item_filter_to_string_without_preamble(const lang::item_filter& filter)
 {
 	std::stringstream ss;
-
-	for (const lang::item_filter_block& block : filter.blocks)
-		block.print(ss);
-
+	filter.print(ss);
 	return ss.str();
 }
 

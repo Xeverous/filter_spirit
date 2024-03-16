@@ -3,12 +3,13 @@
 #include <fs/lang/conditions.hpp>
 #include <fs/lang/action_set.hpp>
 
-#include <iosfwd>
-#include <optional>
-#include <vector>
-#include <utility>
-#include <iterator>
 #include <functional>
+#include <iosfwd>
+#include <iterator>
+#include <optional>
+#include <utility>
+#include <variant>
+#include <vector>
 
 namespace fs::lang
 {
@@ -28,18 +29,75 @@ struct block_continuation
 	std::optional<position_tag> origin;
 };
 
-enum class block_match_status { success, failure_mismatch, failure_invalid_block };
+enum class block_match_status { success, failure_mismatch, failure_invalid_block, ignored_import_block };
 
 struct block_match_result
 {
+private:
+	// prevent instancing with broken invariants
+	block_match_result(
+		block_match_status status,
+		position_tag block_statement_origin,
+		std::optional<position_tag> continue_origin,
+		std::vector<condition_match_result> match_results)
+	: status(status)
+	, block_statement_origin(block_statement_origin)
+	, continue_origin(continue_origin)
+	, match_results(std::move(match_results))
+	{}
+
+public:
+	static block_match_result ignored_import_block(
+		position_tag block_statement_origin)
+	{
+		return block_match_result(
+			block_match_status::ignored_import_block, block_statement_origin, std::nullopt, {});
+	}
+
+	static block_match_result success(
+		position_tag block_statement_origin,
+		std::optional<position_tag> continue_origin,
+		std::vector<condition_match_result> match_results)
+	{
+		return block_match_result(
+			block_match_status::success, block_statement_origin, continue_origin, std::move(match_results));
+	}
+
+	static block_match_result failure_mismatch(
+		position_tag block_statement_origin,
+		std::optional<position_tag> continue_origin,
+		std::vector<condition_match_result> match_results)
+	{
+		return block_match_result(
+			block_match_status::failure_mismatch, block_statement_origin, continue_origin, std::move(match_results));
+	}
+
+	static block_match_result failure_invalid_block(
+		position_tag block_statement_origin,
+		std::optional<position_tag> continue_origin)
+	{
+		return block_match_result(
+			block_match_status::failure_invalid_block, block_statement_origin, continue_origin, {});
+	}
+
 	bool is_successful() const { return status == block_match_status::success; }
 
-	block_match_status status = block_match_status::failure_invalid_block;
+	block_match_status status;
+	position_tag block_statement_origin; // Show/Hide/Minimal or Import
 	std::optional<position_tag> continue_origin;
 	std::vector<condition_match_result> match_results;
 };
 
 // ---- real_filter_representation ----
+
+struct import_block
+{
+	void print(std::ostream& output_stream) const;
+
+	string path;
+	bool is_optional;
+	position_tag origin;
+};
 
 struct item_filter_block
 {
@@ -73,9 +131,13 @@ struct item_filter_block
 	block_continuation continuation;
 };
 
+using block_variant = std::variant<item_filter_block, import_block>;
+
 struct item_filter
 {
-	std::vector<item_filter_block> blocks;
+	void print(std::ostream& output_stream) const;
+
+	std::vector<block_variant> blocks;
 };
 
 // ---- pieces for spirit filter ----
@@ -91,10 +153,20 @@ struct block_generation_info
 	price_range_condition price_range;
 };
 
+struct generated_blocks_consumer
+{
+	void push(item_filter_block&& block)
+	{
+		blocks.get().emplace_back(std::move(block));
+	}
+
+	std::reference_wrapper<std::vector<block_variant>> blocks;
+};
+
 using blocks_generator_func_type = void (
 	const block_generation_info&,
 	const market::item_price_data&,
-	std::back_insert_iterator<std::vector<item_filter_block>>
+	generated_blocks_consumer
 );
 
 struct autogen_extension
@@ -112,9 +184,11 @@ struct spirit_item_filter_block
 	std::optional<autogen_extension> autogen;
 };
 
+using spirit_block_variant = std::variant<spirit_item_filter_block, import_block>;
+
 struct spirit_item_filter
 {
-	std::vector<spirit_item_filter_block> blocks;
+	std::vector<spirit_block_variant> blocks;
 };
 
 // ---- types for item filtering ----

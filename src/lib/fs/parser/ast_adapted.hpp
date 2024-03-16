@@ -37,6 +37,10 @@ BOOST_FUSION_ADAPT_STRUCT(
 	fs::parser::ast::common::comparison_expression,
 	operator_, integer)
 
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::parser::ast::common::import_statement,
+	path, is_optional)
+
 // -------- real filter --------
 
 BOOST_FUSION_ADAPT_STRUCT(

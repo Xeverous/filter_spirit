@@ -232,6 +232,12 @@ namespace common
 
 		lang::item_visibility_policy value;
 	};
+
+	struct import_statement : x3::position_tagged
+	{
+		string_literal path;
+		bool is_optional;
+	};
 }
 
 // tokens that exist only in real filters
@@ -303,7 +309,13 @@ namespace rf
 		std::vector<rule> rules;
 	};
 
-	using ast_type = std::vector<filter_block>;
+	struct block_variant : x3::variant<common::import_statement, filter_block>, x3::position_tagged
+	{
+		using base_type::base_type;
+		using base_type::operator=;
+	};
+
+	using ast_type = std::vector<block_variant>;
 } // namespace rf
 
 // tokens that exist only in spirit filter
@@ -533,6 +545,7 @@ namespace sf
 	struct rule_block : std::vector<statement>, x3::position_tagged {};
 
 	struct statement : x3::variant<
+			common::import_statement,
 			condition,
 			action,
 			expand_statement,

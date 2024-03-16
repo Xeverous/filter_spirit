@@ -203,6 +203,13 @@ namespace common
 	const continue_statement_type continue_statement = "continue statement";
 	const auto continue_statement_def = make_keyword(lang::keywords::rf::continue_);
 	BOOST_SPIRIT_DEFINE(continue_statement)
+
+	const import_statement_type import_statement = "import statement";
+	const auto import_statement_def =
+		make_keyword(lang::keywords::rf::import_)
+		> string_literal
+		> ((make_keyword(lang::keywords::rf::optional) > x3::attr(true)) | x3::attr(false));
+	BOOST_SPIRIT_DEFINE(import_statement)
 } // namespace common
 
 namespace rf
@@ -246,8 +253,12 @@ namespace rf
 	const auto filter_block_def = common::static_visibility_statement > *rule;
 	BOOST_SPIRIT_DEFINE(filter_block)
 
+	const block_variant_type block_variant = "block variant";
+	const auto block_variant_def = common::import_statement | filter_block;
+	BOOST_SPIRIT_DEFINE(block_variant)
+
 	const grammar_type grammar = "code";
-	const auto grammar_def = *filter_block > x3::eoi;
+	const auto grammar_def = *block_variant > x3::eoi;
 	BOOST_SPIRIT_DEFINE(grammar)
 } // namespace rf
 
@@ -367,7 +378,8 @@ namespace sf
 	// moved here due to circular dependency
 	const rule_block_type rule_block = "rule block";
 
-	const auto statement_def = condition | action | expand_statement | behavior_statement | rule_block | unknown_statement;
+	const auto statement_def =
+		common::import_statement | condition | action | expand_statement | behavior_statement | rule_block | unknown_statement;
 	BOOST_SPIRIT_DEFINE(statement)
 
 	const auto rule_block_def = x3::lit('{') > *statement > x3::lit('}');

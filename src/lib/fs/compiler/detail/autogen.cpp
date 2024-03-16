@@ -73,7 +73,7 @@ void generate_blocks_simple(
 	const lang::block_generation_info& block_info,
 	const std::vector<MarketItemType>& item_price_data_field,
 	std::string_view item_class_name,
-	std::back_insert_iterator<std::vector<lang::item_filter_block>> output_iterator)
+	lang::generated_blocks_consumer consumer)
 {
 	static_assert(std::is_base_of_v<lang::market::elementary_item, MarketItemType>);
 
@@ -93,13 +93,13 @@ void generate_blocks_simple(
 		block_info.autogen_origin));
 
 	if (block.conditions.is_valid())
-		output_iterator = std::move(block);
+		consumer.push(std::move(block));
 }
 
 void generate_blocks_gems(
 	const lang::block_generation_info& block_info,
 	const lang::market::item_price_data& item_price_data,
-	std::back_insert_iterator<std::vector<lang::item_filter_block>> output_iterator)
+	lang::generated_blocks_consumer consumer)
 {
 	for (int level = lang::limits::min_item_gem_level; level <= lang::limits::max_item_gem_level; ++level) {
 		for (int quality = lang::limits::min_item_gem_quality; quality <= lang::limits::max_item_gem_quality; ++quality) {
@@ -137,7 +137,7 @@ void generate_blocks_gems(
 					block_info.autogen_origin));
 
 				if (block.conditions.is_valid())
-					output_iterator = std::move(block);
+					consumer.push(std::move(block));
 			}
 		}
 	}
@@ -238,12 +238,12 @@ make_autogen_simple(
 	if (!verify_autogen_conditions(st, conditions, class_condition_verifier{item_class_name}, autogen_origin, diagnostics))
 		return {};
 
-	return [=](
+	return [field, item_class_name](
 			const lang::block_generation_info& block_info,
 			const lang::market::item_price_data& item_price_data,
-			std::back_insert_iterator<std::vector<lang::item_filter_block>> output_iterator)
+			lang::generated_blocks_consumer consumer)
 		{
-			return generate_blocks_simple(block_info, item_price_data.*field, item_class_name, output_iterator);
+			return generate_blocks_simple(block_info, item_price_data.*field, item_class_name, consumer);
 		};
 }
 
@@ -342,7 +342,7 @@ make_autogen_func(
 			return [](
 				const lang::block_generation_info& /* block_info */,
 				const lang::market::item_price_data& /* item_price_data */,
-				std::back_insert_iterator<std::vector<lang::item_filter_block>> /* output_iterator */)
+				lang::generated_blocks_consumer /* consumer */)
 			{};
 	}
 

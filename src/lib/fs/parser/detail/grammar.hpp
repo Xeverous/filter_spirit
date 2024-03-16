@@ -101,6 +101,7 @@ namespace common
 
 	struct static_visibility_statement_class     : error_on_error, annotate_on_success {};
 	struct continue_statement_class              : error_on_error, annotate_on_success {};
+	struct import_statement_class                : error_on_error, annotate_on_success {};
 }
 
 namespace rf
@@ -126,6 +127,7 @@ namespace rf
 	struct rule_class                            : error_on_error, annotate_on_success {};
 	struct static_visibility_statement_class     : error_on_error, annotate_on_success {};
 	struct filter_block_class                    : error_on_error, annotate_on_success {};
+	struct block_variant_class                   : error_on_error, annotate_on_success {};
 	struct grammar_class                         : error_on_error, annotate_on_success {};
 } // namespace rf
 
@@ -281,6 +283,9 @@ namespace common
 
 	using continue_statement_type = x3::rule<continue_statement_class, ast::common::continue_statement>;
 	BOOST_SPIRIT_DECLARE(continue_statement_type)
+
+	using import_statement_type = x3::rule<import_statement_class, ast::common::import_statement>;
+	BOOST_SPIRIT_DECLARE(import_statement_type)
 } // namespace common
 
 namespace rf
@@ -309,11 +314,13 @@ namespace rf
 	using rule_type                           = x3::rule<rule_class,                        ast::rf::rule>;
 	using static_visibility_statement_type    = x3::rule<static_visibility_statement_class, ast::rf::static_visibility_statement>;
 	using filter_block_type                   = x3::rule<filter_block_class,                ast::rf::filter_block>;
+	using block_variant_type                  = x3::rule<block_variant_class,               ast::rf::block_variant>;
 	using grammar_type                        = x3::rule<grammar_class,                     ast::rf::ast_type>;
 	BOOST_SPIRIT_DECLARE(
 		rule_type,
 		static_visibility_statement_type,
 		filter_block_type,
+		block_variant_type,
 		grammar_type
 	)
 } // namespace rf
