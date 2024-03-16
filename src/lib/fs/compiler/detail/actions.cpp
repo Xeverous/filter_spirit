@@ -105,7 +105,7 @@ make_play_effect_action(
 		return boost::none;
 
 	diagnostics_store diagnostics_none;
-	auto none = get_as<lang::none>(obj.values[0], diagnostics_none);
+	auto none = get_as<lang::none_type>(obj.values[0], diagnostics_none);
 	diagnostics_store diagnostics_suit;
 	auto suit = get_as<lang::suit>(obj.values[0], diagnostics_suit);
 
@@ -200,7 +200,7 @@ make_builtin_alert_sound_id(
 	diagnostics_store& diagnostics)
 {
 	diagnostics_store diagnostics_none;
-	auto none_sound_id = get_as<lang::none>(sobj, diagnostics_none);
+	auto none_sound_id = get_as<lang::none_type>(sobj, diagnostics_none);
 	diagnostics_store diagnostics_integer;
 	auto integer_sound_id = get_as<lang::integer>(sobj, diagnostics_integer);
 	diagnostics_store diagnostics_shaper;

@@ -14,13 +14,13 @@
 namespace fs::lang
 {
 
-struct none
+struct none_type
 {
 	position_tag origin;
 };
 
-inline bool operator==(none, none) noexcept { return true; }
-inline bool operator!=(none, none) noexcept { return false; }
+inline bool operator==(none_type, none_type) noexcept { return true; }
+inline bool operator!=(none_type, none_type) noexcept { return false; }
 
 struct temp
 {

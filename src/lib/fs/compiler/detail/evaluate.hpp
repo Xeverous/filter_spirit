@@ -93,7 +93,7 @@ evaluate(parser::ast::common::temp_literal tl)
 	return {parser::position_tag_of(tl)};
 }
 
-[[nodiscard]] inline lang::none
+[[nodiscard]] inline lang::none_type
 evaluate(parser::ast::common::none_literal nl)
 {
 	return {parser::position_tag_of(nl)};

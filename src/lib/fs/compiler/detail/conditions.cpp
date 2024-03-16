@@ -112,7 +112,7 @@ make_influence_spec(settings st, const lang::object& obj, diagnostics_store& dia
 
 	if (obj.values.size() == 1u) {
 		diagnostics_store diagnostics_none; // ignore logs and move on if get_as<none> fails
-		if (auto maybe_none = get_as<lang::none>(obj.values.front(), diagnostics_none); maybe_none) {
+		if (auto maybe_none = get_as<lang::none_type>(obj.values.front(), diagnostics_none); maybe_none) {
 			spec.none = (*maybe_none).origin;
 			return spec;
 		}
@@ -236,7 +236,7 @@ make_condition_values_container(settings st, const lang::object& obj, diagnostic
 	for (const lang::single_object& sobj : obj.values) {
 		// Skip "None"s - they may come from variables.
 		// If an object is not none - ignore the problem and move forward.
-		if (get_as<lang::none>(sobj, diagnostics_none))
+		if (get_as<lang::none_type>(sobj, diagnostics_none))
 			continue;
 
 		auto val = get_as<T>(sobj, diagnostics);

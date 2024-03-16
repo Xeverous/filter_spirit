@@ -133,7 +133,7 @@ $string         = "Leather Belt"
 			const compiler::symbol_table symbols = expect_success_when_resolving_symbols(parse_data.ast.definitions, parse_data);
 
 			expect_object(symbols, lookup_data, "none", search(input, "$none").result(),
-				{{lang::none{no_origin()}, search(input, "None").result()}}
+				{{lang::none_type{no_origin()}, search(input, "None").result()}}
 			);
 			expect_object(symbols, lookup_data, "temp", search(input, "$temp").result(),
 				{{lang::temp{no_origin()}, search(input, "Temp").result()}}

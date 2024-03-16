@@ -13,7 +13,7 @@ namespace fs::lang
 {
 
 using object_variant = std::variant<
-	none,
+	none_type,
 	temp,
 	boolean,
 	fractional,
@@ -98,7 +98,7 @@ namespace detail {
 	}
 
 	template <> constexpr
-	object_type object_type_of_impl<none>() noexcept { return object_type::none; }
+	object_type object_type_of_impl<none_type>() noexcept { return object_type::none; }
 	template <> constexpr
 	object_type object_type_of_impl<temp>() noexcept { return object_type::temp; }
 	template <> constexpr

@@ -57,10 +57,10 @@ inline bool operator!=(enabled_play_effect lhs, enabled_play_effect rhs) { retur
 
 struct disabled_play_effect
 {
-	none none_;
+	none_type none;
 };
 
-inline bool operator==(disabled_play_effect lhs, disabled_play_effect rhs) { return lhs.none_ == rhs.none_; }
+inline bool operator==(disabled_play_effect lhs, disabled_play_effect rhs) { return lhs.none == rhs.none; }
 inline bool operator!=(disabled_play_effect lhs, disabled_play_effect rhs) { return !(lhs == rhs); }
 
 struct play_effect_action
@@ -106,7 +106,7 @@ inline bool operator!=(minimap_icon_action lhs, minimap_icon_action rhs) { retur
 
 struct builtin_alert_sound_id
 {
-	std::variant<integer, shaper_voice_line, none> id;
+	std::variant<integer, shaper_voice_line, none_type> id;
 };
 
 inline bool operator==(builtin_alert_sound_id lhs, builtin_alert_sound_id rhs) { return lhs.id == rhs.id; }
@@ -114,7 +114,7 @@ inline bool operator!=(builtin_alert_sound_id lhs, builtin_alert_sound_id rhs) {
 
 struct builtin_alert_sound
 {
-	bool is_disabled() const { return std::holds_alternative<none>(sound_id.id); }
+	bool is_disabled() const { return std::holds_alternative<none_type>(sound_id.id); }
 
 	bool is_positional; // this is not a lang type because it is implied by keyword, not by value
 	builtin_alert_sound_id sound_id;

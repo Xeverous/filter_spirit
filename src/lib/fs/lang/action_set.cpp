@@ -76,7 +76,7 @@ void output_builtin_alert_sound_id(builtin_alert_sound_id sound_id, std::ostream
 	output_stream << ' ';
 
 	std::visit(utility::visitor{
-		[&output_stream](none /* sound_id */)        { output_stream << keywords::rf::none; },
+		[&output_stream](none_type /* sound_id */)   { output_stream << keywords::rf::none; },
 		[&output_stream](integer sound_id)           { output_stream << sound_id.value; },
 		[&output_stream](shaper_voice_line sound_id) { output_stream << to_string_view(sound_id.value); }
 	}, sound_id.id);
