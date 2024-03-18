@@ -76,7 +76,7 @@ void draw_item_tooltip_first_column()
 	ImGui::Text("%s:", kw::elder_map);
 	ImGui::Text("%s:", kw::blighted_map);
 	ImGui::Text("%s:", kw::replica);
-	ImGui::Text("%s:", kw::alternate_quality);
+	ImGui::Text("%s:", kw::transfigured_gem);
 }
 
 void draw_item_tooltip_second_column(const lang::item& itm)
@@ -155,15 +155,15 @@ void draw_item_tooltip_second_column(const lang::item& itm)
 	};
 
 	output_boolean(itm.is_identified);
-	output_boolean(itm.is_corrupted);
+	output_boolean(itm.is_corrupted());
 	output_boolean(itm.is_mirrored);
-	output_boolean(itm.is_fractured_item);
-	output_boolean(itm.is_synthesised_item);
+	output_boolean(itm.is_fractured);
+	output_boolean(itm.is_synthesised);
 	output_boolean(itm.is_shaped_map);
 	output_boolean(itm.is_elder_map);
-	output_boolean(itm.is_blighted_map);
+	output_boolean(itm.is_blighted_map());
 	output_boolean(itm.is_replica);
-	output_boolean(itm.is_alternate_quality);
+	output_boolean(itm.is_transfigured_gem);
 }
 
 // TODO draw also applied filter rules

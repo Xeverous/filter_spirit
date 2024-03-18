@@ -49,57 +49,15 @@ void color_line_by_origin(
 }
 
 void color_line_by_condition_result(
-	const std::optional<lang::condition_match_result>& opt_result,
+	const lang::condition_match_result& result,
 	const parser::parse_metadata& metadata,
 	std::vector<ImU32>& line_colors)
 {
-	if (!opt_result)
-		return;
-
-	const lang::condition_match_result& result = *opt_result;
-	const lang::position_tag origin = result.condition_origin();
-
-	if (!lang::is_valid(origin))
-		return;
-
-	const std::size_t line_number = origins_line_number(metadata, origin);
-	FS_ASSERT(line_number < line_colors.size());
-
-	if (result.is_successful())
-		line_colors[line_number] = color_background_condition_success;
-	else
-		line_colors[line_number] = color_background_condition_failure;
-}
-
-void color_line_by_condition_result(
-	const lang::range_condition_match_result& result,
-	const parser::parse_metadata& metadata,
-	std::vector<ImU32>& line_colors)
-{
-	/*
-	 * Range conditions that are defined using = will have the same origin for both bounds
-	 * (= x is treated as >= x and <= x at the same time). We need to avoid coloring the
-	 * same line twice - otherwise one result with override another.
-	 *
-	 * If origins are the same, the coloring must use success color only if both succeded.
-	 */
-	if (result.lower_bound.has_value() && result.upper_bound.has_value()) {
-		if (lang::compare((*result.lower_bound).condition_origin(), (*result.upper_bound).condition_origin()) == 0) {
-
-			const bool is_success = (*result.lower_bound).is_successful() && (*result.upper_bound).is_successful();
-			const lang::position_tag origin = (*result.lower_bound).condition_origin();
-
-			if (is_success)
-				color_line_by_origin(origin, metadata, line_colors, color_background_condition_success);
-			else
-				color_line_by_origin(origin, metadata, line_colors, color_background_condition_failure);
-
-			return;
-		}
-	}
-
-	color_line_by_condition_result(result.lower_bound, metadata, line_colors);
-	color_line_by_condition_result(result.upper_bound, metadata, line_colors);
+	color_line_by_origin(
+		result.condition_origin(),
+		metadata,
+		line_colors,
+		result.is_successful() ? color_background_condition_success : color_background_condition_failure);
 }
 
 template <typename Action>
@@ -265,41 +223,9 @@ void debug_state::recompute(const parser::parse_metadata& metadata)
 		 * Might want to do more precise coloring later
 		 * (then specific condition results will have specific types).
 		 */
-		const lang::condition_set_match_result& cs = block.condition_set_result;
-		color_line_by_condition_result(cs.item_level,               metadata, _line_colors);
-		color_line_by_condition_result(cs.drop_level,               metadata, _line_colors);
-		color_line_by_condition_result(cs.quality,                  metadata, _line_colors);
-		color_line_by_condition_result(cs.rarity,                   metadata, _line_colors);
-		color_line_by_condition_result(cs.linked_sockets,           metadata, _line_colors);
-		color_line_by_condition_result(cs.height,                   metadata, _line_colors);
-		color_line_by_condition_result(cs.width,                    metadata, _line_colors);
-		color_line_by_condition_result(cs.stack_size,               metadata, _line_colors);
-		color_line_by_condition_result(cs.gem_level,                metadata, _line_colors);
-		color_line_by_condition_result(cs.map_tier,                 metadata, _line_colors);
-		color_line_by_condition_result(cs.area_level,               metadata, _line_colors);
-		color_line_by_condition_result(cs.corrupted_mods,           metadata, _line_colors);
-		color_line_by_condition_result(cs.class_,                   metadata, _line_colors);
-		color_line_by_condition_result(cs.base_type,                metadata, _line_colors);
-		color_line_by_condition_result(cs.sockets,                  metadata, _line_colors);
-		color_line_by_condition_result(cs.socket_group,             metadata, _line_colors);
-		color_line_by_condition_result(cs.has_explicit_mod,         metadata, _line_colors);
-		color_line_by_condition_result(cs.has_enchantment,          metadata, _line_colors);
-		color_line_by_condition_result(cs.enchantment_passive_node, metadata, _line_colors);
-		color_line_by_condition_result(cs.enchantment_passive_num,  metadata, _line_colors);
-		color_line_by_condition_result(cs.has_influence,            metadata, _line_colors);
-		color_line_by_condition_result(cs.is_identified,            metadata, _line_colors);
-		color_line_by_condition_result(cs.is_corrupted,             metadata, _line_colors);
-		color_line_by_condition_result(cs.is_mirrored,              metadata, _line_colors);
-		color_line_by_condition_result(cs.is_elder_item,            metadata, _line_colors);
-		color_line_by_condition_result(cs.is_shaper_item,           metadata, _line_colors);
-		color_line_by_condition_result(cs.is_fractured_item,        metadata, _line_colors);
-		color_line_by_condition_result(cs.is_synthesised_item,      metadata, _line_colors);
-		color_line_by_condition_result(cs.is_enchanted,             metadata, _line_colors);
-		color_line_by_condition_result(cs.is_shaped_map,            metadata, _line_colors);
-		color_line_by_condition_result(cs.is_elder_map,             metadata, _line_colors);
-		color_line_by_condition_result(cs.is_blighted_map,          metadata, _line_colors);
-		color_line_by_condition_result(cs.is_replica,               metadata, _line_colors);
-		color_line_by_condition_result(cs.is_alternate_quality,     metadata, _line_colors);
+		for (const lang::condition_match_result& condition_result : block.match_results) {
+			color_line_by_condition_result(condition_result, metadata, _line_colors);
+		}
 
 		if (block.continue_origin) {
 			const std::size_t line_number = origins_line_number(metadata, *block.continue_origin);
@@ -313,10 +239,11 @@ void debug_state::recompute(const parser::parse_metadata& metadata)
 	color_line_by_action_origin(style.text_color,        metadata, _line_colors);
 	color_line_by_action_origin(style.background_color,  metadata, _line_colors);
 	color_line_by_action_origin(style.font_size,         metadata, _line_colors);
-	color_line_by_action_origin(style.play_alert_sound,  metadata, _line_colors);
+	color_line_by_action_origin(style.alert_sound,       metadata, _line_colors);
 	color_line_by_action_origin(style.switch_drop_sound, metadata, _line_colors);
+	color_line_by_action_origin(style.switch_drop_sound_if_alert_sound, metadata, _line_colors);
 	color_line_by_action_origin(style.minimap_icon,      metadata, _line_colors);
-	color_line_by_action_origin(style.play_effect,       metadata, _line_colors);
+	color_line_by_action_origin(style.effect,            metadata, _line_colors);
 
 	color_line_by_origin(style.visibility.origin, metadata, _line_colors, color_background_matched_visibility);
 }

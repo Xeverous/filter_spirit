@@ -1,6 +1,5 @@
 #include <fs/gui/windows/filter/real_filter_state_mediator.hpp>
 #include <fs/compiler/compiler.hpp>
-#include <fs/utility/monadic.hpp>
 
 #include <utility>
 
@@ -46,14 +45,14 @@ void real_filter_state_mediator::on_parsed_real_filter_change(const parser::pars
 		return;
 	}
 
-	compiler::diagnostics_container diagnostics;
-	boost::optional<lang::item_filter> result = compiler::compile_real_filter({}, parsed_real_filter->ast, diagnostics);
-	compiler::output_messages(diagnostics, parsed_real_filter->metadata, logger());
+	compiler::diagnostics_store diagnostics;
+	std::optional<lang::item_filter> result = compiler::compile_real_filter({}, parsed_real_filter->ast, diagnostics);
+	diagnostics.output_messages(parsed_real_filter->metadata, logger());
 
 	if (result)
 		logger().info() << "Compilation successful.";
 
-	new_filter_representation(utility::to_std_optional(std::move(result)));
+	new_filter_representation(std::move(result));
 }
 
 void real_filter_state_mediator::draw_interface_derived(const network_settings& /* networking */, network::cache& /* cache */)

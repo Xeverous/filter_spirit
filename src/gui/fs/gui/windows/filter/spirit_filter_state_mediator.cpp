@@ -1,9 +1,6 @@
 #include <fs/gui/windows/filter/spirit_filter_state_mediator.hpp>
 #include <fs/compiler/compiler.hpp>
-#include <fs/generator/make_item_filter.hpp>
-#include <fs/generator/generator.hpp>
 #include <fs/utility/assert.hpp>
-#include <fs/utility/monadic.hpp>
 #include <fs/utility/file.hpp>
 
 #include <imgui.h>
@@ -85,16 +82,16 @@ void spirit_filter_state_mediator::on_parsed_spirit_filter_change(const parser::
 		return;
 	}
 
-	compiler::diagnostics_container diagnostics;
-	boost::optional<compiler::symbol_table> result = compiler::resolve_spirit_filter_symbols(
+	compiler::diagnostics_store diagnostics;
+	std::optional<compiler::symbol_table> result = compiler::resolve_spirit_filter_symbols(
 		{}, parsed_spirit_filter->ast.definitions, diagnostics);
 
-	compiler::output_messages(diagnostics, parsed_spirit_filter->metadata, logger());
+	diagnostics.output_messages(parsed_spirit_filter->metadata, logger());
 
 	if (result)
 		logger().info() << "Resolving definitions successful.";
 
-	new_spirit_filter_symbols(utility::to_std_optional(std::move(result)));
+	new_spirit_filter_symbols(std::move(result));
 }
 
 void spirit_filter_state_mediator::new_spirit_filter_symbols(std::optional<compiler::symbol_table> symbols)
@@ -112,16 +109,16 @@ void spirit_filter_state_mediator::on_spirit_filter_symbols_change(
 		return;
 	}
 
-	compiler::diagnostics_container diagnostics;
-	boost::optional<lang::spirit_item_filter> result = compiler::compile_spirit_filter_statements(
+	compiler::diagnostics_store diagnostics;
+	std::optional<lang::spirit_item_filter> result = compiler::compile_spirit_filter_statements(
 		{}, parsed_spirit_filter->ast.statements, *spirit_filter_symbols, diagnostics);
 
-	compiler::output_messages(diagnostics, parsed_spirit_filter->metadata, logger());
+	diagnostics.output_messages(parsed_spirit_filter->metadata, logger());
 
 	if (result)
 		logger().info() << "Compilation successful.";
 
-	new_spirit_filter(utility::to_std_optional(std::move(result)));
+	new_spirit_filter(std::move(result));
 }
 
 void spirit_filter_state_mediator::new_spirit_filter(std::optional<lang::spirit_item_filter> filter)
@@ -149,7 +146,7 @@ void spirit_filter_state_mediator::refresh_filter_representation(
 		return;
 	}
 
-	new_filter_representation(generator::make_item_filter(*spirit_filter, item_price_data));
+	new_filter_representation(compiler::make_item_filter(*spirit_filter, item_price_data));
 }
 
 void spirit_filter_state_mediator::draw_interface_derived(const network_settings& networking, network::cache& cache)
