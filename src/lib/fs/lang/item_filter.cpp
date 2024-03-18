@@ -18,7 +18,7 @@ namespace
 integer make_int(int val)
 {
 	return integer{val, no_origin()};
-};
+}
 
 item_style default_item_style(const item& itm)
 {
