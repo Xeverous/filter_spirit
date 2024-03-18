@@ -197,6 +197,11 @@ if(FILTER_SPIRIT_ENABLE_ASSERTION_EXCEPTIONS)
 	target_compile_definitions(filter_spirit PUBLIC BOOST_ENABLE_ASSERT_HANDLER)
 endif()
 
+if(FILTER_SPIRIT_ENABLE_SANITIZERS)
+	target_compile_options(filter_spirit PUBLIC -fsanitize=address -fsanitize=undefined)
+	target_link_options(filter_spirit PUBLIC -fsanitize=address -fsanitize=undefined)
+endif()
+
 if(FILTER_SPIRIT_ENABLE_LTO)
 	set_target_properties(filter_spirit PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif()

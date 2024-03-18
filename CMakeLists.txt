@@ -37,6 +37,8 @@ option(FILTER_SPIRIT_BUILD_TESTS
 	"build Filter Spirit tests" ON)
 option(FILTER_SPIRIT_ENABLE_ASSERTION_EXCEPTIONS
 	"ON: throw on assertion failure; OFF: rely on assert() behavior" OFF)
+option(FILTER_SPIRIT_ENABLE_SANITIZERS
+	"build with -fsanitize=address -fsanitize=undefined" OFF)
 option(FILTER_SPIRIT_ADD_FILESYSTEM_LINK
 	"add linker command for standard filesystem library (required by earlier GCC and Clang versions)" OFF)
 option(FILTER_SPIRIT_ENABLE_LTO
