@@ -53,8 +53,14 @@ template <typename F>
 void for_each_item(std::string_view json_str, log::logger& logger, F f)
 {
 	nlohmann::json json = nlohmann::json::parse(json_str);
-	const auto& lines = json.at("lines");
-	for (const auto& item : lines) {
+	const auto it = json.find("lines");
+
+	if (it == json.end()) {
+		logger.error() << "Could not parse this JSON (first 200 characters): " << json_str.substr(0u, 200u);
+		return;
+	}
+
+	for (const auto& item : *it) {
 		try {
 			f(item);
 		}
