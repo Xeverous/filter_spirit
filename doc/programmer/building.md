@@ -29,7 +29,11 @@ Note that:
 
 Bolded dependencies need to be build. Rest are header-only libraries.
 
-For Ubuntu-derived distros install OpenSSL this way: `sudo apt install libssl-dev`.
+Package names for Ubuntu-derived distros (`sudo apt install`):
+
+- OpenSSL: `libssl-dev`
+- OpenGL headers: `libgl1-mesa-dev`
+- SDL2: `libsdl2-dev`
 
 ## invokation
 
