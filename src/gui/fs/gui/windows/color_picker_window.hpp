@@ -20,7 +20,7 @@ public:
 private:
 	void draw_impl(const font_settings& fonting);
 
-	Magnum::Color4 _selected_color = Magnum::Color4::fromSrgbAlpha(0xffffffff);
+	Magnum::Color4 _selected_color = Magnum::Color4::fromSrgbAlphaInt(0xffffffff);
 };
 
 }

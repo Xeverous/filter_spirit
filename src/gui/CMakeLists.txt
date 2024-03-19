@@ -6,15 +6,16 @@ add_subdirectory("${CMAKE_SOURCE_DIR}/external/corrade" corrade EXCLUDE_FROM_ALL
 
 # Add Magnum as a subproject, enable specific application implementation
 if(FILTER_SPIRIT_PLATFORM STREQUAL "emscripten")
-	set(WITH_EMSCRIPTENAPPLICATION ON CACHE BOOL "" FORCE)
+	set(MAGNUM_WITH_EMSCRIPTENAPPLICATION ON CACHE BOOL "" FORCE)
 else()
-	set(WITH_SDL2APPLICATION ON CACHE BOOL "" FORCE)
+	set(MAGNUM_WITH_SDL2APPLICATION ON CACHE BOOL "" FORCE)
 endif()
 
 add_subdirectory("${CMAKE_SOURCE_DIR}/external/magnum" magnum EXCLUDE_FROM_ALL)
 
+# based on https://doc.magnum.graphics/magnum/namespaceMagnum_1_1ImGuiIntegration.html
 set(IMGUI_DIR ${CMAKE_SOURCE_DIR}/external/imgui)
-set(WITH_IMGUI ON CACHE BOOL "" FORCE)
+set(MAGNUM_WITH_IMGUI ON CACHE BOOL "" FORCE)
 add_subdirectory("${CMAKE_SOURCE_DIR}/external/magnum-integration" magnum-integration EXCLUDE_FROM_ALL)
 
 add_subdirectory("${CMAKE_SOURCE_DIR}/external/tiny_file_dialogs" tiny_file_dialogs EXCLUDE_FROM_ALL)
