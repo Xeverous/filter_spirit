@@ -167,7 +167,7 @@ target_compile_options(filter_spirit
 		# GCC's -Wconvertion is too aggressive with no way to silence it
 		$<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -Wpedantic -Wno-deprecated-copy -ffast-math
 			-Wsuggest-attribute=noreturn -Wduplicated-branches -Wduplicated-cond -Wfloat-equal
-			-Wenum-conversion -Wsign-conversion -Wlogical-op -Wmissing-declarations
+			-Wsign-conversion -Wlogical-op -Wmissing-declarations
 			-Wmismatched-tags -Wextra-semi -Wsuggest-override>
 		$<$<CXX_COMPILER_ID:Clang>:-Wall -Wextra -Wpedantic -Wdeprecated -Wdocumentation -ffast-math
 			-Wabstract-vbase-init -Wanon-enum-enum-conversion -Warray-bounds-pointer-arithmetic
@@ -233,8 +233,13 @@ endif()
 
 # earlier GCC and Clang versions which support C++17 require explicit link to filesystem library
 if(FILTER_SPIRIT_ADD_FILESYSTEM_LINK)
-	target_link_libraries(filter_spirit
+	target_link_libraries(filter_spirit PUBLIC
 		$<$<CXX_COMPILER_ID:GNU>:stdc++fs>
 		$<$<CXX_COMPILER_ID:Clang>:c++fs>
 	)
+endif()
+
+if(FILTER_SPIRIT_ADD_PTHREAD_FLAGS)
+	target_compile_options(filter_spirit PUBLIC -pthread)
+	target_link_options(filter_spirit PUBLIC -pthread)
 endif()
