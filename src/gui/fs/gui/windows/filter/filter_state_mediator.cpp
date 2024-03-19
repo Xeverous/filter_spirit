@@ -111,21 +111,12 @@ void filter_state_mediator::draw_interface_loot(
 	lang::loot::generator& gen)
 {
 	std::array<char, 64> loot_status_str_buf;
-	if (const auto& str = "Loot preview & filter debug"; _loot_state.num_items() > 0u) {
-		std::snprintf(
-			loot_status_str_buf.data(),
-			loot_status_str_buf.size(),
-			"%s (%zu items, %zu hidden)",
-			str,
-			_loot_state.num_items(),
-			_loot_state.num_hidden_items());
-	}
-	else {
-		constexpr auto str_size = std::size(str);
-		constexpr auto buf_size = loot_status_str_buf.size();
-		static_assert(buf_size >= str_size);
-		std::memcpy(loot_status_str_buf.data(), str, str_size);
-	}
+	std::snprintf(
+		loot_status_str_buf.data(),
+		loot_status_str_buf.size(),
+		"Loot preview & filter debug (%zu items, %zu hidden)",
+		_loot_state.num_items(),
+		_loot_state.num_hidden_items());
 
 	if (ImGui::CollapsingHeader(loot_status_str_buf.data(), ImGuiTreeNodeFlags_DefaultOpen)) {
 		if (!_filter_representation) {
