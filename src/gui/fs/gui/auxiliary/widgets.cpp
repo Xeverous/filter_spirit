@@ -48,9 +48,8 @@ namespace fs::gui::aux {
 
 void on_hover_text_tooltip(std::string_view text)
 {
-	FS_ASSERT(!text.empty()); // Dear ImGui does not work with empty ranges
-
-	if (ImGui::IsItemHovered())
+	// https://github.com/ocornut/imgui/issues/211#issuecomment-2008649075
+	if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled))
 	{
 		scoped_tooltip _;
 		ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
