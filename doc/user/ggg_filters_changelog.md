@@ -6,6 +6,24 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 
 *newest at the top*
 
+### 3.24 (Necropolis) [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3497460)
+
+- Removal of Sextants and rework of Scarabs
+- [patch notes](https://www.pathofexile.com/forum/view-thread/3496784)
+- [new and changed Gems](https://www.pathofexile.com/forum/view-thread/3497686)
+- [all Scarabs](https://www.pathofexile.com/forum/view-thread/3497694)
+
+### 3.23.1
+
+- [patch notes](https://www.pathofexile.com/forum/view-thread/3480999) - Added a new `/reloaditemfilter` chat command
+
+### 3.23 (Affliction) [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3452297)
+
+- Removal of alternate quality (and introduction of Transfigured Gems)
+- New item bases and Affliction-related item classes
+- Metamorph replaced with Ultimatum
+- [patch notes](https://www.pathofexile.com/forum/view-thread/3451455)
+
 ### 3.22 (Trial of the Ancestors) [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3410483)
 
 - New gems, cards, currency and other items
