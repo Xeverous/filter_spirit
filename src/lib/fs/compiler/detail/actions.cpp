@@ -414,12 +414,16 @@ add_set_font_size_action(
 			if (font_size.value < lang::limits::min_filter_font_size
 				|| font_size.value > lang::limits::max_filter_font_size)
 			{
-				// TODO check if font sizes outside range are allowed
-				// if so, change severity to st.werror ? error : warning.
-				diagnostics.push_error_value_out_of_range(
-					lang::limits::min_filter_font_size,
-					lang::limits::max_filter_font_size,
-					font_size);
+				diagnostics.push_message(make_warning(
+					diagnostic_message_id::value_out_of_range,
+					font_size.origin,
+					"invalid font size, expected value in range ",
+					std::to_string(lang::limits::min_filter_font_size),
+					" - ",
+					std::to_string(lang::limits::max_filter_font_size),
+					" but got ",
+					std::to_string(font_size.value),
+					" (game will clamp the font size in this range)"));
 				return boost::none;
 			}
 

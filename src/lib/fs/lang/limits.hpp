@@ -28,7 +28,7 @@ namespace fs::lang::limits
 
 	// these are not strictly enforced by the filter
 	// but the game client clamps values in this range
-	constexpr auto min_filter_font_size = 18;
+	constexpr auto min_filter_font_size = 1;
 	constexpr auto max_filter_font_size = 45;
 
 	constexpr auto min_filter_sound_id = 1;
