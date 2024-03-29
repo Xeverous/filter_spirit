@@ -49,6 +49,7 @@ $color_labyrinth           =   0 150   0
 $color_incursion           = $color_labyrinth
 $color_ultimatum           = 165  72   0
 $color_harvest             =   0 252 186
+$color_necropolis          =  53  83 120
 $color_quest               =  74 230  58
 $color_card                = 100 210 255
 $color_gem                 =  27 162 155
@@ -940,6 +941,17 @@ Class == "Stackable Currency"
 		SetFontSize $font_max
 		SetAlertSound $alert_currency_mid
 		MinimapIcon $icon_harvest
+		Show
+	}
+
+	# 3.24 Necropolis (Coffins do not drop)
+	BaseType == "Empty Coffin" "Filled Coffin"
+	{
+		SetBorderColor $color_necropolis
+		SetTextColor $color_white
+		SetBackgroundColor $color_necropolis
+		SetFontSize $font_max
+		SetAlertSound $alert_currency_mid
 		Show
 	}
 
