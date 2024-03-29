@@ -623,7 +623,7 @@ Class == "Stackable Currency"
 {
 	SetBackgroundColor $color_black
 
-	BaseType == "Divine Orb" "Mirror of Kalandra" "Eternal Orb" "Albino Rhoa Feather" "Mirror Shard" "Crusader's Exalted Orb" "Redeemer's Exalted Orb" "Hunter's Exalted Orb" "Warlord's Exalted Orb" "Awakener's Orb" "Prime Regrading Lens" "Secondary Regrading Lens" "Tempering Orb" "Tailoring Orb" "Tainted Divine Teardrop" "Exceptional Eldritch Ember" "Exceptional Eldritch Ichor" "Orb of Conflict" "Orb of Dominance" "Fracturing Orb" "Fracturing Shard"
+	BaseType == "Divine Orb" "Mirror of Kalandra" "Eternal Orb" "Albino Rhoa Feather" "Mirror Shard" "Crusader's Exalted Orb" "Redeemer's Exalted Orb" "Hunter's Exalted Orb" "Warlord's Exalted Orb" "Awakener's Orb" "Prime Regrading Lens" "Secondary Regrading Lens" "Tempering Orb" "Tailoring Orb" "Tainted Divine Teardrop" "Exceptional Eldritch Ember" "Exceptional Eldritch Ichor" "Orb of Conflict" "Orb of Dominance" "Fracturing Orb" "Fracturing Shard" "Hinekora's Lock"
 	{
 		Expand $actions_currency_high
 		Show
@@ -641,7 +641,7 @@ Class == "Stackable Currency"
 		Show
 	}
 
-	BaseType "Hinekora's Lock" "Loyalty Tatto" "Honoured Tattoo" "Omen of Connections"
+	BaseType "Loyalty Tatto" "Honoured Tattoo" "Omen of Connections"
 	{
 		Expand $actions_currency_high
 		Show
