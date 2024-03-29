@@ -436,62 +436,6 @@ $actions_influence_very_low = {
 	SetFontSize $font_influence_very_low
 }
 
-$blocks_influence_price = {
-	Price >= $cfg_influence_high_min_value
-	{
-		Expand $actions_influence_high
-		Show
-	}
-
-	Price < $cfg_influence_high_min_value
-	Price >= $cfg_influence_mid_min_value
-	{
-		Expand $actions_influence_mid
-		ShowDiscard $show_influence_mid
-	}
-
-	Price < $cfg_influence_mid_min_value
-	Price > $cfg_influence_low_min_value
-	{
-		Expand $actions_influence_low
-		ShowDiscard $show_influence_low
-	}
-
-	Price <= $cfg_influence_low_min_value
-	{
-		Expand $actions_influence_very_low
-		ShowDiscard $show_influence_very_low
-	}
-}
-
-$blocks_influence_ilvl =
-{
-	ItemLevel >= 86
-	{
-		Expand $blocks_influence_price
-	}
-
-	ItemLevel 85
-	{
-		Expand $blocks_influence_price
-	}
-
-	ItemLevel 84
-	{
-		Expand $blocks_influence_price
-	}
-
-	ItemLevel 83
-	{
-		Expand $blocks_influence_price
-	}
-
-	ItemLevel 82
-	{
-		Expand $blocks_influence_price
-	}
-}
-
 # Below are all variables intended for easy strictness editing.
 #
 # - poe.ninja seems to round some prices to 1c or too many players sell for 1 chaos.
@@ -1292,97 +1236,7 @@ Rarity Unique
 	SetBorderColor $color_unique
 	SetFontSize $font_unique
 
-	{
-		SetAlertSound $alert_unique_unknown
-		Autogen "uniques_eq_ambiguous"
-		{
-			Show
-		}
-		Autogen "uniques_flasks_ambiguous"
-		{
-			Show
-		}
-		Autogen "uniques_jewels_ambiguous"
-		{
-			Show
-		}
-		Autogen "uniques_maps_ambiguous"
-		{
-			Show
-		}
-	}
-
-	Price >= $cfg_uniques_high_min_value
-	{
-		SetBackgroundColor $color_white
-		SetAlertSound $alert_unique_high
-		PlayEffect $beam_unique
-		MinimapIcon $icon_unique_high
-
-		Autogen "uniques_eq_unambiguous"
-		{
-			Show
-		}
-		Autogen "uniques_flasks_unambiguous"
-		{
-			Show
-		}
-		Autogen "uniques_jewels_unambiguous"
-		{
-			Show
-		}
-		Autogen "uniques_maps_unambiguous"
-		{
-			Show
-		}
-	}
-
-	Price < $cfg_uniques_high_min_value
-	Price >= $cfg_uniques_mid_min_value
-	{
-		SetBackgroundColor $color_white
-		SetAlertSound $alert_unique_mid
-		PlayEffect $beam_unique
-		MinimapIcon $icon_unique_mid
-
-		Autogen "uniques_eq_unambiguous"
-		{
-			Show
-		}
-		Autogen "uniques_flasks_unambiguous"
-		{
-			Show
-		}
-		Autogen "uniques_jewels_unambiguous"
-		{
-			Show
-		}
-		Autogen "uniques_maps_unambiguous"
-		{
-			Show
-		}
-	}
-
-	Price < $cfg_uniques_mid_min_value
-	Price >= $cfg_uniques_low_min_value
-	{
-		Autogen "uniques_eq_unambiguous"
-		{
-			Show
-		}
-		Autogen "uniques_flasks_unambiguous"
-		{
-			Show
-		}
-		Autogen "uniques_jewels_unambiguous"
-		{
-			Show
-		}
-		Autogen "uniques_maps_unambiguous"
-		{
-			Show
-		}
-	}
+	# (removed all autogeneration before a new one is implemented)
 
 	# note that APIs may not list all possible uniques
 	# therefore always make a block with no price requirement
@@ -2157,46 +2011,7 @@ Rarity <= Rare
 	}
 
 	# pricing machinery for bases
-	Autogen "bases"
-	{
-		HasInfluence == Shaper
-		{
-			Expand $blocks_influence_ilvl
-		}
-
-		HasInfluence == Elder
-		{
-			Expand $blocks_influence_ilvl
-		}
-
-		HasInfluence == Crusader
-		{
-			Expand $blocks_influence_ilvl
-		}
-
-		HasInfluence == Redeemer
-		{
-			Expand $blocks_influence_ilvl
-		}
-
-		HasInfluence == Hunter
-		{
-			Expand $blocks_influence_ilvl
-		}
-
-		HasInfluence == Warlord
-		{
-			Expand $blocks_influence_ilvl
-		}
-
-		HasInfluence == None
-		{
-			ItemLevel >= 86
-			{
-				Expand $blocks_influence_price
-			}
-		}
-	}
+	# (removed all blocks until a stable and high-confidence generation is possible)
 
 	# influenced bases with unknown value
 	HasInfluence Shaper Elder Crusader Redeemer Hunter Warlord
