@@ -1402,6 +1402,12 @@ Class == "Map Fragments"
 		{
 			Show
 		}
+
+		# 3.24 (Necropolis) new boss fragments (after normal/uber encounter separation)
+		BaseType == "Cosmic Fragment" "Decaying Fragment" "Awakening Fragment" "Synthesising Fragment" "Reality Fragment" "Devouring Fragment" "Blazing Fragment"
+		{
+			Show
+		}
 	}
 
 	BaseType == "Sacred Blossom"
