@@ -631,7 +631,7 @@ Class == "Stackable Currency"
 		Show
 	}
 
-	BaseType == "Exalted Orb" "Chaos Orb" "Gemcutter's Prism" "Stacked Deck" "Awakened Sextant" "Elevated Sextant" "Exalted Shard" "Orb of Annulment" "Harbinger's Orb" "Ancient Orb" "Ancient Shard" "Facetor's Lens" "Infused Engineer's Orb" "Orb of Unmaking" "Ritual Splinter" "Ritual Vessel" "Crescent Splinter" "Tainted Blessing" "Tainted Chromatic Orb" "Tainted Orb of Fusing" "Tainted Jeweller's Orb" "Tainted Blacksmith's Whetstone" "Tainted Armourer's Scrap" "Tainted Chaos Orb" "Tainted Mythic Orb" "Tainted Blessing" "Tainted Exalted Orb" "Sacred Orb" "Lesser Eldritch Ember" "Greater Eldritch Ember" "Grand Eldritch Ember" "Lesser Eldritch Ichor" "Greater Eldritch Ichor" "Grand Eldritch Ichor" "Eldritch Chaos Orb" "Eldritch Exalted Orb" "Eldritch Orb of Annulment"
+	BaseType == "Exalted Orb" "Chaos Orb" "Gemcutter's Prism" "Stacked Deck" "Exalted Shard" "Orb of Annulment" "Harbinger's Orb" "Ancient Orb" "Ancient Shard" "Facetor's Lens" "Infused Engineer's Orb" "Orb of Unmaking" "Ritual Splinter" "Ritual Vessel" "Crescent Splinter" "Tainted Blessing" "Tainted Chromatic Orb" "Tainted Orb of Fusing" "Tainted Jeweller's Orb" "Tainted Blacksmith's Whetstone" "Tainted Armourer's Scrap" "Tainted Chaos Orb" "Tainted Mythic Orb" "Tainted Blessing" "Tainted Exalted Orb" "Sacred Orb" "Lesser Eldritch Ember" "Greater Eldritch Ember" "Grand Eldritch Ember" "Lesser Eldritch Ichor" "Greater Eldritch Ichor" "Grand Eldritch Ichor" "Eldritch Chaos Orb" "Eldritch Exalted Orb" "Eldritch Orb of Annulment"
 	{
 		Expand $actions_currency_mid
 		Show
@@ -661,7 +661,7 @@ Class == "Stackable Currency"
 		Show
 	}
 
-	BaseType "Delirium Orb" "Catalyst" "Surveyor's Compass" "Charged Compass" "Oil Extractor" "Scouting Report"
+	BaseType "Delirium Orb" "Catalyst" "Oil Extractor" "Scouting Report"
 	{
 		Expand $actions_currency_mid
 		Show
