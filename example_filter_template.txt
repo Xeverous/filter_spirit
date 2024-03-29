@@ -269,6 +269,7 @@ $alert_blueprint           = $alert_common
 $alert_sanctum_relic       = $alert_very_specific
 $alert_sanctum_research    = $alert_uncommon
 $alert_logbook             = $alert_uncommon
+$alert_necropolis_ember    = $alert_common
 $alert_quest_item          = $alert_very_specific
 $alert_influence_high      = $alert_extraordinary
 $alert_influence_mid       = $alert_uncommon
@@ -1081,6 +1082,17 @@ Class == "Expedition Logbook"
 	SetAlertSound $alert_logbook
 	SetFontSize $font_logbook
 	MinimapIcon $icon_logbook
+	Show
+}
+
+# 3.24 Necropolis Embers
+Class == "Embers of the Allflame"
+{
+	SetBorderColor $color_necropolis
+	SetTextColor $color_white
+	SetBackgroundColor $color_necropolis
+	SetFontSize $font_max
+	SetAlertSound $alert_necropolis_ember
 	Show
 }
 
