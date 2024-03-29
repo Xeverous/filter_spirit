@@ -34,6 +34,7 @@ namespace item_class_names {
 	constexpr auto vials                      = currency_stackable;
 	constexpr auto nets                       = currency_stackable;
 	constexpr auto stacked_deck               = currency_stackable;
+	constexpr auto tattoos                    = currency_stackable;
 	constexpr auto resonators                 = "Delve Stackable Socketable Currency";
 	constexpr auto divination_card            = "Divination Card";
 	constexpr auto incubator                  = "Incubator"; // TODO why not plural?

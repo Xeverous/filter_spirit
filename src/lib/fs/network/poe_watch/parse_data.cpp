@@ -746,13 +746,7 @@ parse_item_price_data(
 			continue;
 		}
 		else if (std::holds_alternative<categories::enchantment>(itm.category)) {
-			const auto& ench = std::get<categories::enchantment>(itm.category);
-
-			if (ench.type == +categories::enchantment_type::helmet) {
-				result.helmet_enchants.push_back(elementary_item{price_data, std::move(itm.name)});
-			}
-
-			// we do not care about other enchants
+			// we do not care about enchants
 			continue;
 		}
 

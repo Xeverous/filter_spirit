@@ -302,6 +302,8 @@ make_autogen_func(
 			return make_autogen_simple(st, conditions, autogen.origin, cn::resonators, &ipd::resonators, diagnostics);
 		case lang::autogen_category::scarabs:
 			return make_autogen_simple(st, conditions, autogen.origin, cn::scarabs, &ipd::scarabs, diagnostics);
+		case lang::autogen_category::tattoos:
+			return make_autogen_simple(st, conditions, autogen.origin, cn::tattoos, &ipd::tattoos, diagnostics);
 		case lang::autogen_category::incubators:
 			return make_autogen_simple(st, conditions, autogen.origin, cn::incubator, &ipd::vials, diagnostics);
 		case lang::autogen_category::cards:
@@ -309,21 +311,14 @@ make_autogen_func(
 		case lang::autogen_category::gems:
 			return make_autogen_gem(st, conditions, autogen.origin, diagnostics);
 
-		case lang::autogen_category::bases:
+		// NOT IMPLEMENTED - bases
 			// implementation notes
 			// - condition: ItemLevel
 			// - condition: HasInfluence
 			// - print Corrupted False
 			// - print Mirrored False
 			// - print Rarity Normal Magic Rare
-		case lang::autogen_category::uniques_eq_unambiguous:
-		case lang::autogen_category::uniques_eq_ambiguous:
-		case lang::autogen_category::uniques_flasks_unambiguous:
-		case lang::autogen_category::uniques_flasks_ambiguous:
-		case lang::autogen_category::uniques_jewels_unambiguous:
-		case lang::autogen_category::uniques_jewels_ambiguous:
-		case lang::autogen_category::uniques_maps_unambiguous:
-		case lang::autogen_category::uniques_maps_ambiguous:
+		// NOT IMPLEMENTED - uniques
 			// implementation notes
 			// - verify Rarity Unique is allowed
 			// - print Rarity Unique in generated blocks
@@ -338,12 +333,6 @@ make_autogen_func(
 			//   - HasSearingExarchImplicit/HasEaterOfWorldsImplicit: ? (detects boss-specific drops)
 			//   - Sockets/SocketGroup: ?
 			//   - Replica: ?
-			diagnostics.push_message(make_warning(diagnostic_message_id::minor_note, autogen.origin, "not implemented"));
-			return [](
-				const lang::block_generation_info& /* block_info */,
-				const lang::market::item_price_data& /* item_price_data */,
-				lang::generated_blocks_consumer /* consumer */)
-			{};
 	}
 
 	diagnostics.push_error_internal_compiler_error(__func__, autogen.origin);

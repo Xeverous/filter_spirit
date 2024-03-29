@@ -43,7 +43,7 @@ download_item_price_data(
 		ITEM_OVERVIEW_LINK(DivinationCard)  + league_encoded,
 		ITEM_OVERVIEW_LINK(SkillGem)        + league_encoded,
 		ITEM_OVERVIEW_LINK(BaseType)        + league_encoded,
-		ITEM_OVERVIEW_LINK(HelmetEnchant)   + league_encoded,
+		ITEM_OVERVIEW_LINK(Tattoo)          + league_encoded,
 		ITEM_OVERVIEW_LINK(UniqueMap)       + league_encoded,
 		ITEM_OVERVIEW_LINK(Map)             + league_encoded,
 		ITEM_OVERVIEW_LINK(UniqueJewel)     + league_encoded,

@@ -115,7 +115,7 @@ struct item_price_data
 	std::vector<elementary_item> fossils;
 	std::vector<elementary_item> resonators;
 	std::vector<elementary_item> scarabs;
-	std::vector<elementary_item> helmet_enchants;
+	std::vector<elementary_item> tattoos;
 
 	std::vector<gem> gems;
 

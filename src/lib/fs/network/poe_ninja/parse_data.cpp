@@ -305,7 +305,7 @@ lang::market::item_price_data parse_item_price_data(const api_item_price_data& j
 	result.resonators      = parse_elementary_items(jsons.resonator,      logger);
 	result.essences        = parse_elementary_items(jsons.essence,        logger);
 	result.vials           = parse_elementary_items(jsons.vial,           logger);
-	result.helmet_enchants = parse_elementary_items(jsons.helmet_enchant, logger);
+	result.tattoos         = parse_elementary_items(jsons.tattoo,         logger);
 
 	result.gems = parse_gems(jsons.skill_gem, logger);
 

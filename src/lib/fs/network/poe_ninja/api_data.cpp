@@ -19,7 +19,7 @@ constexpr auto filename_essence = "Essence.json";
 constexpr auto filename_divination_card = "DivinationCard.json";
 constexpr auto filename_skill_gem = "SkillGem.json";
 constexpr auto filename_base_type = "BaseType.json";
-constexpr auto filename_helmet_enchant = "HelmetEnchant.json";
+constexpr auto filename_tattoo = "Tattoo.json";
 constexpr auto filename_unique_map = "UniqueMap.json";
 constexpr auto filename_map = "Map.json";
 constexpr auto filename_unique_jewel = "UniqueJewel.json";
@@ -47,7 +47,7 @@ namespace fs::network::poe_ninja
 	MACRO(divination_card, filename_divination_card) \
 	MACRO(skill_gem, filename_skill_gem) \
 	MACRO(base_type, filename_base_type) \
-	MACRO(helmet_enchant, filename_helmet_enchant) \
+	MACRO(tattoo, filename_tattoo) \
 	MACRO(unique_map, filename_unique_map) \
 	MACRO(map, filename_map) \
 	MACRO(unique_jewel, filename_unique_jewel) \

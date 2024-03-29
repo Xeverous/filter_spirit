@@ -46,7 +46,7 @@ auto make_undroppable_uniques()
 		// fated uniques (Prophecy upgrade only)
 		// as of 3.17, prophecy content no longer exists
 		// some items were brought to core drop pool, some become legacy
-		
+
 		// list of legacy items
 		"Corona Solaris",
 		"Crystal Vault",
@@ -72,7 +72,7 @@ auto make_undroppable_uniques()
 		"The Oak",
 		"Voidheart",
 		"Wall of Brambles",
-		
+
 		// other prophecy-related changes
 		"Bloodboil", // renamed to Winterweave
 		"Thirst for Horrors",
@@ -231,9 +231,7 @@ void compare_item_price_data(
 	run_compare_elementary(lhs.fossils, rhs.fossils, "fossils");
 	run_compare_elementary(lhs.resonators, rhs.resonators, "resonators");
 	run_compare_elementary(lhs.scarabs, rhs.scarabs, "scarabs");
-
-	// currently poe.watch and poe.ninja represent enchants in different forms (#% vs 30%)
-	// run_compare_elementary(lhs.helmet_enchants, rhs.helmet_enchants, "helmet enchants");
+	run_compare_elementary(lhs.tattoos, rhs.tattoos, "tattoos");
 
 	// much more complex to report (2+ properties)
 	// run_compare_elementary(lhs.gems, rhs.gems, "gems");
@@ -329,8 +327,7 @@ log::message_stream& operator<<(log::message_stream& stream, const item_price_da
 		"\tfossils         : " << ipd.fossils.size() << "\n"
 		"\tresonators      : " << ipd.resonators.size() << "\n"
 		"\tscarabs         : " << ipd.scarabs.size() << "\n"
-		// not supported (yet)
-		// "\thelmet enchants : " << ipd.helmet_enchants.size() << "\n"
+		"\ttattoos         : " << ipd.tattoos.size() << "\n"
 		"\tgems            : " << ipd.gems.size() << "\n"
 		"\tbases           : " << ipd.bases.size() << "\n"
 		"\tunique equipment (unambiguous): " << ipd.unique_eq.unambiguous.size() << "\n"
@@ -374,7 +371,7 @@ void item_price_data::sort()
 	std::sort(fossils.begin(),          fossils.end(),          compare_by_name_asc);
 	std::sort(resonators.begin(),       resonators.end(),       compare_by_name_asc);
 	std::sort(scarabs.begin(),          scarabs.end(),          compare_by_name_asc);
-	std::sort(helmet_enchants.begin(),  helmet_enchants.end(),  compare_by_name_asc);
+	std::sort(tattoos.begin(),          tattoos.end(),          compare_by_name_asc);
 	std::sort(gems.begin(),             gems.end(),             compare_by_name_asc);
 	std::sort(bases.begin(),            bases.end(),            compare_by_name_asc);
 }

@@ -30,7 +30,7 @@ struct api_item_price_data
 	std::string divination_card;
 	std::string skill_gem;
 	std::string base_type;
-	std::string helmet_enchant;
+	std::string tattoo;
 	std::string unique_map;
 	std::string map;
 	std::string unique_jewel;
