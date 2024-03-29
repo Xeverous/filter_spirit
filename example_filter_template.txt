@@ -75,6 +75,7 @@ $color_scarab_mid          = 182 182   0
 $color_scarab_low          = 127 127   0
 $color_scarab_very_low     = $color_scarab_low
 $color_blight              = 255 127   0
+$color_tattoo              = 142  71   0
 $color_map_purple          = $color_purple
 $color_map_red             = $color_red
 $color_map_yellow          = $color_rare
@@ -128,6 +129,9 @@ $font_gem_low            = $font_low
 $font_oil_high           = $font_currency_high
 $font_oil_mid            = $font_currency_mid
 $font_oil_low            = $font_currency_low
+$font_tattoo_high        = $font_currency_high
+$font_tattoo_mid         = $font_currency_mid
+$font_tattoo_low         = $font_currency_low
 $font_map_blight         = $font_max
 $font_map_guardian       = $font_max
 $font_map_enchanted      = $font_max
@@ -242,6 +246,8 @@ $alert_gem_20_quality      = $alert_uncommon
 $alert_gem_non_0_quality   = $alert_frequent
 $alert_oil_high            = $alert_high
 $alert_oil_mid             = $alert_mid
+$alert_tattoo_high         = $alert_high
+$alert_tattoo_mid          = $alert_mid
 $alert_atlas_upgrade       = $alert_very_specific
 $alert_map_blight          = $alert_uncommon
 $alert_map_guardian        = $alert_map_high
@@ -292,6 +298,7 @@ $beam_reliquary       = White
 $beam_fishing_rod     = White
 $beam_card            = Blue
 $beam_blight          = Orange
+$beam_tattoo          = Brown
 $beam_gem             = Green
 $beam_unique          = Brown
 $beam_6_link          = Red
@@ -311,6 +318,8 @@ $icon_card_mid        = 1 Blue Square
 $icon_card_low        = 2 Blue Square
 $icon_oil_high        = 0 Orange Raindrop
 $icon_oil_mid         = 2 Orange Raindrop
+$icon_tattoo_high     = 0 Brown Triangle
+$icon_tattoo_mid      = 2 Brown Triangle
 $icon_reliquary       = 0 Brown Star
 $icon_atlas_upgrade   = 0 Purple Cross
 $icon_map_guardian    = 0 White Cross
@@ -331,14 +340,14 @@ $icon_gem_high        = 0 Green Circle
 $icon_gem_mid         = 2 Green Circle
 $icon_gem_20_lvl      = 0 Green Circle
 $icon_gem_20_quality  = 0 Green Circle
-$icon_unique_high     = 0 Brown Triangle
-$icon_unique_mid      = 2 Brown Triangle
+$icon_unique_high     = 0 Brown Kite
+$icon_unique_mid      = 2 Brown Kite
 $icon_6_link          = 0 Red Hexagon
 $icon_base_defence    = 0 Grey Square
-$icon_ultimatum       = 0 Orange Triangle
+$icon_ultimatum       = 0 Red Square
 $icon_logbook         = 0 Cyan Square
 $icon_sanctum_research= 0 Brown Square
-$icon_error           = 0 Red Square
+$icon_error           = 0 Red UpsideDownHouse
 $icon_harvest         = 2 Blue Circle
 
 $actions_currency_high = {
@@ -502,6 +511,13 @@ $show_oils_mid = True
 $show_oils_low = True
 $show_oils_very_low = True
 
+$cfg_tattoos_high_min_value = 100
+$cfg_tattoos_mid_min_value = 20
+$cfg_tattoos_low_min_value = 1
+$show_tattoos_mid = True
+$show_tattoos_low = True
+$show_tattoos_very_low = True
+
 $cfg_vials_high_min_value = 100
 $cfg_vials_mid_min_value = 10
 $cfg_vials_low_min_value = 1
@@ -648,13 +664,13 @@ Class == "Stackable Currency"
 		Show
 	}
 
-	BaseType "Loyalty Tatto" "Honoured Tattoo" "Omen of Connections"
+	BaseType == "Omen of Fortune" "Omen of Connections" "Omen of Amelioration" "Omen of Blanching"
 	{
 		Expand $actions_currency_high
 		Show
 	}
 
-	BaseType "Silver Coin" "Tatto" "Omen of"
+	BaseType "Omen of"
 	{
 		Expand $actions_currency_mid
 		Show
@@ -934,6 +950,61 @@ Class == "Stackable Currency"
 		SetFontSize $font_oil_mid
 		SetAlertSound $alert_oil_mid
 		PlayEffect $beam_blight Temp
+		Show
+	}
+
+	Autogen "tattoos"
+	{
+		Price >= $cfg_tattoos_high_min_value
+		{
+			SetTextColor $color_black
+			SetBorderColor $color_tattoo
+			SetBackgroundColor $color_tattoo
+			SetFontSize $font_tattoo_high
+			PlayEffect $beam_tattoo
+			SetAlertSound $alert_tattoo_high
+			MinimapIcon $icon_tattoo_high
+			Show
+		}
+
+		Price < $cfg_tattoos_high_min_value
+		Price >= $cfg_tattoos_mid_min_value
+		{
+			SetTextColor $color_black
+			SetBorderColor $color_tattoo
+			SetBackgroundColor $color_tattoo
+			SetFontSize $font_tattoo_mid
+			PlayEffect $beam_tattoo
+			SetAlertSound $alert_tattoo_mid
+			MinimapIcon $icon_tattoo_mid
+			ShowHide $show_tattoos_mid
+		}
+
+		Price < $cfg_tattoos_mid_min_value
+		Price > $cfg_tattoos_low_min_value
+		{
+			SetTextColor $color_tattoo
+			SetBorderColor $color_tattoo
+			SetFontSize $font_tattoo_low
+			ShowHide $show_tattoos_low
+		}
+
+		Price <= $cfg_tattoos_low_min_value
+		{
+			SetTextColor $color_tattoo
+			SetFontSize $font_tattoo_low
+			ShowHide $show_tattoos_very_low
+		}
+	}
+
+	# Tattoos unknown to autogeneration
+	BaseType "Tattoo"
+	{
+		SetTextColor $color_tattoo
+		SetBorderColor $color_error
+		SetFontSize $font_tattoo_mid
+		SetAlertSound $alert_tattoo_mid
+		PlayEffect $beam_tattoo Temp
 		Show
 	}
 
