@@ -1538,17 +1538,6 @@ Class == "Misc Map Items"
 		Show
 	}
 
-	BaseType "Maven's Invitation"
-	{
-		SetBorderColor 204 153 0
-		SetTextColor $color_white
-		SetBackgroundColor 204 153 0
-		SetAlertSound $alert_invitation
-		PlayEffect $beam_reliquary
-		MinimapIcon $icon_reliquary
-		Show
-	}
-
 	BaseType "Inscribed Ultimatum"
 	{
 		SetBackgroundColor $color_white
