@@ -655,6 +655,12 @@ Class == "Stackable Currency"
 		Show
 	}
 
+	BaseType == "Veiled Scarab"
+	{
+		Expand $actions_currency_mid
+		Show
+	}
+
 	BaseType "Delirium Orb" "Catalyst" "Surveyor's Compass" "Charged Compass" "Oil Extractor" "Scouting Report"
 	{
 		Expand $actions_currency_mid
