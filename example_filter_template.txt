@@ -19,6 +19,7 @@ $color_black               =   0   0   0
 $color_red                 = 255   0   0
 $color_golden              = 240 200 150
 $color_error               = $color_red
+$color_purple              = 175   0 175
 
 $color_normal              = 200 200 200
 $color_magic               = 136 136 255
@@ -74,6 +75,7 @@ $color_scarab_mid          = 182 182   0
 $color_scarab_low          = 127 127   0
 $color_scarab_very_low     = $color_scarab_low
 $color_blight              = 255 127   0
+$color_map_purple          = $color_purple
 $color_map_red             = $color_red
 $color_map_yellow          = $color_rare
 $color_map_white           = $color_normal
@@ -129,6 +131,7 @@ $font_oil_low            = $font_currency_low
 $font_map_blight         = $font_max
 $font_map_guardian       = $font_max
 $font_map_enchanted      = $font_max
+$font_map_purple         = $font_max
 $font_map_red            = $font_max
 $font_map_yellow         = $font_max
 $font_map_white          = $font_max
@@ -243,6 +246,7 @@ $alert_atlas_upgrade       = $alert_very_specific
 $alert_map_blight          = $alert_uncommon
 $alert_map_guardian        = $alert_map_high
 $alert_map_enchanted       = $alert_map_high
+$alert_map_purple          = $alert_map_high
 $alert_map_red             = $alert_map_high
 $alert_map_yellow          = $alert_map_low
 $alert_map_white           = $alert_map_low
@@ -310,9 +314,10 @@ $icon_oil_mid         = 2 Orange Raindrop
 $icon_reliquary       = 0 Brown Star
 $icon_atlas_upgrade   = 0 Purple Cross
 $icon_map_guardian    = 0 White Cross
+$icon_map_purple      = 2 Purple Cross
 $icon_map_red         = 2 White Cross
 $icon_map_blight      = 0 Orange Cross
-$icon_map_enchanted   = 0 Purple Cross
+$icon_map_enchanted   = 0 Cyan Cross
 $icon_influence_high  = 0 Pink Cross
 $icon_influence_mid   = 2 Pink Cross
 $icon_dominance_high  = $icon_influence_high
@@ -1785,6 +1790,17 @@ Class == "Maps"
 		SetAlertSound $alert_map_enchanted
 		PlayEffect $beam_map
 		MinimapIcon $icon_map_enchanted
+		Show
+	}
+
+	MapTier >= 17
+	{
+		SetTextColor $color_white
+		SetBorderColor $color_white
+		SetBackgroundColor $color_map_purple
+		SetFontSize $font_map_purple
+		SetAlertSound $alert_map_purple
+		MinimapIcon $icon_map_purple
 		Show
 	}
 
