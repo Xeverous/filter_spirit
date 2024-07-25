@@ -32,6 +32,7 @@ $color_rare_regal          = 255 173   0 # ilvl 75+
 $color_unique              = 175  96  37
 $color_chromatic_small     = 175 255 200
 $color_chromatic_big       = 128 128 192
+$color_30_quality          =   0 255 255
 $color_6_socket            = 152   0 152
 $color_6_link              = $color_red
 $color_5_link              = 192 128   0
@@ -42,6 +43,7 @@ $color_fractured_item      = 255 192 255
 $color_synthesised_item    = $color_fractured_item
 $color_veiled_item         = 215 174 134
 $color_perandus            = 255 192 128
+$color_gold                = $color_perandus
 $color_breach              = 255  51 204
 $color_legion              = 200 133  44
 $color_delirium            = 192 192 192
@@ -50,7 +52,7 @@ $color_labyrinth           =   0 150   0
 $color_incursion           = $color_labyrinth
 $color_ultimatum           = 165  72   0
 $color_harvest             =   0 252 186
-$color_necropolis          =  53  83 120
+$color_corpse              =  53  83 120
 $color_quest               =  74 230  58
 $color_card                = 100 210 255
 $color_gem                 =  27 162 155
@@ -81,6 +83,7 @@ $color_map_red             = $color_red
 $color_map_yellow          = $color_rare
 $color_map_white           = $color_normal
 $color_flask_utility       = 122 105  28
+$color_tincture            = $color_flask_utility
 $color_hammer              = 162  85   0
 $color_influence_high      = 255   0 127
 $color_dominance_high      = 181  75 255
@@ -164,6 +167,7 @@ $font_sanctum_research   = $font_high
 $font_heist_gear         = $font_mid
 $font_experimented_base  = $font_max
 $font_logbook            = $font_max
+$font_corpse             = $font_max
 $font_influence_high     = $font_high
 $font_influence_mid      = $font_mid
 $font_influence_low      = $font_low
@@ -206,6 +210,7 @@ $alert_currency_low        = $alert_low
 $alert_currency_very_low   = $alert_frequent
 $alert_perandus            = $alert_frequent
 $alert_splinter            = $alert_frequent
+$alert_gold                = $alert_frequent
 $alert_blessing            = $alert_uncommon
 $alert_harbinger_scroll    = $alert_currency_high
 $alert_essence_t7_t6       = $alert_common
@@ -229,6 +234,7 @@ $alert_fragment_sacrifice  = $alert_frequent
 $alert_fragment_mortal     = $alert_common
 $alert_fragment_atlas      = $alert_uncommon
 $alert_fragment_sacred_blossom = $alert_uncommon
+$alert_fragment_mist_king  = $alert_uncommon
 $alert_breachstone         = $alert_uncommon
 $alert_emblem              = $alert_uncommon
 $alert_reliquary           = $alert_extraordinary
@@ -279,7 +285,7 @@ $alert_blueprint           = $alert_common
 $alert_sanctum_relic       = $alert_very_specific
 $alert_sanctum_research    = $alert_uncommon
 $alert_logbook             = $alert_uncommon
-$alert_necropolis_ember    = $alert_common
+$alert_corpse              = $alert_uncommon
 $alert_quest_item          = $alert_very_specific
 $alert_influence_high      = $alert_extraordinary
 $alert_influence_mid       = $alert_uncommon
@@ -304,6 +310,7 @@ $beam_unique          = Brown
 $beam_6_link          = Red
 $beam_map             = Grey
 $beam_base_defence    = Grey
+$beam_corpse          = Grey
 $beam_influence       = Pink
 $beam_dominance       = Pink
 $beam_ultimatum       = Orange
@@ -346,6 +353,7 @@ $icon_6_link          = 0 Red Hexagon
 $icon_base_defence    = 0 Grey Square
 $icon_ultimatum       = 0 Red Square
 $icon_logbook         = 0 Cyan Square
+$icon_corpse          = 0 Grey UpsideDownHouse
 $icon_sanctum_research= 0 Brown Square
 $icon_error           = 0 Red UpsideDownHouse
 $icon_harvest         = 2 Blue Circle
@@ -553,6 +561,7 @@ $cfg_uniques_low_min_value = 1
 $show_flasks_utility = True
 $show_flasks_20q = True
 $show_flasks_other = True
+$show_tinctures = True
 
 # Chisel recipe
 $show_hammers = False
@@ -601,15 +610,20 @@ $show_gear_mods_warband = True # you will need to ID such items first
 $show_gear_chrome_small = True
 # Apply border color for RGB items of any other size
 $show_gear_chrome_big = True
+$show_gear_30_quality = True
 $show_gear_enchanted_helmets = True
 $show_gear_enchanted_other = False
 # These are highest bases for each attribute combination.
 # Rare items on these bases will get a different background color, final Show/Hide is unaffected.
 # If you don't like this feature, just set the variable below to None or show variable to False.
-$cfg_t1_base_names = "Stygian Vise" "Eternal Burgonet" "Lion Pelt" "Hubris Circlet" "Nightmare Bascinet" "Titan Gauntlets" "Slink Gloves" "Sorcerer Gloves" "Dragonscale Gauntlets" "Titan Greaves" "Slink Boots" "Sorcerer Boots" "Dragonscale Boots" "Assassin's Boots" "Glorious Plate" "Assassin's Garb" "Vaal Regalia" "Titanium Spirit Shield" "Harbinger Bow" "Ambusher" "Ezomyte Dagger" "Platinum Kris" "Imperial Skean" "Demon Dagger" "Void Sceptre" "Sambar Sceptre" "Profane Wand" "Prophecy Wand" "Tornado Wand" "Opal Wand" "Imbued Wand" "Demon's Horn"
 $cfg_atlas_base_names = "Apothecary's Gloves" "Fingerless Silk Gloves" "Fugitive Boots" "Gripped Gloves" "Spiked Gloves" "Two-Toned Boots" "Convoking Wand" "Bone Helmet" "Artillery Quiver" "Marble Amulet" "Seaglass Amulet" "Blue Pearl Amulet" "Iolite Ring" "Vanguard Belt" "Crystal Belt" "Cerulean Ring" "Opal Ring" "Steel Ring" "Vermillion Ring" "Unset Amulet" "Dusk Ring" "Penumbra Ring" "Gloam Ring" "Tenebrous Ring" "Shadowed Ring" "Bone Ring"
-$cfg_good_base_names = $cfg_t1_base_names $cfg_atlas_base_names
-$cfg_base_defence_base_names = $cfg_t1_base_names $cfg_atlas_base_names
+$cfg_t1_weapon_base_names = "Harbinger Bow" "Ambusher" "Ezomyte Dagger" "Platinum Kris" "Imperial Skean" "Demon Dagger" "Void Sceptre" "Sambar Sceptre" "Profane Wand" "Prophecy Wand" "Tornado Wand" "Opal Wand" "Imbued Wand" "Demon's Horn"
+$cfg_t1_armour_base_names = "Giantslayer Helmet" "Majestic Pelt" "Lich's Circlet" "Haunted Bascinet" "Divine Crown" "Torturer's Mask" "Royal Plate" "Syndicate's Garb" "Twilight Regalia" "Conquest Lamellar" "Sacred Chainmail" "Necrotic Armour" "Leviathan Greaves" "Velour Boots" "Warlock Boots" "Wyvernscale Boots" "Paladin Boots" "Phantom Boots" "Leviathan Gauntlets" "Velour Gloves" "Warlock Gloves" "Wyvernscale Gauntlets" "Paladin Gloves" "Phantom Mitts"
+$cfg_t2_armour_base_names = "Conqueror's Helmet" "Grizzly Pelt" "Sunfire Circlet" "Conquest Helmet" "Paladin Crown" "Ancient Mask" "Legion Plate" "Astral Leather" "Nightweave Robe" "Marshall's Brigandine" "Paladin's Hauberk" "Torturer Garb" "Precursor Greaves" "Harpyskin Boots" "Sage Slippers" "Chimerascale Boots" "Martyr Boots" "Infiltrator Boots" "Precursor Gauntlets" "Harpyskin Gloves" "Sage Gloves" "Chimerascale Gauntlets" "Martyr Gloves" "Infiltrator Mitts"
+$cfg_t3_armour_base_names = "General's Helmet" "Dire Pelt" "Moonlit Circlet" "Knight Helm" "Faithful Helmet" "Jester Mask" "Titan Plate" "Supreme Leather" "Arcane Vestment" "Full Wyvernscale" "Grand Ringmail" "Sanguine Raiment"
+$cfg_t1_other_base_names = "Stygian Vise" "Titanium Spirit Shield"
+$cfg_good_base_names = $cfg_atlas_base_names $cfg_t1_weapon_base_names $cfg_t1_other_base_names
+$cfg_base_defence_base_names = $cfg_atlas_base_names $cfg_t1_other_base_names
 $cfg_base_defence_percentile_min_value = 90
 $cfg_base_defence_percentile_min_ilvl = 84
 $show_gear_rare_good_base = True
@@ -652,6 +666,12 @@ Class == "Stackable Currency"
 		Show
 	}
 
+	BaseType == "Reflecting Mist"
+	{
+		Expand $actions_currency_high
+		Show
+	}
+
 	BaseType == "Exalted Orb" "Chaos Orb" "Gemcutter's Prism" "Stacked Deck" "Exalted Shard" "Orb of Annulment" "Harbinger's Orb" "Ancient Orb" "Facetor's Lens" "Infused Engineer's Orb" "Orb of Unmaking" "Ritual Splinter" "Ritual Vessel" "Crescent Splinter" "Tainted Blessing" "Tainted Chromatic Orb" "Tainted Orb of Fusing" "Tainted Jeweller's Orb" "Tainted Blacksmith's Whetstone" "Tainted Armourer's Scrap" "Tainted Chaos Orb" "Tainted Mythic Orb" "Tainted Blessing" "Tainted Exalted Orb" "Sacred Orb" "Lesser Eldritch Ember" "Greater Eldritch Ember" "Grand Eldritch Ember" "Lesser Eldritch Ichor" "Greater Eldritch Ichor" "Grand Eldritch Ichor" "Eldritch Chaos Orb" "Eldritch Exalted Orb" "Eldritch Orb of Annulment"
 	{
 		Expand $actions_currency_mid
@@ -661,6 +681,7 @@ Class == "Stackable Currency"
 	BaseType == "Armour Recombinator" "Weapon Recombinator" "Jewellery Recombinator"
 	{
 		Expand $actions_currency_mid
+		SetAlertSound $alert_undroppable
 		Show
 	}
 
@@ -683,6 +704,12 @@ Class == "Stackable Currency"
 	}
 
 	BaseType "Delirium Orb" "Catalyst" "Oil Extractor" "Scouting Report"
+	{
+		Expand $actions_currency_mid
+		Show
+	}
+
+	BaseType "Maven's Chisel"
 	{
 		Expand $actions_currency_mid
 		Show
@@ -1015,6 +1042,13 @@ Class == "Stackable Currency"
 		Show
 	}
 
+	# 3.25 Runes for crafting in Kingsmarch
+	BaseType == "Life Rune" "Sun Rune" "Bound Rune" "War Rune" "River Rune" "Bounty Rune" "Journey Rune" "Mountain Rune" "Time Rune" "Power Rune"
+	{
+		Expand $actions_currency_mid
+		Show
+	}
+
 	# 3.19 reworked Harvest - make each of respective color?
 	BaseType "Crystallised Lifeforce"
 	{
@@ -1024,17 +1058,6 @@ Class == "Stackable Currency"
 		SetFontSize $font_max
 		SetAlertSound $alert_currency_mid
 		MinimapIcon $icon_harvest
-		Show
-	}
-
-	# 3.24 Necropolis (Coffins do not drop)
-	BaseType == "Empty Coffin" "Filled Coffin"
-	{
-		SetBorderColor $color_necropolis
-		SetTextColor $color_white
-		SetBackgroundColor $color_necropolis
-		SetFontSize $font_max
-		SetAlertSound $alert_currency_mid
 		Show
 	}
 
@@ -1067,6 +1090,26 @@ Class == "Stackable Currency"
 	SetFontSize $font_max
 	SetAlertSound $alert_error
 	Show
+}
+
+Class == "Gold"
+{
+	SetTextColor $color_gold
+	SetBackgroundColor $color_black
+	SetFontSize $font_currency_mid
+	SetAlertSound $alert_gold
+	Show
+}
+
+Class == "Corpses"
+{
+	SetTextColor $color_white
+	SetBorderColor $color_corpse
+	SetBackgroundColor $color_corpse
+	SetFontSize $font_corpse
+	SetAlertSound $alert_corpse
+	PlayEffect $beam_corpse
+	MinimapIcon $icon_corpse
 }
 
 Class == "Delve Stackable Socketable Currency"
@@ -1164,17 +1207,6 @@ Class == "Expedition Logbook"
 	SetAlertSound $alert_logbook
 	SetFontSize $font_logbook
 	MinimapIcon $icon_logbook
-	Show
-}
-
-# 3.24 Necropolis Embers
-Class == "Embers of the Allflame"
-{
-	SetBorderColor $color_necropolis
-	SetTextColor $color_white
-	SetBackgroundColor $color_necropolis
-	SetFontSize $font_max
-	SetAlertSound $alert_necropolis_ember
 	Show
 }
 
@@ -1287,27 +1319,13 @@ Class == "Skill Gems" "Support Gems"
 	ShowHide $show_gems_other
 }
 
-BaseType == "Gavel" "Stone Hammer" "Rock Breaker"
+# Chisel recipe
+BaseType == "Gavel"
+Rarity <= Rare
 {
 	SetTextColor $color_white
 	SetBackgroundColor $color_hammer
-
-	Rarity Normal
-	{
-		ShowDiscard $show_hammers
-	}
-
-	Rarity Magic
-	Quality > 12
-	{
-		ShowDiscard $show_hammers
-	}
-
-	Rarity Rare
-	Quality > 16
-	{
-		ShowDiscard $show_hammers
-	}
+	ShowDiscard $show_hammers
 }
 
 # harbinger unique pieces
@@ -1502,6 +1520,16 @@ Class == "Map Fragments"
 		{
 			Show
 		}
+	}
+
+	# 3.25 reintroduction of King of the Mists boss from Affliction league
+	BaseType == "An Audience With The King"
+	{
+		SetBorderColor $color_black
+		SetTextColor $color_black
+		SetBackgroundColor $color_white
+		SetFontSize $font_max
+		SetAlertSound $alert_fragment_mist_king
 	}
 
 	BaseType == "Sacred Blossom"
@@ -2050,6 +2078,15 @@ Rarity <= Rare
 		}
 	}
 
+	# high-quality bases for Mythic Orb or chancing
+	Quality >= 30
+	Mirrored False
+	{
+		SetBorderColor $color_30_quality
+		ShowDiscard $show_gear_30_quality
+		Continue
+	}
+
 	AnyEnchantment True
 	{
 		SetBorderColor $color_white
@@ -2268,6 +2305,12 @@ Rarity <= Rare
 	# enchants and RGB - part 2/2
 	# these blocks stop filtering to prevent hiding such items
 	# (it's the same code but without styles and Continue)
+	Quality >= 30
+	Mirrored False
+	{
+		ShowDiscard $show_gear_30_quality
+	}
+
 	Sockets < 6
 	SocketGroup RGB
 	{
@@ -2333,6 +2376,13 @@ Class == "Utility Flasks"
 Class "Flasks"
 {
 	ShowDiscard $show_flasks_other
+}
+
+Class == "Tinctures"
+{
+	SetTextColor $color_white
+	SetBackgroundColor $color_tincture
+	ShowDiscard $show_tinctures
 }
 
 AreaLevel <= $cfg_gear_show_4_link_max_area_lvl
