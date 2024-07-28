@@ -672,7 +672,7 @@ Class == "Stackable Currency"
 		Show
 	}
 
-	BaseType == "Exalted Orb" "Chaos Orb" "Gemcutter's Prism" "Stacked Deck" "Exalted Shard" "Orb of Annulment" "Harbinger's Orb" "Ancient Orb" "Facetor's Lens" "Infused Engineer's Orb" "Orb of Unmaking" "Ritual Splinter" "Ritual Vessel" "Crescent Splinter" "Tainted Blessing" "Tainted Chromatic Orb" "Tainted Orb of Fusing" "Tainted Jeweller's Orb" "Tainted Blacksmith's Whetstone" "Tainted Armourer's Scrap" "Tainted Chaos Orb" "Tainted Mythic Orb" "Tainted Blessing" "Tainted Exalted Orb" "Sacred Orb" "Lesser Eldritch Ember" "Greater Eldritch Ember" "Grand Eldritch Ember" "Lesser Eldritch Ichor" "Greater Eldritch Ichor" "Grand Eldritch Ichor" "Eldritch Chaos Orb" "Eldritch Exalted Orb" "Eldritch Orb of Annulment"
+	BaseType == "Exalted Orb" "Chaos Orb" "Gemcutter's Prism" "Stacked Deck" "Exalted Shard" "Orb of Annulment" "Harbinger's Orb" "Ancient Orb" "Facetor's Lens" "Infused Engineer's Orb" "Orb of Unmaking" "Ritual Splinter" "Ritual Vessel" "Crescent Splinter" "Tainted Blessing" "Tainted Chromatic Orb" "Tainted Orb of Fusing" "Tainted Jeweller's Orb" "Tainted Blacksmith's Whetstone" "Tainted Armourer's Scrap" "Tainted Chaos Orb" "Tainted Mythic Orb" "Tainted Blessing" "Tainted Exalted Orb" "Sacred Orb" "Lesser Eldritch Ember" "Greater Eldritch Ember" "Grand Eldritch Ember" "Lesser Eldritch Ichor" "Greater Eldritch Ichor" "Grand Eldritch Ichor" "Eldritch Chaos Orb" "Eldritch Exalted Orb" "Eldritch Orb of Annulment" "Glassblower's Bauble"
 	{
 		Expand $actions_currency_mid
 		Show
@@ -715,13 +715,13 @@ Class == "Stackable Currency"
 		Show
 	}
 
-	BaseType == "Cartographer's Chisel" "Chromatic Orb" "Jeweller's Orb" "Orb of Alchemy" "Orb of Alteration" "Orb of Fusing" "Orb of Scouring" "Blessed Orb" "Harbinger's Shard" "Orb of Regret" "Regal Orb" "Vaal Orb" "Remnant of Corruption" "Orb of Binding" "Orb of Horizons" "Chaos Shard" "Annulment Shard" "Ancient Shard"
+	BaseType == "Cartographer's Chisel" "Chromatic Orb" "Jeweller's Orb" "Orb of Alchemy" "Orb of Alteration" "Orb of Fusing" "Orb of Scouring" "Blessed Orb" "Harbinger's Shard" "Orb of Regret" "Regal Orb" "Vaal Orb" "Remnant of Corruption" "Orb of Binding" "Orb of Horizons" "Armourer's Scrap" "Blacksmith's Whetstone" "Chaos Shard" "Annulment Shard" "Ancient Shard"
 	{
 		Expand $actions_currency_low
 		ShowHide $show_currency_low
 	}
 
-	BaseType == "Armourer's Scrap" "Blacksmith's Whetstone" "Glassblower's Bauble" "Orb of Transmutation" "Orb of Augmentation" "Orb of Chance"
+	BaseType == "Orb of Transmutation" "Orb of Augmentation" "Orb of Chance"
 	{
 		Expand $actions_currency_very_low
 		ShowHide $show_currency_very_low
