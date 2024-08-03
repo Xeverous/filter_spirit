@@ -6,6 +6,13 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 
 *newest at the top*
 
+### 3.25 (Settlers of Kalguur) [Item Filter Information](www.pathofexile.com/forum/view-thread/3532553)
+
+- Huge balance patch with multiple reworks (over 30k words) - [patch notes](https://www.pathofexile.com/forum/view-thread/3531661)
+- note: some implicit filter changes are hidden in the patch notes (e.g. quality changes)
+- note: additional helpful information on [reddit](https://www.reddit.com/r/pathofexile/comments/1e9uez6/settlers_of_kalguur_item_filter_information/leiygze/)
+- [new and changed gems](https://www.pathofexile.com/forum/view-thread/3532728)
+
 ### 3.24 (Necropolis) [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3497460)
 
 - Removal of Sextants and rework of Scarabs
