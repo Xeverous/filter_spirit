@@ -32,7 +32,7 @@ $color_rare_regal          = 255 173   0 # ilvl 75+
 $color_unique              = 175  96  37
 $color_chromatic_small     = 175 255 200
 $color_chromatic_big       = 128 128 192
-$color_30_quality          =   0 255 255
+$color_high_quality        =   0 255 255
 $color_6_socket            = 152   0 152
 $color_6_link              = $color_red
 $color_5_link              = 192 128   0
@@ -274,6 +274,7 @@ $alert_scourged            = None
 $alert_fractured_item      = $alert_very_specific
 $alert_synthesised_item    = $alert_very_specific
 $alert_experimented_base   = $alert_very_specific
+$alert_item_high_quality   = $alert_very_specific
 $alert_veiled_item         = $alert_common
 $alert_metamorph           = $alert_common
 $alert_archnemesis         = $alert_common
@@ -610,7 +611,7 @@ $show_gear_mods_warband = True # you will need to ID such items first
 $show_gear_chrome_small = True
 # Apply border color for RGB items of any other size
 $show_gear_chrome_big = True
-$show_gear_30_quality = True
+$show_items_high_quality = True
 $show_gear_enchanted_helmets = True
 $show_gear_enchanted_other = False
 # These are highest bases for each attribute combination.
@@ -2086,13 +2087,13 @@ Rarity <= Rare
 		}
 	}
 
-	# high-quality bases for Mythic Orb or chancing
-	Quality >= 30
+	# high-quality bases for Mythic Orb, crafting or chancing
+	Quality > 20
 	Mirrored False
 	{
-		SetBorderColor $color_30_quality
-		ShowDiscard $show_gear_30_quality
-		Continue
+		SetBackgroundColor $color_high_quality
+		SetAlertSound $alert_item_high_quality
+		ShowDiscard $show_items_high_quality
 	}
 
 	AnyEnchantment True
@@ -2313,12 +2314,6 @@ Rarity <= Rare
 	# enchants and RGB - part 2/2
 	# these blocks stop filtering to prevent hiding such items
 	# (it's the same code but without styles and Continue)
-	Quality >= 30
-	Mirrored False
-	{
-		ShowDiscard $show_gear_30_quality
-	}
-
 	Sockets < 6
 	SocketGroup RGB
 	{
