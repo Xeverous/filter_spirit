@@ -666,6 +666,12 @@ Class == "Stackable Currency"
 		Show
 	}
 
+	BaseType == "Valdo's Puzzle Box"
+	{
+		Expand $actions_currency_high
+		Show
+	}
+
 	BaseType == "Reflecting Mist"
 	{
 		Expand $actions_currency_high
@@ -1232,33 +1238,35 @@ Class == "Expedition Logbook"
 # - any
 Class == "Skill Gems" "Support Gems"
 {
-	Autogen "gems"
-	{
-		Price >= $cfg_gems_high_min_value
-		{
-			Expand $actions_gem_high
-			Show
-		}
+	# Disabled until BaseType issue is resolved
+	# poe.ninja reports Transfgured Gems but the game does not support them.
+	# Autogen "gems"
+	# {
+		# Price >= $cfg_gems_high_min_value
+		# {
+			# Expand $actions_gem_high
+			# Show
+		# }
 
-		Price < $cfg_gems_high_min_value
-		Price >= $cfg_gems_mid_min_value
-		{
-			Expand $actions_gem_mid
-			ShowDiscard $show_gems_mid
-		}
+		# Price < $cfg_gems_high_min_value
+		# Price >= $cfg_gems_mid_min_value
+		# {
+			# Expand $actions_gem_mid
+			# ShowDiscard $show_gems_mid
+		# }
 
-		Price < $cfg_gems_mid_min_value
-		Price > $cfg_gems_low_min_value
-		{
-			Expand $actions_gem_low
-			ShowDiscard $show_gems_low
-		}
+		# Price < $cfg_gems_mid_min_value
+		# Price > $cfg_gems_low_min_value
+		# {
+			# Expand $actions_gem_low
+			# ShowDiscard $show_gems_low
+		# }
 
-		Price <= $cfg_gems_low_min_value
-		{
-			ShowDiscard $show_gems_very_low
-		}
-	}
+		# Price <= $cfg_gems_low_min_value
+		# {
+			# ShowDiscard $show_gems_very_low
+		# }
+	# }
 
 	# next blocks have fixed Show because
 	# if autogeneration did not caught them, they have unknown value
