@@ -1348,26 +1348,38 @@ Class == "Pieces"
 	Show
 }
 
-# Tabula Rasa and Skin of the Loyal
-# ...and any unique that drops 6L'd (some league content drops linked uniques)
-Rarity Unique
-LinkedSockets 6
-{
-	SetTextColor $color_unique
-	SetBorderColor $color_unique
-	SetBackgroundColor $color_white
-	SetFontSize $font_max
-	SetAlertSound $alert_unique_6_link
-	PlayEffect $beam_6_link
-	MinimapIcon $icon_6_link
-	Show
-}
-
 Rarity Unique
 {
 	SetTextColor $color_unique
 	SetBorderColor $color_unique
 	SetFontSize $font_unique
+
+	Quality > 20
+	{
+		SetBorderColor $color_high_quality
+		ShowDiscard $show_items_high_quality
+		Continue
+	}
+
+	# Tabula Rasa and Skin of the Loyal
+	# ...and any unique that drops 6L'd (some league content drops linked uniques)
+	LinkedSockets 6
+	{
+		SetTextColor $color_unique
+		SetBackgroundColor $color_white
+		SetFontSize $font_max
+		SetAlertSound $alert_unique_6_link
+		PlayEffect $beam_6_link
+		MinimapIcon $icon_6_link
+		Show
+	}
+
+	Quality > 20
+	{
+		SetBorderColor $color_high_quality
+		SetAlertSound $alert_item_high_quality
+		ShowDiscard $show_items_high_quality
+	}
 
 	# (removed all autogeneration before a new one is implemented)
 
