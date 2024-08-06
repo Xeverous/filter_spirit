@@ -136,7 +136,7 @@ $font_tattoo_high        = $font_currency_high
 $font_tattoo_mid         = $font_currency_mid
 $font_tattoo_low         = $font_currency_low
 $font_map_blight         = $font_max
-$font_map_guardian       = $font_max
+$font_map_atlas_boss     = $font_max
 $font_map_enchanted      = $font_max
 $font_map_purple         = $font_max
 $font_map_red            = $font_max
@@ -255,10 +255,11 @@ $alert_oil_mid             = $alert_mid
 $alert_tattoo_high         = $alert_high
 $alert_tattoo_mid          = $alert_mid
 $alert_atlas_upgrade       = $alert_very_specific
+$alert_map_valuable        = $alert_uncommon
 $alert_map_blight          = $alert_uncommon
-$alert_map_guardian        = $alert_map_high
+$alert_map_atlas_boss      = $alert_map_valuable
 $alert_map_enchanted       = $alert_map_high
-$alert_map_purple          = $alert_map_high
+$alert_map_purple          = $alert_map_valuable
 $alert_map_red             = $alert_map_high
 $alert_map_yellow          = $alert_map_low
 $alert_map_white           = $alert_map_low
@@ -330,7 +331,7 @@ $icon_tattoo_high     = 0 Brown Triangle
 $icon_tattoo_mid      = 2 Brown Triangle
 $icon_reliquary       = 0 Brown Star
 $icon_atlas_upgrade   = 0 Purple Cross
-$icon_map_guardian    = 0 White Cross
+$icon_map_atlas_boss  = 0 White Cross
 $icon_map_purple      = 2 Purple Cross
 $icon_map_red         = 2 White Cross
 $icon_map_blight      = 0 Orange Cross
@@ -1896,10 +1897,10 @@ Class == "Maps"
 		SetTextColor $color_white
 		SetBorderColor $color_white
 		SetBackgroundColor $color_red
-		SetFontSize $font_map_guardian
-		SetAlertSound $alert_map_guardian
+		SetFontSize $font_map_atlas_boss
+		SetAlertSound $alert_map_atlas_boss
 		PlayEffect $beam_map
-		MinimapIcon $icon_map_guardian
+		MinimapIcon $icon_map_atlas_boss
 
 		# Shaper guardians are only on specific bases
 		BaseType == "Forge of the Phoenix Map" "Maze of the Minotaur Map" "Pit of the Chimera Map" "Lair of the Hydra Map"
