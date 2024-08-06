@@ -1101,6 +1101,27 @@ Class == "Stackable Currency"
 
 Class == "Gold"
 {
+	StackSize >= 1000
+	{
+		SetTextColor $color_black
+		SetBackgroundColor $color_gold
+		SetFontSize $font_currency_high
+		SetAlertSound $alert_currency_mid
+		MinimapIcon $icon_currency_high
+		Show
+	}
+
+	StackSize >= 100
+	{
+		SetTextColor $color_gold
+		SetBackgroundColor $color_black
+		SetBorderColor $color_gold
+		SetFontSize $font_currency_mid
+		SetAlertSound $alert_gold
+		MinimapIcon $icon_currency_mid
+		Show
+	}
+
 	SetTextColor $color_gold
 	SetBackgroundColor $color_black
 	SetFontSize $font_currency_mid
