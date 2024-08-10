@@ -628,7 +628,7 @@ $cfg_good_base_names = $cfg_atlas_base_names $cfg_t1_weapon_base_names $cfg_t1_a
 $cfg_base_defence_base_names = $cfg_atlas_base_names $cfg_t1_armour_base_names $cfg_t1_other_base_names
 $cfg_base_defence_percentile_min_value = 90
 $cfg_base_defence_percentile_min_ilvl = 84
-$show_gear_rare_good_base = True
+$highlight_gear_good_base = True
 # Like $cfg_good_base_names but actually affects final Show/Hide.
 # You might want to set it to $cfg_good_base_names and/or add own preferred bases.
 # Names written here but not in $cfg_good_base_names will not get special background color.
@@ -656,7 +656,8 @@ $cfg_gear_show_3_link_max_area_lvl = 30
 $cfg_gear_show_all_max_area_lvl = 15
 
 # this will apply globally to ALL blocks, unless overriden
-SetBackgroundColor $color_black
+# removed because it breaks highlighting bases with Continue blocks
+# SetBackgroundColor $color_black
 
 Class == "Stackable Currency"
 {
@@ -2146,18 +2147,17 @@ Rarity <= Rare
 		Continue
 	}
 
+	BaseType $cfg_good_base_names
+	Mirrored False
+	{
+		SetBackgroundColor $color_rare_good_base
+		ShowDiscard $highlight_gear_good_base
+		Continue
+	}
+
 	Rarity >= Rare
 	{
-		# highlight rares with good base
-		BaseType $cfg_good_base_names
-		{
-			SetBackgroundColor $color_rare_good_base
-			ShowDiscard $show_gear_rare_good_base
-			Continue
-		}
-
 		# set text color to indicate chance/chaos/regal recipe
-
 		ItemLevel >= 75
 		{
 			SetTextColor $color_rare_regal
