@@ -244,6 +244,7 @@ $alert_card_mid            = $alert_mid
 $alert_card_low            = $alert_low
 $alert_gem_awakened        = $alert_extraordinary
 $alert_gem_alternate       = $alert_extraordinary
+$alert_gem_exceptional     = $alert_extraordinary
 $alert_gem_drop_only       = $alert_uncommon
 $alert_gem_high            = $alert_high
 $alert_gem_mid             = $alert_mid
@@ -344,6 +345,7 @@ $icon_scarab_mid      = 1 White Kite
 $icon_scarab_low      = 2 White Kite
 $icon_gem_awakened    = 0 Green Diamond
 $icon_gem_alternate   = 0 Green Diamond
+$icon_gem_exceptional = 0 Green Diamond
 $icon_gem_drop_only   = 2 Green Diamond
 $icon_gem_high        = 0 Green Circle
 $icon_gem_mid         = 2 Green Circle
@@ -1317,8 +1319,24 @@ Class == "Skill Gems" "Support Gems"
 		Show
 	}
 
-	BaseType == "Empower Support" "Enhance Support" "Enlighten Support" "Portal" "Vaal Breach" "Awakened Enlighten Support" "Awakened Enhance Support" "Awakened Empower Support"
+	# drop only - expensive
+	BaseType == "Empower Support" "Enhance Support" "Enlighten Support" "Awakened Enlighten Support" "Awakened Enhance Support" "Awakened Empower Support"
 	{
+		SetBorderColor $color_gem
+		SetTextColor $color_gem
+		SetBackgroundColor $color_white
+		SetFontSize $font_max
+		SetAlertSound $alert_gem_exceptional
+		MinimapIcon $icon_gem_exceptional
+		Show
+	}
+
+	# drop only - cheap
+	BaseType == "Portal" "Vaal Breach"
+	{
+		SetTextColor $color_gem
+		SetBorderColor $color_gem
+		SetBackgroundColor $color_black
 		SetFontSize $font_gem_drop_only
 		SetAlertSound $alert_gem_drop_only
 		MinimapIcon $icon_gem_drop_only
