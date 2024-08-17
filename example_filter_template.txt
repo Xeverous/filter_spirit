@@ -323,6 +323,8 @@ $icon_fishing_rod     = 0 White Star
 $icon_currency_high   = 0 Yellow Star
 $icon_currency_mid    = 1 Yellow Star
 $icon_currency_low    = 2 Yellow Star
+$icon_gold_high       = 0 Yellow Circle
+$icon_gold_mid        = 2 Yellow Circle
 $icon_card_high       = 0 Blue Square
 $icon_card_mid        = 1 Blue Square
 $icon_card_low        = 2 Blue Square
@@ -1111,7 +1113,7 @@ Class == "Gold"
 		SetBackgroundColor $color_gold
 		SetFontSize $font_currency_high
 		SetAlertSound $alert_currency_mid
-		MinimapIcon $icon_currency_high
+		MinimapIcon $icon_gold_high
 		Show
 	}
 
@@ -1122,7 +1124,7 @@ Class == "Gold"
 		SetBorderColor $color_gold
 		SetFontSize $font_currency_mid
 		SetAlertSound $alert_gold
-		MinimapIcon $icon_currency_mid
+		MinimapIcon $icon_gold_mid
 		Show
 	}
 
