@@ -44,6 +44,7 @@ $color_synthesised_item    = $color_fractured_item
 $color_veiled_item         = 215 174 134
 $color_perandus            = 255 192 128
 $color_gold                = $color_perandus
+$color_idol                = $color_gold
 $color_breach              = 255  51 204
 $color_legion              = 200 133  44
 $color_delirium            = 192 192 192
@@ -211,6 +212,7 @@ $alert_currency_very_low   = $alert_frequent
 $alert_perandus            = $alert_frequent
 $alert_splinter            = $alert_frequent
 $alert_gold                = $alert_frequent
+$alert_idol                = $alert_common
 $alert_blessing            = $alert_uncommon
 $alert_harbinger_scroll    = $alert_currency_high
 $alert_essence_t7_t6       = $alert_common
@@ -1102,6 +1104,16 @@ Class == "Stackable Currency"
 	SetBackgroundColor $color_currency_mid
 	SetFontSize $font_max
 	SetAlertSound $alert_error
+	Show
+}
+
+Class == "Idol"
+{
+	SetTextColor $color_black
+	SetBackgroundColor $color_idol
+	SetFontSize $font_max
+	SetAlertSound $alert_idol
+	MinimapIcon $icon_atlas_upgrade
 	Show
 }
 
