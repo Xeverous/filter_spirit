@@ -1,3 +1,4 @@
+# always first, provides core dependencies and CMake settings
 add_subdirectory(lib)
 
 if(FILTER_SPIRIT_BUILD_EXECUTABLE_CLI)

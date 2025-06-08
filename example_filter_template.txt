@@ -658,12 +658,22 @@ $show_gear_any_normal = False
 # Show any equippable gear with specific links untill specified AreaLevel
 $cfg_gear_show_4_link_max_area_lvl = 67
 $cfg_gear_show_3_link_max_area_lvl = 30
-# Show absolutely any equippable gear untill speciied AreaLevel
+# Show absolutely any equippable gear until specified AreaLevel
 $cfg_gear_show_all_max_area_lvl = 15
 
-# this will apply globally to ALL blocks, unless overriden
-# removed because it breaks highlighting bases with Continue blocks
-# SetBackgroundColor $color_black
+$cfg_default_background_color = $color_black
+
+# Apply default background at the start.
+# Some items pass through multiple Continue blocks before reaching their final block.
+# This Continue block is better than plain action at the top because it applies
+# only once whereas a global action would inject an override to each block in
+# Continue-based highlights, needlessly overriding a style applied by first blocks
+# if the later ones do not have the same action specified.
+{
+	SetBackgroundColor $cfg_default_background_color
+	Show
+	Continue
+}
 
 Class == "Stackable Currency"
 {

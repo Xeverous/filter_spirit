@@ -81,7 +81,7 @@ obtain_item_price_report(
 	cache.load_cache_file_from_disk(logger);
 	if (download_league_name_ninja) {
 		return cache.get_report(
-			std::move(*download_league_name_ninja),
+			*download_league_name_ninja,
 			lang::data_source_type::poe_ninja,
 			expiration_time,
 			std::move(settings),
@@ -90,7 +90,7 @@ obtain_item_price_report(
 	}
 	else if (download_league_name_watch) {
 		return cache.get_report(
-			std::move(*download_league_name_watch),
+			*download_league_name_watch,
 			lang::data_source_type::poe_watch,
 			expiration_time,
 			std::move(settings),

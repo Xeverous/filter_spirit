@@ -1,7 +1,3 @@
-# declare dependencies
-
-find_package(Boost 1.68 REQUIRED)
-
 ##############################################################################
 # create target and set its properties
 

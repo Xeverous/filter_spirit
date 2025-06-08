@@ -5,7 +5,8 @@
 # - relative source file paths
 # - target_link_directories()
 # - INTERFACE_LINK_LIBRARIES
-cmake_minimum_required(VERSION 3.13...3.16)
+# 3.30 adds CMP0167 which replaces FindBoost with search for BoostConfig.cmake (supplied by Boost >= 1.70)
+cmake_minimum_required(VERSION 3.13...3.30)
 
 if(${CMAKE_VERSION} VERSION_LESS 3.12)
     cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
