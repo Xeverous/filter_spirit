@@ -122,7 +122,7 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 
 			for (const auto& str : expected.description_substrings) {
 				if (!utility::contains(actual.description, str)) {
-					BOOST_ERROR("underline \"" << actual.description << "\" does not contain \"" << str << "\"");
+					BOOST_ERROR("description \"" << actual.description << "\" does not contain \"" << str << "\"");
 				}
 			}
 		}
@@ -722,6 +722,29 @@ Autogen "oils"
 				diagnostic_message_pattern{dms::note, dmid::minor_note, expected_price_origin, {}},
 				diagnostic_message_pattern{dms::warning, dmid::autogen_without_price, expected_autogen_error, {}},
 				diagnostic_message_pattern{dms::note, dmid::minor_note, expected_autogen_origin, {}}
+			};
+
+			compare_diagnostics(patterns, diagnostics, parse_data.metadata);
+		}
+
+		BOOST_AUTO_TEST_CASE(invalid_transfigured_gem)
+		{
+			const std::string input_str = minimal_input() + R"(
+TransfiguredGem 123
+)";
+			const std::string_view input = input_str;
+			const parser::parsed_spirit_filter parse_data = parse(input);
+			const diagnostics_store diagnostics = expect_error_when_compiling(parse_data.ast);
+
+			const std::string_view expected_origin = search(input, "TransfiguredGem 123").result();
+			const std::string_view expected_param_origin = search(input, "123").result();
+
+			std::vector<diagnostic_message_pattern> patterns = {
+				diagnostic_message_pattern{dms::error, dmid::invalid_expression, expected_origin, {}},
+				diagnostic_message_pattern{dms::note, dmid::attempt_description, boost::none, {"TransfiguredGem Boolean"}},
+				diagnostic_message_pattern{dms::error, dmid::type_mismatch, expected_param_origin, {}},
+				diagnostic_message_pattern{dms::note, dmid::attempt_description, boost::none, {"TransfiguredGem [EQ] String+"}},
+				diagnostic_message_pattern{dms::error, dmid::type_mismatch, expected_param_origin, {}},
 			};
 
 			compare_diagnostics(patterns, diagnostics, parse_data.metadata);

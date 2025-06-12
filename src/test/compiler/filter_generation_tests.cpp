@@ -1794,6 +1794,14 @@ MemoryStrands < 20
 {
 	Hide
 }
+TransfiguredGem "Heavy Strike of Trarthus" "Sunder of Trarthus"
+{
+	Hide
+}
+TransfiguredGem True
+{
+	Show
+}
 )");
 			const std::string_view expected_filter =
 R"(Show
@@ -1809,6 +1817,12 @@ Show
 
 Hide
 	MemoryStrands < 20
+
+Hide
+	TransfiguredGem "Heavy Strike of Trarthus" "Sunder of Trarthus"
+
+Show
+	TransfiguredGem True
 
 )";
 

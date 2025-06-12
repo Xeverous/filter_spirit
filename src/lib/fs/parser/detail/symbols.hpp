@@ -165,7 +165,6 @@ namespace rf
 				(lang::keywords::rf::has_implicit_mod,          property::has_implicit_mod)
 				(lang::keywords::rf::has_crucible_passive_tree, property::has_crucible_passive_tree)
 				(lang::keywords::rf::alternate_quality,         property::alternate_quality)
-				(lang::keywords::rf::transfigured_gem,          property::transfigured_gem)
 				(lang::keywords::rf::zana_memory,               property::zana_memory)
 
 				// influence
@@ -209,6 +208,9 @@ namespace rf
 				// sockets
 				(lang::keywords::rf::sockets,      property::sockets)
 				(lang::keywords::rf::socket_group, property::socket_group)
+
+				// special (multiple variants)
+				(lang::keywords::rf::transfigured_gem, property::transfigured_gem)
 			;
 		}
 	};

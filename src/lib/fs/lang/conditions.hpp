@@ -54,12 +54,16 @@ private:
 	std::optional<lang::position_tag> m_value_origin;
 };
 
+// base type for all conditions
+// (currently nothing specific to add here)
 class condition
 {
 public:
 	virtual ~condition() = default;
 };
 
+// base type for all real-filter conditions
+// both RF and SF might generate them
 class official_condition : public condition
 {
 public:
@@ -182,7 +186,7 @@ inline std::shared_ptr<boolean_condition> make_has_crucible_passive_tree_conditi
 	return std::make_shared<boolean_condition_with_field_test>(official_condition_property::has_crucible_passive_tree, &item::has_crucible_passive_tree, value, origin);
 }
 
-inline std::shared_ptr<boolean_condition> make_transfigured_gem_condition(boolean value, position_tag origin)
+inline std::shared_ptr<boolean_condition> make_transfigured_gem_condition_boolean_version(boolean value, position_tag origin)
 {
 	return std::make_shared<boolean_condition_with_field_test>(official_condition_property::transfigured_gem, &item::is_transfigured_gem, value, origin);
 }
@@ -307,8 +311,8 @@ inline auto make_has_influence_condition(influence_spec spec, bool exact_match, 
  * - less/more comparison with 1 value - e.g. Rarity < Unique, ItemLevel >= 60
  * - equality comparison with (potentially multiple) values: e.g. Rarity Normal Rare
  *
- * The less/more variant (range_condition) stores only min/max bounds because
- * any such condition can be simplified to (at most) 2 bound values:
+ * The less/more variant (range_condition) stores only min/max bound because
+ * any such condition can be simplified to the most boundary value:
  * ItemLevel < 20 80 40 86
  * can be simplified to
  * ItemLevel < 86
@@ -941,6 +945,9 @@ inline std::shared_ptr<value_list_condition<integer>> make_area_level_value_list
  * - == works as expected
  */
 
+// Base type for all string-based comparisons.
+// Adds a common set of function implementations
+// but does not implement actual item test.
 class string_comparison_condition : public official_condition
 {
 public:
@@ -962,17 +969,40 @@ public:
 
 	bool allows_item_class(std::string_view class_name) const final;
 
-	condition_match_result test_item(const item& itm, int area_level) const final;
-
 protected:
-	virtual const std::string* get_item_field(const item& itm) const = 0;
+	condition_match_result test_item_impl(const std::string* item_field) const;
 
 private:
 	equality_comparison_type m_comparison_type;
 	container_type m_values;
 };
 
-class string_comparison_condition_with_string_field_test : public string_comparison_condition
+// Adds an item test implementation and a protected interface function
+// to supply the property from the item to match.
+// A potential design alternative would be to take pointer-to-member
+// but virtual function is more flexible - it allows to return null
+// in case item's property is std::optional<std::string>.
+class string_comparison_condition_with_field_test : public string_comparison_condition
+{
+public:
+	string_comparison_condition_with_field_test(
+		official_condition_property tested_property,
+		equality_comparison_type cmp,
+		container_type values,
+		position_tag origin)
+	: string_comparison_condition(tested_property, cmp, values, origin)
+	{}
+
+	condition_match_result test_item(const item& itm, int /* area_level */) const final
+	{
+		return test_item_impl(get_item_field(itm));
+	}
+
+protected:
+	virtual const std::string* get_item_field(const item& itm) const = 0;
+};
+
+class string_comparison_condition_with_string_field_test : public string_comparison_condition_with_field_test
 {
 public:
 	string_comparison_condition_with_string_field_test(
@@ -981,7 +1011,7 @@ public:
 		equality_comparison_type cmp,
 		container_type values,
 		position_tag origin)
-	: string_comparison_condition(tested_property, cmp, std::move(values), origin)
+	: string_comparison_condition_with_field_test(tested_property, cmp, std::move(values), origin)
 	, m_tested_field(tested_field)
 	{}
 
@@ -1010,7 +1040,7 @@ inline std::shared_ptr<string_comparison_condition> make_base_type_condition(
 		official_condition_property::base_type, &item::base_type, cmp, std::move(values), origin);
 }
 
-class string_comparison_condition_with_optional_string_field_test : public string_comparison_condition
+class string_comparison_condition_with_optional_string_field_test : public string_comparison_condition_with_field_test
 {
 public:
 	string_comparison_condition_with_optional_string_field_test(
@@ -1019,7 +1049,7 @@ public:
 		equality_comparison_type cmp,
 		container_type values,
 		position_tag origin)
-	: string_comparison_condition(tested_property, cmp, std::move(values), origin)
+	: string_comparison_condition_with_field_test(tested_property, cmp, std::move(values), origin)
 	, m_tested_field(tested_field)
 	{}
 
@@ -1049,6 +1079,36 @@ inline std::shared_ptr<string_comparison_condition> make_archnemesis_mod_conditi
 {
 	return std::make_shared<string_comparison_condition_with_optional_string_field_test>(
 		official_condition_property::archnemesis_mod, &item::archnemesis_mod, cmp, std::move(values), origin);
+}
+
+// string variant of the TransfiguredGem condition
+class transfigured_gem_string_comparison_condition : public string_comparison_condition
+{
+public:
+	transfigured_gem_string_comparison_condition(
+		equality_comparison_type cmp,
+		container_type values,
+		position_tag origin)
+	: string_comparison_condition(official_condition_property::transfigured_gem, cmp, std::move(values), origin)
+	{}
+
+	condition_match_result test_item(const item& itm, int /* area_level */) const final
+	{
+		// Fail early if the item is not a TransfiguredGem,
+		// otherwise testing the string (gem name) has no point.
+		if (!itm.is_transfigured_gem)
+			return condition_match_result(false, origin());
+
+		return test_item_impl(&itm.base_type);
+	}
+};
+
+inline std::shared_ptr<string_comparison_condition> make_transfigured_gem_condition_string_version(
+	equality_comparison_type cmp,
+	string_comparison_condition::container_type values,
+	position_tag origin)
+{
+	return std::make_shared<transfigured_gem_string_comparison_condition>(cmp, std::move(values), origin);
 }
 
 // ---- counted string comparison ----

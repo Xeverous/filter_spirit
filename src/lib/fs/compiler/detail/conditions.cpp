@@ -228,22 +228,24 @@ make_range_bound(
 
 template <typename T>
 [[nodiscard]] boost::optional<lang::condition_values_container<T>>
-make_condition_values_container(settings st, const lang::object& obj, diagnostics_store& diagnostics)
+make_condition_values_container(settings /* st */, const lang::object& obj, diagnostics_store& diagnostics)
 {
 	lang::condition_values_container<T> values;
 	diagnostics_store diagnostics_none;
 
 	for (const lang::single_object& sobj : obj.values) {
 		// Skip "None"s - they may come from variables.
-		// If an object is not none - ignore the problem and move forward.
 		if (get_as<lang::none_type>(sobj, diagnostics_none))
 			continue;
 
 		auto val = get_as<T>(sobj, diagnostics);
 
+		// If an object can not be T, fail immediately - this might force
+		// the caller to attempt different "rule overload". Returning valid
+		// object with errors could result in suboptimal overload choices.
 		if (val)
 			values.push_back(std::move(*val));
-		else if (st.error_handling.stop_on_error)
+		else
 			return boost::none;
 	}
 
@@ -426,8 +428,6 @@ make_official_condition(
 		case property_t::alternate_quality:
 			diagnostics.push_warning_dead_condition(pc.condition_origin, "no item can match it (use TransfiguredGem for gems)");
 			return make_boolean_condition(std::move(pc), lang::make_alternate_quality_condition, diagnostics);
-		case property_t::transfigured_gem:
-			return make_boolean_condition(std::move(pc), lang::make_transfigured_gem_condition, diagnostics);
 		case property_t::zana_memory:
 			return make_boolean_condition(std::move(pc), lang::make_zana_memory_condition, diagnostics);
 
@@ -607,6 +607,39 @@ make_official_condition(
 			return make_socket_specification_condition(st, std::move(pc), lang::make_sockets_condition, diagnostics);
 		case property_t::socket_group:
 			return make_socket_specification_condition(st, std::move(pc), lang::make_socket_group_condition, diagnostics);
+
+		// special case - TransfiguredGem
+		// it supports both a boolean test (e.g. TransfiguredGem True)
+		// but also a string test (e.g. TransfiguredGem "Heavy Strike of Trarthus")
+		case property_t::transfigured_gem: {
+			diagnostics_store diagnostics_boolean_version;
+			auto boolean_version_result = make_boolean_condition(
+				pc, lang::make_transfigured_gem_condition_boolean_version, diagnostics_boolean_version);
+
+			if (boolean_version_result) {
+				diagnostics.move_messages_from(diagnostics_boolean_version);
+				return boolean_version_result;
+			}
+
+			diagnostics_store diagnostics_string_version;
+			auto string_version_result = make_string_comparison_condition(
+				st, pc, lang::make_transfigured_gem_condition_string_version, diagnostics_string_version);
+
+			if (string_version_result) {
+				diagnostics.move_messages_from(diagnostics_string_version);
+				return string_version_result;
+			}
+
+			// main error
+			diagnostics.push_message(make_error(
+				diagnostic_message_id::invalid_expression, pc.condition_origin, "invalid ", lang::keywords::rf::transfigured_gem));
+			// errors specifying each variant problems
+			diagnostics.push_message(make_note_attempt_description("in attempt of TransfiguredGem Boolean"));
+			diagnostics.move_messages_from(diagnostics_boolean_version);
+			diagnostics.push_message(make_note_attempt_description("in attempt of TransfiguredGem [EQ] String+"));
+			diagnostics.move_messages_from(diagnostics_string_version);
+			return nullptr;
+		}
 	}
 
 	diagnostics.push_error_internal_compiler_error(__func__, pc.condition_origin);
@@ -654,7 +687,6 @@ spirit_filter_is_condition_allowed(
 		case property_t::has_implicit_mod:
 		case property_t::has_crucible_passive_tree:
 		case property_t::alternate_quality:
-		case property_t::transfigured_gem:
 		case property_t::zana_memory:
 		// influence - only 1 is allowed
 		case property_t::has_influence: {
@@ -758,6 +790,8 @@ spirit_filter_is_condition_allowed(
 		case property_t::has_enchantment:
 		case property_t::sockets:
 		case property_t::socket_group:
+		// This is always allowed because it has multiple variants
+		case property_t::transfigured_gem:
 			return true;
 	}
 

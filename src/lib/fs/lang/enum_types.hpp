@@ -31,7 +31,6 @@ enum class official_condition_property
 	has_implicit_mod,
 	has_crucible_passive_tree,
 	alternate_quality,
-	transfigured_gem,
 	zana_memory,
 
 	// comparison with influence
@@ -74,7 +73,10 @@ enum class official_condition_property
 
 	// socket conditions
 	sockets,
-	socket_group
+	socket_group,
+
+	// special (multiple variants)
+	transfigured_gem
 };
 
 inline std::string_view to_keyword(official_condition_property property)
@@ -114,8 +116,6 @@ inline std::string_view to_keyword(official_condition_property property)
 			return keywords::rf::has_crucible_passive_tree;
 		case official_condition_property::alternate_quality:
 			return keywords::rf::alternate_quality;
-		case official_condition_property::transfigured_gem:
-			return keywords::rf::transfigured_gem;
 		case official_condition_property::zana_memory:
 			return keywords::rf::zana_memory;
 		case official_condition_property::has_influence:
@@ -178,6 +178,8 @@ inline std::string_view to_keyword(official_condition_property property)
 			return keywords::rf::sockets;
 		case official_condition_property::socket_group:
 			return keywords::rf::socket_group;
+		case official_condition_property::transfigured_gem:
+			return keywords::rf::transfigured_gem;
 	}
 
 	throw unhandled_switch_case(__FILE__, __LINE__, __func__);

@@ -436,9 +436,8 @@ bool string_comparison_condition::allows_item_class(std::string_view class_name)
 	return find_match(class_name, m_values, m_comparison_type == equality_comparison_type::exact_match) != nullptr;
 }
 
-condition_match_result string_comparison_condition::test_item(const item& itm, int /* area_level */) const
+condition_match_result string_comparison_condition::test_item_impl(const std::string* item_field) const
 {
-	const std::string* const item_field = get_item_field(itm);
 	const string* match = nullptr;
 
 	if (item_field != nullptr) {

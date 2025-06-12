@@ -107,6 +107,7 @@ Class                  [EQ] String+
 BaseType               [EQ] String+
 EnchantmentPassiveNode [EQ] String+
 ArchnemesisMod         [EQ] String+
+TransfiguredGem        [EQ] String+
 HasInfluence           [EQ] None | Influence+
 
 HasExplicitMod         [==] | CMPInteger String+
@@ -136,9 +137,9 @@ TransfiguredGem        Boolean
 ZanaMemory             Boolean
 ```
 
-Note: numeric and `Rarity` conditions can accept multiple values, but there is no practicaly point in doing so. You can cover any range with 2 lines using different comparisons, which is much better than manually specifying all possible values in 1 line. Additionally, current FS implementation does not support this and will error on more than 1 value (this is true both for real filters and filter templates).
+Note: numeric and `Rarity` conditions can accept multiple values, but there is no practicaly point in doing so. You can cover any range with 2 lines using different comparisons, which is much better than manually specifying all possible values in 1 line.
 
-Note: Game allows it, but currently FS does not support multiples of the same non-range condition within one block.
+Note: `TransfiguredGem` has 2 possible ways of being used: either as a boolean test (gem is/is-not Transfigured) or as a name check (gem is Transfigured and matches specified name(s)).
 
 Wiki has some class-name related info (might be outdated):
 
