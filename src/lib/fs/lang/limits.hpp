@@ -22,6 +22,9 @@ namespace fs::lang::limits
 	constexpr auto max_item_influences = 6;
 	constexpr auto max_filter_influences = 6;
 
+	constexpr auto min_memory_strands = 0;
+	constexpr auto max_memory_strands = 100;
+
 	// ---- actions ----
 
 	constexpr auto ruthless_min_set_text_color_alpha = 80;

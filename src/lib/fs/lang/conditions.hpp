@@ -187,6 +187,11 @@ inline std::shared_ptr<boolean_condition> make_transfigured_gem_condition(boolea
 	return std::make_shared<boolean_condition_with_field_test>(official_condition_property::transfigured_gem, &item::is_transfigured_gem, value, origin);
 }
 
+inline std::shared_ptr<boolean_condition> make_zana_memory_condition(boolean value, position_tag origin)
+{
+	return std::make_shared<boolean_condition_with_field_test>(official_condition_property::zana_memory, &item::zana_memory, value, origin);
+}
+
 // a boolean_condition which's test_item implementation calls a boolean function in the item struct
 class boolean_condition_with_function_test : public boolean_condition
 {
@@ -849,6 +854,20 @@ inline std::shared_ptr<value_list_condition<integer>> make_base_defence_percenti
 {
 	return std::make_shared<value_list_condition_with_field_test<integer>>(
 		official_condition_property::base_defence_percentile, &item::base_defence_percentile, std::move(values), allowed, origin);
+}
+
+inline std::shared_ptr<range_bound_condition<integer>> make_memory_strands_range_bound_condition(
+	range_bound<integer> bound, bool is_lower_bound, position_tag origin)
+{
+	return std::make_shared<range_bound_condition_with_field_test<integer>>(
+		official_condition_property::memory_strands, &item::memory_strands, bound, is_lower_bound, origin);
+}
+
+inline std::shared_ptr<value_list_condition<integer>> make_memory_strands_value_list_condition(
+	value_list_condition<integer>::container_type values, bool allowed, position_tag origin)
+{
+	return std::make_shared<value_list_condition_with_field_test<integer>>(
+		official_condition_property::memory_strands, &item::memory_strands, std::move(values), allowed, origin);
 }
 
 // -- function test --

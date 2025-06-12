@@ -428,6 +428,8 @@ make_official_condition(
 			return make_boolean_condition(std::move(pc), lang::make_alternate_quality_condition, diagnostics);
 		case property_t::transfigured_gem:
 			return make_boolean_condition(std::move(pc), lang::make_transfigured_gem_condition, diagnostics);
+		case property_t::zana_memory:
+			return make_boolean_condition(std::move(pc), lang::make_zana_memory_condition, diagnostics);
 
 		// comparison with influence
 		case property_t::has_influence:
@@ -575,6 +577,13 @@ make_official_condition(
 				lang::make_has_eater_of_worlds_implicit_range_bound_condition,
 				lang::make_has_eater_of_worlds_implicit_value_list_condition,
 				diagnostics);
+		case property_t::memory_strands:
+			return make_range_or_list_condition(
+				st,
+				std::move(pc),
+				lang::make_memory_strands_range_bound_condition,
+				lang::make_memory_strands_value_list_condition,
+				diagnostics);
 
 		// comparison with an array of strings
 		case property_t::class_:
@@ -646,6 +655,7 @@ spirit_filter_is_condition_allowed(
 		case property_t::has_crucible_passive_tree:
 		case property_t::alternate_quality:
 		case property_t::transfigured_gem:
+		case property_t::zana_memory:
 		// influence - only 1 is allowed
 		case property_t::has_influence: {
 			FS_ASSERT_MSG(
@@ -679,7 +689,9 @@ spirit_filter_is_condition_allowed(
 		case property_t::base_energy_shield:
 		case property_t::base_ward:
 		case property_t::has_searing_exarch_implicit:
-		case property_t::has_eater_of_worlds_implicit: {
+		case property_t::has_eater_of_worlds_implicit:
+		case property_t::memory_strands:
+		{
 			switch (condition.comparison.operator_.value) {
 				case lang::comparison_type::less:
 				case lang::comparison_type::less_equal:

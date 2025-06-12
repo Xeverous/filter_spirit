@@ -101,6 +101,7 @@ BaseEnergyShield      [CMP] Integer+
 BaseWard              [CMP] Integer+
 HasSearingExarchImplicit [CMP] Integer+
 HasEaterOfWorldsImplicit [CMP] Integer+
+MemoryStrands         [CMP] Integer+
 
 Class                  [EQ] String+
 BaseType               [EQ] String+
@@ -132,6 +133,7 @@ UberBlightedMap        Boolean
 HasImplicitMod         Boolean
 HasCruciblePassiveTree Boolean
 TransfiguredGem        Boolean
+ZanaMemory             Boolean
 ```
 
 Note: numeric and `Rarity` conditions can accept multiple values, but there is no practicaly point in doing so. You can cover any range with 2 lines using different comparisons, which is much better than manually specifying all possible values in 1 line. Additionally, current FS implementation does not support this and will error on more than 1 value (this is true both for real filters and filter templates).

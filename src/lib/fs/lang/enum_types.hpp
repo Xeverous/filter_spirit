@@ -32,6 +32,7 @@ enum class official_condition_property
 	has_crucible_passive_tree,
 	alternate_quality,
 	transfigured_gem,
+	zana_memory,
 
 	// comparison with influence
 	has_influence,
@@ -59,6 +60,7 @@ enum class official_condition_property
 	base_defence_percentile,
 	has_searing_exarch_implicit,
 	has_eater_of_worlds_implicit,
+	memory_strands,
 
 	// comparison with an array of strings
 	class_,
@@ -114,6 +116,8 @@ inline std::string_view to_keyword(official_condition_property property)
 			return keywords::rf::alternate_quality;
 		case official_condition_property::transfigured_gem:
 			return keywords::rf::transfigured_gem;
+		case official_condition_property::zana_memory:
+			return keywords::rf::zana_memory;
 		case official_condition_property::has_influence:
 			return keywords::rf::has_influence;
 		case official_condition_property::rarity:
@@ -156,6 +160,8 @@ inline std::string_view to_keyword(official_condition_property property)
 			return keywords::rf::has_searing_exarch_implicit;
 		case official_condition_property::has_eater_of_worlds_implicit:
 			return keywords::rf::has_eater_of_worlds_implicit;
+		case official_condition_property::memory_strands:
+			return keywords::rf::memory_strands;
 		case official_condition_property::class_:
 			return keywords::rf::class_;
 		case official_condition_property::base_type:

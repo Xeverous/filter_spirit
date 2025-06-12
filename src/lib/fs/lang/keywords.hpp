@@ -72,6 +72,8 @@ namespace rf
 	constexpr auto has_implicit_mod = "HasImplicitMod";
 	constexpr auto has_crucible_passive_tree = "HasCruciblePassiveTree";
 	constexpr auto transfigured_gem = "TransfiguredGem";
+	constexpr auto zana_memory      = "ZanaMemory";
+	constexpr auto memory_strands   = "MemoryStrands";
 
 	// removed conditions
 	constexpr auto prophecy         = "Prophecy";

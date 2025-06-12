@@ -573,6 +573,7 @@ struct item
 	static constexpr auto sentinel_map_tier   = 0;
 	static constexpr auto sentinel_base_defence_percentile = 100;
 	static constexpr auto sentinel_enchantment_passive_num = 0;
+	static constexpr auto sentinel_memory_strands = 0;
 
 	// common and fundamental
 	int item_level = sentinel_item_level;
@@ -582,6 +583,7 @@ struct item
 	int max_stack_size = sentinel_stack_size; // filters do not support this property
 	rarity_type rarity_ = sentinel_rarity;
 	socket_info sockets = {};
+	int memory_strands = sentinel_memory_strands;
 
 	// defence
 	int base_armour = 0;
@@ -626,6 +628,7 @@ struct item
 	bool is_replica = false;
 	bool has_crucible_passive_tree = false;
 	bool is_transfigured_gem = false;
+	bool zana_memory = false;
 
 	// A logic-irrelevant field. Only for the user.
 	std::string description;

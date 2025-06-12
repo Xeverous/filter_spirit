@@ -1773,6 +1773,48 @@ Hide
 			BOOST_TEST(compare_strings(expected_filter, actual_filter));
 		}
 
+		BOOST_AUTO_TEST_CASE(trarthus_new_conditions)
+		{
+			const std::string actual_filter = generate_filter(minimal_input() + R"(
+MemoryStrands >= 50
+{
+	SetTextColor 50 0 0
+	Show
+}
+MemoryStrands >= 20
+{
+	SetTextColor 20 0 0
+	Show
+}
+ZanaMemory True
+{
+	Show
+}
+MemoryStrands < 20
+{
+	Hide
+}
+)");
+			const std::string_view expected_filter =
+R"(Show
+	MemoryStrands >= 50
+	SetTextColor 50 0 0
+
+Show
+	MemoryStrands >= 20
+	SetTextColor 20 0 0
+
+Show
+	ZanaMemory True
+
+Hide
+	MemoryStrands < 20
+
+)";
+
+			BOOST_TEST(compare_strings(expected_filter, actual_filter));
+		}
+
 		BOOST_AUTO_TEST_CASE(shaper_voice_lines)
 		{
 			const std::string actual_filter = generate_filter(minimal_input() + R"(

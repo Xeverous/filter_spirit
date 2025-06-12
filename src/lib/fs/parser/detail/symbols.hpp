@@ -166,6 +166,7 @@ namespace rf
 				(lang::keywords::rf::has_crucible_passive_tree, property::has_crucible_passive_tree)
 				(lang::keywords::rf::alternate_quality,         property::alternate_quality)
 				(lang::keywords::rf::transfigured_gem,          property::transfigured_gem)
+				(lang::keywords::rf::zana_memory,               property::zana_memory)
 
 				// influence
 				(lang::keywords::rf::has_influence,             property::has_influence)
@@ -193,6 +194,7 @@ namespace rf
 				(lang::keywords::rf::base_ward,                    property::base_ward)
 				(lang::keywords::rf::has_searing_exarch_implicit,  property::has_searing_exarch_implicit)
 				(lang::keywords::rf::has_eater_of_worlds_implicit, property::has_eater_of_worlds_implicit)
+				(lang::keywords::rf::memory_strands,               property::memory_strands)
 
 				// array of strings
 				(lang::keywords::rf::class_,                   property::class_)
