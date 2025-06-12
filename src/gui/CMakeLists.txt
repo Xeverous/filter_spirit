@@ -1,5 +1,10 @@
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/" ${CMAKE_MODULE_PATH})
 
+if(FILTER_SPIRIT_ENABLE_SANITIZERS)
+	# Required by Corrade. ifunc is incompatible with sanitizers
+	set(CORRADE_CPU_USE_IFUNC OFF CACHE BOOL "" FORCE)
+endif()
+
 # Add Corrade as a subproject
 set(CORRADE_USE_PEDANTIC_FLAGS ON)
 add_subdirectory("${CMAKE_SOURCE_DIR}/external/corrade" corrade EXCLUDE_FROM_ALL)
