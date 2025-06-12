@@ -112,9 +112,9 @@ public:
 	, m_value(value)
 	{}
 
-	bool is_valid() const override { return true; }
+	bool is_valid() const final { return true; }
 
-	void print(std::ostream& os) const override;
+	void print(std::ostream& os) const final;
 
 protected:
 	boolean value() const { return m_value; }
@@ -132,7 +132,7 @@ public:
 	, m_tested_field(tested_field)
 	{}
 
-	condition_match_result test_item(const item& itm, int /* area_level */) const override
+	condition_match_result test_item(const item& itm, int /* area_level */) const final
 	{
 		const boolean val = value();
 		return condition_match_result(itm.*m_tested_field == val.value, origin(), val.origin);
@@ -203,7 +203,7 @@ public:
 	, m_test_func(test_func)
 	{}
 
-	condition_match_result test_item(const item& itm, int /* area_level */) const override
+	condition_match_result test_item(const item& itm, int /* area_level */) const final
 	{
 		const boolean val = value();
 		return condition_match_result((itm.*m_test_func)() == val.value, origin(), val.origin);
@@ -260,7 +260,7 @@ public:
 	: boolean_condition(official_condition_property::alternate_quality, value, origin)
 	{}
 
-	condition_match_result test_item(const item& /* itm */, int /* area_level */) const override
+	condition_match_result test_item(const item& /* itm */, int /* area_level */) const final
 	{
 		// dead condition, no item can satisfy it
 		return condition_match_result::failure(origin());
@@ -283,11 +283,11 @@ public:
 	, m_influence_spec(spec)
 	{}
 
-	condition_match_result test_item(const item& itm, int area_level) const override;
+	condition_match_result test_item(const item& itm, int area_level) const final;
 
-	bool is_valid() const override { return true; }
+	bool is_valid() const final { return true; }
 
-	void print(std::ostream& os) const override;
+	void print(std::ostream& os) const final;
 
 private:
 	bool m_exact_match;
@@ -385,7 +385,7 @@ public:
 	, m_bound(bound)
 	{}
 
-	bool allows_item_rarity(rarity_type r) const override
+	bool allows_item_rarity(rarity_type r) const final
 	{
 		if constexpr (std::is_same_v<value_type, rarity_type>)
 			return test_property_value(r);
@@ -440,7 +440,7 @@ public:
 	{}
 
 protected:
-	value_type get_tested_property_value(const item& itm, int /* area_level */) const override
+	value_type get_tested_property_value(const item& itm, int /* area_level */) const final
 	{
 		return itm.*m_tested_field;
 	}
@@ -466,7 +466,7 @@ public:
 	{}
 
 protected:
-	value_type get_tested_property_value(const item& itm, int /* area_level */) const override
+	value_type get_tested_property_value(const item& itm, int /* area_level */) const final
 	{
 		return (itm.*m_test_func)();
 	}
@@ -489,7 +489,7 @@ public:
 	{}
 
 protected:
-	value_type get_tested_property_value(const item& /* itm */, int area_level) const override
+	value_type get_tested_property_value(const item& /* itm */, int area_level) const final
 	{
 		return area_level;
 	}
@@ -521,7 +521,7 @@ public:
 	, m_allowed(allowed)
 	{}
 
-	bool allows_item_rarity(rarity_type r) const override
+	bool allows_item_rarity(rarity_type r) const final
 	{
 		if constexpr (std::is_same_v<value_type, rarity_type>)
 			return test_property_value(r).is_successful;
@@ -573,7 +573,7 @@ public:
 	{}
 
 protected:
-	value_type get_tested_property_value(const item& itm, int /* area_level */) const override
+	value_type get_tested_property_value(const item& itm, int /* area_level */) const final
 	{
 		return itm.*m_tested_field;
 	}
@@ -601,7 +601,7 @@ public:
 	{}
 
 protected:
-	value_type get_tested_property_value(const item& itm, int /* area_level */) const override
+	value_type get_tested_property_value(const item& itm, int /* area_level */) const final
 	{
 		return (itm.*m_test_func)();
 	}
@@ -624,7 +624,7 @@ public:
 	{}
 
 protected:
-	value_type get_tested_property_value(const item& /* itm */, int area_level) const override
+	value_type get_tested_property_value(const item& /* itm */, int area_level) const final
 	{
 		return area_level;
 	}
@@ -960,7 +960,7 @@ public:
 
 	void print(std::ostream& os) const final;
 
-	bool allows_item_class(std::string_view class_name) const override;
+	bool allows_item_class(std::string_view class_name) const final;
 
 	condition_match_result test_item(const item& itm, int area_level) const final;
 
@@ -986,7 +986,7 @@ public:
 	{}
 
 protected:
-	const std::string* get_item_field(const item& itm) const override { return &(itm.*m_tested_field); }
+	const std::string* get_item_field(const item& itm) const final { return &(itm.*m_tested_field); }
 
 private:
 	std::string item::* m_tested_field;
@@ -1024,7 +1024,7 @@ public:
 	{}
 
 protected:
-	const std::string* get_item_field(const item& itm) const override
+	const std::string* get_item_field(const item& itm) const final
 	{
 		const std::optional<std::string>& opt = itm.*m_tested_field;
 		if (opt)
@@ -1123,7 +1123,7 @@ public:
 	{}
 
 protected:
-	int count_matches(const item& itm, const container_type& values, bool exact_match_required) const override;
+	int count_matches(const item& itm, const container_type& values, bool exact_match_required) const final;
 };
 
 inline std::shared_ptr<counted_string_comparison_condition> make_has_explicit_mod_condition(
@@ -1149,7 +1149,7 @@ public:
 	{}
 
 protected:
-	int count_matches(const item& itm, const container_type& values, bool exact_match_required) const override;
+	int count_matches(const item& itm, const container_type& values, bool exact_match_required) const final;
 };
 
 inline std::shared_ptr<counted_string_comparison_condition> make_has_enchantment_condition(
@@ -1177,11 +1177,11 @@ public:
 	, m_values(std::move(specs))
 	{}
 
-	bool is_valid() const override { return !m_values.empty(); }
+	bool is_valid() const final { return !m_values.empty(); }
 
-	condition_match_result test_item(const item& itm, int area_level) const override;
+	condition_match_result test_item(const item& itm, int area_level) const final;
 
-	void print(std::ostream& os) const override;
+	void print(std::ostream& os) const final;
 
 private:
 	comparison_type m_comparison_type;
