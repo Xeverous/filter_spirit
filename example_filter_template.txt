@@ -59,7 +59,7 @@ $color_card                = 100 210 255
 $color_gem                 =  27 162 155
 $color_corrupted           = 255 127 127
 $color_scourged            = 210 112   0
-$color_sacrifice           = 127  63   0
+$color_sacrifice           =  87  43   0
 $color_mortal              =  60 150   0
 $color_heist               = 204 130 130
 $color_sanctum             = $color_heist
@@ -1555,8 +1555,9 @@ Class == "Map Fragments"
 	# Normal Atziri
 	BaseType "Sacrifice"
 	{
-		SetTextColor $color_sacrifice
+		SetBackgroundColor $color_sacrifice
 		SetBorderColor $color_sacrifice
+		SetTextColor $color_white
 		SetFontSize $font_max
 		SetAlertSound $alert_fragment_sacrifice
 		Show
@@ -1565,8 +1566,9 @@ Class == "Map Fragments"
 	# Uber Atziri
 	BaseType "Mortal"
 	{
-		SetTextColor $color_mortal
+		SetBackgroundColor $color_mortal
 		SetBorderColor $color_mortal
+		SetTextColor $color_white
 		SetFontSize $font_max
 		SetAlertSound $alert_fragment_mortal
 		Show
