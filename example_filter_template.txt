@@ -1616,6 +1616,7 @@ Class == "Map Fragments"
 		SetBackgroundColor $color_white
 		SetFontSize $font_max
 		SetAlertSound $alert_fragment_mist_king
+		Show
 	}
 
 	BaseType == "Sacred Blossom"
@@ -1625,6 +1626,7 @@ Class == "Map Fragments"
 		SetBackgroundColor $color_harvest
 		SetFontSize $font_max
 		SetAlertSound $alert_fragment_sacred_blossom
+		Show
 	}
 
 	BaseType "Emblem"
@@ -1690,6 +1692,13 @@ Class == "Map Fragments"
 		Show
 	}
 
+	# error block
+	SetTextColor $color_error
+	SetBorderColor $color_error
+	SetFontSize $font_max
+	SetAlertSound $alert_error
+	PlayEffect Red
+	MinimapIcon $icon_error
 	Show
 }
 
