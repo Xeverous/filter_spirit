@@ -1356,7 +1356,7 @@ Class == "Skill Gems" "Support Gems"
 	}
 
 	# 3.26 new transfigured gems
-	BaseType "of Trarthus"
+	TransfiguredGem "of Trarthus"
 	{
 		SetBorderColor $color_gem
 		SetTextColor $color_gem
