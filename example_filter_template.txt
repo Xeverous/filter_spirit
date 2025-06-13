@@ -2188,7 +2188,9 @@ Rarity <= Rare
 	Quality > 20
 	Mirrored False
 	{
+		SetTextColor $color_black
 		SetBackgroundColor $color_high_quality
+		SetBorderColor $color_high_quality
 		SetAlertSound $alert_item_high_quality
 		ShowDiscard $show_items_high_quality
 	}
