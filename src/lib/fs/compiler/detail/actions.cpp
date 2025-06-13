@@ -159,8 +159,17 @@ make_minimap_icon_action(
 		return boost::none;
 
 	auto maybe_icon_size = get_as<lang::integer>(obj.values[0], diagnostics);
-	if (!maybe_icon_size)
+	if (!maybe_icon_size) {
+		// Check for a common mistake: using None instead of -1 for MinimapIcon
+		diagnostics_store diagnostics_ignored;
+		auto maybe_none = get_as<lang::none_type>(obj.values[0], diagnostics_ignored);
+		if (maybe_none) {
+			diagnostics.push_message(make_note(
+				dmid::minor_note, obj.values[0].origin, "use value -1 to disable MinimapIcon"));
+		}
+
 		return boost::none;
+	}
 
 	const lang::integer& icon_size = *maybe_icon_size;
 
