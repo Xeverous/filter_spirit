@@ -680,7 +680,7 @@ Class == "Stackable Currency"
 {
 	SetBackgroundColor $color_black
 
-	BaseType == "Divine Orb" "Mirror of Kalandra" "Eternal Orb" "Albino Rhoa Feather" "Mirror Shard" "Crusader's Exalted Orb" "Redeemer's Exalted Orb" "Hunter's Exalted Orb" "Warlord's Exalted Orb" "Awakener's Orb" "Prime Regrading Lens" "Secondary Regrading Lens" "Tempering Orb" "Tailoring Orb" "Tainted Divine Teardrop" "Exceptional Eldritch Ember" "Exceptional Eldritch Ichor" "Orb of Conflict" "Orb of Dominance" "Fracturing Orb" "Fracturing Shard" "Hinekora's Lock" "Veiled Orb"
+	BaseType == "Divine Orb" "Mirror of Kalandra" "Eternal Orb" "Albino Rhoa Feather" "Mirror Shard" "Crusader's Exalted Orb" "Redeemer's Exalted Orb" "Hunter's Exalted Orb" "Warlord's Exalted Orb" "Shaper's Exalted Orb" "Elder's Exalted Orb" "Awakener's Orb" "Prime Regrading Lens" "Secondary Regrading Lens" "Tempering Orb" "Tailoring Orb" "Tainted Divine Teardrop" "Exceptional Eldritch Ember" "Exceptional Eldritch Ichor" "Orb of Conflict" "Orb of Dominance" "Fracturing Orb" "Fracturing Shard" "Hinekora's Lock" "Veiled Exalted Orb" "Orb of Remembrance" "Orb of Unravelling" "Orb of Intention"
 	{
 		Expand $actions_currency_high
 		Show
@@ -698,7 +698,13 @@ Class == "Stackable Currency"
 		Show
 	}
 
-	BaseType == "Exalted Orb" "Chaos Orb" "Gemcutter's Prism" "Stacked Deck" "Exalted Shard" "Orb of Annulment" "Harbinger's Orb" "Ancient Orb" "Facetor's Lens" "Infused Engineer's Orb" "Orb of Unmaking" "Ritual Splinter" "Ritual Vessel" "Crescent Splinter" "Tainted Blessing" "Tainted Chromatic Orb" "Tainted Orb of Fusing" "Tainted Jeweller's Orb" "Tainted Blacksmith's Whetstone" "Tainted Armourer's Scrap" "Tainted Chaos Orb" "Tainted Mythic Orb" "Tainted Blessing" "Tainted Exalted Orb" "Sacred Orb" "Lesser Eldritch Ember" "Greater Eldritch Ember" "Grand Eldritch Ember" "Lesser Eldritch Ichor" "Greater Eldritch Ichor" "Grand Eldritch Ichor" "Eldritch Chaos Orb" "Eldritch Exalted Orb" "Eldritch Orb of Annulment" "Glassblower's Bauble"
+	BaseType == "Exalted Orb" "Chaos Orb" "Gemcutter's Prism" "Stacked Deck" "Exalted Shard" "Orb of Annulment" "Harbinger's Orb" "Ancient Orb" "Facetor's Lens" "Infused Engineer's Orb" "Orb of Unmaking" "Ritual Splinter" "Ritual Vessel" "Crescent Splinter" "Tainted Blessing" "Tainted Chromatic Orb" "Tainted Orb of Fusing" "Tainted Jeweller's Orb" "Tainted Blacksmith's Whetstone" "Tainted Armourer's Scrap" "Tainted Chaos Orb" "Tainted Mythic Orb" "Tainted Blessing" "Tainted Exalted Orb" "Sacred Orb" "Lesser Eldritch Ember" "Greater Eldritch Ember" "Grand Eldritch Ember" "Lesser Eldritch Ichor" "Greater Eldritch Ichor" "Grand Eldritch Ichor" "Eldritch Chaos Orb" "Eldritch Exalted Orb" "Eldritch Orb of Annulment" "Glassblower's Bauble" "Veiled Chaos Orb"
+	{
+		Expand $actions_currency_mid
+		Show
+	}
+
+	BaseType "Runegraft"
 	{
 		Expand $actions_currency_mid
 		Show
@@ -1068,13 +1074,6 @@ Class == "Stackable Currency"
 		Show
 	}
 
-	# 3.25 Runes for crafting in Kingsmarch
-	BaseType == "Life Rune" "Sun Rune" "Bound Rune" "War Rune" "River Rune" "Bounty Rune" "Journey Rune" "Mountain Rune" "Time Rune" "Power Rune"
-	{
-		Expand $actions_currency_mid
-		Show
-	}
-
 	# 3.19 reworked Harvest - make each of respective color?
 	BaseType "Crystallised Lifeforce"
 	{
@@ -1356,6 +1355,18 @@ Class == "Skill Gems" "Support Gems"
 		Show
 	}
 
+	# 3.26 new transfigured gems
+	BaseType "of Trarthus"
+	{
+		SetBorderColor $color_gem
+		SetTextColor $color_gem
+		SetBackgroundColor $color_white
+		SetFontSize $font_max
+		SetAlertSound $alert_gem_exceptional
+		MinimapIcon $icon_gem_exceptional
+		Show
+	}
+
 	# drop only - cheap
 	BaseType == "Portal" "Vaal Breach"
 	{
@@ -1475,6 +1486,26 @@ Class == "Atlas Upgrade Items"
 	SetFontSize $font_max
 	SetAlertSound $alert_atlas_upgrade
 	MinimapIcon $icon_atlas_upgrade
+	Show
+}
+
+ZanaMemory True
+{
+	SetTextColor $color_black
+	SetBorderColor $color_black
+	SetBackgroundColor $color_atlas
+	SetFontSize $font_max
+	SetAlertSound $alert_very_specific
+	Show
+}
+
+MemoryStrands > 0
+{
+	SetTextColor $color_black
+	SetBorderColor $color_black
+	SetBackgroundColor $color_atlas
+	SetFontSize $font_max
+	SetAlertSound $alert_very_specific
 	Show
 }
 
@@ -1611,10 +1642,17 @@ Class == "Map Fragments"
 		{
 			Show
 		}
+
+		# 3.26 Atlas Embers (scarab-like items)
+		BaseType "Allflame Ember"
+		{
+			Show
+		}
 	}
 
 	# 3.25 reintroduction of King of the Mists boss from Affliction league
-	BaseType == "An Audience With The King"
+	# 3.26 reworked, now itemized Catarina entry
+	BaseType == "An Audience With The King" "Syndicate Medallion"
 	{
 		SetBorderColor $color_black
 		SetTextColor $color_black
@@ -1661,7 +1699,7 @@ Class == "Map Fragments"
 		Show
 	}
 
-	BaseType == "The Maven's Writ"
+	BaseType == "The Maven's Writ" "Echo of Trauma" "Echo of Reverence" "Echo of Loneliness"
 	{
 		SetTextColor $color_white
 		SetBorderColor $color_atlas
@@ -1806,16 +1844,6 @@ Class == "Vault Key"
 	{
 		Show
 	}
-}
-
-Class == "Memory"
-{
-	SetTextColor $color_black
-	SetBorderColor $color_black
-	SetBackgroundColor $color_atlas
-	SetFontSize $font_max
-	SetAlertSound $alert_very_specific
-	Show
 }
 
 # note: Izaro will speak upon key drops
