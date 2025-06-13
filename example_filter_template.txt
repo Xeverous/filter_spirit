@@ -335,6 +335,7 @@ $icon_oil_mid         = 2 Orange Raindrop
 $icon_tattoo_high     = 0 Brown Triangle
 $icon_tattoo_mid      = 2 Brown Triangle
 $icon_reliquary       = 0 Brown Star
+$icon_fragment_worthy = 0 Purple Cross
 $icon_atlas_upgrade   = 0 Purple Cross
 $icon_map_atlas_boss  = 0 White Cross
 $icon_map_purple      = 2 Purple Cross
@@ -1547,6 +1548,7 @@ Class == "Map Fragments"
 		SetBackgroundColor $color_atlas
 		SetFontSize $font_divine_vessel
 		SetAlertSound $alert_divine_vessel
+		MinimapIcon $icon_fragment_worthy
 		Show
 	}
 
@@ -1576,6 +1578,7 @@ Class == "Map Fragments"
 		SetBackgroundColor $color_red
 		SetFontSize $font_max
 		SetAlertSound $alert_fragment_atlas
+		MinimapIcon $icon_fragment_worthy
 
 		# Shaper guardians
 		BaseType == "Fragment of the Phoenix" "Fragment of the Minotaur" "Fragment of the Chimera" "Fragment of the Hydra"
@@ -1616,6 +1619,7 @@ Class == "Map Fragments"
 		SetBackgroundColor $color_white
 		SetFontSize $font_max
 		SetAlertSound $alert_fragment_mist_king
+		MinimapIcon $icon_fragment_worthy
 		Show
 	}
 
@@ -1626,6 +1630,7 @@ Class == "Map Fragments"
 		SetBackgroundColor $color_harvest
 		SetFontSize $font_max
 		SetAlertSound $alert_fragment_sacred_blossom
+		MinimapIcon $icon_fragment_worthy
 		Show
 	}
 
@@ -1636,6 +1641,7 @@ Class == "Map Fragments"
 		SetBackgroundColor $color_white
 		SetFontSize $font_emblem
 		SetAlertSound $alert_emblem
+		MinimapIcon $icon_fragment_worthy
 		Show
 	}
 
@@ -1649,6 +1655,7 @@ Class == "Map Fragments"
 		SetBackgroundColor $color_white
 		SetFontSize $font_max
 		SetAlertSound $alert_undroppable
+		MinimapIcon $icon_fragment_worthy
 		Show
 	}
 
@@ -1659,6 +1666,7 @@ Class == "Map Fragments"
 		SetBackgroundColor $color_atlas
 		SetFontSize $font_max
 		SetAlertSound $alert_undroppable
+		MinimapIcon $icon_fragment_worthy
 		Show
 	}
 
@@ -1669,6 +1677,7 @@ Class == "Map Fragments"
 		SetBackgroundColor $color_white
 		SetFontSize $font_max
 		SetAlertSound $alert_undroppable
+		MinimapIcon $icon_fragment_worthy
 		Show
 	}
 
