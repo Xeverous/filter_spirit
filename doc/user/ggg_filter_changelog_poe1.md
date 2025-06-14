@@ -1,10 +1,20 @@
-# List of changes in actual filters made by GGG
+# List of changes in actual filters made by GGG - Path of Exile 1
 
 ## Basically a list of all official forum threads and reddit posts containing filter-related information.
 
 Most threads contain a lit of new map tiers, new mods, new item base types and new filter features.
 
 *newest at the top*
+
+### 3.26 (Secrets of the Atlas + Trarthus) [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3788869)
+
+- new condition: `ZanaMemory Boolean`
+- new condition: `MemoryStrands [CMP] Integer`
+- `TransfiguredGem Boolean` has now a new variant: `TransfiguredGem String+` (matches specific gems)
+- New Currencies, Map Fragments and Transfigured Gems
+- changed Divination Cards and Veiled Chaos/Exalted Orb
+- Removed Runes and Memories
+- [patch notes](https://www.pathofexile.com/forum/view-thread/3787013)
 
 ### 3.25 (Settlers of Kalguur) [Item Filter Information](www.pathofexile.com/forum/view-thread/3532553)
 
@@ -30,6 +40,15 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 - New item bases and Affliction-related item classes
 - Metamorph replaced with Ultimatum
 - [patch notes](https://www.pathofexile.com/forum/view-thread/3451455)
+
+### 3.22.2b (Ancestors end)[https://www.pathofexile.com/forum/view-thread/3452244]
+
+- *Added a new `Import` command to load contents of one item filter into another.*
+- *Item filters can now use `!=` in place of `!` if desired to check for negation.*
+- *When specifying multiple matches for negation specifically, item filters now use "none of" instead of "any of" for the match.*
+- *`CustomAlertSound` can now specify multiple files, separated by semicolons, and will play one at random.*
+- *Fixed `!=` (and `!`) not working with `EnchantmentPassiveNode`, `HasExplicitMod`, `HasEnchantment` rules.*
+- *Fixed a bug where hidden items could still play effects, sounds and create minimap icons.*
 
 ### 3.22 (Trial of the Ancestors) [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3410483)
 
@@ -67,6 +86,16 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 - [announcement post](https://www.pathofexile.com/forum/view-thread/3264698)
 - [list of teasers](https://www.pathofexile.com/forum/view-thread/3265256)
 
+### 03.03.2022 - [Undocumented Change](https://old.reddit.com/r/pathofexile/comments/t5eaa0/filters_are_broken/)
+
+- The change broke one `EnchantmentPassiveNode` name: `"Damage with Two Handed Melee Weapons"` was changed to `"Damage with Two Handed Weapons"`
+- Yes, this means that the fix is to just remove `Melee`. Pun intended.
+
+### 3.17.2
+
+- [patch notes](https://www.pathofexile.com/forum/view-thread/3251063)
+- *Fixed a bug where temporary beam effects for item filters were not so temporary if they continued from a permanent beam.*
+
 ### 3.17 (Archnemesis + Siege of the Atlas) [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3230194)
 
 - New conditions: `HasSearingExarchImplicit`, `HasSearingExarchImplicit` and `ArchnemesisMod`
@@ -74,6 +103,10 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 - [gem information](https://www.pathofexile.com/forum/view-thread/3229646)
 - [announcement post](https://www.pathofexile.com/forum/view-thread/3229084)
 - [list of teasers](https://www.pathofexile.com/forum/view-thread/3228003)
+
+### 19.01.2022 - [HasExplicitMod bugs found](https://old.reddit.com/r/pathofexile/comments/s7bk7s/filter_condition_hasexplicitmod_seems_buggy/)
+
+- `HasExplicitMod` was behaving incorrectly (in reverse) with operators `>`, `<`, and `<=`
 
 ### 3.16.0b
 
