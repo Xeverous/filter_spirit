@@ -1431,13 +1431,6 @@ Rarity Unique
 	SetBorderColor $color_unique
 	SetFontSize $font_unique
 
-	Quality > 20
-	{
-		SetBorderColor $color_high_quality
-		ShowDiscard $show_items_high_quality
-		Continue
-	}
-
 	# Tabula Rasa and Skin of the Loyal
 	# ...and any unique that drops 6L'd (some league content drops linked uniques)
 	LinkedSockets 6
@@ -1451,7 +1444,7 @@ Rarity Unique
 		Show
 	}
 
-	Quality > 20
+	Quality >= 28
 	{
 		SetBorderColor $color_high_quality
 		SetAlertSound $alert_item_high_quality
@@ -2213,7 +2206,7 @@ Rarity <= Rare
 	}
 
 	# high-quality bases for Mythic Orb, crafting or chancing
-	Quality > 20
+	Quality >= 28
 	Mirrored False
 	{
 		SetTextColor $color_black
