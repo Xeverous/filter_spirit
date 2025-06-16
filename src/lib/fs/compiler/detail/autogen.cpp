@@ -305,7 +305,7 @@ make_autogen_func(
 		case lang::autogen_category::tattoos:
 			return make_autogen_simple(st, conditions, autogen.origin, cn::tattoos, &ipd::tattoos, diagnostics);
 		case lang::autogen_category::incubators:
-			return make_autogen_simple(st, conditions, autogen.origin, cn::incubator, &ipd::vials, diagnostics);
+			return make_autogen_simple(st, conditions, autogen.origin, cn::incubator, &ipd::incubators, diagnostics);
 		case lang::autogen_category::cards:
 			return make_autogen_simple(st, conditions, autogen.origin, cn::divination_card, &ipd::divination_cards, diagnostics);
 		case lang::autogen_category::gems:
