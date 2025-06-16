@@ -829,14 +829,32 @@ spirit_filter_add_official_condition(
 
 [[nodiscard]] bool
 spirit_filter_add_autogen_condition(
+	settings st,
 	const parser::ast::sf::autogen_condition& condition,
+	const symbol_table& symbols,
 	std::optional<autogen_protocondition>& autogen,
 	diagnostics_store& diagnostics)
 {
-	const auto category = lang::autogen_category::_from_string_nothrow(condition.name.c_str());
+	const auto maybe_obj = evaluate_sequence(st, condition.seq, symbols, diagnostics);
+	if (!maybe_obj)
+		return false;
+
+	const lang::object& obj = *maybe_obj;
+
+	if (!check_object_size(obj, 1, 1, diagnostics))
+		return false;
+
+	FS_ASSERT(obj.values.size() == 1u);
+
+	const auto maybe_str = get_as<lang::string>(obj.values.front(), diagnostics);
+	if (!maybe_str)
+		return false;
+
+	const lang::string& autogen_name = *maybe_str;
+
+	const auto category = lang::autogen_category::_from_string_nothrow(autogen_name.value.c_str());
 	if (!category) {
-		diagnostics.push_error_invalid_expression(
-			position_tag_of(condition.name), "invalid autogeneration");
+		diagnostics.push_error_invalid_expression(autogen_name.origin, "invalid autogeneration name");
 		return false;
 	}
 
@@ -978,7 +996,7 @@ spirit_filter_add_condition(
 			return spirit_filter_add_official_condition(st, cond, symbols, block_conditions.official, diagnostics);
 		},
 		[&](const parser::ast::sf::autogen_condition& cond) {
-			return spirit_filter_add_autogen_condition(cond, block_conditions.autogen, diagnostics);
+			return spirit_filter_add_autogen_condition(st, cond, symbols, block_conditions.autogen, diagnostics);
 		},
 		[&](const parser::ast::sf::price_comparison_condition& cond) {
 			return spirit_filter_add_price_comparison_condition(st, cond, symbols, block_conditions.price_range, diagnostics);

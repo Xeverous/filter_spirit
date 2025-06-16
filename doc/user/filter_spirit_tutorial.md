@@ -708,7 +708,7 @@ FS offers extra conditions that automatically fill `BaseType` condition with ite
 
 ```
 # FS autogeneration extensions
-Autogen         Identifier    # does not start with "$"
+Autogen         String
 Price           [CMP] Integer
 ```
 
@@ -800,6 +800,7 @@ Some autogenerations place additional requirements:
 Some implementation notes:
 
 - `scarabs` also report bestiary lures (both have class `"Map Fragments"`)
+- **Unique items are currently not supported**. Planned for reimplementation on a more robust algorithm, taking into consideration all aspects (base, sockets, ilvl, whether all uniques on specific base are cheap etc.).
 
 Examples:
 
@@ -813,7 +814,7 @@ Class == "Divination Card"
 		Show
 	}
 
-	Autogen cards
+	Autogen "cards"
 	{
 		Price > 150
 		{
@@ -863,7 +864,7 @@ Rarity Unique
 	SetTextColor $brown
 
 	# surely good drops
-	Autogen uniques_eq_unambiguous
+	Autogen "uniques_eq_unambiguous"
 	Price > 100
 	{
 		SetAlertSound 1
@@ -871,7 +872,7 @@ Rarity Unique
 	}
 
 	# potentially good drops
-	Autogen uniques_eq_ambiguous
+	Autogen "uniques_eq_ambiguous"
 	Price > 100
 	{
 		SetAlertSound $sound_need_check
@@ -890,7 +891,7 @@ Class == "Stackable Currency"
 	SetTextColor $yellow
 
 	# show only valuable catalysts
-	Autogen currency
+	Autogen "currency"
 	BaseType "Catalyst"
 	Price >= 0.5
 	{

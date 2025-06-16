@@ -311,7 +311,7 @@ namespace sf
 	// ---- conditions ----
 
 	const autogen_condition_type autogen_condition = "autogen condition";
-	const auto autogen_condition_def = make_keyword(lang::keywords::sf::autogen) > common::string_literal;
+	const auto autogen_condition_def = make_keyword(lang::keywords::sf::autogen) > sequence;
 	BOOST_SPIRIT_DEFINE(autogen_condition)
 
 	const price_comparison_condition_type price_comparison_condition = "price comparison condition";

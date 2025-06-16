@@ -424,15 +424,15 @@ namespace sf
 
 	struct autogen_condition : x3::position_tagged
 	{
-		auto& operator=(common::string_literal autogen_name)
+		auto& operator=(sequence s)
 		{
-			name = std::move(autogen_name);
+			seq = std::move(s);
 			return *this;
 		}
 
-		const auto& get_value() const { return name; }
+		const auto& get_value() const { return seq; }
 
-		common::string_literal name;
+		sequence seq;
 	};
 
 	struct price_comparison_condition : x3::position_tagged
