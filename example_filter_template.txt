@@ -592,6 +592,8 @@ $show_jewels_basic = True
 
 $show_gear_fractured = True
 $show_gear_synthesised = True
+$show_gear_memory_strands = True
+$cfg_memory_strands_min = 1
 $show_gear_breach_ring = True
 $show_gear_scourged = True
 $show_gear_corrupted = False
@@ -1492,16 +1494,6 @@ ZanaMemory True
 	Show
 }
 
-MemoryStrands > 0
-{
-	SetTextColor $color_black
-	SetBorderColor $color_black
-	SetBackgroundColor $color_atlas
-	SetFontSize $font_max
-	SetAlertSound $alert_very_specific
-	Show
-}
-
 Class == "Map Fragments"
 {
 	# scarabs by default get border color 200 200 200
@@ -2289,6 +2281,14 @@ Rarity <= Rare
 
 	# pricing machinery for bases
 	# (removed all blocks until a stable and high-confidence generation is possible)
+
+	MemoryStrands >= $cfg_memory_strands_min
+	{
+		SetTextColor $color_black
+		SetBackgroundColor $color_atlas
+		ShowDiscard $show_gear_memory_strands
+		Continue
+	}
 
 	# influenced bases with unknown value
 	HasInfluence Shaper Elder Crusader Redeemer Hunter Warlord
