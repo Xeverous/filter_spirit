@@ -1484,16 +1484,6 @@ Class == "Atlas Upgrade Items"
 	Show
 }
 
-ZanaMemory True
-{
-	SetTextColor $color_black
-	SetBorderColor $color_black
-	SetBackgroundColor $color_atlas
-	SetFontSize $font_max
-	SetAlertSound $alert_very_specific
-	Show
-}
-
 Class == "Map Fragments"
 {
 	# scarabs by default get border color 200 200 200
@@ -1957,6 +1947,18 @@ Class == "Divination Card"
 
 Class == "Maps"
 {
+	# 3.26 Memory maps
+	ZanaMemory True
+	{
+		SetTextColor $color_black
+		SetBorderColor $color_black
+		SetBackgroundColor $color_atlas
+		SetFontSize $font_map_enchanted
+		SetAlertSound $alert_map_enchanted
+		MinimapIcon $icon_map_enchanted
+		Show
+	}
+
 	BlightedMap True
 	{
 		SetTextColor $color_white
