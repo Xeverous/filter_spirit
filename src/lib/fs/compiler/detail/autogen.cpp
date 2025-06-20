@@ -5,16 +5,105 @@
 #include <fs/lang/item_filter.hpp>
 #include <fs/lang/limits.hpp>
 #include <fs/lang/market/item_price_data.hpp>
+#include <fs/lang/knowledge/currency.hpp>
 
+#include <cmath>
+#include <limits>
 #include <string_view>
 #include <initializer_list>
 #include <type_traits>
+#include <iostream>
 
 namespace fs::compiler::detail {
 
 namespace {
 
 // ---- item search/match functions ----
+
+struct eligible_item
+{
+	std::string_view name;
+	std::optional<int> amount_min;
+	std::optional<int> amount_max;
+
+	bool has_same_amounts_as(eligible_item other) const
+	{
+		return amount_min == other.amount_min && amount_max == other.amount_max;
+	}
+};
+
+bool operator<(eligible_item lhs, eligible_item rhs)
+{
+	const int lhs_min = lhs.amount_min.value_or(-1);
+	const int rhs_min = rhs.amount_min.value_or(-1);
+	if (lhs_min != rhs_min)
+		return lhs_min < rhs_min;
+
+	const int lhs_max = lhs.amount_max.value_or(std::numeric_limits<int>::max());
+	const int rhs_max = rhs.amount_max.value_or(std::numeric_limits<int>::max());
+	if (lhs_max != rhs_max)
+		return lhs_max < rhs_max;
+
+	return false;
+}
+
+// From market_items, get a list of items that match specified price_range.
+// Each item will have minimum and/or maximum stack size computed, based on known_items.
+// Returned items will be sorted by min and max amount fields for efficient block generation.
+[[nodiscard]] std::vector<eligible_item> get_eligible_items(
+	lang::price_range_condition price_range,
+	const std::vector<lang::market::elementary_item>& market_items,
+	lang::kl::stackable_item_collection known_items)
+{
+	std::vector<eligible_item> eligible_items;
+	// there will be at most market_items.size() eligible items
+	eligible_items.reserve(market_items.size());
+
+	for (const lang::market::elementary_item& market_item : market_items) {
+		eligible_item itm;
+
+		if (price_range.lower_bound()) {
+			// note: narrowing convertion from double to int
+			const int amount_min = std::ceil((*price_range.lower_bound()).bound.value.value / market_item.price.chaos_value);
+
+			std::optional<int> max_stack_size = known_items.max_stack_size_of(market_item.name);
+			if (!max_stack_size) {
+				// TODO print warning that item is unknown and a safe max stack size is assumed
+				std::cout << "item \"" << market_item.name << "\" has unknown stack size\n";
+				max_stack_size = 50000;
+			}
+
+			if (amount_min > *max_stack_size) {
+				// item too cheap, requires higher amount than the stack allows
+				continue;
+			}
+
+			itm.amount_min = amount_min;
+		}
+
+		if (price_range.upper_bound()) {
+			// note: narrowing convertion from double to int
+			const int amount_max = std::floor((*price_range.upper_bound()).bound.value.value / market_item.price.chaos_value);
+			FS_ASSERT(itm.amount_min.value_or(0) <= amount_max); // math sanity check
+
+			if (amount_max == 0) {
+				// item too expensive, even stack of 1 would exceed upper bound
+				continue;
+			}
+
+			itm.amount_max = amount_max;
+		}
+
+		// since at least 1 price bound must be specified, at least 1 amount bound should be computed
+		FS_ASSERT(itm.amount_min.has_value() || itm.amount_max.has_value());
+
+		itm.name = market_item.name;
+		eligible_items.push_back(itm);
+	}
+
+	std::sort(eligible_items.begin(), eligible_items.end());
+	return eligible_items;
+}
 
 template <typename Container, typename Predicate>
 [[nodiscard]] lang::condition_values_container<lang::string>
@@ -69,6 +158,75 @@ struct gem_matcher
 // ---- block generation functions ----
 
 template <typename MarketItemType>
+void generate_blocks_stackable_item(
+	const lang::block_generation_info& block_info,
+	const std::vector<MarketItemType>& item_price_data_field,
+	std::string_view item_class_name,
+	lang::kl::stackable_item_collection known_items,
+	lang::generated_blocks_consumer consumer)
+{
+	static_assert(std::is_base_of_v<lang::market::elementary_item, MarketItemType>);
+
+	const std::vector<eligible_item> eligible_items = get_eligible_items(
+		block_info.price_range, item_price_data_field, known_items);
+	FS_ASSERT(std::is_sorted(eligible_items.begin(), eligible_items.end()));
+
+	for (auto it = eligible_items.begin(); it != eligible_items.end();) {
+		// Find a range of items with same amount requirements (eligible items are sorted by it).
+		// Then for each group of items with same requirements, generate a block.
+		// Grouping by StackSize avoids excessive generation of a block for each item.
+		const eligible_item& first_item = *it;
+		const auto last_item_it = std::find_if_not(it, eligible_items.end(), [&first_item](eligible_item ei) {
+			return ei.has_same_amounts_as(first_item);
+		});
+
+		lang::item_filter_block block(block_info.visibility);
+		block.actions = block_info.actions;
+		block.continuation = block_info.continuation;
+
+		// Class == @item_class_name
+		block.conditions.conditions.push_back(lang::make_class_condition(
+			lang::equality_comparison_type::exact_match,
+			lang::condition_values_container<lang::string>{
+				lang::string{std::string(item_class_name), block_info.autogen_origin}
+			},
+			block_info.autogen_origin));
+
+		// BaseType == @base_types
+		lang::string_comparison_condition::container_type base_types;
+		for (; it != last_item_it; ++it) {
+			base_types.push_back(lang::string{std::string(it->name), block_info.autogen_origin});
+		}
+		block.conditions.conditions.push_back(lang::make_base_type_condition(
+			lang::equality_comparison_type::exact_match,
+			std::move(base_types),
+			block_info.autogen_origin));
+
+		// StackSize >= @amount_min
+		if (first_item.amount_min) {
+			block.conditions.conditions.push_back(lang::make_stack_size_range_bound_condition(
+				lang::range_bound<lang::integer>{lang::integer{*first_item.amount_min, block_info.autogen_origin}, true},
+				true,
+				block_info.autogen_origin
+			));
+		}
+
+		// StackSize <= @amount_max
+		if (first_item.amount_max) {
+			block.conditions.conditions.push_back(lang::make_stack_size_range_bound_condition(
+				lang::range_bound<lang::integer>{lang::integer{*first_item.amount_max, block_info.autogen_origin}, true},
+				false,
+				block_info.autogen_origin
+			));
+		}
+
+		// iterating through eligible_items should never produce blocks with empty BaseType
+		FS_ASSERT(block.conditions.is_valid());
+		consumer.push(std::move(block));
+	}
+}
+
+template <typename MarketItemType>
 void generate_blocks_simple(
 	const lang::block_generation_info& block_info,
 	const std::vector<MarketItemType>& item_price_data_field,
@@ -81,12 +239,15 @@ void generate_blocks_simple(
 	block.actions = block_info.actions;
 	block.continuation = block_info.continuation;
 
+	// Class == @item_class_name
 	block.conditions.conditions.push_back(lang::make_class_condition(
 		lang::equality_comparison_type::exact_match,
 		lang::condition_values_container<lang::string>{
 			lang::string{std::string(item_class_name), block_info.autogen_origin}
 		},
 		block_info.autogen_origin));
+
+	// BaseType == @get_mathing_items()
 	block.conditions.conditions.push_back(lang::make_base_type_condition(
 		lang::equality_comparison_type::exact_match,
 		get_matching_items(item_price_data_field, empty_matcher{}, block_info.price_range, block_info.autogen_origin),
@@ -225,6 +386,31 @@ struct gem_condition_verifier
 
 template <typename MarketItemType>
 [[nodiscard]] std::function<lang::blocks_generator_func_type>
+make_autogen_stackable_item(
+	settings st,
+	const lang::official_conditions& conditions,
+	lang::position_tag autogen_origin,
+	std::string_view item_class_name,
+	std::vector<MarketItemType> lang::market::item_price_data::* field,
+	lang::kl::stackable_item_collection known_items,
+	diagnostics_store& diagnostics)
+{
+	static_assert(std::is_base_of_v<lang::market::elementary_item, MarketItemType>);
+
+	if (!verify_autogen_conditions(st, conditions, class_condition_verifier{item_class_name}, autogen_origin, diagnostics))
+		return {};
+
+	return [field, item_class_name, known_items](
+			const lang::block_generation_info& block_info,
+			const lang::market::item_price_data& item_price_data,
+			lang::generated_blocks_consumer consumer)
+		{
+			return generate_blocks_stackable_item(block_info, item_price_data.*field, item_class_name, known_items, consumer);
+		};
+}
+
+template <typename MarketItemType>
+[[nodiscard]] std::function<lang::blocks_generator_func_type>
 make_autogen_simple(
 	settings st,
 	const lang::official_conditions& conditions,
@@ -285,7 +471,7 @@ make_autogen_func(
 	switch (autogen.category) {
 		// TODO some of these may benefit from additional StackSize condition
 		case lang::autogen_category::currency:
-			return make_autogen_simple(st, conditions, autogen.origin, cn::currency_stackable, &ipd::currency, diagnostics);
+			return make_autogen_stackable_item(st, conditions, autogen.origin, cn::currency_stackable, &ipd::currency, lang::kl::group_currency, diagnostics);
 		case lang::autogen_category::delirium_orbs:
 			return make_autogen_simple(st, conditions, autogen.origin, cn::delirium_orbs, &ipd::delirium_orbs, diagnostics);
 		case lang::autogen_category::essences:

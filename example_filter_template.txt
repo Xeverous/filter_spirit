@@ -684,6 +684,27 @@ Class == "Stackable Currency"
 {
 	SetBackgroundColor $color_black
 
+	Autogen "currency"
+	{
+		Price >= 50
+		{
+			Expand $actions_currency_high
+			Show
+		}
+
+		Price >= 1
+		{
+			Expand $actions_currency_mid
+			Show
+		}
+
+		Price >= 0.2
+		{
+			Expand $actions_currency_low
+			Show
+		}
+	}
+
 	BaseType == "Divine Orb" "Mirror of Kalandra" "Eternal Orb" "Albino Rhoa Feather" "Mirror Shard" "Crusader's Exalted Orb" "Redeemer's Exalted Orb" "Hunter's Exalted Orb" "Warlord's Exalted Orb" "Shaper's Exalted Orb" "Elder's Exalted Orb" "Awakener's Orb" "Prime Regrading Lens" "Secondary Regrading Lens" "Tempering Orb" "Tailoring Orb" "Tainted Divine Teardrop" "Exceptional Eldritch Ember" "Exceptional Eldritch Ichor" "Orb of Conflict" "Orb of Dominance" "Fracturing Orb" "Fracturing Shard" "Hinekora's Lock" "Veiled Exalted Orb" "Orb of Remembrance" "Orb of Unravelling" "Orb of Intention"
 	{
 		Expand $actions_currency_high
