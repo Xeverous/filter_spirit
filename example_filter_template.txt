@@ -2173,6 +2173,15 @@ BaseType "Talisman"
 # a situation where multi-exalt 6s influenced base gets "just 6s" style.
 Rarity <= Rare
 {
+	# 3.26 Infamous Mercenaries
+	HasExplicitMod == "Infamous" "of Infamy"
+	{
+		SetTextColor $color_black
+		SetBackgroundColor $color_veiled_item
+		SetAlertSound $alert_veiled_item
+		Show
+	}
+
 	# enchants and RGB - part 1/2
 	# these blocks only set styles (or not if discarded)
 	Sockets < 6
