@@ -341,6 +341,7 @@ $icon_map_atlas_boss  = 0 White Cross
 $icon_map_purple      = 0 Purple Cross
 $icon_map_red         = 2 White Cross
 $icon_map_blight      = 0 Orange Cross
+$icon_map_unique      = 0 Brown Cross
 $icon_map_enchanted   = 0 Cyan Cross
 $icon_influence_high  = 0 Pink Cross
 $icon_influence_mid   = 2 Pink Cross
@@ -1432,6 +1433,16 @@ Rarity Unique
 	SetTextColor $color_unique
 	SetBorderColor $color_unique
 	SetFontSize $font_unique
+
+	Class == "Maps"
+	BaseType == "Synthesised Map"
+	{
+		SetFontSize $font_max
+		SetAlertSound $alert_map_valuable
+		PlayEffect $beam_unique
+		MinimapIcon $icon_map_unique
+		Show
+	}
 
 	# Tabula Rasa and Skin of the Loyal
 	# ...and any unique that drops 6L'd (some league content drops linked uniques)
