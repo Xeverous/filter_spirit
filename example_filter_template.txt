@@ -319,6 +319,7 @@ $beam_corpse          = Grey
 $beam_influence       = Pink
 $beam_dominance       = Pink
 $beam_ultimatum       = Orange
+$beam_scarab          = Green
 
 $icon_quest_item      = 0 Green Pentagon
 $icon_fishing_rod     = 0 White Star
@@ -1508,6 +1509,7 @@ Class == "Map Fragments"
 			SetBackgroundColor $color_scarab_high
 			SetFontSize $font_scarab_high
 			SetAlertSound $alert_scarab_high
+			PlayEffect $beam_scarab
 			MinimapIcon $icon_scarab_high
 			Show
 		}
@@ -1520,6 +1522,7 @@ Class == "Map Fragments"
 			SetBackgroundColor $color_scarab_mid
 			SetFontSize $font_scarab_mid
 			SetAlertSound $alert_scarab_mid
+			PlayEffect $beam_scarab
 			MinimapIcon $icon_scarab_mid
 			ShowHide $show_scarabs_mid
 		}
