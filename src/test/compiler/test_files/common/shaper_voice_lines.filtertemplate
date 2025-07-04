@@ -1,0 +1,29 @@
+PlayAlertSound ShExalted
+{
+	Show
+}
+
+PlayAlertSound ShDivine 250
+{
+	Show
+}
+
+PlayAlertSoundPositional ShRegal
+{
+	Show
+}
+
+PlayAlertSoundPositional ShFusing 200
+{
+	Show
+}
+
+SetAlertSound ShAlchemy
+{
+	Show
+}
+
+SetAlertSound ShVaal 150
+{
+	Show
+}

@@ -1,0 +1,136 @@
+Show
+	PlayAlertSound ShChaos 200
+	Continue
+
+Show
+	ItemLevel 1
+	PlayAlertSound 1 100
+	Continue
+
+Show
+	ItemLevel 2
+	PlayAlertSound 2
+	Continue
+
+Show
+	ItemLevel 3
+	PlayAlertSound ShGeneral 300
+	Continue
+
+Show
+	ItemLevel 4
+	PlayAlertSound ShGeneral
+	Continue
+
+Show
+	ItemLevel 5
+	PlayAlertSound None
+	Continue
+
+Show
+	ItemLevel 6
+	PlayAlertSound None
+	Continue
+
+Show
+	ItemLevel 1
+	PlayAlertSoundPositional 1 100
+	Continue
+
+Show
+	ItemLevel 2
+	PlayAlertSoundPositional 2
+	Continue
+
+Show
+	ItemLevel 3
+	PlayAlertSoundPositional ShGeneral 300
+	Continue
+
+Show
+	ItemLevel 4
+	PlayAlertSoundPositional ShGeneral
+	Continue
+
+Show
+	ItemLevel 5
+	PlayAlertSoundPositional None
+	Continue
+
+Show
+	ItemLevel 6
+	PlayAlertSoundPositional None
+	Continue
+
+Show
+	ItemLevel 7
+	CustomAlertSound ""
+	Continue
+
+Show
+	ItemLevel 8
+	CustomAlertSound ""
+	Continue
+
+Show
+	ItemLevel 9
+	CustomAlertSound "None"
+	Continue
+
+Show
+	ItemLevel 10
+	CustomAlertSound "None"
+	Continue
+
+Show
+	ItemLevel 1
+	PlayAlertSound 1 100
+	Continue
+
+Show
+	ItemLevel 2
+	PlayAlertSound 2
+	Continue
+
+Show
+	ItemLevel 3
+	PlayAlertSound ShGeneral 300
+	Continue
+
+Show
+	ItemLevel 4
+	PlayAlertSound ShGeneral
+	Continue
+
+Show
+	ItemLevel 5
+	PlayAlertSound None
+	Continue
+
+Show
+	ItemLevel 6
+	PlayAlertSound None
+	Continue
+
+Show
+	ItemLevel 7
+	CustomAlertSound ""
+	Continue
+
+Show
+	ItemLevel 8
+	CustomAlertSound ""
+	Continue
+
+Show
+	ItemLevel 9
+	CustomAlertSound "None"
+	Continue
+
+Show
+	ItemLevel 10
+	CustomAlertSound "None"
+	Continue
+
+Show
+	PlayAlertSound ShVaal 100

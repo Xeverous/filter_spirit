@@ -1,0 +1,7 @@
+$x = 36
+$c1 = 1 2 $x
+
+SetTextColor $c1
+SetBackgroundColor $c1
+SetFontSize $x
+Show

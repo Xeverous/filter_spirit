@@ -1,0 +1,16 @@
+Show
+	Class "Divination Card"
+	BaseType == "The Wolf" "The Demon"
+
+Show
+	Class "Divination Card"
+	BaseType "The Wolf" "The Demon"
+
+Show
+	EnchantmentPassiveNode "Damage while you have a Herald"
+
+Show
+	EnchantmentPassiveNode "Damage while you have a Herald"
+
+Show
+	EnchantmentPassiveNode == "Damage while you have a Herald"

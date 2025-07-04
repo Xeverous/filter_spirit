@@ -1,0 +1,36 @@
+MinimapIcon 0 Yellow Star
+PlayEffect Yellow
+
+DropLevel >= 10
+{
+	MinimapIcon 1 Green Raindrop
+	PlayEffect Green
+
+	ItemLevel < 70
+	{
+		MinimapIcon -1
+		PlayEffect None
+		Hide
+	}
+
+	Rarity >= Rare
+	ItemLevel >= 70
+	{
+		SetFontSize 40
+		DisableDropSound
+		Show
+	}
+
+	Sockets 6
+	{
+		MinimapIcon -1
+		PlayEffect None
+		Show
+		Continue
+	}
+
+	EnableDropSound
+	Show
+}
+
+Hide

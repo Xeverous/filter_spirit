@@ -1,0 +1,10 @@
+Show
+	ItemLevel >= 75
+	SetTextColor 1 1 1
+	Continue
+
+Show
+	ItemLevel >= 60
+	ItemLevel < 75
+	SetTextColor 2 2 2
+	Continue

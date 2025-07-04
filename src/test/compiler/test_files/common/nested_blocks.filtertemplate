@@ -1,0 +1,22 @@
+SetBackgroundColor 0 0 0
+
+Class "Boots"
+{
+	SetBorderColor 1 2 3
+
+	BaseType "Dragonscale Boots" "Sorcerer Boots"
+	{
+		PlayAlertSound 1
+		Quality > 0
+		{
+			SetBorderColor 255 255 255
+			Show
+		}
+
+		Show
+	}
+
+	Hide
+}
+
+Show

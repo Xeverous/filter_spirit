@@ -1,0 +1,11 @@
+Show
+	SetFontSize 26
+
+Show
+	SetFontSize 40
+
+Hide
+	SetFontSize 22
+
+Hide
+	SetFontSize 40

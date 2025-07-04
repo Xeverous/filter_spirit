@@ -1,0 +1,19 @@
+SetFontSize 10
+{
+	Show
+}
+
+SetFontSize 40
+{
+	Show
+}
+
+SetFontSize 10
+{
+	Hide
+}
+
+SetFontSize 40
+{
+	Hide
+}

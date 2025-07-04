@@ -1,0 +1,20 @@
+Show
+	BaseDefencePercentile >= 90
+
+Show
+	BaseArmour > 500
+
+Show
+	BaseEvasion > 500
+
+Show
+	BaseEnergyShield > 200
+
+Show
+	BaseWard > 50
+
+Show
+	Scourged True
+
+Show
+	UberBlightedMap True

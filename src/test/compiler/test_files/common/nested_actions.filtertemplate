@@ -1,0 +1,18 @@
+$x = 36
+$y = 38
+$c1 = 1 2 $x
+$c2 = 11 22 $y
+
+BaseType "Vaal"
+Width > 1
+{
+	SetBorderColor $c2
+	SetBackgroundColor $c2
+	SetFontSize $y
+	Show
+}
+
+SetTextColor $c1
+SetBackgroundColor $c1
+SetFontSize $x
+Show

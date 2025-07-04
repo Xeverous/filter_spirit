@@ -1,0 +1,22 @@
+Show
+	BaseType "Gavel" "Stone Hammer" "Rock Breaker"
+	Rarity Normal
+	SetTextColor 255 255 255
+	SetBackgroundColor 162 85 0
+
+Show
+	BaseType "Gavel" "Stone Hammer" "Rock Breaker"
+	Rarity Magic
+	Quality > 12
+	SetTextColor 255 255 255
+	SetBackgroundColor 162 85 0
+
+Show
+	BaseType "Gavel" "Stone Hammer" "Rock Breaker"
+	Rarity Rare
+	Quality > 16
+	SetTextColor 255 255 255
+	SetBackgroundColor 162 85 0
+
+Show
+	Rarity Rare

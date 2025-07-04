@@ -1,0 +1,16 @@
+HasExplicitMod ==  "of Haast" "of Tzteosh" "of Ephij"
+{
+	Show
+}
+HasExplicitMod     "of Haast" "of Tzteosh" "of Ephij"
+{
+	Show
+}
+HasExplicitMod ==2 "of Haast" "of Tzteosh" "of Ephij"
+{
+	Show
+}
+HasExplicitMod >=2 "of Haast" "of Tzteosh" "of Ephij"
+{
+	Show
+}

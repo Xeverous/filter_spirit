@@ -1,0 +1,41 @@
+SetFontSize 30
+
+DropLevel >= 10
+{
+	SetFontSize 35
+
+	ItemLevel < 70
+	{
+		EnableDropSound
+		Hide
+	}
+
+	Rarity >= Rare
+	ItemLevel >= 75
+	{
+		SetFontSize 40
+		DisableDropSoundIfAlertSound
+		Show
+	}
+
+	Rarity >= Rare
+	ItemLevel >= 70
+	{
+		SetFontSize 40
+		DisableDropSound
+		Show
+	}
+
+	Sockets 6
+	{
+		PlayEffect Blue
+		Show
+		Continue
+	}
+
+	EnableDropSound
+	Show
+}
+
+EnableDropSoundIfAlertSound
+Hide

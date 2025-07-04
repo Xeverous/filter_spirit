@@ -1,0 +1,10 @@
+Show
+	Rarity Rare
+	SetTextColor 1 2 3
+	SetBorderColor 11 22 33
+	SetFontSize 36
+
+Show
+	SetTextColor 1 2 3
+	SetBorderColor 11 22 33
+	SetFontSize 36

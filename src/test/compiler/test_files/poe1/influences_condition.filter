@@ -1,0 +1,11 @@
+Show
+	BaseType "Leather Belt"
+	HasInfluence None
+
+Show
+	BaseType "Leather Belt"
+	HasInfluence == Crusader Hunter
+
+Show
+	BaseType "Leather Belt"
+	HasInfluence Redeemer Warlord

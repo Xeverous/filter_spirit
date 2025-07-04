@@ -1,0 +1,6 @@
+BaseType "Something"
+Replica True
+AlternateQuality True
+{
+	Show
+}

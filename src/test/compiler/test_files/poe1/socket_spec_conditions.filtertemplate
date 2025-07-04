@@ -1,0 +1,32 @@
+Sockets        1 2 3R AA 3D 5GBW
+{
+	Show
+}
+Sockets     =  1 2 3R AA 3D 5GBW
+{
+	Show
+}
+Sockets     == 1 2 3R AA 3D 5GBW
+{
+	Show
+}
+Sockets     >= 1 2 3R AA 3D 5GBW
+{
+	Show
+}
+SocketGroup    1 2 3R AA 3D 5GBW
+{
+	Show
+}
+SocketGroup =  1 2 3R AA 3D 5GBW
+{
+	Show
+}
+SocketGroup == 1 2 3R AA 3D 5GBW
+{
+	Show
+}
+SocketGroup >= 1 2 3R AA 3D 5GBW
+{
+	Show
+}

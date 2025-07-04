@@ -27,6 +27,14 @@ target_include_directories(filter_spirit_test
 		${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+add_custom_target(copy_test_files ALL
+	COMMAND ${CMAKE_COMMAND} -E copy_directory
+	${CMAKE_CURRENT_SOURCE_DIR}/compiler/test_files
+	${CMAKE_BINARY_DIR}/bin/test_files
+)
+
+add_dependencies(filter_spirit_test copy_test_files)
+
 ##############################################################################
 # setup compiler flags
 

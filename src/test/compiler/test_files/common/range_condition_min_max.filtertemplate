@@ -1,0 +1,14 @@
+ItemLevel >= 85 75 80
+{
+	SetTextColor 1 1 1
+	Show
+	Continue
+}
+
+ItemLevel >= 65 60 70
+ItemLevel < 70 75 65
+{
+	SetTextColor 2 2 2
+	Show
+	Continue
+}

@@ -1,0 +1,14 @@
+Show
+	HasSearingExarchImplicit 5
+
+Show
+	HasSearingExarchImplicit >= 4
+
+Show
+	HasEaterOfWorldsImplicit 6
+
+Show
+	HasEaterOfWorldsImplicit > 4
+
+Hide
+	ArchnemesisMod "Toxic" "Hasted"

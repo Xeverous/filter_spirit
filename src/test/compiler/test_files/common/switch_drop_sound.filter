@@ -1,0 +1,35 @@
+Hide
+	DropLevel >= 10
+	ItemLevel < 70
+	SetFontSize 35
+	EnableDropSound
+
+Show
+	DropLevel >= 10
+	Rarity >= Rare
+	ItemLevel >= 75
+	SetFontSize 40
+	DisableDropSoundIfAlertSound
+
+Show
+	DropLevel >= 10
+	Rarity >= Rare
+	ItemLevel >= 70
+	SetFontSize 40
+	DisableDropSound
+
+Show
+	DropLevel >= 10
+	Sockets 6
+	SetFontSize 35
+	PlayEffect Blue
+	Continue
+
+Show
+	DropLevel >= 10
+	SetFontSize 35
+	EnableDropSound
+
+Hide
+	SetFontSize 30
+	EnableDropSoundIfAlertSound

@@ -1,0 +1,25 @@
+Class "Divination Card"
+Autogen "cards"
+{
+	Price >= 100
+	{
+		Show
+	}
+
+	Price < 100
+	Price >= 10
+	{
+		Show
+	}
+
+	Price < 10
+	Price >= 5
+	{
+		Show
+	}
+
+	Price < 5
+	{
+		Hide
+	}
+}

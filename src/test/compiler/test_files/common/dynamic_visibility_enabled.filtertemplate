@@ -1,0 +1,30 @@
+$show_rares = True
+$show_hammers = True
+
+BaseType "Gavel" "Stone Hammer" "Rock Breaker"
+{
+	SetTextColor 255 255 255
+	SetBackgroundColor 162 85 0
+
+	Rarity Normal
+	{
+		ShowDiscard $show_hammers
+	}
+
+	Rarity Magic
+	Quality > 12
+	{
+		ShowDiscard $show_hammers
+	}
+
+	Rarity Rare
+	Quality > 16
+	{
+		ShowDiscard $show_hammers
+	}
+}
+
+Rarity Rare
+{
+	ShowHide $show_rares
+}

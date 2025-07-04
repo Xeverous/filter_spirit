@@ -1,0 +1,19 @@
+Show
+	MemoryStrands >= 50
+	SetTextColor 50 0 0
+
+Show
+	MemoryStrands >= 20
+	SetTextColor 20 0 0
+
+Show
+	ZanaMemory True
+
+Hide
+	MemoryStrands < 20
+
+Hide
+	TransfiguredGem "Heavy Strike of Trarthus" "Sunder of Trarthus"
+
+Show
+	TransfiguredGem True

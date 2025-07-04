@@ -1,0 +1,41 @@
+$x = None
+
+Class "Divination Card"
+{
+	# Nones should be skipped
+	BaseType == "The Wolf" $x "The Demon" None
+	{
+		Show
+	}
+	BaseType    "The Wolf" $x "The Demon" None
+	{
+		Show
+	}
+
+	# these blocks should not be generated (only Nones)
+	BaseType == None
+	{
+		Show
+	}
+	BaseType    None
+	{
+		Show
+	}
+	BaseType    $x
+	{
+		Show
+	}
+}
+
+EnchantmentPassiveNode    "Damage while you have a Herald"
+{
+	Show
+}
+EnchantmentPassiveNode =  "Damage while you have a Herald"
+{
+	Show
+}
+EnchantmentPassiveNode == "Damage while you have a Herald"
+{
+	Show
+}

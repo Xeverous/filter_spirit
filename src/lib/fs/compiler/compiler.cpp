@@ -648,7 +648,16 @@ std::string item_filter_to_string_without_preamble(const lang::item_filter& filt
 {
 	std::stringstream ss;
 	filter.print(ss, overrides);
-	return ss.str();
+	std::string result = ss.str();
+
+	// Each Condition/Action/etc. adds a newline after itself.
+	// Additionally, each Block also adds a newline after itself to separate blocks with 1 empty line.
+	// If filter is non-empty, this means there are 2 linebreaks after the last line.
+	// Remove one, as text editing tools expect a single trailing newline and to ease committing test files.
+	if (utility::ends_with(result, "\n\n"))
+		result.resize(result.size() - 1);
+
+	return result;
 }
 
 std::string

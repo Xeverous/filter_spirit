@@ -1,0 +1,11 @@
+Show
+	BaseType "Vaal"
+	Width > 1
+	SetBorderColor 11 22 38
+	SetBackgroundColor 11 22 38
+	SetFontSize 38
+
+Show
+	SetTextColor 1 2 36
+	SetBackgroundColor 1 2 36
+	SetFontSize 36

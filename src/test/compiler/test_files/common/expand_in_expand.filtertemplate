@@ -1,0 +1,24 @@
+$x = 11 22 33
+$y = 1 2 3
+
+$actions1 =
+{
+	SetBorderColor $x
+	SetTextColor $x
+}
+
+$actions2 =
+{
+	SetBorderColor $y
+	Expand $actions1
+	SetTextColor $y
+}
+
+SetFontSize 36
+Expand $actions2
+Rarity Rare
+{
+	Show
+}
+
+Show

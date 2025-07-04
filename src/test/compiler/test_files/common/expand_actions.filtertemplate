@@ -1,0 +1,18 @@
+$x = 1 2 3
+$actions =
+{
+	SetBorderColor $x
+	SetTextColor $x
+}
+
+$actions_copy =
+{
+	Expand $actions
+}
+
+SetFontSize 36
+Expand $actions_copy
+Rarity Rare
+{
+	Show
+}

@@ -1,0 +1,19 @@
+Show
+	SetTextColor 255 0 0
+	SetBorderColor 0 255 0
+	SetBackgroundColor 0 0 255 245
+
+Show
+	SetTextColor 255 255 0 100
+	SetBorderColor 255 0 255 250
+	SetBackgroundColor 0 255 255 250
+
+Hide
+	SetTextColor 255 0 0
+	SetBorderColor 0 255 0
+	SetBackgroundColor 0 0 255 200
+
+Hide
+	SetTextColor 255 255 0 200
+	SetBorderColor 255 0 255 100
+	SetBackgroundColor 0 255 255 160

@@ -1,0 +1,15 @@
+Show
+	Class == "Divination Card"
+	BaseType == "Abandoned Wealth" "The Doctor"
+
+Show
+	Class == "Divination Card"
+	BaseType == "A Dab of Ink"
+
+Show
+	Class == "Divination Card"
+	BaseType == "Humility"
+
+Hide
+	Class == "Divination Card"
+	BaseType == "Rain of Chaos"

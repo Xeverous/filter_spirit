@@ -1,0 +1,10 @@
+$x1 = True
+$x2 = True
+$x3 = True
+$xx = $x1 $x2 $x3
+
+ShowDiscard False $xx
+ShowHide $x1 $x2 $x3
+ShowHide $x1 True $x2 True $x3
+ShowHide $xx
+ShowHide $x1 True $xx True $x2 False $x3

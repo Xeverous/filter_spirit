@@ -1,0 +1,15 @@
+Import "MyCustomRules.filter"
+
+Show
+	DropLevel >= 10
+	Sockets 6
+	SetFontSize 30
+	PlayEffect Blue
+	Continue
+
+Import "MyOptionalRules.filter" Optional
+
+Import "MyExtraRules.filter"
+
+Hide
+	SetFontSize 30

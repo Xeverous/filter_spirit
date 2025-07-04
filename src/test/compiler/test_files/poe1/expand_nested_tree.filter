@@ -1,0 +1,77 @@
+Show
+	Rarity Normal
+	SocketGroup RGB
+	Width 2
+	Height <= 2
+	SetTextColor 200 200 200
+	SetBorderColor 175 255 200
+
+Show
+	Rarity Normal
+	SocketGroup RGB
+	Width 1
+	Height <= 4
+	SetTextColor 200 200 200
+	SetBorderColor 175 255 200
+
+Show
+	Rarity Normal
+	SocketGroup RGB
+	SetTextColor 200 200 200
+	SetBorderColor 128 128 192
+
+Show
+	Rarity Normal
+	SetTextColor 200 200 200
+
+Show
+	Rarity Magic
+	SocketGroup RGB
+	Width 2
+	Height <= 2
+	SetTextColor 136 136 255
+	SetBorderColor 175 255 200
+
+Show
+	Rarity Magic
+	SocketGroup RGB
+	Width 1
+	Height <= 4
+	SetTextColor 136 136 255
+	SetBorderColor 175 255 200
+
+Show
+	Rarity Magic
+	SocketGroup RGB
+	SetTextColor 136 136 255
+	SetBorderColor 128 128 192
+
+Show
+	Rarity Magic
+	SetTextColor 136 136 255
+
+Show
+	Rarity Rare
+	SocketGroup RGB
+	Width 2
+	Height <= 2
+	SetTextColor 255 255 119
+	SetBorderColor 175 255 200
+
+Show
+	Rarity Rare
+	SocketGroup RGB
+	Width 1
+	Height <= 4
+	SetTextColor 255 255 119
+	SetBorderColor 175 255 200
+
+Show
+	Rarity Rare
+	SocketGroup RGB
+	SetTextColor 255 255 119
+	SetBorderColor 128 128 192
+
+Show
+	Rarity Rare
+	SetTextColor 255 255 119

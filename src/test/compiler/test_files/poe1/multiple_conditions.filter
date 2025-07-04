@@ -1,0 +1,5 @@
+Show
+	BaseType "Vaal"
+	Quality > 0
+	Width 1
+	EnchantmentPassiveNum <= 9

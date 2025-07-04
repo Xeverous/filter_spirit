@@ -1,0 +1,188 @@
+SetAlertSound ShChaos 200
+Show
+Continue
+
+ItemLevel 1
+{
+	PlayAlertSound 1 100
+	Show
+	Continue
+}
+
+ItemLevel 2
+{
+	PlayAlertSound 2
+	Show
+	Continue
+}
+
+ItemLevel 3
+{
+	PlayAlertSound ShGeneral 300
+	Show
+	Continue
+}
+
+ItemLevel 4
+{
+	PlayAlertSound ShGeneral
+	Show
+	Continue
+}
+
+ItemLevel 5
+{
+	PlayAlertSound None 50
+	Show
+	Continue
+}
+
+ItemLevel 6
+{
+	PlayAlertSound None
+	Show
+	Continue
+}
+
+ItemLevel 1
+{
+	PlayAlertSoundPositional 1 100
+	Show
+	Continue
+}
+
+ItemLevel 2
+{
+	PlayAlertSoundPositional 2
+	Show
+	Continue
+}
+
+ItemLevel 3
+{
+	PlayAlertSoundPositional ShGeneral 300
+	Show
+	Continue
+}
+
+ItemLevel 4
+{
+	PlayAlertSoundPositional ShGeneral
+	Show
+	Continue
+}
+
+ItemLevel 5
+{
+	PlayAlertSoundPositional None 50
+	Show
+	Continue
+}
+
+ItemLevel 6
+{
+	PlayAlertSoundPositional None
+	Show
+	Continue
+}
+
+ItemLevel 7
+{
+	CustomAlertSound "" 250
+	Show
+	Continue
+}
+
+ItemLevel 8
+{
+	CustomAlertSound ""
+	Show
+	Continue
+}
+
+ItemLevel 9
+{
+	CustomAlertSound "None" 150
+	Show
+	Continue
+}
+
+ItemLevel 10
+{
+	CustomAlertSound "None"
+	Show
+	Continue
+}
+
+ItemLevel 1
+{
+	SetAlertSound 1 100
+	Show
+	Continue
+}
+
+ItemLevel 2
+{
+	SetAlertSound 2
+	Show
+	Continue
+}
+
+ItemLevel 3
+{
+	SetAlertSound ShGeneral 300
+	Show
+	Continue
+}
+
+ItemLevel 4
+{
+	SetAlertSound ShGeneral
+	Show
+	Continue
+}
+
+ItemLevel 5
+{
+	SetAlertSound None 50
+	Show
+	Continue
+}
+
+ItemLevel 6
+{
+	SetAlertSound None
+	Show
+	Continue
+}
+
+ItemLevel 7
+{
+	SetAlertSound "" 250
+	Show
+	Continue
+}
+
+ItemLevel 8
+{
+	SetAlertSound ""
+	Show
+	Continue
+}
+
+ItemLevel 9
+{
+	SetAlertSound "None" 150
+	Show
+	Continue
+}
+
+ItemLevel 10
+{
+	SetAlertSound "None"
+	Show
+	Continue
+}
+
+PlayAlertSound ShVaal 100
+Show

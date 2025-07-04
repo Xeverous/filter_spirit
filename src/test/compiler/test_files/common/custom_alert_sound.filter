@@ -1,0 +1,11 @@
+Show
+	CustomAlertSound "pop.wav"
+
+Show
+	CustomAlertSound "pop.wav" 123
+
+Show
+	CustomAlertSoundOptional "pop.wav"
+
+Show
+	CustomAlertSoundOptional "pop.wav" 123

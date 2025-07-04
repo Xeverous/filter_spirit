@@ -1,0 +1,12 @@
+PlayAlertSoundPositional 1 300
+Show
+
+Class "Boots"
+{
+	SetBorderColor 1 2 3
+	CustomAlertSound "pop.wav"
+	Hide
+}
+
+SetBackgroundColor 255 0 0
+Show
