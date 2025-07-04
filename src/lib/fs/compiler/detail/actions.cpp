@@ -1,6 +1,6 @@
 #include <fs/compiler/detail/evaluate.hpp>
 #include <fs/compiler/detail/actions.hpp>
-#include <fs/lang/limits.hpp>
+#include <fs/lang/constants.hpp>
 #include <fs/lang/keywords.hpp>
 #include <fs/lang/action_set.hpp>
 #include <fs/utility/assert.hpp>
@@ -46,19 +46,19 @@ make_color(
 
 		lang::integer alpha = *result_a;
 		if (is_set_text_color && st.ruthless_mode
-			&& alpha.value < lang::limits::ruthless_min_set_text_color_opacity)
+			&& alpha.value < lang::constants::ruthless_min_set_text_color_opacity)
 		{
 			diagnostics.push_error_value_out_of_range(
-				lang::limits::ruthless_min_set_text_color_opacity, 255, alpha);
+				lang::constants::ruthless_min_set_text_color_opacity, 255, alpha);
 			diagnostics.push_message(make_note_minor(
 				alpha.origin,
 				"Ruthless filters require SetTextColor alpha value to be at least ",
-				std::to_string(lang::limits::ruthless_min_set_text_color_opacity)));
+				std::to_string(lang::constants::ruthless_min_set_text_color_opacity)));
 
 			if (st.error_handling.stop_on_error)
 				return boost::none;
 			else
-				alpha.value = lang::limits::ruthless_min_set_text_color_opacity;
+				alpha.value = lang::constants::ruthless_min_set_text_color_opacity;
 		}
 
 		return lang::color{*result_r, *result_g, *result_b, alpha};
@@ -223,8 +223,8 @@ make_builtin_alert_sound_id(
 		diagnostics.move_messages_from(diagnostics_integer);
 		return make_integer_in_range(
 			*integer_sound_id,
-			lang::limits::min_filter_sound_id,
-			lang::limits::max_filter_sound_id,
+			lang::constants::min_filter_sound_id,
+			lang::constants::max_filter_sound_id,
 			diagnostics)
 			.map([](lang::integer sound_id) {
 				return lang::builtin_alert_sound_id{sound_id};
@@ -285,8 +285,8 @@ make_volume(
 		.flat_map([&](lang::integer intgr) {
 			return make_integer_in_range(
 				intgr,
-				lang::limits::min_filter_volume,
-				lang::limits::max_filter_volume,
+				lang::constants::min_filter_volume,
+				lang::constants::max_filter_volume,
 				diagnostics);
 		});
 }
@@ -420,16 +420,16 @@ add_set_font_size_action(
 
 	return get_as<lang::integer>(obj.values[0], diagnostics)
 		.flat_map([&](lang::integer font_size) -> boost::optional<lang::font_size_action> {
-			if (font_size.value < lang::limits::min_filter_font_size
-				|| font_size.value > lang::limits::max_filter_font_size)
+			if (font_size.value < lang::constants::min_filter_font_size
+				|| font_size.value > lang::constants::max_filter_font_size)
 			{
 				diagnostics.push_message(make_warning(
 					diagnostic_message_id::value_out_of_range,
 					font_size.origin,
 					"invalid font size, expected value in range ",
-					std::to_string(lang::limits::min_filter_font_size),
+					std::to_string(lang::constants::min_filter_font_size),
 					" - ",
-					std::to_string(lang::limits::max_filter_font_size),
+					std::to_string(lang::constants::max_filter_font_size),
 					" but got ",
 					std::to_string(font_size.value),
 					" (game will clamp the font size in this range)"));

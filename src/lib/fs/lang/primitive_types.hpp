@@ -1,6 +1,6 @@
 #pragma once
 
-#include <fs/lang/limits.hpp>
+#include <fs/lang/constants.hpp>
 #include <fs/lang/position_tag.hpp>
 #include <fs/lang/keywords.hpp>
 
@@ -75,13 +75,13 @@ struct socket_spec
 		if (!num)
 			return true;
 
-		return limits::min_item_sockets <= *num && *num <= limits::max_item_sockets;
+		return constants::min_item_sockets <= *num && *num <= constants::max_item_sockets;
 	}
 
 	bool is_valid() const noexcept
 	{
 		auto sum = r + g + b + w + a + d;
-		return limits::min_item_sockets <= sum && sum <= limits::max_item_sockets && is_num_valid();
+		return constants::min_item_sockets <= sum && sum <= constants::max_item_sockets && is_num_valid();
 	}
 
 	std::optional<int> num = std::nullopt;

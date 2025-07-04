@@ -1,6 +1,6 @@
 #pragma once
 
-#include <fs/lang/limits.hpp>
+#include <fs/lang/constants.hpp>
 
 #include <boost/optional.hpp>
 
@@ -39,10 +39,10 @@ struct color_overrides
 	boost::optional<int> hide_opacity_max;
 
 	// assert correctness of numbers in help
-	static_assert(fs::lang::limits::default_set_text_color_opacity       == 255);
-	static_assert(fs::lang::limits::default_set_border_color_opacity     == 255);
-	static_assert(fs::lang::limits::default_set_background_color_opacity == 240);
-	static_assert(fs::lang::limits::ruthless_min_set_text_color_opacity  ==  80);
+	static_assert(fs::lang::constants::default_set_text_color_opacity       == 255);
+	static_assert(fs::lang::constants::default_set_border_color_opacity     == 255);
+	static_assert(fs::lang::constants::default_set_background_color_opacity == 240);
+	static_assert(fs::lang::constants::ruthless_min_set_text_color_opacity  ==  80);
 	static constexpr auto help_override_all_actions =
 		"If enabled, apply opacity overrides to all color actions instead of just SetBackgroundColor.\n"
 		"    Note 1: Too low opacity on SetTextColor might make it unreadable.\n"

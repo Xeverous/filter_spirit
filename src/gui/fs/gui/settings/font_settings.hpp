@@ -1,7 +1,7 @@
 #pragma once
 
 #include <fs/gui/auxiliary/raii.hpp>
-#include <fs/lang/limits.hpp>
+#include <fs/lang/constants.hpp>
 #include <fs/utility/assert.hpp>
 
 #include <imgui.h>
@@ -56,7 +56,7 @@ private:
 constexpr int num_item_preview_fonts()
 {
 	// +1 because both range ends are inclusive
-	return lang::limits::max_filter_font_size - lang::limits::min_filter_font_size + 1;
+	return lang::constants::max_filter_font_size - lang::constants::min_filter_font_size + 1;
 }
 
 class font_settings

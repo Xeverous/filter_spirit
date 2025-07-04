@@ -106,9 +106,9 @@ void font_settings::draw_font_selection_ui()
 
 ImFont* font_settings::filter_preview_font(int size) const
 {
-	FS_ASSERT(size >= lang::limits::min_filter_font_size);
-	FS_ASSERT(size <= lang::limits::max_filter_font_size);
-	const std::size_t index = size - lang::limits::min_filter_font_size;
+	FS_ASSERT(size >= lang::constants::min_filter_font_size);
+	FS_ASSERT(size <= lang::constants::max_filter_font_size);
+	const std::size_t index = size - lang::constants::min_filter_font_size;
 	FS_ASSERT(index < _filter_preview_fonts.size());
 	const auto result = _filter_preview_fonts[index];
 	FS_ASSERT(result != nullptr);
@@ -144,7 +144,7 @@ void font_settings::rebuild()
 
 	FS_ASSERT(!_text_fonts.empty()); // loop below assumes that preview font is first in _text_fonts
 	for (std::size_t i = 0; i < _filter_preview_fonts.size(); ++i) {
-		_filter_preview_fonts[i] = build_font(atlas, _text_fonts.front(), i + lang::limits::min_filter_font_size);
+		_filter_preview_fonts[i] = build_font(atlas, _text_fonts.front(), i + lang::constants::min_filter_font_size);
 		FS_ASSERT(_filter_preview_fonts[i] != nullptr);
 	}
 

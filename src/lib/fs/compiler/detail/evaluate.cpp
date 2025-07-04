@@ -1,7 +1,7 @@
 #include <fs/compiler/detail/evaluate.hpp>
 #include <fs/lang/position_tag.hpp>
 #include <fs/lang/keywords.hpp>
-#include <fs/lang/limits.hpp>
+#include <fs/lang/constants.hpp>
 #include <fs/utility/holds_alternative.hpp>
 #include <fs/utility/assert.hpp>
 
@@ -92,12 +92,12 @@ evaluate(
 	if (literal.socket_count) {
 		const auto& intgr = evaluate(*literal.socket_count);
 
-		if (intgr.value < lang::limits::min_item_sockets
-			|| intgr.value > lang::limits::max_item_sockets)
+		if (intgr.value < lang::constants::min_item_sockets
+			|| intgr.value > lang::constants::max_item_sockets)
 		{
 			diagnostics.push_error_value_out_of_range(
-				lang::limits::min_item_sockets,
-				lang::limits::max_item_sockets,
+				lang::constants::min_item_sockets,
+				lang::constants::max_item_sockets,
 				intgr);
 		}
 

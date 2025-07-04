@@ -91,7 +91,7 @@ target_sources(filter_spirit
 		fs/lang/item_filter.hpp
 		fs/lang/keywords.hpp
 		fs/lang/league.hpp
-		fs/lang/limits.hpp
+		fs/lang/constants.hpp
 		fs/lang/object.hpp
 		fs/lang/position_tag.hpp
 		fs/lang/primitive_types.hpp

@@ -3,7 +3,7 @@
 #include <fs/lang/conditions.hpp>
 #include <fs/lang/item.hpp>
 #include <fs/lang/item_filter.hpp>
-#include <fs/lang/limits.hpp>
+#include <fs/lang/constants.hpp>
 #include <fs/lang/market/item_price_data.hpp>
 
 #include <string_view>
@@ -101,8 +101,8 @@ void generate_blocks_gems(
 	const lang::market::item_price_data& item_price_data,
 	lang::generated_blocks_consumer consumer)
 {
-	for (int level = lang::limits::min_item_gem_level; level <= lang::limits::max_item_gem_level; ++level) {
-		for (int quality = lang::limits::min_item_gem_quality; quality <= lang::limits::max_item_gem_quality; ++quality) {
+	for (int level = lang::constants::min_item_gem_level; level <= lang::constants::max_item_gem_level; ++level) {
+		for (int quality = lang::constants::min_item_gem_quality; quality <= lang::constants::max_item_gem_quality; ++quality) {
 			for (bool corrupt : {false, true}) {
 				lang::item_filter_block block(block_info.visibility);
 				block.actions = block_info.actions;

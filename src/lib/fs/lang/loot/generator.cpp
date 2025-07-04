@@ -713,7 +713,7 @@ void corrupt_equippable_item(
 		}
 		else {
 			itm.sockets = roll_links_and_colors(
-				roll_sockets_amount(max_item_sockets, lang::limits::max_item_level, rng),
+				roll_sockets_amount(max_item_sockets, lang::constants::max_item_level, rng),
 				0, 0, 0, rng);
 		}
 	}

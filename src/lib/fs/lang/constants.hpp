@@ -1,6 +1,6 @@
 #pragma once
 
-namespace fs::lang::limits
+namespace fs::lang::constants
 {
 	// ---- conditions ----
 

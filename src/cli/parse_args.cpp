@@ -4,7 +4,7 @@
 #include <fs/version.hpp>
 #include <fs/log/console_logger.hpp>
 #include <fs/lang/market/item_price_data.hpp>
-#include <fs/lang/limits.hpp>
+#include <fs/lang/constants.hpp>
 #include <fs/network/curl/libcurl.hpp>
 #include <fs/utility/terminal.hpp>
 
@@ -138,8 +138,8 @@ int run(int argc, char* argv[])
 				fs::lang::font_overrides::help_font_size)
 		;
 		// assert correctness of numbers in command-line help
-		static_assert(fs::lang::limits::min_filter_font_size ==  1);
-		static_assert(fs::lang::limits::max_filter_font_size == 45);
+		static_assert(fs::lang::constants::min_filter_font_size ==  1);
+		static_assert(fs::lang::constants::max_filter_font_size == 45);
 
 		boost::optional<std::string> input_path;
 		boost::optional<std::string> output_path;

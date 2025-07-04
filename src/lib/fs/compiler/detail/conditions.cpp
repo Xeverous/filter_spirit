@@ -2,7 +2,7 @@
 #include <fs/compiler/detail/evaluate.hpp>
 #include <fs/lang/position_tag.hpp>
 #include <fs/lang/conditions.hpp>
-#include <fs/lang/limits.hpp>
+#include <fs/lang/constants.hpp>
 #include <fs/utility/assert.hpp>
 
 #include <boost/container/static_vector.hpp>

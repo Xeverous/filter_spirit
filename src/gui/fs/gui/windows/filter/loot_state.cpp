@@ -6,7 +6,7 @@
 #include <fs/gui/auxiliary/raii.hpp>
 #include <fs/gui/auxiliary/colors.hpp>
 #include <fs/lang/keywords.hpp>
-#include <fs/lang/limits.hpp>
+#include <fs/lang/constants.hpp>
 #include <fs/lang/loot/item_database.hpp>
 #include <fs/lang/loot/generator.hpp>
 #include <fs/utility/assert.hpp>
@@ -83,7 +83,7 @@ ImU32 to_imgui_color(lang::color c)
 	if (c.a)
 		return IM_COL32(c.r.value, c.g.value, c.b.value, (*c.a).value);
 	else
-		return IM_COL32(c.r.value, c.g.value, c.b.value, lang::limits::default_set_background_color_opacity);
+		return IM_COL32(c.r.value, c.g.value, c.b.value, lang::constants::default_set_background_color_opacity);
 }
 
 ImU32 to_imgui_color(lang::socket_color color)
@@ -387,7 +387,7 @@ void loot_state::draw_loot_settings_global()
 	if (!ImGui::CollapsingHeader("Global settings", ImGuiTreeNodeFlags_DefaultOpen))
 		return;
 
-	ImGui::SliderInt("area level", &_area_level, 1, lang::limits::max_item_level);
+	ImGui::SliderInt("area level", &_area_level, 1, lang::constants::max_item_level);
 	if (_area_level > 67) {
 		ImGui::SameLine(0, 0);
 		ImGui::Text(" (tier %d)", _area_level - 67);

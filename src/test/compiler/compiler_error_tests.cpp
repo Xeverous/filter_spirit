@@ -247,10 +247,10 @@ SetBackgroundColor 0 0 0 50
 
 			std::vector<diagnostic_message_pattern> patterns = {
 				diagnostic_message_pattern{dms::error, dmid::value_out_of_range, expected_argument, {
-					std::to_string(lang::limits::ruthless_min_set_text_color_opacity), "255", "got 40"
+					std::to_string(lang::constants::ruthless_min_set_text_color_opacity), "255", "got 40"
 				}},
 				diagnostic_message_pattern{dms::note, dmid::minor_note, expected_argument, {
-					"Ruthless", "SetTextColor", std::to_string(lang::limits::ruthless_min_set_text_color_opacity)
+					"Ruthless", "SetTextColor", std::to_string(lang::constants::ruthless_min_set_text_color_opacity)
 				}}
 			};
 

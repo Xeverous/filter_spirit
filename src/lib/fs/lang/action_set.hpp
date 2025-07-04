@@ -20,9 +20,9 @@ enum class color_action_type { text, border, background };
 inline int get_default_color_action_opacity(color_action_type action_type)
 {
 	return
-		action_type == color_action_type::text   ? limits::default_set_text_color_opacity   :
-		action_type == color_action_type::border ? limits::default_set_border_color_opacity :
-		                                           limits::default_set_background_color_opacity;
+		action_type == color_action_type::text   ? constants::default_set_text_color_opacity   :
+		action_type == color_action_type::border ? constants::default_set_border_color_opacity :
+		                                           constants::default_set_background_color_opacity;
 }
 
 struct color
@@ -166,8 +166,8 @@ struct alert_sound_action
 	{
 		return std::visit(
 			utility::visitor{
-				[](     builtin_alert_sound  /* sound */) { return limits::default_play_alert_sound_volume; },
-				[](const custom_alert_sound& /* sound */) { return limits::default_custom_alert_sound_volume; }
+				[](     builtin_alert_sound  /* sound */) { return constants::default_play_alert_sound_volume; },
+				[](const custom_alert_sound& /* sound */) { return constants::default_custom_alert_sound_volume; }
 			},
 			sound);
 	}
@@ -218,7 +218,7 @@ inline int override_opacity(
 	}();
 
 	if (filter_is_ruthless && action_type == color_action_type::text)
-		return std::max(result, lang::limits::ruthless_min_set_text_color_opacity);
+		return std::max(result, lang::constants::ruthless_min_set_text_color_opacity);
 	else
 		return result;
 }
@@ -228,14 +228,14 @@ inline int override_font_size(int nominal, font_overrides overrides, bool block_
 	if (block_is_show) {
 		return std::clamp(
 			nominal,
-			overrides.show_size_min.value_or(limits::min_filter_font_size),
-			overrides.show_size_max.value_or(limits::max_filter_font_size));
+			overrides.show_size_min.value_or(constants::min_filter_font_size),
+			overrides.show_size_max.value_or(constants::max_filter_font_size));
 	}
 	else {
 		return std::clamp(
 			nominal,
-			overrides.hide_size_min.value_or(limits::min_filter_font_size),
-			overrides.hide_size_max.value_or(limits::max_filter_font_size));
+			overrides.hide_size_min.value_or(constants::min_filter_font_size),
+			overrides.hide_size_max.value_or(constants::max_filter_font_size));
 	}
 }
 
