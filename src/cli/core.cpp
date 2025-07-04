@@ -4,6 +4,7 @@
 #include <fs/network/item_price_report.hpp>
 #include <fs/network/ggg/download_data.hpp>
 #include <fs/network/ggg/parse_data.hpp>
+#include <fs/lang/constants.hpp>
 #include <fs/utility/file.hpp>
 #include <fs/log/logger.hpp>
 
@@ -22,6 +23,23 @@ bool generate_item_filter_impl(
 	fs::compiler::settings st,
 	log::logger& logger)
 {
+	auto check_extension = [&](const char* expected_extension) {
+		const auto actual_extension = output_filepath.extension().generic_string();
+
+		if (expected_extension != actual_extension) {
+			logger.warning() << "output file extension \"" << actual_extension
+				<< "\" differs from expected \"" << expected_extension
+				<< "\" - it is recommended to rename the file\n";
+		}
+	};
+
+	if (st.ruthless_mode) {
+		check_extension(lang::constants::file_extension_filter_ruthless);
+	}
+	else {
+		check_extension(lang::constants::file_extension_filter);
+	}
+
 	std::optional<std::string> source_file_content = utility::load_file(source_filepath, logger);
 
 	if (!source_file_content)

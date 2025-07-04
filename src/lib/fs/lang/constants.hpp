@@ -2,6 +2,12 @@
 
 namespace fs::lang::constants
 {
+	// ---- general ----
+
+	constexpr auto file_extension_filter_template = ".filtertemplate";
+	constexpr auto file_extension_filter = ".filter";
+	constexpr auto file_extension_filter_ruthless = ".ruthlessfilter";
+
 	// ---- conditions ----
 
 	constexpr auto min_item_width   = 1;
