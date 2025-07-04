@@ -1,5 +1,7 @@
 #pragma once
 
+#include <fs/lang/style_overrides.hpp>
+
 namespace fs::compiler
 {
 
@@ -14,6 +16,7 @@ struct settings
 	bool ruthless_mode = false;
 	bool print_ast = false;
 	error_handling_settings error_handling;
+	lang::style_overrides overrides;
 };
 
 }

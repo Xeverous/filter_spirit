@@ -46,19 +46,19 @@ make_color(
 
 		lang::integer alpha = *result_a;
 		if (is_set_text_color && st.ruthless_mode
-			&& alpha.value < lang::limits::ruthless_min_set_text_color_alpha)
+			&& alpha.value < lang::limits::ruthless_min_set_text_color_opacity)
 		{
 			diagnostics.push_error_value_out_of_range(
-				lang::limits::ruthless_min_set_text_color_alpha, 255, alpha);
+				lang::limits::ruthless_min_set_text_color_opacity, 255, alpha);
 			diagnostics.push_message(make_note_minor(
 				alpha.origin,
 				"Ruthless filters require SetTextColor alpha value to be at least ",
-				std::to_string(lang::limits::ruthless_min_set_text_color_alpha)));
+				std::to_string(lang::limits::ruthless_min_set_text_color_opacity)));
 
 			if (st.error_handling.stop_on_error)
 				return boost::none;
 			else
-				alpha.value = lang::limits::ruthless_min_set_text_color_alpha;
+				alpha.value = lang::limits::ruthless_min_set_text_color_opacity;
 		}
 
 		return lang::color{*result_r, *result_g, *result_b, alpha};

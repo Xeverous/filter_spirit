@@ -3,13 +3,27 @@
 #include <fs/lang/primitive_types.hpp>
 #include <fs/lang/position_tag.hpp>
 #include <fs/lang/keywords.hpp>
+#include <fs/lang/style_overrides.hpp>
+#include <fs/utility/visitor.hpp>
 
+#include <algorithm>
 #include <utility>
 #include <iosfwd>
 #include <optional>
 
 namespace fs::lang
 {
+
+// needed only for some helper functions
+enum class color_action_type { text, border, background };
+
+inline int get_default_color_action_opacity(color_action_type action_type)
+{
+	return
+		action_type == color_action_type::text   ? limits::default_set_text_color_opacity   :
+		action_type == color_action_type::border ? limits::default_set_border_color_opacity :
+		                                           limits::default_set_background_color_opacity;
+}
 
 struct color
 {
@@ -142,9 +156,20 @@ inline bool operator!=(const custom_alert_sound& lhs, const custom_alert_sound& 
 
 struct alert_sound_action
 {
+	// Sounds are disabled with None or "None" values. In such case volume should be empty.
 	bool is_disabled() const
 	{
-		return std::visit([](auto sound) { return sound.is_disabled(); }, sound);
+		return std::visit([](const auto& sound) { return sound.is_disabled(); }, sound);
+	}
+
+	int get_default_volume() const
+	{
+		return std::visit(
+			utility::visitor{
+				[](     builtin_alert_sound  /* sound */) { return limits::default_play_alert_sound_volume; },
+				[](const custom_alert_sound& /* sound */) { return limits::default_custom_alert_sound_volume; }
+			},
+			sound);
 	}
 
 	std::variant<builtin_alert_sound, custom_alert_sound> sound;
@@ -167,6 +192,53 @@ struct switch_drop_sound_action
 inline bool operator==(switch_drop_sound_action lhs, switch_drop_sound_action rhs) { return lhs.enable == rhs.enable; }
 inline bool operator!=(switch_drop_sound_action lhs, switch_drop_sound_action rhs) { return !(lhs == rhs); }
 
+inline int override_opacity(
+	color_action_type action_type,
+	int nominal,
+	color_overrides overrides,
+	bool block_is_show,
+	bool filter_is_ruthless)
+{
+	const int result = [&]() {
+		if (!overrides.override_all_actions && action_type != color_action_type::background)
+			return nominal;
+
+		if (block_is_show) {
+			return std::clamp(
+				nominal,
+				overrides.show_opacity_min.value_or(0),
+				overrides.show_opacity_max.value_or(255));
+		}
+		else {
+			return std::clamp(
+				nominal,
+				overrides.hide_opacity_min.value_or(0),
+				overrides.hide_opacity_max.value_or(255));
+		}
+	}();
+
+	if (filter_is_ruthless && action_type == color_action_type::text)
+		return std::max(result, lang::limits::ruthless_min_set_text_color_opacity);
+	else
+		return result;
+}
+
+inline int override_font_size(int nominal, font_overrides overrides, bool block_is_show)
+{
+	if (block_is_show) {
+		return std::clamp(
+			nominal,
+			overrides.show_size_min.value_or(limits::min_filter_font_size),
+			overrides.show_size_max.value_or(limits::max_filter_font_size));
+	}
+	else {
+		return std::clamp(
+			nominal,
+			overrides.hide_size_min.value_or(limits::min_filter_font_size),
+			overrides.hide_size_max.value_or(limits::max_filter_font_size));
+	}
+}
+
 /**
  * @class a type describing all of the given filter block actions
  *
@@ -178,7 +250,8 @@ struct action_set
 {
 	void override_with(const action_set& other);
 
-	void print(std::ostream& output_stream) const;
+	// The knowledge whether a block has Show or filter is Ruthless is necessary for some overrides
+	void print(std::ostream& output_stream, style_overrides overrides, bool block_is_show, bool filter_is_ruthless) const;
 
 	std::optional<color_action> text_color;
 	std::optional<color_action> border_color;

@@ -71,7 +71,7 @@ void import_block::print(std::ostream& output_stream) const
 	output_stream << "\n\n";
 }
 
-void item_filter_block::print(std::ostream& output_stream) const
+void item_filter_block::print(std::ostream& output_stream, style_overrides overrides, bool filter_is_ruthless) const
 {
 	if (!is_valid())
 		return;
@@ -93,7 +93,11 @@ void item_filter_block::print(std::ostream& output_stream) const
 	output_stream << '\n';
 
 	conditions.print(output_stream);
-	actions.print(output_stream);
+	actions.print(
+		output_stream,
+		overrides,
+		visibility.policy == item_visibility_policy::show,
+		filter_is_ruthless);
 
 	if (continuation.origin)
 		output_stream << '\t' << keywords::rf::continue_ << '\n';
@@ -101,10 +105,16 @@ void item_filter_block::print(std::ostream& output_stream) const
 	output_stream << '\n';
 }
 
-void item_filter::print(std::ostream& output_stream) const
+void item_filter::print(std::ostream& output_stream, style_overrides overrides) const
 {
-	for (const block_variant& block_variant : blocks)
-		std::visit([&](const auto& block) { block.print(output_stream); }, block_variant);
+	for (const block_variant& block_variant : blocks) {
+		std::visit(
+			utility::visitor{
+				[&](const item_filter_block& block) { block.print(output_stream, overrides, is_ruthless); },
+				[&](const      import_block& block) { block.print(output_stream); }
+			},
+			block_variant);
+	}
 }
 
 item_style::item_style()
@@ -145,6 +155,28 @@ void item_style::override_with(const action_set& actions)
 
 	if (actions.switch_drop_sound_if_alert_sound)
 		switch_drop_sound_if_alert_sound = *actions.switch_drop_sound_if_alert_sound;
+}
+
+void item_style::override_with(style_overrides overrides, bool filter_is_ruthless)
+{
+	auto update_opacity =
+		[overrides = overrides.color, is_show = visibility.show, filter_is_ruthless]
+		(color_action_type action_type, std::optional<integer>& alpha)
+	{
+		const int assumed_opacity = alpha ? (*alpha).value : get_default_color_action_opacity(action_type);
+		const int opacity = override_opacity(action_type, assumed_opacity, overrides, is_show, filter_is_ruthless);
+
+		// Filter reproducibility: override opacity only if it is meaningful
+		if (opacity != assumed_opacity)
+			alpha = integer{opacity, no_origin()};
+	};
+
+	update_opacity(color_action_type::text, text_color.c.a);
+	if (border_color)
+		update_opacity(color_action_type::border, (*border_color).c.a);
+	update_opacity(color_action_type::background, background_color.c.a);
+
+	font_size.size.value = override_font_size(font_size.size.value, overrides.font, visibility.show);
 }
 
 block_match_result item_filter_block::test_item(const item& itm, int area_level) const

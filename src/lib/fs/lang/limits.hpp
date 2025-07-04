@@ -27,7 +27,11 @@ namespace fs::lang::limits
 
 	// ---- actions ----
 
-	constexpr auto ruthless_min_set_text_color_alpha = 80;
+	constexpr auto default_set_text_color_opacity       = 255;
+	constexpr auto default_set_border_color_opacity     = 255;
+	constexpr auto default_set_background_color_opacity = 240;
+
+	constexpr auto ruthless_min_set_text_color_opacity  =  80;
 
 	// these are not strictly enforced by the filter
 	// but the game client clamps values in this range
@@ -40,8 +44,9 @@ namespace fs::lang::limits
 	constexpr auto min_filter_volume = 0;
 	constexpr auto max_filter_volume = 300;
 
+	constexpr auto default_play_alert_sound_volume   =  50; // PlayAlertSound, PlayAlertSoundPositional
+	constexpr auto default_custom_alert_sound_volume = 100; // CustomAlertSound, CustomAlertSoundOptional
+
 	constexpr auto min_item_level = 0;
 	constexpr auto max_item_level = 100;
-
-	constexpr auto default_filter_opacity = 240;
 }

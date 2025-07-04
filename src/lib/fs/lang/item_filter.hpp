@@ -123,7 +123,7 @@ struct item_filter_block
 
 	block_match_result test_item(const item& itm, int area_level) const;
 
-	void print(std::ostream& output_stream) const;
+	void print(std::ostream& output_stream, style_overrides overrides, bool filter_is_ruthless) const;
 
 	item_visibility visibility;
 	official_conditions conditions;
@@ -135,8 +135,14 @@ using block_variant = std::variant<item_filter_block, import_block>;
 
 struct item_filter
 {
-	void print(std::ostream& output_stream) const;
+	item_filter(bool is_ruthless, std::vector<block_variant> blocks = {})
+	: is_ruthless(is_ruthless)
+	, blocks(std::move(blocks))
+	{}
 
+	void print(std::ostream& output_stream, style_overrides overrides) const;
+
+	bool is_ruthless;
 	std::vector<block_variant> blocks;
 };
 
@@ -188,6 +194,12 @@ using spirit_block_variant = std::variant<spirit_item_filter_block, import_block
 
 struct spirit_item_filter
 {
+	spirit_item_filter(bool is_ruthless, std::vector<spirit_block_variant> blocks = {})
+	: is_ruthless(is_ruthless)
+	, blocks(std::move(blocks))
+	{}
+
+	bool is_ruthless;
 	std::vector<spirit_block_variant> blocks;
 };
 
@@ -203,7 +215,11 @@ struct item_style
 {
 	item_style();
 
+	// to be used during filtering, when applying Continue blocks and the final styles
 	void override_with(const action_set& actions);
+
+	// to be used after entire filtering
+	void override_with(style_overrides overrides, bool filter_is_ruthless);
 
 	item_visibility_style visibility;
 

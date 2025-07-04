@@ -8,25 +8,55 @@ namespace fs::lang {
 
 namespace {
 
-void output_color_action(std::optional<color_action> action, const char* keyword, std::ostream& output_stream)
+void output_color_action(
+	std::optional<color_action> action,
+	color_action_type action_type,
+	color_overrides overrides,
+	bool block_is_show,
+	bool filter_is_ruthless,
+	std::ostream& output_stream)
 {
 	if (!action.has_value())
 		return;
 
+	const auto keyword =
+		action_type == color_action_type::text   ? keywords::rf::set_text_color   :
+		action_type == color_action_type::border ? keywords::rf::set_border_color :
+		keywords::rf::set_background_color;
 	const color& c = (*action).c;
 	output_stream << '\t' << keyword << ' ' << c.r.value << ' ' << c.g.value << ' ' << c.b.value;
-	if (c.a.has_value())
-		output_stream << ' ' << (*c.a).value;
+
+	// The code here could be much simpler but since the goal is to have reproducible filters,
+	// changes/additions should be made only if necessary.
+	// Thus color overrides should append opacity in output only if it is meaningful.
+	if (c.a.has_value()) {
+		// opacity specified - always output it, possibly overriden
+		const int opacity = override_opacity(action_type, (*c.a).value, overrides, block_is_show, filter_is_ruthless);
+		output_stream << ' ' << opacity;
+	}
+	else {
+		const int default_opacity = get_default_color_action_opacity(action_type);
+
+		// opacity not specified - output it only if overrides would make it different from the default
+		const int opacity = override_opacity(action_type, default_opacity, overrides, block_is_show, filter_is_ruthless);
+		if (opacity != default_opacity)
+			output_stream << ' ' << opacity;
+	}
 
 	output_stream << '\n';
 }
 
-void output_font_size(std::optional<font_size_action> action, std::ostream& output_stream)
+void output_font_size(
+	std::optional<font_size_action> action,
+	font_overrides overrides,
+	bool block_is_show,
+	std::ostream& output_stream)
 {
 	if (!action.has_value())
 		return;
 
-	output_stream << '\t' << keywords::rf::set_font_size << ' ' << (*action).size.value << '\n';
+	const int font_size = override_font_size((*action).size.value, overrides, block_is_show);
+	output_stream << '\t' << keywords::rf::set_font_size << ' ' << font_size << '\n';
 }
 
 void output_effect(std::optional<play_effect_action> action, std::ostream& output_stream)
@@ -144,13 +174,13 @@ void output_switch_drop_sound(
 
 } // namespace
 
-void action_set::print(std::ostream& output_stream) const
+void action_set::print(std::ostream& output_stream, style_overrides overrides, bool block_is_show, bool filter_is_ruthless) const
 {
-	output_color_action(text_color,       keywords::rf::set_text_color,       output_stream);
-	output_color_action(border_color,     keywords::rf::set_border_color,     output_stream);
-	output_color_action(background_color, keywords::rf::set_background_color, output_stream);
+	output_color_action(text_color,       color_action_type::text,       overrides.color, block_is_show, filter_is_ruthless, output_stream);
+	output_color_action(border_color,     color_action_type::border,     overrides.color, block_is_show, filter_is_ruthless, output_stream);
+	output_color_action(background_color, color_action_type::background, overrides.color, block_is_show, filter_is_ruthless, output_stream);
 
-	output_font_size(font_size, output_stream);
+	output_font_size(font_size, overrides.font, block_is_show, output_stream);
 	output_effect(effect, output_stream);
 	output_minimap_icon(minimap_icon, output_stream);
 

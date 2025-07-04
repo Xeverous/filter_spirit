@@ -83,7 +83,7 @@ ImU32 to_imgui_color(lang::color c)
 	if (c.a)
 		return IM_COL32(c.r.value, c.g.value, c.b.value, (*c.a).value);
 	else
-		return IM_COL32(c.r.value, c.g.value, c.b.value, lang::limits::default_filter_opacity);
+		return IM_COL32(c.r.value, c.g.value, c.b.value, lang::limits::default_set_background_color_opacity);
 }
 
 ImU32 to_imgui_color(lang::socket_color color)

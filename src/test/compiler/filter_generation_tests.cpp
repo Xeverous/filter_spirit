@@ -2075,6 +2075,281 @@ Hide
 			BOOST_TEST(compare_strings(expected_filter, actual_filter));
 		}
 
+		BOOST_AUTO_TEST_CASE(override_settings_font_min)
+		{
+			compiler::settings st;
+			st.overrides.font.show_size_min = 26;
+			st.overrides.font.hide_size_min = 22;
+
+			const std::string actual_filter = generate_filter(st, minimal_input() + R"(
+SetFontSize 10
+{
+	Show
+}
+
+SetFontSize 40
+{
+	Show
+}
+
+SetFontSize 10
+{
+	Hide
+}
+
+SetFontSize 40
+{
+	Hide
+}
+)");
+			const std::string_view expected_filter =
+R"(Show
+	SetFontSize 26
+
+Show
+	SetFontSize 40
+
+Hide
+	SetFontSize 22
+
+Hide
+	SetFontSize 40
+
+)";
+
+			BOOST_TEST(compare_strings(expected_filter, actual_filter));
+		}
+
+		BOOST_AUTO_TEST_CASE(override_settings_font_max)
+		{
+			compiler::settings st;
+			st.overrides.font.show_size_max = 26;
+			st.overrides.font.hide_size_max = 22;
+
+			// TODO same input as in the test above
+			const std::string actual_filter = generate_filter(st, minimal_input() + R"(
+SetFontSize 10
+{
+	Show
+}
+
+SetFontSize 40
+{
+	Show
+}
+
+SetFontSize 10
+{
+	Hide
+}
+
+SetFontSize 40
+{
+	Hide
+}
+)");
+			const std::string_view expected_filter =
+R"(Show
+	SetFontSize 10
+
+Show
+	SetFontSize 26
+
+Hide
+	SetFontSize 10
+
+Hide
+	SetFontSize 22
+
+)";
+
+			BOOST_TEST(compare_strings(expected_filter, actual_filter));
+		}
+
+		BOOST_AUTO_TEST_CASE(override_settings_font_min_max)
+		{
+			compiler::settings st;
+			st.overrides.font.show_size_min = 24;
+			st.overrides.font.show_size_max = 26;
+			st.overrides.font.hide_size_min = 18;
+			st.overrides.font.hide_size_max = 22;
+
+			// TODO same input as in the test above
+			const std::string actual_filter = generate_filter(st, minimal_input() + R"(
+SetFontSize 10
+{
+	Show
+}
+
+SetFontSize 40
+{
+	Show
+}
+
+SetFontSize 10
+{
+	Hide
+}
+
+SetFontSize 40
+{
+	Hide
+}
+)");
+			const std::string_view expected_filter =
+R"(Show
+	SetFontSize 24
+
+Show
+	SetFontSize 26
+
+Hide
+	SetFontSize 18
+
+Hide
+	SetFontSize 22
+
+)";
+
+			BOOST_TEST(compare_strings(expected_filter, actual_filter));
+		}
+
+		BOOST_AUTO_TEST_CASE(override_settings_opacity_min_max)
+		{
+			compiler::settings st;
+			st.overrides.color.show_opacity_min = 245;
+			st.overrides.color.show_opacity_max = 250;
+			st.overrides.color.hide_opacity_min = 160;
+			st.overrides.color.hide_opacity_max = 200;
+
+			const std::string actual_filter = generate_filter(st, minimal_input() + R"(
+# implicit opacity
+SetTextColor 255 0 0
+SetBorderColor 0 255 0
+SetBackgroundColor 0 0 255
+{
+	Show
+}
+
+# explicit opacity (below default, below default, above default)
+SetTextColor 255 255 0 100
+SetBorderColor 255 0 255 250
+SetBackgroundColor 0 255 255 252
+{
+	Show
+}
+
+# implicit opacity
+SetTextColor 255 0 0
+SetBorderColor 0 255 0
+SetBackgroundColor 0 0 255
+{
+	Hide
+}
+
+# explicit opacity (3x below default)
+SetTextColor 255 255 0 200
+SetBorderColor 255 0 255 100
+SetBackgroundColor 0 255 255 120
+{
+	Hide
+}
+)");
+			const std::string_view expected_filter =
+R"(Show
+	SetTextColor 255 0 0
+	SetBorderColor 0 255 0
+	SetBackgroundColor 0 0 255 245
+
+Show
+	SetTextColor 255 255 0 100
+	SetBorderColor 255 0 255 250
+	SetBackgroundColor 0 255 255 250
+
+Hide
+	SetTextColor 255 0 0
+	SetBorderColor 0 255 0
+	SetBackgroundColor 0 0 255 200
+
+Hide
+	SetTextColor 255 255 0 200
+	SetBorderColor 255 0 255 100
+	SetBackgroundColor 0 255 255 160
+
+)";
+
+			BOOST_TEST(compare_strings(expected_filter, actual_filter));
+		}
+
+		BOOST_AUTO_TEST_CASE(override_settings_opacity_min_max_all_actions)
+		{
+			compiler::settings st;
+			st.overrides.color.show_opacity_min = 245;
+			st.overrides.color.show_opacity_max = 250;
+			st.overrides.color.hide_opacity_min = 160;
+			st.overrides.color.hide_opacity_max = 200;
+			st.overrides.color.override_all_actions = true;
+
+			// TODO same input as in the test above
+			const std::string actual_filter = generate_filter(st, minimal_input() + R"(
+# implicit opacity
+SetTextColor 255 0 0
+SetBorderColor 0 255 0
+SetBackgroundColor 0 0 255
+{
+	Show
+}
+
+# explicit opacity (below default, below default, above default)
+SetTextColor 255 255 0 100
+SetBorderColor 255 0 255 250
+SetBackgroundColor 0 255 255 252
+{
+	Show
+}
+
+# implicit opacity
+SetTextColor 255 0 0
+SetBorderColor 0 255 0
+SetBackgroundColor 0 0 255
+{
+	Hide
+}
+
+# explicit opacity (3x below default)
+SetTextColor 255 255 0 200
+SetBorderColor 255 0 255 100
+SetBackgroundColor 0 255 255 120
+{
+	Hide
+}
+)");
+			const std::string_view expected_filter =
+R"(Show
+	SetTextColor 255 0 0 250
+	SetBorderColor 0 255 0 250
+	SetBackgroundColor 0 0 255 245
+
+Show
+	SetTextColor 255 255 0 245
+	SetBorderColor 255 0 255 250
+	SetBackgroundColor 0 255 255 250
+
+Hide
+	SetTextColor 255 0 0 200
+	SetBorderColor 0 255 0 200
+	SetBackgroundColor 0 0 255 200
+
+Hide
+	SetTextColor 255 255 0 200
+	SetBorderColor 255 0 255 160
+	SetBackgroundColor 0 255 255 160
+
+)";
+
+			BOOST_TEST(compare_strings(expected_filter, actual_filter));
+		}
+
 	BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE_END()

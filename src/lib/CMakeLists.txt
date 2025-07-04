@@ -63,6 +63,7 @@ target_sources(filter_spirit
 		fs/utility/file.cpp
 		fs/utility/dump_json.cpp
 		fs/utility/string_helpers.cpp
+		fs/utility/terminal.cpp
 		fs/network/url_encode.cpp
 		fs/network/download.cpp
 		fs/network/poe_watch/download_data.cpp
@@ -134,6 +135,7 @@ target_sources(filter_spirit
 		fs/utility/type_traits.hpp
 		fs/utility/visitor.hpp
 		fs/utility/string_helpers.hpp
+		fs/utility/terminal.hpp
 		fs/utility/async.hpp
 		fs/version.hpp
 )

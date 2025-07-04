@@ -47,12 +47,14 @@ make_item_filter(
 // real_filter_representation => string
 [[nodiscard]] std::string
 item_filter_to_string_without_preamble(
-	const lang::item_filter& filter);
+	const lang::item_filter& filter,
+	lang::style_overrides overrides);
 
 // real_filter_representation => preamble + output_string
 [[nodiscard]] std::string
 item_filter_to_string_with_preamble(
 	const lang::item_filter& filter,
+	lang::style_overrides overrides,
 	const lang::market::item_price_metadata& item_price_metadata);
 
 // end-to-end function: input_string => output_string
