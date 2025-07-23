@@ -6,6 +6,11 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 
 *newest at the top*
 
+### 3.26.0e
+
+- [patch notes](https://www.pathofexile.com/forum/view-thread/3817515)
+- *Fixed a bug where the filter version was not displaying correctly when loading an online Item Filter.*
+
 ### 3.26 (Secrets of the Atlas + Trarthus) [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3788869)
 
 - new condition: `ZanaMemory Boolean`
