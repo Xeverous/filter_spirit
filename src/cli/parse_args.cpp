@@ -110,12 +110,15 @@ int run(int argc, char* argv[])
 		;
 
 		bool opt_generate = false;
+		bool ruthless_mode = false;
+		bool poe2_mode = false;
 		fs::compiler::settings st;
 		po::options_description generation_options = make_options("generation options");
 		generation_options.add_options()
 			// generation
 			("generate,g", po::bool_switch(&opt_generate), "generate an item filter")
-			("ruthless,r", po::bool_switch(&st.ruthless_mode), "enable Ruthless-specific filter logic")
+			("ruthless,r", po::bool_switch(&ruthless_mode), "enable Ruthless-specific filter logic")
+			("poe2,2", po::bool_switch(&poe2_mode), "enable PoE 2 filter logic")
 			// warning/error/debug
 			("stop-on-error", po::bool_switch(&st.error_handling.stop_on_error),
 				"stop on first error")
@@ -181,6 +184,17 @@ int run(int argc, char* argv[])
 		po::variables_map vm;
 		po::store(po::command_line_parser(argc, argv).options(all_options).positional(positional_options_description).run(), vm);
 		po::notify(vm);
+
+		if (ruthless_mode && poe2_mode) {
+			logger.error() << "Can not use Ruthless together with PoE 2\n";
+			return EXIT_FAILURE;
+		}
+		else if (ruthless_mode) {
+			st.game_variant = fs::lang::game_variant_type::poe1_ruthless;
+		}
+		else if (poe2_mode) {
+			st.game_variant = fs::lang::game_variant_type::poe2;
+		}
 
 		if (argc == 0 || argc == 1) {
 			// later: run with GUI

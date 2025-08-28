@@ -1,11 +1,11 @@
 #pragma once
 
+#include <fs/lang/enum_types.hpp>
 #include <fs/lang/conditions.hpp>
 #include <fs/lang/action_set.hpp>
 
 #include <functional>
 #include <iosfwd>
-#include <iterator>
 #include <optional>
 #include <utility>
 #include <variant>
@@ -135,14 +135,14 @@ using block_variant = std::variant<item_filter_block, import_block>;
 
 struct item_filter
 {
-	item_filter(bool is_ruthless, std::vector<block_variant> blocks = {})
-	: is_ruthless(is_ruthless)
+	item_filter(game_variant_type game_variant, std::vector<block_variant> blocks = {})
+	: game_variant(game_variant)
 	, blocks(std::move(blocks))
 	{}
 
 	void print(std::ostream& output_stream, style_overrides overrides) const;
 
-	bool is_ruthless;
+	game_variant_type game_variant;
 	std::vector<block_variant> blocks;
 };
 
@@ -194,12 +194,12 @@ using spirit_block_variant = std::variant<spirit_item_filter_block, import_block
 
 struct spirit_item_filter
 {
-	spirit_item_filter(bool is_ruthless, std::vector<spirit_block_variant> blocks = {})
-	: is_ruthless(is_ruthless)
+	spirit_item_filter(game_variant_type game_variant, std::vector<spirit_block_variant> blocks = {})
+	: game_variant(game_variant)
 	, blocks(std::move(blocks))
 	{}
 
-	bool is_ruthless;
+	game_variant_type game_variant;
 	std::vector<spirit_block_variant> blocks;
 };
 

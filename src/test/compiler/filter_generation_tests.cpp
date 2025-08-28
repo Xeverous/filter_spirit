@@ -1,4 +1,3 @@
-#include "common/test_fixtures.hpp"
 #include "common/string_operations.hpp"
 
 #include <fs/compiler/compiler.hpp>
@@ -71,7 +70,7 @@ boost::test_tools::predicate_result compile_from_files(
 		.concat(lang::constants::file_extension_filter_template);
 
 	const auto output_path = std::filesystem::path(input_output_prefix_path)
-		.concat(st.ruthless_mode ?
+		.concat(st.is_ruthless() ?
 			lang::constants::file_extension_filter_ruthless :
 			lang::constants::file_extension_filter);
 
@@ -200,7 +199,7 @@ BOOST_AUTO_TEST_CASE(dynamic_visibility_multiple_values)
 BOOST_AUTO_TEST_CASE(dynamic_visibility_ruthless)
 {
 	compiler::settings st;
-	st.ruthless_mode = true;
+	st.game_variant = lang::game_variant_type::poe1_ruthless;
 	BOOST_TEST(compile_from_files("poe1/dynamic_visibility_ruthless", st));
 }
 

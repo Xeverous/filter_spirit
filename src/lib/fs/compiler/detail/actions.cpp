@@ -9,7 +9,6 @@
 #include <boost/optional.hpp>
 
 #include <utility>
-#include <type_traits>
 
 namespace fs::compiler::detail {
 namespace {
@@ -45,7 +44,7 @@ make_color(
 			return boost::none;
 
 		lang::integer alpha = *result_a;
-		if (is_set_text_color && st.ruthless_mode
+		if (is_set_text_color && st.is_ruthless()
 			&& alpha.value < lang::constants::ruthless_min_set_text_color_opacity)
 		{
 			diagnostics.push_error_value_out_of_range(

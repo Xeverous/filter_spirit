@@ -13,10 +13,6 @@
 
 #include <string>
 #include <string_view>
-#include <functional>
-#include <utility>
-#include <stdexcept>
-#include <exception>
 
 namespace ut = boost::unit_test;
 
@@ -240,7 +236,7 @@ SetBackgroundColor 0 0 0 50
 			const parser::parsed_spirit_filter parse_data = parse(input);
 
 			compiler::settings st;
-			st.ruthless_mode = true;
+			st.game_variant = lang::game_variant_type::poe1_ruthless;
 			const diagnostics_store diagnostics = expect_error_when_compiling(parse_data.ast, st);
 
 			const std::string_view expected_argument = search(input, "40").result();
@@ -328,7 +324,7 @@ Class == "Skill Gems"
 			const parser::parsed_spirit_filter parse_data = parse(input);
 
 			compiler::settings st;
-			st.ruthless_mode = true;
+			st.game_variant = lang::game_variant_type::poe1_ruthless;
 			const diagnostics_store diagnostics = expect_error_when_compiling(parse_data.ast, st);
 
 			const std::string_view expected_expression = search(input, "Hide").result();

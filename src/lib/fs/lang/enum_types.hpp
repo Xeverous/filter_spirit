@@ -9,6 +9,22 @@
 
 namespace fs::lang {
 
+enum class game_variant_type { poe1, poe1_ruthless, poe2 };
+
+constexpr std::string_view to_string(game_variant_type game_variant)
+{
+	switch (game_variant) {
+		case game_variant_type::poe1:
+			return "PoE 1";
+		case game_variant_type::poe1_ruthless:
+			return "PoE 1 Ruthless";
+		case game_variant_type::poe2:
+			return "PoE 2";
+	}
+
+	return "(unknown)";
+}
+
 // ---- conditions ----
 
 enum class official_condition_property

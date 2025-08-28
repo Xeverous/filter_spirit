@@ -33,7 +33,7 @@ bool generate_item_filter_impl(
 		}
 	};
 
-	if (st.ruthless_mode) {
+	if (st.is_ruthless()) {
 		check_extension(lang::constants::file_extension_filter_ruthless);
 	}
 	else {

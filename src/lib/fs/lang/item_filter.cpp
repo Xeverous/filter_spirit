@@ -7,7 +7,6 @@
 #include <algorithm>
 #include <utility>
 #include <ostream>
-#include <type_traits>
 
 namespace fs::lang
 {
@@ -110,7 +109,7 @@ void item_filter::print(std::ostream& output_stream, style_overrides overrides) 
 	for (const block_variant& block_variant : blocks) {
 		std::visit(
 			utility::visitor{
-				[&](const item_filter_block& block) { block.print(output_stream, overrides, is_ruthless); },
+				[&](const item_filter_block& block) { block.print(output_stream, overrides, game_variant == game_variant_type::poe1_ruthless); },
 				[&](const      import_block& block) { block.print(output_stream); }
 			},
 			block_variant);
