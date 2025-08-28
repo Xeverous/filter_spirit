@@ -874,6 +874,34 @@ inline std::shared_ptr<value_list_condition<integer>> make_memory_strands_value_
 		official_condition_property::memory_strands, &item::memory_strands, std::move(values), allowed, origin);
 }
 
+inline std::shared_ptr<range_bound_condition<integer>> make_unidentified_item_tier_range_bound_condition(
+	range_bound<integer> bound, bool is_lower_bound, position_tag origin)
+{
+	return std::make_shared<range_bound_condition_with_field_test<integer>>(
+		official_condition_property::unidentified_item_tier, &item::unidentified_item_tier, bound, is_lower_bound, origin);
+}
+
+inline std::shared_ptr<value_list_condition<integer>> make_unidentified_item_tier_value_list_condition(
+	value_list_condition<integer>::container_type values, bool allowed, position_tag origin)
+{
+	return std::make_shared<value_list_condition_with_field_test<integer>>(
+		official_condition_property::unidentified_item_tier, &item::unidentified_item_tier, std::move(values), allowed, origin);
+}
+
+inline std::shared_ptr<range_bound_condition<integer>> make_waystone_tier_range_bound_condition(
+	range_bound<integer> bound, bool is_lower_bound, position_tag origin)
+{
+	return std::make_shared<range_bound_condition_with_field_test<integer>>(
+		official_condition_property::waystone_tier, &item::waystone_tier, bound, is_lower_bound, origin);
+}
+
+inline std::shared_ptr<value_list_condition<integer>> make_waystone_tier_value_list_condition(
+	value_list_condition<integer>::container_type values, bool allowed, position_tag origin)
+{
+	return std::make_shared<value_list_condition_with_field_test<integer>>(
+		official_condition_property::waystone_tier, &item::waystone_tier, std::move(values), allowed, origin);
+}
+
 // -- function test --
 
 inline std::shared_ptr<range_bound_condition<integer>> make_linked_sockets_range_bound_condition(

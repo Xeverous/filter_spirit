@@ -13,6 +13,7 @@
 
 #include <string>
 #include <string_view>
+#include <utility>
 
 namespace ut = boost::unit_test;
 
@@ -334,6 +335,38 @@ Class == "Skill Gems"
 			};
 
 			compare_diagnostics(patterns, diagnostics, parse_data.metadata);
+		}
+
+		BOOST_AUTO_TEST_CASE(invalid_condition_in_poe1_filter)
+		{
+			std::vector<std::pair<std::string, std::string>> conditions_to_test = {
+				{"UnidentifiedItemTier", ">= 1"},
+				{"WaystoneTier", ">= 1"}
+			};
+
+			for (const auto& [condition_keyword, condition_test] : conditions_to_test) {
+				const auto condition_statement = condition_keyword + " " + condition_test;
+				const std::string input_str = minimal_input() +
+					condition_statement + "\n"
+					"{\n"
+						"\tSetTextColor 0 255 0\n"
+						"\tShow\n"
+					"}\n";
+
+				const std::string_view input = input_str;
+				const parser::parsed_spirit_filter parse_data = parse(input);
+
+				compiler::settings st; // by default uses PoE 1
+				const diagnostics_store diagnostics = expect_error_when_compiling(parse_data.ast, st);
+
+				const std::string_view expected_expression = search(input, condition_statement).result();
+
+				std::vector<diagnostic_message_pattern> patterns = {
+					diagnostic_message_pattern{dms::error, dmid::game_variant_mismatch, expected_expression, {"valid only for PoE 2"}},
+				};
+
+				compare_diagnostics(patterns, diagnostics, parse_data.metadata);
+			}
 		}
 
 		BOOST_AUTO_TEST_CASE(invalid_statement_action_after_condition)

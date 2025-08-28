@@ -584,6 +584,32 @@ make_official_condition(
 				lang::make_memory_strands_range_bound_condition,
 				lang::make_memory_strands_value_list_condition,
 				diagnostics);
+		case property_t::unidentified_item_tier: {
+			if (!st.is_poe2()) {
+				diagnostics.push_error_only_in_poe2(pc.condition_origin);
+				return nullptr;
+			}
+
+			return make_range_or_list_condition(
+				st,
+				std::move(pc),
+				lang::make_unidentified_item_tier_range_bound_condition,
+				lang::make_unidentified_item_tier_value_list_condition,
+				diagnostics);
+		}
+		case property_t::waystone_tier: {
+			if (!st.is_poe2()) {
+				diagnostics.push_error_only_in_poe2(pc.condition_origin);
+				return nullptr;
+			}
+
+			return make_range_or_list_condition(
+				st,
+				std::move(pc),
+				lang::make_waystone_tier_range_bound_condition,
+				lang::make_waystone_tier_value_list_condition,
+				diagnostics);
+		}
 
 		// comparison with an array of strings
 		case property_t::class_:
@@ -723,6 +749,8 @@ spirit_filter_is_condition_allowed(
 		case property_t::has_searing_exarch_implicit:
 		case property_t::has_eater_of_worlds_implicit:
 		case property_t::memory_strands:
+		case property_t::unidentified_item_tier:
+		case property_t::waystone_tier:
 		{
 			switch (condition.comparison.operator_.value) {
 				case lang::comparison_type::less:

@@ -75,6 +75,10 @@ namespace rf
 	constexpr auto zana_memory      = "ZanaMemory";
 	constexpr auto memory_strands   = "MemoryStrands";
 
+	// PoE 2 only
+	constexpr auto unidentified_item_tier = "UnidentifiedItemTier";
+	constexpr auto waystone_tier          = "WaystoneTier";
+
 	// removed conditions
 	constexpr auto prophecy         = "Prophecy";
 	constexpr auto gem_quality_type = "GemQualityType";

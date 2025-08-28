@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <iterator>
+#include <string_view>
 
 namespace fs::parser {
 
@@ -53,6 +54,7 @@ enum class diagnostic_message_id
 	no_such_name,
 
 	// condition-specific
+	game_variant_mismatch,
 	condition_redefinition,
 	lower_bound_redefinition,
 	upper_bound_redefinition,
@@ -307,6 +309,16 @@ public:
 	}
 
 	// condition-specific
+
+	void push_error_game_variant_mismatch(lang::position_tag condition, std::string_view explanation)
+	{
+		push_message(make_error(diagnostic_message_id::game_variant_mismatch, condition, explanation));
+	}
+
+	void push_error_only_in_poe2(lang::position_tag condition)
+	{
+		push_error_game_variant_mismatch(condition, "This condition is valid only for PoE 2");
+	}
 
 	void push_error_condition_redefinition(lang::position_tag redefinition, lang::position_tag original)
 	{

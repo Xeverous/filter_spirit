@@ -262,6 +262,7 @@ enum class item_validity
 	valid,
 
 	identified_without_name,
+	identified_with_unidentified_tier,
 	unidentified_with_name,
 	unidentified_with_explicit_mods,
 	synthesised_without_implicit,
@@ -456,6 +457,9 @@ struct item
 		if (!name.has_value() && is_identified)
 			return item_validity::identified_without_name;
 
+		if (unidentified_item_tier != 0 && is_identified)
+			return item_validity::identified_with_unidentified_tier;
+
 		if (name.has_value() && rarity_ == rarity_type::normal)
 			return item_validity::normal_rarity_with_name;
 
@@ -544,6 +548,7 @@ struct item
 	std::string class_;
 	std::optional<std::string> name; // only for IDed items with non-normal rarity
 	std::string base_type;
+	int unidentified_item_tier = 0; // PoE 2 only
 	// these 2 should be overwritten whenever an item is created - size 0x0 makes no sense
 	int height = 0;
 	int width  = 0;
@@ -571,6 +576,7 @@ struct item
 	static constexpr auto sentinel_stack_size = 1;
 	static constexpr auto sentinel_gem_level  = 0;
 	static constexpr auto sentinel_map_tier   = 0;
+	static constexpr auto sentinel_waystone_tier = 0;
 	static constexpr auto sentinel_base_defence_percentile = 100;
 	static constexpr auto sentinel_enchantment_passive_num = 0;
 	static constexpr auto sentinel_memory_strands = 0;
@@ -617,6 +623,7 @@ struct item
 	// map
 	int map_tier = sentinel_map_tier;
 	blight_map_status_t blight_map_status = blight_map_status_t::none;
+	int waystone_tier = sentinel_waystone_tier; // PoE 2 only
 
 	// boolean
 	bool is_identified = false;

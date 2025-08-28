@@ -1,0 +1,7 @@
+Show
+	UnidentifiedItemTier >= 1
+	SetTextColor 0 255 0
+
+Show
+	WaystoneTier >= 15
+	SetTextColor 255 0 0

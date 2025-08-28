@@ -194,6 +194,8 @@ namespace rf
 				(lang::keywords::rf::has_searing_exarch_implicit,  property::has_searing_exarch_implicit)
 				(lang::keywords::rf::has_eater_of_worlds_implicit, property::has_eater_of_worlds_implicit)
 				(lang::keywords::rf::memory_strands,               property::memory_strands)
+				(lang::keywords::rf::unidentified_item_tier,       property::unidentified_item_tier)
+				(lang::keywords::rf::waystone_tier,                property::waystone_tier)
 
 				// array of strings
 				(lang::keywords::rf::class_,                   property::class_)

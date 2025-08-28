@@ -76,6 +76,8 @@ enum class official_condition_property
 	has_searing_exarch_implicit,
 	has_eater_of_worlds_implicit,
 	memory_strands,
+	unidentified_item_tier,
+	waystone_tier,
 
 	// comparison with an array of strings
 	class_,
@@ -178,6 +180,10 @@ inline std::string_view to_keyword(official_condition_property property)
 			return keywords::rf::has_eater_of_worlds_implicit;
 		case official_condition_property::memory_strands:
 			return keywords::rf::memory_strands;
+		case official_condition_property::unidentified_item_tier:
+			return keywords::rf::unidentified_item_tier;
+		case official_condition_property::waystone_tier:
+			return keywords::rf::waystone_tier;
 		case official_condition_property::class_:
 			return keywords::rf::class_;
 		case official_condition_property::base_type:

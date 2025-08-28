@@ -203,6 +203,13 @@ BOOST_AUTO_TEST_CASE(dynamic_visibility_ruthless)
 	BOOST_TEST(compile_from_files("poe1/dynamic_visibility_ruthless", st));
 }
 
+BOOST_AUTO_TEST_CASE(poe2_conditions)
+{
+	compiler::settings st;
+	st.game_variant = lang::game_variant_type::poe2;
+	BOOST_TEST(compile_from_files("poe2/poe2_only_conditions", st));
+}
+
 BOOST_AUTO_TEST_CASE(continue_statement)
 {
 	BOOST_TEST(compile_from_files("common/continue_statement"));
