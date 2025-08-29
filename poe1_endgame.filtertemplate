@@ -1,4 +1,4 @@
-# Filter Spirit - example filter template
+# Filter Spirit - example filter template for Path of Exile 1
 # This file is public domain. You can freely modify and reuse it in any way.
 # more about Filter Spirit tool on https://github.com/Xeverous/filter_spirit
 
@@ -101,7 +101,7 @@ $color_gear_mods_bestiary  = $color_gear_special_mods
 $color_gear_mods_warband   = $color_gear_special_mods
 
 $font_min                = 18
-$font_max                = 42
+$font_max                = 45
 $font_high               = $font_max
 $font_mid                = 38
 $font_low                = 34

@@ -1,0 +1,706 @@
+# Filter Spirit - example filter template for Path of Exile 2
+# This file is public domain. You can freely modify and reuse it in any way.
+# more about Filter Spirit tool on https://github.com/Xeverous/filter_spirit
+
+# This filter is designed towards endgame. It has some minor leveling help
+# but don't expect it to perform well in any racing or things of this sort.
+
+# if you want to disable some action (so that an alert/icon/beam does not happen),
+# assign a special value
+# $icon_* = -1
+# $alert_* = None
+# $beam_* = None
+# $cfg_*_names = None
+# other types: sorry, not possible; search for variable usage and edit filter structure
+
+##############################################################################
+### Constants
+##############################################################################
+$color_white               = 255 255 255
+$color_black               =   0   0   0
+$color_red                 = 255   0   0
+$color_golden              = 240 200 150
+$color_error               = $color_red
+$color_purple              = 175   0 175
+
+$color_currency_high       = $color_red
+$color_currency_mid        = 249 150  25
+$color_currency_low        = 213 159   0
+$color_currency_very_low   = 190 178 135
+$color_gem                 =  20 240 240
+$color_gold                = 255 192 128
+
+$font_min                = 18
+$font_max                = 45
+$font_high               = $font_max
+$font_mid                = 38
+$font_low                = 34
+$font_very_low           = 26
+
+$font_scroll             = $font_mid
+$font_currency_high      = $font_high
+$font_currency_mid       = $font_high
+$font_currency_low       = $font_mid
+$font_currency_very_low  = $font_mid
+
+# items that drop only under certain conditions
+$alert_very_specific       = 1
+# item value - low uncertainty
+$alert_high                = 6
+$alert_mid                 = 2
+$alert_low                 = $alert_mid
+# item value - high uncertainty
+$alert_extraordinary       = 5
+$alert_uncommon            = $alert_high
+$alert_common              = $alert_mid
+$alert_frequent            = None
+# value can not be easily determined
+$alert_check_required      = 3
+# some items can only be created by players
+$alert_undroppable         = $alert_high
+# maps - people quickly lose interest in low tiers
+$alert_map_high            = 5
+$alert_map_low             = 4
+# other
+$alert_leveling            = 12
+# I have yet to see someone who likes 15
+$alert_error               = 15
+
+$alert_currency_high       = $alert_high
+$alert_currency_mid        = $alert_mid
+$alert_currency_low        = $alert_low
+$alert_currency_very_low   = $alert_frequent
+$alert_gold                = $alert_frequent
+$alert_chance              = $alert_common
+
+$beam_currency        = Yellow
+$beam_gem             = Green
+
+$icon_currency_high   = 0 Yellow Star
+$icon_currency_mid    = 1 Yellow Star
+$icon_currency_low    = 2 Yellow Star
+$icon_gold_high       = 0 Yellow Circle
+$icon_gold_mid        = 2 Yellow Circle
+$icon_gem_high        = 0 Green Circle
+$icon_gem_mid         = 2 Green Circle
+$icon_error           = 0 Red UpsideDownHouse
+
+$actions_currency_high = {
+	SetTextColor $color_golden
+	SetBorderColor $color_golden
+	SetBackgroundColor $color_currency_high
+	SetFontSize $font_currency_high
+	SetAlertSound $alert_currency_high
+	PlayEffect $beam_currency
+	MinimapIcon $icon_currency_high
+}
+
+$actions_currency_mid = {
+	SetTextColor $color_black
+	SetBackgroundColor $color_currency_mid
+	SetFontSize $font_currency_mid
+	SetAlertSound $alert_currency_mid
+	PlayEffect $beam_currency
+	MinimapIcon $icon_currency_mid
+}
+
+$actions_currency_low = {
+	SetTextColor $color_black
+	SetBackgroundColor $color_currency_low
+	SetFontSize $font_currency_low
+	SetAlertSound $alert_currency_low
+	PlayEffect $beam_currency
+	MinimapIcon $icon_currency_low
+}
+
+$actions_currency_very_low = {
+	SetTextColor $color_currency_very_low
+	SetBackgroundColor $color_black
+	SetFontSize $font_currency_very_low
+	SetAlertSound $alert_currency_very_low
+}
+
+$actions_currency_low_shards = {
+	SetTextColor $color_currency_very_low
+	SetBackgroundColor $color_black
+	SetFontSize $font_currency_very_low
+	SetAlertSound $alert_currency_very_low
+}
+
+##############################################################################
+### Configuration
+##############################################################################
+$cfg_default_background_color = $color_black
+$cfg_default_font_size = 36
+
+$show_scrolls_wisdom = True
+
+$cfg_show_runes_lesser  = True
+$cfg_show_runes_regular = True
+$cfg_show_runes_greater = True
+$cfg_show_talismans_regular = True
+$cfg_show_talismans_endgame = True
+$cfg_gear_unid_tier_min = 1
+
+##############################################################################
+### Filter starts here
+##############################################################################
+
+# Apply default background at the start.
+# Some items pass through multiple Continue blocks before reaching their final block.
+# This Continue block is better than plain action at the top because it applies
+# only once whereas a global action would inject an override to each block in
+# Continue-based highlights, needlessly overriding a style applied by first blocks
+# if the later ones do not have the same action specified.
+{
+	SetFontSize $cfg_default_font_size
+	SetBackgroundColor $cfg_default_background_color
+	Show
+	Continue
+}
+
+#--------------------------
+# Gold
+#--------------------------
+
+# Strange: Gold doesn't seem to have any usable class
+#Class "Currency Item" "Gold"
+BaseType == "Gold"
+{
+	StackSize >= 1000
+	{
+		SetTextColor $color_black
+		SetBackgroundColor $color_gold
+		SetFontSize $font_currency_high
+		SetAlertSound $alert_currency_mid
+		MinimapIcon $icon_gold_high
+		Show
+	}
+
+	StackSize >= 200
+	{
+		SetTextColor $color_gold
+		SetBackgroundColor $color_black
+		SetBorderColor $color_gold
+		SetFontSize $font_currency_mid
+		SetAlertSound $alert_gold
+		MinimapIcon $icon_gold_mid
+		Show
+	}
+
+	SetTextColor $color_gold
+	SetBackgroundColor $color_black
+	SetFontSize $font_currency_mid
+	SetAlertSound $alert_gold
+	Show
+}
+
+#--------------------------
+# Currency
+#--------------------------
+
+Class == "Stackable Currency"
+{
+	SetBackgroundColor $color_black
+
+	# Divine tier
+	BaseType == "Divine Orb" "Mirror of Kalandra" "Perfect Jeweller's Orb" "Distilled Fear" "Distilled Suffering" "Distilled Isolation" "Greater Essence of the Mind" "Greater Essence of the Infinite" "Greater Essence of Electricity" "Greater Essence of Torment" "Greater Essence of Sorcery" "Greater Essence of Haste" "Omen of Corruption" "Omen of Amelioration" "Omen of Whittling" "Omen of Sinistral Erasure" "Omen of Dextral Erasure" "Omen of Sinistral Annulment" "Omen of Dextral Annulment" "Soul Core of Azcapa" "Fracturing Orb"
+	{
+		Expand $actions_currency_high
+		Show
+	}
+
+	# Chaos/Exalt tier"
+	BaseType == "Gemcutter's Prism" "Orb of Annulment" "Orb of Chance" "Glassblower's Bauble" "Exalted Orb" "Vaal Orb" "Chaos Orb" "Chance Shard" "Greater Jeweller's Orb" "Exotic Coinage" "Artificer's Orb" "Orb of Alchemy" "Distilled Despair"
+	{
+		Expand $actions_currency_mid
+		Show
+	}
+
+	BaseType "Greater Essence of"
+	{
+		Expand $actions_currency_mid
+		Show
+	}
+
+	# Scrap tier
+	BaseType == "Arcanist's Etcher" "Armourer's Scrap" "Blacksmith's Whetstone" "Regal Orb" "Orb of Augmentation" "Orb of Transmutation" "Regal Shard" "Lesser Jeweller's Orb"
+	{
+		Expand $actions_currency_low
+		Show
+	}
+
+	# Splinters etc
+	BaseType == "Simulacrum Splinter" "Breach Splinter" "Broken Circle Artifact" "Black Scythe Artifact" "Order Artifact" "Sun Artifact"
+	{
+		Expand $actions_currency_low
+		Show
+	}
+
+	# corruption-only Essences
+	BaseType == "Essence of Hysteria" "Essence of Horror" "Essence of Insanity" "Essence of Delirium"
+	{
+		Expand $actions_currency_high
+		Show
+	}
+
+	# Catalysts, Essences, Omens - generic
+	BaseType "Distilled" "Catalyst" "Essence of" "Omen of"
+	{
+		Expand $actions_currency_mid
+		Show
+	}
+
+	BaseType == "Scroll of Wisdom"
+	{
+		SetTextColor 220 195 160
+		SetFontSize $font_scroll
+		ShowHide $show_scrolls_wisdom
+	}
+
+	SetTextColor $color_error
+	SetBorderColor $color_error
+	SetBackgroundColor $color_currency_mid
+	SetFontSize $font_max
+	SetAlertSound $alert_error
+	Show
+}
+
+#--------------------------
+# Socketable
+#--------------------------
+
+Class "Socketable"
+{
+	# Runes
+	{
+		SetFontSize 42
+		SetBackgroundColor 0 240 190 255
+		SetTextColor 0 0 0 255
+		PlayEffect Cyan Temp
+
+		BaseType == "Lesser Adept Rune" "Lesser Body Rune" "Lesser Desert Rune" "Lesser Glacial Rune" "Lesser Inspiration Rune" "Lesser Iron Rune" "Lesser Mind Rune" "Lesser Rebirth Rune" "Lesser Resolve Rune" "Lesser Robust Rune" "Lesser Stone Rune" "Lesser Storm Rune" "Lesser Vision Rune"
+		{
+			ShowHide $cfg_show_runes_lesser
+		}
+
+		BaseType == "Adept Rune" "Body Rune" "Desert Rune" "Glacial Rune" "Inspiration Rune" "Iron Rune" "Mind Rune" "Rebirth Rune" "Resolve Rune" "Robust Rune" "Stone Rune" "Storm Rune" "Vision Rune"
+		{
+			ShowHide $cfg_show_runes_regular
+		}
+
+		BaseType == "Greater Adept Rune" "Greater Body Rune" "Greater Desert Rune" "Greater Glacial Rune" "Greater Inspiration Rune" "Greater Iron Rune" "Greater Mind Rune" "Greater Rebirth Rune" "Greater Resolve Rune" "Greater Robust Rune" "Greater Stone Rune" "Greater Storm Rune" "Greater Vision Rune"
+		{
+			ShowHide $cfg_show_runes_greater
+		}
+
+		# 0.2.1 endgame runes
+		BaseType == "Countess Seske's Rune of Archery" "Courtesan Mannan's Rune of Cruelty" "Craiceann's Rune of Recovery" "Craiceann's Rune of Warding" "Farrul's Rune of Grace" "Farrul's Rune of the Chase" "Farrul's Rune of the Hunt" "Fenumus' Rune of Agony" "Fenumus' Rune of Draining" "Fenumus' Rune of Spinning" "Hedgewitch Assandra's Rune of Wisdom" "Lady Hestra's Rune of Winter" "Saqawal's Rune of Erosion" "Saqawal's Rune of Memory" "Saqawal's Rune of the Sky" "Thane Girt's Rune of Wildness" "Thane Grannell's Rune of Mastery" "Thane Leld's Rune of Spring" "Thane Myrk's Rune of Summer" "The Greatwolf's Rune of Claws" "The Greatwolf's Rune of Willpower"
+		{
+			Show
+		}
+
+		# 0.2.0 The Phaaryl Megalith
+		BaseType == "Greater Rune of Leadership" "Greater Rune of Tithing" "Greater Rune of Alacrity" "Greater Rune of Nobility"
+		{
+			PlayEffect Cyan
+			MinimapIcon 0 Cyan Kite
+			Show
+		}
+
+		BaseType == "Serpent Talisman" "Primate Talisman" "Owl Talisman" "Cat Talisman" "Wolf Talisman" "Stag Talisman" "Boar Talisman" "Bear Talisman" "Ox Talisman" "Rabbit Talisman" "Fox Talisman"
+		{
+			ShowHide $cfg_show_talismans_regular
+			Show
+		}
+
+		# 0.2.1 endgame Talismans
+		BaseType == "Talisman of Eeshta" "Talisman of Egrin" "Talisman of Grold" "Talisman of Maxarius" "Talisman of Ralakesh" "Talisman of Sirrius" "Talisman of Thruldana"
+		{
+			ShowHide $cfg_show_talismans_endgame
+			Show
+		}
+	}
+
+	# Soul Cores
+	{
+		SetTextColor 0 240 190 255
+		SetBorderColor 0 240 190 255
+		SetFontSize 40
+		MinimapIcon 2 Cyan Triangle
+		PlayEffect Cyan
+
+		# 0.2.1 endgame Soul Cores
+		BaseType == "Atmohua's Soul Core of Retreat" "Cholotl's Soul Core of War" "Citaqualotl's Soul Core of Foulness" "Estazunti's Soul Core of Convalescence" "Guatelitzi's Soul Core of Endurance" "Hayoxi's Soul Core of Heatproofing" "Opiloti's Soul Core of Assault" "Quipolatl's Soul Core of Flow" "Tacati's Soul Core of Affliction" "Topotante's Soul Core of Dampening" "Tzamoto's Soul Core of Ferocity" "Uromoti's Soul Core of Attenuation" "Xipocado's Soul Core of Dominion" "Xopec's Soul Core of Power" "Zalatl's Soul Core of Insulation"
+		{
+			Show
+		}
+
+		# other
+		BaseType "Soul Core"
+		{
+			Show
+		}
+	}
+
+	Show
+}
+
+#--------------------------
+# Gems
+#--------------------------
+
+# Strange: Uncut gems seem to have no class
+BaseType == "Uncut Skill Gem" "Uncut Spirit Gem" "Uncut Support Gem"
+{
+	GemLevel 20
+	{
+		SetFontSize $font_max
+		SetTextColor $color_red
+		SetBorderColor $color_red
+		SetBackgroundColor $color_white
+		SetAlertSound $alert_high
+		PlayEffect $beam_gem
+		MinimapIcon $icon_gem_high
+		Show
+	}
+
+	SetTextColor $color_gem
+	SetBorderColor $color_gem
+	SetAlertSound $alert_mid
+	PlayEffect $beam_gem Temp
+	Show
+}
+
+#--------------------------
+# Valuables
+#--------------------------
+
+Class == "Quest Items"
+{
+	SetTextColor 74 230 58
+	SetBorderColor 74 230 58
+	SetBackgroundColor $color_black
+	SetFontSize $font_max
+	MinimapIcon 0 Green Pentagon
+	PlayAlertSound 1 300
+	Show
+}
+
+Class == "Expedition Logbook"
+{
+	SetTextColor $color_black
+	SetBorderColor 0 105 255
+	SetBackgroundColor 0 105 255
+	SetFontSize $font_max
+	MinimapIcon 0 Cyan Square
+	SetAlertSound $alert_high
+	Show
+}
+
+# Sanctum Relics
+Class == "Relics"
+{
+	SetTextColor 0 240 190 255
+	SetBorderColor 0 240 190 255
+	SetFontSize 40
+	MinimapIcon 2 Cyan Triangle
+	PlayEffect Cyan
+	Show
+}
+
+#--------------------------
+# Fragments etc.
+#--------------------------
+
+# Djinn Barya and Inscribed Ultimatum
+Class == "Trial Coins" "Inscribed Ultimatum"
+{
+	SetTextColor 255 207 255 255
+	SetBorderColor 255 207 255 255
+	SetBackgroundColor 65 20 80 255
+	PlayAlertSound $alert_common
+	SetFontSize 40
+	Show
+}
+
+# Crisis Fragments (Arbiter of Ash)
+Class == "Pinnacle Keys"
+{
+	SetTextColor $color_white
+	SetBorderColor $color_white
+	SetBackgroundColor $color_red
+	SetFontSize $font_max
+	SetAlertSound $alert_high
+	PlayEffect White
+	MinimapIcon 0 Brown Star
+	Show
+}
+
+# Trialmaster fragments
+Class == "Map Fragment"
+BaseType == "Cowardly Fate" "Deadly Fate" "Victorious Fate"
+{
+	SetTextColor $color_white
+	SetBorderColor 204 153 0
+	SetBackgroundColor 204 153 0
+	SetFontSize $font_max
+	PlayEffect White
+	MinimapIcon 0 Brown Star
+	PlayAlertSound $alert_very_specific
+	Show
+}
+
+{
+	SetTextColor 74 230 58
+	SetBorderColor 74 230 58
+	SetBackgroundColor $color_black
+	SetFontSize $font_max
+	SetAlertSound $alert_extraordinary
+
+	# 0.2.0 Twilight Reliquary Key etc.
+	Class == "Vault Keys"
+	{
+		Show
+	}
+
+	# 0.3.0 Legacy - now only as splinters
+	Class == "Map Fragment"
+	BaseType == "Simulacrum"
+	{
+		Show
+	}
+
+	# 0.3.0 Legacy - now only as splinters
+	Class == "Breachstone"
+	{
+		Show
+	}
+}
+
+#--------------------------
+# Uniques
+#--------------------------
+
+Rarity Unique
+{
+	PlayEffect Brown
+
+	BaseType == "Timeless Jewel"
+	{
+		SetTextColor 0 240 190 255
+		SetBorderColor 0 240 190 255
+		SetFontSize $font_max
+		SetAlertSound $alert_high
+		MinimapIcon 0 Brown Star
+		Show
+	}
+
+	SetTextColor 175 96 37 255
+	SetBorderColor 175 96 37 255
+	SetBackgroundColor 53 13 13 255
+	SetFontSize 40
+	PlayAlertSound 3 300
+	MinimapIcon 2 Brown Star
+	Show
+}
+
+#--------------------------
+# Maps
+#--------------------------
+
+Class == "Waystone"
+Rarity <= Rare
+{
+	SetTextColor $color_white
+	SetBorderColor $color_white
+	SetFontSize 40
+
+	WaystoneTier >= 14
+	{
+		SetAlertSound $alert_map_high
+		PlayEffect White
+		MinimapIcon 1 White Square
+		Show
+	}
+
+	{
+		PlayAlertSound $alert_map_low
+		#PlayEffect White
+		#MinimapIcon 1 White Square
+		Show
+	}
+}
+
+Class == "Tablet"
+{
+	SetTextColor 255 207 255 255
+	SetBorderColor 255 207 255 255
+	SetBackgroundColor 65 20 80 255
+	PlayAlertSound $alert_mid
+	PlayEffect White
+	MinimapIcon 1 White Square
+	SetFontSize 40
+	Show
+}
+
+#--------------------------
+# Gear - rares
+#--------------------------
+
+Class "Jewel"
+{
+	#SetTextColor 0 240 190 255
+	#SetBorderColor 0 240 190 255
+	SetFontSize 40
+
+	Rarity Rare
+	{
+		MinimapIcon 2 Cyan Triangle
+		PlayEffect Cyan
+		Show
+	}
+
+	Rarity Magic
+	{
+		PlayEffect Cyan Temp
+		Show
+	}
+}
+
+Class "Rings" "Amulets" "Belts"
+Rarity Rare
+{
+	SetFontSize 40
+	SetTextColor 233 206 75 255
+	SetBorderColor 233 206 75 255
+	PlayEffect Yellow
+	MinimapIcon 1 Yellow Diamond
+	Show
+}
+
+# Chance Orb
+BaseType "Stellar Amulet" "Sapphire Ring" "Breach Ring"
+Rarity Normal
+Corrupted False
+Mirrored False
+{
+	SetFontSize 40
+	SetTextColor 0 0 0 255
+	SetBackgroundColor 51 204 204 255
+	SetAlertSound $alert_chance
+	PlayEffect Pink
+	MinimapIcon 1 Pink Diamond
+	Show
+}
+
+Class == "Charms"
+{
+	SetFontSize 42
+	SetTextColor 122 105  28 255
+	SetBackgroundColor $color_black
+	PlayEffect Cyan Temp
+
+	Quality > 0
+	{
+		SetBorderColor 122 105  28 255
+		Show
+	}
+
+	Show
+}
+
+#--------------------------
+# Salvage Bench items
+#--------------------------
+
+Sockets > 0
+{
+	SetFontSize 35
+
+	Rarity Normal
+	{
+		SetBorderColor 200 200 200 255
+		Show
+	}
+
+	Rarity Magic
+	{
+		SetBorderColor 0 0 200 255
+		Show
+	}
+}
+
+Quality > 10
+{
+	SetFontSize 35
+
+	Rarity Normal
+	{
+		SetBorderColor 200 200 200 255
+		Show
+	}
+
+	Rarity Magic
+	{
+		SetBorderColor 0 0 200 255
+		Show
+	}
+}
+
+Class "Flask"
+{
+	SetBackgroundColor 122 105  28 255
+
+	Quality > 0
+	{
+		SetBorderColor 255 255 255 255
+		Show
+	}
+
+	Show
+}
+
+#--------------------------
+# Gear - remaining sections
+#--------------------------
+
+# leveling - show jewellery
+AreaLevel < 65
+Rarity Normal Magic
+Class "Rings" "Amulets" "Belts"
+{
+	SetFontSize 40
+	Show
+}
+
+# Hide remaining low-value gear
+# TODO potentially missing: Trap, Claw
+Rarity <= Magic
+Class "Flask" "Body" "Helmet" "Boots" "Gloves" "Shields" "Buckler" "Quiver" "Axe" "Mace" "Sword" "Staff" "Dagger" "Flail" "Quarter" "Spear" "Bow" "Crossbow" "Wand" "Sceptre" "Ring" "Belt" "Amulet" "Focus"
+AreaLevel >= 65
+{
+	Hide
+}
+
+Rarity Magic Rare
+UnidentifiedItemTier < $cfg_gear_unid_tier_min
+{
+	Hide
+}
+
+Rarity Magic Rare
+{
+	Show
+}
+
+#--------------------------
+# Final error block
+#--------------------------
+SetTextColor $color_error
+SetBorderColor $color_error
+SetFontSize $font_max
+SetAlertSound $alert_error
+PlayEffect Red
+MinimapIcon $icon_error
+Show
