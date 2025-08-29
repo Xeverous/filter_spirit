@@ -211,7 +211,7 @@ Class == "Stackable Currency"
 	}
 
 	# Chaos/Exalt tier"
-	BaseType == "Gemcutter's Prism" "Orb of Annulment" "Orb of Chance" "Glassblower's Bauble" "Exalted Orb" "Vaal Orb" "Chaos Orb" "Chance Shard" "Greater Jeweller's Orb" "Exotic Coinage" "Artificer's Orb" "Orb of Alchemy" "Liquid Paranoia" "Liquid Envy" "Liquid Disgust" "Liquid Despair" "Greater Chaos Orb" "Perfect Chaos Orb" "Greater Exalted Orb" "Perfect Exalted Orb" 
+	BaseType == "Gemcutter's Prism" "Orb of Annulment" "Orb of Chance" "Glassblower's Bauble" "Exalted Orb" "Vaal Orb" "Chaos Orb" "Chance Shard" "Greater Jeweller's Orb" "Exotic Coinage" "Artificer's Orb" "Orb of Alchemy" "Liquid Paranoia" "Liquid Envy" "Liquid Disgust" "Liquid Despair" "Greater Chaos Orb" "Perfect Chaos Orb" "Greater Exalted Orb" "Perfect Exalted Orb"
 	{
 		Expand $actions_currency_mid
 		Show
@@ -231,12 +231,18 @@ Class == "Stackable Currency"
 	}
 
 	# Splinters etc
-	BaseType == "Simulacrum Splinter" "Breach Splinter" "Petition Splinter" "Runic Splinter" "Broken Circle Artifact" "Black Scythe Artifact" "Order Artifact" "Sun Artifact" 
+	BaseType == "Simulacrum Splinter" "Breach Splinter" "Petition Splinter" "Runic Splinter" "Broken Circle Artifact" "Black Scythe Artifact" "Order Artifact" "Sun Artifact"
 	{
 		Expand $actions_currency_low
 		Show
 	}
-	
+
+	BaseType == "Transmutation Shard" "Artificer's Shard"
+	{
+		Expand $actions_currency_low_shards
+		Show
+	}
+
 	# Abyss crafting orbs
 	BaseType == "Gnawed Jawbone" "Preserved Jawbone" "Ancient Jawbone" "Gnawed Rib" "Preserved Rib" "Ancient Rib" "Gnawed Collarbone" "Preserved Collarbone" "Ancient Collarbone" "Preserved Cranium" "Preserved Vertebrae"
 	{
@@ -256,7 +262,7 @@ Class == "Stackable Currency"
 		Expand $actions_currency_mid
 		Show
 	}
-	
+
 	# lowest tier Delirium Emotions
 	BaseType == "Diluted Liquid Ire" "Diluted Liquid Guilt" "Diluted Liquid Greed"
 	{
@@ -355,7 +361,7 @@ Class "Socketable"
 			Show
 		}
 	}
-	
+
 	# 0.3.0 Abyss socketables
 	BaseType == "Amanamu's Gaze" "Tecrod's Gaze" "Kurgal's Gaze" "Ulaman's Gaze"
 	{
@@ -386,12 +392,12 @@ BaseType == "Uncut Skill Gem" "Uncut Spirit Gem" "Uncut Support Gem"
 		SetAlertSound $alert_high
 		PlayEffect $beam_gem
 		MinimapIcon $icon_gem_high
-		
+
 		GemLevel 20
 		{
 			Show
 		}
-		
+
 		# 0.3.0 Lineage Supports
 		BaseType "Atalui's Bloodletting" "Einhar's Beastrite" "Vilenta's Propulsion" "Ahn's Citadel" "Brutus' Brain" "Tecrod's Revenge" "Uruk's Smelting" "Paquate's Pact" "Ailith's Chimes" "Doedre's Undoing" "Ratha's Assault" "Arjun's Medal" "Kaom's Madness" "Sione's Temper" "Ixchel's Torment" "Romira's Requital" "Tawhoa's Tending" "Piety's Mercy" "Dialla's Desire" "Kalisa's Crescendo" "Xoph's Pyre" "Esh's Radiance" "Tul's Stillness" "Uul-Netol's Embrace" "Rakiata's Flow" "Rigwald's Ferocity" "Uhtred's Exodus" "Uhtred's Omen" "Uhtred's Augury" "Daresso's Passion" "Atziri's Allure" "Tacati's Ire" "Zarokh's Refrain" "Garukhan's Resolve" "Kurgal's Leash" "Kulemak's Dominion" "Amanamu's Tithe" "Varashta's Blessing" "Arbiter's Ignition" "Arakaali's Lust"
 		{
