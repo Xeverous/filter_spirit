@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <iosfwd>
 #include <optional>
+#include <variant>
 
 namespace fs::lang
 {

@@ -673,7 +673,7 @@ bool spirit_filter_add_action(
 	lang::action_set& set,
 	diagnostics_store& diagnostics)
 {
-	return action.apply_visitor(make_lambda_visitor<bool>(
+	const auto result = action.apply_visitor(make_lambda_visitor<bool>(
 		[&](const ast::sf::official_action& a) {
 			return spirit_filter_add_official_action(st, a, symbols, set, diagnostics);
 		},
@@ -681,6 +681,11 @@ bool spirit_filter_add_action(
 			return spirit_filter_add_set_alert_sound_action(st, a, symbols, set, diagnostics);
 		}
 	));
+
+	if (!result)
+		diagnostics.push_error_invalid_statement(position_tag_of(action), "Action failed due to previous error(s)");
+
+	return result;
 }
 
 } // namespace fs::compiler::detail
