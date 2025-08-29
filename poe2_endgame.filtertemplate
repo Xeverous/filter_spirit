@@ -725,7 +725,7 @@ UnidentifiedItemTier < $cfg_gear_unid_tier_min
 	Hide
 }
 
-Rarity Magic Rare
+Rarity Normal Magic Rare
 {
 	Show
 }
