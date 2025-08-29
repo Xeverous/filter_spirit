@@ -251,7 +251,7 @@ Class == "Stackable Currency"
 	}
 
 	# Catalysts, Essences, Omens - generic
-	BaseType "Distilled" "Catalyst" "Essence of" "Omen of"
+	BaseType "Catalyst" "Essence of" "Omen of"
 	{
 		Expand $actions_currency_mid
 		Show
