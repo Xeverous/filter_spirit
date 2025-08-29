@@ -204,37 +204,43 @@ Class == "Stackable Currency"
 	SetBackgroundColor $color_black
 
 	# Divine tier
-	BaseType == "Divine Orb" "Mirror of Kalandra" "Perfect Jeweller's Orb" "Distilled Fear" "Distilled Suffering" "Distilled Isolation" "Greater Essence of the Mind" "Greater Essence of the Infinite" "Greater Essence of Electricity" "Greater Essence of Torment" "Greater Essence of Sorcery" "Greater Essence of Haste" "Omen of Corruption" "Omen of Amelioration" "Omen of Whittling" "Omen of Sinistral Erasure" "Omen of Dextral Erasure" "Omen of Sinistral Annulment" "Omen of Dextral Annulment" "Soul Core of Azcapa" "Fracturing Orb"
+	BaseType == "Divine Orb" "Mirror of Kalandra" "Perfect Jeweller's Orb" "Concentrated Liquid Fear" "Concentrated Liquid Suffering" "Concentrated Liquid Isolation" "Greater Essence of the Mind" "Greater Essence of the Infinite" "Greater Essence of Electricity" "Greater Essence of Abrasion" "Greater Essence of Sorcery" "Greater Essence of Haste" "Omen of Corruption" "Omen of Amelioration" "Omen of Whittling" "Omen of Sinistral Erasure" "Omen of Dextral Erasure" "Omen of Sinistral Annulment" "Omen of Dextral Annulment" "Soul Core of Azcapa" "Fracturing Orb" "Hinekora's Lock"
 	{
 		Expand $actions_currency_high
 		Show
 	}
 
 	# Chaos/Exalt tier"
-	BaseType == "Gemcutter's Prism" "Orb of Annulment" "Orb of Chance" "Glassblower's Bauble" "Exalted Orb" "Vaal Orb" "Chaos Orb" "Chance Shard" "Greater Jeweller's Orb" "Exotic Coinage" "Artificer's Orb" "Orb of Alchemy" "Distilled Despair"
+	BaseType == "Gemcutter's Prism" "Orb of Annulment" "Orb of Chance" "Glassblower's Bauble" "Exalted Orb" "Vaal Orb" "Chaos Orb" "Chance Shard" "Greater Jeweller's Orb" "Exotic Coinage" "Artificer's Orb" "Orb of Alchemy" "Liquid Paranoia" "Liquid Envy" "Liquid Disgust" "Liquid Despair" "Greater Chaos Orb" "Perfect Chaos Orb" "Greater Exalted Orb" "Perfect Exalted Orb" 
 	{
 		Expand $actions_currency_mid
 		Show
 	}
 
-	BaseType "Greater Essence of"
+	BaseType "Perfect Essence of" "Greater Essence of" "Lesser Essence of"
 	{
 		Expand $actions_currency_mid
 		Show
 	}
 
 	# Scrap tier
-	BaseType == "Arcanist's Etcher" "Armourer's Scrap" "Blacksmith's Whetstone" "Regal Orb" "Orb of Augmentation" "Orb of Transmutation" "Regal Shard" "Lesser Jeweller's Orb"
+	BaseType == "Arcanist's Etcher" "Armourer's Scrap" "Blacksmith's Whetstone" "Regal Orb" "Orb of Augmentation" "Orb of Transmutation" "Regal Shard" "Lesser Jeweller's Orb" "Greater Orb of Transmutation" "Perfect Orb of Transmutation" "Greater Regal Orb" "Perfect Regal Orb" "Greater Orb of Augmentation" "Perfect Orb of Augmentation"
 	{
 		Expand $actions_currency_low
 		Show
 	}
 
 	# Splinters etc
-	BaseType == "Simulacrum Splinter" "Breach Splinter" "Broken Circle Artifact" "Black Scythe Artifact" "Order Artifact" "Sun Artifact"
+	BaseType == "Simulacrum Splinter" "Breach Splinter" "Petition Splinter" "Runic Splinter" "Broken Circle Artifact" "Black Scythe Artifact" "Order Artifact" "Sun Artifact" 
 	{
 		Expand $actions_currency_low
 		Show
+	}
+	
+	# Abyss crafting orbs
+	BaseType == "Gnawed Jawbone" "Preserved Jawbone" "Ancient Jawbone" "Gnawed Rib" "Preserved Rib" "Ancient Rib" "Gnawed Collarbone" "Preserved Collarbone" "Ancient Collarbone" "Preserved Cranium" "Preserved Vertebrae"
+	{
+		Expand $actions_currency_mid
 	}
 
 	# corruption-only Essences
@@ -248,6 +254,13 @@ Class == "Stackable Currency"
 	BaseType "Distilled" "Catalyst" "Essence of" "Omen of"
 	{
 		Expand $actions_currency_mid
+		Show
+	}
+	
+	# lowest tier Delirium Emotions
+	BaseType == "Diluted Liquid Ire" "Diluted Liquid Guilt" "Diluted Liquid Greed"
+	{
+		Expand $actions_currency_low
 		Show
 	}
 
@@ -342,6 +355,18 @@ Class "Socketable"
 			Show
 		}
 	}
+	
+	# 0.3.0 Abyss socketables
+	BaseType == "Amanamu's Gaze" "Tecrod's Gaze" "Kurgal's Gaze" "Ulaman's Gaze"
+	{
+		# Right now reuse Soul Cores colors
+		SetTextColor 0 240 190 255
+		SetBorderColor 0 240 190 255
+		SetFontSize 40
+		MinimapIcon 2 Cyan Triangle
+		PlayEffect Cyan
+		Show
+	}
 
 	Show
 }
@@ -353,7 +378,6 @@ Class "Socketable"
 # Strange: Uncut gems seem to have no class
 BaseType == "Uncut Skill Gem" "Uncut Spirit Gem" "Uncut Support Gem"
 {
-	GemLevel 20
 	{
 		SetFontSize $font_max
 		SetTextColor $color_red
@@ -362,7 +386,17 @@ BaseType == "Uncut Skill Gem" "Uncut Spirit Gem" "Uncut Support Gem"
 		SetAlertSound $alert_high
 		PlayEffect $beam_gem
 		MinimapIcon $icon_gem_high
-		Show
+		
+		GemLevel 20
+		{
+			Show
+		}
+		
+		# 0.3.0 Lineage Supports
+		BaseType "Atalui's Bloodletting" "Einhar's Beastrite" "Vilenta's Propulsion" "Ahn's Citadel" "Brutus' Brain" "Tecrod's Revenge" "Uruk's Smelting" "Paquate's Pact" "Ailith's Chimes" "Doedre's Undoing" "Ratha's Assault" "Arjun's Medal" "Kaom's Madness" "Sione's Temper" "Ixchel's Torment" "Romira's Requital" "Tawhoa's Tending" "Piety's Mercy" "Dialla's Desire" "Kalisa's Crescendo" "Xoph's Pyre" "Esh's Radiance" "Tul's Stillness" "Uul-Netol's Embrace" "Rakiata's Flow" "Rigwald's Ferocity" "Uhtred's Exodus" "Uhtred's Omen" "Uhtred's Augury" "Daresso's Passion" "Atziri's Allure" "Tacati's Ire" "Zarokh's Refrain" "Garukhan's Resolve" "Kurgal's Leash" "Kulemak's Dominion" "Amanamu's Tithe" "Varashta's Blessing" "Arbiter's Ignition" "Arakaali's Lust"
+		{
+			Show
+		}
 	}
 
 	SetTextColor $color_gem
@@ -425,6 +459,7 @@ Class == "Trial Coins" "Inscribed Ultimatum"
 }
 
 # Crisis Fragments (Arbiter of Ash)
+# Calamity Fragments (Uber Arbiter of Ash)
 Class == "Pinnacle Keys"
 {
 	SetTextColor $color_white
@@ -437,9 +472,9 @@ Class == "Pinnacle Keys"
 	Show
 }
 
-# Trialmaster fragments
+# Trialmaster fragments, Vaal Vault key, Well of Souls key
 Class == "Map Fragment"
-BaseType == "Cowardly Fate" "Deadly Fate" "Victorious Fate"
+BaseType == "Cowardly Fate" "Deadly Fate" "Victorious Fate" "Idol of Estazunti" "Kulemak's Invitation"
 {
 	SetTextColor $color_white
 	SetBorderColor 204 153 0
@@ -568,6 +603,7 @@ Class "Jewel"
 	}
 }
 
+# TODO any use for "Abyssal Signet" base?
 Class "Rings" "Amulets" "Belts"
 Rarity Rare
 {
