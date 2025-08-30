@@ -247,6 +247,7 @@ Class == "Stackable Currency"
 	BaseType == "Gnawed Jawbone" "Preserved Jawbone" "Ancient Jawbone" "Gnawed Rib" "Preserved Rib" "Ancient Rib" "Gnawed Collarbone" "Preserved Collarbone" "Ancient Collarbone" "Preserved Cranium" "Preserved Vertebrae"
 	{
 		Expand $actions_currency_mid
+		Show
 	}
 
 	# corruption-only Essences
