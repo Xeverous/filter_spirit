@@ -127,6 +127,15 @@ $actions_currency_low_shards = {
 	SetAlertSound $alert_currency_very_low
 }
 
+$actions_quest_items = {
+	SetTextColor 74 230 58
+	SetBorderColor 74 230 58
+	SetBackgroundColor $color_black
+	SetFontSize $font_max
+	MinimapIcon 0 Green Pentagon
+	PlayAlertSound 1 300
+}
+
 ##############################################################################
 ### Configuration
 ##############################################################################
@@ -278,6 +287,12 @@ Class == "Stackable Currency"
 		ShowHide $show_scrolls_wisdom
 	}
 
+	BaseType == "Bronze Key" "Silver Key" "Gold Key"
+	{
+		Expand $actions_quest_items
+		Show
+	}
+
 	SetTextColor $color_error
 	SetBorderColor $color_error
 	SetBackgroundColor $color_currency_mid
@@ -419,12 +434,7 @@ BaseType == "Uncut Skill Gem" "Uncut Spirit Gem" "Uncut Support Gem"
 
 Class == "Quest Items"
 {
-	SetTextColor 74 230 58
-	SetBorderColor 74 230 58
-	SetBackgroundColor $color_black
-	SetFontSize $font_max
-	MinimapIcon 0 Green Pentagon
-	PlayAlertSound 1 300
+	Expand $actions_quest_items
 	Show
 }
 
