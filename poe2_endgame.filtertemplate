@@ -212,6 +212,7 @@ Class == "Stackable Currency"
 {
 	SetBackgroundColor $color_black
 
+	# TODO: remove omens here they have their own class
 	# Divine tier
 	BaseType == "Divine Orb" "Mirror of Kalandra" "Perfect Jeweller's Orb" "Concentrated Liquid Fear" "Concentrated Liquid Suffering" "Concentrated Liquid Isolation" "Greater Essence of the Mind" "Greater Essence of the Infinite" "Greater Essence of Electricity" "Greater Essence of Abrasion" "Greater Essence of Sorcery" "Greater Essence of Haste" "Omen of Corruption" "Omen of Amelioration" "Omen of Whittling" "Omen of Sinistral Erasure" "Omen of Dextral Erasure" "Omen of Sinistral Annulment" "Omen of Dextral Annulment" "Soul Core of Azcapa" "Fracturing Orb" "Hinekora's Lock"
 	{
@@ -266,8 +267,8 @@ Class == "Stackable Currency"
 		Show
 	}
 
-	# Catalysts, Essences, Omens - generic
-	BaseType "Catalyst" "Essence of" "Omen of"
+	# Catalysts, Essences - generic
+	BaseType "Catalyst" "Essence of"
 	{
 		Expand $actions_currency_mid
 		Show
@@ -298,6 +299,12 @@ Class == "Stackable Currency"
 	SetBackgroundColor $color_currency_mid
 	SetFontSize $font_max
 	SetAlertSound $alert_error
+	Show
+}
+
+Class == "Omen"
+{
+	Expand $actions_currency_mid
 	Show
 }
 
