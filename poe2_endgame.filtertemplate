@@ -405,7 +405,7 @@ Class "Socketable"
 #--------------------------
 
 # Strange: Uncut gems seem to have no class
-BaseType == "Uncut Skill Gem" "Uncut Spirit Gem" "Uncut Support Gem"
+Class == "Uncut Skill Gems" "Uncut Spirit Gems" "Uncut Support Gems"
 {
 	{
 		SetFontSize $font_max
