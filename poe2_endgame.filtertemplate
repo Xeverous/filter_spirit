@@ -149,6 +149,12 @@ $cfg_show_runes_regular = True
 $cfg_show_runes_greater = True
 $cfg_show_talismans_regular = True
 $cfg_show_talismans_endgame = True
+$cfg_show_flasks = True
+$cfg_show_charms = True
+$cfg_show_salvage_sockets = True
+$cfg_show_salvage_quality_flasks = True
+$cfg_show_salvage_quality_charms = True
+$cfg_show_salvage_quality_gear = True
 $cfg_gear_unid_tier_min = 1
 
 ##############################################################################
@@ -654,58 +660,16 @@ Mirrored False
 	Show
 }
 
-Class == "Charms"
-{
-	SetFontSize 42
-	SetTextColor 122 105  28 255
-	SetBackgroundColor $color_black
-	PlayEffect Cyan Temp
-
-	Quality > 0
-	{
-		SetBorderColor 122 105  28 255
-		Show
-	}
-
-	Show
-}
-
 #--------------------------
 # Salvage Bench items
 #--------------------------
 
 Sockets > 0
+Rarity <= Rare
 {
 	SetFontSize 35
-
-	Rarity Normal
-	{
-		SetBorderColor 200 200 200 255
-		Show
-	}
-
-	Rarity Magic
-	{
-		SetBorderColor 0 0 200 255
-		Show
-	}
-}
-
-Quality > 10
-{
-	SetFontSize 35
-
-	Rarity Normal
-	{
-		SetBorderColor 200 200 200 255
-		Show
-	}
-
-	Rarity Magic
-	{
-		SetBorderColor 0 0 200 255
-		Show
-	}
+	SetBorderColor 185 83 0
+	ShowDiscard $cfg_show_salvage_sockets
 }
 
 Class "Flask"
@@ -715,10 +679,32 @@ Class "Flask"
 	Quality > 0
 	{
 		SetBorderColor 255 255 255 255
-		Show
+		ShowDiscard $cfg_show_salvage_quality_flasks
 	}
 
-	Show
+	ShowHide $cfg_show_flasks
+}
+
+Class == "Charms"
+{
+	SetFontSize 42
+	SetTextColor 122 105  28 255
+
+	Quality > 0
+	{
+		SetBorderColor 122 105  28 255
+		ShowDiscard $cfg_show_salvage_quality_charms
+	}
+
+	ShowHide $cfg_show_charms
+}
+
+Quality >= 10
+Rarity Normal Magic Rare
+{
+	SetFontSize 35
+	SetBorderColor 128 128 128
+	ShowDiscard $cfg_show_salvage_quality_gear
 }
 
 #--------------------------
