@@ -410,13 +410,12 @@ Class "Socketable"
 # Gems
 #--------------------------
 
-# Strange: Uncut gems seem to have no class
-Class == "Uncut Skill Gems" "Uncut Spirit Gems" "Uncut Support Gems"
+Class == "Uncut Skill Gems" "Uncut Spirit Gems" "Uncut Support Gems" "Support Gems"
 {
 	{
 		SetFontSize $font_max
-		SetTextColor $color_red
-		SetBorderColor $color_red
+		SetTextColor $color_gem
+		SetBorderColor $color_gem
 		SetBackgroundColor $color_white
 		SetAlertSound $alert_high
 		PlayEffect $beam_gem
