@@ -445,7 +445,7 @@ Class == "Uncut Skill Gems" "Uncut Spirit Gems" "Uncut Support Gems"
 # Valuables
 #--------------------------
 
-Class == "Quest Items"
+Class == "Quest Items" "Instance Local Items"
 {
 	Expand $actions_quest_items
 	Show
