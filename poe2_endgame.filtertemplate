@@ -434,6 +434,7 @@ Class == "Uncut Skill Gems" "Uncut Spirit Gems" "Uncut Support Gems" "Support Ge
 		}
 	}
 
+	SetFontSize $font_mid
 	SetTextColor $color_gem
 	SetBorderColor $color_gem
 	SetAlertSound $alert_mid
