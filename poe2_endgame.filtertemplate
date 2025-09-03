@@ -150,6 +150,7 @@ $cfg_show_runes_greater = True
 $cfg_show_talismans_regular = True
 $cfg_show_talismans_endgame = True
 $cfg_show_flasks = True
+$cfg_show_flasks_high_ilvl = True
 $cfg_show_charms = True
 $cfg_show_salvage_sockets = True
 $cfg_show_salvage_quality_flasks = True
@@ -674,6 +675,12 @@ Rarity <= Rare
 Class "Flask"
 {
 	SetBackgroundColor 122 105  28 255
+
+	ItemLevel >= 81
+	{
+		SetBorderColor $color_golden
+		ShowDiscard $cfg_show_flasks_high_ilvl
+	}
 
 	Quality > 0
 	{
