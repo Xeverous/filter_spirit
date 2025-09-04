@@ -552,7 +552,7 @@ Rarity Unique
 {
 	PlayEffect Brown
 
-	BaseType == "Timeless Jewel" "Diamond" "Time-Lost Diamond"
+	BaseType == "Timeless Jewel" "Diamond" "Time-Lost Diamond" "Ring"
 	{
 		SetTextColor 0 240 190 255
 		SetBorderColor 0 240 190 255
