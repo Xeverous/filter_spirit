@@ -27,7 +27,7 @@ void print_help(const po::options_description& options)
 	std::cout <<
 		"Filter Spirit - advanced item filter generator for Path of Exile game client\n\n"
 		"Usage:\n"
-		"./filter_spirit_cli <data_obtaining_option> [cache_option]... [-g input_path output_path [generation_option]...]\n"
+		"./filter_spirit_cli [game_version_option] <data_obtaining_option> [cache_option]... [-g input_path output_path [generation_option]...]\n"
 		"./filter_spirit_cli <generic_option>\n"
 		"\n"
 		"Examples:\n"
@@ -65,6 +65,14 @@ int run(int argc, char* argv[])
 	};
 
 	try {
+		bool ruthless_mode = false;
+		bool poe2_mode = false;
+		po::options_description game_version_options = make_options("game version options (affect data download and generation)");
+		game_version_options.add_options()
+			("ruthless,r", po::bool_switch(&ruthless_mode), "enable Ruthless-specific filter logic (PoE 1 only)")
+			("poe2,2", po::bool_switch(&poe2_mode), "use PoE 2 logic (PoE 1 is the default)")
+		;
+
 		boost::optional<std::string> download_league_name_watch;
 		boost::optional<std::string> download_league_name_ninja;
 		bool opt_empty_data = false;
@@ -110,15 +118,11 @@ int run(int argc, char* argv[])
 		;
 
 		bool opt_generate = false;
-		bool ruthless_mode = false;
-		bool poe2_mode = false;
 		fs::compiler::settings st;
 		po::options_description generation_options = make_options("generation options");
 		generation_options.add_options()
 			// generation
 			("generate,g", po::bool_switch(&opt_generate), "generate an item filter")
-			("ruthless,r", po::bool_switch(&ruthless_mode), "enable Ruthless-specific filter logic")
-			("poe2,2", po::bool_switch(&poe2_mode), "enable PoE 2 filter logic")
 			// warning/error/debug
 			("stop-on-error", po::bool_switch(&st.error_handling.stop_on_error),
 				"stop on first error")
@@ -174,6 +178,7 @@ int run(int argc, char* argv[])
 
 		po::options_description all_options(terminal_width, terminal_width / 2);
 		all_options
+			.add(game_version_options)
 			.add(data_obtaining_options)
 			.add(cache_options)
 			.add(networking_options)
