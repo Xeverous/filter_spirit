@@ -29,6 +29,7 @@ $color_currency_low        = 213 159   0
 $color_currency_very_low   = 190 178 135
 $color_gem                 =  20 240 240
 $color_gold                = 255 192 128
+$color_gear_exceptional    =   0 255 255
 
 $font_min                = 18
 $font_max                = 45
@@ -72,6 +73,7 @@ $alert_currency_low        = $alert_low
 $alert_currency_very_low   = $alert_frequent
 $alert_gold                = $alert_frequent
 $alert_chance              = $alert_common
+$alert_item_exceptional    = $alert_very_specific
 
 $beam_currency        = Yellow
 $beam_gem             = Green
@@ -152,6 +154,8 @@ $cfg_show_talismans_endgame = True
 $cfg_show_flasks = True
 $cfg_show_flasks_high_ilvl = True
 $cfg_show_charms = True
+$cfg_show_gear_exceptional_quality = True
+$cfg_show_gear_exceptional_sockets = True
 $cfg_show_salvage_sockets = True
 $cfg_show_salvage_quality_flasks = True
 $cfg_show_salvage_quality_charms = True
@@ -631,6 +635,36 @@ Class "Jewel"
 	{
 		PlayEffect Cyan Temp
 		Show
+	}
+}
+
+# Exceptional bases - over 20 quality or with an extra socket
+Mirrored False
+Corrupted False
+Rarity <= Rare
+{
+	SetTextColor $color_black
+	SetBackgroundColor $color_gear_exceptional
+	SetBorderColor $color_gear_exceptional
+	SetAlertSound $alert_item_exceptional
+
+	Quality >= 28
+	{
+		ShowDiscard $cfg_show_gear_exceptional_quality
+	}
+
+	# later: also "Trap"
+
+	Class "Body Armour" "Two Hand" "Quarterstaff" "Staff" "Bow" "Crossbow"
+	Sockets > 2
+	{
+		ShowDiscard $cfg_show_gear_exceptional_sockets
+	}
+
+	Class != "Body Armour" "Two Hand" "Quarterstaff" "Staff" "Bow" "Crossbow"
+	Sockets > 1
+	{
+		ShowDiscard $cfg_show_gear_exceptional_sockets
 	}
 }
 
