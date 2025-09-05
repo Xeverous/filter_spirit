@@ -146,6 +146,7 @@ $cfg_default_font_size = 36
 
 $show_scrolls_wisdom = True
 
+$cfg_show_currency_low_shards = True
 $cfg_show_runes_lesser  = True
 $cfg_show_runes_regular = True
 $cfg_show_runes_greater = True
@@ -245,7 +246,7 @@ Class == "Stackable Currency"
 	}
 
 	# Scrap tier
-	BaseType == "Arcanist's Etcher" "Armourer's Scrap" "Blacksmith's Whetstone" "Regal Orb" "Orb of Augmentation" "Orb of Transmutation" "Regal Shard" "Lesser Jeweller's Orb" "Greater Orb of Transmutation" "Perfect Orb of Transmutation" "Greater Regal Orb" "Perfect Regal Orb" "Greater Orb of Augmentation" "Perfect Orb of Augmentation"
+	BaseType == "Arcanist's Etcher" "Armourer's Scrap" "Blacksmith's Whetstone" "Regal Orb" "Orb of Augmentation" "Orb of Transmutation" "Lesser Jeweller's Orb" "Greater Orb of Transmutation" "Perfect Orb of Transmutation" "Greater Regal Orb" "Perfect Regal Orb" "Greater Orb of Augmentation" "Perfect Orb of Augmentation"
 	{
 		Expand $actions_currency_low
 		Show
@@ -258,10 +259,10 @@ Class == "Stackable Currency"
 		Show
 	}
 
-	BaseType == "Transmutation Shard" "Artificer's Shard"
+	BaseType == "Transmutation Shard" "Artificer's Shard" "Regal Shard"
 	{
 		Expand $actions_currency_low_shards
-		Show
+		ShowHide $cfg_show_currency_low_shards
 	}
 
 	# Abyss crafting orbs
