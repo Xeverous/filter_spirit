@@ -103,30 +103,58 @@ struct item_price_data
 	 */
 	void sort();
 
+	// Class == "Stackable Currency"
+	std::vector<elementary_item> currency;
+	std::vector<elementary_item> essences;      // 2.4
+	std::vector<elementary_item> vials;         // 3.3
+	std::vector<elementary_item> fossils;       // 3.4
+	std::vector<elementary_item> oils;          // 3.8
+	std::vector<elementary_item> delirium_orbs; // 3.10
+	std::vector<elementary_item> artifacts;     // 3.15
+	std::vector<elementary_item> tattoos;       // 3.22
+	std::vector<elementary_item> omens;         // 3.22
+	std::vector<elementary_item> runegrafts;    // 3.26
+
+	// Class == "Delve Stackable Socketable Currency"
+	std::vector<elementary_item> resonators;
+
+	// Class == "Divination Card"
 	std::vector<divination_card> divination_cards;
 
-	std::vector<elementary_item> currency;
+	// Class == "Map Fragments"
 	std::vector<elementary_item> fragments;
-	std::vector<elementary_item> delirium_orbs;
-	std::vector<elementary_item> vials;
-	std::vector<elementary_item> oils;
-	std::vector<elementary_item> incubators;
-	std::vector<elementary_item> essences;
-	std::vector<elementary_item> fossils;
-	std::vector<elementary_item> resonators;
 	std::vector<elementary_item> scarabs;
-	std::vector<elementary_item> tattoos;
+	std::vector<elementary_item> allflame_embers;
 
+	// Class == "Misc Map Items"
+	std::vector<elementary_item> invitations;
+
+	// Class == "Incubator"
+	std::vector<elementary_item> incubators;
+
+	// Class == "Skill Gems" "Support Gems"
 	std::vector<gem> gems;
 
+	// HasInfluence, ItemLevel
 	std::vector<base> bases;
 
-	unique_item_price_data unique_eq; // jewellery, body parts, weapons
+	// TODO: cluster jewels
+
+	// Rarity Unique
+	unique_item_price_data unique_eq; // weapons, armours, jewellery (accessory)
 	unique_item_price_data unique_flasks;
+	unique_item_price_data unique_tinctures;
 	unique_item_price_data unique_jewels;
 	unique_item_price_data unique_maps;
-};
+	unique_item_price_data unique_relics;
+	unique_item_price_data unique_idols;
 
+	// unused:
+	// - Beast (unfilterable)
+	// - Map
+	// - Blighted Map
+	// - Blight-ravaged Map
+};
 
 log::message_stream& operator<<(log::message_stream& stream, const item_price_data& ipd);
 
@@ -162,6 +190,9 @@ load_item_price_report(
  * Produce logs about differences in 2 item data sets
  *
  * both item data inputs must be sorted
+ *
+ * TODO the implementation is old/stale (not updated)
+ * perhaps remove or rewrite when UI is done
  */
 void compare_item_price_reports(
 	const item_price_report& lhs,
