@@ -15,7 +15,7 @@ namespace fs::network::poe_watch
 parse_league_info(
 	std::string_view league_json);
 
-[[nodiscard]] lang::market::item_price_data
+[[nodiscard]] lang::market::poe1::item_price_data
 parse_item_price_data(
 	const api_item_price_data& ipd,
 	log::logger& logger);

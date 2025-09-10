@@ -1,3 +1,4 @@
+#include <fs/lang/market/item_price_data.hpp>
 #include <fs/network/poe_watch/parse_data.hpp>
 #include <fs/network/exceptions.hpp>
 #include <fs/utility/dump_json.hpp>
@@ -10,10 +11,8 @@
 #include <nlohmann/json.hpp>
 
 #include <algorithm>
-#include <iterator>
 #include <optional>
 #include <variant>
-#include <type_traits>
 #include <utility>
 
 namespace
@@ -274,10 +273,14 @@ log::message_stream& operator<<(log::message_stream& stream, const item& item)
 	return stream;
 }
 
-// same behaviour as JavaScript code on poe.watch
-bool is_low_confidence(int daily, int current)
+lang::market::confidence_level to_confidence_level(int daily, int current)
 {
-	return daily < 10 || current < 10;
+	// same behaviour as JavaScript code on poe.watch
+	// TODO medium?
+	if (daily < 10 || current < 10)
+		return lang::market::confidence_level::low;
+	else
+		return lang::market::confidence_level::high;
 }
 
 // example query: https://api.poe.watch/compact?league=Standard
@@ -331,7 +334,7 @@ parse_compact(std::string_view compact_json, log::logger& logger)
 
 		item_prices[id] = lang::market::price_data{
 			item.at("mean").get<double>(),
-			is_low_confidence(
+			to_confidence_level(
 				item.at("daily").get<int>(),
 				item.at("current").get<int>())};
 	}
@@ -561,7 +564,7 @@ std::vector<lang::league> parse_league_info(std::string_view league_json)
 	return result;
 }
 
-lang::market::item_price_data
+lang::market::poe1::item_price_data
 parse_item_price_data(
 	const api_item_price_data& ipd,
 	log::logger& logger)
@@ -578,7 +581,7 @@ parse_item_price_data(
 
 	logger.info() << "Item entries: " << itemdata.size() << '\n';
 
-	lang::market::item_price_data result;
+	lang::market::poe1::item_price_data result;
 	for (item& itm : itemdata) {
 		/*
 		 * Ignore items which do not have price information.
@@ -595,7 +598,7 @@ parse_item_price_data(
 		const lang::market::price_data& price_data = *item_prices[itm.id];
 
 		// ignore items with low confidence
-		if (price_data.is_low_confidence)
+		if (price_data.confidence == lang::market::confidence_level::low)
 			continue;
 
 		// ignore beasts - they do not drop
@@ -626,7 +629,7 @@ parse_item_price_data(
 
 			// skip uniques which do not drop (eg fated items) - this will reduce ambiguity and
 			// not pollute the filter with items we would not care for
-			if (lang::market::is_undroppable_unique(itm.name))
+			if (lang::market::poe1::is_undroppable_unique(itm.name))
 				continue;
 
 			if (std::holds_alternative<categories::armour>(itm.category)
@@ -703,7 +706,7 @@ parse_item_price_data(
 					<< "Assuming for safety the card might have a stack size of 1, which so far was the case with this bug.\n";
 			}
 
-			result.divination_cards.push_back(lang::market::divination_card{
+			result.divination_cards.push_back(lang::market::poe1::divination_card{
 				elementary_item{price_data, std::move(itm.name)},
 				itm.max_stack_size.value_or(1)});
 			continue;
@@ -722,7 +725,7 @@ parse_item_price_data(
 		else if (std::holds_alternative<categories::base>(itm.category)) {
 			const auto& base = std::get<categories::base>(itm.category);
 
-			result.bases.push_back(lang::market::base{
+			result.bases.push_back(lang::market::poe1::base{
 				elementary_item{price_data, std::move(itm.name)},
 				base.ilvl,
 				lang::influence_info{
@@ -738,7 +741,7 @@ parse_item_price_data(
 		else if (std::holds_alternative<categories::gem>(itm.category)) {
 			const auto& gem = std::get<categories::gem>(itm.category);
 
-			result.gems.push_back(lang::market::gem{
+			result.gems.push_back(lang::market::poe1::gem{
 				elementary_item{price_data, std::move(itm.name)},
 				gem.level,
 				gem.quality,

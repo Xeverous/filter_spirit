@@ -78,6 +78,8 @@ compare_strings_ignore_diacritics(
 [[nodiscard]] std::string_view rtrim(std::string_view str, char c);
 [[nodiscard]] std::string_view trim(std::string_view str, char c);
 
+[[nodiscard]] std::string remove_cr(std::string str);
+
 /**
  * A line with underline for pretty-printing
  *

@@ -8,7 +8,7 @@
 #include <type_traits>
 
 BOOST_FUSION_ADAPT_STRUCT(
-	fs::network::poe_ninja::api_item_price_data,
+	fs::network::poe_ninja::poe1::api_item_price_data,
 	// general
 	currency,
 	fragment,
@@ -47,11 +47,28 @@ BOOST_FUSION_ADAPT_STRUCT(
 	essence,
 	vial)
 
-namespace fs::network::poe_ninja
-{
+BOOST_FUSION_ADAPT_STRUCT(
+	fs::network::poe_ninja::poe2::api_item_price_data,
+	// general
+	currency,
+	fragments,
+	abyss,
+	uncut_gems,
+	lineage_support_gems,
+	essences,
+	ultimatum,
+	talismans,
+	runes,
+	ritual,
+	expedition,
+	delirium,
+	breach)
 
-namespace detail
-{
+namespace fs::network::poe_ninja {
+
+namespace poe1 {
+
+namespace detail {
 
 template <typename F>
 struct applier
@@ -71,7 +88,7 @@ struct applier
 	F f;
 };
 
-}
+} // namespace detail
 
 template <typename F>
 void api_item_price_data::for_each_file(F f)
@@ -88,5 +105,49 @@ void api_item_price_data::for_each_file(F f) const
 
 	boost::fusion::for_each(*this, detail::applier<F>{f});
 }
+
+} // namespace poe1
+
+namespace poe2 {
+
+namespace detail {
+
+template <typename F>
+struct applier
+{
+	template <const char* Name>
+	void operator()(json_file<Name>& object) const
+	{
+		f(Name, object.file_content);
+	}
+
+	template <const char* Name>
+	void operator()(const json_file<Name>& object) const
+	{
+		f(Name, object.file_content);
+	}
+
+	F f;
+};
+
+} // namespace detail
+
+template <typename F>
+void api_item_price_data::for_each_file(F f)
+{
+	static_assert(std::is_invocable_v<F, const char*, std::string&>);
+
+	boost::fusion::for_each(*this, detail::applier<F>{f});
+}
+
+template <typename F>
+void api_item_price_data::for_each_file(F f) const
+{
+	static_assert(std::is_invocable_v<F, const char*, const std::string&>);
+
+	boost::fusion::for_each(*this, detail::applier<F>{f});
+}
+
+} // namespace poe2
 
 }

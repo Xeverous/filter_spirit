@@ -3,10 +3,13 @@
 #include <fs/lang/enum_types.hpp>
 #include <fs/lang/conditions.hpp>
 #include <fs/lang/action_set.hpp>
+#include <fs/lang/market/item_price_data.hpp>
 
 #include <functional>
 #include <iosfwd>
 #include <optional>
+#include <unordered_set>
+#include <string_view>
 #include <utility>
 #include <variant>
 #include <vector>
@@ -148,8 +151,6 @@ struct item_filter
 
 // ---- pieces for spirit filter ----
 
-namespace market { struct item_price_data; }
-
 struct block_generation_info
 {
 	item_visibility visibility;
@@ -166,17 +167,36 @@ struct generated_blocks_consumer
 		blocks.get().emplace_back(std::move(block));
 	}
 
+	void report_unknown_item(std::string_view item_name)
+	{
+		unknown_items.get().insert(item_name);
+	}
+
 	std::reference_wrapper<std::vector<block_variant>> blocks;
+	std::reference_wrapper<std::unordered_set<std::string_view>> unknown_items;
 };
 
-using blocks_generator_func_type = void (
+template <typename ItemPriceData>
+using specific_blocks_generator_func_type = void (
 	const block_generation_info&,
-	const market::item_price_data&,
+	const ItemPriceData&,
 	generated_blocks_consumer
 );
 
+using poe1_blocks_generator_func_type = specific_blocks_generator_func_type<market::poe1::item_price_data>;
+using poe2_blocks_generator_func_type = specific_blocks_generator_func_type<market::poe2::item_price_data>;
+using blocks_generator_func_type      = specific_blocks_generator_func_type<market::item_price_data>;
+
 struct autogen_extension
 {
+	void generate_blocks(
+		const item_filter_block& base_block,
+		const market::item_price_data& ipd,
+		std::vector<block_variant>& result_blocks,
+		std::unordered_set<std::string_view>& unknown_items) const;
+
+	static constexpr int unknown_item_assumed_max_stack_size = 1000;
+
 	std::function<blocks_generator_func_type> blocks_generator; // should never be empty
 	price_range_condition price_range;
 	position_tag origin;

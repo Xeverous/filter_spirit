@@ -78,6 +78,7 @@ std::optional<lang::market::item_price_report>
 obtain_item_price_report(
 	const boost::optional<std::string>& download_league_name_ninja,
 	const boost::optional<std::string>& download_league_name_watch,
+	fs::lang::game_variant_type game_variant,
 	boost::posix_time::time_duration expiration_time,
 	network::download_settings settings,
 	const boost::optional<std::string>& data_read_dir,
@@ -99,6 +100,7 @@ obtain_item_price_report(
 	cache.load_cache_file_from_disk(logger);
 	if (download_league_name_ninja) {
 		return cache.get_report(
+			game_variant,
 			*download_league_name_ninja,
 			lang::data_source_type::poe_ninja,
 			expiration_time,
@@ -108,6 +110,7 @@ obtain_item_price_report(
 	}
 	else if (download_league_name_watch) {
 		return cache.get_report(
+			game_variant,
 			*download_league_name_watch,
 			lang::data_source_type::poe_watch,
 			expiration_time,
@@ -155,33 +158,6 @@ int print_item_price_report(
 	}
 
 	logger.info() << "" << *report;
-
-	return EXIT_SUCCESS;
-}
-
-int compare_data_saves(
-	const std::vector<std::string>& paths,
-	fs::log::logger& logger)
-{
-	if (paths.size() != 2u) {
-		logger.error() << "For comparing data saves exactly 2 paths should be given.\n";
-		return EXIT_FAILURE;
-	}
-
-	std::optional<lang::market::item_price_report> report_lhs = lang::market::load_item_price_report(paths[0], logger);
-	if (!report_lhs) {
-		return EXIT_FAILURE;
-	}
-
-	std::optional<lang::market::item_price_report> report_rhs = lang::market::load_item_price_report(paths[1], logger);
-	if (!report_rhs) {
-		return EXIT_FAILURE;
-	}
-
-	(*report_lhs).data.sort();
-	(*report_rhs).data.sort();
-
-	lang::market::compare_item_price_reports(*report_lhs, *report_rhs, logger);
 
 	return EXIT_SUCCESS;
 }

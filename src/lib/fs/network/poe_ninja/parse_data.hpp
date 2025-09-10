@@ -7,6 +7,16 @@
 namespace fs::network::poe_ninja
 {
 
-[[nodiscard]] lang::market::item_price_data parse_item_price_data(const api_item_price_data& jsons, log::logger& logger);
+namespace poe1 {
+
+[[nodiscard]] lang::market::poe1::item_price_data parse_item_price_data(const api_item_price_data& jsons, log::logger& logger);
+
+}
+
+namespace poe2 {
+
+[[nodiscard]] lang::market::poe2::item_price_data parse_item_price_data(const api_item_price_data& jsons, log::logger& logger);
+
+}
 
 }

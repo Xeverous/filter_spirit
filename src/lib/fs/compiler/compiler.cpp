@@ -609,10 +609,12 @@ compile_spirit_filter_statements(
 lang::item_filter
 make_item_filter(
 	const lang::spirit_item_filter& filter_template,
-	const lang::market::item_price_data& item_price_data)
+	const lang::market::item_price_data& item_price_data,
+	log::logger& logger)
 {
 	std::vector<lang::block_variant> result_blocks;
 	result_blocks.reserve(filter_template.blocks.size());
+	std::unordered_set<std::string_view> unknown_items;
 
 	for (const lang::spirit_block_variant& block_variant : filter_template.blocks) {
 		std::visit(utility::visitor{
@@ -621,24 +623,24 @@ make_item_filter(
 			},
 			[&](const lang::spirit_item_filter_block& block) {
 				if (block.autogen) {
-					const auto& autogen = *block.autogen;
-
-					lang::block_generation_info block_gen_info{
-						block.block.visibility,
-						block.block.actions,
-						block.block.continuation,
-						autogen.origin,
-						autogen.price_range
-					};
-
-					autogen.blocks_generator(
-						block_gen_info, item_price_data, lang::generated_blocks_consumer{std::ref(result_blocks)});
+					(*block.autogen).generate_blocks(block.block, item_price_data, result_blocks, unknown_items);
 				}
 				else {
 					result_blocks.push_back(lang::block_variant(block.block));
 				}
 			}
 		}, block_variant);
+	}
+
+	if (!unknown_items.empty()) {
+		auto stream = logger.warning();
+		stream << unknown_items.size() << " items had unknown max stack size. "
+			"Generated blocks assuming these items can stack up to "
+			<< lang::autogen_extension::unknown_item_assumed_max_stack_size
+			<< " to catch potential large stacks in high-tier price blocks.";
+
+		for (const auto& item : unknown_items)
+			stream << "\"" << item << "\"\n";
 	}
 
 	return lang::item_filter{filter_template.game_variant, std::move(result_blocks)};
@@ -682,7 +684,7 @@ std::optional<std::string> parse_compile_generate_spirit_filter_without_preamble
 	if (!spirit_filter)
 		return std::nullopt;
 
-	lang::item_filter filter = make_item_filter(*spirit_filter, item_price_data);
+	lang::item_filter filter = make_item_filter(*spirit_filter, item_price_data, logger);
 	logger.info() << "Compilation successful.\n";
 
 	return item_filter_to_string_without_preamble(filter, st.overrides);

@@ -81,6 +81,7 @@ target_sources(filter_spirit
 		fs/compiler/symbol_table.hpp
 		fs/lang/loot/item_database.hpp
 		fs/lang/loot/generator.hpp
+		fs/lang/loot/knowledge.hpp
 		fs/lang/market/item_price_data.hpp
 		fs/lang/enum_types.hpp
 		fs/lang/action_set.hpp

@@ -3,6 +3,7 @@
 #include <fs/log/logger.hpp>
 #include <fs/network/download.hpp>
 #include <fs/compiler/settings.hpp>
+#include <fs/lang/enum_types.hpp>
 #include <fs/lang/market/item_price_data.hpp>
 
 #include <boost/optional.hpp>
@@ -19,6 +20,7 @@ list_leagues(
 obtain_item_price_report(
 	const boost::optional<std::string>& download_league_name_ninja,
 	const boost::optional<std::string>& download_league_name_watch,
+	fs::lang::game_variant_type game_variant,
 	boost::posix_time::time_duration expiration_time,
 	fs::network::download_settings settings,
 	const boost::optional<std::string>& data_read_dir,
@@ -35,9 +37,4 @@ generate_item_filter(
 [[nodiscard]] int // <= exit status
 print_item_price_report(
 	const std::string& path,
-	fs::log::logger& logger);
-
-[[nodiscard]] int // <= exit status
-compare_data_saves(
-	const std::vector<std::string>& paths,
 	fs::log::logger& logger);

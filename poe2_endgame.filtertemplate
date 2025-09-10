@@ -30,6 +30,7 @@ $color_currency_very_low   = 190 178 135
 $color_gem                 =  20 240 240
 $color_gold                = 255 192 128
 $color_gear_exceptional    =   0 255 255
+$color_essence             =   0 128 192
 
 $font_min                = 18
 $font_max                = 45
@@ -77,14 +78,35 @@ $alert_item_exceptional    = $alert_very_specific
 
 $beam_currency        = Yellow
 $beam_gem             = Green
+$beam_essence         = Blue
+$beam_soul_core       = Red
+$beam_rune            = Blue
+$beam_omen            = Brown
+$beam_emotion         = Grey
 
 $icon_currency_high   = 0 Yellow Star
 $icon_currency_mid    = 1 Yellow Star
 $icon_currency_low    = 2 Yellow Star
 $icon_gold_high       = 0 Yellow Circle
 $icon_gold_mid        = 2 Yellow Circle
-$icon_gem_high        = 0 Green Circle
-$icon_gem_mid         = 2 Green Circle
+$icon_gem_high        = 0 Green Triangle
+$icon_gem_mid         = 2 Green Triangle
+$icon_essence_high    = 0 Blue Star
+$icon_essence_mid     = 2 Blue Star
+# socketables - use Circle
+$icon_soul_core_high  = 0 Red Circle
+$icon_soul_core_mid   = 2 Red Circle
+$icon_talisman_high   = 0 Brown Circle
+$icon_talisman_mid    = 2 Brown Circle
+$icon_rune_high       = 0 Blue Circle
+$icon_rune_mid        = 2 Blue Circle
+
+$icon_omen_high       = 0 Brown Kite
+$icon_omen_mid        = 2 Brown Kite
+$icon_emotion_high    = 0 Grey Raindrop
+$icon_emotion_mid     = 2 Grey Raindrop
+# catalysts are pretty much never valuable
+$icon_catalyst_mid    = 2 Purple Star
 $icon_error           = 0 Red UpsideDownHouse
 
 $actions_currency_high = {
@@ -224,22 +246,69 @@ Class == "Stackable Currency"
 {
 	SetBackgroundColor $color_black
 
-	# TODO: remove omens here they have their own class
+	BaseType == "Transmutation Shard" "Artificer's Shard" "Regal Shard"
+	{
+		Expand $actions_currency_low_shards
+		ShowHide $cfg_show_currency_low_shards
+	}
+
+	# Splinters etc
+	BaseType == "Simulacrum Splinter" "Breach Splinter" "Petition Splinter" "Runic Splinter" "Broken Circle Artifact" "Black Scythe Artifact" "Order Artifact" "Sun Artifact"
+	{
+		Expand $actions_currency_low
+		Show
+	}
+
+	BaseType == "Scroll of Wisdom"
+	{
+		SetTextColor 220 195 160
+		SetFontSize $font_scroll
+		ShowHide $show_scrolls_wisdom
+	}
+
+	Autogen "Currency"
+	{
+		Price >= 20
+		{
+			Expand $actions_currency_high
+			Show
+		}
+
+		Price < 20
+		Price >= 1
+		{
+			Expand $actions_currency_mid
+			Show
+		}
+
+		Price < 1
+		Price >= 0.05
+		{
+			Expand $actions_currency_low
+			Show
+		}
+
+		Price < 0.05
+		{
+			Hide
+		}
+	}
+
 	# Divine tier
-	BaseType == "Divine Orb" "Mirror of Kalandra" "Perfect Jeweller's Orb" "Concentrated Liquid Fear" "Concentrated Liquid Suffering" "Concentrated Liquid Isolation" "Greater Essence of the Mind" "Greater Essence of the Infinite" "Greater Essence of Electricity" "Greater Essence of Abrasion" "Greater Essence of Sorcery" "Greater Essence of Haste" "Omen of Corruption" "Omen of Amelioration" "Omen of Whittling" "Omen of Sinistral Erasure" "Omen of Dextral Erasure" "Omen of Sinistral Annulment" "Omen of Dextral Annulment" "Soul Core of Azcapa" "Fracturing Orb" "Hinekora's Lock"
+	BaseType == "Divine Orb" "Mirror of Kalandra" "Perfect Jeweller's Orb" "Concentrated Liquid Fear" "Concentrated Liquid Suffering" "Concentrated Liquid Isolation" "Soul Core of Azcapa" "Hinekora's Lock"
 	{
 		Expand $actions_currency_high
 		Show
 	}
 
 	# Chaos/Exalt tier"
-	BaseType == "Gemcutter's Prism" "Orb of Annulment" "Orb of Chance" "Glassblower's Bauble" "Exalted Orb" "Vaal Orb" "Chaos Orb" "Chance Shard" "Greater Jeweller's Orb" "Exotic Coinage" "Artificer's Orb" "Orb of Alchemy" "Liquid Paranoia" "Liquid Envy" "Liquid Disgust" "Liquid Despair" "Greater Chaos Orb" "Perfect Chaos Orb" "Greater Exalted Orb" "Perfect Exalted Orb"
+	BaseType == "Gemcutter's Prism" "Orb of Annulment" "Orb of Chance" "Glassblower's Bauble" "Exalted Orb" "Vaal Orb" "Chaos Orb" "Chance Shard" "Greater Jeweller's Orb" "Exotic Coinage" "Artificer's Orb" "Orb of Alchemy" "Greater Chaos Orb" "Perfect Chaos Orb" "Greater Exalted Orb" "Perfect Exalted Orb" "Fracturing Orb"
 	{
 		Expand $actions_currency_mid
 		Show
 	}
 
-	BaseType "Perfect Essence of" "Greater Essence of" "Lesser Essence of"
+	BaseType "Essence of"
 	{
 		Expand $actions_currency_mid
 		Show
@@ -250,19 +319,6 @@ Class == "Stackable Currency"
 	{
 		Expand $actions_currency_low
 		Show
-	}
-
-	# Splinters etc
-	BaseType == "Simulacrum Splinter" "Breach Splinter" "Petition Splinter" "Runic Splinter" "Broken Circle Artifact" "Black Scythe Artifact" "Order Artifact" "Sun Artifact"
-	{
-		Expand $actions_currency_low
-		Show
-	}
-
-	BaseType == "Transmutation Shard" "Artificer's Shard" "Regal Shard"
-	{
-		Expand $actions_currency_low_shards
-		ShowHide $cfg_show_currency_low_shards
 	}
 
 	# Abyss crafting orbs
@@ -279,25 +335,11 @@ Class == "Stackable Currency"
 		Show
 	}
 
-	# Catalysts, Essences - generic
-	BaseType "Catalyst" "Essence of"
+	# Catalysts, Essences, Emotions - generic
+	BaseType "Catalyst" "Essence of" "Liquid"
 	{
 		Expand $actions_currency_mid
 		Show
-	}
-
-	# lowest tier Delirium Emotions
-	BaseType == "Diluted Liquid Ire" "Diluted Liquid Guilt" "Diluted Liquid Greed"
-	{
-		Expand $actions_currency_low
-		Show
-	}
-
-	BaseType == "Scroll of Wisdom"
-	{
-		SetTextColor 220 195 160
-		SetFontSize $font_scroll
-		ShowHide $show_scrolls_wisdom
 	}
 
 	BaseType == "Bronze Key" "Silver Key" "Gold Key"
@@ -324,7 +366,7 @@ Class == "Omen"
 # Socketable
 #--------------------------
 
-Class "Socketable"
+Class == "Socketable"
 {
 	# Runes
 	{
@@ -712,7 +754,7 @@ Class "Flask"
 {
 	SetBackgroundColor 122 105  28 255
 
-	ItemLevel >= 81
+	ItemLevel >= 84
 	{
 		SetBorderColor $color_golden
 		ShowDiscard $cfg_show_flasks_high_ilvl

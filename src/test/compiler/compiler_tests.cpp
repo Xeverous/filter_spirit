@@ -7,6 +7,7 @@
 #include <fs/compiler/symbol_table.hpp>
 #include <fs/lang/position_tag.hpp>
 #include <fs/log/string_logger.hpp>
+#include <fs/log/null_logger.hpp>
 #include <fs/utility/visitor.hpp>
 
 #include <boost/test/unit_test.hpp>
@@ -103,7 +104,8 @@ BOOST_FIXTURE_TEST_SUITE(compiler_suite, compiler_fixture)
 			}
 
 			BOOST_TEST_REQUIRE(spirit_filter.has_value());
-			return compiler::make_item_filter(*spirit_filter, /* empty item price data */ {});
+			log::null_logger nl;
+			return compiler::make_item_filter(*spirit_filter, /* empty item price data */ {}, nl);
 		}
 	};
 

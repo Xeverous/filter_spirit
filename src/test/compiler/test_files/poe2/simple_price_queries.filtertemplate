@@ -1,0 +1,29 @@
+Class "Stackable Currency"
+Autogen "Currency"
+{
+	Price >= 100
+	{
+		SetBackgroundColor 100 0 0
+		Show
+	}
+
+	Price < 100
+	Price >= 1
+	{
+		SetBackgroundColor 100 1 0
+		Show
+	}
+
+	Price < 1
+	Price >= 0.1
+	{
+		SetBackgroundColor 1 0 1
+		Show
+	}
+
+	Price < 0.1
+	{
+		SetBackgroundColor 0 0 1
+		Hide
+	}
+}

@@ -240,6 +240,12 @@ std::string_view trim(std::string_view str, char c)
 	return rtrim(ltrim(str, c), c);
 }
 
+std::string remove_cr(std::string str)
+{
+	str.erase(std::remove(str.begin(), str.end(), '\r'), str.end());
+	return str;
+}
+
 code_underliner::code_underliner(std::string_view surrounding_code, std::string_view code_to_underline)
 : surrounding_first(surrounding_code.data())
 , surrounding_last (surrounding_code.data() + surrounding_code.size())

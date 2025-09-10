@@ -162,15 +162,12 @@ int run(int argc, char* argv[])
 		bool opt_help = false;
 		bool opt_version = false;
 		boost::optional<std::string> info_path;
-		std::vector<std::string> compare_paths;
 		po::options_description generic_options = make_options("generic options (use 1)");
 		generic_options.add_options()
 			("list-leagues,l", po::bool_switch(&opt_list_leagues), "list leagues available for data download")
 			("help,h",         po::bool_switch(&opt_help),    "print this message")
 			("version,v",      po::bool_switch(&opt_version), "print version number")
 			("info,i",         po::value(&info_path)->value_name("DIRPATH"), "show information about given item price data save")
-			("compare,c",      po::value(&compare_paths)->multitoken()->value_name("DIRPATH DIRPATH"),
-				"compare single-property items (cards, oils, scarabs, fossils, ...) in 2 price data saves")
 		;
 
 		po::positional_options_description positional_options_description;
@@ -239,10 +236,6 @@ int run(int argc, char* argv[])
 			return print_item_price_report(*info_path, logger);
 		}
 
-		if (!compare_paths.empty()) {
-			return compare_data_saves(compare_paths, logger);
-		}
-
 		const auto item_price_report = [&]() -> std::optional<fs::lang::market::item_price_report> {
 			if (opt_empty_data) {
 				// user explicitly stated to use empty data, some find it useful
@@ -253,6 +246,7 @@ int run(int argc, char* argv[])
 				return obtain_item_price_report(
 					download_league_name_ninja,
 					download_league_name_watch,
+					st.game_variant,
 					boost::posix_time::minutes(max_age),
 					download_settings,
 					data_read_dir,

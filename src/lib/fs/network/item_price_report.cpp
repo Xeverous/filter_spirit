@@ -27,6 +27,7 @@ using namespace fs::network;
 [[nodiscard]] bool
 matches(
 	const lang::market::item_price_metadata& metadata,
+	lang::game_variant_type game_variant,
 	const std::string& league,
 	lang::data_source_type api)
 {
@@ -36,17 +37,21 @@ matches(
 	if (metadata.league_name != league)
 		return false;
 
+	if (metadata.game_variant != game_variant)
+		return false;
+
 	return true;
 }
 
 [[nodiscard]] bool
 matches(
 	const lang::market::item_price_metadata& metadata,
+	lang::game_variant_type game_variant,
 	const std::string& league,
 	lang::data_source_type api,
 	boost::posix_time::time_duration expiration_time)
 {
-	if (!matches(metadata, league, api))
+	if (!matches(metadata, game_variant, league, api))
 		return false;
 
 	const auto now = boost::posix_time::microsec_clock::universal_time();
@@ -86,10 +91,14 @@ std::string normalize_league_name(std::string_view league_name)
 	return result;
 }
 
-std::string make_save_path(lang::data_source_type api, std::string_view league)
+std::string make_save_path(lang::data_source_type api, lang::game_variant_type game_variant, std::string_view league)
 {
 	std::string path = cache_dir_path;
 	path.append("/");
+	if (game_variant == lang::game_variant_type::poe2)
+		path.append("poe2/");
+	else
+		path.append("poe1/");
 
 	if (api == lang::data_source_type::poe_ninja)
 		path += "ninja";
@@ -140,22 +149,29 @@ void save_api_data(
 lang::market::item_price_report
 download_and_parse_ninja(
 	item_price_report_cache& self,
+	lang::game_variant_type game_variant,
 	std::string league,
 	download_settings settings,
 	download_info* info,
 	log::logger& logger)
 {
-	poe_ninja::api_item_price_data api_data = poe_ninja::download_item_price_data(league, settings, info, logger);
-
 	lang::market::item_price_report report;
+	report.metadata.game_variant = game_variant;
 	report.metadata.data_source = lang::data_source_type::poe_ninja;
 	report.metadata.league_name = league;
 	report.metadata.download_date = boost::posix_time::microsec_clock::universal_time();
 
-	std::string save_path = make_save_path(lang::data_source_type::poe_ninja, league);
-	save_api_data(api_data, report.metadata, save_path, logger);
-
-	report.data = poe_ninja::parse_item_price_data(api_data, logger);
+	const std::string save_path = make_save_path(lang::data_source_type::poe_ninja, game_variant, league);
+	if (game_variant == lang::game_variant_type::poe2) {
+		poe_ninja::poe2::api_item_price_data api_data = poe_ninja::poe2::download_item_price_data(league, settings, info, logger);
+		save_api_data(api_data, report.metadata, save_path, logger);
+		report.data = poe_ninja::poe2::parse_item_price_data(api_data, logger);
+	}
+	else {
+		poe_ninja::poe1::api_item_price_data api_data = poe_ninja::poe1::download_item_price_data(league, settings, info, logger);
+		save_api_data(api_data, report.metadata, save_path, logger);
+		report.data = poe_ninja::poe1::parse_item_price_data(api_data, logger);
+	}
 
 	self.update_memory_cache(report);
 	self.update_disk_cache({report.metadata, save_path, version::current()});
@@ -179,7 +195,7 @@ download_and_parse_watch(
 	report.metadata.league_name = league;
 	report.metadata.download_date = boost::posix_time::microsec_clock::universal_time();
 
-	std::string save_path = make_save_path(lang::data_source_type::poe_watch, league);
+	std::string save_path = make_save_path(lang::data_source_type::poe_watch, lang::game_variant_type::poe1, league);
 	save_api_data(api_data, report.metadata, save_path, logger);
 
 	report.data = poe_watch::parse_item_price_data(api_data, logger);
@@ -227,6 +243,7 @@ void update_leagues_on_disk(const ggg::api_league_data& api_data, log::logger& l
 
 lang::market::item_price_report
 item_price_report_cache::get_report(
+	lang::game_variant_type game_variant,
 	std::string league,
 	lang::data_source_type api,
 	boost::posix_time::time_duration expiration_time,
@@ -238,16 +255,16 @@ item_price_report_cache::get_report(
 		return lang::market::item_price_report();
 	}
 
-	if (std::optional<lang::market::item_price_report> report = find_in_memory_cache(league, api, expiration_time); report) {
+	if (std::optional<lang::market::item_price_report> report = find_in_memory_cache(game_variant, league, api, expiration_time); report) {
 		return *report;
 	}
 
-	if (std::optional<metadata_save> metadata = find_in_disk_cache(league, api, expiration_time); metadata) {
+	if (std::optional<metadata_save> metadata = find_in_disk_cache(game_variant, league, api, expiration_time); metadata) {
 		return load_item_price_report(*this, std::move(*metadata), logger);
 	}
 
 	if (api == lang::data_source_type::poe_ninja) {
-		return download_and_parse_ninja(*this, std::move(league), std::move(settings), info, logger);
+		return download_and_parse_ninja(*this, game_variant, std::move(league), std::move(settings), info, logger);
 	}
 	else /* if (api == lang::data_source_type::poe_watch) */ {
 		FS_ASSERT(api == lang::data_source_type::poe_watch);
@@ -257,6 +274,7 @@ item_price_report_cache::get_report(
 
 [[nodiscard]] std::optional<lang::market::item_price_report>
 item_price_report_cache::find_in_memory_cache(
+	lang::game_variant_type game_variant,
 	const std::string& league,
 	lang::data_source_type api,
 	boost::posix_time::time_duration expiration_time) const
@@ -264,7 +282,7 @@ item_price_report_cache::find_in_memory_cache(
 	auto _ = std::lock_guard<std::mutex>(_memory_cache_mutex);
 
 	for (const lang::market::item_price_report& rep : _memory_cache) {
-		if (matches(rep.metadata, league, api, expiration_time))
+		if (matches(rep.metadata, game_variant, league, api, expiration_time))
 			return rep;
 	}
 
@@ -273,6 +291,7 @@ item_price_report_cache::find_in_memory_cache(
 
 [[nodiscard]] std::optional<item_price_report_cache::metadata_save>
 item_price_report_cache::find_in_disk_cache(
+	lang::game_variant_type game_variant,
 	const std::string& league,
 	lang::data_source_type api,
 	boost::posix_time::time_duration expiration_time) const
@@ -280,7 +299,7 @@ item_price_report_cache::find_in_disk_cache(
 	auto _ = std::lock_guard<std::mutex>(_disk_cache_mutex);
 
 	for (const metadata_save& metadata : _disk_cache) {
-		if (matches(metadata.metadata, league, api, expiration_time))
+		if (matches(metadata.metadata, game_variant, league, api, expiration_time))
 			return metadata;
 	}
 
@@ -292,7 +311,7 @@ void item_price_report_cache::update_disk_cache(metadata_save newer)
 	auto _ = std::lock_guard<std::mutex>(_disk_cache_mutex);
 
 	for (metadata_save& metadata : _disk_cache) {
-		if (matches(metadata.metadata, newer.metadata.league_name, newer.metadata.data_source)) {
+		if (matches(metadata.metadata, newer.metadata.game_variant, newer.metadata.league_name, newer.metadata.data_source)) {
 			metadata = std::move(newer);
 			return;
 		}
@@ -306,7 +325,7 @@ void item_price_report_cache::update_memory_cache(lang::market::item_price_repor
 	auto _ = std::lock_guard<std::mutex>(_memory_cache_mutex);
 
 	for (lang::market::item_price_report& rep : _memory_cache) {
-		if (matches(rep.metadata, newer.metadata.league_name, newer.metadata.data_source)) {
+		if (matches(rep.metadata, newer.metadata.game_variant, newer.metadata.league_name, newer.metadata.data_source)) {
 			rep = std::move(newer);
 			return;
 		}

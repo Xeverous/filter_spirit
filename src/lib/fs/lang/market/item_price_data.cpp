@@ -1,3 +1,4 @@
+#include <fs/lang/enum_types.hpp>
 #include <fs/lang/market/item_price_data.hpp>
 #include <fs/network/poe_ninja/api_data.hpp>
 #include <fs/network/poe_watch/api_data.hpp>
@@ -18,11 +19,16 @@
 #include <array>
 #include <algorithm>
 #include <cstring>
+#include <optional>
 #include <utility>
 #include <initializer_list>
+#include <variant>
 
-namespace
-{
+namespace fs::lang::market {
+
+namespace poe1 {
+
+namespace {
 
 // C++20: use constexpr std::sort
 auto make_undroppable_uniques()
@@ -160,88 +166,7 @@ auto make_undroppable_uniques()
 
 const auto undroppable_uniques = make_undroppable_uniques();
 
-using namespace fs;
-using namespace fs::lang;
-using namespace fs::lang::market;
-
-void compare_item_price_data(
-	const item_price_data& lhs,
-	const item_price_data& rhs,
-	log::message_stream& stream)
-{
-	// divination cards
-	{
-		const auto compare_div_card_eq =
-			[](const divination_card& lhs, const divination_card& rhs) {
-				return lhs.max_stack_size == rhs.max_stack_size && lhs.name == rhs.name;
-			};
-
-		const auto compare_div_card_lt =
-			[](const divination_card& lhs, const divination_card& rhs) {
-				return std::tie(lhs.name, lhs.max_stack_size) < std::tie(rhs.name, rhs.max_stack_size);
-			};
-
-		boost::format lhs_fmter("%-47s %2s |\n");
-		const auto report_lhs = [&](const divination_card& c) { stream << (lhs_fmter % c.name % c.max_stack_size).str(); };
-
-		boost::format rhs_fmter("                                                   | %-47s %2s\n");
-		const auto report_rhs = [&](const divination_card& c) { stream << (rhs_fmter % c.name % c.max_stack_size).str(); };
-
-		stream << "divination cards (name + max stack size): " << lhs.divination_cards.size()
-			<< " vs " << rhs.divination_cards.size() << '\n';
-		utility::diff_report(
-			lhs.divination_cards.begin(), lhs.divination_cards.end(),
-			rhs.divination_cards.begin(), rhs.divination_cards.end(),
-			compare_div_card_eq, compare_div_card_lt,
-			report_lhs, report_rhs);
-	}
-
-	const auto compare_elementary_items_eq =
-		[](const elementary_item& lhs, const elementary_item& rhs) {
-			return lhs.name == rhs.name;
-		};
-
-	const auto compare_elementary_items_lt =
-		[](const elementary_item& lhs, const elementary_item& rhs) {
-			return lhs.name < rhs.name;
-		};
-
-	boost::format lhs_fmter("%-50s |\n");
-	const auto report_lhs = [&](const elementary_item& e) { stream << (lhs_fmter % e.name).str(); };
-
-	boost::format rhs_fmter("                                                   | %s\n");
-	const auto report_rhs = [&](const elementary_item& e) { stream << (rhs_fmter % e.name).str(); };
-
-	const auto run_compare_elementary =
-		[&](const std::vector<elementary_item>& lhs, const std::vector<elementary_item>& rhs, const char* desc) {
-			stream << desc << ": " << lhs.size() << " vs " << rhs.size() << '\n';
-			utility::diff_report(
-				lhs.begin(), lhs.end(), rhs.begin(), rhs.end(),
-				compare_elementary_items_eq, compare_elementary_items_lt,
-				report_lhs, report_rhs);
-		};
-
-	run_compare_elementary(lhs.currency, rhs.currency, "currency");
-	run_compare_elementary(lhs.fragments, rhs.fragments, "fragments");
-	run_compare_elementary(lhs.delirium_orbs, rhs.delirium_orbs, "delirium orbs");
-	run_compare_elementary(lhs.vials, rhs.vials, "vials");
-	run_compare_elementary(lhs.oils, rhs.oils, "oils");
-	run_compare_elementary(lhs.incubators, rhs.incubators, "incubators");
-	run_compare_elementary(lhs.essences, rhs.essences, "essences");
-	run_compare_elementary(lhs.fossils, rhs.fossils, "fossils");
-	run_compare_elementary(lhs.resonators, rhs.resonators, "resonators");
-	run_compare_elementary(lhs.scarabs, rhs.scarabs, "scarabs");
-	run_compare_elementary(lhs.tattoos, rhs.tattoos, "tattoos");
-
-	// much more complex to report (2+ properties)
-	// run_compare_elementary(lhs.gems, rhs.gems, "gems");
-	// run_compare_elementary(lhs.bases, rhs.bases, "bases");
-}
-
 } // namespace
-
-namespace fs::lang::market
-{
 
 bool is_undroppable_unique(std::string_view name) noexcept
 {
@@ -253,40 +178,31 @@ bool item_price_data::load_and_parse(
 	const std::filesystem::path& directory_path,
 	log::logger& logger)
 {
-	try {
-		if (metadata.data_source == lang::data_source_type::poe_ninja) {
-			network::poe_ninja::api_item_price_data api_data;
+	if (metadata.data_source == lang::data_source_type::poe_ninja) {
+		network::poe_ninja::poe1::api_item_price_data api_data;
 
-			if (!api_data.load(directory_path, logger)) {
-				logger.error() << "Failed to load item price data.\n";
-				return false;
-			}
-
-			*this = network::poe_ninja::parse_item_price_data(api_data, logger);
-			return true;
-		}
-		else if (metadata.data_source == lang::data_source_type::poe_watch) {
-			network::poe_watch::api_item_price_data api_data;
-
-			if (!api_data.load(directory_path, logger)) {
-				logger.error() << "Failed to load item price data.\n";
-				return false;
-			}
-
-			*this = network::poe_watch::parse_item_price_data(api_data, logger);
-			return true;
-		}
-		else {
-			logger.error() << "Unknown data source.\n";
+		if (!api_data.load(directory_path, logger)) {
+			logger.error() << "Failed to load item price data.\n";
 			return false;
 		}
+
+		*this = network::poe_ninja::poe1::parse_item_price_data(api_data, logger);
+		return true;
 	}
-	catch (const network::json_parse_error& e) {
-		logger.error() << "Failed to parse JSON file: " << e.what() << '\n';
+	else if (metadata.data_source == lang::data_source_type::poe_watch) {
+		network::poe_watch::api_item_price_data api_data;
+
+		if (!api_data.load(directory_path, logger)) {
+			logger.error() << "Failed to load item price data.\n";
+			return false;
+		}
+
+		*this = network::poe_watch::parse_item_price_data(api_data, logger);
+		return true;
 	}
-	catch (const nlohmann::json::exception& e) {
-		// no need to add more text, nlohmann exceptions are verbose
-		logger.error() << e.what() << '\n';
+	else {
+		logger.error() << "Unknown data source.\n";
+		return false;
 	}
 
 	return false;
@@ -351,19 +267,6 @@ log::message_stream& operator<<(log::message_stream& stream, const item_price_da
 		"\tUnique Idols (ambiguous)      : " << ipd.unique_idols.ambiguous.size() << "\n";
 }
 
-log::message_stream& operator<<(log::message_stream& stream, const item_price_metadata& ipm)
-{
-	return stream << "Item price metadata:\n"
-		"\titem price data downloaded: " << utility::ptime_to_pretty_string(ipm.download_date) << "\n"
-		"\titem price data from      : " << std::string(lang::to_string(ipm.data_source)) << "\n"
-		"\titem price data for league: " << ipm.league_name << "\n";
-}
-
-log::message_stream& operator<<(log::message_stream& stream, const item_price_report& ipr)
-{
-	return stream << ipr.metadata << ipr.data;
-}
-
 void item_price_data::sort()
 {
 	const auto compare_by_name_asc =
@@ -387,18 +290,58 @@ void item_price_data::sort()
 	std::sort(bases.begin(),            bases.end(),            compare_by_name_asc);
 }
 
-void compare_item_price_reports(
-	const item_price_report& lhs,
-	const item_price_report& rhs,
+} // namespace poe1
+
+namespace poe2 {
+
+bool item_price_data::load_and_parse(
+	const item_price_metadata& metadata,
+	const std::filesystem::path& directory_path,
 	log::logger& logger)
 {
-	auto stream = logger.info();
-	stream << "Left price data:\n" << lhs.metadata << "Right price data:\n" << rhs.metadata;
-	compare_item_price_data(lhs.data, rhs.data, stream);
+	if (metadata.data_source == lang::data_source_type::poe_ninja) {
+		network::poe_ninja::poe2::api_item_price_data api_data;
+
+		if (!api_data.load(directory_path, logger)) {
+			logger.error() << "Failed to load item price data.\n";
+			return false;
+		}
+
+		*this = network::poe_ninja::poe2::parse_item_price_data(api_data, logger);
+		return true;
+	}
+	else {
+		logger.error() << "Unknown data source.\n";
+		return false;
+	}
+
+	return false;
+}
+
+log::message_stream& operator<<(log::message_stream& stream, const item_price_data& ipd)
+{
+	return stream << "Item price data:\n"
+		"\tCurrency         : " << ipd.currency.size() << "\n"
+		"\tFragments        : " << ipd.fragments.size() << "\n"
+		"\tAbyss Currency   : " << ipd.abyss_currency.size() << "\n"
+		"\tUncut Skill Gems : " << ipd.uncut_skill_gems.size() << "\n"
+		"\tUncut Spirit Gems: " << ipd.uncut_spirit_gems.size() << "\n"
+		"\tLineage Gems     : " << ipd.lineage_support_gems.size() << "\n"
+		"\tEssences         : " << ipd.essences.size() << "\n"
+		"\tSoul Cores       : " << ipd.soul_cores.size() << "\n"
+		"\tTalismans        : " << ipd.talismans.size() << "\n"
+		"\tRunes            : " << ipd.runes.size() << "\n"
+		"\tOmens            : " << ipd.omens.size() << "\n"
+		"\tExpedition       : " << ipd.expedition.size() << "\n"
+		"\tEmotions         : " << ipd.emotions.size() << "\n"
+		"\tCatalysts        : " << ipd.catalysts.size() << "\n";
+}
+
 }
 
 constexpr auto filename_metadata = "metadata.json";
 
+constexpr auto field_game_variant = "game_variant";
 constexpr auto field_league_name = "league_name";
 constexpr auto field_data_source = "data_source";
 constexpr auto field_download_date = "download_date";
@@ -406,6 +349,7 @@ constexpr auto field_download_date = "download_date";
 nlohmann::json to_json(const item_price_metadata& metadata)
 {
 	return {
+		{field_game_variant, to_string(metadata.game_variant)},
 		{field_league_name, metadata.league_name},
 		{field_data_source, to_string(metadata.data_source)},
 		{field_download_date, boost::posix_time::to_iso_string(metadata.download_date)}
@@ -415,6 +359,7 @@ nlohmann::json to_json(const item_price_metadata& metadata)
 std::optional<item_price_metadata> from_json(const nlohmann::json& json, log::logger& logger)
 {
 	item_price_metadata data;
+	data.game_variant = to_game_variant(json.at(field_game_variant).get_ref<const std::string&>()).value_or(game_variant_type::poe1);
 	data.league_name = json.at(field_league_name).get<std::string>();
 
 	if (
@@ -485,23 +430,71 @@ bool item_price_metadata::load(const std::filesystem::path& directory, log::logg
 	}
 }
 
+log::message_stream& operator<<(log::message_stream& stream, const item_price_metadata& ipm)
+{
+	return stream << "Item price metadata:\n"
+		"\tdownload date: " << utility::ptime_to_pretty_string(ipm.download_date) << "\n"
+		"\tdata source  : " << std::string(lang::to_string(ipm.data_source)) << "\n"
+		"\tgame variant : " << to_string(ipm.game_variant) << "\n"
+		"\tleague name  : " << ipm.league_name << "\n";
+}
+
+log::message_stream& operator<<(log::message_stream& stream, const item_price_report& ipr)
+{
+	return stream << ipr.metadata << ipr.data;
+}
+
 std::optional<item_price_report>
 load_item_price_report(
 	const std::filesystem::path& directory,
 	log::logger& logger)
 {
-	item_price_report report;
-	if (!report.metadata.load(directory, logger)) {
-		logger.error() << "Failed to load item price metadata.\n";
-		return std::nullopt;
+	try {
+		item_price_report report;
+		if (!report.metadata.load(directory, logger)) {
+			logger.error() << "Failed to load item price metadata.\n";
+			return std::nullopt;
+		}
+
+		if (report.metadata.game_variant == game_variant_type::poe2) {
+			poe2::item_price_data data;
+			if (!data.load_and_parse(report.metadata, directory, logger)) {
+				logger.error() << "Failed to load item price data.\n";
+				return std::nullopt;
+			}
+
+			report.data = std::move(data);
+		}
+		else {
+			poe1::item_price_data data;
+			if (!data.load_and_parse(report.metadata, directory, logger)) {
+				logger.error() << "Failed to load item price data.\n";
+				return std::nullopt;
+			}
+
+			report.data = std::move(data);
+		}
+
+		return report;
+	}
+	catch (const network::json_parse_error& e) {
+		logger.error() << "Failed to parse JSON file: " << e.what() << '\n';
+	}
+	catch (const nlohmann::json::exception& e) {
+		// no need to add more text, nlohmann exceptions are verbose
+		logger.error() << e.what() << '\n';
 	}
 
-	if (!report.data.load_and_parse(report.metadata, directory, logger)) {
-		logger.error() << "Failed to load item price data.\n";
-		return std::nullopt;
-	}
+	return std::nullopt;
+}
 
-	return report;
+}
+
+namespace fs::log {
+
+message_stream& operator<<(message_stream& stream, const lang::market::item_price_data& ipd)
+{
+	return std::visit([&](const auto& obj) -> decltype(auto) { return stream << obj; }, ipd);
 }
 
 }

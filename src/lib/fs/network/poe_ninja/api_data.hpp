@@ -8,6 +8,9 @@
 namespace fs::network::poe_ninja
 {
 
+namespace poe1
+{
+
 // string literals can not be used as NTTP directly
 // however, global objects of type array of char are fine
 
@@ -75,9 +78,11 @@ struct api_item_price_data
 
 	// #include api_data_adapted.hpp to obtain these
 
+	// F must accept (const char* name, bool is_currency, std::string& content)
 	template <typename F>
 	void for_each_file(F f);
 
+	// F must accept (const char* name, bool is_currency, const std::string& content)
 	template <typename F>
 	void for_each_file(F f) const;
 
@@ -124,5 +129,65 @@ struct api_item_price_data
 	json_file<filename_essence> essence;
 	json_file<filename_vial> vial;
 };
+
+} // namespace poe1
+
+namespace poe2 {
+
+inline constexpr const char filename_currency[] = "Currency";
+inline constexpr const char filename_fragments[] = "Fragments";
+inline constexpr const char filename_abyss[] = "Abyss";
+inline constexpr const char filename_uncut_gems[] = "UncutGems";
+inline constexpr const char filename_lineage_support_gems[] = "LineageSupportGems";
+inline constexpr const char filename_essences[] = "Essences";
+inline constexpr const char filename_ultimatum[] = "Ultimatum";
+inline constexpr const char filename_talismans[] = "Talismans";
+inline constexpr const char filename_runes[] = "Runes";
+inline constexpr const char filename_ritual[] = "Ritual";
+inline constexpr const char filename_expedition[] = "Expedition";
+inline constexpr const char filename_delirium[] = "Delirium";
+inline constexpr const char filename_breach[] = "Breach";
+
+template <const char* Name, bool IsCurrency = false>
+struct json_file
+{
+	std::string file_content;
+};
+
+struct api_item_price_data
+{
+	// ordinary functions
+
+	[[nodiscard]] static int num_files();
+	[[nodiscard]] bool save(const std::filesystem::path& directory, log::logger& logger) const;
+	[[nodiscard]] bool load(const std::filesystem::path& directory, log::logger& logger);
+
+	// #include api_data_adapted.hpp to obtain these
+
+	// F must accept (const char* name, std::string& content)
+	template <typename F>
+	void for_each_file(F f);
+
+	// F must accept (const char* name, std::string& content)
+	template <typename F>
+	void for_each_file(F f) const;
+
+	// order as on poe.ninja
+	json_file<filename_currency> currency;
+	json_file<filename_fragments> fragments; // Map Fragments + "Runic Splinter"
+	json_file<filename_abyss> abyss; // Abyss currency + "Kulemak's Invitation"
+	json_file<filename_uncut_gems> uncut_gems;
+	json_file<filename_lineage_support_gems> lineage_support_gems;
+	json_file<filename_essences> essences;
+	json_file<filename_ultimatum> ultimatum; // Soul Cores
+	json_file<filename_talismans> talismans;
+	json_file<filename_runes> runes;
+	json_file<filename_ritual> ritual; // Omens + "Petition Splinter"
+	json_file<filename_expedition> expedition;
+	json_file<filename_delirium> delirium; // Emotions + "Simulacrum Splinter"
+	json_file<filename_breach> breach; // Catalysts + "Breach Splinter"
+};
+
+} // namespace poe2
 
 }

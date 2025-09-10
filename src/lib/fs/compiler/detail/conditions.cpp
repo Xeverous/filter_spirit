@@ -880,7 +880,17 @@ spirit_filter_add_autogen_condition(
 
 	const lang::string& autogen_name = *maybe_str;
 
-	const auto category = lang::autogen_category::_from_string_nothrow(autogen_name.value.c_str());
+	std::optional<lang::autogen_category> category;
+	if (st.is_poe1()) {
+		// BETTER_ENUM library has its own optional<T>
+		const auto cat = lang::poe1::autogen_category::_from_string_nothrow(autogen_name.value.c_str());
+		if (cat)
+			category = *cat;
+	}
+	else {
+		category = lang::poe2::to_autogen_category(autogen_name.value);
+	}
+
 	if (!category) {
 		diagnostics.push_error_invalid_expression(autogen_name.origin, "invalid autogeneration name");
 		return false;

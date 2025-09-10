@@ -6,6 +6,7 @@
 
 #include <string_view>
 #include <optional>
+#include <variant>
 
 namespace fs::lang {
 
@@ -23,6 +24,18 @@ constexpr std::string_view to_string(game_variant_type game_variant)
 	}
 
 	return "(unknown)";
+}
+
+constexpr std::optional<game_variant_type> to_game_variant(std::string_view sv)
+{
+	if (sv == "PoE 1")
+		return game_variant_type::poe1;
+	else if (sv == "PoE 1 Ruthless")
+		return game_variant_type::poe1_ruthless;
+	else if (sv == "PoE 2")
+		return game_variant_type::poe2;
+
+	return std::nullopt;
 }
 
 // ---- conditions ----
@@ -302,6 +315,8 @@ enum class item_visibility_policy
 
 // ---- extensions ----
 
+namespace poe1 {
+
 // TODO rename Autogen names to be easier to understand
 // Then replace BETTER_ENUM with manual implementation
 BETTER_ENUM(autogen_category, int,
@@ -323,5 +338,65 @@ BETTER_ENUM(autogen_category, int,
 	// NOT IMPLEMENTED
 	// bases, uniques
 )
+
+} // namespace poe1
+
+namespace poe2 {
+
+enum class autogen_category
+{
+	currency,
+	fragments,
+	abyss_currency,
+	uncut_skill_gems,
+	uncut_spirit_gems,
+	lineage_support_gems,
+	essences,
+	soul_cores,
+	talismans,
+	runes,
+	omens,
+	expedition,
+	emotions,
+	catalysts
+};
+
+constexpr std::optional<autogen_category> to_autogen_category(std::string_view sv)
+{
+	if (sv == "Currency")
+		return autogen_category::currency;
+	else if (sv == "Fragments")
+		return autogen_category::fragments;
+	else if (sv == "Abyss Currency")
+		return autogen_category::abyss_currency;
+	else if (sv == "Uncut Skill Gems")
+		return autogen_category::uncut_skill_gems;
+	else if (sv == "Uncut Spirit Gems")
+		return autogen_category::uncut_spirit_gems;
+	else if (sv == "Lineage Support Gems")
+		return autogen_category::lineage_support_gems;
+	else if (sv == "Essences")
+		return autogen_category::essences;
+	else if (sv == "Soul Cores")
+		return autogen_category::soul_cores;
+	else if (sv == "Talismans")
+		return autogen_category::talismans;
+	else if (sv == "Runes")
+		return autogen_category::runes;
+	else if (sv == "Omens")
+		return autogen_category::omens;
+	else if (sv == "Expedition")
+		return autogen_category::expedition;
+	else if (sv == "Emotions")
+		return autogen_category::emotions;
+	else if (sv == "Catalysts")
+		return autogen_category::catalysts;
+
+	return std::nullopt;
+}
+
+} // namespace poe2
+
+using autogen_category = std::variant<poe1::autogen_category, poe2::autogen_category>;
 
 } // namespace fs::lang

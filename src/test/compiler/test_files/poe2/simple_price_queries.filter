@@ -1,0 +1,60 @@
+Show
+	Class == "Stackable Currency"
+	BaseType == "Divine Orb" "Hinekora's Lock"
+	StackSize >= 1
+	SetBackgroundColor 100 0 0
+
+Show
+	Class == "Stackable Currency"
+	BaseType == "Divine Orb"
+	StackSize >= 1
+	StackSize <= 1
+	SetBackgroundColor 100 1 0
+
+Show
+	Class == "Stackable Currency"
+	BaseType == "Exalted Orb"
+	StackSize >= 1
+	StackSize <= 20
+	SetBackgroundColor 100 1 0
+
+Show
+	Class == "Stackable Currency"
+	BaseType == "Regal Orb"
+	StackSize >= 2
+	StackSize <= 20
+	SetBackgroundColor 100 1 0
+
+Show
+	Class == "Stackable Currency"
+	BaseType == "Lesser Jeweller's Orb"
+	StackSize >= 20
+	StackSize <= 20
+	SetBackgroundColor 100 1 0
+
+Show
+	Class == "Stackable Currency"
+	BaseType == "Exalted Orb"
+	StackSize >= 1
+	StackSize <= 1
+	SetBackgroundColor 1 0 1
+
+Show
+	Class == "Stackable Currency"
+	BaseType == "Regal Orb"
+	StackSize >= 1
+	StackSize <= 2
+	SetBackgroundColor 1 0 1
+
+Show
+	Class == "Stackable Currency"
+	BaseType == "Lesser Jeweller's Orb"
+	StackSize >= 2
+	StackSize <= 20
+	SetBackgroundColor 1 0 1
+
+Hide
+	Class == "Stackable Currency"
+	BaseType == "Lesser Jeweller's Orb"
+	StackSize <= 2
+	SetBackgroundColor 0 0 1

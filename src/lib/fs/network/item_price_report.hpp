@@ -1,5 +1,6 @@
 #pragma once
 
+#include <fs/lang/enum_types.hpp>
 #include <fs/lang/market/item_price_data.hpp>
 #include <fs/lang/league.hpp>
 #include <fs/network/download.hpp>
@@ -53,6 +54,7 @@ public:
 	 */
 	[[nodiscard]] lang::market::item_price_report
 	get_report(
+		lang::game_variant_type game_variant,
 		std::string league,
 		lang::data_source_type api,
 		boost::posix_time::time_duration expiration_time,
@@ -75,6 +77,7 @@ public:
 
 	[[nodiscard]] std::optional<lang::market::item_price_report>
 	find_in_memory_cache(
+		lang::game_variant_type game_variant,
 		const std::string& league,
 		lang::data_source_type api,
 		boost::posix_time::time_duration expiration_time) const;
@@ -82,6 +85,7 @@ public:
 private:
 	[[nodiscard]] std::optional<metadata_save>
 	find_in_disk_cache(
+		lang::game_variant_type game_variant,
 		const std::string& league,
 		lang::data_source_type api,
 		boost::posix_time::time_duration expiration_time) const;

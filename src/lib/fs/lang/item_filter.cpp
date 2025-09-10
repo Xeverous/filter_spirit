@@ -116,6 +116,19 @@ void item_filter::print(std::ostream& output_stream, style_overrides overrides) 
 	}
 }
 
+void autogen_extension::generate_blocks(
+	const item_filter_block& base_block,
+	const market::item_price_data& ipd,
+	std::vector<block_variant>& result_blocks,
+	std::unordered_set<std::string_view>& unknown_items) const
+{
+	FS_ASSERT_MSG(blocks_generator, "Implementation bug - empty block generation function!");
+
+	block_generation_info info{base_block.visibility, base_block.actions, base_block.continuation, origin, price_range};
+	generated_blocks_consumer consumer{result_blocks, unknown_items};
+	blocks_generator(info, ipd, consumer);
+}
+
 item_style::item_style()
 : visibility{true, no_origin()}
 // initial color values taken from:

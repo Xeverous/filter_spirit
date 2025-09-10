@@ -3,11 +3,13 @@
 #include <fs/log/logger.hpp>
 #include <fs/lang/data_source_type.hpp>
 #include <fs/lang/influence_info.hpp>
+#include <fs/lang/enum_types.hpp>
 
 #include <nlohmann/json.hpp>
 
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
+#include <variant>
 #include <vector>
 #include <string>
 #include <unordered_map>
@@ -15,13 +17,34 @@
 #include <filesystem>
 #include <optional>
 
-namespace fs::lang::market
+namespace fs::lang::market {
+
+struct item_price_metadata
 {
+	[[nodiscard]] bool save(const std::filesystem::path& directory, log::logger& logger) const;
+	[[nodiscard]] bool load(const std::filesystem::path& directory, log::logger& logger);
+
+	game_variant_type game_variant = game_variant_type::poe1;
+	std::string league_name = "(none)";
+	data_source_type data_source = data_source_type::none;
+	boost::posix_time::ptime download_date = boost::posix_time::ptime(boost::posix_time::not_a_date_time);
+};
+
+nlohmann::json to_json(const item_price_metadata& metadata);
+std::optional<item_price_metadata> from_json(const nlohmann::json& object, log::logger& logger);
+
+log::message_stream& operator<<(log::message_stream& stream, const item_price_metadata& ipm);
+
+enum class confidence_level { low, medium, high };
+constexpr bool operator< (confidence_level lhs, confidence_level rhs) { return static_cast<int>(lhs) < static_cast<int>(rhs); }
+constexpr bool operator> (confidence_level lhs, confidence_level rhs) { return rhs < lhs; }
+constexpr bool operator<=(confidence_level lhs, confidence_level rhs) { return !(lhs > rhs); }
+constexpr bool operator>=(confidence_level lhs, confidence_level rhs) { return !(lhs < rhs); }
 
 struct price_data
 {
 	double chaos_value;
-	bool is_low_confidence;
+	confidence_level confidence;
 };
 
 struct elementary_item
@@ -29,6 +52,8 @@ struct elementary_item
 	price_data price;
 	std::string name;
 };
+
+namespace poe1 {
 
 struct divination_card : elementary_item
 {
@@ -83,8 +108,6 @@ struct unique_item_price_data
 	using ambiguous_container_type = std::unordered_map<std::string, std::vector<elementary_item>>;
 	ambiguous_container_type ambiguous;
 };
-
-struct item_price_metadata;
 
 struct item_price_data
 {
@@ -158,20 +181,40 @@ struct item_price_data
 
 log::message_stream& operator<<(log::message_stream& stream, const item_price_data& ipd);
 
-nlohmann::json to_json(const item_price_metadata& metadata);
-std::optional<item_price_metadata> from_json(const nlohmann::json& object, log::logger& logger);
+} // namespace poe1
 
-struct item_price_metadata
+namespace poe2 {
+
+struct item_price_data
 {
-	[[nodiscard]] bool save(const std::filesystem::path& directory, log::logger& logger) const;
-	[[nodiscard]] bool load(const std::filesystem::path& directory, log::logger& logger);
+	[[nodiscard]] bool
+	load_and_parse(
+		const item_price_metadata& metadata,
+		const std::filesystem::path& directory_path,
+		log::logger& logger);
 
-	std::string league_name = "(none)";
-	data_source_type data_source = data_source_type::none;
-	boost::posix_time::ptime download_date = boost::posix_time::ptime(boost::posix_time::not_a_date_time);
+	std::vector<elementary_item> currency;
+	std::vector<elementary_item> fragments;
+	std::vector<elementary_item> abyss_currency;
+	std::vector<elementary_item> uncut_skill_gems;
+	std::vector<elementary_item> uncut_spirit_gems;
+	// (no uncut_support_gems - they are never valuable)
+	std::vector<elementary_item> lineage_support_gems;
+	std::vector<elementary_item> essences;
+	std::vector<elementary_item> soul_cores;
+	std::vector<elementary_item> talismans;
+	std::vector<elementary_item> runes;
+	std::vector<elementary_item> omens;
+	std::vector<elementary_item> expedition;
+	std::vector<elementary_item> emotions;
+	std::vector<elementary_item> catalysts;
 };
 
-log::message_stream& operator<<(log::message_stream& stream, const item_price_metadata& ipm);
+log::message_stream& operator<<(log::message_stream& stream, const item_price_data& ipd);
+
+} // namespace poe2
+
+using item_price_data = std::variant<poe1::item_price_data, poe2::item_price_data>;
 
 struct item_price_report
 {
@@ -186,16 +229,16 @@ load_item_price_report(
 	const std::filesystem::path& directory,
 	log::logger& logger);
 
-/**
- * Produce logs about differences in 2 item data sets
- *
- * both item data inputs must be sorted
- *
- * TODO the implementation is old/stale (not updated)
- * perhaps remove or rewrite when UI is done
- */
-void compare_item_price_reports(
-	const item_price_report& lhs,
-	const item_price_report& rhs,
-	log::logger& logger);
+}
+
+// https://stackoverflow.com/a/46234826/4818802
+// item_price_data is an alias of specific std::variant
+// Ordinary operator overload would not work here:
+// - template parameters are not picked up by ADL
+// - variant comes from namespace std and it is forbidden to inject names into it
+// workaround: overload for fs::log::message_stream's namespace instead
+namespace fs::log {
+
+message_stream& operator<<(message_stream& stream, const lang::market::item_price_data& ipd);
+
 }

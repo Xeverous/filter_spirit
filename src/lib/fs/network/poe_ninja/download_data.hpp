@@ -9,11 +9,26 @@
 namespace fs::network::poe_ninja
 {
 
+namespace poe1 {
+
 [[nodiscard]] api_item_price_data
 download_item_price_data(
 	const std::string& league_name,
 	const download_settings& settings,
 	download_info* info,
 	log::logger& logger);
+
+}
+
+namespace poe2 {
+
+[[nodiscard]] api_item_price_data
+download_item_price_data(
+	const std::string& league_name,
+	const download_settings& settings,
+	download_info* info,
+	log::logger& logger);
+
+}
 
 }

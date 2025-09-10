@@ -53,10 +53,12 @@ boost::test_tools::predicate_result compile_from_files(
 
 	const std::filesystem::path test_dir = "test_files/";
 	const std::string input = load_file(test_dir / input_path);
-	const std::string expected_output = load_file(test_dir / expected_output_path);
+	const std::string expected_output = utility::remove_cr(load_file(test_dir / expected_output_path));
 
+	// Remove CR from both strings. This approach is much better than trying to
+	// configure git's auto CRLF and forcing certain kind of linebreaks in FS output.
 	// TODO: if prefix is "common", run in both poe1 and poe2 modes
-	return compare_strings(generate_filter(input, st, ipd), expected_output);
+	return compare_strings(utility::remove_cr(generate_filter(input, st, ipd)), expected_output);
 }
 
 // convenience overload - pass only prefix name, extensions will be added automatically
@@ -280,18 +282,37 @@ BOOST_AUTO_TEST_CASE(switch_drop_sound)
 	BOOST_TEST(compile_from_files("common/switch_drop_sound"));
 }
 
-BOOST_AUTO_TEST_CASE(simple_price_queries)
+BOOST_AUTO_TEST_CASE(simple_price_queries_poe1)
 {
-	using lang::market::divination_card;
-	using lang::market::price_data;
+	lang::market::poe1::item_price_data ipd;
+	const auto push_card = [&](double price, std::string name, int max_stack_size) {
+		ipd.divination_cards.push_back(lang::market::poe1::divination_card{
+			lang::market::price_data{price, lang::market::confidence_level::high}, std::move(name), max_stack_size});
+	};
+	push_card(0.125, "Rain of Chaos", 8);
+	push_card(5, "Humility", 9);
+	push_card(10, "A Dab of Ink", 9);
+	push_card(100, "Abandoned Wealth", 5);
+	push_card(1000, "The Doctor", 8);
+	BOOST_TEST(compile_from_files("poe1/simple_price_queries", {}, ipd));
+}
 
-	lang::market::item_price_data ipd;
-	ipd.divination_cards.push_back(divination_card{price_data{0.125, false}, "Rain of Chaos", 8});
-	ipd.divination_cards.push_back(divination_card{price_data{5, false}, "Humility", 9});
-	ipd.divination_cards.push_back(divination_card{price_data{10, false}, "A Dab of Ink", 9});
-	ipd.divination_cards.push_back(divination_card{price_data{100, false}, "Abandoned Wealth", 5});
-	ipd.divination_cards.push_back(divination_card{price_data{1000, false}, "The Doctor", 8});
-	BOOST_TEST(compile_from_files("common/simple_price_queries", {}, ipd));
+BOOST_AUTO_TEST_CASE(price_queries_and_stack_size_poe2)
+{
+	lang::market::poe2::item_price_data ipd;
+	const auto push_item = [&](double price, std::string name) {
+		ipd.currency.push_back(lang::market::elementary_item{
+			lang::market::price_data{price, lang::market::confidence_level::high}, std::move(name)});
+	};
+	push_item(0.05, "Lesser Jeweller's Orb");
+	push_item(0.5, "Regal Orb");
+	push_item(1, "Exalted Orb");
+	push_item(100, "Divine Orb");
+	push_item(1000, "Hinekora's Lock");
+
+	compiler::settings st;
+	st.game_variant = lang::game_variant_type::poe2;
+	BOOST_TEST(compile_from_files("poe2/simple_price_queries", st, ipd));
 }
 
 BOOST_AUTO_TEST_CASE(override_settings_font_min)
