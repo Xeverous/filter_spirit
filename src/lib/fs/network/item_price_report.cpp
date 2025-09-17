@@ -117,7 +117,7 @@ load_item_price_report(
 	item_price_report_cache::metadata_save meta,
 	log::logger& logger)
 {
-	std::optional<lang::market::item_price_report> report = lang::market::load_item_price_report(meta.path, logger);
+	std::optional<lang::market::item_price_report> report = lang::market::item_price_report::load(meta.path, logger);
 	if (!report)
 		throw std::runtime_error("failed to load item price report from disk");
 
@@ -155,13 +155,11 @@ download_and_parse_ninja(
 	download_info* info,
 	log::logger& logger)
 {
-	lang::market::item_price_report report;
-	report.metadata.game_variant = game_variant;
-	report.metadata.data_source = lang::data_source_type::poe_ninja;
-	report.metadata.league_name = league;
-	report.metadata.download_date = boost::posix_time::microsec_clock::universal_time();
-
 	const std::string save_path = make_save_path(lang::data_source_type::poe_ninja, game_variant, league);
+
+	lang::market::item_price_report report{{}, lang::market::item_price_metadata(
+		game_variant, league, lang::data_source_type::poe_ninja, boost::posix_time::microsec_clock::universal_time())};
+
 	if (game_variant == lang::game_variant_type::poe2) {
 		poe_ninja::poe2::api_item_price_data api_data = poe_ninja::poe2::download_item_price_data(league, settings, info, logger);
 		save_api_data(api_data, report.metadata, save_path, logger);
@@ -190,18 +188,19 @@ download_and_parse_watch(
 {
 	poe_watch::api_item_price_data api_data = poe_watch::download_item_price_data(league, settings, info, logger);
 
-	lang::market::item_price_report report;
-	report.metadata.data_source = lang::data_source_type::poe_ninja;
-	report.metadata.league_name = league;
-	report.metadata.download_date = boost::posix_time::microsec_clock::universal_time();
+	lang::market::item_price_report report{
+		poe_watch::parse_item_price_data(api_data, logger),
+		lang::market::item_price_metadata(
+			lang::game_variant_type::poe1,
+			league,
+			lang::data_source_type::poe_watch,
+			boost::posix_time::microsec_clock::universal_time())};
 
 	std::string save_path = make_save_path(lang::data_source_type::poe_watch, lang::game_variant_type::poe1, league);
 	save_api_data(api_data, report.metadata, save_path, logger);
 
-	report.data = poe_watch::parse_item_price_data(api_data, logger);
-
 	self.update_memory_cache(report);
-	self.update_disk_cache({report.metadata, save_path, version::current()});
+	self.update_disk_cache({report.metadata, std::move(save_path), version::current()});
 	self.update_cache_file_on_disk(logger);
 	return report;
 }
@@ -252,11 +251,11 @@ item_price_report_cache::get_report(
 	log::logger& logger)
 {
 	if (api == lang::data_source_type::none) {
-		return lang::market::item_price_report();
+		return lang::market::item_price_report::empty(game_variant);
 	}
 
 	if (std::optional<lang::market::item_price_report> report = find_in_memory_cache(game_variant, league, api, expiration_time); report) {
-		return *report;
+		return *std::move(report);
 	}
 
 	if (std::optional<metadata_save> metadata = find_in_disk_cache(game_variant, league, api, expiration_time); metadata) {
@@ -381,14 +380,14 @@ bool item_price_report_cache::load_cache_file_from_disk(log::logger& logger)
 			return false;
 		}
 
-		metadata_save save;
-		save.metadata = std::move(*meta);
-		save.path = obj.at(field_path).get<std::string>();
-
-		auto& version_arr = obj.at(field_fs_version).get_ref<const nlohmann::json::array_t&>();
-		save.fs_version.major = version_arr.at(0).get<int>();
-		save.fs_version.minor = version_arr.at(1).get<int>();
-		save.fs_version.patch = version_arr.at(2).get<int>();
+		const auto& version_arr = obj.at(field_fs_version).get_ref<const nlohmann::json::array_t&>();
+		metadata_save save{
+			std::move(*meta),
+			obj.at(field_path).get<std::string>(),
+			version::version_triplet{
+				version_arr.at(0).get<int>(),
+				version_arr.at(1).get<int>(),
+				version_arr.at(2).get<int>()}};
 
 		saves.push_back(std::move(save));
 	}

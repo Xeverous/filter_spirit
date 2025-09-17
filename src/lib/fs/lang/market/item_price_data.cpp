@@ -358,30 +358,27 @@ nlohmann::json to_json(const item_price_metadata& metadata)
 
 std::optional<item_price_metadata> from_json(const nlohmann::json& json, log::logger& logger)
 {
-	item_price_metadata data;
-	data.game_variant = to_game_variant(json.at(field_game_variant).get_ref<const std::string&>()).value_or(game_variant_type::poe1);
-	data.league_name = json.at(field_league_name).get<std::string>();
-
-	if (
-		std::optional<data_source_type> data_source = lang::from_string(
-			json.at(field_data_source).get_ref<const std::string&>());
-		data_source)
-	{
-		data.data_source = *data_source;
+	const auto& game_variant = to_game_variant(json.at(field_game_variant).get_ref<const std::string&>());
+	if (!game_variant) {
+		logger.error() << "Unable to parse game variant from metadata file.\n";
+		return std::nullopt;
 	}
-	else {
+
+	std::optional<data_source_type> data_source = lang::from_string(
+		json.at(field_data_source).get_ref<const std::string&>());
+	if (!data_source) {
 		logger.error() << "Failed to parse data source from metadata file.\n";
 		return std::nullopt;
 	}
 
-	data.download_date = boost::posix_time::from_iso_string(
+	auto download_date = boost::posix_time::from_iso_string(
 		json.at(field_download_date).get_ref<const std::string&>());
-	if (data.download_date.is_special()) {
+	if (download_date.is_special()) {
 		logger.error() << "Invalid date in metadata file.\n";
 		return std::nullopt;
 	}
 
-	return data;
+	return item_price_metadata(*game_variant, json.at(field_league_name).get<std::string>(), *data_source, download_date);
 }
 
 bool item_price_metadata::save(const std::filesystem::path& directory, log::logger& logger) const
@@ -400,7 +397,7 @@ bool item_price_metadata::save(const std::filesystem::path& directory, log::logg
 	return true;
 }
 
-bool item_price_metadata::load(const std::filesystem::path& directory, log::logger& logger)
+std::optional<item_price_metadata> item_price_metadata::load(const std::filesystem::path& directory, log::logger& logger)
 {
 	std::error_code ec;
 	const auto path = directory / filename_metadata;
@@ -408,7 +405,7 @@ bool item_price_metadata::load(const std::filesystem::path& directory, log::logg
 
 	if (ec) {
 		logger.error() << "Failed to load " << path.generic_string() << ": " << ec.message() << ".\n";
-		return false;
+		return std::nullopt;
 	}
 
 	try {
@@ -416,17 +413,14 @@ bool item_price_metadata::load(const std::filesystem::path& directory, log::logg
 		// move from a separate instance to implement strong exception guuarantee
 		std::optional<item_price_metadata> metadata = from_json(json, logger);
 
-		if (!metadata) {
+		if (!metadata)
 			logger.error() << "Failed to parse metadata JSON file.\n";
-			return false;
-		}
 
-		*this = std::move(*metadata);
-		return true;
+		return metadata;
 	}
 	catch (const std::exception& e) {
 		logger.error() << "When reading " << path.generic_string() << ": " << e.what() << ".\n";
-		return false;
+		return std::nullopt;
 	}
 }
 
@@ -439,43 +433,35 @@ log::message_stream& operator<<(log::message_stream& stream, const item_price_me
 		"\tleague name  : " << ipm.league_name << "\n";
 }
 
-log::message_stream& operator<<(log::message_stream& stream, const item_price_report& ipr)
-{
-	return stream << ipr.metadata << ipr.data;
-}
-
 std::optional<item_price_report>
-load_item_price_report(
-	const std::filesystem::path& directory,
-	log::logger& logger)
+item_price_report::load(const std::filesystem::path& directory, log::logger& logger)
 {
 	try {
-		item_price_report report;
-		if (!report.metadata.load(directory, logger)) {
+		std::optional<item_price_metadata> maybe_metadata;
+		if (maybe_metadata = item_price_metadata::load(directory, logger); !maybe_metadata) {
 			logger.error() << "Failed to load item price metadata.\n";
 			return std::nullopt;
 		}
 
-		if (report.metadata.game_variant == game_variant_type::poe2) {
+		auto& metadata = *maybe_metadata;
+		if (metadata.game_variant == game_variant_type::poe2) {
 			poe2::item_price_data data;
-			if (!data.load_and_parse(report.metadata, directory, logger)) {
+			if (!data.load_and_parse(metadata, directory, logger)) {
 				logger.error() << "Failed to load item price data.\n";
 				return std::nullopt;
 			}
 
-			report.data = std::move(data);
+			return item_price_report{std::move(data), std::move(metadata)};
 		}
 		else {
 			poe1::item_price_data data;
-			if (!data.load_and_parse(report.metadata, directory, logger)) {
+			if (!data.load_and_parse(metadata, directory, logger)) {
 				logger.error() << "Failed to load item price data.\n";
 				return std::nullopt;
 			}
 
-			report.data = std::move(data);
+			return item_price_report{std::move(data), std::move(metadata)};
 		}
-
-		return report;
 	}
 	catch (const network::json_parse_error& e) {
 		logger.error() << "Failed to parse JSON file: " << e.what() << '\n';
@@ -486,6 +472,11 @@ load_item_price_report(
 	}
 
 	return std::nullopt;
+}
+
+log::message_stream& operator<<(log::message_stream& stream, const item_price_report& ipr)
+{
+	return stream << ipr.metadata << ipr.data;
 }
 
 }

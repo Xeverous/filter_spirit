@@ -93,7 +93,7 @@ obtain_item_price_report(
 	}
 
 	if (data_read_dir) {
-		return lang::market::load_item_price_report(*data_read_dir, logger);
+		return lang::market::item_price_report::load(*data_read_dir, logger);
 	}
 
 	network::item_price_report_cache cache;
@@ -152,7 +152,7 @@ int print_item_price_report(
 	const std::string& path,
 	fs::log::logger& logger)
 {
-	std::optional<lang::market::item_price_report> report = lang::market::load_item_price_report(path, logger);
+	std::optional<lang::market::item_price_report> report = lang::market::item_price_report::load(path, logger);
 	if (!report) {
 		return EXIT_FAILURE;
 	}

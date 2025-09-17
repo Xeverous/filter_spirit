@@ -21,13 +21,33 @@ namespace fs::lang::market {
 
 struct item_price_metadata
 {
-	[[nodiscard]] bool save(const std::filesystem::path& directory, log::logger& logger) const;
-	[[nodiscard]] bool load(const std::filesystem::path& directory, log::logger& logger);
+	item_price_metadata(
+		game_variant_type game_variant,
+		std::string league_name,
+		data_source_type data_source,
+		boost::posix_time::ptime download_date)
+	: game_variant(game_variant)
+	, league_name(std::move(league_name))
+	, data_source(data_source)
+	, download_date(download_date)
+	{}
 
-	game_variant_type game_variant = game_variant_type::poe1;
-	std::string league_name = "(none)";
-	data_source_type data_source = data_source_type::none;
-	boost::posix_time::ptime download_date = boost::posix_time::ptime(boost::posix_time::not_a_date_time);
+	static item_price_metadata empty(game_variant_type game_variant)
+	{
+		return item_price_metadata(
+			game_variant,
+			"(none)",
+			data_source_type::none,
+			boost::posix_time::ptime(boost::posix_time::not_a_date_time));
+	}
+
+	[[nodiscard]] bool save(const std::filesystem::path& directory, log::logger& logger) const;
+	static std::optional<item_price_metadata> load(const std::filesystem::path& directory, log::logger& logger);
+
+	game_variant_type game_variant;
+	std::string league_name;
+	data_source_type data_source;
+	boost::posix_time::ptime download_date;
 };
 
 nlohmann::json to_json(const item_price_metadata& metadata);
@@ -218,16 +238,24 @@ using item_price_data = std::variant<poe1::item_price_data, poe2::item_price_dat
 
 struct item_price_report
 {
+	static std::optional<item_price_report>
+	load(const std::filesystem::path& directory, log::logger& logger);
+
+	static item_price_report empty(game_variant_type game_variant)
+	{
+		return {
+			game_variant == game_variant_type::poe2
+				? item_price_data(poe2::item_price_data{})
+				: item_price_data(poe1::item_price_data{}),
+			item_price_metadata::empty(game_variant)
+		};
+	}
+
 	item_price_data data;
 	item_price_metadata metadata;
 };
 
 log::message_stream& operator<<(log::message_stream& stream, const item_price_report& ipr);
-
-std::optional<item_price_report>
-load_item_price_report(
-	const std::filesystem::path& directory,
-	log::logger& logger);
 
 }
 

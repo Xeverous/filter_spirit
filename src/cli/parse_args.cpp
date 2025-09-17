@@ -240,7 +240,7 @@ int run(int argc, char* argv[])
 			if (opt_empty_data) {
 				// user explicitly stated to use empty data, some find it useful
 				// to write SSF filters where price queries are not used
-				return fs::lang::market::item_price_report();
+				return fs::lang::market::item_price_report::empty(st.game_variant);
 			}
 			else {
 				return obtain_item_price_report(
