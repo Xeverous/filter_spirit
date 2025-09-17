@@ -637,7 +637,7 @@ make_item_filter(
 		stream << unknown_items.size() << " items had unknown max stack size. "
 			"Generated blocks assuming these items can stack up to "
 			<< lang::autogen_extension::unknown_item_assumed_max_stack_size
-			<< " to catch potential large stacks in high-tier price blocks.";
+			<< " to catch potential large stacks in high-tier price blocks.\n";
 
 		for (const auto& item : unknown_items)
 			stream << "\"" << item << "\"\n";

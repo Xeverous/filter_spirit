@@ -684,6 +684,49 @@ Class == "Stackable Currency"
 {
 	SetBackgroundColor $color_black
 
+	BaseType == "Scroll of Wisdom"
+	{
+		SetTextColor 220 195 160
+		SetFontSize $font_scroll
+		ShowHide $show_scrolls_wisdom
+	}
+
+	BaseType == "Portal Scroll"
+	{
+		SetTextColor 162 152 145
+		SetFontSize $font_scroll
+		ShowHide $show_scrolls_portal
+	}
+
+	Autogen "currency"
+	{
+		Price >= 50
+		{
+			Expand $actions_currency_high
+			Show
+		}
+
+		Price < 50
+		Price >= 1
+		{
+			Expand $actions_currency_mid
+			Show
+		}
+
+		Price < 1
+		Price >= 0.2
+		{
+			Expand $actions_currency_low
+			ShowHide $show_currency_low
+		}
+
+		Price < 0.2
+		{
+			Expand $actions_currency_very_low
+			ShowHide $show_currency_very_low
+		}
+	}
+
 	BaseType == "Divine Orb" "Mirror of Kalandra" "Eternal Orb" "Albino Rhoa Feather" "Mirror Shard" "Crusader's Exalted Orb" "Redeemer's Exalted Orb" "Hunter's Exalted Orb" "Warlord's Exalted Orb" "Shaper's Exalted Orb" "Elder's Exalted Orb" "Awakener's Orb" "Prime Regrading Lens" "Secondary Regrading Lens" "Tempering Orb" "Tailoring Orb" "Tainted Divine Teardrop" "Exceptional Eldritch Ember" "Exceptional Eldritch Ichor" "Orb of Conflict" "Orb of Dominance" "Fracturing Orb" "Fracturing Shard" "Hinekora's Lock" "Veiled Exalted Orb" "Orb of Remembrance" "Orb of Unravelling" "Orb of Intention"
 	{
 		Expand $actions_currency_high
@@ -767,20 +810,6 @@ Class == "Stackable Currency"
 	{
 		Expand $actions_currency_low_shards
 		ShowHide $show_currency_low_shards
-	}
-
-	BaseType == "Scroll of Wisdom"
-	{
-		SetTextColor 220 195 160
-		SetFontSize $font_scroll
-		ShowHide $show_scrolls_wisdom
-	}
-
-	BaseType == "Portal Scroll"
-	{
-		SetTextColor 162 152 145
-		SetFontSize $font_scroll
-		ShowHide $show_scrolls_portal
 	}
 
 	BaseType == "Transmutation Shard" "Alteration Shard" "Engineer's Shard" "Scroll Fragment"

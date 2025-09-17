@@ -1,11 +1,14 @@
 #pragma once
 
+#include <fs/utility/string_helpers.hpp>
+
 #include <boost/container/static_vector.hpp>
 
 #include <string>
 #include <initializer_list>
 #include <optional>
 #include <unordered_map>
+#include <vector>
 
 /*
  * This implementation is somewhat a duplicate of item_database.
@@ -139,10 +142,15 @@ public:
 	[[nodiscard]] const known_item_properties* find_item(const std::string& name) const
 	{
 		const auto it = m_data.find(name);
-		if (it == m_data.end())
-			return nullptr;
+		if (it != m_data.end())
+			return &it->second;
 
-		return &it->second;
+		for (const known_item& item_family : m_item_families) {
+			if (utility::contains(name, item_family.name))
+				return &item_family.properties;
+		}
+
+		return nullptr;
 	}
 
 	// convenience overload
@@ -156,13 +164,17 @@ public:
 	}
 
 	template <typename... Containers>
-	static known_items_store create(const Containers&... containers)
+	static known_items_store create(std::initializer_list<known_item> item_families, const Containers&... containers)
 	{
 		known_items_store result;
+
 		([&result](const auto& container) {
 			for (const known_item& item : container)
 				result.m_data.insert({item.name, item.properties});
 		}(containers), ...);
+
+		for (const known_item& item : item_families)
+			result.m_item_families.push_back(item);
 
 		return result;
 	}
@@ -178,14 +190,22 @@ private:
 	 * Thus, a plain hash table is used. Immune to categorization problems and still very efficient.
 	 */
 	std::unordered_map<std::string, known_item_properties> m_data;
+	// for more-often changed items with same stack size (e.g. Tattoos, Scarabs)
+	std::vector<known_item> m_item_families;
 };
 
 namespace poe1 {
 
+// lists sorted by game version where particular item family was introduced
+
 inline const std::initializer_list<known_item> currency_basic = {
 	// (by drop level, then alphabetical)
+	{"Ancient Orb",                   known_item_properties(   20,  1)},
 	{"Armourer's Scrap",              known_item_properties(   40,  1)},
 	{"Blacksmith's Whetstone",        known_item_properties(   20,  1)},
+	{"Engineer's Orb",                known_item_properties(   20,  1)},
+	{"Fracturing Orb",                known_item_properties(   20,  1)},
+	{"Harbinger's Orb",               known_item_properties(   20,  1)},
 	{"Orb of Augmentation",           known_item_properties(   30,  1)},
 	{"Orb of Transmutation",          known_item_properties(   40,  1)},
 	{"Scroll of Wisdom",              known_item_properties(   40,  1)},
@@ -213,6 +233,8 @@ inline const std::initializer_list<known_item> currency_basic = {
 	{"Enkindling Orb",                known_item_properties(   20, 40)},
 	{"Hinekora's Lock",               known_item_properties(   10, 40)},
 	{"Instilling Orb",                known_item_properties(   20, 40)},
+	// officially 40 but in reality drops only from T16+ - TODO DropLevel needs testing in-game
+	{"Reflecting Mist",               known_item_properties(   10, 40)},
 	{"Rogue's Marker",                known_item_properties(50000, 48)},
 	{"Stacked Deck",                  known_item_properties(   20, 50)},
 	{"Cartographer's Chisel",         known_item_properties(   20, 52)},
@@ -220,16 +242,7 @@ inline const std::initializer_list<known_item> currency_basic = {
 	{"Lesser Eldritch Ember",         known_item_properties(   10, 68)},
 	{"Lesser Eldritch Ichor",         known_item_properties(   10, 68)},
 	{"Orb of Horizons",               known_item_properties(   20, 68)},
-	{"Blighted Scouting Report",      known_item_properties(   20, 69)},
-	{"Comprehensive Scouting Report", known_item_properties(   20, 69)},
-	{"Delirious Scouting Report",     known_item_properties(   20, 69)},
-	{"Explorer's Scouting Report",    known_item_properties(   20, 69)},
-	{"Operative's Scouting Report",   known_item_properties(   20, 69)},
-	{"Singular Scouting Report",      known_item_properties(   20, 69)},
-	{"Vaal Scouting Report",          known_item_properties(   20, 69)},
 	{"Orb of Unmaking",               known_item_properties(   40, 70)},
-	{"Influenced Scouting Report",    known_item_properties(   20, 81)},
-	{"Otherwordly Scouting Report",   known_item_properties(   20, 81)},
 };
 
 inline const std::initializer_list<known_item> currency_shards = {
@@ -255,6 +268,7 @@ inline const std::initializer_list<known_item> currency_atlas = {
 	// (by drop level, then alphabetical)
 	{"Awakener's Orb",                  known_item_properties(10,  1)}, // drops from Sirus
 	{"Crusader's Exalted Orb",          known_item_properties(20,  1)}, // drops from Baran
+	{"Elder's Exalted Orb",             known_item_properties(20,  1)}, // drops from ((Uber) Uber) Edler
 	{"Hunter's Exalted Orb",            known_item_properties(20,  1)}, // drops from Al-Hezmin
 
 	// drops from any Maven's Inviation (any Crucible) or witnessed map bosses
@@ -273,6 +287,7 @@ inline const std::initializer_list<known_item> currency_atlas = {
 	{"Orb of Unravelling",              known_item_properties(10,  1)},
 
 	{"Redeemer's Exalted Orb",          known_item_properties(20,  1)}, // drops from Veritania
+	{"Shaper's Exalted Orb",            known_item_properties(20,  1)}, // drops from Shaper
 	{"Warlord's Exalted Orb",           known_item_properties(20,  1)}, // drops from Drox
 
 	// Exarch/Eater monsters or their mini-bosses
@@ -290,12 +305,19 @@ inline const std::initializer_list<known_item> currency_atlas = {
 
 	// drops from any Maven's Inviation (any Crucible)
 	{"Crescent Splinter",               known_item_properties(10, 83)},
+
+	// drops in T11+ and in Delve
+	{"Valdo's Puzzle Box",              known_item_properties(10, 83)},
+};
+
+inline const std::initializer_list<known_item> currency_legacy = {
+	{"Infused Engineer's Orb", known_item_properties(20, 1)}, // 3.11 - 3.19
+	{"Veiled Scarab",          known_item_properties(20, 1)}, // 3.24+ (converted legacy items)
 };
 
 // note: drop-level for Essences has weak meaning as corruption
 // and atlas passives can produce better tiers than original
-// TODO verify drop-level by in-game testing
-inline const std::initializer_list<known_item> currency_essences = {
+inline const std::initializer_list<known_item> currency_essences = { // 2.4
 	// Group A
 	{"Whispering Essence of Greed",    known_item_properties(9,  1)},
 	{"Muttering Essence of Greed",     known_item_properties(9, 12)},
@@ -431,26 +453,247 @@ inline const std::initializer_list<known_item> currency_essences = {
 	{"Remnant of Corruption",          known_item_properties(9, 1)}
 };
 
-inline const std::initializer_list<known_item> currency_breach = {
-
+inline const std::initializer_list<known_item> currency_breach_splinters = { // 2.5
+	{"Splinter of Xoph",      known_item_properties(100, 1)},
+	{"Splinter of Tul",       known_item_properties(100, 1)},
+	{"Splinter of Esh",       known_item_properties(100, 1)},
+	{"Splinter of Uul-Netol", known_item_properties(100, 1)},
+	{"Splinter of Chayula",   known_item_properties(100, 1)}
 };
 
-// UNFINISHED:
-// breach
-// legion
-// harbinger (better scrolls)
-// incursion (vials)
-// delve
-// blight
-// delirium
-// heist
-// ritual
-// ultimatum
-// expedition
-// beyond (tainted)
-// kalandra (reflecting mist)
-// runegrafts
-// tattoos
+inline const std::initializer_list<known_item> currency_breach_blessings = { // 2.5
+	{"Blessing of Xoph",      known_item_properties(10, 1)},
+	{"Blessing of Tul",       known_item_properties(10, 1)},
+	{"Blessing of Esh",       known_item_properties(10, 1)},
+	{"Blessing of Uul-Netol", known_item_properties(10, 1)},
+	{"Blessing of Chayula",   known_item_properties(10, 1)}
+};
+
+inline const std::initializer_list<known_item> currency_incursion_vials = { // 3.3
+	{"Vial of Awakening",     known_item_properties(10, 50)},
+	{"Vial of Consequence",   known_item_properties(10, 50)},
+	{"Vial of Dominance",     known_item_properties(10, 50)},
+	{"Vial of Fate",          known_item_properties(10, 50)},
+	{"Vial of Summoning",     known_item_properties(10, 50)},
+	{"Vial of the Ritual",    known_item_properties(10, 50)},
+	{"Vial of Transcendence", known_item_properties(10, 50)},
+	{"Vial of Sacrifice",     known_item_properties(10, 68)},
+	{"Vial of the Ghost",     known_item_properties(10, 68)}
+};
+
+inline const std::initializer_list<known_item> currency_delve_fossils = { // 3.4
+	{"Aberrant Fossil",     known_item_properties(20, 1)},
+	{"Aetheric Fossil",     known_item_properties(20, 1)},
+	{"Bloodstained Fossil", known_item_properties(10, 1)},
+	{"Bound Fossil",        known_item_properties(20, 1)},
+	{"Corroded Fossil",     known_item_properties(20, 1)},
+	{"Deft Fossil",         known_item_properties(20, 1)},
+	{"Dense Fossil",        known_item_properties(20, 1)},
+	{"Faceted Fossil",      known_item_properties(10, 1)},
+	{"Fractured Fossil",    known_item_properties(10, 1)},
+	{"Frigid Fossil",       known_item_properties(20, 1)},
+	{"Fundamental Fossil",  known_item_properties(20, 1)},
+	{"Gilded Fossil",       known_item_properties(10, 1)},
+	{"Glyphic Fossil",      known_item_properties(10, 1)},
+	{"Hollow Fossil",       known_item_properties(10, 1)},
+	{"Jagged Fossil",       known_item_properties(20, 1)},
+	{"Lucent Fossil",       known_item_properties(20, 1)},
+	{"Metallic Fossil",     known_item_properties(20, 1)},
+	{"Opulent Fossil",      known_item_properties(20, 1)},
+	{"Prismatic Fossil",    known_item_properties(20, 1)},
+	{"Pristine Fossil",     known_item_properties(20, 1)},
+	{"Sanctified Fossil",   known_item_properties(10, 1)},
+	{"Scorched Fossil",     known_item_properties(20, 1)},
+	{"Serrated Fossil",     known_item_properties(20, 1)},
+	{"Shuddering Fossil",   known_item_properties(20, 1)},
+	{"Tangled Fossil",      known_item_properties(10, 1)}
+};
+
+inline const std::initializer_list<known_item> currency_delve_resonators = { // 3.4
+	{"Primitive Chaotic Resonator", known_item_properties(10, 34, 1, 1)},
+	{"Potent Chaotic Resonator",    known_item_properties(10, 34, 1, 2)},
+	{"Powerful Chaotic Resonator",  known_item_properties(10, 34, 2, 2)},
+	{"Prime Chaotic Resonator",     known_item_properties(10, 68, 2, 2)}
+};
+
+inline const std::initializer_list<known_item> currency_delve_resonators_legacy = { // 3.4 - 3.16
+	{"Primitive Alchemical Resonator", known_item_properties(10,  1, 1, 1)},
+	{"Potent Alchemical Resonator",    known_item_properties(10,  1, 1, 2)},
+	{"Powerful Alchemical Resonator",  known_item_properties(10, 34, 2, 2)},
+	{"Prime Alchemical Resonator",     known_item_properties(10, 68, 2, 2)}
+};
+
+inline const std::initializer_list<known_item> currency_delve_resonators_ruthless = currency_delve_resonators_legacy;
+
+inline const std::initializer_list<known_item> currency_legion_splinters = { // 3.7
+	{"Timeless Vaal Splinter",           known_item_properties(100, 1)},
+	{"Timeless Karui Splinter",          known_item_properties(100, 1)},
+	{"Timeless Eternal Empire Splinter", known_item_properties(100, 1)},
+	{"Timeless Templar Splinter",        known_item_properties(100, 1)},
+	{"Timeless Maraketh Splinter",       known_item_properties(100, 1)}
+};
+
+inline const std::initializer_list<known_item> currency_blight_oils_regular = { // 3.8
+	{"Clear Oil",      known_item_properties(10,  1)},
+	{"Sepia Oil",      known_item_properties(10, 10)},
+	{"Amber Oil",      known_item_properties(10, 19)},
+	{"Verdant Oil",    known_item_properties(10, 27)},
+	{"Teal Oil",       known_item_properties(10, 36)},
+	{"Azure Oil",      known_item_properties(10, 44)},
+	{"Indigo Oil",     known_item_properties(10, 48)},
+	{"Violet Oil",     known_item_properties(10, 52)},
+	{"Crimson Oil",    known_item_properties(10, 60)},
+	{"Black Oil",      known_item_properties(10, 68)},
+	{"Opalescent Oil", known_item_properties(10, 73)},
+	{"Silver Oil",     known_item_properties(10, 78)},
+	{"Golden Oil",     known_item_properties(10, 80)}
+};
+
+inline const std::initializer_list<known_item> currency_blight_oils_special = { // 3.8
+	{"Reflective Oil", known_item_properties(10,  1)},
+	{"Tainted Oil",    known_item_properties(10,  1)},
+	{"Prismatic Oil",  known_item_properties(10, 80)}
+};
+
+inline const std::initializer_list<known_item> currency_catalysts = { // 3.9
+	{"Abrasive Catalyst",     known_item_properties(10,  1)},
+	{"Accelerating Catalyst", known_item_properties(10,  1)},
+	{"Imbued Catalyst",       known_item_properties(10,  1)},
+	{"Intrinsic Catalyst",    known_item_properties(10,  1)},
+	{"Noxious Catalyst",      known_item_properties(10,  1)},
+	{"Tainted Catalyst",      known_item_properties(10,  1)},
+	{"Turbulent Catalyst",    known_item_properties(10,  1)},
+	{"Unstable Catalyst",     known_item_properties(10,  1)},
+	{"Fertile Catalyst",      known_item_properties(10, 68)},
+	{"Prismatic Catalyst",    known_item_properties(10, 68)},
+	{"Tempering Catalyst",    known_item_properties(10, 68)}
+};
+
+inline const std::initializer_list<known_item> currency_delirium_splinters = { // 3.10
+	{"Simulacrum Splinter", known_item_properties(300, 1)}
+};
+
+inline const std::initializer_list<known_item> currency_delirium_orbs = { // 3.10
+	{"Abyssal Delirium Orb",        known_item_properties(10)},
+	{"Armoursmith's Delirium Orb",  known_item_properties(10)},
+	{"Blacksmith's Delirium Orb",   known_item_properties(10)},
+	{"Blighted Delirium Orb",       known_item_properties(10)},
+	{"Cartographer's Delirium Orb", known_item_properties(10)},
+	{"Diviner's Delirium Orb",      known_item_properties(10)},
+	{"Fine Delirium Orb",           known_item_properties(10)},
+	{"Foreboding Delirium Orb",     known_item_properties(10)},
+	{"Fossilised Delirium Orb",     known_item_properties(10)},
+	{"Fragmented Delirium Orb",     known_item_properties(10)},
+	{"Jeweller's Delirium Orb",     known_item_properties(10)},
+	{"Obscured Delirium Orb",       known_item_properties(10)},
+	{"Singular Delirium Orb",       known_item_properties(10)},
+	{"Skittering Delirium Orb",     known_item_properties(10)},
+	{"Thaumaturge's Delirium Orb",  known_item_properties(10)},
+	{"Timeless Delirium Orb",       known_item_properties(10)},
+	{"Whispering Delirium Orb",     known_item_properties(10)},
+};
+
+inline const std::initializer_list<known_item> currency_delirium_orbs_legacy = { // 3.10 - ?
+	{"Challenging Delirium Orb", known_item_properties(10)},
+	{"Kalguuran Delirium Orb",   known_item_properties(10)},
+	{"Imperial Delirium Orb",    known_item_properties(10)},
+	{"Primal Delirium Orb",      known_item_properties(10)}
+};
+
+// In Ruthless only 1 generic Delirum Orb is available
+inline const std::initializer_list<known_item> currency_delirium_orbs_ruthless = {
+	{"Delirium Orb", known_item_properties(10)}
+};
+
+inline const std::initializer_list<known_item> currency_harbinger_scrolls = { // 3.11
+	{"Deregulation Scroll",    known_item_properties(10, 1)},
+	{"Electroshock Scroll",    known_item_properties(10, 1)},
+	{"Fragmentation Scroll",   known_item_properties(10, 1)},
+	{"Haemocombustion Scroll", known_item_properties(10, 1)},
+	{"Specularity Scroll",     known_item_properties(10, 1)},
+	{"Time-light Scroll",      known_item_properties(10, 1)},
+};
+
+inline const std::initializer_list<known_item> currency_heist = { // 3.12
+	{"Tempering Orb", known_item_properties(20, 1)},
+	{"Tailoring Orb", known_item_properties(20, 1)},
+};
+
+inline const std::initializer_list<known_item> currency_ritual = { // 3.13
+	{"Ritual Splinter", known_item_properties(100, 1)},
+	{"Ritual Vessel",   known_item_properties( 10, 1)}
+};
+
+// Not obtainable in Ruthless
+inline const std::initializer_list<known_item> currency_betrayal = { // 3.14 (though changed extensively)
+	{"Veiled Chaos Orb",   known_item_properties(20, 61)},
+	{"Veiled Exalted Orb", known_item_properties(20, 61)},
+};
+
+inline const std::initializer_list<known_item> currency_expedition = { // 3.15
+	{"Astragali",        known_item_properties(1000, 1)},
+	{"Scrap Metal",      known_item_properties(1000, 1)},
+	{"Exotic Coinage",   known_item_properties(1000, 1)},
+	{"Burial Medallion", known_item_properties(1000, 1)}
+};
+
+inline const std::initializer_list<known_item> currency_beyond = { // 3.16
+	{"Tainted Armourer's Scrap",       known_item_properties(40,  1)},
+	{"Tainted Blacksmith's Whetstone", known_item_properties(20,  1)},
+	{"Tainted Chromatic Orb",          known_item_properties(20,  2)},
+	{"Tainted Mythic Orb",             known_item_properties(20,  2)},
+	{"Tainted Jeweller's Orb",         known_item_properties(20,  8)},
+	{"Tainted Chaos Orb",              known_item_properties(20, 12)},
+	{"Tainted Exalted Orb",            known_item_properties(20, 35)},
+	{"Tainted Orb of Fusing",          known_item_properties(20, 50)},
+	{"Tainted Divine Teardrop",        known_item_properties(10, 68)},
+};
+
+inline const std::initializer_list<known_item> currency_scouting_reports = { // 3.17
+	{"Blighted Scouting Report",      known_item_properties(20, 69)},
+	{"Comprehensive Scouting Report", known_item_properties(20, 69)},
+	{"Delirious Scouting Report",     known_item_properties(20, 69)},
+	{"Explorer's Scouting Report",    known_item_properties(20, 69)},
+	{"Operative's Scouting Report",   known_item_properties(20, 69)},
+	{"Singular Scouting Report",      known_item_properties(20, 69)},
+	{"Vaal Scouting Report",          known_item_properties(20, 69)},
+	{"Influenced Scouting Report",    known_item_properties(20, 81)},
+	{"Otherworldly Scouting Report",  known_item_properties(20, 81)},
+};
+
+inline const std::initializer_list<known_item> currency_harvest_lifeforce_regular = { // 3.19
+	{"Primal Crystallised Lifeforce", known_item_properties(50000)},
+	{"Vivid Crystallised Lifeforce",  known_item_properties(50000)},
+	{"Wild Crystallised Lifeforce",   known_item_properties(50000)}
+};
+
+inline const std::initializer_list<known_item> currency_harvest_lifeforce_special = { // 3.19
+	{"Sacred Crystallised Lifeforce", known_item_properties(10)}
+};
+
+inline const std::initializer_list<known_item> currency_runegrafts = { // 3.26
+	{"Runegraft of Bellows",       known_item_properties(10)},
+	{"Runegraft of Blasphemy",     known_item_properties(10)},
+	{"Runegraft of Gemcraft",      known_item_properties(10)},
+	{"Runegraft of Loyalty",       known_item_properties(10)},
+	{"Runegraft of Quaffing",      known_item_properties(10)},
+	{"Runegraft of Recompense",    known_item_properties(10)},
+	{"Runegraft of Restitching",   known_item_properties(10)},
+	{"Runegraft of Stability",     known_item_properties(10)},
+	{"Runegraft of the Angler",    known_item_properties(10)},
+	{"Runegraft of the Bound",     known_item_properties(10)},
+	{"Runegraft of the Combatant", known_item_properties(10)},
+	{"Runegraft of the Fortress",  known_item_properties(10)},
+	{"Runegraft of the Jeweller",  known_item_properties(10)},
+	{"Runegraft of the Novamark",  known_item_properties(10)},
+	{"Runegraft of the River",     known_item_properties(10)},
+	{"Runegraft of the Sinistral", known_item_properties(10)},
+	{"Runegraft of the Soulwick",  known_item_properties(10)},
+	{"Runegraft of the Warp",      known_item_properties(10)},
+	{"Runegraft of the Witchmark", known_item_properties(10)},
+	{"Runegraft of Time",          known_item_properties(10)},
+	{"Runegraft of Treachery",     known_item_properties(10)}
+};
 
 inline const known_item_collection group_currency = {{
 	std::make_pair(currency_basic .begin(), currency_basic .end()),
@@ -458,11 +701,47 @@ inline const known_item_collection group_currency = {{
 	std::make_pair(currency_atlas .begin(), currency_atlas .end()),
 }};
 
+// UNFINISHED:
+// Scarabs (3.5)  (uses family matching)
+// Tattoos (3.22) (uses family matching)
+//   Omens (3.22) (NOT IMPLEMENTED)
+// (more items but they are not currency)
+
 inline const auto known_items = known_items_store::create(
+	{
+		known_item{"Tattoo", known_item_properties(10)},
+		known_item{"Scarab", known_item_properties(10)}
+	},
 	currency_basic,
 	currency_shards,
 	currency_atlas,
-	currency_essences
+	currency_legacy,
+	currency_essences,
+	currency_breach_splinters,
+	currency_breach_blessings,
+	currency_incursion_vials,
+	currency_delve_fossils,
+	currency_delve_resonators,
+	currency_delve_resonators_legacy,
+	// currency_delve_resonators_ruthless, (same as currency_delve_resonators_legacy)
+	currency_legion_splinters,
+	currency_blight_oils_regular,
+	currency_blight_oils_special,
+	currency_catalysts,
+	currency_delirium_splinters,
+	currency_delirium_orbs,
+	currency_delirium_orbs_legacy,
+	currency_delirium_orbs_ruthless,
+	currency_harbinger_scrolls,
+	currency_heist,
+	currency_ritual,
+	currency_betrayal,
+	currency_expedition,
+	currency_beyond,
+	currency_scouting_reports,
+	currency_harvest_lifeforce_regular,
+	currency_harvest_lifeforce_special,
+	currency_runegrafts
 );
 
 } // namespace poe1

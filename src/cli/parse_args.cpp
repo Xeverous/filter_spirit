@@ -92,7 +92,7 @@ int run(int argc, char* argv[])
 		int max_age;
 		po::options_description cache_options = make_options("cache options");
 		cache_options.add_options()
-			("age,a", po::value(&max_age)->value_name("MINUTES")->default_value(60),
+			("age,a", po::value(&max_age)->value_name("MINUTES")->default_value(720),
 				"max age of cached item price data - too old data will be redownloaded, "
 				"otherwise it is read from file cache; set to 0 if you always want to download")
 		;

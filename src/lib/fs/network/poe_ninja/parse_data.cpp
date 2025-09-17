@@ -1,4 +1,3 @@
-#include <algorithm>
 #include <fs/network/poe_ninja/parse_data.hpp>
 #include <fs/network/exceptions.hpp>
 #include <fs/utility/dump_json.hpp>
@@ -9,6 +8,7 @@
 
 #include <nlohmann/json.hpp>
 
+#include <algorithm>
 #include <string_view>
 #include <vector>
 
@@ -39,6 +39,27 @@ void for_each_item_impl(std::string_view json_str, const char* initial_key, log:
 			logger.warning() << e.what() << ", ignoring this item: " << utility::dump_json(item) << '\n';
 		}
 	}
+}
+
+// poe.ninja sorts items by mechanical themes instead of filter item classes.
+// For example, many Splinters are grouped with other items from same mechanic or
+// put into Fragments even though they are technically "Stackable Currency".
+// This function exists to adjust categorization for filter purposes.
+void move_item(
+	std::string_view name,
+	std::vector<lang::market::elementary_item>& from,
+	std::vector<lang::market::elementary_item>& to)
+{
+	const auto it = std::find_if(
+		from.begin(),
+		from.end(),
+		[&](const lang::market::elementary_item& item) { return item.name == name; });
+
+	if (it == from.end())
+		return;
+
+	to.push_back(std::move(*it));
+	from.erase(it);
 }
 
 }
@@ -344,7 +365,20 @@ lang::market::poe1::item_price_data parse_item_price_data(const api_item_price_d
 	parse_and_fill_uniques(jsons.unique_relic.file_content,     result.unique_relics,    logger);
 	parse_and_fill_uniques(jsons.unique_idol.file_content,      result.unique_idols,     logger);
 
-	// TODO review items which might be miscategorized
+	// TODO "Misc Map Items"? Can all fragments be caught as "Map Fragments"?
+	move_item("Valdo's Puzzle Box",               result.fragments, result.currency);
+	move_item("Crescent Splinter",                result.fragments, result.currency);
+	move_item("Simulacrum Splinter",              result.fragments, result.currency);
+	move_item("Splinter of Xoph",                 result.fragments, result.currency);
+	move_item("Splinter of Tul",                  result.fragments, result.currency);
+	move_item("Splinter of Esh",                  result.fragments, result.currency);
+	move_item("Splinter of Uul-Netol",            result.fragments, result.currency);
+	move_item("Splinter of Chayula",              result.fragments, result.currency);
+	move_item("Timeless Vaal Splinter",           result.fragments, result.currency);
+	move_item("Timeless Karui Splinter",          result.fragments, result.currency);
+	move_item("Timeless Eternal Empire Splinter", result.fragments, result.currency);
+	move_item("Timeless Templar Splinter",        result.fragments, result.currency);
+	move_item("Timeless Maraketh Splinter",       result.fragments, result.currency);
 
 	/*
 	 * not all jsons are being read but:
@@ -405,27 +439,6 @@ void parse_uncut_gems(
 		else if (utility::contains(uncut_gem.name, "Spirit"))
 			uncut_spirit_gems.push_back(std::move(uncut_gem));
 	}
-}
-
-// poe.ninja sorts items by mechanical themes instead of filter item classes.
-// For example, many Splinters are grouped with other items from same mechanic or
-// put into Fragments even though they are technically "Stackable Currency".
-// This function exists to adjust categorization for filter purposes.
-void move_item(
-	std::string_view name,
-	std::vector<lang::market::elementary_item>& from,
-	std::vector<lang::market::elementary_item>& to)
-{
-	const auto it = std::find_if(
-		from.begin(),
-		from.end(),
-		[&](const lang::market::elementary_item& item) { return item.name == name; });
-
-	if (it == from.end())
-		return;
-
-	to.push_back(std::move(*it));
-	from.erase(it);
 }
 
 } // namespace

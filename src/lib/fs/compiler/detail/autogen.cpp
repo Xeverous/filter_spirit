@@ -468,13 +468,13 @@ poe1_make_autogen_func(
 		case cat_t::currency:
 			return make_autogen_stackable_item(st, conditions, autogen_origin, cn::currency_stackable, &ipd::currency, lang::loot::poe1::known_items, diagnostics);
 		case cat_t::delirium_orbs:
-			return make_autogen_simple(st, conditions, autogen_origin, cn::delirium_orbs, &ipd::delirium_orbs, diagnostics);
+			return make_autogen_stackable_item(st, conditions, autogen_origin, cn::delirium_orbs, &ipd::delirium_orbs, lang::loot::poe1::known_items, diagnostics);
 		case cat_t::essences:
 			return make_autogen_stackable_item(st, conditions, autogen_origin, cn::essences, &ipd::essences, lang::loot::poe1::known_items, diagnostics);
 		case cat_t::fossils:
-			return make_autogen_simple(st, conditions, autogen_origin, cn::fossils, &ipd::fossils, diagnostics);
+			return make_autogen_stackable_item(st, conditions, autogen_origin, cn::fossils, &ipd::fossils, lang::loot::poe1::known_items, diagnostics);
 		case cat_t::oils:
-			return make_autogen_simple(st, conditions, autogen_origin, cn::oils, &ipd::oils, diagnostics);
+			return make_autogen_stackable_item(st, conditions, autogen_origin, cn::oils, &ipd::oils, lang::loot::poe1::known_items, diagnostics);
 		case cat_t::vials:
 			return make_autogen_simple(st, conditions, autogen_origin, cn::vials, &ipd::vials, diagnostics);
 		case cat_t::fragments:
@@ -482,9 +482,9 @@ poe1_make_autogen_func(
 		case cat_t::resonators:
 			return make_autogen_simple(st, conditions, autogen_origin, cn::resonators, &ipd::resonators, diagnostics);
 		case cat_t::scarabs:
-			return make_autogen_simple(st, conditions, autogen_origin, cn::scarabs, &ipd::scarabs, diagnostics);
+			return make_autogen_stackable_item(st, conditions, autogen_origin, cn::scarabs, &ipd::scarabs, lang::loot::poe1::known_items, diagnostics);
 		case cat_t::tattoos:
-			return make_autogen_simple(st, conditions, autogen_origin, cn::tattoos, &ipd::tattoos, diagnostics);
+			return make_autogen_stackable_item(st, conditions, autogen_origin, cn::tattoos, &ipd::tattoos, lang::loot::poe1::known_items, diagnostics);
 		case cat_t::incubators:
 			return make_autogen_simple(st, conditions, autogen_origin, cn::incubator, &ipd::incubators, diagnostics);
 		case cat_t::cards:
@@ -492,6 +492,7 @@ poe1_make_autogen_func(
 		case cat_t::gems:
 			return poe1_make_autogen_gem(st, conditions, autogen_origin, diagnostics);
 
+		// NOT IMPLEMENTED - cluster jewels
 		// NOT IMPLEMENTED - bases
 			// implementation notes
 			// - condition: ItemLevel
