@@ -140,7 +140,10 @@ bool operator<(eligible_item lhs, eligible_item rhs)
 		if (price_range.upper_bound()) {
 			const auto amount_max = static_cast<int>(std::floor(
 				(*price_range.upper_bound()).bound.value.value / market_item.price.chaos_value));
-			FS_ASSERT(itm.amount_min.value_or(0) <= amount_max); // math sanity check
+
+			// skip items that can not fit between mix and max price bound
+			if (itm.amount_min.value_or(0) > amount_max)
+				continue;
 
 			if (amount_max == 0) {
 				// item too expensive, even stack of 1 would exceed upper bound
