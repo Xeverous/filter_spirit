@@ -168,6 +168,8 @@ $cfg_default_font_size = 36
 
 $show_scrolls_wisdom = True
 
+$cfg_show_currency_low = True
+$cfg_show_currency_very_low = True
 $cfg_show_currency_low_shards = True
 $cfg_show_runes_lesser  = True
 $cfg_show_runes_regular = True
@@ -275,6 +277,35 @@ Class == "Stackable Currency"
 		}
 
 		Price < 20
+		Price >= 0.25
+		{
+			Expand $actions_currency_mid
+			Show
+		}
+
+		Price < 0.25
+		Price >= 0.05
+		{
+			Expand $actions_currency_low
+			ShowHide $cfg_show_currency_low
+		}
+
+		Price < 0.05
+		{
+			Expand $actions_currency_very_low
+			ShowHide $cfg_show_currency_very_low
+		}
+	}
+
+	Autogen "Abyss Currency"
+	{
+		Price >= 20
+		{
+			Expand $actions_currency_high
+			Show
+		}
+
+		Price < 20
 		Price >= 1
 		{
 			Expand $actions_currency_mid
@@ -285,12 +316,13 @@ Class == "Stackable Currency"
 		Price >= 0.05
 		{
 			Expand $actions_currency_low
-			Show
+			ShowHide $cfg_show_currency_low
 		}
 
 		Price < 0.05
 		{
-			Hide
+			Expand $actions_currency_very_low
+			ShowHide $cfg_show_currency_very_low
 		}
 	}
 
@@ -469,16 +501,24 @@ Class == "Uncut Skill Gems" "Uncut Spirit Gems" "Uncut Support Gems" "Support Ge
 		PlayEffect $beam_gem
 		MinimapIcon $icon_gem_high
 
-		GemLevel 20
+		Price >= 1
 		{
-			Show
+			Autogen "Uncut Skill Gems"
+			{
+				Show
+			}
+
+			Autogen "Uncut Spirit Gems"
+			{
+				Show
+			}
+
+			Autogen "Lineage Support Gems"
+			{
+				Show
+			}
 		}
 
-		# 0.3.0 Lineage Supports
-		BaseType "Atalui's Bloodletting" "Einhar's Beastrite" "Vilenta's Propulsion" "Ahn's Citadel" "Brutus' Brain" "Tecrod's Revenge" "Uruk's Smelting" "Paquate's Pact" "Ailith's Chimes" "Doedre's Undoing" "Ratha's Assault" "Arjun's Medal" "Kaom's Madness" "Sione's Temper" "Ixchel's Torment" "Romira's Requital" "Tawhoa's Tending" "Piety's Mercy" "Dialla's Desire" "Kalisa's Crescendo" "Xoph's Pyre" "Esh's Radiance" "Tul's Stillness" "Uul-Netol's Embrace" "Rakiata's Flow" "Rigwald's Ferocity" "Uhtred's Exodus" "Uhtred's Omen" "Uhtred's Augury" "Daresso's Passion" "Atziri's Allure" "Tacati's Ire" "Zarokh's Refrain" "Garukhan's Resolve" "Kurgal's Leash" "Kulemak's Dominion" "Amanamu's Tithe" "Varashta's Blessing" "Arbiter's Ignition" "Arakaali's Lust"
-		{
-			Show
-		}
 	}
 
 	SetFontSize $font_mid
@@ -486,6 +526,12 @@ Class == "Uncut Skill Gems" "Uncut Spirit Gems" "Uncut Support Gems" "Support Ge
 	SetBorderColor $color_gem
 	SetAlertSound $alert_mid
 	PlayEffect $beam_gem Temp
+	# 0.3.0 Lineage Supports
+	BaseType "Atalui's Bloodletting" "Einhar's Beastrite" "Vilenta's Propulsion" "Ahn's Citadel" "Brutus' Brain" "Tecrod's Revenge" "Uruk's Smelting" "Paquate's Pact" "Ailith's Chimes" "Doedre's Undoing" "Ratha's Assault" "Arjun's Medal" "Kaom's Madness" "Sione's Temper" "Ixchel's Torment" "Romira's Requital" "Tawhoa's Tending" "Piety's Mercy" "Dialla's Desire" "Kalisa's Crescendo" "Xoph's Pyre" "Esh's Radiance" "Tul's Stillness" "Uul-Netol's Embrace" "Rakiata's Flow" "Rigwald's Ferocity" "Uhtred's Exodus" "Uhtred's Omen" "Uhtred's Augury" "Daresso's Passion" "Atziri's Allure" "Tacati's Ire" "Zarokh's Refrain" "Garukhan's Resolve" "Kurgal's Leash" "Kulemak's Dominion" "Amanamu's Tithe" "Varashta's Blessing" "Arbiter's Ignition" "Arakaali's Lust"
+	{
+		Show
+	}
+
 	Show
 }
 
@@ -724,7 +770,7 @@ Rarity Rare
 }
 
 # Chance Orb
-BaseType "Stellar Amulet" "Sapphire Ring" "Breach Ring"
+BaseType "Heavy Belt"
 Rarity Normal
 Corrupted False
 Mirrored False
