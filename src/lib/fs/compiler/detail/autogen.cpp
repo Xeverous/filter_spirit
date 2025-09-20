@@ -394,7 +394,7 @@ struct poe1_gem_condition_verifier
 // ---- make_autogen functions ----
 
 template <typename MarketItemType, typename ItemPriceData>
-[[nodiscard]] std::function<lang::specific_blocks_generator_func_type<ItemPriceData>>
+[[nodiscard]] std::function<lang::specific_blocks_generator_func_type<ItemPriceData>> // empty on failure
 make_autogen_simple(
 	settings st,
 	const lang::official_conditions& conditions,
@@ -418,7 +418,7 @@ make_autogen_simple(
 }
 
 template <typename MarketItemType, typename ItemPriceData>
-[[nodiscard]] std::function<lang::specific_blocks_generator_func_type<ItemPriceData>>
+[[nodiscard]] std::function<lang::specific_blocks_generator_func_type<ItemPriceData>> // empty on failure
 make_autogen_stackable_item(
 	settings st,
 	const lang::official_conditions& conditions,
@@ -442,7 +442,7 @@ make_autogen_stackable_item(
 		};
 }
 
-[[nodiscard]] std::function<lang::poe1_blocks_generator_func_type>
+[[nodiscard]] std::function<lang::poe1_blocks_generator_func_type> // empty on failure
 poe1_make_autogen_gem(
 	settings st,
 	const lang::official_conditions& conditions,
@@ -455,7 +455,7 @@ poe1_make_autogen_gem(
 	return poe1_generate_blocks_gems;
 }
 
-[[nodiscard]] std::function<lang::poe1_blocks_generator_func_type>
+[[nodiscard]] std::function<lang::poe1_blocks_generator_func_type> // empty on failure
 poe1_make_autogen_func(
 	settings st,
 	const lang::official_conditions& conditions,
@@ -524,7 +524,7 @@ poe1_make_autogen_func(
 	return {};
 }
 
-[[nodiscard]] std::function<lang::poe2_blocks_generator_func_type>
+[[nodiscard]] std::function<lang::poe2_blocks_generator_func_type> // empty on failure
 poe2_make_autogen_func(
 	settings st,
 	const lang::official_conditions& conditions,
@@ -572,7 +572,7 @@ poe2_make_autogen_func(
 }
 
 template <typename ItemPriceData>
-[[nodiscard]] std::function<lang::blocks_generator_func_type>
+[[nodiscard]] std::function<lang::blocks_generator_func_type> // empty on failure
 enclose_autogen_func(std::function<lang::specific_blocks_generator_func_type<ItemPriceData>> func)
 {
 	return [f = std::move(func)](
@@ -590,8 +590,8 @@ enclose_autogen_func(std::function<lang::specific_blocks_generator_func_type<Ite
 
 } // namespace
 
-[[nodiscard]] std::function<lang::blocks_generator_func_type>
-make_autogen_func(
+[[nodiscard]] std::optional<lang::autogen_extension>
+make_autogen_extension(
 	settings st,
 	const lang::official_conditions& conditions,
 	lang::price_range_condition price_range,
@@ -607,14 +607,28 @@ make_autogen_func(
 		diagnostics.push_message(make_note_minor(autogen.origin, "Autogen specified here"));
 	}
 
-	return std::visit(utility::visitor{
-		[&](lang::poe1::autogen_category cat) {
-			return enclose_autogen_func(poe1_make_autogen_func(st, conditions, cat, autogen.origin, diagnostics));
-		},
-		[&](lang::poe2::autogen_category cat) {
-			return enclose_autogen_func(poe2_make_autogen_func(st, conditions, cat, autogen.origin, diagnostics));
-		}
-	}, autogen.category);
+	lang::autogen_extension::functions_container_type functions;
+	functions.reserve(autogen.categories.size());
+
+	for (lang::autogen_category cat : autogen.categories) {
+		std::function<lang::blocks_generator_func_type> func = std::visit(utility::visitor{
+			[&](lang::poe1::autogen_category cat) {
+				return enclose_autogen_func(poe1_make_autogen_func(st, conditions, cat, autogen.origin, diagnostics));
+			},
+			[&](lang::poe2::autogen_category cat) {
+				return enclose_autogen_func(poe2_make_autogen_func(st, conditions, cat, autogen.origin, diagnostics));
+			}
+		}, cat);
+
+		// If the user specified autogeneration, func creation should succeed.
+		// Otherwise the entire block is invalid and thus nullopt is returned.
+		if (!func)
+			return std::nullopt;
+
+		functions.push_back(std::move(func));
+	}
+
+	return lang::autogen_extension{std::move(functions), price_range, autogen.origin};;
 }
 
 }

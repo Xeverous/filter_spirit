@@ -6,10 +6,12 @@
 #include <fs/compiler/diagnostics.hpp>
 #include <fs/compiler/detail/types.hpp>
 
+#include <optional>
+
 namespace fs::compiler::detail {
 
-[[nodiscard]] std::function<lang::blocks_generator_func_type> // empty on failure
-make_autogen_func(
+[[nodiscard]] std::optional<lang::autogen_extension>
+make_autogen_extension(
 	settings st,
 	const lang::official_conditions& conditions,
 	lang::price_range_condition price_range,

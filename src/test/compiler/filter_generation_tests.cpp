@@ -58,7 +58,7 @@ boost::test_tools::predicate_result compile_from_files(
 	// Remove CR from both strings. This approach is much better than trying to
 	// configure git's auto CRLF and forcing certain kind of linebreaks in FS output.
 	// TODO: if prefix is "common", run in both poe1 and poe2 modes
-	return compare_strings(utility::remove_cr(generate_filter(input, st, ipd)), expected_output);
+	return compare_strings(expected_output, utility::remove_cr(generate_filter(input, st, ipd)));
 }
 
 // convenience overload - pass only prefix name, extensions will be added automatically
@@ -313,6 +313,24 @@ BOOST_AUTO_TEST_CASE(price_queries_and_stack_size_poe2)
 	compiler::settings st;
 	st.game_variant = lang::game_variant_type::poe2;
 	BOOST_TEST(compile_from_files("poe2/simple_price_queries", st, ipd));
+}
+
+BOOST_AUTO_TEST_CASE(price_queries_multiple_categories_one_block)
+{
+	const auto push_item = [](std::vector<lang::market::elementary_item>& container, double price, std::string name) {
+		container.push_back(lang::market::elementary_item{
+			lang::market::price_data{price, lang::market::confidence_level::high}, std::move(name)});
+	};
+
+	lang::market::poe2::item_price_data ipd;
+	push_item(ipd.runes,      1, "Greater Iron Rune");
+	push_item(ipd.runes,      1, "Countess Seske's Rune of Archery");
+	push_item(ipd.soul_cores, 1, "Soul Core of Azcapa");
+	push_item(ipd.talismans,  1, "Wolf Talisman");
+
+	compiler::settings st;
+	st.game_variant = lang::game_variant_type::poe2;
+	BOOST_TEST(compile_from_files("poe2/price_queries_multiple_categories_one_block", st, ipd));
 }
 
 BOOST_AUTO_TEST_CASE(override_settings_font_min)

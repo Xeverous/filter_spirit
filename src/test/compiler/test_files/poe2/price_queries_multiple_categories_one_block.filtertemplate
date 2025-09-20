@@ -1,0 +1,9 @@
+Class "Socketable"
+Autogen "Runes" "Soul Cores" "Talismans"
+{
+	Price >= 1
+	{
+		SetBackgroundColor 0 255 0
+		Show
+	}
+}

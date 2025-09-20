@@ -122,11 +122,15 @@ void autogen_extension::generate_blocks(
 	std::vector<block_variant>& result_blocks,
 	std::unordered_set<std::string_view>& unknown_items) const
 {
-	FS_ASSERT_MSG(blocks_generator, "Implementation bug - empty block generation function!");
+	FS_ASSERT_MSG(!block_generators.empty(), "Implementation bug - Autogen present but has no functions");
 
 	block_generation_info info{base_block.visibility, base_block.actions, base_block.continuation, origin, price_range};
 	generated_blocks_consumer consumer{result_blocks, unknown_items};
-	blocks_generator(info, ipd, consumer);
+
+	for (const auto& generator : block_generators) {
+		FS_ASSERT_MSG(generator, "Implementation bug - empty block generation function!");
+		generator(info, ipd, consumer);
+	}
 }
 
 item_style::item_style()

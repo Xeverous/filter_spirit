@@ -168,16 +168,11 @@ make_spirit_filter_block(
 
 	std::optional<lang::autogen_extension> result_autogen;
 	if (conditions.autogen) {
-		const detail::autogen_protocondition& autogen = *conditions.autogen;
+		result_autogen = detail::make_autogen_extension(
+			st, conditions.official, conditions.price_range, *conditions.autogen, visibility.origin, diagnostics);
 
-		auto func = detail::make_autogen_func(
-			st, conditions.official, conditions.price_range, autogen, visibility.origin, diagnostics);
-		// If the user specified autogeneration, func creation should succeed.
-		// Otherwise the entire block is invalid and thus none is returned.
-		if (!func)
+		if (!result_autogen)
 			return boost::none;
-
-		result_autogen = lang::autogen_extension{std::move(func), conditions.price_range, autogen.origin};
 	}
 
 	return lang::spirit_item_filter_block{

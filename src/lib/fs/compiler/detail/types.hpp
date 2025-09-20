@@ -3,6 +3,8 @@
 #include <fs/lang/conditions.hpp>
 #include <fs/lang/enum_types.hpp>
 
+#include <boost/container/small_vector.hpp>
+
 #include <optional>
 
 namespace fs::compiler::detail {
@@ -11,7 +13,9 @@ namespace fs::compiler::detail {
 
 struct autogen_protocondition
 {
-	lang::autogen_category category;
+	using autogen_container_type = boost::container::small_vector<lang::autogen_category, 1u>;
+
+	autogen_container_type categories;
 	lang::position_tag origin;
 };
 

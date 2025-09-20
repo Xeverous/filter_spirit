@@ -863,45 +863,51 @@ spirit_filter_add_autogen_condition(
 	std::optional<autogen_protocondition>& autogen,
 	diagnostics_store& diagnostics)
 {
+	if (autogen.has_value()) {
+		diagnostics.push_error_condition_redefinition(position_tag_of(condition), (*autogen).origin);
+		return false;
+	}
+
 	const auto maybe_obj = evaluate_sequence(st, condition.seq, symbols, diagnostics);
 	if (!maybe_obj)
 		return false;
 
 	const lang::object& obj = *maybe_obj;
 
-	if (!check_object_size(obj, 1, 1, diagnostics))
+	if (!check_object_size(obj, 1, {}, diagnostics))
 		return false;
 
-	FS_ASSERT(obj.values.size() == 1u);
+	FS_ASSERT(obj.values.size() >= 1u);
 
-	const auto maybe_str = get_as<lang::string>(obj.values.front(), diagnostics);
-	if (!maybe_str)
-		return false;
+	autogen_protocondition::autogen_container_type categories;
+	categories.reserve(obj.values.size());
+	for (const lang::single_object& sobj : obj.values) {
+		const auto maybe_str = get_as<lang::string>(sobj, diagnostics);
+		if (!maybe_str)
+			return false;
 
-	const lang::string& autogen_name = *maybe_str;
+		const lang::string& autogen_name = *maybe_str;
 
-	std::optional<lang::autogen_category> category;
-	if (st.is_poe1()) {
-		// BETTER_ENUM library has its own optional<T>
-		const auto cat = lang::poe1::autogen_category::_from_string_nothrow(autogen_name.value.c_str());
-		if (cat)
-			category = *cat;
+		std::optional<lang::autogen_category> category;
+		if (st.is_poe1()) {
+			// BETTER_ENUM library has its own optional<T>
+			const auto cat = lang::poe1::autogen_category::_from_string_nothrow(autogen_name.value.c_str());
+			if (cat)
+				category = *cat;
+		}
+		else {
+			category = lang::poe2::to_autogen_category(autogen_name.value);
+		}
+
+		if (!category) {
+			diagnostics.push_error_invalid_expression(autogen_name.origin, "invalid autogeneration name");
+			return false;
+		}
+
+		categories.push_back(*category);
 	}
-	else {
-		category = lang::poe2::to_autogen_category(autogen_name.value);
-	}
 
-	if (!category) {
-		diagnostics.push_error_invalid_expression(autogen_name.origin, "invalid autogeneration name");
-		return false;
-	}
-
-	if (autogen.has_value()) {
-		diagnostics.push_error_condition_redefinition(position_tag_of(condition), (*autogen).origin);
-		return false;
-	}
-
-	autogen = autogen_protocondition{*category, position_tag_of(condition)};
+	autogen = autogen_protocondition{std::move(categories), position_tag_of(condition)};
 	return true;
 }
 

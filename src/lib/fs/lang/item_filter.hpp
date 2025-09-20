@@ -5,6 +5,8 @@
 #include <fs/lang/action_set.hpp>
 #include <fs/lang/market/item_price_data.hpp>
 
+#include <boost/container/small_vector.hpp>
+
 #include <functional>
 #include <iosfwd>
 #include <optional>
@@ -197,7 +199,9 @@ struct autogen_extension
 
 	static constexpr int unknown_item_assumed_max_stack_size = 1000;
 
-	std::function<blocks_generator_func_type> blocks_generator; // should never be empty
+	using functions_container_type = boost::container::small_vector<std::function<blocks_generator_func_type>, 1u>;
+
+	functions_container_type block_generators; // functions should never be empty
 	price_range_condition price_range;
 	position_tag origin;
 };

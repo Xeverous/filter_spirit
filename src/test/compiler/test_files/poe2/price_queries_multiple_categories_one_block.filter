@@ -1,0 +1,14 @@
+Show
+	Class == "Socketable"
+	BaseType == "Greater Iron Rune" "Countess Seske's Rune of Archery"
+	SetBackgroundColor 0 255 0
+
+Show
+	Class == "Socketable"
+	BaseType == "Soul Core of Azcapa"
+	SetBackgroundColor 0 255 0
+
+Show
+	Class == "Socketable"
+	BaseType == "Wolf Talisman"
+	SetBackgroundColor 0 255 0
