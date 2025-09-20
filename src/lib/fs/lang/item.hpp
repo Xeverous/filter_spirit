@@ -127,7 +127,7 @@ namespace item_class_names {
 		constexpr auto uncut_spirit_gems  = "Uncut Spirit Gems";
 		constexpr auto uncut_support_gems = "Uncut Support Gems";
 
-		constexpr auto omens = "Omens";
+		constexpr auto omens = "Omen"; // plural form is not accepted
 
 	} // namespace poe2
 
