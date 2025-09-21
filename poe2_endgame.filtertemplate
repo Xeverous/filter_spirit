@@ -196,7 +196,7 @@ $actions_quest_items = {
 	SetBackgroundColor $color_black
 	SetFontSize $font_max
 	MinimapIcon 0 Green Pentagon
-	PlayAlertSound 1 300
+	SetAlertSound 1 300
 }
 
 ##############################################################################
@@ -816,7 +816,7 @@ Class == "Trial Coins" "Inscribed Ultimatum"
 	SetTextColor 255 207 255 255
 	SetBorderColor 255 207 255 255
 	SetBackgroundColor 65 20 80 255
-	PlayAlertSound $alert_common
+	SetAlertSound $alert_common
 	SetFontSize 40
 	Show
 }
@@ -845,7 +845,7 @@ BaseType == "Cowardly Fate" "Deadly Fate" "Victorious Fate" "Idol of Estazunti" 
 	SetFontSize $font_max
 	PlayEffect White
 	MinimapIcon 0 Brown Star
-	PlayAlertSound $alert_very_specific
+	SetAlertSound $alert_very_specific
 	Show
 }
 
@@ -898,7 +898,7 @@ Rarity Unique
 	SetBorderColor 175 96 37 255
 	SetBackgroundColor 53 13 13 255
 	SetFontSize 40
-	PlayAlertSound 3 300
+	SetAlertSound 3 300
 	MinimapIcon 2 Brown Star
 	Show
 }
@@ -923,7 +923,7 @@ Rarity <= Rare
 	}
 
 	{
-		PlayAlertSound $alert_map_low
+		SetAlertSound $alert_map_low
 		#PlayEffect White
 		#MinimapIcon 1 White Square
 		Show
@@ -935,7 +935,7 @@ Class == "Tablet"
 	SetTextColor 255 207 255 255
 	SetBorderColor 255 207 255 255
 	SetBackgroundColor 65 20 80 255
-	PlayAlertSound $alert_mid
+	SetAlertSound $alert_mid
 	PlayEffect White
 	MinimapIcon 1 White Square
 	SetFontSize 40
