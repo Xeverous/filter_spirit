@@ -293,7 +293,7 @@ BaseType == "Gold"
 		SetTextColor $color_black
 		SetBackgroundColor $color_gold
 		SetFontSize $font_currency_high
-		SetAlertSound $alert_currency_mid
+		SetAlertSound $alert_gold
 		MinimapIcon $icon_gold_high
 		Show
 	}
