@@ -816,7 +816,7 @@ inline const std::initializer_list<known_item> currency_essences = {
 	{"Essence of the Abyss", known_item_properties(10, 1)},
 	{"Greater Essence of Alacrity", known_item_properties(10, 1)},
 	{"Greater Essence of Command", known_item_properties(10, 1)},
-	{"Greater Essence of Groudning", known_item_properties(10, 1)},
+	{"Greater Essence of Grounding", known_item_properties(10, 1)},
 	{"Greater Essence of Insulation", known_item_properties(10, 1)},
 	{"Greater Essence of Opulence", known_item_properties(10, 1)},
 	{"Greater Essence of Thawing", known_item_properties(10, 1)},
