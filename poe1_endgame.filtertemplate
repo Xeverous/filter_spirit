@@ -616,9 +616,11 @@ $show_gear_veiled = True
 $cfg_gear_mods_incursion = "Citaqualotl's" "Guatelitzi's" "Matatl's" "Tacati's" "Topotante's" "Xopec's" "of Citaqualotl" "of Guatelitzi" "of Matatl" "of Puhuarte" "of Tacati"
 $cfg_gear_mods_bestiary = "of Farrul" "of Saqawal" "of Craiceann" "of Fenumus"
 $cfg_gear_mods_warband = "Redblade" "Mutewind" "Brinerot" "Betrayer's" "Deceiver's" "Turncoat's"
+$cfg_gear_mods_delve = "Subterranean" "of the Underground"
 $show_gear_mods_incursion = True
 $show_gear_mods_bestiary = True
 $show_gear_mods_warband = True # you will need to ID such items first
+$show_gear_mods_delve = True
 # Apply border color for RGB items of size 2x2 1x4 or smaller
 $show_gear_chrome_small = True
 # Apply border color for RGB items of any other size
@@ -2433,6 +2435,12 @@ Rarity <= Rare
 		SetBackgroundColor $color_gear_mods_warband
 		SetAlertSound $alert_gear_mods_warband
 		ShowDiscard $show_gear_mods_warband
+	}
+
+	HasExplicitMod == $cfg_gear_mods_delve {
+		SetBackgroundColor $color_gear_mods_incursion
+		SetAlertSound $alert_gear_mods_incursion
+		ShowDiscard $show_gear_mods_delve
 	}
 
 	LinkedSockets 5
