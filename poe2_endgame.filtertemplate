@@ -16,6 +16,7 @@
 ##############################################################################
 ### Constants
 ##############################################################################
+# generic colors
 $color_white               = 255 255 255
 $color_black               =   0   0   0
 $color_red                 = 255   0   0
@@ -23,14 +24,29 @@ $color_golden              = 240 200 150
 $color_error               = $color_red
 $color_purple              = 175   0 175
 
+# specific colors
+$color_gold                = 255 192 128
 $color_currency_high       = $color_red
 $color_currency_mid        = 249 150  25
 $color_currency_low        = 213 159   0
 $color_currency_very_low   = 190 178 135
+$color_omen_high           = 244 244   0
+$color_omen_mid            = 182 182   0
+$color_omen_low            = 127 127   0
+$color_omen_very_low       = $color_omen_low
+$color_socketable_high     = 170   0 255
+$color_socketable_mid      = 169 109 233
+$color_socketable_low      = $color_socketable_mid
+$color_socketable_very_low = $color_socketable_low
+$color_essence_high        =   0 172 255
+$color_essence_mid         =   0  96 128
+# low tiers use text/border color instead of background color
+# brigther color is necessary here because it is hard to read otherwise
+$color_essence_low         = $color_essence_high
+$color_essence_very_low    = $color_essence_high
 $color_gem                 =  20 240 240
-$color_gold                = 255 192 128
 $color_gear_exceptional    =   0 255 255
-$color_essence             =   0 128 192
+$color_unknown_price       = $color_red
 
 $font_min                = 18
 $font_max                = 45
@@ -44,6 +60,22 @@ $font_currency_high      = $font_high
 $font_currency_mid       = $font_high
 $font_currency_low       = $font_mid
 $font_currency_very_low  = $font_mid
+$font_essence_high       = $font_currency_high
+$font_essence_mid        = $font_currency_mid
+$font_essence_low        = $font_currency_low
+$font_essence_very_low   = $font_currency_very_low
+$font_omen_high          = $font_currency_high
+$font_omen_mid           = $font_currency_mid
+$font_omen_low           = $font_currency_low
+$font_omen_very_low      = $font_currency_very_low
+$font_socketable_high    = $font_currency_high
+$font_socketable_mid     = $font_currency_mid
+$font_socketable_low     = $font_currency_low
+$font_socketable_very_low= $font_currency_very_low
+$font_gem_high           = $font_max
+$font_gem_mid            = $font_high
+$font_gem_low            = $font_mid
+$font_gem_very_low       = $font_low
 
 # items that drop only under certain conditions
 $alert_very_specific       = 1
@@ -68,45 +100,51 @@ $alert_leveling            = 12
 # I have yet to see someone who likes 15
 $alert_error               = 15
 
+$alert_gold                = $alert_frequent
 $alert_currency_high       = $alert_high
 $alert_currency_mid        = $alert_mid
 $alert_currency_low        = $alert_low
 $alert_currency_very_low   = $alert_frequent
-$alert_gold                = $alert_frequent
+$alert_essence_high        = $alert_high
+$alert_essence_mid         = $alert_mid
+$alert_essence_low         = $alert_low
+$alert_essence_very_low    = $alert_frequent
+$alert_omen_high           = $alert_high
+$alert_omen_mid            = $alert_mid
+$alert_omen_low            = $alert_low
+$alert_omen_very_low       = $alert_frequent
+$alert_socketable_high     = $alert_high
+$alert_socketable_mid      = $alert_mid
+$alert_socketable_low      = $alert_low
+$alert_gem_high            = $alert_high
+$alert_gem_mid             = $alert_mid
+$alert_gem_low             = $alert_low
 $alert_chance              = $alert_common
 $alert_item_exceptional    = $alert_very_specific
 
 $beam_currency        = Yellow
 $beam_gem             = Green
 $beam_essence         = Blue
-$beam_soul_core       = Red
-$beam_rune            = Blue
+$beam_socketable      = Purple
 $beam_omen            = Brown
-$beam_emotion         = Grey
 
-$icon_currency_high   = 0 Yellow Star
-$icon_currency_mid    = 1 Yellow Star
-$icon_currency_low    = 2 Yellow Star
 $icon_gold_high       = 0 Yellow Circle
 $icon_gold_mid        = 2 Yellow Circle
-$icon_gem_high        = 0 Green Triangle
-$icon_gem_mid         = 2 Green Triangle
-$icon_essence_high    = 0 Blue Star
-$icon_essence_mid     = 2 Blue Star
-# socketables - use Circle
-$icon_soul_core_high  = 0 Red Circle
-$icon_soul_core_mid   = 2 Red Circle
-$icon_talisman_high   = 0 Brown Circle
-$icon_talisman_mid    = 2 Brown Circle
-$icon_rune_high       = 0 Blue Circle
-$icon_rune_mid        = 2 Blue Circle
-
-$icon_omen_high       = 0 Brown Kite
-$icon_omen_mid        = 2 Brown Kite
-$icon_emotion_high    = 0 Grey Raindrop
-$icon_emotion_mid     = 2 Grey Raindrop
-# catalysts are pretty much never valuable
-$icon_catalyst_mid    = 2 Purple Star
+$icon_currency_high   = 0 $beam_currency Star
+$icon_currency_mid    = 1 $beam_currency Star
+$icon_currency_low    = 2 $beam_currency Star
+$icon_omen_high       = 0 $beam_omen Kite
+$icon_omen_mid        = 1 $beam_omen Kite
+$icon_omen_low        = 2 $beam_omen Kite
+$icon_socketable_high = 0 $beam_socketable Circle
+$icon_socketable_mid  = 1 $beam_socketable Circle
+$icon_socketable_low  = 2 $beam_socketable Circle
+$icon_gem_high        = 0 $beam_gem Triangle
+$icon_gem_mid         = 1 $beam_gem Triangle
+$icon_gem_low         = 2 $beam_gem Triangle
+$icon_essence_high    = 0 $beam_essence Star
+$icon_essence_mid     = 2 $beam_essence Star
+$icon_essence_low     = -1
 $icon_error           = 0 Red UpsideDownHouse
 
 $actions_currency_high = {
@@ -139,6 +177,7 @@ $actions_currency_low = {
 
 $actions_currency_very_low = {
 	SetTextColor $color_currency_very_low
+	SetBorderColor $color_currency_very_low
 	SetBackgroundColor $color_black
 	SetFontSize $font_currency_very_low
 	SetAlertSound $alert_currency_very_low
@@ -166,16 +205,49 @@ $actions_quest_items = {
 $cfg_default_background_color = $color_black
 $cfg_default_font_size = 36
 
-$show_scrolls_wisdom = True
+$cfg_show_scrolls_wisdom = True
 
-$cfg_show_currency_low = True
-$cfg_show_currency_very_low = True
+$cfg_currency_high_min_value = 20
+$cfg_currency_mid_min_value  =  0.5
+$cfg_currency_low_min_value  =  0.05
+$cfg_show_currency_low        = True
+$cfg_show_currency_very_low   = True
 $cfg_show_currency_low_shards = True
+
+$cfg_essences_high_min_value = 20
+$cfg_essences_mid_min_value  =  1
+$cfg_essences_low_min_value  =  0.25
+$cfg_show_essences_mid      = True
+$cfg_show_essences_low      = True
+$cfg_show_essences_very_low = True
+
+$cfg_omens_high_min_value = 50
+$cfg_omens_mid_min_value  = 10
+$cfg_omens_low_min_value  =  1
+$cfg_show_omens_mid      = True
+$cfg_show_omens_low      = True
+$cfg_show_omens_very_low = True
+
+$cfg_show_socketables_mid      = True
+$cfg_show_socketables_low      = True
+$cfg_show_socketables_very_low = True
+$cfg_socketables_high_min_value = 50
+$cfg_socketables_mid_min_value  = 10
+$cfg_socketables_low_min_value  =  1
+# (on unknown prices)
 $cfg_show_runes_lesser  = True
 $cfg_show_runes_regular = True
 $cfg_show_runes_greater = True
 $cfg_show_talismans_regular = True
 $cfg_show_talismans_endgame = True
+
+$cfg_gems_high_min_value = 50
+$cfg_gems_mid_min_value  =  5
+$cfg_gems_low_min_value  =  0.5
+$cfg_show_gems_mid      = True
+$cfg_show_gems_low      = True
+$cfg_show_gems_very_low = True
+
 $cfg_show_flasks = True
 $cfg_show_flasks_high_ilvl = True
 $cfg_show_charms = True
@@ -185,7 +257,11 @@ $cfg_show_salvage_sockets = True
 $cfg_show_salvage_quality_flasks = True
 $cfg_show_salvage_quality_charms = True
 $cfg_show_salvage_quality_gear = True
-$cfg_gear_unid_tier_min = 1
+$cfg_gear_unid_tier_min = 1 # set to 1 to show all
+
+$cfg_always_show_splinters = True
+$cfg_always_show_expedition = True
+$cfg_always_show_uncut_support_gems = True
 
 ##############################################################################
 ### Filter starts here
@@ -255,71 +331,48 @@ Class == "Stackable Currency"
 	}
 
 	# Splinters etc
-	BaseType == "Simulacrum Splinter" "Breach Splinter" "Petition Splinter" "Runic Splinter" "Broken Circle Artifact" "Black Scythe Artifact" "Order Artifact" "Sun Artifact"
+	BaseType == "Simulacrum Splinter" "Breach Splinter" "Petition Splinter" "Runic Splinter"
 	{
 		Expand $actions_currency_low
-		Show
+		ShowDiscard $cfg_always_show_splinters
+	}
+
+	BaseType == "Broken Circle Artifact" "Black Scythe Artifact" "Order Artifact" "Sun Artifact" "Exotic Coinage"
+	{
+		Expand $actions_currency_low
+		ShowDiscard $cfg_always_show_expedition
 	}
 
 	BaseType == "Scroll of Wisdom"
 	{
 		SetTextColor 220 195 160
 		SetFontSize $font_scroll
-		ShowHide $show_scrolls_wisdom
+		ShowHide $cfg_show_scrolls_wisdom
 	}
 
-	Autogen "Currency"
+	Autogen "Currency" "Abyss Currency" "Catalysts" "Emotions" "Expedition"
 	{
-		Price >= 20
+		Price >= $cfg_currency_high_min_value
 		{
 			Expand $actions_currency_high
 			Show
 		}
 
-		Price < 20
-		Price >= 0.25
+		Price < $cfg_currency_high_min_value
+		Price >= $cfg_currency_mid_min_value
 		{
 			Expand $actions_currency_mid
 			Show
 		}
 
-		Price < 0.25
-		Price >= 0.05
+		Price < $cfg_currency_mid_min_value
+		Price >= $cfg_currency_low_min_value
 		{
 			Expand $actions_currency_low
 			ShowHide $cfg_show_currency_low
 		}
 
-		Price < 0.05
-		{
-			Expand $actions_currency_very_low
-			ShowHide $cfg_show_currency_very_low
-		}
-	}
-
-	Autogen "Abyss Currency"
-	{
-		Price >= 20
-		{
-			Expand $actions_currency_high
-			Show
-		}
-
-		Price < 20
-		Price >= 1
-		{
-			Expand $actions_currency_mid
-			Show
-		}
-
-		Price < 1
-		Price >= 0.05
-		{
-			Expand $actions_currency_low
-			ShowHide $cfg_show_currency_low
-		}
-
-		Price < 0.05
+		Price < $cfg_currency_low_min_value
 		{
 			Expand $actions_currency_very_low
 			ShowHide $cfg_show_currency_very_low
@@ -334,15 +387,65 @@ Class == "Stackable Currency"
 	}
 
 	# Chaos/Exalt tier"
-	BaseType == "Gemcutter's Prism" "Orb of Annulment" "Orb of Chance" "Glassblower's Bauble" "Exalted Orb" "Vaal Orb" "Chaos Orb" "Chance Shard" "Greater Jeweller's Orb" "Exotic Coinage" "Artificer's Orb" "Orb of Alchemy" "Greater Chaos Orb" "Perfect Chaos Orb" "Greater Exalted Orb" "Perfect Exalted Orb" "Fracturing Orb"
+	BaseType == "Gemcutter's Prism" "Orb of Annulment" "Orb of Chance" "Glassblower's Bauble" "Exalted Orb" "Vaal Orb" "Chaos Orb" "Chance Shard" "Greater Jeweller's Orb" "Artificer's Orb" "Orb of Alchemy" "Greater Chaos Orb" "Perfect Chaos Orb" "Greater Exalted Orb" "Perfect Exalted Orb" "Fracturing Orb"
 	{
 		Expand $actions_currency_mid
 		Show
 	}
 
+	Autogen "Essences"
+	{
+		Price >= $cfg_essences_high_min_value
+		{
+			SetTextColor $color_white
+			SetBorderColor $color_essence_high
+			SetBackgroundColor $color_essence_high
+			SetFontSize $font_essence_high
+			SetAlertSound $alert_essence_high
+			PlayEffect $beam_essence
+			MinimapIcon $icon_essence_high
+			Show
+		}
+
+		Price < $cfg_essences_high_min_value
+		Price >= $cfg_essences_mid_min_value
+		{
+			SetTextColor $color_white
+			SetBorderColor $color_essence_mid
+			SetBackgroundColor $color_essence_mid
+			SetFontSize $font_essence_mid
+			SetAlertSound $alert_essence_mid
+			PlayEffect $beam_essence
+			MinimapIcon $icon_essence_mid
+			ShowHide $cfg_show_essences_mid
+		}
+
+		Price < $cfg_essences_mid_min_value
+		Price >= $cfg_essences_low_min_value
+		{
+			SetTextColor $color_essence_low
+			SetBorderColor $color_essence_low
+			SetBackgroundColor $color_black
+			SetFontSize $font_essence_low
+			SetAlertSound $alert_essence_low
+			MinimapIcon $icon_essence_low
+			ShowHide $cfg_show_essences_low
+		}
+
+		Price < $cfg_essences_low_min_value
+		{
+			SetTextColor $color_essence_very_low
+			SetBackgroundColor $color_black
+			SetFontSize $font_essence_very_low
+			SetAlertSound $alert_essence_very_low
+			ShowHide $cfg_show_essences_very_low
+		}
+	}
+
 	BaseType "Essence of"
 	{
 		Expand $actions_currency_mid
+		SetBorderColor $color_unknown_price
 		Show
 	}
 
@@ -390,7 +493,61 @@ Class == "Stackable Currency"
 
 Class == "Omen"
 {
-	Expand $actions_currency_mid
+	Autogen "Omens"
+	{
+		Price >= $cfg_omens_high_min_value
+		{
+			SetTextColor $color_black
+			SetBorderColor $color_omen_high
+			SetBackgroundColor $color_omen_high
+			SetFontSize $font_omen_high
+			SetAlertSound $alert_omen_high
+			PlayEffect $beam_omen
+			MinimapIcon $icon_omen_high
+			Show
+		}
+
+		Price < $cfg_omens_high_min_value
+		Price >= $cfg_omens_mid_min_value
+		{
+			SetTextColor $color_black
+			SetBorderColor $color_omen_mid
+			SetBackgroundColor $color_omen_mid
+			SetFontSize $font_omen_mid
+			SetAlertSound $alert_omen_mid
+			PlayEffect $beam_omen
+			MinimapIcon $icon_omen_mid
+			ShowHide $cfg_show_omens_mid
+		}
+
+		Price < $cfg_omens_mid_min_value
+		Price >= $cfg_omens_low_min_value
+		{
+			SetTextColor $color_black
+			SetBorderColor $color_omen_low
+			SetBackgroundColor $color_omen_low
+			SetFontSize $font_omen_low
+			SetAlertSound $alert_omen_low
+			MinimapIcon $icon_omen_low
+			ShowHide $cfg_show_omens_low
+		}
+
+		Price < $cfg_omens_low_min_value
+		{
+			SetTextColor $color_omen_very_low
+			SetBorderColor $color_omen_very_low
+			SetBackgroundColor $color_black
+			SetFontSize $font_omen_very_low
+			SetAlertSound $alert_omen_very_low
+			ShowHide $cfg_show_omens_very_low
+		}
+	}
+
+	# unknown price
+	SetTextColor $color_black
+	SetBorderColor $color_unknown_price
+	SetBackgroundColor $color_omen_mid
+	SetFontSize $font_omen_mid
 	Show
 }
 
@@ -400,6 +557,54 @@ Class == "Omen"
 
 Class == "Socketable"
 {
+	Autogen "Runes" "Soul Cores" "Talismans"
+	{
+		Price >= $cfg_socketables_high_min_value
+		{
+			SetTextColor $color_white
+			SetBorderColor $color_socketable_high
+			SetBackgroundColor $color_socketable_high
+			SetFontSize $font_socketable_high
+			SetAlertSound $alert_socketable_high
+			PlayEffect $beam_socketable
+			MinimapIcon $icon_socketable_high
+			Show
+		}
+
+		Price < $cfg_socketables_high_min_value
+		Price >= $cfg_socketables_mid_min_value
+		{
+			SetTextColor $color_black
+			SetBorderColor $color_socketable_mid
+			SetBackgroundColor $color_socketable_mid
+			SetFontSize $font_socketable_mid
+			SetAlertSound $alert_socketable_mid
+			PlayEffect $beam_socketable
+			MinimapIcon $icon_socketable_mid
+			ShowHide $cfg_show_socketables_mid
+		}
+
+		Price < $cfg_socketables_mid_min_value
+		Price >= $cfg_socketables_low_min_value
+		{
+			SetTextColor $color_black
+			SetBorderColor $color_socketable_low
+			SetBackgroundColor $color_socketable_low
+			SetFontSize $font_socketable_low
+			SetAlertSound $alert_socketable_low
+			MinimapIcon $icon_socketable_low
+			ShowHide $cfg_show_socketables_low
+		}
+
+		Price < $cfg_socketables_low_min_value
+		{
+			SetTextColor $color_socketable_very_low
+			SetBackgroundColor $color_black
+			SetFontSize $font_socketable_very_low
+			ShowHide $cfg_show_socketables_very_low
+		}
+	}
+
 	# Runes
 	{
 		SetFontSize 42
@@ -490,49 +695,83 @@ Class == "Socketable"
 # Gems
 #--------------------------
 
-Class == "Uncut Skill Gems" "Uncut Spirit Gems" "Uncut Support Gems" "Support Gems"
+Class == "Uncut Skill Gems" "Uncut Spirit Gems" "Support Gems"
 {
+	Autogen "Uncut Skill Gems" "Uncut Spirit Gems" "Lineage Support Gems"
 	{
-		SetFontSize $font_max
-		SetTextColor $color_gem
-		SetBorderColor $color_gem
-		SetBackgroundColor $color_white
-		SetAlertSound $alert_high
-		PlayEffect $beam_gem
-		MinimapIcon $icon_gem_high
-
-		Price >= 1
+		Price >= $cfg_gems_high_min_value
 		{
-			Autogen "Uncut Skill Gems"
-			{
-				Show
-			}
-
-			Autogen "Uncut Spirit Gems"
-			{
-				Show
-			}
-
-			Autogen "Lineage Support Gems"
-			{
-				Show
-			}
+			SetTextColor $color_gem
+			SetBorderColor $color_gem
+			SetBackgroundColor $color_white
+			SetFontSize $font_gem_high
+			SetAlertSound $alert_gem_high
+			PlayEffect $beam_gem
+			MinimapIcon $icon_gem_high
+			Show
 		}
 
+		Price < $cfg_gems_high_min_value
+		Price >= $cfg_gems_mid_min_value
+		{
+			SetTextColor $color_black
+			SetBorderColor $color_gem
+			SetBackgroundColor $color_gem
+			SetFontSize $font_gem_mid
+			SetAlertSound $alert_gem_mid
+			PlayEffect $beam_gem
+			MinimapIcon $icon_gem_mid
+			ShowHide $cfg_show_gems_mid
+		}
+
+		Price < $cfg_gems_mid_min_value
+		Price >= $cfg_gems_low_min_value
+		{
+			SetTextColor $color_black
+			SetBorderColor $color_gem
+			SetBackgroundColor $color_gem
+			SetFontSize $font_gem_low
+			SetAlertSound $alert_gem_low
+			MinimapIcon $icon_gem_low
+			ShowHide $cfg_show_gems_low
+		}
+
+		Price < $cfg_gems_low_min_value
+		{
+			SetTextColor $color_gem
+			SetBorderColor $color_gem
+			SetBackgroundColor $color_black
+			SetFontSize $font_gem_very_low
+			ShowHide $cfg_show_gems_very_low
+		}
 	}
 
 	SetFontSize $font_mid
-	SetTextColor $color_gem
-	SetBorderColor $color_gem
+	SetTextColor $color_black
+	SetBorderColor $color_unknown_price
+	SetBackgroundColor $color_gem
 	SetAlertSound $alert_mid
 	PlayEffect $beam_gem Temp
-	# 0.3.0 Lineage Supports
+
+	# 0.3.0 Lineage Supports (unknown price)
 	BaseType "Atalui's Bloodletting" "Einhar's Beastrite" "Vilenta's Propulsion" "Ahn's Citadel" "Brutus' Brain" "Tecrod's Revenge" "Uruk's Smelting" "Paquate's Pact" "Ailith's Chimes" "Doedre's Undoing" "Ratha's Assault" "Arjun's Medal" "Kaom's Madness" "Sione's Temper" "Ixchel's Torment" "Romira's Requital" "Tawhoa's Tending" "Piety's Mercy" "Dialla's Desire" "Kalisa's Crescendo" "Xoph's Pyre" "Esh's Radiance" "Tul's Stillness" "Uul-Netol's Embrace" "Rakiata's Flow" "Rigwald's Ferocity" "Uhtred's Exodus" "Uhtred's Omen" "Uhtred's Augury" "Daresso's Passion" "Atziri's Allure" "Tacati's Ire" "Zarokh's Refrain" "Garukhan's Resolve" "Kurgal's Leash" "Kulemak's Dominion" "Amanamu's Tithe" "Varashta's Blessing" "Arbiter's Ignition" "Arakaali's Lust"
 	{
 		Show
 	}
 
+	# Other unknown Skill and Spirit Gems
 	Show
+}
+
+# These are never valuable
+# Users might want to disable them in late game
+Class == "Uncut Support Gems"
+{
+	SetTextColor $color_gem
+	SetBorderColor $color_gem
+	SetBackgroundColor $color_black
+	SetFontSize $font_gem_low
+	ShowHide $cfg_always_show_uncut_support_gems
 }
 
 #--------------------------
