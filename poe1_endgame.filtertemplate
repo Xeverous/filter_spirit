@@ -698,6 +698,18 @@ Class == "Stackable Currency"
 		ShowHide $show_scrolls_portal
 	}
 
+	# 3.19 reworked Harvest - make each of respective color?
+	BaseType "Crystallised Lifeforce"
+	{
+		SetBorderColor $color_harvest
+		SetTextColor $color_black
+		SetBackgroundColor $color_harvest
+		SetFontSize $font_max
+		SetAlertSound $alert_currency_mid
+		MinimapIcon $icon_harvest
+		Show
+	}
+
 	Autogen "currency"
 	{
 		Price >= 50
@@ -1104,18 +1116,6 @@ Class == "Stackable Currency"
 	BaseType "Enkindling Orb" "Instilling Orb" "Exotic Coinage" "Scrap Metal" "Astragali" "Burial Medallion" "Lesser Broken Circle Artifact" "Greater Broken Circle Artifact" "Grand Broken Circle Artifact" "Exceptional Broken Circle Artifact" "Lesser Black Scythe Artifact" "Greater Black Scythe Artifact" "Grand Black Scythe Artifact" "Exceptional Black Scythe Artifact" "Lesser Order Artifact" "Greater Order Artifact" "Grand Order Artifact" "Exceptional Order Artifact" "Lesser Sun Artifact" "Greater Sun Artifact" "Grand Sun Artifact" "Exceptional Sun Artifact"
 	{
 		Expand $actions_currency_mid
-		Show
-	}
-
-	# 3.19 reworked Harvest - make each of respective color?
-	BaseType "Crystallised Lifeforce"
-	{
-		SetBorderColor $color_harvest
-		SetTextColor $color_black
-		SetBackgroundColor $color_harvest
-		SetFontSize $font_max
-		SetAlertSound $alert_currency_mid
-		MinimapIcon $icon_harvest
 		Show
 	}
 
@@ -1995,7 +1995,7 @@ Class == "Maps"
 	{
 		SetTextColor $color_black
 		SetBorderColor $color_black
-		SetBackgroundColor $color_atlas
+		SetBackgroundColor 0 252 186 # differentiate from other maps
 		SetFontSize $font_map_enchanted
 		SetAlertSound $alert_map_enchanted
 		MinimapIcon $icon_map_enchanted
