@@ -18,6 +18,19 @@ Filters know nothing about allocation of items in a party. All drops are treated
 
 ## usage
 
+**How do I filter for cluster jewels?**
+
+There is no separate class for cluster jewels, however there is a condition that detects enchantments, therefore:
+
+```
+Class "Jewel"
+AnyEnchantment True
+```
+
+**Does `HasExplicitMod` detect Metamorph rewards?**
+
+No.
+
 **How about auto-refresh feature?**
 
 Could be added very easily. The problem is that the game client is not aware that the filter file has been updated so you have to manually open UI options => item filter => reload.
