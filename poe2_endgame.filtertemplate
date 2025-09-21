@@ -889,7 +889,7 @@ Rarity Unique
 		SetTextColor 0 240 190 255
 		SetBorderColor 0 240 190 255
 		SetFontSize $font_max
-		SetAlertSound $alert_high
+		SetAlertSound $alert_extraordinary
 		MinimapIcon 0 Brown Star
 		Show
 	}
@@ -898,7 +898,7 @@ Rarity Unique
 	SetBorderColor 175 96 37 255
 	SetBackgroundColor 53 13 13 255
 	SetFontSize 40
-	SetAlertSound 3 300
+	SetAlertSound $alert_check_required
 	MinimapIcon 2 Brown Star
 	Show
 }
