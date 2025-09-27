@@ -159,8 +159,7 @@ struct parse_metadata
 struct parse_failure_data
 {
 	parse_metadata metadata;
-	error_holder_type errors;
-	iterator_type parser_stop_position;
+	parse_error error;
 };
 
 void print_parse_errors(const parse_failure_data& parse_data, log::logger& logger);

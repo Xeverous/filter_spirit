@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_SUITE(parser_suite)
 			std::variant<parser::parsed_spirit_filter, parser::parse_failure_data> parse_result = parser::parse_spirit_filter(input);
 			BOOST_TEST_REQUIRE(std::holds_alternative<parser::parse_failure_data>(parse_result));
 			const auto& parse_data = std::get<parser::parse_failure_data>(parse_result);
-			BOOST_TEST(!parse_data.errors.empty());
+			BOOST_TEST(!parse_data.error.what_was_expected.empty());
 		}
 	};
 

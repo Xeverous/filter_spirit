@@ -57,22 +57,6 @@ struct annotate_on_success
 	}
 };
 
-struct error_on_error
-{
-	template <typename Iterator, typename Exception, typename Context>
-	x3::error_handler_result on_error(
-		Iterator& first,
-		const Iterator& /* last */,
-		const Exception& ex, // x3::expectation_failure<Iterator> or similar type
-		const Context& context)
-	{
-		error_holder_type& error_holder = x3::get<error_holder_tag>(context).get();
-		error_holder.push_back(parse_error{ex.where(), first, ex.which()});
-		return x3::error_handler_result::fail;
-	}
-};
-
-
 // rule IDs
 // use multiple inheritance to add more handlers
 // rules which do not have any handlers can use forward declared types
@@ -80,55 +64,55 @@ struct error_on_error
 
 namespace common
 {
-	struct identifier_class                      : error_on_error, annotate_on_success {};
-	struct integer_literal_class                 : error_on_error, annotate_on_success {};
-	struct floating_point_literal_class          : error_on_error, annotate_on_success {};
-	struct string_literal_class                  : error_on_error, annotate_on_success {};
-	struct socket_spec_literal_class             : error_on_error, annotate_on_success {};
-	struct boolean_literal_class                 : error_on_error, annotate_on_success {};
-	struct rarity_literal_class                  : error_on_error, annotate_on_success {};
-	struct shape_literal_class                   : error_on_error, annotate_on_success {};
-	struct suit_literal_class                    : error_on_error, annotate_on_success {};
-	struct influence_literal_class               : error_on_error, annotate_on_success {};
-	struct shaper_voice_line_literal_class       : error_on_error, annotate_on_success {};
-	struct temp_literal_class                    : error_on_error, annotate_on_success {};
-	struct none_literal_class                    : error_on_error, annotate_on_success {};
+	struct identifier_class                      : annotate_on_success {};
+	struct integer_literal_class                 : annotate_on_success {};
+	struct floating_point_literal_class          : annotate_on_success {};
+	struct string_literal_class                  : annotate_on_success {};
+	struct socket_spec_literal_class             : annotate_on_success {};
+	struct boolean_literal_class                 : annotate_on_success {};
+	struct rarity_literal_class                  : annotate_on_success {};
+	struct shape_literal_class                   : annotate_on_success {};
+	struct suit_literal_class                    : annotate_on_success {};
+	struct influence_literal_class               : annotate_on_success {};
+	struct shaper_voice_line_literal_class       : annotate_on_success {};
+	struct temp_literal_class                    : annotate_on_success {};
+	struct none_literal_class                    : annotate_on_success {};
 
-	struct literal_expression_class              : error_on_error, annotate_on_success {};
-	struct comparison_operator_class             : error_on_error, annotate_on_success {};
-	struct comparison_expression_class           : error_on_error, annotate_on_success {};
-	struct unknown_expression_class              : error_on_error, annotate_on_success {};
+	struct literal_expression_class              : annotate_on_success {};
+	struct comparison_operator_class             : annotate_on_success {};
+	struct comparison_expression_class           : annotate_on_success {};
+	struct unknown_expression_class              : annotate_on_success {};
 
-	struct static_visibility_statement_class     : error_on_error, annotate_on_success {};
-	struct continue_statement_class              : error_on_error, annotate_on_success {};
-	struct import_statement_class                : error_on_error, annotate_on_success {};
+	struct static_visibility_statement_class     : annotate_on_success {};
+	struct continue_statement_class              : annotate_on_success {};
+	struct import_statement_class                : annotate_on_success {};
 }
 
 namespace rf
 {
 	// ---- literal types ----
 
-	struct string_class                          : error_on_error, annotate_on_success {};
+	struct string_class                          : annotate_on_success {};
 
 	// ---- expression ----
 
-	struct literal_sequence_class                : error_on_error, annotate_on_success {};
+	struct literal_sequence_class                : annotate_on_success {};
 
 	// ---- conditions ----
 
-	struct condition_class                       : error_on_error, annotate_on_success {};
+	struct condition_class                       : annotate_on_success {};
 
 	// ---- actions ----
 
-	struct action_class                          : error_on_error, annotate_on_success {};
+	struct action_class                          : annotate_on_success {};
 
 	// ---- filter structure ----
 
-	struct rule_class                            : error_on_error, annotate_on_success {};
-	struct static_visibility_statement_class     : error_on_error, annotate_on_success {};
-	struct filter_block_class                    : error_on_error, annotate_on_success {};
-	struct block_variant_class                   : error_on_error, annotate_on_success {};
-	struct grammar_class                         : error_on_error, annotate_on_success {};
+	struct rule_class                            : annotate_on_success {};
+	struct static_visibility_statement_class     : annotate_on_success {};
+	struct filter_block_class                    : annotate_on_success {};
+	struct block_variant_class                   : annotate_on_success {};
+	struct grammar_class                         : annotate_on_success {};
 } // namespace rf
 
 namespace sf
@@ -139,7 +123,7 @@ namespace sf
 
 	// ---- fundamental tokens ----
 
-	struct name_class                            : error_on_error, annotate_on_success {};
+	struct name_class                            : annotate_on_success {};
 
 	// ---- literal types ----
 
@@ -147,42 +131,42 @@ namespace sf
 
 	// ---- expressions ----
 
-	struct primitive_value_class                 : error_on_error, annotate_on_success {};
-	struct sequence_class                        : error_on_error, annotate_on_success {};
-	struct statement_list_expression_class       : error_on_error, annotate_on_success {};
-	struct value_expression_class                : error_on_error, annotate_on_success {};
+	struct primitive_value_class                 : annotate_on_success {};
+	struct sequence_class                        : annotate_on_success {};
+	struct statement_list_expression_class       : annotate_on_success {};
+	struct value_expression_class                : annotate_on_success {};
 
 	// ---- definitions ----
 
-	struct constant_definition_class             : error_on_error, annotate_on_success {};
-	struct definition_class                      : error_on_error, annotate_on_success {};
+	struct constant_definition_class             : annotate_on_success {};
+	struct definition_class                      : annotate_on_success {};
 
 	// ---- conditions ----
 
-	struct autogen_condition_class               : error_on_error, annotate_on_success {};
-	struct price_comparison_condition_class      : error_on_error, annotate_on_success {};
-	struct official_condition_class              : error_on_error, annotate_on_success {};
-	struct condition_class                       : error_on_error, annotate_on_success {};
+	struct autogen_condition_class               : annotate_on_success {};
+	struct price_comparison_condition_class      : annotate_on_success {};
+	struct official_condition_class              : annotate_on_success {};
+	struct condition_class                       : annotate_on_success {};
 
 	// ---- actions ----
 
-	struct set_alert_sound_action_class          : error_on_error, annotate_on_success {};
-	struct official_action_class                 : error_on_error, annotate_on_success {};
-	struct action_class                          : error_on_error, annotate_on_success {};
+	struct set_alert_sound_action_class          : annotate_on_success {};
+	struct official_action_class                 : annotate_on_success {};
+	struct action_class                          : annotate_on_success {};
 
 	// ---- filter structure ----
 
-	struct expand_statement_class                : error_on_error, annotate_on_success {};
-	struct dynamic_visibility_policy_class       : error_on_error, annotate_on_success {};
-	struct dynamic_visibility_statement_class    : error_on_error, annotate_on_success {};
-	struct visibility_statement_class            : error_on_error, annotate_on_success {};
-	struct behavior_statement_class              : error_on_error, annotate_on_success {};
-	struct unknown_statement_class               : error_on_error, annotate_on_success {};
-	struct statement_class                       : error_on_error, annotate_on_success {};
-	struct rule_block_class                      : error_on_error, annotate_on_success {};
-	struct filter_structure_class                : error_on_error, annotate_on_success {};
+	struct expand_statement_class                : annotate_on_success {};
+	struct dynamic_visibility_policy_class       : annotate_on_success {};
+	struct dynamic_visibility_statement_class    : annotate_on_success {};
+	struct visibility_statement_class            : annotate_on_success {};
+	struct behavior_statement_class              : annotate_on_success {};
+	struct unknown_statement_class               : annotate_on_success {};
+	struct statement_class                       : annotate_on_success {};
+	struct rule_block_class                      : annotate_on_success {};
+	struct filter_structure_class                : annotate_on_success {};
 
-	struct grammar_class                         : error_on_error, annotate_on_success {};
+	struct grammar_class                         : annotate_on_success {};
 } // namespace sf
 
 namespace common

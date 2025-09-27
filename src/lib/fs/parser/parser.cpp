@@ -1,4 +1,5 @@
 #include <fs/parser/parser.hpp>
+#include <fs/parser/detail/config.hpp>
 #include <fs/parser/detail/grammar.hpp>
 #include <fs/log/logger.hpp>
 
@@ -19,19 +20,23 @@ parse_impl(
 	Grammar grammar,
 	Skipper skipper)
 {
-	const char *const first{input.data()};
-	const char *const last {input.data() + input.size()};
+	const iterator_type first{input.data()};
+	const iterator_type last {input.data() + input.size()};
 	detail::position_cache_type position_cache(first, last);
-	error_holder_type error_holder;
 	// note: x3::with<> must match with grammar's context_type, otherwise you will get linker errors
-	const auto parser = x3::with<detail::position_cache_tag>(std::ref(position_cache))
-	[
-		x3::with<detail::error_holder_tag>(std::ref(error_holder))[grammar]
-	];
+	const auto parser = x3::with<detail::position_cache_tag>(std::ref(position_cache))[grammar];
 
 	Ast ast;
-	const char* it = first;
-	const bool result = x3::phrase_parse(it, last, parser, skipper, ast);
+	iterator_type it = first;
+	bool result = false;
+	parse_error error{first, {}};
+	try {
+		result = x3::phrase_parse(it, last, parser, skipper, ast);
+	}
+	catch (const x3::expectation_failure<iterator_type>& ex) {
+		error.error_place = ex.where();
+		error.what_was_expected = ex.which();
+	}
 
 	if (it != last || !result) {
 		return parse_failure_data{
@@ -39,8 +44,7 @@ parse_impl(
 				lookup_data(std::move(position_cache)),
 				line_lookup(first, last)
 			},
-			std::move(error_holder),
-			it
+			std::move(error)
 		};
 	}
 
@@ -51,25 +55,6 @@ parse_impl(
 			line_lookup(first, last)
 		},
 	};
-}
-
-void print_error(
-	const parse_error& error,
-	const parse_metadata& metadata,
-	fs::log::logger& logger)
-{
-	auto stream = logger.error();
-	stream << "parse failure\n";
-
-	text_context tc = metadata.lines.text_context_for(range_type(error.error_place, error.error_place));
-	stream.print_line_number_with_description(
-		static_cast<int>(tc.line_number), "expected ", error.what_was_expected, " here");
-	stream.print_pointed_code(tc.surrounding_lines, error.error_place);
-
-	tc = metadata.lines.text_context_for(range_type(error.backtracking_place, error.backtracking_place));
-	stream.print_line_number_with_description(
-		static_cast<int>(tc.line_number), "previous checkpoint here");
-	stream.print_pointed_code(tc.surrounding_lines, error.backtracking_place);
 }
 
 } // namespace
@@ -140,13 +125,18 @@ std::variant<parsed_real_filter, parse_failure_data> parse_real_filter(std::stri
 
 void print_parse_errors(const parse_failure_data& parse_data, log::logger& logger)
 {
-	if (parse_data.errors.empty()) {
+	if (parse_data.error.what_was_expected.empty()) {
 		logger.error() << "Parse failed but no error information has been generated.\n" << log::strings::request_bug_report;
 		return;
 	}
 
-	for (const parse_error& error : parse_data.errors)
-		print_error(error, parse_data.metadata, logger);
+	auto stream = logger.error();
+	stream << "parse failure\n";
+
+	text_context tc = parse_data.metadata.lines.text_context_for(range_type(parse_data.error.error_place, parse_data.error.error_place));
+	stream.print_line_number_with_description(
+		static_cast<int>(tc.line_number), "expected ", parse_data.error.what_was_expected, " here");
+	stream.print_pointed_code(tc.surrounding_lines, parse_data.error.error_place);
 }
 
 }
