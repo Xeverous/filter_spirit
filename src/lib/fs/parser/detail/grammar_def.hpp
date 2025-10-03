@@ -33,7 +33,7 @@ namespace common
 	const auto non_eol_whitespace_def = x3::space - x3::eol;
 	BOOST_SPIRIT_DEFINE(non_eol_whitespace)
 
-	const end_of_line_type end_of_line = "end of line or file";
+	const end_of_line_type end_of_line = "end of line or end of file";
 	const auto end_of_line_def = comment | x3::eol | &x3::eoi;
 	BOOST_SPIRIT_DEFINE(end_of_line)
 

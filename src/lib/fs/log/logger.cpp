@@ -38,7 +38,8 @@ message_stream& operator<<(message_stream& stream, severity s)
 
 void message_stream::print_line_number(int line_number)
 {
-	*this << "line " << line_number << ": ";
+	// add 1 to convert from 0-based index
+	*this << "line " << line_number + 1 << ": ";
 }
 
 void message_stream::print_underlined_code(utility::underlined_code uc, char underline_char)

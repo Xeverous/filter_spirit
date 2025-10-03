@@ -283,7 +283,7 @@ underlined_code code_underliner::next() noexcept
 
 	const char *const underline_line_first = indent_last + spaces;
 	const char *const underline_line_last  = find_line_end(underline_line_first, underline_last);
-	const auto underlines = underline_line_last - underline_line_first;
+	const auto underlines = std::max<std::ptrdiff_t>(underline_line_last - underline_line_first, 1);
 
 	code_it = skip_lf_cr(code_line_last, code_last);
 
