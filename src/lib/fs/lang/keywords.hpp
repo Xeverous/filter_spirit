@@ -74,6 +74,7 @@ namespace rf
 	constexpr auto transfigured_gem = "TransfiguredGem";
 	constexpr auto zana_memory      = "ZanaMemory";
 	constexpr auto memory_strands   = "MemoryStrands";
+	constexpr auto foulborn         = "Foulborn";
 
 	// PoE 2 only
 	constexpr auto unidentified_item_tier = "UnidentifiedItemTier";

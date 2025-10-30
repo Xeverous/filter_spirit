@@ -166,6 +166,7 @@ namespace rf
 				(lang::keywords::rf::has_crucible_passive_tree, property::has_crucible_passive_tree)
 				(lang::keywords::rf::alternate_quality,         property::alternate_quality)
 				(lang::keywords::rf::zana_memory,               property::zana_memory)
+				(lang::keywords::rf::foulborn,                  property::foulborn)
 
 				// influence
 				(lang::keywords::rf::has_influence,             property::has_influence)

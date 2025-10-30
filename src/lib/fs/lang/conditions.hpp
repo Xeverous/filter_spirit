@@ -196,6 +196,11 @@ inline std::shared_ptr<boolean_condition> make_zana_memory_condition(boolean val
 	return std::make_shared<boolean_condition_with_field_test>(official_condition_property::zana_memory, &item::zana_memory, value, origin);
 }
 
+inline std::shared_ptr<boolean_condition> make_foulborn_condition(boolean value, position_tag origin)
+{
+	return std::make_shared<boolean_condition_with_field_test>(official_condition_property::foulborn, &item::is_foulborn, value, origin);
+}
+
 // a boolean_condition which's test_item implementation calls a boolean function in the item struct
 class boolean_condition_with_function_test : public boolean_condition
 {

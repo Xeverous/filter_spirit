@@ -430,6 +430,8 @@ make_official_condition(
 			return make_boolean_condition(std::move(pc), lang::make_alternate_quality_condition, diagnostics);
 		case property_t::zana_memory:
 			return make_boolean_condition(std::move(pc), lang::make_zana_memory_condition, diagnostics);
+		case property_t::foulborn:
+			return make_boolean_condition(std::move(pc), lang::make_foulborn_condition, diagnostics);
 
 		// comparison with influence
 		case property_t::has_influence:
@@ -714,6 +716,7 @@ spirit_filter_is_condition_allowed(
 		case property_t::has_crucible_passive_tree:
 		case property_t::alternate_quality:
 		case property_t::zana_memory:
+		case property_t::foulborn:
 		// influence - only 1 is allowed
 		case property_t::has_influence: {
 			FS_ASSERT_MSG(

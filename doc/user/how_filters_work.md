@@ -135,6 +135,7 @@ HasImplicitMod         Boolean
 HasCruciblePassiveTree Boolean
 TransfiguredGem        Boolean
 ZanaMemory             Boolean
+Foulborn               Boolean
 ```
 
 Note: numeric and `Rarity` conditions can accept multiple values, but there is no practicaly point in doing so. You can cover any range with 2 lines using different comparisons, which is much better than manually specifying all possible values in 1 line.

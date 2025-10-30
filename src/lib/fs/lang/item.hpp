@@ -287,6 +287,7 @@ enum class item_validity
 	normal_rarity_with_name,
 	nonnormal_rarity_without_name,
 	non_unique_replica,
+	non_unique_foulborn,
 	resonator_or_abyss_socket_linked,
 	more_than_6_sockets,
 	invalid_item_level,
@@ -528,6 +529,9 @@ struct item
 		if (rarity_ != rarity_type::unique && is_replica)
 			return item_validity::non_unique_replica;
 
+		if (rarity_ != rarity_type::unique && is_foulborn)
+			return item_validity::non_unique_foulborn;
+
 		return item_validity::valid;
 	}
 
@@ -654,6 +658,7 @@ struct item
 	bool has_crucible_passive_tree = false;
 	bool is_transfigured_gem = false;
 	bool zana_memory = false;
+	bool is_foulborn = false;
 
 	// A logic-irrelevant field. Only for the user.
 	std::string description;

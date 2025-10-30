@@ -61,6 +61,7 @@ enum class official_condition_property
 	has_crucible_passive_tree,
 	alternate_quality,
 	zana_memory,
+	foulborn,
 
 	// comparison with influence
 	has_influence,
@@ -149,6 +150,8 @@ inline std::string_view to_keyword(official_condition_property property)
 			return keywords::rf::alternate_quality;
 		case official_condition_property::zana_memory:
 			return keywords::rf::zana_memory;
+		case official_condition_property::foulborn:
+			return keywords::rf::foulborn;
 		case official_condition_property::has_influence:
 			return keywords::rf::has_influence;
 		case official_condition_property::rarity:
