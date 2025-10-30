@@ -708,6 +708,19 @@ inline const std::initializer_list<known_item> currency_runegrafts = { // 3.26
 	{"Runegraft of Treachery",     known_item_properties(10)}
 };
 
+inline const std::initializer_list<known_item> currency_implant = {
+	{"Augmentation Implant", known_item_properties(10)},
+	{"Regal Implant",        known_item_properties(10)},
+	{"Exalted Implant",      known_item_properties(10)},
+	{"Unstable Implant",     known_item_properties(10)}
+};
+
+inline const std::initializer_list<known_item> currency_foulborn = {
+	{"Foulborn Orb of Augmentation", known_item_properties(10)},
+	{"Foulborn Regal Orb",           known_item_properties(10)},
+	{"Foulborn Exalted Orb",         known_item_properties(10)}
+};
+
 inline const std::initializer_list<known_item> fragments_lures = { // 3.11 - 3.19 (legacy now)
 	{"Craicic Lure",  known_item_properties::legacy(20)},
 	{"Farric Lure",   known_item_properties::legacy(20)},
@@ -763,6 +776,8 @@ inline const auto known_items = known_items_store::create(
 	currency_harvest_lifeforce_regular,
 	currency_harvest_lifeforce_special,
 	currency_runegrafts,
+	currency_implant,
+	currency_foulborn,
 	fragments_lures
 );
 
