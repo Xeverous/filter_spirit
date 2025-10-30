@@ -29,10 +29,19 @@ struct known_item_properties
 	: max_stack_size(max_stack_size), drop_level(drop_level), width(width), height(height)
 	{}
 
+	static known_item_properties legacy(
+		int max_stack_size, std::optional<int> drop_level = std::nullopt, int width = 1, int height = 1)
+	{
+		known_item_properties props(max_stack_size, drop_level, width, height);
+		props.drop_disabled = true;
+		return props;
+	}
+
 	int max_stack_size; // for unstackable items, just use 1
 	std::optional<int> drop_level;
 	int width;
 	int height;
+	bool drop_disabled = false;
 };
 
 struct known_item
@@ -311,8 +320,8 @@ inline const std::initializer_list<known_item> currency_atlas = {
 };
 
 inline const std::initializer_list<known_item> currency_legacy = {
-	{"Infused Engineer's Orb", known_item_properties(20, 1)}, // 3.11 - 3.19
-	{"Veiled Scarab",          known_item_properties(20, 1)}, // 3.24+ (converted legacy items)
+	{"Infused Engineer's Orb", known_item_properties::legacy(20, 1)}, // 3.11 - 3.19 (legacy now)
+	{"Veiled Scarab",          known_item_properties::legacy(20, 1)}, // 3.24+ (converted legacy items)
 };
 
 // note: drop-level for Essences has weak meaning as corruption
@@ -517,10 +526,10 @@ inline const std::initializer_list<known_item> currency_delve_resonators = { // 
 };
 
 inline const std::initializer_list<known_item> currency_delve_resonators_legacy = { // 3.4 - 3.16
-	{"Primitive Alchemical Resonator", known_item_properties(10,  1, 1, 1)},
-	{"Potent Alchemical Resonator",    known_item_properties(10,  1, 1, 2)},
-	{"Powerful Alchemical Resonator",  known_item_properties(10, 34, 2, 2)},
-	{"Prime Alchemical Resonator",     known_item_properties(10, 68, 2, 2)}
+	{"Primitive Alchemical Resonator", known_item_properties::legacy(10,  1, 1, 1)},
+	{"Potent Alchemical Resonator",    known_item_properties::legacy(10,  1, 1, 2)},
+	{"Powerful Alchemical Resonator",  known_item_properties::legacy(10, 34, 2, 2)},
+	{"Prime Alchemical Resonator",     known_item_properties::legacy(10, 68, 2, 2)}
 };
 
 inline const std::initializer_list<known_item> currency_delve_resonators_ruthless = currency_delve_resonators_legacy;
@@ -531,6 +540,10 @@ inline const std::initializer_list<known_item> currency_legion_splinters = { // 
 	{"Timeless Eternal Empire Splinter", known_item_properties(100, 1)},
 	{"Timeless Templar Splinter",        known_item_properties(100, 1)},
 	{"Timeless Maraketh Splinter",       known_item_properties(100, 1)}
+};
+
+inline const std::initializer_list<known_item> currency_blight_legacy = { // 3.17 - 3.25 (legacy now)
+	{"Oil Extractor", known_item_properties::legacy(10)}
 };
 
 inline const std::initializer_list<known_item> currency_blight_oils_regular = { // 3.8
@@ -594,10 +607,10 @@ inline const std::initializer_list<known_item> currency_delirium_orbs = { // 3.1
 };
 
 inline const std::initializer_list<known_item> currency_delirium_orbs_legacy = { // 3.10 - ?
-	{"Challenging Delirium Orb", known_item_properties(10)},
-	{"Kalguuran Delirium Orb",   known_item_properties(10)},
-	{"Imperial Delirium Orb",    known_item_properties(10)},
-	{"Primal Delirium Orb",      known_item_properties(10)}
+	{"Challenging Delirium Orb", known_item_properties::legacy(10)},
+	{"Kalguuran Delirium Orb",   known_item_properties::legacy(10)},
+	{"Imperial Delirium Orb",    known_item_properties::legacy(10)},
+	{"Primal Delirium Orb",      known_item_properties::legacy(10)}
 };
 
 // In Ruthless only 1 generic Delirum Orb is available
@@ -695,6 +708,13 @@ inline const std::initializer_list<known_item> currency_runegrafts = { // 3.26
 	{"Runegraft of Treachery",     known_item_properties(10)}
 };
 
+inline const std::initializer_list<known_item> fragments_lures = { // 3.11 - 3.19 (legacy now)
+	{"Craicic Lure",  known_item_properties::legacy(20)},
+	{"Farric Lure",   known_item_properties::legacy(20)},
+	{"Fenumal Lure",  known_item_properties::legacy(20)},
+	{"Saqawine Lure", known_item_properties::legacy(20)}
+};
+
 inline const known_item_collection group_currency = {{
 	std::make_pair(currency_basic .begin(), currency_basic .end()),
 	std::make_pair(currency_shards.begin(), currency_shards.end()),
@@ -710,7 +730,7 @@ inline const known_item_collection group_currency = {{
 inline const auto known_items = known_items_store::create(
 	{
 		known_item{"Tattoo", known_item_properties(10)},
-		known_item{"Scarab", known_item_properties(10)}
+		known_item{"Scarab", known_item_properties(20)}
 	},
 	currency_basic,
 	currency_shards,
@@ -725,6 +745,7 @@ inline const auto known_items = known_items_store::create(
 	currency_delve_resonators_legacy,
 	// currency_delve_resonators_ruthless, (same as currency_delve_resonators_legacy)
 	currency_legion_splinters,
+	currency_blight_legacy,
 	currency_blight_oils_regular,
 	currency_blight_oils_special,
 	currency_catalysts,
@@ -741,7 +762,8 @@ inline const auto known_items = known_items_store::create(
 	currency_scouting_reports,
 	currency_harvest_lifeforce_regular,
 	currency_harvest_lifeforce_special,
-	currency_runegrafts
+	currency_runegrafts,
+	fragments_lures
 );
 
 } // namespace poe1
