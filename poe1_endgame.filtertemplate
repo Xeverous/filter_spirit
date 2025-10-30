@@ -2437,7 +2437,8 @@ Rarity <= Rare
 		ShowDiscard $show_gear_mods_warband
 	}
 
-	HasExplicitMod == $cfg_gear_mods_delve {
+	HasExplicitMod == $cfg_gear_mods_delve
+	{
 		SetBackgroundColor $color_gear_mods_incursion
 		SetAlertSound $alert_gear_mods_incursion
 		ShowDiscard $show_gear_mods_delve
