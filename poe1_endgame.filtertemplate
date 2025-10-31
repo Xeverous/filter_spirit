@@ -765,6 +765,26 @@ Class == "Stackable Currency"
 		Show
 	}
 
+	# 3.27 Foulborn currency (better orbs)
+	BaseType == "Foulborn Exalted Orb"
+	{
+		Expand $actions_currency_high
+		Show
+	}
+
+	BaseType == "Foulborn Orb of Augmentation" "Foulborn Regal Orb"
+	{
+		Expand $actions_currency_mid
+		Show
+	}
+
+	# 3.27 Graft Implants
+	BaseType "Implant"
+	{
+		Expand $actions_currency_mid
+		Show
+	}
+
 	BaseType "Runegraft"
 	{
 		Expand $actions_currency_mid
@@ -1466,6 +1486,13 @@ Rarity Unique
 	SetBorderColor $color_unique
 	SetFontSize $font_unique
 
+	Foulborn True
+	{
+		SetBackgroundColor $color_breach
+		SetAlertSound $alert_unique_unknown
+		Show
+	}
+
 	Class == "Maps"
 	BaseType == "Synthesised Map"
 	{
@@ -1476,11 +1503,22 @@ Rarity Unique
 		Show
 	}
 
+	# The Squire (always valuable)
+	Sockets == 3WWW
+	BaseType == "Elegant Round Shield"
+	{
+		SetBackgroundColor $color_white
+		SetFontSize $font_max
+		SetAlertSound $alert_unique_high
+		PlayEffect $beam_unique
+		MinimapIcon $icon_unique_high
+		Show
+	}
+
 	# Tabula Rasa and Skin of the Loyal
 	# ...and any unique that drops 6L'd (some league content drops linked uniques)
 	LinkedSockets 6
 	{
-		SetTextColor $color_unique
 		SetBackgroundColor $color_white
 		SetFontSize $font_max
 		SetAlertSound $alert_unique_6_link
@@ -1668,6 +1706,12 @@ Class == "Map Fragments"
 		{
 			Show
 		}
+
+		# 3.27 new Uber Memory boss Fragments + Breach boss
+		BaseType == "Hivebrain Gland" "Traumatic Fragment" "Reverent Fragment" "Lonely Fragment"
+		{
+			Show
+		}
 	}
 
 	# 3.25 reintroduction of King of the Mists boss from Affliction league
@@ -1781,6 +1825,23 @@ Class == "Breachstone"
 	Show
 }
 
+# 3.27 character-boosting Grafts
+# no strong style - these only drop from Genesis Tree
+Class == "Grafts"
+{
+	SetBackgroundColor $color_breach
+	SetAlertSound $alert_common
+	Show
+}
+
+# 3.27 Genesis Tree resource - drop from Breach content
+Class == "Wombgifts"
+{
+	Expand $actions_currency_mid
+	SetBackgroundColor $color_breach
+	Show
+}
+
 Class == "Leaguestones"
 {
 	SetTextColor $color_black
@@ -1859,8 +1920,13 @@ Class == "Vault Key"
 	}
 
 	# reliquary keys from Legacy ("Ancient") and Delve ("Timeworn") leagues
-	# ...and any future reliquary keys
 	BaseType == "Ancient Reliquary Key" "Timeworn Reliquary Key"
+	{
+		Show
+	}
+
+	# keys from 3.27 (Memory boss) (Keepers)
+	BaseType == "Lonely Reliquary Key" "Reverent Reliquary Key" "Traumatic Reliquary Key"
 	{
 		Show
 	}
