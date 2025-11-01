@@ -1488,7 +1488,7 @@ Rarity Unique
 
 	Foulborn True
 	{
-		SetBackgroundColor $color_breach
+		SetBorderColor $color_breach
 		SetAlertSound $alert_unique_unknown
 		Show
 	}
