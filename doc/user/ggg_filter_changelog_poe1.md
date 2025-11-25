@@ -6,12 +6,24 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 
 *newest at the top*
 
-### 3.26.0e
+### 3.27.0c - [patch notes](https://www.pathofexile.com/forum/view-thread/3877526)
 
-- [patch notes](https://www.pathofexile.com/forum/view-thread/3817515)
+- *Fixed an issue where Wombgifts could not be filtered by Item Level in Item Filters.*
+- *Fixed a bug where item filters could interpret exact string matches as non-exact matches (or vice versa).*
+
+### 3.27 (Keepers of the Flame) - [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3870283)
+
+- new keyword: `Foulborn` (boolean test)
+- new currency, gems, fragments and item classes
+- removed `Bestiary Orb` and some wand bases
+- [patch notes](https://www.pathofexile.com/forum/view-thread/3869068)
+- league promo: https://www.pathofexile.com/keepers
+
+### 3.26.0e - [patch notes](https://www.pathofexile.com/forum/view-thread/3817515)
+
 - *Fixed a bug where the filter version was not displaying correctly when loading an online Item Filter.*
 
-### 3.26 (Secrets of the Atlas + Trarthus) [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3788869)
+### 3.26 (Secrets of the Atlas + Trarthus) - [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3788869)
 
 - new condition: `ZanaMemory Boolean`
 - new condition: `MemoryStrands [CMP] Integer`
@@ -21,25 +33,25 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 - Removed Runes and Memories
 - [patch notes](https://www.pathofexile.com/forum/view-thread/3787013)
 
-### 3.25 (Settlers of Kalguur) [Item Filter Information](www.pathofexile.com/forum/view-thread/3532553)
+### 3.25 (Settlers of Kalguur) - [Item Filter Information](www.pathofexile.com/forum/view-thread/3532553)
 
 - Huge balance patch with multiple reworks (over 30k words) - [patch notes](https://www.pathofexile.com/forum/view-thread/3531661)
 - note: some implicit filter changes are hidden in the patch notes (e.g. quality changes)
 - note: additional helpful information on [reddit](https://www.reddit.com/r/pathofexile/comments/1e9uez6/settlers_of_kalguur_item_filter_information/leiygze/)
 - [new and changed gems](https://www.pathofexile.com/forum/view-thread/3532728)
 
-### 3.24 (Necropolis) [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3497460)
+### 3.24 (Necropolis) - [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3497460)
 
 - Removal of Sextants and rework of Scarabs
 - [patch notes](https://www.pathofexile.com/forum/view-thread/3496784)
 - [new and changed Gems](https://www.pathofexile.com/forum/view-thread/3497686)
 - [all Scarabs](https://www.pathofexile.com/forum/view-thread/3497694)
 
-### 3.23.1
+### 3.23.1 - [patch notes](https://www.pathofexile.com/forum/view-thread/3480999)
 
-- [patch notes](https://www.pathofexile.com/forum/view-thread/3480999) - Added a new `/reloaditemfilter` chat command
+- Added a new `/reloaditemfilter` chat command
 
-### 3.23 (Affliction) [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3452297)
+### 3.23 (Affliction) - [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3452297)
 
 - Removal of alternate quality (and introduction of Transfigured Gems)
 - New item bases and Affliction-related item classes
@@ -55,27 +67,27 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 - *Fixed `!=` (and `!`) not working with `EnchantmentPassiveNode`, `HasExplicitMod`, `HasEnchantment` rules.*
 - *Fixed a bug where hidden items could still play effects, sounds and create minimap icons.*
 
-### 3.22 (Trial of the Ancestors) [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3410483)
+### 3.22 (Trial of the Ancestors) - [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3410483)
 
 - New gems, cards, currency and other items
 - Adjusted gem class names
 - [patch notes](https://www.pathofexile.com/forum/view-thread/3409617)
 
-### 3.21 (Crucible) [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3362077)
+### 3.21 (Crucible) - [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3362077)
 
 - New gems, cards, currency and other items
 - Breachstones are now a separate item class (instead of "Map Fragments")
 - Some Reliquary keys have different item classes now: https://www.pathofexile.com/forum/view-thread/3324396#THU6
 - [patch notes](https://www.pathofexile.com/forum/view-thread/3361403)
 
-### 3.20 (The Forbidden Sanctum) [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3324656)
+### 3.20 (The Forbidden Sanctum) - [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3324656)
 
 - New gems, cards, currency
 - New item class: Relics
 - [3.20.1 Item Filter update](https://www.pathofexile.com/forum/view-thread/3331539) - Invocations
 - [patch notes](https://www.pathofexile.com/forum/view-thread/3323944)
 
-### 3.19 (Lake of Kalandra) [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3294085)
+### 3.19 (Lake of Kalandra) - [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3294085)
 
 - New cards, ring bases and wand bases
 - Reworked harvest - pickupable lifeforce
@@ -84,7 +96,7 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 - [patch notes](https://www.pathofexile.com/forum/view-thread/3293287)
 - [balance manifesto](https://www.pathofexile.com/forum/view-thread/3292308)
 
-### 3.18 (Sentintel) [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3265282)
+### 3.18 (Sentintel) - [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3265282)
 
 - New awakened exceptional gems, cards, quest items, currency and sentinels (no new features in filters)
 - [patch notes](https://www.pathofexile.com/forum/view-thread/3264788)
@@ -96,12 +108,11 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 - The change broke one `EnchantmentPassiveNode` name: `"Damage with Two Handed Melee Weapons"` was changed to `"Damage with Two Handed Weapons"`
 - Yes, this means that the fix is to just remove `Melee`. Pun intended.
 
-### 3.17.2
+### 3.17.2 - [patch notes](https://www.pathofexile.com/forum/view-thread/3251063)
 
-- [patch notes](https://www.pathofexile.com/forum/view-thread/3251063)
 - *Fixed a bug where temporary beam effects for item filters were not so temporary if they continued from a permanent beam.*
 
-### 3.17 (Archnemesis + Siege of the Atlas) [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3230194)
+### 3.17 (Archnemesis + Siege of the Atlas) - [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3230194)
 
 - New conditions: `HasSearingExarchImplicit`, `HasSearingExarchImplicit` and `ArchnemesisMod`
 - [patch notes](https://www.pathofexile.com/forum/view-thread/3229187)
@@ -113,9 +124,8 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 
 - `HasExplicitMod` was behaving incorrectly (in reverse) with operators `>`, `<`, and `<=`
 
-### 3.16.0b
+### 3.16.0b - [patch notes](https://www.pathofexile.com/forum/view-thread/3193737)
 
-- [patch notes](https://www.pathofexile.com/forum/view-thread/3193737)
 - *Fixed a bug where Item Filters would incorrectly assign Weapons and Jewellery a BaseDefencePercentile value of 0 rather than 100.*
 
 ### 3.16 (Scourge) - [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3187476)
@@ -128,9 +138,8 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 - [list of teasers](https://www.pathofexile.com/forum/view-thread/3184585)
 - [ascendancy changes](https://www.pathofexile.com/forum/view-thread/3187468)
 
-### 3.15.0d
+### 3.15.0d - [patch notes](https://www.pathofexile.com/forum/view-thread/3152771)
 
-- [patch notes](https://www.pathofexile.com/forum/view-thread/3152771)
 - *Rapier One Hand Swords are once again classified as Thrusting One Hand Swords. Their Weapon Range is again 14 (instead of 11). Please update your item filters!*
 
 ### 3.15 (Expedition) - [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3147480)
@@ -146,9 +155,8 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 
 - undocumented change: filters stopped accepting `""` and `"Microtransactions"` item classes
 
-### 3.14.0b - invisible items fix
+### 3.14.0b - invisible items fix - [patch notes](https://www.pathofexile.com/forum/view-thread/3085367)
 
-- [patch notes](https://www.pathofexile.com/forum/view-thread/3085367)
 - [bug report](https://www.pathofexile.com/forum/view-thread/3084331)
 - [reddit thread](https://www.reddit.com/r/pathofexile/comments/mtcsw6/significant_bug_within_item_filters_invisible/)
 - *Fixed a bug where Item Filters could set item labels to be completely transparent when using certain `Continue` statements.*
@@ -175,9 +183,9 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 - Added `Replica True` parameter that allows you to filter for Replica Unique Items.
 - (edit after posting) You can now filter for specific quality types (`GemQualityType`).
 
-### 3.11.1 (Harvest bugfixes)
+### 3.11.1 (Harvest bugfixes) - [patch notes](https://www.pathofexile.com/forum/view-thread/2893980)
 
-- [patch notes](https://www.pathofexile.com/forum/view-thread/2893980) - new seed types.
+- new seed types.
 - [reddit comments](https://old.reddit.com/r/pathofexile/comments/hk5c3n/3111_patch_notes/fwqo2yp/?context=3) about newly introduced items.
 
 ### 3.11 (Harvest) - [Item Filter information](https://www.pathofexile.com/forum/view-thread/2873743)
@@ -186,15 +194,11 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 - Added `HasInfluence None` parameter.
 - Added `EnchantmentPassiveNode` parameter to filter Cluster Jewels by enchantment type.
 
-### 3.10.2b
-
-From the [patch notes](https://www.pathofexile.com/forum/view-thread/2867400):
+### 3.10.2b - [patch notes](https://www.pathofexile.com/forum/view-thread/2867400)
 
 - You can now filter for items without being required to use special alphanumeric characters, such as "Maelstrom Staff" rather than "Maelström Staff".
 
-### 3.10.1
-
-From the [patch notes](https://www.pathofexile.com/forum/view-thread/2806232):
+### 3.10.1 - [patch notes](https://www.pathofexile.com/forum/view-thread/2806232)
 
 - Added an `EnableDropSound` parameter that can be used in Item Filters.
 - Fixed an issue with the `PlayAlertSound` parameter in Item Filters not handling the `Continue` command correctly.
@@ -214,11 +218,9 @@ From the [patch notes](https://www.pathofexile.com/forum/view-thread/2806232):
 - [patch notes](https://www.pathofexile.com/forum/view-thread/2687400) - new gems, base types, uniques and cards
 - [reddit post clarification](https://www.reddit.com/r/pathofexile/comments/e910dq/forum_announcements_conquerors_of_the_atlas_patch/fafxgvj/) - regarding new influence types
 
-### 3.8.1d
+### 3.8.1d - [patch notes](https://www.pathofexile.com/forum/view-thread/2655286)
 
-From the [patch notes](https://www.pathofexile.com/forum/view-thread/2655286):
-
-- You can now use an "Exact Match" parameter in Item Filters. Simply use == to filter for exact matches. For example, BaseType == "The Demon" will show The Demon Divination Card but will not show The Demoness.
+- You can now use an "Exact Match" parameter in Item Filters. Simply use `==` to filter for exact matches. For example, `BaseType == "The Demon"` will show `The Demon` Divination Card but will not show `The Demoness`.
 
 ### 3.8 (Blight) - [Item Filter information](https://www.pathofexile.com/forum/view-thread/2627576)
 
@@ -226,10 +228,10 @@ From the [patch notes](https://www.pathofexile.com/forum/view-thread/2655286):
 
 From [this reddit post](https://www.reddit.com/r/pathofexile/comments/d0isb7/lootfilter_neversinks_itemfilter_version_730/ezb1w0z/):
 
-- The parser is now more strict about formatting. So as you can see in this very thread, some people are now getting new errors, e.g. if they have a number after a custom sound file path. Previously, that number was silently ignored; now, it raises a formatting error.
-- Filters also no longer accept negative numbers for anything, since it doesn't make sense for any of the rules atm.
-- Comments (marked with "#") should now work better. Previously they could cause errors in certain places because they were incorrectly interpreted as search strings/values etc. Now, they should work everywhere. If you find somewhere that comments still don't work, let me know.
-- Fixed the "Your Item Filter is out of date" error message appearing too often. It's only supposed to show if the filter fails to load the very first time the game tries and the filter hasn't updated since then.
+- *The parser is now more strict about formatting. So as you can see in this very thread, some people are now getting new errors, e.g. if they have a number after a custom sound file path. Previously, that number was silently ignored; now, it raises a formatting error.*
+- *Filters also no longer accept negative numbers for anything, since it doesn't make sense for any of the rules atm.*
+- *Comments (marked with "#") should now work better. Previously they could cause errors in certain places because they were incorrectly interpreted as search strings/values etc. Now, they should work everywhere. If you find somewhere that comments still don't work, let me know.*
+- *Fixed the "Your Item Filter is out of date" error message appearing too often. It's only supposed to show if the filter fails to load the very first time the game tries and the filter hasn't updated since then.*
 
 ### 3.7 (Legion) - [Item Filter information](https://www.pathofexile.com/forum/view-thread/2513458)
 
@@ -249,9 +251,7 @@ From the [patch notes](https://www.pathofexile.com/forum/view-thread/2333648):
 
 - [patch notes](https://www.pathofexile.com/forum/view-thread/2201187) - new gems, base types, uniques and cards
 
-### 3.3.0c
-
-From the [patch notes](https://www.pathofexile.com/forum/view-thread/2167029):
+### 3.3.0c - [patch notes](https://www.pathofexile.com/forum/view-thread/2167029)
 
 - Tweaked various alert sounds in the Default Loot Filter.
 
@@ -284,9 +284,7 @@ From the [patch notes](https://www.pathofexile.com/forum/view-thread/1773975):
 
 - Items filters can now see whether an item is corrupted with "corrupted true" (Yes, this code fragment contains casing mistakes).
 
-### 2.4.2
-
-From the [patch notes](https://www.pathofexile.com/forum/view-thread/1767835):
+### 2.4.2 - [patch notes](https://www.pathofexile.com/forum/view-thread/1767835)
 
 - There's now an item filter bundled with Path of Exile that you can select in the User Interface options.
 
@@ -294,9 +292,7 @@ From the [patch notes](https://www.pathofexile.com/forum/view-thread/1767835):
 
 - [patch notes](https://www.pathofexile.com/forum/view-thread/1716228) - new gems, base types, uniques and cards
 
-### 2.3.2 (Mediallion race season)
-
-From the [patch notes](https://www.pathofexile.com/forum/view-thread/1703209):
+### 2.3.2 (Mediallion race season) - [patch notes](https://www.pathofexile.com/forum/view-thread/1703209)
 
 - Added "Identified" as a filter option for Item Filters. Valid values for this filter are "True" or "False".
 
@@ -305,31 +301,25 @@ From the [patch notes](https://www.pathofexile.com/forum/view-thread/1703209):
 - New item base type: `Offering to the Goddess`. Its current class is `Map Fragments` (the thread now is either outdated or was never correct about offering's class)
 - [patch notes](https://www.pathofexile.com/forum/view-thread/1667259) - new gems, base types, uniques and cards
 
-### 2.2.1d
-
-From the [patch notes](https://www.pathofexile.com/forum/view-thread/1621545):
+### 2.2.1d - [patch notes](https://www.pathofexile.com/forum/view-thread/1621545)
 
 - Fixed a bug where Labyrinth Items could be displayed incorrectly when modifying how they are shown using Item Filters.
 
-### 2.2.0 (Ascendancy + Perandus)
+### 2.2.0 (Ascendancy + Perandus) - [patch notes](https://www.pathofexile.com/forum/view-thread/1596094)
 
 - New item class: `Labyrinth Trinket`
-- [patch notes](https://www.pathofexile.com/forum/view-thread/1596094) - new gems, base types, uniques and cards
+- new gems, base types, uniques and cards
 
-### 2.1.0 (Talisman)
+### 2.1.0 (Talisman) - [patch notes](https://www.pathofexile.com/forum/view-thread/1489915)
 
 - Talismans - new amulet base types. **They do not have separate item class.**
-- [patch notes](https://www.pathofexile.com/forum/view-thread/1489915) - new gems, base types, uniques and cards
+- new gems, base types, uniques and cards
 
-### 2.0.1
-
-From the [patch notes](https://www.pathofexile.com/forum/view-thread/1367504):
+### 2.0.1 - [patch notes](https://www.pathofexile.com/forum/view-thread/1367504)
 
 - Sound events triggered by item filters can now have a maximum volume of 300 (up from 100).
 
-### 2.0.0b
-
-From the [patch notes](http://www.pathofexile.com/forum/view-thread/1306473):
+### 2.0.0b - [patch notes](http://www.pathofexile.com/forum/view-thread/1306473)
 
 - Fixed a bug with Item Filters where some item types would not load if they were included in a type that was already loaded. For example, "Thrusting" when "Swords" was already loaded.
 
