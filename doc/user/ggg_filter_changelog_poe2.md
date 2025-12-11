@@ -6,7 +6,14 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 
 *newest at the top*
 
-### (2025.08.27) 0.3.0 (The Third Edict + Rise of the Abyssal) [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3828542)
+### (2025.12.09) 0.4.0 (The Last of the Druids + Fate of the Vaal) - [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3884730)
+
+- [patch notes](https://www.pathofexile.com/forum/view-thread/3883495)
+- *Rune Sockets* renamed to *Augment Sockets*.
+- *Talismans* renamed to *Idols*.
+- Introduction of new item classes (Incubators, Talismans and more) but they work differently than in PoE 1.
+
+### (2025.08.27) 0.3.0 (The Third Edict + Rise of the Abyssal) - [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3828542)
 
 - [patch notes](https://www.pathofexile.com/forum/view-thread/3826682)
 - Large amount of new item types and changes to existing items.
@@ -16,15 +23,14 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 - *Added support for the `Import` keyword in item filters.*
 - *Added support for multiple custom sounds in item filters.*
 
-### (2025.06.06) 0.2.1
+### (2025.06.06) 0.2.1 - [patch notes](https://www.pathofexile.com/forum/view-thread/3787044)
 
-- [patch notes](https://www.pathofexile.com/forum/view-thread/3787044)
 - *Added 21 new Endgame Runes* (Stated as 22 but there were only 21).
 - *Added 15 new Endgame Soulcores.*
 - *Added 7 new Endgame Talismans.*
 - *Added 9 new Unique Items.*
 
-### (2025.04.04) 0.2.0 (Dawn of the Hunt) [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3740346)
+### (2025.04.04) 0.2.0 (Dawn of the Hunt) - [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3740346)
 
 - [patch notes](https://www.pathofexile.com/forum/view-thread/3740562)
 - Many new currencies and other items.
