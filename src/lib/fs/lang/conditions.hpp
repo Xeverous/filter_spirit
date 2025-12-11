@@ -201,6 +201,21 @@ inline std::shared_ptr<boolean_condition> make_foulborn_condition(boolean value,
 	return std::make_shared<boolean_condition_with_field_test>(official_condition_property::foulborn, &item::is_foulborn, value, origin);
 }
 
+inline std::shared_ptr<boolean_condition> make_is_vaal_unique_condition(boolean value, position_tag origin) // PoE 2 only
+{
+	return std::make_shared<boolean_condition_with_field_test>(official_condition_property::is_vaal_unique, &item::is_vaal_unique, value, origin);
+}
+
+inline std::shared_ptr<boolean_condition> make_has_vaal_unique_mod_condition(boolean value, position_tag origin) // PoE 2 only
+{
+	return std::make_shared<boolean_condition_with_field_test>(official_condition_property::has_vaal_unique_mod, &item::has_vaal_unique_mod, value, origin);
+}
+
+inline std::shared_ptr<boolean_condition> make_always_show_condition(boolean value, position_tag origin) // PoE 2 only
+{
+	return std::make_shared<boolean_condition_with_field_test>(official_condition_property::always_show, &item::always_show, value, origin);
+}
+
 // a boolean_condition which's test_item implementation calls a boolean function in the item struct
 class boolean_condition_with_function_test : public boolean_condition
 {
@@ -260,6 +275,11 @@ inline std::shared_ptr<boolean_condition> make_elder_item_condition(boolean valu
 inline std::shared_ptr<boolean_condition> make_shaper_item_condition(boolean value, position_tag origin)
 {
 	return std::make_shared<boolean_condition_with_function_test>(official_condition_property::shaper_item, &item::is_shaper_item, value, origin);
+}
+
+inline std::shared_ptr<boolean_condition> make_twice_corrupted_condition(boolean value, position_tag origin) // PoE 2 only
+{
+	return std::make_shared<boolean_condition_with_function_test>(official_condition_property::twice_corrupted, &item::is_twice_corrupted, value, origin);
 }
 
 class alternate_quality_condition : public boolean_condition
@@ -880,28 +900,28 @@ inline std::shared_ptr<value_list_condition<integer>> make_memory_strands_value_
 }
 
 inline std::shared_ptr<range_bound_condition<integer>> make_unidentified_item_tier_range_bound_condition(
-	range_bound<integer> bound, bool is_lower_bound, position_tag origin)
+	range_bound<integer> bound, bool is_lower_bound, position_tag origin)  // PoE 2 only
 {
 	return std::make_shared<range_bound_condition_with_field_test<integer>>(
 		official_condition_property::unidentified_item_tier, &item::unidentified_item_tier, bound, is_lower_bound, origin);
 }
 
 inline std::shared_ptr<value_list_condition<integer>> make_unidentified_item_tier_value_list_condition(
-	value_list_condition<integer>::container_type values, bool allowed, position_tag origin)
+	value_list_condition<integer>::container_type values, bool allowed, position_tag origin)  // PoE 2 only
 {
 	return std::make_shared<value_list_condition_with_field_test<integer>>(
 		official_condition_property::unidentified_item_tier, &item::unidentified_item_tier, std::move(values), allowed, origin);
 }
 
 inline std::shared_ptr<range_bound_condition<integer>> make_waystone_tier_range_bound_condition(
-	range_bound<integer> bound, bool is_lower_bound, position_tag origin)
+	range_bound<integer> bound, bool is_lower_bound, position_tag origin)  // PoE 2 only
 {
 	return std::make_shared<range_bound_condition_with_field_test<integer>>(
 		official_condition_property::waystone_tier, &item::waystone_tier, bound, is_lower_bound, origin);
 }
 
 inline std::shared_ptr<value_list_condition<integer>> make_waystone_tier_value_list_condition(
-	value_list_condition<integer>::container_type values, bool allowed, position_tag origin)
+	value_list_condition<integer>::container_type values, bool allowed, position_tag origin)  // PoE 2 only
 {
 	return std::make_shared<value_list_condition_with_field_test<integer>>(
 		official_condition_property::waystone_tier, &item::waystone_tier, std::move(values), allowed, origin);

@@ -167,6 +167,11 @@ namespace rf
 				(lang::keywords::rf::alternate_quality,         property::alternate_quality)
 				(lang::keywords::rf::zana_memory,               property::zana_memory)
 				(lang::keywords::rf::foulborn,                  property::foulborn)
+				// PoE 2 only
+				(lang::keywords::rf::is_vaal_unique,            property::is_vaal_unique)
+				(lang::keywords::rf::has_vaal_unique_mod,       property::has_vaal_unique_mod)
+				(lang::keywords::rf::twice_corrupted,           property::twice_corrupted)
+				(lang::keywords::rf::always_show,               property::always_show)
 
 				// influence
 				(lang::keywords::rf::has_influence,             property::has_influence)
@@ -195,6 +200,7 @@ namespace rf
 				(lang::keywords::rf::has_searing_exarch_implicit,  property::has_searing_exarch_implicit)
 				(lang::keywords::rf::has_eater_of_worlds_implicit, property::has_eater_of_worlds_implicit)
 				(lang::keywords::rf::memory_strands,               property::memory_strands)
+				// PoE 2 only
 				(lang::keywords::rf::unidentified_item_tier,       property::unidentified_item_tier)
 				(lang::keywords::rf::waystone_tier,                property::waystone_tier)
 

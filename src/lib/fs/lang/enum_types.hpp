@@ -62,6 +62,11 @@ enum class official_condition_property
 	alternate_quality,
 	zana_memory,
 	foulborn,
+	// PoE 2 only
+	is_vaal_unique,
+	has_vaal_unique_mod,
+	twice_corrupted,
+	always_show,
 
 	// comparison with influence
 	has_influence,
@@ -90,6 +95,7 @@ enum class official_condition_property
 	has_searing_exarch_implicit,
 	has_eater_of_worlds_implicit,
 	memory_strands,
+	// PoE 2 only
 	unidentified_item_tier,
 	waystone_tier,
 
@@ -110,6 +116,24 @@ enum class official_condition_property
 	// special (multiple variants)
 	transfigured_gem
 };
+
+constexpr bool is_poe2_only(official_condition_property property)
+{
+	using prop_t = official_condition_property;
+	for (auto prop : {
+		prop_t::has_vaal_unique_mod,
+		prop_t::is_vaal_unique,
+		prop_t::twice_corrupted,
+		prop_t::always_show,
+		prop_t::unidentified_item_tier,
+		prop_t::waystone_tier,
+	}) {
+		if (property == prop)
+			return true;
+	}
+
+	return false;
+}
 
 inline std::string_view to_keyword(official_condition_property property)
 {
@@ -152,6 +176,14 @@ inline std::string_view to_keyword(official_condition_property property)
 			return keywords::rf::zana_memory;
 		case official_condition_property::foulborn:
 			return keywords::rf::foulborn;
+		case official_condition_property::is_vaal_unique:
+			return keywords::rf::is_vaal_unique;
+		case official_condition_property::has_vaal_unique_mod:
+			return keywords::rf::has_vaal_unique_mod;
+		case official_condition_property::twice_corrupted:
+			return keywords::rf::twice_corrupted;
+		case official_condition_property::always_show:
+			return keywords::rf::always_show;
 		case official_condition_property::has_influence:
 			return keywords::rf::has_influence;
 		case official_condition_property::rarity:

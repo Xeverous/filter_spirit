@@ -288,6 +288,7 @@ enum class item_validity
 	nonnormal_rarity_without_name,
 	non_unique_replica,
 	non_unique_foulborn,
+	non_unique_vaal_unique,
 	resonator_or_abyss_socket_linked,
 	more_than_6_sockets,
 	invalid_item_level,
@@ -451,7 +452,7 @@ void traverse_sockets(socket_info info, OnSocket on_socket, OnLink on_link)
 	}
 }
 
-enum class corruption_status_t { normal, corrupted, scourged };
+enum class corruption_status_t { none, corrupted, scourged, /* PoE 2 only */ twice_corrupted };
 
 // none can mean non-blighted map but also not a map item
 enum class blight_map_status_t { none, blighted, uber_blighted };
@@ -532,11 +533,15 @@ struct item
 		if (rarity_ != rarity_type::unique && is_foulborn)
 			return item_validity::non_unique_foulborn;
 
+		if (rarity_ != rarity_type::unique && is_vaal_unique)
+			return item_validity::non_unique_vaal_unique;
+
 		return item_validity::valid;
 	}
 
-	bool is_corrupted() const { return corruption_status != corruption_status_t::normal; }
+	bool is_corrupted() const { return corruption_status != corruption_status_t::none; }
 	bool is_scourged() const { return corruption_status == corruption_status_t::scourged; }
+	bool is_twice_corrupted() const { return corruption_status == corruption_status_t::twice_corrupted; }
 
 	int linked_sockets() const { return sockets.links(); }
 
@@ -621,7 +626,7 @@ struct item
 	int base_defence_percentile = sentinel_base_defence_percentile;
 
 	// mods - implicit
-	corruption_status_t corruption_status = corruption_status_t::normal;
+	corruption_status_t corruption_status = corruption_status_t::none;
 	int corrupted_mods = 0;
 	bool has_non_atlas_implicit_mod = false;
 	exarch_or_eater_implicit_t exarch_implicit = exarch_or_eater_implicit_t::none;
@@ -659,6 +664,10 @@ struct item
 	bool is_transfigured_gem = false;
 	bool zana_memory = false;
 	bool is_foulborn = false;
+	// PoE 2 only
+	bool is_vaal_unique = false;
+	bool has_vaal_unique_mod = false;
+	bool always_show = false;
 
 	// A logic-irrelevant field. Only for the user.
 	std::string description;

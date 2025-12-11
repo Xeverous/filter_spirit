@@ -389,6 +389,11 @@ make_official_condition(
 	protocondition pc,
 	diagnostics_store& diagnostics)
 {
+	if (!st.is_poe2() && lang::is_poe2_only(property)) {
+		diagnostics.push_error_only_in_poe2(pc.condition_origin);
+		return nullptr;
+	}
+
 	using property_t = lang::official_condition_property;
 
 	switch (property) {
@@ -432,6 +437,14 @@ make_official_condition(
 			return make_boolean_condition(std::move(pc), lang::make_zana_memory_condition, diagnostics);
 		case property_t::foulborn:
 			return make_boolean_condition(std::move(pc), lang::make_foulborn_condition, diagnostics);
+		case property_t::is_vaal_unique:
+			return make_boolean_condition(std::move(pc), lang::make_is_vaal_unique_condition, diagnostics);
+		case property_t::has_vaal_unique_mod:
+			return make_boolean_condition(std::move(pc), lang::make_has_vaal_unique_mod_condition, diagnostics);
+		case property_t::twice_corrupted:
+			return make_boolean_condition(std::move(pc), lang::make_twice_corrupted_condition, diagnostics);
+		case property_t::always_show:
+			return make_boolean_condition(std::move(pc), lang::make_always_show_condition, diagnostics);
 
 		// comparison with influence
 		case property_t::has_influence:
@@ -586,32 +599,20 @@ make_official_condition(
 				lang::make_memory_strands_range_bound_condition,
 				lang::make_memory_strands_value_list_condition,
 				diagnostics);
-		case property_t::unidentified_item_tier: {
-			if (!st.is_poe2()) {
-				diagnostics.push_error_only_in_poe2(pc.condition_origin);
-				return nullptr;
-			}
-
+		case property_t::unidentified_item_tier:
 			return make_range_or_list_condition(
 				st,
 				std::move(pc),
 				lang::make_unidentified_item_tier_range_bound_condition,
 				lang::make_unidentified_item_tier_value_list_condition,
 				diagnostics);
-		}
-		case property_t::waystone_tier: {
-			if (!st.is_poe2()) {
-				diagnostics.push_error_only_in_poe2(pc.condition_origin);
-				return nullptr;
-			}
-
+		case property_t::waystone_tier:
 			return make_range_or_list_condition(
 				st,
 				std::move(pc),
 				lang::make_waystone_tier_range_bound_condition,
 				lang::make_waystone_tier_value_list_condition,
 				diagnostics);
-		}
 
 		// comparison with an array of strings
 		case property_t::class_:
@@ -717,6 +718,10 @@ spirit_filter_is_condition_allowed(
 		case property_t::alternate_quality:
 		case property_t::zana_memory:
 		case property_t::foulborn:
+		case property_t::is_vaal_unique:
+		case property_t::has_vaal_unique_mod:
+		case property_t::twice_corrupted:
+		case property_t::always_show:
 		// influence - only 1 is allowed
 		case property_t::has_influence: {
 			FS_ASSERT_MSG(

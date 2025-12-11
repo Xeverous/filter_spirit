@@ -5,3 +5,19 @@ Show
 Show
 	WaystoneTier >= 15
 	SetTextColor 255 0 0
+
+Show
+	IsVaalUnique True
+	SetTextColor 101 0 0
+
+Show
+	HasVaalUniqueMod True
+	SetTextColor 102 0 0
+
+Show
+	TwiceCorrupted True
+	SetTextColor 103 0 0
+
+Show
+	AlwaysShow True
+	SetTextColor 104 0 0

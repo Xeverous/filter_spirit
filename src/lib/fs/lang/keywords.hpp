@@ -79,6 +79,10 @@ namespace rf
 	// PoE 2 only
 	constexpr auto unidentified_item_tier = "UnidentifiedItemTier";
 	constexpr auto waystone_tier          = "WaystoneTier";
+	constexpr auto is_vaal_unique         = "IsVaalUnique";
+	constexpr auto has_vaal_unique_mod    = "HasVaalUniqueMod";
+	constexpr auto twice_corrupted        = "TwiceCorrupted";
+	constexpr auto always_show            = "AlwaysShow";
 
 	// removed conditions
 	constexpr auto prophecy         = "Prophecy";
