@@ -397,7 +397,7 @@ Class == "Stackable Currency"
 	}
 
 	# Chaos/Exalt tier"
-	BaseType == "Gemcutter's Prism" "Orb of Annulment" "Orb of Chance" "Glassblower's Bauble" "Exalted Orb" "Vaal Orb" "Chaos Orb" "Chance Shard" "Greater Jeweller's Orb" "Artificer's Orb" "Orb of Alchemy" "Greater Chaos Orb" "Perfect Chaos Orb" "Greater Exalted Orb" "Perfect Exalted Orb" "Fracturing Orb" "Vaal Cultivation Orb" "Ancient Infuser" "Orb of Extraction" "Core Destabilizer" "Vaal Infuser"
+	BaseType == "Gemcutter's Prism" "Orb of Annulment" "Orb of Chance" "Glassblower's Bauble" "Exalted Orb" "Vaal Orb" "Chaos Orb" "Chance Shard" "Greater Jeweller's Orb" "Artificer's Orb" "Orb of Alchemy" "Greater Chaos Orb" "Perfect Chaos Orb" "Greater Exalted Orb" "Perfect Exalted Orb" "Fracturing Orb" "Vaal Cultivation Orb" "Ancient Infuser" "Orb of Extraction" "Core Destabiliser" "Vaal Infuser"
 	{
 		Expand $actions_currency_mid
 		Show
@@ -781,7 +781,7 @@ Class == "Uncut Skill Gems" "Uncut Spirit Gems" "Support Gems"
 	PlayEffect $beam_gem Temp
 
 	# 0.3.0 Lineage Supports (unknown price)
-	BaseType "Atalui's Bloodletting" "Einhar's Beastrite" "Vilenta's Propulsion" "Ahn's Citadel" "Brutus' Brain" "Tecrod's Revenge" "Uruk's Smelting" "Paquate's Pact" "Ailith's Chimes" "Doedre's Undoing" "Ratha's Assault" "Arjun's Medal" "Kaom's Madness" "Sione's Temper" "Ixchel's Torment" "Romira's Requital" "Tawhoa's Tending" "Piety's Mercy" "Dialla's Desire" "Kalisa's Crescendo" "Xoph's Pyre" "Esh's Radiance" "Tul's Stillness" "Uul-Netol's Embrace" "Rakiata's Flow" "Rigwald's Ferocity" "Uhtred's Exodus" "Uhtred's Omen" "Uhtred's Augury" "Daresso's Passion" "Atziri's Allure" "Tacati's Ire" "Zarokh's Refrain" "Garukhan's Resolve" "Kurgal's Leash" "Kulemak's Dominion" "Amanamu's Tithe" "Varashta's Blessing" "Arbiter's Ignition" "Arakaali's Lust"
+	BaseType "Atalui's Bloodletting" "Einhar's Beastrite" "Vilenta's Propulsion" "Ahn's Citadel" "Brutus' Brain" "Tecrod's Revenge" "Uruk's Smelting" "Paquate's Pact" "Ailith's Chimes" "Doedre's Undoing" "Ratha's Assault" "Arjun's Medal" "Kaom's Madness" "Sione's Temper" "Ixchel's Torment" "Romira's Requital" "Tawhoa's Tending" "Dominus' Grasp" "Dialla's Desire" "Kalisa's Crescendo" "Xoph's Pyre" "Esh's Radiance" "Tul's Stillness" "Uul-Netol's Embrace" "Rakiata's Flow" "Rigwald's Ferocity" "Uhtred's Exodus" "Uhtred's Omen" "Uhtred's Augury" "Daresso's Passion" "Atziri's Allure" "Tacati's Ire" "Zarokh's Refrain" "Garukhan's Resolve" "Kurgal's Leash" "Kulemak's Dominion" "Amanamu's Tithe" "Varashta's Blessing" "Arbiter's Ignition" "Arakaali's Lust"
 	{
 		Show
 	}
