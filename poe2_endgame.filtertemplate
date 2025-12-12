@@ -34,10 +34,10 @@ $color_omen_high           = 244 244   0
 $color_omen_mid            = 182 182   0
 $color_omen_low            = 127 127   0
 $color_omen_very_low       = $color_omen_low
-$color_socketable_high     = 170   0 255
-$color_socketable_mid      = 169 109 233
-$color_socketable_low      = $color_socketable_mid
-$color_socketable_very_low = $color_socketable_low
+$color_augment_high        = 170   0 255
+$color_augment_mid         = 169 109 233
+$color_augment_low         = $color_augment_mid
+$color_augment_very_low    = $color_augment_low
 $color_essence_high        =   0 172 255
 $color_essence_mid         =   0  96 128
 # low tiers use text/border color instead of background color
@@ -47,6 +47,7 @@ $color_essence_very_low    = $color_essence_high
 $color_gem                 =  20 240 240
 $color_gear_exceptional    =   0 255 255
 $color_unknown_price       = $color_red
+$color_corrupted           = 255 127 127
 
 $font_min                = 18
 $font_max                = 45
@@ -68,10 +69,10 @@ $font_omen_high          = $font_currency_high
 $font_omen_mid           = $font_currency_mid
 $font_omen_low           = $font_currency_low
 $font_omen_very_low      = $font_currency_very_low
-$font_socketable_high    = $font_currency_high
-$font_socketable_mid     = $font_currency_mid
-$font_socketable_low     = $font_currency_low
-$font_socketable_very_low= $font_currency_very_low
+$font_augment_high       = $font_currency_high
+$font_augment_mid        = $font_currency_mid
+$font_augment_low        = $font_currency_low
+$font_augment_very_low   = $font_currency_very_low
 $font_gem_high           = $font_max
 $font_gem_mid            = $font_high
 $font_gem_low            = $font_mid
@@ -113,9 +114,9 @@ $alert_omen_high           = $alert_high
 $alert_omen_mid            = $alert_mid
 $alert_omen_low            = $alert_low
 $alert_omen_very_low       = $alert_frequent
-$alert_socketable_high     = $alert_high
-$alert_socketable_mid      = $alert_mid
-$alert_socketable_low      = $alert_low
+$alert_augment_high        = $alert_high
+$alert_augment_mid         = $alert_mid
+$alert_augment_low         = $alert_low
 $alert_gem_high            = $alert_high
 $alert_gem_mid             = $alert_mid
 $alert_gem_low             = $alert_low
@@ -125,7 +126,7 @@ $alert_item_exceptional    = $alert_very_specific
 $beam_currency        = Yellow
 $beam_gem             = Green
 $beam_essence         = Blue
-$beam_socketable      = Purple
+$beam_augment         = Purple
 $beam_omen            = Brown
 
 $icon_gold_high       = 0 Yellow Circle
@@ -136,9 +137,9 @@ $icon_currency_low    = 2 $beam_currency Star
 $icon_omen_high       = 0 $beam_omen Kite
 $icon_omen_mid        = 1 $beam_omen Kite
 $icon_omen_low        = 2 $beam_omen Kite
-$icon_socketable_high = 0 $beam_socketable Circle
-$icon_socketable_mid  = 1 $beam_socketable Circle
-$icon_socketable_low  = 2 $beam_socketable Circle
+$icon_augment_high    = 0 $beam_augment Circle
+$icon_augment_mid     = 1 $beam_augment Circle
+$icon_augment_low     = 2 $beam_augment Circle
 $icon_gem_high        = 0 $beam_gem Triangle
 $icon_gem_mid         = 1 $beam_gem Triangle
 $icon_gem_low         = 2 $beam_gem Triangle
@@ -228,18 +229,18 @@ $cfg_show_omens_mid      = True
 $cfg_show_omens_low      = True
 $cfg_show_omens_very_low = True
 
-$cfg_show_socketables_mid      = True
-$cfg_show_socketables_low      = True
-$cfg_show_socketables_very_low = True
-$cfg_socketables_high_min_value = 50
-$cfg_socketables_mid_min_value  = 10
-$cfg_socketables_low_min_value  =  1
+$cfg_show_augments_mid      = True
+$cfg_show_augments_low      = True
+$cfg_show_augments_very_low = True
+$cfg_augments_high_min_value = 50
+$cfg_augments_mid_min_value  = 10
+$cfg_augments_low_min_value  =  1
 # (on unknown prices)
 $cfg_show_runes_lesser  = True
 $cfg_show_runes_regular = True
 $cfg_show_runes_greater = True
-$cfg_show_talismans_regular = True
-$cfg_show_talismans_endgame = True
+$cfg_show_idols_regular = True
+$cfg_show_idols_endgame = True
 
 $cfg_gems_high_min_value = 50
 $cfg_gems_mid_min_value  =  5
@@ -278,6 +279,15 @@ $cfg_always_show_uncut_support_gems = True
 	SetBackgroundColor $cfg_default_background_color
 	Show
 	Continue
+}
+
+# Items that should be always shown
+# (perhaps crafts that drop items instead returning them on UI)
+AlwaysShow True
+{
+	SetBackgroundColor 0 96 0
+	SetAlertSound $alert_very_specific
+	Show
 }
 
 #--------------------------
@@ -380,14 +390,14 @@ Class == "Stackable Currency"
 	}
 
 	# Divine tier
-	BaseType == "Divine Orb" "Mirror of Kalandra" "Perfect Jeweller's Orb" "Concentrated Liquid Fear" "Concentrated Liquid Suffering" "Concentrated Liquid Isolation" "Soul Core of Azcapa" "Hinekora's Lock"
+	BaseType == "Divine Orb" "Mirror of Kalandra" "Perfect Jeweller's Orb" "Concentrated Liquid Fear" "Concentrated Liquid Suffering" "Concentrated Liquid Isolation" "Hinekora's Lock" "Architect's Orb" "Crystallised Corruption"
 	{
 		Expand $actions_currency_high
 		Show
 	}
 
 	# Chaos/Exalt tier"
-	BaseType == "Gemcutter's Prism" "Orb of Annulment" "Orb of Chance" "Glassblower's Bauble" "Exalted Orb" "Vaal Orb" "Chaos Orb" "Chance Shard" "Greater Jeweller's Orb" "Artificer's Orb" "Orb of Alchemy" "Greater Chaos Orb" "Perfect Chaos Orb" "Greater Exalted Orb" "Perfect Exalted Orb" "Fracturing Orb"
+	BaseType == "Gemcutter's Prism" "Orb of Annulment" "Orb of Chance" "Glassblower's Bauble" "Exalted Orb" "Vaal Orb" "Chaos Orb" "Chance Shard" "Greater Jeweller's Orb" "Artificer's Orb" "Orb of Alchemy" "Greater Chaos Orb" "Perfect Chaos Orb" "Greater Exalted Orb" "Perfect Exalted Orb" "Fracturing Orb" "Vaal Cultivation Orb" "Ancient Infuser" "Orb of Extraction" "Core Destabilizer" "Vaal Infuser"
 	{
 		Expand $actions_currency_mid
 		Show
@@ -551,57 +561,65 @@ Class == "Omen"
 	Show
 }
 
+# presumably only drops from Atziri
+Class == "Incubators"
+{
+	Expand $actions_currency_high
+	Show
+}
+
 #--------------------------
-# Socketable
+# Augment (called Socketable before 0.4.0)
 #--------------------------
 
-Class == "Socketable"
+Class == "Augment"
 {
+	# ninja may still use the legacy name of Talismans, not Idols
 	Autogen "Runes" "Soul Cores" "Talismans"
 	{
-		Price >= $cfg_socketables_high_min_value
+		Price >= $cfg_augments_high_min_value
 		{
 			SetTextColor $color_white
-			SetBorderColor $color_socketable_high
-			SetBackgroundColor $color_socketable_high
-			SetFontSize $font_socketable_high
-			SetAlertSound $alert_socketable_high
-			PlayEffect $beam_socketable
-			MinimapIcon $icon_socketable_high
+			SetBorderColor $color_augment_high
+			SetBackgroundColor $color_augment_high
+			SetFontSize $font_augment_high
+			SetAlertSound $alert_augment_high
+			PlayEffect $beam_augment
+			MinimapIcon $icon_augment_high
 			Show
 		}
 
-		Price < $cfg_socketables_high_min_value
-		Price >= $cfg_socketables_mid_min_value
+		Price < $cfg_augments_high_min_value
+		Price >= $cfg_augments_mid_min_value
 		{
 			SetTextColor $color_black
-			SetBorderColor $color_socketable_mid
-			SetBackgroundColor $color_socketable_mid
-			SetFontSize $font_socketable_mid
-			SetAlertSound $alert_socketable_mid
-			PlayEffect $beam_socketable
-			MinimapIcon $icon_socketable_mid
-			ShowHide $cfg_show_socketables_mid
+			SetBorderColor $color_augment_mid
+			SetBackgroundColor $color_augment_mid
+			SetFontSize $font_augment_mid
+			SetAlertSound $alert_augment_mid
+			PlayEffect $beam_augment
+			MinimapIcon $icon_augment_mid
+			ShowHide $cfg_show_augments_mid
 		}
 
-		Price < $cfg_socketables_mid_min_value
-		Price >= $cfg_socketables_low_min_value
+		Price < $cfg_augments_mid_min_value
+		Price >= $cfg_augments_low_min_value
 		{
 			SetTextColor $color_black
-			SetBorderColor $color_socketable_low
-			SetBackgroundColor $color_socketable_low
-			SetFontSize $font_socketable_low
-			SetAlertSound $alert_socketable_low
-			MinimapIcon $icon_socketable_low
-			ShowHide $cfg_show_socketables_low
+			SetBorderColor $color_augment_low
+			SetBackgroundColor $color_augment_low
+			SetFontSize $font_augment_low
+			SetAlertSound $alert_augment_low
+			MinimapIcon $icon_augment_low
+			ShowHide $cfg_show_augments_low
 		}
 
-		Price < $cfg_socketables_low_min_value
+		Price < $cfg_augments_low_min_value
 		{
-			SetTextColor $color_socketable_very_low
+			SetTextColor $color_augment_very_low
 			SetBackgroundColor $color_black
-			SetFontSize $font_socketable_very_low
-			ShowHide $cfg_show_socketables_very_low
+			SetFontSize $font_augment_very_low
+			ShowHide $cfg_show_augments_very_low
 		}
 	}
 
@@ -641,16 +659,16 @@ Class == "Socketable"
 			Show
 		}
 
-		BaseType == "Serpent Talisman" "Primate Talisman" "Owl Talisman" "Cat Talisman" "Wolf Talisman" "Stag Talisman" "Boar Talisman" "Bear Talisman" "Ox Talisman" "Rabbit Talisman" "Fox Talisman"
+		BaseType == "Snake Idol" "Primate Idol" "Owl Idol" "Cat Idol" "Wolf Idol" "Stag Idol" "Boar Idol" "Bear Idol" "Ox Idol" "Rabbit Idol" "Fox Idol"
 		{
-			ShowHide $cfg_show_talismans_regular
+			ShowHide $cfg_show_idols_regular
 			Show
 		}
 
-		# 0.2.1 endgame Talismans
-		BaseType == "Talisman of Eeshta" "Talisman of Egrin" "Talisman of Grold" "Talisman of Maxarius" "Talisman of Ralakesh" "Talisman of Sirrius" "Talisman of Thruldana"
+		# 0.2.1 endgame Idols
+		BaseType == "Idol of Eeshta" "Idol of Egrin" "Idol of Grold" "Idol of Maxarius" "Idol of Ralakesh" "Idol of Sirrius" "Idol of Thruldana"
 		{
-			ShowHide $cfg_show_talismans_endgame
+			ShowHide $cfg_show_idols_endgame
 			Show
 		}
 	}
@@ -676,8 +694,6 @@ Class == "Socketable"
 		}
 	}
 
-	# 0.3.0 Abyss socketables
-	BaseType == "Amanamu's Gaze" "Tecrod's Gaze" "Kurgal's Gaze" "Ulaman's Gaze"
 	{
 		# Right now reuse Soul Cores colors
 		SetTextColor 0 240 190 255
@@ -685,7 +701,18 @@ Class == "Socketable"
 		SetFontSize 40
 		MinimapIcon 2 Cyan Triangle
 		PlayEffect Cyan
-		Show
+
+		# 0.3.0 Abyss Augments
+		BaseType == "Amanamu's Gaze" "Tecrod's Gaze" "Kurgal's Gaze" "Ulaman's Gaze"
+		{
+			Show
+		}
+
+		# 0.4.0 corruption-only Augments
+		BaseType == "Quipolatl's Thesis" "Jiquani's Thesis" "Guatelitzi's Thesis" "Citaqualotl's Thesis"
+		{
+			Show
+		}
 	}
 
 	Show
@@ -884,6 +911,7 @@ Rarity Unique
 {
 	PlayEffect Brown
 
+	# Expensive uniques
 	BaseType == "Timeless Jewel" "Diamond" "Time-Lost Diamond" "Ring"
 	{
 		SetTextColor 0 240 190 255
@@ -945,6 +973,12 @@ Class == "Tablet"
 #--------------------------
 # Gear - rares
 #--------------------------
+
+TwiceCorrupted True
+{
+	SetBackgroundColor $color_corrupted
+	Show
+}
 
 Class "Jewel"
 {

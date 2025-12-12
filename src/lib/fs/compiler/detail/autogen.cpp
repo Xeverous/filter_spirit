@@ -554,7 +554,7 @@ poe2_make_autogen_func(
 		case cat_t::soul_cores:
 			return make_autogen_simple(st, conditions, autogen_origin, cn::poe2::soul_cores, &ipd::soul_cores, diagnostics);
 		case cat_t::talismans:
-			return make_autogen_simple(st, conditions, autogen_origin, cn::poe2::talismans, &ipd::talismans, diagnostics);
+			return make_autogen_simple(st, conditions, autogen_origin, cn::poe2::idols, &ipd::talismans, diagnostics);
 		case cat_t::runes:
 			return make_autogen_simple(st, conditions, autogen_origin, cn::poe2::runes, &ipd::runes, diagnostics);
 		case cat_t::omens:

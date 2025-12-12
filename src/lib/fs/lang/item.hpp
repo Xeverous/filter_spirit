@@ -118,10 +118,10 @@ namespace item_class_names {
 		constexpr auto emotions = currency_stackable;
 		constexpr auto catalysts = currency_stackable;
 
-		constexpr auto socketable = "Socketable";
-		constexpr auto soul_cores = socketable;
-		constexpr auto talismans = socketable;
-		constexpr auto runes = socketable;
+		constexpr auto augment    = "Augment";
+		constexpr auto soul_cores = augment;
+		constexpr auto idols      = augment;
+		constexpr auto runes      = augment;
 
 		constexpr auto uncut_skill_gems   = "Uncut Skill Gems";
 		constexpr auto uncut_spirit_gems  = "Uncut Spirit Gems";

@@ -973,6 +973,21 @@ inline const std::initializer_list<known_item> currency_expedition = {
 	{"Sun Artifact", known_item_properties(20, 1)},
 };
 
+inline const std::initializer_list<known_item> currency_vaal = { // 0.4.0
+	// drop level not known at the time of writing
+	{"Architect's Orb",         known_item_properties(10, 1)},
+	{"Crystallised Corruption", known_item_properties(10, 1)},
+	{"Vaal Cultivation Orb",    known_item_properties(10, 1)},
+	{"Ancient Infuser",         known_item_properties(10, 1)},
+	{"Orb of Extraction",       known_item_properties(10, 1)},
+	{"Core Destabilizer",       known_item_properties(10, 1)},
+	{"Vaal Infuser",            known_item_properties(10, 1)}
+};
+
+inline const std::initializer_list<known_item> incubators = { // 0.4.0
+	{"Vaal Siphoner", known_item_properties(10, 1)}
+};
+
 inline const auto known_items = known_items_store::create(
 	currency_basic,
 	currency_shards,
@@ -980,7 +995,9 @@ inline const auto known_items = known_items_store::create(
 	currency_abyss,
 	currency_catalysts,
 	currency_emotions,
-	currency_expedition
+	currency_expedition,
+	currency_vaal,
+	incubators
 );
 
 } // namespace poe2
