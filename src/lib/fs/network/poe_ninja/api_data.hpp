@@ -141,7 +141,7 @@ inline constexpr const char filename_uncut_gems[] = "UncutGems";
 inline constexpr const char filename_lineage_support_gems[] = "LineageSupportGems";
 inline constexpr const char filename_essences[] = "Essences";
 inline constexpr const char filename_ultimatum[] = "Ultimatum";
-inline constexpr const char filename_talismans[] = "Talismans";
+inline constexpr const char filename_idols[] = "Idols";
 inline constexpr const char filename_runes[] = "Runes";
 inline constexpr const char filename_ritual[] = "Ritual";
 inline constexpr const char filename_expedition[] = "Expedition";
@@ -180,7 +180,7 @@ struct api_item_price_data
 	json_file<filename_lineage_support_gems> lineage_support_gems;
 	json_file<filename_essences> essences;
 	json_file<filename_ultimatum> ultimatum; // Soul Cores
-	json_file<filename_talismans> talismans;
+	json_file<filename_idols> idols;
 	json_file<filename_runes> runes;
 	json_file<filename_ritual> ritual; // Omens + "Petition Splinter"
 	json_file<filename_expedition> expedition;

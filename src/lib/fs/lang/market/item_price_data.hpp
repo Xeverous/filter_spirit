@@ -222,7 +222,7 @@ struct item_price_data
 	std::vector<elementary_item> lineage_support_gems;
 	std::vector<elementary_item> essences;
 	std::vector<elementary_item> soul_cores;
-	std::vector<elementary_item> talismans;
+	std::vector<elementary_item> idols;
 	std::vector<elementary_item> runes;
 	std::vector<elementary_item> omens;
 	std::vector<elementary_item> expedition;

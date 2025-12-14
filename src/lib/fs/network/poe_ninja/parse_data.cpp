@@ -16,18 +16,15 @@ namespace fs::network::poe_ninja {
 
 namespace {
 
-template <typename F>
-void for_each_item_impl(std::string_view json_str, const char* initial_key, log::logger& logger, F f)
+void print_file_parse_error(std::string_view json_str, log::logger& logger)
 {
-	nlohmann::json json = nlohmann::json::parse(json_str);
-	const auto it = json.find(initial_key);
+	logger.error() << "Could not parse this JSON (first 200 characters): " << json_str.substr(0u, 200u);
+}
 
-	if (it == json.end()) {
-		logger.error() << "Could not parse this JSON (first 200 characters): " << json_str.substr(0u, 200u);
-		return;
-	}
-
-	for (const auto& item : *it) {
+template <typename F>
+void for_each_item_in_items(const nlohmann::json& items, log::logger& logger, F f)
+{
+	for (const auto& item : items) {
 		try {
 			f(item);
 		}
@@ -108,9 +105,17 @@ lang::market::confidence_level to_confidence_level(int count)
 }
 
 template <typename F>
-void for_each_item(std::string_view json_str, log::logger& logger, F f)
+void for_each_item_in_json(std::string_view json_str, log::logger& logger, F f)
 {
-	for_each_item_impl(json_str, "lines", logger, f);
+	const nlohmann::json json = nlohmann::json::parse(json_str);
+	const auto it = json.find("lines");
+
+	if (it == json.end()) {
+		print_file_parse_error(json_str, logger);
+		return;
+	}
+
+	for_each_item_in_items(*it, logger, f);
 }
 
 [[nodiscard]] const std::string&
@@ -221,7 +226,7 @@ parse_currency_items(std::string_view json_str, log::logger& logger)
 {
 	std::vector<lang::market::elementary_item> result;
 
-	for_each_item(json_str, logger, [&](const auto& item) {
+	for_each_item_in_json(json_str, logger, [&](const auto& item) {
 		result.push_back(get_currency_item_data(item));
 	});
 
@@ -233,7 +238,7 @@ parse_elementary_items(std::string_view json_str, log::logger& logger)
 {
 	std::vector<lang::market::elementary_item> result;
 
-	for_each_item(json_str, logger, [&](const auto& item) {
+	for_each_item_in_json(json_str, logger, [&](const auto& item) {
 		result.push_back(get_elementary_item_data(item));
 	});
 
@@ -245,7 +250,7 @@ parse_divination_cards(std::string_view json_str, log::logger& logger)
 {
 	std::vector<lang::market::poe1::divination_card> result;
 
-	for_each_item(json_str, logger, [&](const nlohmann::json& item) {
+	for_each_item_in_json(json_str, logger, [&](const nlohmann::json& item) {
 		result.emplace_back(
 			get_elementary_item_data(item),
 			get_item_property_stack_size(item)
@@ -260,7 +265,7 @@ parse_gems(std::string_view json_str, log::logger& logger)
 {
 	std::vector<lang::market::poe1::gem> result;
 
-	for_each_item(json_str, logger, [&](const nlohmann::json& item) {
+	for_each_item_in_json(json_str, logger, [&](const nlohmann::json& item) {
 		result.emplace_back(
 			get_elementary_item_data(item),
 			item.at("gemLevel").get<int>(),
@@ -277,7 +282,7 @@ parse_bases(std::string_view json_str, log::logger& logger)
 {
 	std::vector<lang::market::poe1::base> result;
 
-	for_each_item(json_str, logger, [&](const nlohmann::json& item) {
+	for_each_item_in_json(json_str, logger, [&](const nlohmann::json& item) {
 		// yes, not really a proper name but poe.ninja reuses some fields for other purposes
 		const auto item_level = item.at("levelRequired").get<int>();
 		result.emplace_back(
@@ -295,7 +300,7 @@ void parse_and_fill_uniques(
 	lang::market::poe1::unique_item_price_data& uniques,
 	log::logger& logger)
 {
-	for_each_item(uniques_json, logger, [&](const nlohmann::json& item) {
+	for_each_item_in_json(uniques_json, logger, [&](const nlohmann::json& item) {
 		// skip uniques which are linked
 		if (get_item_property_links(item) == 6) {
 			return;
@@ -394,32 +399,45 @@ namespace poe2 {
 
 namespace {
 
-[[nodiscard]] lang::market::elementary_item
-get_elementary_item_data(const nlohmann::json& item)
-{
-	return lang::market::elementary_item{
-		lang::market::price_data{
-			item.at("primaryValue").get<double>(),
-			// data in PoE 2 is always high confidence (straight from currency exchange)
-			lang::market::confidence_level::high
-		},
-		item.at("item").at("name").get_ref<const std::string&>()
-	};
-}
-
-template <typename F>
-void for_each_item(std::string_view json_str, log::logger& logger, F f)
-{
-	for_each_item_impl(json_str, "items", logger, f);
-}
-
 [[nodiscard]] std::vector<lang::market::elementary_item>
 parse_elementary_items(std::string_view json_str, log::logger& logger)
 {
 	std::vector<lang::market::elementary_item> result;
 
-	for_each_item(json_str, logger, [&](const auto& item) {
-		result.push_back(get_elementary_item_data(item));
+	std::unordered_map<std::string, std::string> item_ids_to_names;
+
+	const nlohmann::json json = nlohmann::json::parse(json_str);
+	const auto it_items = json.find("items"); // item id => item description (includes name)
+	const auto it_lines = json.find("lines"); // item id => item value
+
+	if (it_lines == json.end() || it_items == json.end()) {
+		print_file_parse_error(json_str, logger);
+		return {};
+	}
+
+	item_ids_to_names.reserve(it_items->size());
+
+	for_each_item_in_items(*it_items, logger, [&](const nlohmann::json& item) {
+		item_ids_to_names.emplace(item.at("id"), item.at("name"));
+	});
+
+	for_each_item_in_items(*it_lines, logger, [&](const nlohmann::json& item) {
+		const auto id = item.at("id").get_ref<const std::string&>();
+		const auto name_it = item_ids_to_names.find(id);
+
+		if (name_it == item_ids_to_names.end()) {
+			logger.error() << "Price data for item with id = \"" << id << "\" has no item associated";
+			return;
+		}
+
+		result.push_back(lang::market::elementary_item{
+			lang::market::price_data{
+				item.at("primaryValue").get<double>(),
+				// data in PoE 2 is always high confidence (straight from currency exchange)
+				lang::market::confidence_level::high
+			},
+			name_it->second
+		});
 	});
 
 	return result;
@@ -454,7 +472,7 @@ lang::market::poe2::item_price_data parse_item_price_data(const api_item_price_d
 	result.lineage_support_gems = parse_elementary_items(jsons.lineage_support_gems.file_content, logger);
 	result.essences             = parse_elementary_items(jsons.essences.file_content, logger);
 	result.soul_cores           = parse_elementary_items(jsons.ultimatum.file_content, logger);
-	result.talismans            = parse_elementary_items(jsons.talismans.file_content, logger);
+	result.idols                = parse_elementary_items(jsons.idols.file_content, logger);
 	result.runes                = parse_elementary_items(jsons.runes.file_content, logger);
 	result.omens                = parse_elementary_items(jsons.ritual.file_content, logger);
 	result.expedition           = parse_elementary_items(jsons.expedition.file_content, logger);

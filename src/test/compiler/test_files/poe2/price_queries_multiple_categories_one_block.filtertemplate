@@ -1,5 +1,5 @@
-Class "Socketable"
-Autogen "Runes" "Soul Cores" "Talismans"
+Class "Augment"
+Autogen "Runes" "Soul Cores" "Idols"
 {
 	Price >= 1
 	{

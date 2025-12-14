@@ -924,6 +924,7 @@ inline const std::initializer_list<known_item> currency_essences = {
 };
 
 inline const std::initializer_list<known_item> currency_abyss = {
+	// Crafting
 	{"Gnawed Collarbone", known_item_properties(20, 25)},
 	{"Gnawed Jawbone", known_item_properties(20, 25)},
 	{"Gnawed Rib", known_item_properties(20, 25)},
@@ -934,7 +935,12 @@ inline const std::initializer_list<known_item> currency_abyss = {
 	{"Preserved Vertebrae", known_item_properties(20, 65)},
 	{"Ancient Collarbone", known_item_properties(20, 75)},
 	{"Ancient Jawbone", known_item_properties(20, 75)},
-	{"Ancient Rib", known_item_properties(20, 75)}
+	{"Ancient Rib", known_item_properties(20, 75)},
+	// Augments
+	{"Ulaman's Gaze",  known_item_properties(1, 65)},
+	{"Kurgal's Gaze",  known_item_properties(1, 65)},
+	{"Tecrod's Gaze",  known_item_properties(1, 65)},
+	{"Amanamu's Gaze", known_item_properties(1, 65)}
 };
 
 inline const std::initializer_list<known_item> currency_catalysts = {

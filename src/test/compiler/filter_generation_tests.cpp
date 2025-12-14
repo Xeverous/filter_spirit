@@ -331,7 +331,7 @@ BOOST_AUTO_TEST_CASE(price_queries_multiple_categories_one_block)
 	push_item(ipd.runes,      1, "Greater Iron Rune");
 	push_item(ipd.runes,      1, "Countess Seske's Rune of Archery");
 	push_item(ipd.soul_cores, 1, "Soul Core of Azcapa");
-	push_item(ipd.talismans,  1, "Wolf Talisman");
+	push_item(ipd.idols,      1, "Wolf Idol");
 
 	compiler::settings st;
 	st.game_variant = lang::game_variant_type::poe2;

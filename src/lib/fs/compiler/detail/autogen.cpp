@@ -553,8 +553,8 @@ poe2_make_autogen_func(
 			return make_autogen_stackable_item(st, conditions, autogen_origin, cn::essences, &ipd::essences, lang::loot::poe2::known_items, diagnostics);
 		case cat_t::soul_cores:
 			return make_autogen_simple(st, conditions, autogen_origin, cn::poe2::soul_cores, &ipd::soul_cores, diagnostics);
-		case cat_t::talismans:
-			return make_autogen_simple(st, conditions, autogen_origin, cn::poe2::idols, &ipd::talismans, diagnostics);
+		case cat_t::idols:
+			return make_autogen_simple(st, conditions, autogen_origin, cn::poe2::idols, &ipd::idols, diagnostics);
 		case cat_t::runes:
 			return make_autogen_simple(st, conditions, autogen_origin, cn::poe2::runes, &ipd::runes, diagnostics);
 		case cat_t::omens:

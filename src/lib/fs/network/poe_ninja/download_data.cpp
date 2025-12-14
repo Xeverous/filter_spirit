@@ -29,12 +29,12 @@ std::string poe1_make_url(bool is_currency, std::string_view league_encoded, std
 	return result;
 }
 
-std::string poe2_make_url(std::string_view league_encoded, std::string_view name)
+std::string poe2_make_url(std::string_view league_encoded, std::string_view category)
 {
-	std::string result = "https://poe.ninja/poe2/api/economy/temp/overview";
+	std::string result = "https://poe.ninja/poe2/api/economy/exchange/current/overview";
 
-	result.append("?leagueName=").append(league_encoded);
-	result.append("&overviewName=").append(name);
+	result.append("?league=").append(league_encoded);
+	result.append("&type=").append(category);
 
 	return result;
 }
@@ -90,8 +90,8 @@ download_item_price_data(
 
 	api_item_price_data data;
 	std::vector<std::string> urls;
-	data.for_each_file([&](const char* name, std::string& /* content */) {
-		urls.push_back(poe2_make_url(league_encoded, name));
+	data.for_each_file([&](const char* category, std::string& /* content */) {
+		urls.push_back(poe2_make_url(league_encoded, category));
 	});
 
 	download_result result = download(target_name, urls, settings, info, logger);

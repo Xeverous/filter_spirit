@@ -575,7 +575,7 @@ Class == "Incubators"
 Class == "Augment"
 {
 	# ninja may still use the legacy name of Talismans, not Idols
-	Autogen "Runes" "Soul Cores" "Talismans"
+	Autogen "Runes" "Soul Cores" "Idols"
 	{
 		Price >= $cfg_augments_high_min_value
 		{

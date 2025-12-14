@@ -329,7 +329,7 @@ log::message_stream& operator<<(log::message_stream& stream, const item_price_da
 		"\tLineage Gems     : " << ipd.lineage_support_gems.size() << "\n"
 		"\tEssences         : " << ipd.essences.size() << "\n"
 		"\tSoul Cores       : " << ipd.soul_cores.size() << "\n"
-		"\tTalismans        : " << ipd.talismans.size() << "\n"
+		"\tIdols            : " << ipd.idols.size() << "\n"
 		"\tRunes            : " << ipd.runes.size() << "\n"
 		"\tOmens            : " << ipd.omens.size() << "\n"
 		"\tExpedition       : " << ipd.expedition.size() << "\n"

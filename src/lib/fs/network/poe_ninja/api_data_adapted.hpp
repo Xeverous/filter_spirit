@@ -57,7 +57,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 	lineage_support_gems,
 	essences,
 	ultimatum,
-	talismans,
+	idols,
 	runes,
 	ritual,
 	expedition,

@@ -388,7 +388,7 @@ enum class autogen_category
 	lineage_support_gems,
 	essences,
 	soul_cores,
-	talismans,
+	idols,
 	runes,
 	omens,
 	expedition,
@@ -414,8 +414,8 @@ constexpr std::optional<autogen_category> to_autogen_category(std::string_view s
 		return autogen_category::essences;
 	else if (sv == "Soul Cores")
 		return autogen_category::soul_cores;
-	else if (sv == "Talismans")
-		return autogen_category::talismans;
+	else if (sv == "Idols")
+		return autogen_category::idols;
 	else if (sv == "Runes")
 		return autogen_category::runes;
 	else if (sv == "Omens")
