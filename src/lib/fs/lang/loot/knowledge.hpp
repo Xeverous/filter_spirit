@@ -986,7 +986,7 @@ inline const std::initializer_list<known_item> currency_vaal = { // 0.4.0
 	{"Vaal Cultivation Orb",    known_item_properties(10, 1)},
 	{"Ancient Infuser",         known_item_properties(10, 1)},
 	{"Orb of Extraction",       known_item_properties(10, 1)},
-	{"Core Destabilizer",       known_item_properties(10, 1)},
+	{"Core Destabiliser",       known_item_properties(10, 1)},
 	{"Vaal Infuser",            known_item_properties(10, 1)}
 };
 
