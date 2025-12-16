@@ -291,8 +291,10 @@ BOOST_AUTO_TEST_CASE(simple_price_queries_poe1)
 {
 	lang::market::poe1::item_price_data ipd;
 	const auto push_card = [&](double price, std::string name, int max_stack_size) {
-		ipd.divination_cards.push_back(lang::market::poe1::divination_card{
-			lang::market::price_data{price, lang::market::confidence_level::high}, std::move(name), max_stack_size});
+		lang::market::price_data price_data;
+		price_data.confidence = lang::market::confidence_level::high;
+		price_data.value_chaos = price;
+		ipd.divination_cards.push_back(lang::market::poe1::divination_card{price_data, std::move(name), max_stack_size});
 	};
 	push_card(0.125, "Rain of Chaos", 8);
 	push_card(5, "Humility", 9);
@@ -306,8 +308,10 @@ BOOST_AUTO_TEST_CASE(price_queries_and_stack_size_poe2)
 {
 	lang::market::poe2::item_price_data ipd;
 	const auto push_item = [&](double price, std::string name) {
-		ipd.currency.push_back(lang::market::elementary_item{
-			lang::market::price_data{price, lang::market::confidence_level::high}, std::move(name)});
+		lang::market::price_data price_data;
+		price_data.confidence = lang::market::confidence_level::high;
+		price_data.value_chaos = price;
+		ipd.currency.push_back(lang::market::elementary_item{price_data, std::move(name)});
 	};
 	push_item(0.05, "Lesser Jeweller's Orb");
 	push_item(0.5, "Regal Orb");
@@ -323,8 +327,10 @@ BOOST_AUTO_TEST_CASE(price_queries_and_stack_size_poe2)
 BOOST_AUTO_TEST_CASE(price_queries_multiple_categories_one_block)
 {
 	const auto push_item = [](std::vector<lang::market::elementary_item>& container, double price, std::string name) {
-		container.push_back(lang::market::elementary_item{
-			lang::market::price_data{price, lang::market::confidence_level::high}, std::move(name)});
+		lang::market::price_data price_data;
+		price_data.confidence = lang::market::confidence_level::high;
+		price_data.value_chaos = price;
+		container.push_back(lang::market::elementary_item{price_data, std::move(name)});
 	};
 
 	lang::market::poe2::item_price_data ipd;

@@ -1,5 +1,8 @@
 #pragma once
 
+#include <cmath>
+#include <type_traits>
+
 namespace fs::utility {
 
 template <typename T> constexpr
@@ -12,6 +15,14 @@ template <typename T> constexpr
 T inverse_lerp(T v, T min, T max)
 {
 	return (v - min) / (max - min);
+}
+
+// avoids warning: comparing floating-point with ‘==’ or ‘!=’ is unsafe [-Wfloat-equal]
+template <typename FloatingPoint>
+bool is_zero(FloatingPoint value)
+{
+	static_assert(std::is_floating_point_v<FloatingPoint>);
+	return std::fpclassify(value) == FP_ZERO;
 }
 
 }

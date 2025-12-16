@@ -61,10 +61,20 @@ constexpr bool operator> (confidence_level lhs, confidence_level rhs) { return r
 constexpr bool operator<=(confidence_level lhs, confidence_level rhs) { return !(lhs > rhs); }
 constexpr bool operator>=(confidence_level lhs, confidence_level rhs) { return !(lhs < rhs); }
 
+struct currency_exchange_rates
+{
+	// use x_to_y as 1x : Ny
+	double divine_to_chaos   = 0.0;
+	double divine_to_exalted = 0.0;
+	double exalted_to_chaos  = 0.0;
+};
+
 struct price_data
 {
-	double chaos_value;
-	confidence_level confidence;
+	confidence_level confidence = confidence_level::low;
+	double value_chaos   = 0.0;
+	double value_exalted = 0.0;
+	double value_divine  = 0.0;
 };
 
 struct elementary_item
@@ -146,6 +156,8 @@ struct item_price_data
 	 */
 	void sort();
 
+	currency_exchange_rates rates;
+
 	// Class == "Stackable Currency"
 	std::vector<elementary_item> currency;
 	std::vector<elementary_item> essences;      // 2.4
@@ -212,6 +224,8 @@ struct item_price_data
 		const item_price_metadata& metadata,
 		const std::filesystem::path& directory_path,
 		log::logger& logger);
+
+	currency_exchange_rates rates;
 
 	std::vector<elementary_item> currency;
 	std::vector<elementary_item> fragments;

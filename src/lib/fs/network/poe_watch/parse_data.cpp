@@ -333,10 +333,12 @@ parse_compact(std::string_view compact_json, log::logger& logger)
 		}
 
 		item_prices[id] = lang::market::price_data{
-			item.at("mean").get<double>(),
 			to_confidence_level(
 				item.at("daily").get<int>(),
-				item.at("current").get<int>())};
+				item.at("current").get<int>()),
+			item.at("mean").get<double>(),
+			0.0,
+			0.0};
 	}
 
 	item_prices.resize(max_id);

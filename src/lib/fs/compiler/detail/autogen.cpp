@@ -40,7 +40,7 @@ get_matching_items(
 
 	lang::condition_values_container<lang::string> result;
 	for (const auto& item : container) {
-		if (item.price.confidence == lang::market::confidence_level::low || !price_range.includes(item.price.chaos_value))
+		if (item.price.confidence == lang::market::confidence_level::low || !price_range.includes(item.price.value_chaos))
 			continue;
 
 		if (!predicate(item))
@@ -127,7 +127,7 @@ bool operator<(eligible_item lhs, eligible_item rhs)
 
 		if (price_range.lower_bound()) {
 			const auto amount_min = static_cast<int>(std::ceil(
-				(*price_range.lower_bound()).bound.value.value / market_item.price.chaos_value));
+				(*price_range.lower_bound()).bound.value.value / market_item.price.value_chaos));
 
 			if (amount_min > *max_stack_size) {
 				// item too cheap, requires higher amount than the stack allows
@@ -139,7 +139,7 @@ bool operator<(eligible_item lhs, eligible_item rhs)
 
 		if (price_range.upper_bound()) {
 			const auto amount_max = static_cast<int>(std::floor(
-				(*price_range.upper_bound()).bound.value.value / market_item.price.chaos_value));
+				(*price_range.upper_bound()).bound.value.value / market_item.price.value_chaos));
 
 			// skip items that can not fit between mix and max price bound
 			if (itm.amount_min.value_or(0) > amount_max)
