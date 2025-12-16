@@ -1126,7 +1126,7 @@ Class "Rings" "Amulets" "Belts"
 # Hide remaining low-value gear
 # TODO potentially missing: Trap, Claw
 Rarity <= Magic
-Class "Flask" "Body" "Helmet" "Boots" "Gloves" "Shields" "Buckler" "Quiver" "Axe" "Mace" "Sword" "Staff" "Dagger" "Flail" "Quarter" "Spear" "Bow" "Crossbow" "Wand" "Sceptre" "Ring" "Belt" "Amulet" "Focus"
+Class "Flask" "Body" "Helmet" "Boots" "Gloves" "Shields" "Buckler" "Quiver" "Axe" "Mace" "Sword" "Staff" "Dagger" "Flail" "Quarter" "Spear" "Bow" "Crossbow" "Wand" "Sceptre" "Ring" "Belt" "Amulet" "Focus" "Talisman"
 AreaLevel >= 65
 {
 	Hide
