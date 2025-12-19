@@ -281,15 +281,6 @@ $cfg_always_show_uncut_support_gems = True
 	Continue
 }
 
-# Items that should be always shown
-# (perhaps crafts that drop items instead returning them on UI)
-AlwaysShow True
-{
-	SetBackgroundColor 0 96 0
-	SetAlertSound $alert_very_specific
-	Show
-}
-
 #--------------------------
 # Gold
 #--------------------------
@@ -804,6 +795,15 @@ Class == "Uncut Support Gems"
 #--------------------------
 # Valuables
 #--------------------------
+
+# Items that should be always shown
+# (perhaps crafts that drop items instead returning them on UI)
+AlwaysShow True
+{
+	SetBackgroundColor 0 96 0
+	SetAlertSound $alert_very_specific
+	Show
+}
 
 Class == "Quest Items" "Instance Local Items"
 {
