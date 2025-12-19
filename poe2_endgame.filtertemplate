@@ -408,7 +408,7 @@ Class == "Stackable Currency"
 		Price >= $cfg_essences_high_min_value
 		{
 			SetTextColor $color_white
-			SetBorderColor $color_essence_high
+			SetBorderColor $color_white
 			SetBackgroundColor $color_essence_high
 			SetFontSize $font_essence_high
 			SetAlertSound $alert_essence_high
