@@ -1017,13 +1017,13 @@ Rarity <= Rare
 
 	# later: also "Trap"
 
-	Class "Body Armour" "Two Hand" "Quarterstaff" "Staff" "Bow" "Crossbow"
+	Class "Body Armour" "Two Hand" "Quarterstaff" "Staff" "Bow" "Crossbow" "Talisman"
 	Sockets > 2
 	{
 		ShowDiscard $cfg_show_gear_exceptional_sockets
 	}
 
-	Class != "Body Armour" "Two Hand" "Quarterstaff" "Staff" "Bow" "Crossbow"
+	Class != "Body Armour" "Two Hand" "Quarterstaff" "Staff" "Bow" "Crossbow" "Talisman"
 	Sockets > 1
 	{
 		ShowDiscard $cfg_show_gear_exceptional_sockets
