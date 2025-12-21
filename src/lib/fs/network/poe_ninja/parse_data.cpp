@@ -765,6 +765,9 @@ lang::market::poe2::item_price_data parse_item_price_data(const api_item_price_d
 	move_item("Breach Splinter", result.fragments, result.currency);
 	move_item("Breach Splinter", result.catalysts, result.currency);
 
+	for (auto name : {"Amanamu's Gaze", "Tecrod's Gaze", "Kurgal's Gaze", "Ulaman's Gaze"})
+		move_item(name, result.abyss_currency, result.runes);
+
 	return result;
 }
 
