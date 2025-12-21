@@ -916,6 +916,7 @@ Rarity Unique
 	{
 		SetTextColor 0 240 190 255
 		SetBorderColor 0 240 190 255
+		SetBackgroundColor $color_white
 		SetFontSize $font_max
 		SetAlertSound $alert_extraordinary
 		MinimapIcon 0 Brown Star
