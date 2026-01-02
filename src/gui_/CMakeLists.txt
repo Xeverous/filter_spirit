@@ -1,22 +1,42 @@
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/" ${CMAKE_MODULE_PATH})
+
+if(FILTER_SPIRIT_ENABLE_SANITIZERS)
+	# Required by Corrade. ifunc is incompatible with sanitizers
+	set(CORRADE_CPU_USE_IFUNC OFF CACHE BOOL "" FORCE)
+endif()
+
+# Add Corrade as a subproject
+set(CORRADE_USE_PEDANTIC_FLAGS ON)
+add_subdirectory("${CMAKE_SOURCE_DIR}/external/corrade" corrade EXCLUDE_FROM_ALL)
+
+# Add Magnum as a subproject, enable specific application implementation
+if(FILTER_SPIRIT_PLATFORM STREQUAL "emscripten")
+	set(MAGNUM_WITH_EMSCRIPTENAPPLICATION ON CACHE BOOL "" FORCE)
+else()
+	set(MAGNUM_WITH_SDL2APPLICATION ON CACHE BOOL "" FORCE)
+endif()
+
+add_subdirectory("${CMAKE_SOURCE_DIR}/external/magnum" magnum EXCLUDE_FROM_ALL)
+
+# based on https://doc.magnum.graphics/magnum/namespaceMagnum_1_1ImGuiIntegration.html
+set(IMGUI_DIR ${CMAKE_SOURCE_DIR}/external/imgui)
+set(MAGNUM_WITH_IMGUI ON CACHE BOOL "" FORCE)
+add_subdirectory("${CMAKE_SOURCE_DIR}/external/magnum-integration" magnum-integration EXCLUDE_FROM_ALL)
+
 add_subdirectory("${CMAKE_SOURCE_DIR}/external/tiny_file_dialogs" tiny_file_dialogs EXCLUDE_FROM_ALL)
 
-set(NUKLEAR_HEADER_DIR "${CMAKE_SOURCE_DIR}/external/Nuklear")
-set(NUKLEUS_BUILD_DEMO_SDL2 "ON")
-add_subdirectory("${CMAKE_SOURCE_DIR}/external/nukleus" nukleus)
+if(FILTER_SPIRIT_PLATFORM STREQUAL "emscripten")
+	find_package(Magnum REQUIRED GL EmscriptenApplication)
+else()
+	find_package(Magnum REQUIRED GL Sdl2Application)
+endif()
 
-find_package(SDL2 REQUIRED)
-find_package(OpenGL REQUIRED)
+find_package(MagnumIntegration REQUIRED ImGui)
 
 add_executable(filter_spirit_gui)
 
 target_sources(filter_spirit_gui
 	PRIVATE
-		${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
-		${CMAKE_CURRENT_SOURCE_DIR}/application.hpp
-		${CMAKE_CURRENT_SOURCE_DIR}/application.cpp
-		${CMAKE_CURRENT_SOURCE_DIR}/ui_state.hpp
-		${CMAKE_CURRENT_SOURCE_DIR}/ui_state.cpp
-	#[[
 		fs/gui/application.cpp
 		fs/gui/application.hpp
 		fs/gui/gui_logger.cpp
@@ -66,7 +86,6 @@ target_sources(filter_spirit_gui
 		fs/gui/windows/version_info_window.cpp
 		fs/gui/windows/version_info_window.hpp
 		fs/main.cpp
-	]]
 )
 
 target_include_directories(filter_spirit_gui
@@ -92,19 +111,14 @@ if(FILTER_SPIRIT_ENABLE_LTO)
 	set_target_properties(filter_spirit_gui PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif()
 
-# https://wiki.libsdl.org/SDL2/README-cmake
-# SDL2::SDL2main may or may not be available. It is e.g. required by Windows GUI applications
-if(TARGET SDL2::SDL2main)
-	# It has an implicit dependency on SDL2 functions, so it MUST be added before SDL2::SDL2 (or SDL2::SDL2-static)
-	target_link_libraries(filter_spirit_gui PRIVATE SDL2::SDL2main)
-endif()
-
 target_link_libraries(filter_spirit_gui
 	PRIVATE
 		filter_spirit
-		xev::nukleus
-		SDL2::SDL2
-		OpenGL::GL
+		Corrade::Main
+		MagnumIntegration::ImGui
+		Magnum::Application
+		Magnum::GL
+		Magnum::Magnum
 )
 
 if(FILTER_SPIRIT_PLATFORM STREQUAL "emscripten")
