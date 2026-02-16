@@ -52,7 +52,7 @@ void add_missing_currencies(std::vector<lang::market::elementary_item>& currency
 			[&](const lang::market::elementary_item& item) { return item.name == item_name; });
 	};
 
-	if (!has_item("Chaos Orb")) {
+	if (!has_item("Chaos Orb") && !is_zero(rates.exalted_to_chaos) && !is_zero(rates.divine_to_chaos)) {
 		lang::market::price_data price_data;
 		price_data.confidence = lang::market::confidence_level::high;
 		price_data.value_chaos = 1.0;
@@ -61,7 +61,7 @@ void add_missing_currencies(std::vector<lang::market::elementary_item>& currency
 		currency.push_back(lang::market::elementary_item{price_data, "Chaos Orb"});
 	}
 
-	if (!has_item("Exalted Orb")) {
+	if (!has_item("Exalted Orb") && !is_zero(rates.exalted_to_chaos) && !is_zero(rates.divine_to_exalted)) {
 		lang::market::price_data price_data;
 		price_data.confidence = lang::market::confidence_level::high;
 		price_data.value_chaos = rates.exalted_to_chaos;
@@ -70,7 +70,7 @@ void add_missing_currencies(std::vector<lang::market::elementary_item>& currency
 		currency.push_back(lang::market::elementary_item{price_data, "Exalted Orb"});
 	}
 
-	if (!has_item("Divine Orb")) {
+	if (!has_item("Divine Orb") && !is_zero(rates.divine_to_chaos) && !is_zero(rates.divine_to_exalted)) {
 		lang::market::price_data price_data;
 		price_data.confidence = lang::market::confidence_level::high;
 		price_data.value_chaos = rates.divine_to_chaos;
