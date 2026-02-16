@@ -379,7 +379,7 @@ lang::market::currency_exchange_rates infer_exchange_rates(const std::vector<lan
 
 	const auto it_exalted = find_item("Exalted Orb");
 	if (it_exalted == currency.end()) {
-		logger.warning() << "Could not find \"Exalted Orb\" in currency data. Items will not have Exalted value availalbe.";
+		logger.warning() << "Could not find \"Exalted Orb\" in currency data. Items will not have Exalted value availalbe.\n";
 	}
 	else {
 		rates.exalted_to_chaos = it_exalted->price.value_chaos;
@@ -387,7 +387,7 @@ lang::market::currency_exchange_rates infer_exchange_rates(const std::vector<lan
 
 	const auto it_divine = find_item("Divine Orb");
 	if (it_divine == currency.end()) {
-		logger.warning() << "Could not find \"Divine Orb\" in currency data. Items will not have Divine value availalbe.";
+		logger.warning() << "Could not find \"Divine Orb\" in currency data. Items will not have Divine value availalbe.\n";
 	}
 	else {
 		rates.divine_to_chaos = it_divine->price.value_chaos;
