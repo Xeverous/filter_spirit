@@ -13,8 +13,19 @@
 #include <algorithm>
 #include <string_view>
 #include <vector>
+#include <tuple>
 
 namespace fs::network::poe_ninja {
+
+/**
+ * poe.ninja uses 2 data models to report items.
+ *
+ * - exchange: {"core": {...}, "lines": [...], "items": [...]}
+ * - stash: {"lines"; [...]}
+ *
+ * The "core" part is identical in every currency JSON downloaded at the same time.
+ * As of writing this, PoE 2 currently only reports currencies.
+ */
 
 using fs::utility::is_zero;
 
@@ -42,42 +53,323 @@ void for_each_item_in_items(const nlohmann::json& items, log::logger& logger, F 
 	}
 }
 
-// Sometimes main currencies (Chaos, Exalted, Divine) are not reported. Add them if missing, based on known rates
-void add_missing_currencies(std::vector<lang::market::elementary_item>& currency, lang::market::currency_exchange_rates rates)
+enum class primary_currency { chaos, exalted, divine };
+struct currency_info
 {
-	auto has_item = [&](const char* item_name) {
-		return std::any_of(
-			currency.begin(),
-			currency.end(),
-			[&](const lang::market::elementary_item& item) { return item.name == item_name; });
+	primary_currency primary;
+	lang::market::currency_exchange_rates rates;
+};
+
+std::optional<primary_currency> parse_primary_currency(const nlohmann::json& json, log::logger& logger)
+{
+	const auto it_core = json.find("core");
+	if (it_core == json.end()) {
+		logger.error() << "Could not find \"core\" subobject in JSON";
+		return std::nullopt;
+	}
+
+	const auto it_primary = it_core->find("primary");
+	if (it_primary == it_core->end()) {
+		logger.error() << "Could not find \"core\".\"primary\" subobject in JSON";
+		return std::nullopt;
+	}
+
+	const auto& primary_currency = it_primary->get_ref<const std::string&>();
+
+	if (primary_currency == "chaos")
+		return primary_currency::chaos;
+	else if (primary_currency == "exalted")
+		return primary_currency::exalted;
+	else if (primary_currency == "divine")
+		return primary_currency::divine;
+	else {
+		logger.error() << "Unknown primary currency: \"" << primary_currency << "\"";
+		return std::nullopt;
+	}
+}
+
+std::optional<currency_info> parse_currency_info(const nlohmann::json& json, log::logger& logger)
+{
+	currency_info info;
+
+	if (auto primary = parse_primary_currency(json, logger); !primary)
+		return std::nullopt;
+	else
+		info.primary = *primary;
+
+	const auto it_core = json.find("core");
+	if (it_core == json.end()) {
+		logger.error() << "Could not find \"core\" subobject in JSON";
+		return std::nullopt;
+	}
+
+	const auto it_rates = it_core->find("rates");
+	if (it_rates == it_core->end()) {
+		logger.error() << "Could not find \"core\".\"rates\" subobject in JSON";
+		return std::nullopt;
+	}
+
+	const auto get_rate = [&](const char* name) -> std::optional<double> {
+		const auto it = it_rates->find(name);
+		if (it == it_rates->end())
+			return std::nullopt;
+		return it->get<double>();
 	};
 
-	if (!has_item("Chaos Orb") && !is_zero(rates.exalted_to_chaos) && !is_zero(rates.divine_to_chaos)) {
+	if (info.primary == primary_currency::chaos) {
+		auto chaos_to_exalted = get_rate("exalted");
+		if (chaos_to_exalted)
+			info.rates.exalted_to_chaos = 1.0 / *chaos_to_exalted;
+
+		auto chaos_to_divine = get_rate("divine");
+		if (chaos_to_divine)
+			info.rates.divine_to_chaos = 1.0 / *chaos_to_divine;
+
+		if (chaos_to_exalted && chaos_to_divine)
+			info.rates.divine_to_exalted = info.rates.divine_to_chaos / info.rates.exalted_to_chaos;
+	}
+	else if (info.primary == primary_currency::exalted) {
+		auto exalted_to_chaos = get_rate("chaos");
+		if (exalted_to_chaos)
+			info.rates.exalted_to_chaos = *exalted_to_chaos;
+
+		auto exalted_to_divine = get_rate("divine");
+		if (exalted_to_divine)
+			info.rates.divine_to_exalted = 1.0 / *exalted_to_divine;
+
+		if (exalted_to_chaos && exalted_to_divine)
+			info.rates.divine_to_chaos = info.rates.divine_to_exalted * info.rates.exalted_to_chaos;
+	}
+	else {
+		FS_ASSERT(info.primary == primary_currency::divine);
+
+		auto divine_to_chaos = get_rate("chaos");
+		if (divine_to_chaos)
+			info.rates.divine_to_chaos = *divine_to_chaos;
+
+		auto divine_to_exalted = get_rate("exalted");
+		if (divine_to_exalted)
+			info.rates.divine_to_exalted = *divine_to_exalted;
+
+		if (divine_to_chaos && divine_to_exalted)
+			info.rates.exalted_to_chaos = info.rates.divine_to_chaos / info.rates.divine_to_exalted;
+	}
+
+	/**
+	 * With 2 currencies reported in core, 1 exchange rate should be non-zero
+	 * With 3 currencies reported in core, 3 exchange rates should be non-zero
+	 */
+	if (is_zero(info.rates.divine_to_chaos) && is_zero(info.rates.divine_to_exalted) && is_zero(info.rates.exalted_to_chaos)) {
+		logger.error() << "Could not find any \"core\".\"rates\".\"*\" subobject in JSON";
+		return std::nullopt;
+	}
+
+	return info;
+}
+
+lang::market::price_data compute_item_price(double primary_value, primary_currency primary_type, lang::market::currency_exchange_rates rates)
+{
+	lang::market::price_data price_data;
+	// data from currency exchange API is always high confidence
+	// (and this function is only used for such items)
+	price_data.confidence = lang::market::confidence_level::high;
+
+	if (primary_type == primary_currency::chaos) {
+		price_data.value_chaos = primary_value;
+
+		if (!is_zero(rates.exalted_to_chaos))
+			price_data.value_exalted = price_data.value_chaos / rates.exalted_to_chaos;
+
+		if (!is_zero(rates.divine_to_chaos))
+			price_data.value_divine  = price_data.value_chaos / rates.divine_to_chaos;
+	}
+	else if (primary_type == primary_currency::exalted) {
+		price_data.value_exalted = primary_value;
+
+		if (!is_zero(rates.exalted_to_chaos))
+			price_data.value_chaos  = price_data.value_exalted * rates.exalted_to_chaos;
+
+		if (!is_zero(rates.divine_to_exalted))
+			price_data.value_divine = price_data.value_exalted / rates.divine_to_exalted;
+	}
+	else {
+		FS_ASSERT(primary_type == primary_currency::divine);
+		price_data.value_divine = primary_value;
+
+		if (!is_zero(rates.divine_to_chaos))
+			price_data.value_chaos   = price_data.value_divine * rates.divine_to_chaos;
+
+		if (!is_zero(rates.divine_to_exalted))
+			price_data.value_exalted = price_data.value_divine * rates.divine_to_exalted;
+	}
+
+	return price_data;
+}
+
+[[nodiscard]] std::vector<lang::market::elementary_item>
+parse_exchange_items(const nlohmann::json& json, lang::market::currency_exchange_rates rates, log::logger& logger)
+{
+	std::optional<primary_currency> primary = parse_primary_currency(json, logger);
+	if (!primary)
+		return {};
+
+	const auto it_items = json.find("items"); // item id => item description (includes name)
+	const auto it_lines = json.find("lines"); // item id => item value
+
+	if (it_lines == json.end() || it_items == json.end()) {
+		logger.error() << "Could not parse JSON: missing \"items\" and/or \"lines\" subobjects";
+		return {};
+	}
+
+	std::unordered_map<std::string, std::string> item_ids_to_names;
+	item_ids_to_names.reserve(it_items->size());
+
+	for_each_item_in_items(*it_items, logger, [&](const nlohmann::json& item) {
+		item_ids_to_names.emplace(item.at("id"), item.at("name"));
+	});
+
+	std::vector<lang::market::elementary_item> result;
+	for_each_item_in_items(*it_lines, logger, [&](const nlohmann::json& item) {
+		const auto id = item.at("id").get_ref<const std::string&>();
+		const auto name_it = item_ids_to_names.find(id);
+
+		if (name_it == item_ids_to_names.end()) {
+			logger.error() << "Price data for item with id = \"" << id << "\" has no item associated";
+			return;
+		}
+
+		result.push_back(lang::market::elementary_item{
+			compute_item_price(item.at("primaryValue").get<double>(), *primary, rates),
+			name_it->second
+		});
+	});
+
+	return result;
+}
+
+[[nodiscard]] std::vector<lang::market::elementary_item>
+parse_exchange_items(const std::string& json_str, lang::market::currency_exchange_rates rates, log::logger& logger)
+{
+	return parse_exchange_items(nlohmann::json::parse(json_str), rates, logger);
+}
+
+[[nodiscard]] std::pair<lang::market::currency_exchange_rates, std::vector<lang::market::elementary_item>>
+parse_exchange_currency(std::string_view json_str, log::logger& logger)
+{
+	const nlohmann::json json = nlohmann::json::parse(json_str);
+	std::optional<currency_info> maybe_info = parse_currency_info(json, logger);
+	if (!maybe_info)
+		return {};
+
+	lang::market::currency_exchange_rates rates = (*maybe_info).rates;
+
+	// at this point the "rates" object may contain only partial information
+	// items may have only a single non-zero price field (the primary currency)
+	// in addition to this, the primary currency item can be missing (it would have value == 1.0)
+	auto result = parse_exchange_items(json, rates, logger);
+
+	// Fill missing info about c/ex/div rates when:
+	// - these items are not reported in "core" (parse_currency_info)
+	// - these items are reported in "lines" (parse_exchange_items)
+
+	const auto find_currency_item = [&result](const char* name) -> const lang::market::elementary_item* {
+		const auto it = std::find_if(result.begin(), result.end(), [&](const lang::market::elementary_item& item) { return item.name == name; });
+		if (it == result.end())
+			return nullptr;
+		else
+			return &*it;
+	};
+
+	const auto chaos   = find_currency_item("Chaos Orb");
+	const auto exalted = find_currency_item("Exalted Orb");
+	const auto divine  = find_currency_item("Divine Orb");
+
+	if (is_zero(rates.divine_to_chaos)) {
+		if (chaos && !is_zero(chaos->price.value_divine))
+			rates.divine_to_chaos = 1.0 / chaos->price.value_divine;
+		else if (exalted && !is_zero(exalted->price.value_chaos) && !is_zero(exalted->price.value_divine))
+			rates.divine_to_chaos = exalted->price.value_chaos / exalted->price.value_divine;
+		else if (divine && !is_zero(divine->price.value_chaos))
+			rates.divine_to_chaos = divine->price.value_chaos;
+	}
+
+	if (is_zero(rates.divine_to_exalted)) {
+		if (chaos && !is_zero(chaos->price.value_divine) && !is_zero(chaos->price.value_exalted))
+			rates.divine_to_exalted = chaos->price.value_exalted / chaos->price.value_divine;
+		else if (exalted && !is_zero(exalted->price.value_divine))
+			rates.divine_to_exalted = 1.0 / exalted->price.value_divine;
+		else if (divine && !is_zero(divine->price.value_exalted))
+			rates.divine_to_exalted = divine->price.value_exalted;
+	}
+
+	if (is_zero(rates.exalted_to_chaos)) {
+		if (chaos && !is_zero(chaos->price.value_exalted))
+			rates.exalted_to_chaos = 1.0 / chaos->price.value_exalted;
+		else if (exalted && !is_zero(exalted->price.value_chaos))
+			rates.exalted_to_chaos = exalted->price.value_chaos;
+		else if (divine && !is_zero(divine->price.value_chaos) && !is_zero(divine->price.value_exalted))
+			rates.exalted_to_chaos = divine->price.value_chaos / divine->price.value_exalted;
+	}
+
+	// update prices of all items, given richer exchange rates information
+	for (lang::market::elementary_item& item : result) {
+		switch ((*maybe_info).primary) {
+			case primary_currency::chaos:
+				item.price = compute_item_price(item.price.value_chaos, primary_currency::chaos, rates);
+				break;
+			case primary_currency::exalted:
+				item.price = compute_item_price(item.price.value_exalted, primary_currency::exalted, rates);
+				break;
+			case primary_currency::divine:
+				item.price = compute_item_price(item.price.value_divine, primary_currency::divine, rates);
+				break;
+		}
+	}
+
+	// Sometimes main currencies (Chaos, Exalted, Divine) are not reported. Add them if missing, based on known rates
+	if (!chaos) {
 		lang::market::price_data price_data;
 		price_data.confidence = lang::market::confidence_level::high;
 		price_data.value_chaos = 1.0;
-		price_data.value_exalted = 1.0 / rates.exalted_to_chaos;
-		price_data.value_divine = 1.0 / rates.divine_to_chaos;
-		currency.push_back(lang::market::elementary_item{price_data, "Chaos Orb"});
+
+		if (!is_zero(rates.exalted_to_chaos))
+			price_data.value_exalted = 1.0 / rates.exalted_to_chaos;
+
+		if (!is_zero(rates.divine_to_chaos))
+			price_data.value_divine = 1.0 / rates.divine_to_chaos;
+
+		result.push_back(lang::market::elementary_item{price_data, "Chaos Orb"});
 	}
 
-	if (!has_item("Exalted Orb") && !is_zero(rates.exalted_to_chaos) && !is_zero(rates.divine_to_exalted)) {
+	if (!exalted) {
 		lang::market::price_data price_data;
 		price_data.confidence = lang::market::confidence_level::high;
-		price_data.value_chaos = rates.exalted_to_chaos;
 		price_data.value_exalted = 1.0;
-		price_data.value_divine = 1.0 / rates.divine_to_exalted;
-		currency.push_back(lang::market::elementary_item{price_data, "Exalted Orb"});
+
+		if (!is_zero(rates.exalted_to_chaos))
+			price_data.value_chaos = rates.exalted_to_chaos;
+
+		if (!is_zero(rates.divine_to_exalted))
+			price_data.value_divine = 1.0 / rates.divine_to_exalted;
+
+		result.push_back(lang::market::elementary_item{price_data, "Exalted Orb"});
 	}
 
-	if (!has_item("Divine Orb") && !is_zero(rates.divine_to_chaos) && !is_zero(rates.divine_to_exalted)) {
+	if (!divine) {
 		lang::market::price_data price_data;
 		price_data.confidence = lang::market::confidence_level::high;
-		price_data.value_chaos = rates.divine_to_chaos;
-		price_data.value_exalted = rates.divine_to_exalted;
 		price_data.value_divine = 1.0;
-		currency.push_back(lang::market::elementary_item{price_data, "Divine Orb"});
+
+		if (!is_zero(rates.divine_to_chaos))
+			price_data.value_chaos = rates.divine_to_chaos;
+
+		if (!is_zero(rates.divine_to_exalted))
+			price_data.value_exalted = rates.divine_to_exalted;
+
+		result.push_back(lang::market::elementary_item{price_data, "Divine Orb"});
 	}
+
+	return std::make_pair(rates, std::move(result));
 }
 
 // poe.ninja sorts items by mechanical themes instead of filter item classes.
@@ -105,43 +397,14 @@ void move_item(
 
 namespace poe1 {
 
-// autogenerated ninja's API doc: https://poe.ninja/swagger/index.html (no longer available)
 namespace {
-
-// taken from JavaScript code on the site
-// static/js/economy/pages/CurrencyDetailsPage.tsx
-lang::market::confidence_level currency_to_confidence_level(const nlohmann::json& item) // (only for currency overview items)
-{
-	/*
-	 * This is a hard choice. poe.ninja reports separate confidence
-	 * for buying and selling. Some items with very high demand have
-	 * selling property equal to null, but this does not mean the item
-	 * has low confidence - only that trades gets completed very fast
-	 * which is the case for high-demand (often expensive) items.
-	 *
-	 * I have gone for some compromise. We treat an item as low-confidence
-	 * when the sum of buying and selling offers is < 10.
-	 */
-	const auto get_count = [&](const auto& side_name) {
-		const auto it = item.find(side_name);
-		if (it == item.end() || it->is_null()) {
-			return 0;
-		}
-
-		return it->at("count").template get<int>();
-	};
-
-	const auto total_count = get_count("pay") + get_count("receive");
-	if (total_count < 10)
-		return lang::market::confidence_level::low;
-	else
-		return lang::market::confidence_level::high;
-}
 
 lang::market::confidence_level to_confidence_level(int count)
 {
 	if (count < 5)
 		return lang::market::confidence_level::low;
+	else if (count < 10)
+		return lang::market::confidence_level::medium;
 	else
 		return lang::market::confidence_level::high;
 }
@@ -161,13 +424,13 @@ void for_each_item_in_json(std::string_view json_str, log::logger& logger, F f)
 }
 
 [[nodiscard]] const std::string&
-get_item_property_name(const nlohmann::json& item)
+get_stash_item_property_name(const nlohmann::json& item)
 {
 	return item.at("name").get_ref<const std::string&>();
 }
 
 [[nodiscard]] bool
-get_item_property_corrupted(const nlohmann::json& item)
+get_stash_item_property_corrupted(const nlohmann::json& item)
 {
 	if (const auto it = item.find("corrupted"); it == item.end())
 		return false;
@@ -176,7 +439,7 @@ get_item_property_corrupted(const nlohmann::json& item)
 }
 
 [[nodiscard]] int
-get_item_property_gem_quality(const nlohmann::json& item)
+get_stash_item_property_gem_quality(const nlohmann::json& item)
 {
 	if (const auto it = item.find("gemQuality"); it == item.end())
 		return 0;
@@ -185,7 +448,7 @@ get_item_property_gem_quality(const nlohmann::json& item)
 }
 
 [[nodiscard]] int
-get_item_property_links(const nlohmann::json& item)
+get_stash_item_property_links(const nlohmann::json& item)
 {
 	if (const auto it = item.find("links"); it == item.end())
 		return 0;
@@ -193,18 +456,8 @@ get_item_property_links(const nlohmann::json& item)
 		return it->get<int>();
 }
 
-[[nodiscard]] int
-get_item_property_stack_size(const nlohmann::json& item)
-{
-	if (const auto it = item.find("stackSize"); it == item.end())
-		return 1;
-	else
-		return it->get<int>();
-}
-
-
 [[nodiscard]] lang::influence_info
-get_item_property_influence_info(const nlohmann::json& item)
+get_stash_item_property_influence_info(const nlohmann::json& item)
 {
 	const auto it = item.find("variant");
 	if (it == item.end())
@@ -227,92 +480,46 @@ get_item_property_influence_info(const nlohmann::json& item)
 	};
 }
 
-[[nodiscard]] lang::market::price_data // (only for currency overview items)
-get_currency_price_data(const nlohmann::json& item)
-{
-	lang::market::price_data price_data;
-	price_data.confidence = currency_to_confidence_level(item);
-	price_data.value_chaos = item.at("chaosEquivalent").get<double>();
-	return price_data;
-}
-
 [[nodiscard]] lang::market::price_data
-get_item_price_data(const nlohmann::json& item)
+get_stash_item_price_data(const nlohmann::json& item, lang::market::currency_exchange_rates rates)
 {
-	lang::market::price_data price_data;
+	lang::market::price_data price_data = compute_item_price(item.at("chaosValue").get<double>(), primary_currency::chaos, rates);
 	price_data.confidence = to_confidence_level(item.at("count").get<int>());
-	price_data.value_chaos = item.at("chaosValue").get<double>();
 	return price_data;
 }
 
 [[nodiscard]] lang::market::elementary_item
-get_currency_item_data(const nlohmann::json& item)
+get_stash_item_data(const nlohmann::json& item, lang::market::currency_exchange_rates rates)
 {
 	return lang::market::elementary_item{
-		get_currency_price_data(item),
-		item.at("currencyTypeName").get<std::string>()
-	};
-}
-
-[[nodiscard]] lang::market::elementary_item
-get_elementary_item_data(const nlohmann::json& item)
-{
-	return lang::market::elementary_item{
-		get_item_price_data(item),
-		get_item_property_name(item),
+		get_stash_item_price_data(item, rates),
+		get_stash_item_property_name(item),
 	};
 }
 
 [[nodiscard]] std::vector<lang::market::elementary_item>
-parse_currency_items(std::string_view json_str, log::logger& logger)
+parse_stash_items(std::string_view json_str, lang::market::currency_exchange_rates rates, log::logger& logger)
 {
 	std::vector<lang::market::elementary_item> result;
 
 	for_each_item_in_json(json_str, logger, [&](const auto& item) {
-		result.push_back(get_currency_item_data(item));
-	});
-
-	return result;
-}
-
-[[nodiscard]] std::vector<lang::market::elementary_item>
-parse_elementary_items(std::string_view json_str, log::logger& logger)
-{
-	std::vector<lang::market::elementary_item> result;
-
-	for_each_item_in_json(json_str, logger, [&](const auto& item) {
-		result.push_back(get_elementary_item_data(item));
-	});
-
-	return result;
-}
-
-[[nodiscard]] std::vector<lang::market::poe1::divination_card>
-parse_divination_cards(std::string_view json_str, log::logger& logger)
-{
-	std::vector<lang::market::poe1::divination_card> result;
-
-	for_each_item_in_json(json_str, logger, [&](const nlohmann::json& item) {
-		result.emplace_back(
-			get_elementary_item_data(item),
-			get_item_property_stack_size(item)
-		);
+		result.push_back(get_stash_item_data(item, rates));
 	});
 
 	return result;
 }
 
 [[nodiscard]] std::vector<lang::market::poe1::gem>
-parse_gems(std::string_view json_str, log::logger& logger)
+parse_gems(std::string_view json_str, lang::market::currency_exchange_rates rates, log::logger& logger)
 {
 	std::vector<lang::market::poe1::gem> result;
 
 	for_each_item_in_json(json_str, logger, [&](const nlohmann::json& item) {
 		result.emplace_back(
-			get_elementary_item_data(item),
+			get_stash_item_data(item, rates),
 			item.at("gemLevel").get<int>(),
-			get_item_property_gem_quality(item),
-			get_item_property_corrupted(item)
+			get_stash_item_property_gem_quality(item),
+			get_stash_item_property_corrupted(item)
 		);
 	});
 
@@ -320,7 +527,7 @@ parse_gems(std::string_view json_str, log::logger& logger)
 }
 
 [[nodiscard]] std::vector<lang::market::poe1::base>
-parse_bases(std::string_view json_str, log::logger& logger)
+parse_bases(std::string_view json_str, lang::market::currency_exchange_rates rates, log::logger& logger)
 {
 	std::vector<lang::market::poe1::base> result;
 
@@ -328,9 +535,9 @@ parse_bases(std::string_view json_str, log::logger& logger)
 		// yes, not really a proper name but poe.ninja reuses some fields for other purposes
 		const auto item_level = item.at("levelRequired").get<int>();
 		result.emplace_back(
-			get_elementary_item_data(item),
+			get_stash_item_data(item, rates),
 			item_level,
-			get_item_property_influence_info(item)
+			get_stash_item_property_influence_info(item)
 		);
 	});
 
@@ -339,12 +546,13 @@ parse_bases(std::string_view json_str, log::logger& logger)
 
 void parse_and_fill_uniques(
 	std::string_view uniques_json,
+	lang::market::currency_exchange_rates rates,
 	lang::market::poe1::unique_item_price_data& uniques,
 	log::logger& logger)
 {
 	for_each_item_in_json(uniques_json, logger, [&](const nlohmann::json& item) {
 		// skip uniques which are linked
-		if (get_item_property_links(item) == 6) {
+		if (get_stash_item_property_links(item) == 6) {
 			return;
 		}
 
@@ -359,120 +567,58 @@ void parse_and_fill_uniques(
 
 		// skip uniques which do not drop (eg fated items) - this will reduce ambiguity and
 		// not pollute the filter with items we would not care for
-		const auto& name = get_item_property_name(item);
+		const auto& name = get_stash_item_property_name(item);
 		if (lang::market::poe1::is_undroppable_unique(name)) {
 			return;
 		}
 
 		const auto& base_type = item.at("baseType").get_ref<const nlohmann::json::string_t&>();
-		uniques.add_item(base_type, lang::market::elementary_item{get_item_price_data(item), name});
+		uniques.add_item(base_type, lang::market::elementary_item{get_stash_item_price_data(item, rates), name});
 	});
-}
-
-lang::market::currency_exchange_rates infer_exchange_rates(const std::vector<lang::market::elementary_item>& currency, log::logger& logger)
-{
-	const auto find_item = [&](const char* item_name) {
-		return std::find_if(currency.begin(), currency.end(), [&](const lang::market::elementary_item& item) { return item.name == item_name; });
-	};
-
-	lang::market::currency_exchange_rates rates;
-
-	const auto it_exalted = find_item("Exalted Orb");
-	if (it_exalted == currency.end()) {
-		logger.warning() << "Could not find \"Exalted Orb\" in currency data. Items will not have Exalted value availalbe.\n";
-	}
-	else {
-		rates.exalted_to_chaos = it_exalted->price.value_chaos;
-	}
-
-	const auto it_divine = find_item("Divine Orb");
-	if (it_divine == currency.end()) {
-		logger.warning() << "Could not find \"Divine Orb\" in currency data. Items will not have Divine value availalbe.\n";
-	}
-	else {
-		rates.divine_to_chaos = it_divine->price.value_chaos;
-	}
-
-	if (!is_zero(rates.exalted_to_chaos) && !is_zero(rates.divine_to_chaos))
-		rates.divine_to_exalted = rates.divine_to_chaos / rates.exalted_to_chaos;
-
-	return rates;
-}
-
-void update_non_chaos_prices(lang::market::elementary_item& item, lang::market::currency_exchange_rates rates)
-{
-	if (!is_zero(rates.divine_to_chaos))
-		item.price.value_divine = item.price.value_chaos / rates.divine_to_chaos;
-
-	if (!is_zero(rates.divine_to_chaos))
-		item.price.value_exalted = item.price.value_chaos / rates.exalted_to_chaos;
-}
-
-template <typename Item>
-void update_non_chaos_prices(std::vector<Item>& items, lang::market::currency_exchange_rates rates)
-{
-	static_assert(std::is_base_of_v<lang::market::elementary_item, Item>);
-
-	for (Item& item : items)
-		update_non_chaos_prices(item, rates);
-}
-
-void update_non_chaos_prices(lang::market::poe1::unique_item_price_data& items, lang::market::currency_exchange_rates rates)
-{
-	for (auto& item : items.unambiguous)
-		update_non_chaos_prices(item.second, rates);
-
-	for (auto& items : items.ambiguous)
-		update_non_chaos_prices(items.second, rates);
 }
 
 } // namespace
 
 lang::market::poe1::item_price_data parse_item_price_data(const api_item_price_data& jsons, log::logger& logger)
 {
-	/**
-	 * PoE 1 data reports prices only as Chaos.
-	 * First parse everything, filling only value_chaos field,
-	 * then update all items based on exchange rates.
-	 */
 	lang::market::poe1::item_price_data result;
 
-	result.currency         = parse_currency_items(  jsons.currency.file_content,     logger);
-	result.essences         = parse_elementary_items(jsons.essence.file_content,      logger);
-	result.vials            = parse_elementary_items(jsons.vial.file_content,         logger);
-	result.fossils          = parse_elementary_items(jsons.fossil.file_content,       logger);
-	result.oils             = parse_elementary_items(jsons.oil.file_content,          logger);
-	result.delirium_orbs    = parse_elementary_items(jsons.delirium_orb.file_content, logger);
-	result.artifacts        = parse_elementary_items(jsons.artifact.file_content,     logger);
-	result.tattoos          = parse_elementary_items(jsons.tattoo.file_content,       logger);
-	result.omens            = parse_elementary_items(jsons.omen.file_content,         logger);
-	result.runegrafts       = parse_elementary_items(jsons.runegraft.file_content,    logger);
+	std::tie(result.rates, result.currency) = parse_exchange_currency(jsons.currency.file_content, logger);
 
-	result.resonators       = parse_elementary_items(jsons.resonator.file_content, logger);
+	result.essences         = parse_exchange_items(jsons.essence.file_content,      result.rates, logger);
+	result.vials            = parse_stash_items(jsons.vial.file_content,         result.rates, logger);
+	result.fossils          = parse_exchange_items(jsons.fossil.file_content,       result.rates, logger);
+	result.oils             = parse_exchange_items(jsons.oil.file_content,          result.rates, logger);
+	result.delirium_orbs    = parse_exchange_items(jsons.delirium_orb.file_content, result.rates, logger);
+	result.artifacts        = parse_exchange_items(jsons.artifact.file_content,     result.rates, logger);
+	result.tattoos          = parse_exchange_items(jsons.tattoo.file_content,       result.rates, logger);
+	result.omens            = parse_exchange_items(jsons.omen.file_content,         result.rates, logger);
+	result.runegrafts       = parse_exchange_items(jsons.runegraft.file_content,    result.rates, logger);
 
-	result.divination_cards = parse_divination_cards(jsons.divination_card.file_content, logger);
+	result.resonators       = parse_exchange_items(jsons.resonator.file_content, result.rates, logger);
 
-	result.fragments        = parse_currency_items(  jsons.fragment.file_content, logger);
-	result.scarabs          = parse_elementary_items(jsons.scarab.file_content, logger);
-	result.allflame_embers  = parse_elementary_items(jsons.allflame_ember.file_content, logger);
+	result.divination_cards = parse_exchange_items(jsons.divination_card.file_content, result.rates, logger);
 
-	result.invitations      = parse_elementary_items(jsons.invitation.file_content, logger);
+	result.fragments        = parse_exchange_items(  jsons.fragment.file_content, result.rates, logger);
+	result.scarabs          = parse_exchange_items(jsons.scarab.file_content, result.rates, logger);
+	result.allflame_embers  = parse_exchange_items(jsons.allflame_ember.file_content, result.rates, logger);
 
-	result.incubators       = parse_elementary_items(jsons.incubator.file_content, logger);
+	result.invitations      = parse_stash_items(jsons.invitation.file_content, result.rates, logger);
 
-	result.gems = parse_gems(jsons.skill_gem.file_content, logger);
+	result.incubators       = parse_stash_items(jsons.incubator.file_content, result.rates, logger);
 
-	result.bases = parse_bases(jsons.base_type.file_content, logger);
+	result.gems = parse_gems(jsons.skill_gem.file_content, result.rates, logger);
 
-	parse_and_fill_uniques(jsons.unique_armour.file_content,    result.unique_eq,        logger);
-	parse_and_fill_uniques(jsons.unique_weapon.file_content,    result.unique_eq,        logger);
-	parse_and_fill_uniques(jsons.unique_accessory.file_content, result.unique_eq,        logger);
-	parse_and_fill_uniques(jsons.unique_flask.file_content,     result.unique_flasks,    logger);
-	parse_and_fill_uniques(jsons.unique_tincture.file_content,  result.unique_tinctures, logger);
-	parse_and_fill_uniques(jsons.unique_jewel.file_content,     result.unique_jewels,    logger);
-	parse_and_fill_uniques(jsons.unique_map.file_content,       result.unique_maps,      logger);
-	parse_and_fill_uniques(jsons.unique_relic.file_content,     result.unique_relics,    logger);
-	parse_and_fill_uniques(jsons.unique_idol.file_content,      result.unique_idols,     logger);
+	result.bases = parse_bases(jsons.base_type.file_content, result.rates, logger);
+
+	parse_and_fill_uniques(jsons.unique_armour.file_content,    result.rates, result.unique_eq,        logger);
+	parse_and_fill_uniques(jsons.unique_weapon.file_content,    result.rates, result.unique_eq,        logger);
+	parse_and_fill_uniques(jsons.unique_accessory.file_content, result.rates, result.unique_eq,        logger);
+	parse_and_fill_uniques(jsons.unique_flask.file_content,     result.rates, result.unique_flasks,    logger);
+	parse_and_fill_uniques(jsons.unique_tincture.file_content,  result.rates, result.unique_tinctures, logger);
+	parse_and_fill_uniques(jsons.unique_jewel.file_content,     result.rates, result.unique_jewels,    logger);
+	parse_and_fill_uniques(jsons.unique_map.file_content,       result.rates, result.unique_maps,      logger);
+	parse_and_fill_uniques(jsons.unique_relic.file_content,     result.rates, result.unique_relics,    logger);
 
 	// TODO "Misc Map Items"? Can all fragments be caught as "Map Fragments"?
 	move_item("Valdo's Puzzle Box",               result.fragments, result.currency);
@@ -489,36 +635,6 @@ lang::market::poe1::item_price_data parse_item_price_data(const api_item_price_d
 	move_item("Timeless Templar Splinter",        result.fragments, result.currency);
 	move_item("Timeless Maraketh Splinter",       result.fragments, result.currency);
 
-	result.rates = infer_exchange_rates(result.currency, logger);
-	add_missing_currencies(result.currency, result.rates);
-
-	update_non_chaos_prices(result.currency,         result.rates);
-	update_non_chaos_prices(result.essences,         result.rates);
-	update_non_chaos_prices(result.vials,            result.rates);
-	update_non_chaos_prices(result.fossils,          result.rates);
-	update_non_chaos_prices(result.oils,             result.rates);
-	update_non_chaos_prices(result.delirium_orbs,    result.rates);
-	update_non_chaos_prices(result.artifacts,        result.rates);
-	update_non_chaos_prices(result.tattoos,          result.rates);
-	update_non_chaos_prices(result.omens,            result.rates);
-	update_non_chaos_prices(result.runegrafts,       result.rates);
-	update_non_chaos_prices(result.resonators,       result.rates);
-	update_non_chaos_prices(result.divination_cards, result.rates);
-	update_non_chaos_prices(result.fragments,        result.rates);
-	update_non_chaos_prices(result.scarabs,          result.rates);
-	update_non_chaos_prices(result.allflame_embers,  result.rates);
-	update_non_chaos_prices(result.invitations,      result.rates);
-	update_non_chaos_prices(result.incubators,       result.rates);
-	update_non_chaos_prices(result.gems,             result.rates);
-	update_non_chaos_prices(result.bases,            result.rates);
-	update_non_chaos_prices(result.unique_eq,        result.rates);
-	update_non_chaos_prices(result.unique_flasks,    result.rates);
-	update_non_chaos_prices(result.unique_tinctures, result.rates);
-	update_non_chaos_prices(result.unique_jewels,    result.rates);
-	update_non_chaos_prices(result.unique_maps,      result.rates);
-	update_non_chaos_prices(result.unique_relics,    result.rates);
-	update_non_chaos_prices(result.unique_idols,     result.rates);
-
 	/*
 	 * not all jsons are being read but:
 	 * - we do not care about non-unique maps - people filter them by tier
@@ -533,180 +649,14 @@ namespace poe2 {
 
 namespace {
 
-enum class primary_currency { chaos, exalted, divine };
-struct primary_currency_info
-{
-	primary_currency primary;
-	lang::market::currency_exchange_rates rates;
-};
-
-std::optional<primary_currency_info> infer_primary_currency_info(const nlohmann::json& json, log::logger& logger)
-{
-	const auto it_core = json.find("core");
-	if (it_core == json.end()) {
-		logger.error() << "Could not find \"core\" subobject in JSON";
-		return std::nullopt;
-	}
-
-	const auto it_primary = it_core->find("primary");
-	if (it_primary == it_core->end()) {
-		logger.error() << "Could not find \"core\".\"primary\" subobject in JSON";
-		return std::nullopt;
-	}
-
-	primary_currency_info info;
-	const auto& primary_currency = it_primary->get_ref<const std::string&>();
-
-	if (primary_currency == "chaos")
-		info.primary = primary_currency::chaos;
-	else if (primary_currency == "exalted")
-		info.primary = primary_currency::exalted;
-	else if (primary_currency == "divine")
-		info.primary = primary_currency::divine;
-	else {
-		logger.error() << "Unknown primary currency: \"" << primary_currency << "\"";
-		return std::nullopt;
-	}
-
-	const auto it_rates = it_core->find("rates");
-	if (it_rates == it_core->end()) {
-		logger.error() << "Could not find \"core\".\"rates\" subobject in JSON";
-		return std::nullopt;
-	}
-
-	const auto get_rate = [&](const char* name) -> std::optional<double> {
-		const auto it = it_rates->find(name);
-		if (it == it_rates->end()) {
-			logger.error() << "Could not find \"core\".\"rates\".\"" << name << "\" subobject in JSON";
-			return std::nullopt;
-		};
-		return it->get<double>();
-	};
-
-	if (info.primary == primary_currency::chaos) {
-		auto chaos_to_exalted = get_rate("exalted");
-		if (chaos_to_exalted == std::nullopt)
-			return std::nullopt;
-		info.rates.exalted_to_chaos = 1.0 / *chaos_to_exalted;
-
-		auto chaos_to_divine = get_rate("divine");
-		if (chaos_to_divine == std::nullopt)
-			return std::nullopt;
-		info.rates.divine_to_chaos = 1.0 / *chaos_to_divine;
-
-		info.rates.divine_to_exalted = info.rates.divine_to_chaos / info.rates.exalted_to_chaos;
-	}
-	else if (info.primary == primary_currency::exalted) {
-		auto exalted_to_chaos = get_rate("chaos");
-		if (exalted_to_chaos == std::nullopt)
-			return std::nullopt;
-		info.rates.exalted_to_chaos = *exalted_to_chaos;
-
-		auto exalted_to_divine = get_rate("divine");
-		if (exalted_to_divine == std::nullopt)
-			return std::nullopt;
-		info.rates.divine_to_exalted = 1.0 / *exalted_to_divine;
-
-		info.rates.divine_to_chaos = info.rates.divine_to_exalted * info.rates.exalted_to_chaos;
-	}
-	else {
-		FS_ASSERT(info.primary == primary_currency::divine);
-
-		auto divine_to_chaos = get_rate("chaos");
-		if (divine_to_chaos == std::nullopt)
-			return std::nullopt;
-		info.rates.divine_to_chaos = *divine_to_chaos;
-
-		auto divine_to_exalted = get_rate("exalted");
-		if (divine_to_exalted == std::nullopt)
-			return std::nullopt;
-		info.rates.divine_to_exalted = *divine_to_exalted;
-
-		info.rates.exalted_to_chaos = info.rates.divine_to_chaos / info.rates.divine_to_exalted;
-	}
-
-	return info;
-}
-
-lang::market::price_data compute_item_price(double primary_value, primary_currency_info info)
-{
-	lang::market::price_data price_data;
-	// data from currency exchange API is always high confidence
-	// (and this function is only used for such items)
-	price_data.confidence = lang::market::confidence_level::high;
-
-	if (info.primary == primary_currency::chaos) {
-		price_data.value_chaos = primary_value;
-		price_data.value_exalted = price_data.value_chaos / info.rates.exalted_to_chaos;
-		price_data.value_divine  = price_data.value_chaos / info.rates.divine_to_chaos;
-	}
-	else if (info.primary == primary_currency::exalted) {
-		price_data.value_exalted = primary_value;
-		price_data.value_chaos  = price_data.value_exalted * info.rates.exalted_to_chaos;
-		price_data.value_divine = price_data.value_exalted / info.rates.divine_to_exalted;
-	}
-	else {
-		FS_ASSERT(info.primary == primary_currency::divine);
-		price_data.value_divine = primary_value;
-		price_data.value_chaos   = price_data.value_divine * info.rates.divine_to_chaos;
-		price_data.value_exalted = price_data.value_divine * info.rates.divine_to_exalted;
-	}
-
-	return price_data;
-}
-
-[[nodiscard]] std::vector<lang::market::elementary_item>
-parse_elementary_items(std::string_view json_str, log::logger& logger)
-{
-	std::vector<lang::market::elementary_item> result;
-
-	std::unordered_map<std::string, std::string> item_ids_to_names;
-
-	const nlohmann::json json = nlohmann::json::parse(json_str);
-
-	std::optional<primary_currency_info> info = infer_primary_currency_info(json, logger);
-	if (info == std::nullopt)
-		return {};
-
-	const auto it_items = json.find("items"); // item id => item description (includes name)
-	const auto it_lines = json.find("lines"); // item id => item value
-
-	if (it_lines == json.end() || it_items == json.end()) {
-		print_file_parse_error(json_str, logger);
-		return {};
-	}
-
-	item_ids_to_names.reserve(it_items->size());
-
-	for_each_item_in_items(*it_items, logger, [&](const nlohmann::json& item) {
-		item_ids_to_names.emplace(item.at("id"), item.at("name"));
-	});
-
-	for_each_item_in_items(*it_lines, logger, [&](const nlohmann::json& item) {
-		const auto id = item.at("id").get_ref<const std::string&>();
-		const auto name_it = item_ids_to_names.find(id);
-
-		if (name_it == item_ids_to_names.end()) {
-			logger.error() << "Price data for item with id = \"" << id << "\" has no item associated";
-			return;
-		}
-
-		result.push_back(lang::market::elementary_item{
-			compute_item_price(item.at("primaryValue").get<double>(), *info),
-			name_it->second
-		});
-	});
-
-	return result;
-}
-
 void parse_uncut_gems(
 	std::string_view json_str,
+	lang::market::currency_exchange_rates rates,
 	std::vector<lang::market::elementary_item>& uncut_skill_gems,
 	std::vector<lang::market::elementary_item>& uncut_spirit_gems,
 	log::logger& logger)
 {
-	std::vector<lang::market::elementary_item> uncut_gems = parse_elementary_items(json_str, logger);
+	std::vector<lang::market::elementary_item> uncut_gems = parse_exchange_items(json_str, rates, logger);
 
 	for (auto& uncut_gem: uncut_gems) {
 		if (utility::contains(uncut_gem.name, "Skill"))
@@ -720,36 +670,22 @@ void parse_uncut_gems(
 
 lang::market::poe2::item_price_data parse_item_price_data(const api_item_price_data& jsons, log::logger& logger)
 {
-	/**
-	 * PoE 2 data reports prices only as a single currency, named "primary".
-	 * Each JSON may have different primary currency (Chaos, Exalted or Divine).
-	 * When parsing each JSON, first read core information to infer exchange rates
-	 * (this is done inside poe2::parse_elementary_items).
-	 */
 	lang::market::poe2::item_price_data result;
 
-	const std::optional<primary_currency_info> info = infer_primary_currency_info(nlohmann::json::parse(jsons.currency.file_content), logger);
-	if (info == std::nullopt) {
-		logger.error() << "Could not parse primary currency info";
-		return {};
-	}
-	result.rates = (*info).rates;
+	std::tie(result.rates, result.currency) = parse_exchange_currency(jsons.currency.file_content, logger);
 
-	result.currency             = parse_elementary_items(jsons.currency.file_content, logger);
-	result.fragments            = parse_elementary_items(jsons.fragments.file_content, logger);
-	result.abyss_currency       = parse_elementary_items(jsons.abyss.file_content, logger);
-	parse_uncut_gems(jsons.uncut_gems.file_content, result.uncut_skill_gems, result.uncut_spirit_gems, logger);
-	result.lineage_support_gems = parse_elementary_items(jsons.lineage_support_gems.file_content, logger);
-	result.essences             = parse_elementary_items(jsons.essences.file_content, logger);
-	result.soul_cores           = parse_elementary_items(jsons.ultimatum.file_content, logger);
-	result.idols                = parse_elementary_items(jsons.idols.file_content, logger);
-	result.runes                = parse_elementary_items(jsons.runes.file_content, logger);
-	result.omens                = parse_elementary_items(jsons.ritual.file_content, logger);
-	result.expedition           = parse_elementary_items(jsons.expedition.file_content, logger);
-	result.emotions             = parse_elementary_items(jsons.delirium.file_content, logger);
-	result.catalysts            = parse_elementary_items(jsons.breach.file_content, logger);
-
-	add_missing_currencies(result.currency, result.rates);
+	result.fragments            = parse_exchange_items(jsons.fragments.file_content,            result.rates, logger);
+	result.abyss_currency       = parse_exchange_items(jsons.abyss.file_content,                result.rates, logger);
+	parse_uncut_gems(jsons.uncut_gems.file_content, result.rates, result.uncut_skill_gems, result.uncut_spirit_gems, logger);
+	result.lineage_support_gems = parse_exchange_items(jsons.lineage_support_gems.file_content, result.rates, logger);
+	result.essences             = parse_exchange_items(jsons.essences.file_content,             result.rates, logger);
+	result.soul_cores           = parse_exchange_items(jsons.ultimatum.file_content,            result.rates, logger);
+	result.idols                = parse_exchange_items(jsons.idols.file_content,                result.rates, logger);
+	result.runes                = parse_exchange_items(jsons.runes.file_content,                result.rates, logger);
+	result.omens                = parse_exchange_items(jsons.ritual.file_content,               result.rates, logger);
+	result.expedition           = parse_exchange_items(jsons.expedition.file_content,           result.rates, logger);
+	result.emotions             = parse_exchange_items(jsons.delirium.file_content,             result.rates, logger);
+	result.catalysts            = parse_exchange_items(jsons.breach.file_content,               result.rates, logger);
 
 	move_item("Kulemak's Invitation", result.abyss_currency, result.fragments);
 

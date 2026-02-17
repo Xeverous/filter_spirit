@@ -85,17 +85,6 @@ struct elementary_item
 
 namespace poe1 {
 
-struct divination_card : elementary_item
-{
-	divination_card(elementary_item ei, int max_stack_size)
-	: elementary_item(std::move(ei)), max_stack_size(max_stack_size) {}
-
-	divination_card(price_data price, std::string name, int max_stack_size)
-	: elementary_item{price, std::move(name)}, max_stack_size(max_stack_size) {}
-
-	int max_stack_size;
-};
-
 struct gem : elementary_item
 {
 	gem(elementary_item ei, int level, int quality, bool is_corrupted)
@@ -147,15 +136,6 @@ struct item_price_data
 		const std::filesystem::path& directory_path,
 		log::logger& logger);
 
-	/**
-	 * @brief sort all non-unique item categories by name
-	 *
-	 * Purposes:
-	 * - faster searching of the given item (binary search)
-	 * - efficient comparison of 2 item_price_data instances
-	 */
-	void sort();
-
 	currency_exchange_rates rates;
 
 	// Class == "Stackable Currency"
@@ -174,7 +154,7 @@ struct item_price_data
 	std::vector<elementary_item> resonators;
 
 	// Class == "Divination Card"
-	std::vector<divination_card> divination_cards;
+	std::vector<elementary_item> divination_cards;
 
 	// Class == "Map Fragments"
 	std::vector<elementary_item> fragments;

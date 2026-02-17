@@ -290,17 +290,17 @@ BOOST_AUTO_TEST_CASE(switch_drop_sound)
 BOOST_AUTO_TEST_CASE(simple_price_queries_poe1)
 {
 	lang::market::poe1::item_price_data ipd;
-	const auto push_card = [&](double price, std::string name, int max_stack_size) {
+	const auto push_card = [&](double price, std::string name) {
 		lang::market::price_data price_data;
 		price_data.confidence = lang::market::confidence_level::high;
 		price_data.value_chaos = price;
-		ipd.divination_cards.push_back(lang::market::poe1::divination_card{price_data, std::move(name), max_stack_size});
+		ipd.divination_cards.push_back(lang::market::elementary_item{price_data, std::move(name)});
 	};
-	push_card(0.125, "Rain of Chaos", 8);
-	push_card(5, "Humility", 9);
-	push_card(10, "A Dab of Ink", 9);
-	push_card(100, "Abandoned Wealth", 5);
-	push_card(1000, "The Doctor", 8);
+	push_card(0.125, "Rain of Chaos");
+	push_card(5, "Humility");
+	push_card(10, "A Dab of Ink");
+	push_card(100, "Abandoned Wealth");
+	push_card(1000, "The Doctor");
 	BOOST_TEST(compile_from_files("poe1/simple_price_queries", {}, ipd));
 }
 

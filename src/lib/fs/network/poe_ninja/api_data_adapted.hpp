@@ -12,7 +12,6 @@ BOOST_FUSION_ADAPT_STRUCT(
 	// general
 	currency,
 	fragment,
-	unique_idol,
 	runegraft,
 	allflame_ember,
 	tattoo,

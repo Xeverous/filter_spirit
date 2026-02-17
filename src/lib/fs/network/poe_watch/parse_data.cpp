@@ -708,9 +708,7 @@ parse_item_price_data(
 					<< "Assuming for safety the card might have a stack size of 1, which so far was the case with this bug.\n";
 			}
 
-			result.divination_cards.push_back(lang::market::poe1::divination_card{
-				elementary_item{price_data, std::move(itm.name)},
-				itm.max_stack_size.value_or(1)});
+			result.divination_cards.push_back(lang::market::elementary_item{price_data, std::move(itm.name)});
 			continue;
 		}
 		else if (std::holds_alternative<categories::map>(itm.category)) {

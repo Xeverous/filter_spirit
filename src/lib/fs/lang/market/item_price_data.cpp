@@ -267,29 +267,6 @@ log::message_stream& operator<<(log::message_stream& stream, const item_price_da
 		"\tUnique Idols (ambiguous)      : " << ipd.unique_idols.ambiguous.size() << "\n";
 }
 
-void item_price_data::sort()
-{
-	const auto compare_by_name_asc =
-		[](const elementary_item& lhs, const elementary_item& rhs) {
-			return lhs.name < rhs.name;
-		};
-
-	std::sort(divination_cards.begin(), divination_cards.end(), compare_by_name_asc);
-	std::sort(currency.begin(),         currency.end(),         compare_by_name_asc);
-	std::sort(fragments.begin(),        fragments.end(),        compare_by_name_asc);
-	std::sort(delirium_orbs.begin(),    delirium_orbs.end(),    compare_by_name_asc);
-	std::sort(vials.begin(),            vials.end(),            compare_by_name_asc);
-	std::sort(oils.begin(),             oils.end(),             compare_by_name_asc);
-	std::sort(incubators.begin(),       incubators.end(),       compare_by_name_asc);
-	std::sort(essences.begin(),         essences.end(),         compare_by_name_asc);
-	std::sort(fossils.begin(),          fossils.end(),          compare_by_name_asc);
-	std::sort(resonators.begin(),       resonators.end(),       compare_by_name_asc);
-	std::sort(scarabs.begin(),          scarabs.end(),          compare_by_name_asc);
-	std::sort(tattoos.begin(),          tattoos.end(),          compare_by_name_asc);
-	std::sort(gems.begin(),             gems.end(),             compare_by_name_asc);
-	std::sort(bases.begin(),            bases.end(),            compare_by_name_asc);
-}
-
 } // namespace poe1
 
 namespace poe2 {

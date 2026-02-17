@@ -17,10 +17,12 @@ namespace poe1
 // add "inline" to "constexpr" to avoid
 // GCC warning: "[...] has a field [...] whose type has internal linkage [-Wsubobject-linkage]"
 
+// not used by FS, only applies to Phrecia event leagues and has only legacy data model
+inline constexpr const char filename_unique_idol[] = "UniqueIdol";
+
 // general
 inline constexpr const char filename_currency[] = "Currency";
 inline constexpr const char filename_fragment[] = "Fragment";
-inline constexpr const char filename_unique_idol[] = "UniqueIdol";
 inline constexpr const char filename_runegraft[] = "Runegraft";
 inline constexpr const char filename_allflame_ember[] = "AllflameEmber";
 inline constexpr const char filename_tattoo[] = "Tattoo";
@@ -36,6 +38,7 @@ inline constexpr const char filename_unique_armour[] = "UniqueArmour";
 inline constexpr const char filename_unique_accessory[] = "UniqueAccessory";
 inline constexpr const char filename_unique_flask[] = "UniqueFlask";
 inline constexpr const char filename_unique_jewel[] = "UniqueJewel";
+inline constexpr const char filename_forbidden_jewel[] = "ForbiddenJewel";
 inline constexpr const char filename_unique_tincture[] = "UniqueTincture";
 inline constexpr const char filename_unique_relic[] = "UniqueRelic";
 inline constexpr const char filename_skill_gem[] = "SkillGem";
@@ -49,6 +52,7 @@ inline constexpr const char filename_unique_map[] = "UniqueMap";
 inline constexpr const char filename_delirium_orb[] = "DeliriumOrb";
 inline constexpr const char filename_invitation[] = "Invitation";
 inline constexpr const char filename_scarab[] = "Scarab";
+inline constexpr const char filename_uncursion_temple[] = "IncursionTemple";
 
 // crafting
 inline constexpr const char filename_base_type[] = "BaseType";
@@ -59,7 +63,7 @@ inline constexpr const char filename_essence[] = "Essence";
 inline constexpr const char filename_vial[] = "Vial";
 
 // name - used in API endpoint URL and as a file name
-// currency - (ninja-specific) whether to use currencyoverview or itemoverview URL
+// currency - (ninja-specific) whether to use exchange or stash URL and data model
 template <const char* Name, bool IsCurrency = false>
 struct json_file
 {
@@ -91,14 +95,13 @@ struct api_item_price_data
 	// general
 	json_file<filename_currency, true> currency;
 	json_file<filename_fragment, true> fragment;
-	json_file<filename_unique_idol> unique_idol;
-	json_file<filename_runegraft> runegraft;
-	json_file<filename_allflame_ember> allflame_ember;
-	json_file<filename_tattoo> tattoo;
-	json_file<filename_omen> omen;
-	json_file<filename_divination_card> divination_card;
-	json_file<filename_artifact> artifact;
-	json_file<filename_oil> oil;
+	json_file<filename_runegraft, true> runegraft;
+	json_file<filename_allflame_ember, true> allflame_ember;
+	json_file<filename_tattoo, true> tattoo;
+	json_file<filename_omen, true> omen;
+	json_file<filename_divination_card, true> divination_card;
+	json_file<filename_artifact, true> artifact;
+	json_file<filename_oil, true> oil;
 	json_file<filename_incubator> incubator;
 
 	// equipment & gems
@@ -117,16 +120,16 @@ struct api_item_price_data
 	json_file<filename_blighted_map> blighted_map;
 	json_file<filename_blight_ravaged_map> blight_ravaged_map;
 	json_file<filename_unique_map> unique_map;
-	json_file<filename_delirium_orb> delirium_orb;
+	json_file<filename_delirium_orb, true> delirium_orb;
 	json_file<filename_invitation> invitation;
-	json_file<filename_scarab> scarab;
+	json_file<filename_scarab, true> scarab;
 
 	// crafting
 	json_file<filename_base_type> base_type;
-	json_file<filename_fossil> fossil;
-	json_file<filename_resonator> resonator;
+	json_file<filename_fossil, true> fossil;
+	json_file<filename_resonator, true> resonator;
 	json_file<filename_beast> beast;
-	json_file<filename_essence> essence;
+	json_file<filename_essence, true> essence;
 	json_file<filename_vial> vial;
 };
 

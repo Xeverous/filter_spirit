@@ -13,16 +13,17 @@ namespace fs::network::poe_ninja {
 
 namespace {
 
-constexpr auto target_name = "poe.ninja/api";
-
 std::string poe1_make_url(bool is_currency, std::string_view league_encoded, std::string_view name)
 {
 	std::string result;
-	if (is_currency)
-		result = "https://poe.ninja/api/data/currencyoverview";
-	else
-		result = "https://poe.ninja/api/data/itemoverview";
+	result.reserve(127);
 
+	if (is_currency)
+		result = "https://poe.ninja/poe1/api/economy/exchange/current/overview";
+	else
+		result = "https://poe.ninja/poe1/api/economy/stash/current/item/overview";
+
+	// apply league parameter first - looks nicer in logs (common string prefix)
 	result.append("?league=").append(league_encoded);
 	result.append("&type=").append(name);
 
@@ -58,7 +59,7 @@ download_item_price_data(
 		urls.push_back(poe1_make_url(is_currency, league_encoded, name));
 	});
 
-	download_result result = download(target_name, urls, settings, info, logger);
+	download_result result = download("poe.ninja/poe1/api", urls, settings, info, logger);
 
 	if (result.results.size() != static_cast<unsigned>(data.num_files()))
 	{
@@ -94,7 +95,7 @@ download_item_price_data(
 		urls.push_back(poe2_make_url(league_encoded, category));
 	});
 
-	download_result result = download(target_name, urls, settings, info, logger);
+	download_result result = download("poe.ninja/poe2/api", urls, settings, info, logger);
 
 	if (result.results.size() != static_cast<unsigned>(data.num_files()))
 	{
