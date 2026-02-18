@@ -65,29 +65,29 @@ BOOST_FUSION_ADAPT_STRUCT(
 
 namespace fs::network::poe_ninja {
 
-namespace poe1 {
-
 namespace detail {
 
 template <typename F>
 struct applier
 {
-	template <const char* Name, bool IsCurrency>
-	void operator()(json_file<Name, IsCurrency>& object) const
+	template <const char* FileStem, bool IsCurrency>
+	void operator()(json_file<FileStem, IsCurrency>& object) const
 	{
-		f(Name, IsCurrency, object.file_content);
+		f(FileStem, IsCurrency, object.file_content);
 	}
 
-	template <const char* Name, bool IsCurrency>
-	void operator()(const json_file<Name, IsCurrency>& object) const
+	template <const char* FileStem, bool IsCurrency>
+	void operator()(const json_file<FileStem, IsCurrency>& object) const
 	{
-		f(Name, IsCurrency, object.file_content);
+		f(FileStem, IsCurrency, object.file_content);
 	}
 
 	F f;
 };
 
 } // namespace detail
+
+namespace poe1 {
 
 template <typename F>
 void api_item_price_data::for_each_file(F f)
@@ -109,32 +109,10 @@ void api_item_price_data::for_each_file(F f) const
 
 namespace poe2 {
 
-namespace detail {
-
-template <typename F>
-struct applier
-{
-	template <const char* Name>
-	void operator()(json_file<Name>& object) const
-	{
-		f(Name, object.file_content);
-	}
-
-	template <const char* Name>
-	void operator()(const json_file<Name>& object) const
-	{
-		f(Name, object.file_content);
-	}
-
-	F f;
-};
-
-} // namespace detail
-
 template <typename F>
 void api_item_price_data::for_each_file(F f)
 {
-	static_assert(std::is_invocable_v<F, const char*, std::string&>);
+	static_assert(std::is_invocable_v<F, const char*, bool, std::string&>);
 
 	boost::fusion::for_each(*this, detail::applier<F>{f});
 }
@@ -142,7 +120,7 @@ void api_item_price_data::for_each_file(F f)
 template <typename F>
 void api_item_price_data::for_each_file(F f) const
 {
-	static_assert(std::is_invocable_v<F, const char*, const std::string&>);
+	static_assert(std::is_invocable_v<F, const char*, bool, const std::string&>);
 
 	boost::fusion::for_each(*this, detail::applier<F>{f});
 }

@@ -23,32 +23,33 @@ namespace fs::network::poe_ninja {
  * - exchange: {"core": {...}, "lines": [...], "items": [...]}
  * - stash: {"lines"; [...]}
  *
- * The "core" part is identical in every currency JSON downloaded at the same time.
- * As of writing this, PoE 2 currently only reports currencies.
+ * The "core" part is identical in every exchange-model JSON downloaded at the same time.
+ * As of writing this, PoE 2 currently only reports currencies and thus only uses the exchange model.
  */
 
 using fs::utility::is_zero;
 
 namespace {
 
-void print_file_parse_error(std::string_view json_str, log::logger& logger)
+void print_file_parse_error(std::string_view json_str, const char* file_stem, log::logger& logger)
 {
-	logger.error() << "Could not parse this JSON (first 200 characters): " << json_str.substr(0u, 200u);
+	logger.error() << "Could not parse \"" << file_stem << ".json\": (first 200 characters): " << json_str.substr(0u, 200u) << "\n";
 }
 
 template <typename F>
-void for_each_item_in_items(const nlohmann::json& items, log::logger& logger, F f)
+void for_each_item_in_items(const nlohmann::json& items, const char* file_stem, log::logger& logger, F f)
 {
 	for (const auto& item : items) {
 		try {
 			f(item);
 		}
 		catch (const network::json_parse_error& e) {
-			logger.warning() << "Failed to parse item entry: " << e.what()
+			logger.warning() << "\"" << file_stem << ".json\": failed to parse item entry: " << e.what()
 				<< ", skipping this item: " << utility::dump_json(item) << '\n';
 		}
 		catch (const nlohmann::json::exception& e) {
-			logger.warning() << e.what() << ", ignoring this item: " << utility::dump_json(item) << '\n';
+			logger.warning() << "\"" << file_stem << ".json\":" << e.what()
+				<< ", ignoring this item: " << utility::dump_json(item) << '\n';
 		}
 	}
 }
@@ -60,17 +61,17 @@ struct currency_info
 	lang::market::currency_exchange_rates rates;
 };
 
-std::optional<primary_currency> parse_primary_currency(const nlohmann::json& json, log::logger& logger)
+std::optional<primary_currency> parse_primary_currency(const nlohmann::json& json, const char* file_stem, log::logger& logger)
 {
 	const auto it_core = json.find("core");
 	if (it_core == json.end()) {
-		logger.error() << "Could not find \"core\" subobject in JSON";
+		logger.error() << "Could not find \"core\" subobject in \"" << file_stem << ".json\"\n";
 		return std::nullopt;
 	}
 
 	const auto it_primary = it_core->find("primary");
 	if (it_primary == it_core->end()) {
-		logger.error() << "Could not find \"core\".\"primary\" subobject in JSON";
+		logger.error() << "Could not find \"core\".\"primary\" subobject in \"" << file_stem << ".json\"\n";
 		return std::nullopt;
 	}
 
@@ -83,7 +84,7 @@ std::optional<primary_currency> parse_primary_currency(const nlohmann::json& jso
 	else if (primary_currency == "divine")
 		return primary_currency::divine;
 	else {
-		logger.error() << "Unknown primary currency: \"" << primary_currency << "\"";
+		logger.error() << "Unknown primary currency: \"" << primary_currency << "\" in \"" << file_stem << ".json\"\n";
 		return std::nullopt;
 	}
 }
@@ -92,20 +93,20 @@ std::optional<currency_info> parse_currency_info(const nlohmann::json& json, log
 {
 	currency_info info;
 
-	if (auto primary = parse_primary_currency(json, logger); !primary)
+	if (auto primary = parse_primary_currency(json, poe1::file_stem_currency, logger); !primary) // poe2 has same filename
 		return std::nullopt;
 	else
 		info.primary = *primary;
 
 	const auto it_core = json.find("core");
 	if (it_core == json.end()) {
-		logger.error() << "Could not find \"core\" subobject in JSON";
+		logger.error() << "Could not find \"core\" subobject in \"" << poe1::file_stem_currency << ".json\"\n";
 		return std::nullopt;
 	}
 
 	const auto it_rates = it_core->find("rates");
 	if (it_rates == it_core->end()) {
-		logger.error() << "Could not find \"core\".\"rates\" subobject in JSON";
+		logger.error() << "Could not find \"core\".\"rates\" subobject in \"" << poe1::file_stem_currency << ".json\"\n";
 		return std::nullopt;
 	}
 
@@ -160,7 +161,7 @@ std::optional<currency_info> parse_currency_info(const nlohmann::json& json, log
 	 * With 3 currencies reported in core, 3 exchange rates should be non-zero
 	 */
 	if (is_zero(info.rates.divine_to_chaos) && is_zero(info.rates.divine_to_exalted) && is_zero(info.rates.exalted_to_chaos)) {
-		logger.error() << "Could not find any \"core\".\"rates\".\"*\" subobject in JSON";
+		logger.error() << "Could not find any \"core\".\"rates\".\"*\" subobject in \"" << poe1::file_stem_currency << ".json\"\n";
 		return std::nullopt;
 	}
 
@@ -207,9 +208,9 @@ lang::market::price_data compute_item_price(double primary_value, primary_curren
 }
 
 [[nodiscard]] std::vector<lang::market::elementary_item>
-parse_exchange_items(const nlohmann::json& json, lang::market::currency_exchange_rates rates, log::logger& logger)
+parse_exchange_items(const nlohmann::json& json, const char* file_stem, lang::market::currency_exchange_rates rates, log::logger& logger)
 {
-	std::optional<primary_currency> primary = parse_primary_currency(json, logger);
+	std::optional<primary_currency> primary = parse_primary_currency(json, file_stem, logger);
 	if (!primary)
 		return {};
 
@@ -217,24 +218,24 @@ parse_exchange_items(const nlohmann::json& json, lang::market::currency_exchange
 	const auto it_lines = json.find("lines"); // item id => item value
 
 	if (it_lines == json.end() || it_items == json.end()) {
-		logger.error() << "Could not parse JSON: missing \"items\" and/or \"lines\" subobjects";
+		logger.error() << "Could not parse \"" << file_stem << ".json\": missing \"items\" and/or \"lines\" subobjects\n";
 		return {};
 	}
 
 	std::unordered_map<std::string, std::string> item_ids_to_names;
 	item_ids_to_names.reserve(it_items->size());
 
-	for_each_item_in_items(*it_items, logger, [&](const nlohmann::json& item) {
+	for_each_item_in_items(*it_items, file_stem, logger, [&](const nlohmann::json& item) {
 		item_ids_to_names.emplace(item.at("id"), item.at("name"));
 	});
 
 	std::vector<lang::market::elementary_item> result;
-	for_each_item_in_items(*it_lines, logger, [&](const nlohmann::json& item) {
+	for_each_item_in_items(*it_lines, file_stem, logger, [&](const nlohmann::json& item) {
 		const auto id = item.at("id").get_ref<const std::string&>();
 		const auto name_it = item_ids_to_names.find(id);
 
 		if (name_it == item_ids_to_names.end()) {
-			logger.error() << "Price data for item with id = \"" << id << "\" has no item associated";
+			logger.error() << "\"" << file_stem << ".json\": price data for item with id = \"" << id << "\" has no item associated\n";
 			return;
 		}
 
@@ -247,10 +248,11 @@ parse_exchange_items(const nlohmann::json& json, lang::market::currency_exchange
 	return result;
 }
 
+template <const char* FileStem>
 [[nodiscard]] std::vector<lang::market::elementary_item>
-parse_exchange_items(const std::string& json_str, lang::market::currency_exchange_rates rates, log::logger& logger)
+parse_exchange_items(const json_file<FileStem, true>& json, lang::market::currency_exchange_rates rates, log::logger& logger)
 {
-	return parse_exchange_items(nlohmann::json::parse(json_str), rates, logger);
+	return parse_exchange_items(nlohmann::json::parse(json.file_content), FileStem, rates, logger);
 }
 
 [[nodiscard]] std::pair<lang::market::currency_exchange_rates, std::vector<lang::market::elementary_item>>
@@ -266,7 +268,7 @@ parse_exchange_currency(std::string_view json_str, log::logger& logger)
 	// at this point the "rates" object may contain only partial information
 	// items may have only a single non-zero price field (the primary currency)
 	// in addition to this, the primary currency item can be missing (it would have value == 1.0)
-	auto result = parse_exchange_items(json, rates, logger);
+	auto result = parse_exchange_items(json, poe1::file_stem_currency, rates, logger); // poe2 has same filename
 
 	// Fill missing info about c/ex/div rates when:
 	// - these items are not reported in "core" (parse_currency_info)
@@ -410,17 +412,17 @@ lang::market::confidence_level to_confidence_level(int count)
 }
 
 template <typename F>
-void for_each_item_in_json(std::string_view json_str, log::logger& logger, F f)
+void for_each_item_in_json(std::string_view json_str, const char* file_stem, log::logger& logger, F f)
 {
 	const nlohmann::json json = nlohmann::json::parse(json_str);
 	const auto it = json.find("lines");
 
 	if (it == json.end()) {
-		print_file_parse_error(json_str, logger);
+		print_file_parse_error(json_str, file_stem, logger);
 		return;
 	}
 
-	for_each_item_in_items(*it, logger, f);
+	for_each_item_in_items(*it, file_stem, logger, f);
 }
 
 [[nodiscard]] const std::string&
@@ -498,15 +500,22 @@ get_stash_item_data(const nlohmann::json& item, lang::market::currency_exchange_
 }
 
 [[nodiscard]] std::vector<lang::market::elementary_item>
-parse_stash_items(std::string_view json_str, lang::market::currency_exchange_rates rates, log::logger& logger)
+parse_stash_items(std::string_view json_str, const char* file_stem, lang::market::currency_exchange_rates rates, log::logger& logger)
 {
 	std::vector<lang::market::elementary_item> result;
 
-	for_each_item_in_json(json_str, logger, [&](const auto& item) {
+	for_each_item_in_json(json_str, file_stem, logger, [&](const auto& item) {
 		result.push_back(get_stash_item_data(item, rates));
 	});
 
 	return result;
+}
+
+template <const char* FileStem>
+[[nodiscard]] std::vector<lang::market::elementary_item>
+parse_stash_items(const json_file<FileStem>& json, lang::market::currency_exchange_rates rates, log::logger& logger)
+{
+	return parse_stash_items(json.file_content, FileStem, rates, logger);
 }
 
 [[nodiscard]] std::vector<lang::market::poe1::gem>
@@ -514,7 +523,7 @@ parse_gems(std::string_view json_str, lang::market::currency_exchange_rates rate
 {
 	std::vector<lang::market::poe1::gem> result;
 
-	for_each_item_in_json(json_str, logger, [&](const nlohmann::json& item) {
+	for_each_item_in_json(json_str, file_stem_skill_gem, logger, [&](const nlohmann::json& item) {
 		result.emplace_back(
 			get_stash_item_data(item, rates),
 			item.at("gemLevel").get<int>(),
@@ -531,7 +540,7 @@ parse_bases(std::string_view json_str, lang::market::currency_exchange_rates rat
 {
 	std::vector<lang::market::poe1::base> result;
 
-	for_each_item_in_json(json_str, logger, [&](const nlohmann::json& item) {
+	for_each_item_in_json(json_str, file_stem_base_type, logger, [&](const nlohmann::json& item) {
 		// yes, not really a proper name but poe.ninja reuses some fields for other purposes
 		const auto item_level = item.at("levelRequired").get<int>();
 		result.emplace_back(
@@ -546,11 +555,12 @@ parse_bases(std::string_view json_str, lang::market::currency_exchange_rates rat
 
 void parse_and_fill_uniques(
 	std::string_view uniques_json,
+	const char* file_stem,
 	lang::market::currency_exchange_rates rates,
 	lang::market::poe1::unique_item_price_data& uniques,
 	log::logger& logger)
 {
-	for_each_item_in_json(uniques_json, logger, [&](const nlohmann::json& item) {
+	for_each_item_in_json(uniques_json, file_stem, logger, [&](const nlohmann::json& item) {
 		// skip uniques which are linked
 		if (get_stash_item_property_links(item) == 6) {
 			return;
@@ -577,6 +587,16 @@ void parse_and_fill_uniques(
 	});
 }
 
+template <const char* FileStem>
+void parse_and_fill_uniques(
+	const json_file<FileStem>& json,
+	lang::market::currency_exchange_rates rates,
+	lang::market::poe1::unique_item_price_data& uniques,
+	log::logger& logger)
+{
+	parse_and_fill_uniques(json.file_content, FileStem, rates, uniques, logger);
+}
+
 } // namespace
 
 lang::market::poe1::item_price_data parse_item_price_data(const api_item_price_data& jsons, log::logger& logger)
@@ -585,40 +605,40 @@ lang::market::poe1::item_price_data parse_item_price_data(const api_item_price_d
 
 	std::tie(result.rates, result.currency) = parse_exchange_currency(jsons.currency.file_content, logger);
 
-	result.essences         = parse_exchange_items(jsons.essence.file_content,      result.rates, logger);
-	result.vials            = parse_stash_items(   jsons.vial.file_content,         result.rates, logger);
-	result.fossils          = parse_exchange_items(jsons.fossil.file_content,       result.rates, logger);
-	result.oils             = parse_exchange_items(jsons.oil.file_content,          result.rates, logger);
-	result.delirium_orbs    = parse_exchange_items(jsons.delirium_orb.file_content, result.rates, logger);
-	result.artifacts        = parse_exchange_items(jsons.artifact.file_content,     result.rates, logger);
-	result.tattoos          = parse_exchange_items(jsons.tattoo.file_content,       result.rates, logger);
-	result.omens            = parse_exchange_items(jsons.omen.file_content,         result.rates, logger);
-	result.runegrafts       = parse_exchange_items(jsons.runegraft.file_content,    result.rates, logger);
+	result.essences         = parse_exchange_items(jsons.essence,      result.rates, logger);
+	result.vials            = parse_stash_items(   jsons.vial,         result.rates, logger);
+	result.fossils          = parse_exchange_items(jsons.fossil,       result.rates, logger);
+	result.oils             = parse_exchange_items(jsons.oil,          result.rates, logger);
+	result.delirium_orbs    = parse_exchange_items(jsons.delirium_orb, result.rates, logger);
+	result.artifacts        = parse_exchange_items(jsons.artifact,     result.rates, logger);
+	result.tattoos          = parse_exchange_items(jsons.tattoo,       result.rates, logger);
+	result.omens            = parse_exchange_items(jsons.omen,         result.rates, logger);
+	result.runegrafts       = parse_exchange_items(jsons.runegraft,    result.rates, logger);
 
-	result.resonators       = parse_exchange_items(jsons.resonator.file_content,    result.rates, logger);
+	result.resonators       = parse_exchange_items(jsons.resonator,    result.rates, logger);
 
-	result.divination_cards = parse_exchange_items(jsons.divination_card.file_content, result.rates, logger);
+	result.divination_cards = parse_exchange_items(jsons.divination_card, result.rates, logger);
 
-	result.fragments        = parse_exchange_items(jsons.fragment.file_content,       result.rates, logger);
-	result.scarabs          = parse_exchange_items(jsons.scarab.file_content,         result.rates, logger);
-	result.allflame_embers  = parse_exchange_items(jsons.allflame_ember.file_content, result.rates, logger);
+	result.fragments        = parse_exchange_items(jsons.fragment,       result.rates, logger);
+	result.scarabs          = parse_exchange_items(jsons.scarab,         result.rates, logger);
+	result.allflame_embers  = parse_exchange_items(jsons.allflame_ember, result.rates, logger);
 
-	result.invitations      = parse_stash_items(jsons.invitation.file_content, result.rates, logger);
+	result.invitations      = parse_stash_items(jsons.invitation, result.rates, logger);
 
-	result.incubators       = parse_stash_items(jsons.incubator.file_content, result.rates, logger);
+	result.incubators       = parse_stash_items(jsons.incubator,  result.rates, logger);
 
 	result.gems = parse_gems(jsons.skill_gem.file_content, result.rates, logger);
 
 	result.bases = parse_bases(jsons.base_type.file_content, result.rates, logger);
 
-	parse_and_fill_uniques(jsons.unique_armour.file_content,    result.rates, result.unique_eq,        logger);
-	parse_and_fill_uniques(jsons.unique_weapon.file_content,    result.rates, result.unique_eq,        logger);
-	parse_and_fill_uniques(jsons.unique_accessory.file_content, result.rates, result.unique_eq,        logger);
-	parse_and_fill_uniques(jsons.unique_flask.file_content,     result.rates, result.unique_flasks,    logger);
-	parse_and_fill_uniques(jsons.unique_tincture.file_content,  result.rates, result.unique_tinctures, logger);
-	parse_and_fill_uniques(jsons.unique_jewel.file_content,     result.rates, result.unique_jewels,    logger);
-	parse_and_fill_uniques(jsons.unique_map.file_content,       result.rates, result.unique_maps,      logger);
-	parse_and_fill_uniques(jsons.unique_relic.file_content,     result.rates, result.unique_relics,    logger);
+	parse_and_fill_uniques(jsons.unique_armour,    result.rates, result.unique_eq,        logger);
+	parse_and_fill_uniques(jsons.unique_weapon,    result.rates, result.unique_eq,        logger);
+	parse_and_fill_uniques(jsons.unique_accessory, result.rates, result.unique_eq,        logger);
+	parse_and_fill_uniques(jsons.unique_flask,     result.rates, result.unique_flasks,    logger);
+	parse_and_fill_uniques(jsons.unique_tincture,  result.rates, result.unique_tinctures, logger);
+	parse_and_fill_uniques(jsons.unique_jewel,     result.rates, result.unique_jewels,    logger);
+	parse_and_fill_uniques(jsons.unique_map,       result.rates, result.unique_maps,      logger);
+	parse_and_fill_uniques(jsons.unique_relic,     result.rates, result.unique_relics,    logger);
 
 	// TODO "Misc Map Items"? Can all fragments be caught as "Map Fragments"?
 	move_item("Valdo's Puzzle Box",               result.fragments, result.currency);
@@ -656,7 +676,8 @@ void parse_uncut_gems(
 	std::vector<lang::market::elementary_item>& uncut_spirit_gems,
 	log::logger& logger)
 {
-	std::vector<lang::market::elementary_item> uncut_gems = parse_exchange_items(json_str, rates, logger);
+	std::vector<lang::market::elementary_item> uncut_gems =
+		parse_exchange_items(nlohmann::json::parse(json_str), file_stem_uncut_gems, rates, logger);
 
 	for (auto& uncut_gem: uncut_gems) {
 		if (utility::contains(uncut_gem.name, "Skill"))
@@ -674,18 +695,18 @@ lang::market::poe2::item_price_data parse_item_price_data(const api_item_price_d
 
 	std::tie(result.rates, result.currency) = parse_exchange_currency(jsons.currency.file_content, logger);
 
-	result.fragments            = parse_exchange_items(jsons.fragments.file_content,            result.rates, logger);
-	result.abyss_currency       = parse_exchange_items(jsons.abyss.file_content,                result.rates, logger);
+	result.fragments            = parse_exchange_items(jsons.fragments,            result.rates, logger);
+	result.abyss_currency       = parse_exchange_items(jsons.abyss,                result.rates, logger);
 	parse_uncut_gems(jsons.uncut_gems.file_content, result.rates, result.uncut_skill_gems, result.uncut_spirit_gems, logger);
-	result.lineage_support_gems = parse_exchange_items(jsons.lineage_support_gems.file_content, result.rates, logger);
-	result.essences             = parse_exchange_items(jsons.essences.file_content,             result.rates, logger);
-	result.soul_cores           = parse_exchange_items(jsons.ultimatum.file_content,            result.rates, logger);
-	result.idols                = parse_exchange_items(jsons.idols.file_content,                result.rates, logger);
-	result.runes                = parse_exchange_items(jsons.runes.file_content,                result.rates, logger);
-	result.omens                = parse_exchange_items(jsons.ritual.file_content,               result.rates, logger);
-	result.expedition           = parse_exchange_items(jsons.expedition.file_content,           result.rates, logger);
-	result.emotions             = parse_exchange_items(jsons.delirium.file_content,             result.rates, logger);
-	result.catalysts            = parse_exchange_items(jsons.breach.file_content,               result.rates, logger);
+	result.lineage_support_gems = parse_exchange_items(jsons.lineage_support_gems, result.rates, logger);
+	result.essences             = parse_exchange_items(jsons.essences,             result.rates, logger);
+	result.soul_cores           = parse_exchange_items(jsons.ultimatum,            result.rates, logger);
+	result.idols                = parse_exchange_items(jsons.idols,                result.rates, logger);
+	result.runes                = parse_exchange_items(jsons.runes,                result.rates, logger);
+	result.omens                = parse_exchange_items(jsons.ritual,               result.rates, logger);
+	result.expedition           = parse_exchange_items(jsons.expedition,           result.rates, logger);
+	result.emotions             = parse_exchange_items(jsons.delirium,             result.rates, logger);
+	result.catalysts            = parse_exchange_items(jsons.breach,               result.rates, logger);
 
 	move_item("Kulemak's Invitation", result.abyss_currency, result.fragments);
 

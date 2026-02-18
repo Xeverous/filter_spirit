@@ -61,7 +61,7 @@ int api_item_price_data::num_files()
 bool api_item_price_data::save(const std::filesystem::path& directory, log::logger& logger) const
 {
 	bool success = true;
-	for_each_file([&](const char* name, const std::string& content) {
+	for_each_file([&](const char* name, bool /* is_currency */, const std::string& content) {
 		if (!utility::save_file(directory / make_filename(name), content, logger))
 			success = false;
 	});
@@ -72,7 +72,7 @@ bool api_item_price_data::save(const std::filesystem::path& directory, log::logg
 bool api_item_price_data::load(const std::filesystem::path& directory, log::logger& logger)
 {
 	bool success = true;
-	for_each_file([&](const char* name, std::string& content) {
+	for_each_file([&](const char* name, bool /* is_currency */, std::string& content) {
 		std::optional<std::string> maybe_content = utility::load_file(directory / make_filename(name), logger);
 
 		if (maybe_content)

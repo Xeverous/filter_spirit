@@ -68,7 +68,7 @@ download_item_price_data(
 	}
 
 	std::size_t i = 0;
-	data.for_each_file([&](const char* /* name */, bool /* is_currency */, std::string& content) {
+	data.for_each_file([&](const char* /* file_stem */, bool /* is_currency */, std::string& content) {
 		if (!result.results[i].is_error)
 			content = std::move(result.results[i++].data);
 	});
@@ -91,7 +91,7 @@ download_item_price_data(
 
 	api_item_price_data data;
 	std::vector<std::string> urls;
-	data.for_each_file([&](const char* category, std::string& /* content */) {
+	data.for_each_file([&](const char* category, bool /* is_currency */, std::string& /* content */) {
 		urls.push_back(poe2_make_url(league_encoded, category));
 	});
 
@@ -104,7 +104,7 @@ download_item_price_data(
 	}
 
 	std::size_t i = 0;
-	data.for_each_file([&](const char* /* name */, std::string& content) {
+	data.for_each_file([&](const char* /* file_stem */, bool /* is_currency */, std::string& content) {
 		if (!result.results[i].is_error)
 			content = std::move(result.results[i++].data);
 	});
