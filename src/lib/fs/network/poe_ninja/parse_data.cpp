@@ -586,7 +586,7 @@ lang::market::poe1::item_price_data parse_item_price_data(const api_item_price_d
 	std::tie(result.rates, result.currency) = parse_exchange_currency(jsons.currency.file_content, logger);
 
 	result.essences         = parse_exchange_items(jsons.essence.file_content,      result.rates, logger);
-	result.vials            = parse_stash_items(jsons.vial.file_content,         result.rates, logger);
+	result.vials            = parse_stash_items(   jsons.vial.file_content,         result.rates, logger);
 	result.fossils          = parse_exchange_items(jsons.fossil.file_content,       result.rates, logger);
 	result.oils             = parse_exchange_items(jsons.oil.file_content,          result.rates, logger);
 	result.delirium_orbs    = parse_exchange_items(jsons.delirium_orb.file_content, result.rates, logger);
@@ -595,12 +595,12 @@ lang::market::poe1::item_price_data parse_item_price_data(const api_item_price_d
 	result.omens            = parse_exchange_items(jsons.omen.file_content,         result.rates, logger);
 	result.runegrafts       = parse_exchange_items(jsons.runegraft.file_content,    result.rates, logger);
 
-	result.resonators       = parse_exchange_items(jsons.resonator.file_content, result.rates, logger);
+	result.resonators       = parse_exchange_items(jsons.resonator.file_content,    result.rates, logger);
 
 	result.divination_cards = parse_exchange_items(jsons.divination_card.file_content, result.rates, logger);
 
-	result.fragments        = parse_exchange_items(  jsons.fragment.file_content, result.rates, logger);
-	result.scarabs          = parse_exchange_items(jsons.scarab.file_content, result.rates, logger);
+	result.fragments        = parse_exchange_items(jsons.fragment.file_content,       result.rates, logger);
+	result.scarabs          = parse_exchange_items(jsons.scarab.file_content,         result.rates, logger);
 	result.allflame_embers  = parse_exchange_items(jsons.allflame_ember.file_content, result.rates, logger);
 
 	result.invitations      = parse_stash_items(jsons.invitation.file_content, result.rates, logger);
