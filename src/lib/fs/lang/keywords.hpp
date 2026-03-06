@@ -75,6 +75,7 @@ namespace rf
 	constexpr auto zana_memory      = "ZanaMemory";
 	constexpr auto memory_strands   = "MemoryStrands";
 	constexpr auto foulborn         = "Foulborn";
+	constexpr auto imbued           = "Imbued";
 
 	// PoE 2 only
 	constexpr auto unidentified_item_tier = "UnidentifiedItemTier";

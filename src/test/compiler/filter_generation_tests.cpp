@@ -272,6 +272,11 @@ BOOST_AUTO_TEST_CASE(keepers_new_conditions)
 	BOOST_TEST(compile_from_files("poe1/keepers_new_conditions"));
 }
 
+BOOST_AUTO_TEST_CASE(mirage_new_conditions)
+{
+	BOOST_TEST(compile_from_files("poe1/mirage_new_conditions"));
+}
+
 BOOST_AUTO_TEST_CASE(shaper_voice_lines)
 {
 	BOOST_TEST(compile_from_files("common/shaper_voice_lines"));
