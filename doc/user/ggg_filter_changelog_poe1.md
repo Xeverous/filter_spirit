@@ -6,6 +6,139 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 
 *newest at the top*
 
+### 3.28 (Mirage) - [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3914212)
+
+- many new currencies and many removed currencies + other changed items
+- note: some "removed" items are still in the game (legacy), just not dropping anymore
+- note: some "removed" items (e.g. Side Quest card) have conflicting info in the patch notes
+- note: *The Pillage and Plunder Atlas Passive now has Veiled Items dropped by Defeated Syndicate Members in your Maps have a 5% chance to drop with a Fractured Veiled Modifier*
+- note: Memory Strand items have now better values and a bias towards better bases
+- new keyword: `Imbued` (boolean test)
+- [patch notes](https://www.pathofexile.com/forum/view-thread/3913392)
+- [new and changed gems](https://www.pathofexile.com/forum/view-thread/3914006)
+- league promo: https://www.pathofexile.com/mirage
+
+Changes breakdown (all the confusing stuff):
+
+New `"Stackable Currency"`:
+
+- `"Refracting Fog"`
+- `"Essence of Desolation"`
+- `"Flesh of Xesht"`
+- `"Sinistral Catalyst"`
+- `"Dextral Catalyst"`
+- `"Volatile Vaal Orb"`
+- `"Memory of Trauma"`
+- `"Memory of Reverence"`
+- `"Memory of Loneliness"`
+- `"Crystallised Rancour"`
+- Runegrafts
+- `"Coin of Restoration"`
+- `"Coin of Desecration"`
+- `"Coin of Knowledge"`
+- `"Coin of Power"`
+- `"Coin of Skill"`
+- Astrolabes
+
+New `"Map Fragments"`:
+
+- `"Anarchy Scarab of the Exceptional"`
+- `"Ritual Scarab of Corpses"`
+- `"Kalguuran Scarab of Enriching"`
+- `"The Black Barya"`
+- `"Scarab of the Dextral"`
+- `"Betrayal Scarab of Unbreaking"`
+- `"Abyss Scarab of Descending"`
+- `"Expedition Scarab of Infusion"`
+
+Item class: `"Belts"`
+
+- new base: `"Cord Belt"`
+
+New map base types:
+
+- `"Valdo Map"`
+- `"Shaper Guardian Map"`
+- `"Nightmare Map"`
+
+New `"Divination Card"`:
+
+- `"The Everlasting"`
+- `"Lucky Bastion"`
+- `"The Miracle"`
+- `"Apocalypse"`
+- `"The Slumbering Beast"`
+- `"The Forbidden Fruit"`
+- `"The Silly Boy"`
+- `"Reflection of the Heart"`
+
+Not listed here: new Gems, new Supports, new Corpses, new Incubators
+
+**Legacy, not removed:**
+
+`"Stackable Currency"`:
+
+- `"Cartographer's Chisel"`
+- `"Obscured Delirium Orb"`
+- `"Engineer's Orb"`, `"Harbinger's Orb"`, and `"Orbs of Horizons"` (non-functional)
+- `"Infused Engineer's Orb"` (nothing changed, still exists)
+- `"Time-light Scroll"`
+- `"Fragmentation Scroll"`
+- `"Deregulation Scroll"`
+- `"Electroshock Scroll"`
+- `"Haemocombustion Scroll"`
+- `"Specularity Scroll"`
+- Scouting Reports (non-functional)
+
+`Divination Card`:
+
+- `"The Cartographer"`
+- `"The Obscured"`
+- `"The Puzzle"`
+- `"The Messenger"`
+- `"The Journey"`
+- `"The Landing"`
+- `"The Side Quest"`
+- `"The Bargain"`
+- `"The Eye of Terror"`
+- `"The Cheater"`
+- `"Desecrated Virtue"`
+- `"The Emptiness"`
+
+Other:
+
+- Map `BaseType "Harbinger Map"`
+- `Class "Piece"` Items
+
+**Fully removed:**
+
+`"Stackable Currency"`:
+
+- `"Kalguuran Delirium Orb"`
+- `"Foreboding Delirium Orb"` (will change into Fine Delirium Orb)
+- `"Augmentation Implant"`
+- `"Regal Implant"`
+- `"Exalted Implant"`
+- `"Unstable Implant"`
+- `"Ancient Shard"`
+- `"Binding Shard"`
+- `"Engineer's Shard"`
+- `"Harbinger's Shard"`
+- `"Horizon Shard"`
+
+Scarabs (Class `"Map Fragments"`):
+
+- `"Harbinger Scarab"`
+- `"Harbinger Scarab of Obelisks"`
+- `"Harbinger Scarab of Warhoards"`
+- `"Harbinger Scarab of Regency"`
+- `"Scarab of Hunted Traitors"`
+
+Other:
+
+- `"Fleshgraft"` and all other Grafts
+- `"Growing Wombgift"` (only this Wombgift)
+
 ### 3.27.0c - [patch notes](https://www.pathofexile.com/forum/view-thread/3877526)
 
 - *Fixed an issue where Wombgifts could not be filtered by Item Level in Item Filters.*

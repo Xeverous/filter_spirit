@@ -636,7 +636,7 @@ $cfg_t1_weapon_base_names = "Harbinger Bow" "Ambusher" "Ezomyte Dagger" "Platinu
 $cfg_t1_armour_base_names = "Giantslayer Helmet" "Majestic Pelt" "Lich's Circlet" "Haunted Bascinet" "Divine Crown" "Torturer's Mask" "Royal Plate" "Syndicate's Garb" "Twilight Regalia" "Conquest Lamellar" "Sacred Chainmail" "Necrotic Armour" "Leviathan Greaves" "Velour Boots" "Warlock Boots" "Wyvernscale Boots" "Paladin Boots" "Phantom Boots" "Leviathan Gauntlets" "Velour Gloves" "Warlock Gloves" "Wyvernscale Gauntlets" "Paladin Gloves" "Phantom Mitts"
 $cfg_t2_armour_base_names = "Conqueror's Helmet" "Grizzly Pelt" "Sunfire Circlet" "Conquest Helmet" "Paladin Crown" "Ancient Mask" "Legion Plate" "Astral Leather" "Nightweave Robe" "Marshall's Brigandine" "Paladin's Hauberk" "Torturer Garb" "Precursor Greaves" "Harpyskin Boots" "Sage Slippers" "Chimerascale Boots" "Martyr Boots" "Infiltrator Boots" "Precursor Gauntlets" "Harpyskin Gloves" "Sage Gloves" "Chimerascale Gauntlets" "Martyr Gloves" "Infiltrator Mitts"
 $cfg_t3_armour_base_names = "General's Helmet" "Dire Pelt" "Moonlit Circlet" "Knight Helm" "Faithful Helmet" "Jester Mask" "Titan Plate" "Supreme Leather" "Arcane Vestment" "Full Wyvernscale" "Grand Ringmail" "Sanguine Raiment"
-$cfg_t1_other_base_names = "Stygian Vise" "Titanium Spirit Shield"
+$cfg_t1_other_base_names = "Stygian Vise" "Cord Belt" "Titanium Spirit Shield"
 $cfg_good_base_names = $cfg_atlas_base_names $cfg_t1_weapon_base_names $cfg_t1_armour_base_names $cfg_t1_other_base_names
 $cfg_base_defence_base_names = $cfg_atlas_base_names $cfg_t1_armour_base_names $cfg_t1_other_base_names
 $cfg_base_defence_percentile_min_value = 90
@@ -772,14 +772,21 @@ Class == "Stackable Currency"
 		Show
 	}
 
-	BaseType == "Foulborn Orb of Augmentation" "Foulborn Regal Orb"
+	# 3.28
+	BaseType == "Refracting Fog" "Flesh of Xesht" "Volatile Vaal Orb" "Memory of Trauma" "Memory of Reverence" "Memory of Loneliness" "Crystallised Rancour" "Coin of Restoration" "Coin of Desecration" "Coin of Knowledge" "Coin of Power" "Coin of Skill"
 	{
 		Expand $actions_currency_mid
 		Show
 	}
 
-	# 3.27 Graft Implants
-	BaseType "Implant"
+	# 3.28
+	BaseType "Astrolabe"
+	{
+		Expand $actions_currency_mid
+		Show
+	}
+
+	BaseType == "Foulborn Orb of Augmentation" "Foulborn Regal Orb"
 	{
 		Expand $actions_currency_mid
 		Show
@@ -828,7 +835,7 @@ Class == "Stackable Currency"
 		Show
 	}
 
-	BaseType == "Cartographer's Chisel" "Chromatic Orb" "Jeweller's Orb" "Orb of Alchemy" "Orb of Alteration" "Orb of Fusing" "Orb of Scouring" "Blessed Orb" "Harbinger's Shard" "Regal Orb" "Vaal Orb" "Remnant of Corruption" "Orb of Binding" "Orb of Horizons" "Armourer's Scrap" "Blacksmith's Whetstone" "Chaos Shard" "Annulment Shard" "Ancient Shard"
+	BaseType == "Cartographer's Chisel" "Chromatic Orb" "Jeweller's Orb" "Orb of Alchemy" "Orb of Alteration" "Orb of Fusing" "Orb of Scouring" "Blessed Orb" "Regal Orb" "Vaal Orb" "Remnant of Corruption" "Orb of Binding" "Orb of Horizons" "Armourer's Scrap" "Blacksmith's Whetstone" "Chaos Shard" "Annulment Shard"
 	{
 		Expand $actions_currency_low
 		ShowHide $show_currency_low
@@ -840,13 +847,13 @@ Class == "Stackable Currency"
 		ShowHide $show_currency_very_low
 	}
 
-	BaseType == "Binding Shard" "Horizon Shard" "Regal Shard" "Alchemy Shard" "Engineer's Orb"
+	BaseType == "Regal Shard" "Alchemy Shard" "Engineer's Orb"
 	{
 		Expand $actions_currency_low_shards
 		ShowHide $show_currency_low_shards
 	}
 
-	BaseType == "Transmutation Shard" "Alteration Shard" "Engineer's Shard" "Scroll Fragment"
+	BaseType == "Transmutation Shard" "Alteration Shard" "Scroll Fragment"
 	{
 		Hide
 	}
@@ -1716,7 +1723,8 @@ Class == "Map Fragments"
 
 	# 3.25 reintroduction of King of the Mists boss from Affliction league
 	# 3.26 reworked, now itemized Catarina entry
-	BaseType == "An Audience With The King" "Syndicate Medallion"
+	# 3.28 Mirage boss entry
+	BaseType == "An Audience With The King" "Syndicate Medallion" "The Black Barya"
 	{
 		SetBorderColor $color_black
 		SetTextColor $color_black
@@ -1822,15 +1830,6 @@ Class == "Breachstone"
 	SetBackgroundColor $color_white
 	SetFontSize $font_breachstone
 	SetAlertSound $alert_breachstone
-	Show
-}
-
-# 3.27 character-boosting Grafts
-# no strong style - these only drop from Genesis Tree
-Class == "Grafts"
-{
-	SetBackgroundColor $color_breach
-	SetAlertSound $alert_common
 	Show
 }
 
@@ -2124,7 +2123,7 @@ Class == "Maps"
 		Show
 	}
 
-	MapTier >= 17
+	BaseType == "Valdo Map" "Shaper Guardian Map" "Nightmare Map"
 	{
 		SetTextColor $color_white
 		SetBorderColor $color_white
