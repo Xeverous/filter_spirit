@@ -398,8 +398,8 @@ $actions_currency_low = {
 }
 
 $actions_currency_very_low = {
-	SetTextColor $color_currency_very_low
-	SetBackgroundColor $color_black
+	SetTextColor $color_black
+	SetBackgroundColor $color_currency_very_low
 	SetFontSize $font_currency_very_low
 	SetAlertSound $alert_currency_very_low
 }
