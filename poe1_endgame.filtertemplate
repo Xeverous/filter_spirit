@@ -1429,6 +1429,18 @@ Class == "Skill Gems" "Support Gems"
 		Show
 	}
 
+	# 3.28 Exceptional Support Gems
+	BaseType == "Greater Spell Cascade Support" "Eclipse Support" "Invert the Rules Support" "Cast on Ward Break Support" "Vaal Sacrifice Support" "Greater Spell Echo Support" "Vaal Temptation Support" "Machinations Support" "Pyre Support" "Bonespire Support" "Foulgrasp Support" "Hiveborn Support" "Scornful Herald Support" "Cull the Weak Support" "Greater Ancestral Call Support" "Fissure Support" "Hextoad Support" "Hexpass Support" "Greater Fork Support" "Greater Chain Support" "Lethal Dose Support" "Companionship Support" "Divine Sentinel Support" "Annihilation Support" "Invention Support" "Greater Kinetic Instability Support" "Cooldown Recovery Support" "Voidstorm Support" "Void Shockwave Support" "Eldritch Blasphemy Support" "Gluttony Support" "Overheat Support" "Greater Multistrike Support" "Congregation Support" "Frostmage Support" "Greater Devour Support" "Greater Unleash Support" "Pacifism Support" "Bloodsoaked Banner Support" "Minion Pact Support" "Unholy Trinity Support" "Overloaded Intensity Support" "Transfusion Support"
+	{
+		SetBorderColor $color_gem
+		SetTextColor $color_gem
+		SetBackgroundColor $color_white
+		SetFontSize $font_max
+		SetAlertSound $alert_gem_exceptional
+		MinimapIcon $icon_gem_exceptional
+		Show
+	}
+
 	# drop only - cheap
 	BaseType == "Portal" "Vaal Breach"
 	{
@@ -2167,6 +2179,15 @@ Rarity <= Rare
 		SetTextColor $color_black
 		SetBackgroundColor $color_fractured_item
 		SetAlertSound $alert_fractured_item
+
+		# 3.28 Fracuted and Veiled atlas passive
+		# note: == "Veiled" "of the Veil" would not catch member-specific mods
+		HasExplicitMod "Veil"
+		{
+			SetBorderColor $color_veiled_item
+			Show
+		}
+
 		ShowDiscard $show_gear_fractured
 	}
 
@@ -2283,15 +2304,6 @@ BaseType "Talisman"
 # a situation where multi-exalt 6s influenced base gets "just 6s" style.
 Rarity <= Rare
 {
-	# 3.26 Infamous Mercenaries
-	HasExplicitMod == "Infamous" "of Infamy"
-	{
-		SetTextColor $color_black
-		SetBackgroundColor $color_veiled_item
-		SetAlertSound $alert_veiled_item
-		Show
-	}
-
 	# enchants and RGB - part 1/2
 	# these blocks only set styles (or not if discarded)
 	Sockets < 6
