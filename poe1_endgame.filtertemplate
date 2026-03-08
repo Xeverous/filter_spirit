@@ -1270,9 +1270,15 @@ Class == "Blueprint"
 {
 	SetTextColor $color_black
 	SetBackgroundColor $color_heist
-	SetBorderColor $color_heist
 	SetAlertSound $alert_blueprint
 	SetFontSize $font_blueprint
+
+	AnyEnchantment True
+	{
+		SetBorderColor 64 0 128
+		Show
+	}
+
 	Show
 }
 
@@ -1280,9 +1286,16 @@ Class == "Contract"
 {
 	SetTextColor $color_heist
 	SetBorderColor $color_heist
-	SetBackgroundColor $color_black
 	SetAlertSound $alert_contract
 	SetFontSize $font_contract
+
+	AnyEnchantment True
+	{
+		SetBackgroundColor 64 0 128
+		Show
+	}
+
+	SetBackgroundColor $color_black
 	Show
 }
 
@@ -2122,7 +2135,8 @@ Class == "Maps"
 		}
 	}
 
-	# maps with Delirium and Blight encounter
+	# As of 3.28 plenty of stuff here
+	# special encounters, bosses, delirium
 	AnyEnchantment True
 	{
 		SetTextColor $color_white
