@@ -2318,6 +2318,16 @@ BaseType "Talisman"
 # a situation where multi-exalt 6s influenced base gets "just 6s" style.
 Rarity <= Rare
 {
+	# 3.28 New special mods on Abyss Belts
+	BaseType == "Stygian Vise"
+	HasExplicitMod == "Abyssal" "of the Abyss"
+	{
+		SetTextColor $color_black
+		SetBackgroundColor $color_veiled_item
+		SetAlertSound $alert_veiled_item
+		Show
+	}
+
 	# 3.26 Infamous Mercenaries (did not went core)
 	# 3.28 Mirage Exiles drop these now
 	HasExplicitMod == "Infamous" "of Infamy"
