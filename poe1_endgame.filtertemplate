@@ -1454,6 +1454,18 @@ Class == "Skill Gems" "Support Gems"
 		Show
 	}
 
+	# 3.28 Imbued Gems
+	Imbued True
+	{
+		SetBorderColor $color_gem
+		SetTextColor $color_gem
+		SetBackgroundColor $color_white
+		SetFontSize $font_max
+		SetAlertSound $alert_gem_exceptional
+		MinimapIcon $icon_gem_exceptional
+		Show
+	}
+
 	# drop only - cheap
 	BaseType == "Portal" "Vaal Breach"
 	{
