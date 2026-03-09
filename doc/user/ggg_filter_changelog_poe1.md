@@ -13,6 +13,7 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 - note: some "removed" items (e.g. Side Quest card) have conflicting info in the patch notes
 - note: *The Pillage and Plunder Atlas Passive now has Veiled Items dropped by Defeated Syndicate Members in your Maps have a 5% chance to drop with a Fractured Veiled Modifier*
 - note: Memory Strand items have now better values and a bias towards better bases
+- more notes: https://www.reddit.com/r/pathofexile/comments/1rmklmq/ggg_please_fixsplit_item_filter_information_it/
 - new keyword: `Imbued` (boolean test)
 - [patch notes](https://www.pathofexile.com/forum/view-thread/3913392)
 - [new and changed gems](https://www.pathofexile.com/forum/view-thread/3914006)
