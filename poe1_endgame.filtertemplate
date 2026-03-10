@@ -2466,7 +2466,7 @@ Rarity <= Rare
 		SetTextColor $color_black
 		SetBackgroundColor $color_atlas
 		ShowDiscard $show_gear_memory_strands
-		Continue
+		Show
 	}
 
 	# influenced bases with unknown value
