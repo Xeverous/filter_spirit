@@ -2462,6 +2462,8 @@ Rarity <= Rare
 	# (removed all blocks until a stable and high-confidence generation is possible)
 
 	MemoryStrands >= $cfg_memory_strands_min
+	Corrupted False
+	Mirrored False
 	{
 		SetTextColor $color_black
 		SetBackgroundColor $color_atlas
