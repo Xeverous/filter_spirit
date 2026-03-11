@@ -2199,6 +2199,8 @@ Class == "Maps"
 }
 
 Rarity <= Rare
+Corrupted False
+Mirrored False
 {
 	FracturedItem True
 	{
