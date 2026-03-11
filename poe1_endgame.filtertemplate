@@ -2343,6 +2343,8 @@ Rarity <= Rare
 	# 3.26 Infamous Mercenaries (did not went core)
 	# 3.28 Mirage Exiles drop these now
 	HasExplicitMod == "Infamous" "of Infamy"
+	Corrupted False
+	Mirrored False
 	{
 		SetTextColor $color_black
 		SetBackgroundColor $color_veiled_item
