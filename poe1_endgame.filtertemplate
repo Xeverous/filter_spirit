@@ -2202,6 +2202,18 @@ Rarity <= Rare
 Corrupted False
 Mirrored False
 {
+	BaseType == "Cord Belt"
+	{
+		SetTextColor $color_black
+		SetBorderColor $color_blight
+		SetBackgroundColor $color_blight
+		SetFontSize $font_max
+		PlayEffect $beam_blight
+		SetAlertSound $alert_extraordinary
+		MinimapIcon 0 Orange Square
+		Show
+	}
+
 	FracturedItem True
 	{
 		SetTextColor $color_black
