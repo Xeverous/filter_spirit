@@ -130,9 +130,6 @@ $font_gem_drop_only      = 38
 $font_gem_high           = $font_high
 $font_gem_mid            = $font_mid
 $font_gem_low            = $font_low
-$font_oil_high           = $font_currency_high
-$font_oil_mid            = $font_currency_mid
-$font_oil_low            = $font_currency_low
 $font_tattoo_high        = $font_currency_high
 $font_tattoo_mid         = $font_currency_mid
 $font_tattoo_low         = $font_currency_low
@@ -253,8 +250,6 @@ $alert_gem_mid             = $alert_mid
 $alert_gem_20_lvl          = $alert_uncommon
 $alert_gem_20_quality      = $alert_uncommon
 $alert_gem_non_0_quality   = $alert_frequent
-$alert_oil_high            = $alert_high
-$alert_oil_mid             = $alert_mid
 $alert_tattoo_high         = $alert_high
 $alert_tattoo_mid          = $alert_mid
 $alert_atlas_upgrade       = $alert_very_specific
@@ -1035,12 +1030,8 @@ Class == "Stackable Currency"
 	{
 		Price >= $cfg_oils_high_min_value
 		{
-			SetTextColor $color_black
-			SetBorderColor $color_blight
-			SetBackgroundColor $color_blight
-			SetFontSize $font_oil_high
+			Expand $actions_currency_high
 			PlayEffect $beam_blight
-			SetAlertSound $alert_oil_high
 			MinimapIcon $icon_oil_high
 			Show
 		}
@@ -1048,12 +1039,8 @@ Class == "Stackable Currency"
 		Price < $cfg_oils_high_min_value
 		Price >= $cfg_oils_mid_min_value
 		{
-			SetTextColor $color_black
-			SetBorderColor $color_blight
-			SetBackgroundColor $color_blight
-			SetFontSize $font_oil_mid
+			Expand $actions_currency_mid
 			PlayEffect $beam_blight
-			SetAlertSound $alert_oil_mid
 			MinimapIcon $icon_oil_mid
 			ShowHide $show_oils_mid
 		}
@@ -1061,16 +1048,13 @@ Class == "Stackable Currency"
 		Price < $cfg_oils_mid_min_value
 		Price > $cfg_oils_low_min_value
 		{
-			SetTextColor $color_blight
-			SetBorderColor $color_blight
-			SetFontSize $font_oil_low
+			Expand $actions_currency_low
 			ShowHide $show_oils_low
 		}
 
 		Price <= $cfg_oils_low_min_value
 		{
-			SetTextColor $color_blight
-			SetFontSize $font_oil_low
+			Expand $actions_currency_very_low
 			ShowHide $show_oils_very_low
 		}
 	}
@@ -1080,8 +1064,8 @@ Class == "Stackable Currency"
 	{
 		SetTextColor $color_blight
 		SetBorderColor $color_error
-		SetFontSize $font_oil_mid
-		SetAlertSound $alert_oil_mid
+		SetFontSize $font_currency_mid
+		SetAlertSound $alert_currency_mid
 		PlayEffect $beam_blight Temp
 		Show
 	}
