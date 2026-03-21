@@ -1212,6 +1212,7 @@ Class == "Corpses"
 	SetAlertSound $alert_corpse
 	PlayEffect $beam_corpse
 	MinimapIcon $icon_corpse
+	Show
 }
 
 Class == "Delve Stackable Socketable Currency"
