@@ -2187,6 +2187,18 @@ Rarity <= Rare
 Corrupted False
 Mirrored False
 {
+	# bases coming from specific sources
+	# - Sacrificial Garb: 1.1 Atziri (Normal, Uber, Temple) (no value)
+	# - Cord Belt: 3.28 Miraged Blight (up to few div value)
+	BaseType == "Sacrificial Garb"
+	{
+		SetTextColor $color_white
+		SetBorderColor $color_rare_good_base
+		SetBackgroundColor $color_black
+		SetFontSize $font_max
+		Show
+	}
+
 	BaseType == "Cord Belt"
 	{
 		SetTextColor $color_black
