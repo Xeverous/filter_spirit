@@ -6,6 +6,10 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 
 *newest at the top*
 
+### 3.28.0d - [patch notes](https://www.pathofexile.com/forum/view-thread/3922013)
+
+- Updated built-in Neversink's console filters to version 8.19.1
+
 ### 3.28 (Mirage) - [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3914212)
 
 - many new currencies and many removed currencies + other changed items
