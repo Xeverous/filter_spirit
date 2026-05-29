@@ -46,6 +46,7 @@ $color_essence_low         = $color_essence_high
 $color_essence_very_low    = $color_essence_high
 $color_gem                 =  20 240 240
 $color_gear_exceptional    =   0 255 255
+$color_breach              = 255  51 204
 $color_unknown_price       = $color_red
 $color_corrupted           = 255 127 127
 
@@ -388,7 +389,7 @@ Class == "Stackable Currency"
 	}
 
 	# Chaos/Exalt tier"
-	BaseType == "Gemcutter's Prism" "Orb of Annulment" "Orb of Chance" "Glassblower's Bauble" "Exalted Orb" "Vaal Orb" "Chaos Orb" "Chance Shard" "Greater Jeweller's Orb" "Artificer's Orb" "Orb of Alchemy" "Greater Chaos Orb" "Perfect Chaos Orb" "Greater Exalted Orb" "Perfect Exalted Orb" "Fracturing Orb" "Vaal Cultivation Orb" "Ancient Infuser" "Orb of Extraction" "Core Destabiliser" "Vaal Infuser"
+	BaseType == "Gemcutter's Prism" "Orb of Annulment" "Orb of Chance" "Glassblower's Bauble" "Exalted Orb" "Vaal Orb" "Chaos Orb" "Chance Shard" "Greater Jeweller's Orb" "Artificer's Orb" "Orb of Alchemy" "Greater Chaos Orb" "Perfect Chaos Orb" "Greater Exalted Orb" "Perfect Exalted Orb" "Fracturing Orb" "Vaal Cultivation Orb" "Ancient Infuser" "Orb of Extraction" "Core Destabiliser" "Vaal Armourer's Infuser" "Vaal Blacksmith's Infuser" "Vaal Arcanist's Infuser" "Vaal Catalysing Infuser"
 	{
 		Expand $actions_currency_mid
 		Show
@@ -471,14 +472,14 @@ Class == "Stackable Currency"
 		Show
 	}
 
-	# Catalysts, Essences, Emotions - generic
-	BaseType "Catalyst" "Essence of" "Liquid"
+	# Catalysts, Emotions - generic
+	BaseType "Catalyst" "Liquid" "Alloy" "Starlit Ore" "Flux"
 	{
 		Expand $actions_currency_mid
 		Show
 	}
 
-	BaseType == "Bronze Key" "Silver Key" "Gold Key"
+	BaseType == "Bronze Key" "Silver Key" "Gold Key" "Cryptic Key"
 	{
 		Expand $actions_quest_items
 		Show
@@ -556,6 +557,14 @@ Class == "Omen"
 Class == "Incubators"
 {
 	Expand $actions_currency_high
+	Show
+}
+
+# 0.5.0 breach
+Class == "Wombgifts"
+{
+	Expand $actions_currency_mid
+	SetBackgroundColor $color_breach
 	Show
 }
 
@@ -864,7 +873,7 @@ Class == "Pinnacle Keys"
 
 # Trialmaster fragments, Vaal Vault key, Well of Souls key
 Class == "Map Fragment"
-BaseType == "Cowardly Fate" "Deadly Fate" "Victorious Fate" "Idol of Estazunti" "Kulemak's Invitation"
+BaseType == "Cowardly Fate" "Deadly Fate" "Victorious Fate" "Idol of Estazunti" "Kulemak's Invitation" "The Triskelion Reforged" "Head of the King" "Breachlord Sac" "Raven's Reflection"
 {
 	SetTextColor $color_white
 	SetBorderColor 204 153 0

@@ -6,6 +6,16 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 
 *newest at the top*
 
+### (2026.05.29) 0.5.0 (Return of the Ancients + Runes of Aldur) - [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3933291)
+
+- [patch notes](https://www.pathofexile.com/forum/view-thread/3932540)
+- tons of new and changed currencies
+- tons of new runes (Augments)
+- new gems and supports
+- new fragments
+- new omens
+- many new bases
+
 ### (2025.12.09) 0.4.0 (The Last of the Druids + Fate of the Vaal) - [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3884730)
 
 - [patch notes](https://www.pathofexile.com/forum/view-thread/3883495)
