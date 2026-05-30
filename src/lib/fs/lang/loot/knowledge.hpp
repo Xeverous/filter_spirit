@@ -251,6 +251,7 @@ inline const std::initializer_list<known_item> currency_basic = {
 	{"Lesser Eldritch Ember",         known_item_properties(   10, 68)},
 	{"Lesser Eldritch Ichor",         known_item_properties(   10, 68)},
 	{"Orb of Horizons",               known_item_properties(   20, 68)},
+	{"Volatile Vaal Orb",             known_item_properties(   20, 68)}, // 3.28
 	{"Orb of Unmaking",               known_item_properties(   40, 70)},
 };
 
@@ -475,7 +476,9 @@ inline const std::initializer_list<known_item> currency_breach_blessings = { // 
 	{"Blessing of Tul",       known_item_properties(10, 1)},
 	{"Blessing of Esh",       known_item_properties(10, 1)},
 	{"Blessing of Uul-Netol", known_item_properties(10, 1)},
-	{"Blessing of Chayula",   known_item_properties(10, 1)}
+	{"Blessing of Chayula",   known_item_properties(10, 1)},
+	// 3.28 replaces all, all blessings are now legacy items
+	{"Flesh of Xesht",        known_item_properties(10, 1)},
 };
 
 inline const std::initializer_list<known_item> currency_incursion_vials = { // 3.3
@@ -579,11 +582,14 @@ inline const std::initializer_list<known_item> currency_catalysts = { // 3.9
 	{"Unstable Catalyst",     known_item_properties(10,  1)},
 	{"Fertile Catalyst",      known_item_properties(10, 68)},
 	{"Prismatic Catalyst",    known_item_properties(10, 68)},
-	{"Tempering Catalyst",    known_item_properties(10, 68)}
+	{"Tempering Catalyst",    known_item_properties(10, 68)},
+	{"Sinistral Catalyst",    known_item_properties(10,  1)}, // 3.28
+	{"Dextral Catalyst",      known_item_properties(10,  1)}, // 3.28
 };
 
-inline const std::initializer_list<known_item> currency_delirium_splinters = { // 3.10
-	{"Simulacrum Splinter", known_item_properties(300, 1)}
+inline const std::initializer_list<known_item> currency_delirium_generic = { // 3.10
+	{"Simulacrum Splinter", known_item_properties(300,  1)},
+	{"Refracting Fog",      known_item_properties( 20, 68)}, // 3.28
 };
 
 inline const std::initializer_list<known_item> currency_delirium_orbs = { // 3.10
@@ -681,7 +687,8 @@ inline const std::initializer_list<known_item> currency_harvest_lifeforce_regula
 };
 
 inline const std::initializer_list<known_item> currency_harvest_lifeforce_special = { // 3.19
-	{"Sacred Crystallised Lifeforce", known_item_properties(10)}
+	{"Sacred Crystallised Lifeforce", known_item_properties(10)},
+	{"Crystallised Rancour",          known_item_properties(10)}, // 3.28
 };
 
 inline const std::initializer_list<known_item> currency_runegrafts = { // 3.26
@@ -762,7 +769,7 @@ inline const auto known_items = known_items_store::create(
 	currency_blight_oils_regular,
 	currency_blight_oils_special,
 	currency_catalysts,
-	currency_delirium_splinters,
+	currency_delirium_generic,
 	currency_delirium_orbs,
 	currency_delirium_orbs_legacy,
 	currency_delirium_orbs_ruthless,
