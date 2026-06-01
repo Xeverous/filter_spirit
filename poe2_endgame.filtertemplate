@@ -1057,7 +1057,7 @@ Rarity Rare
 }
 
 # Chance Orb
-BaseType == "Heavy Belt" "Viper Cap"
+BaseType "Heavy Belt"
 Rarity Normal
 Corrupted False
 Mirrored False
