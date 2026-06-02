@@ -1042,6 +1042,14 @@ Rarity <= Rare
 	{
 		ShowDiscard $cfg_show_gear_exceptional_sockets
 	}
+
+	# 3.28 new special bases (TBD)
+	BaseType == "Two-Stone Ring" "Biostatic Ring" "Vitalic Ring" "Mnemonic Ring" "Kinetic Ring" "Oneiric Ring" "Grasping Ring" "Veridical Chain" "Lament Amulet" "Portent Amulet" "Absent Amulet" "Corona Amulet" "Distorted Amulet" "Aberrant Sledge" "Warding Quarterstaff" "Heartwood Shortbow" "Trarthan Cannon" "Twisted Wand" "Runic Fork" "Perching Staff" "Ancient Visor" "Ancient Leggings" "Ancient Gauntlets" "Ornate Ringmail" "Ancient Mail" "Grasping Mail" "Primal Markings" "Stalking Belt" "Invoking Belt" "Sinew Belt" "Forking Belt" "Glacial Fortress" "Venerable Defender"
+	{
+		PlayEffect Pink
+		MinimapIcon 1 Pink Diamond
+		Show
+	}
 }
 
 # TODO any use for "Abyssal Signet" base?
