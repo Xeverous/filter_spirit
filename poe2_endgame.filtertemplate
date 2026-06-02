@@ -382,14 +382,14 @@ Class == "Stackable Currency"
 	}
 
 	# Divine tier
-	BaseType == "Divine Orb" "Mirror of Kalandra" "Perfect Jeweller's Orb" "Concentrated Liquid Fear" "Concentrated Liquid Suffering" "Concentrated Liquid Isolation" "Hinekora's Lock" "Architect's Orb" "Crystallised Corruption"
+	BaseType == "Divine Orb" "Mirror of Kalandra" "Perfect Jeweller's Orb" "Concentrated Liquid Fear" "Concentrated Liquid Suffering" "Concentrated Liquid Isolation" "Hinekora's Lock" "Architect's Orb" "Crystallised Corruption" "Olroth's Crest of the Sun"
 	{
 		Expand $actions_currency_high
 		Show
 	}
 
 	# Chaos/Exalt tier"
-	BaseType == "Gemcutter's Prism" "Orb of Annulment" "Orb of Chance" "Glassblower's Bauble" "Exalted Orb" "Vaal Orb" "Chaos Orb" "Chance Shard" "Greater Jeweller's Orb" "Artificer's Orb" "Orb of Alchemy" "Greater Chaos Orb" "Perfect Chaos Orb" "Greater Exalted Orb" "Perfect Exalted Orb" "Fracturing Orb" "Vaal Cultivation Orb" "Ancient Infuser" "Orb of Extraction" "Core Destabiliser" "Vaal Armourer's Infuser" "Vaal Blacksmith's Infuser" "Vaal Arcanist's Infuser" "Vaal Catalysing Infuser" "Exceptional Verisium"
+	BaseType == "Gemcutter's Prism" "Orb of Annulment" "Orb of Chance" "Glassblower's Bauble" "Exalted Orb" "Vaal Orb" "Chaos Orb" "Chance Shard" "Greater Jeweller's Orb" "Artificer's Orb" "Orb of Alchemy" "Greater Chaos Orb" "Perfect Chaos Orb" "Greater Exalted Orb" "Perfect Exalted Orb" "Fracturing Orb" "Vaal Cultivation Orb" "Ancient Infuser" "Orb of Extraction" "Core Destabiliser" "Vaal Armourer's Infuser" "Vaal Blacksmith's Infuser" "Vaal Arcanist's Infuser" "Vaal Catalysing Infuser" "Exceptional Verisium" "Medved's Crest of the Circle" "Vorana's Crest of the Scythe" "Uhtred's Crest of the Chalice"
 	{
 		Expand $actions_currency_mid
 		Show
