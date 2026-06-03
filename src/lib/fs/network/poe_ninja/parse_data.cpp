@@ -700,7 +700,7 @@ lang::market::poe2::item_price_data parse_item_price_data(const api_item_price_d
 	parse_uncut_gems(jsons.uncut_gems.file_content, result.rates, result.uncut_skill_gems, result.uncut_spirit_gems, logger);
 	result.lineage_support_gems = parse_exchange_items(jsons.lineage_support_gems, result.rates, logger);
 	result.essences             = parse_exchange_items(jsons.essences,             result.rates, logger);
-	result.soul_cores           = parse_exchange_items(jsons.ultimatum,            result.rates, logger);
+	result.soul_cores           = parse_exchange_items(jsons.soul_cores,           result.rates, logger);
 	result.idols                = parse_exchange_items(jsons.idols,                result.rates, logger);
 	result.runes                = parse_exchange_items(jsons.runes,                result.rates, logger);
 	result.omens                = parse_exchange_items(jsons.ritual,               result.rates, logger);

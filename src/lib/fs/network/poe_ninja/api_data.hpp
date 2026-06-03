@@ -143,7 +143,7 @@ inline constexpr const char file_stem_abyss[] = "Abyss";
 inline constexpr const char file_stem_uncut_gems[] = "UncutGems";
 inline constexpr const char file_stem_lineage_support_gems[] = "LineageSupportGems";
 inline constexpr const char file_stem_essences[] = "Essences";
-inline constexpr const char file_stem_ultimatum[] = "Ultimatum";
+inline constexpr const char file_stem_soul_cores[] = "SoulCores";
 inline constexpr const char file_stem_idols[] = "Idols";
 inline constexpr const char file_stem_runes[] = "Runes";
 inline constexpr const char file_stem_ritual[] = "Ritual";
@@ -177,7 +177,7 @@ struct api_item_price_data
 	json_file<file_stem_uncut_gems, true> uncut_gems;
 	json_file<file_stem_lineage_support_gems, true> lineage_support_gems;
 	json_file<file_stem_essences, true> essences;
-	json_file<file_stem_ultimatum, true> ultimatum; // Soul Cores
+	json_file<file_stem_soul_cores, true> soul_cores;
 	json_file<file_stem_idols, true> idols;
 	json_file<file_stem_runes, true> runes;
 	json_file<file_stem_ritual, true> ritual; // Omens + "Petition Splinter"

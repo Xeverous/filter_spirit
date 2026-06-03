@@ -55,7 +55,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 	uncut_gems,
 	lineage_support_gems,
 	essences,
-	ultimatum,
+	soul_cores,
 	idols,
 	runes,
 	ritual,
