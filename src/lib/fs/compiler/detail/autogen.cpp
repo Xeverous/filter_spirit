@@ -565,6 +565,8 @@ poe2_make_autogen_func(
 			return make_autogen_stackable_item(st, conditions, autogen_origin, cn::poe2::emotions, &ipd::emotions, lang::loot::poe2::known_items, diagnostics);
 		case cat_t::catalysts:
 			return make_autogen_stackable_item(st, conditions, autogen_origin, cn::poe2::catalysts, &ipd::catalysts, lang::loot::poe2::known_items, diagnostics);
+		case cat_t::verisium:
+			return make_autogen_stackable_item(st, conditions, autogen_origin, cn::poe2::verisium, &ipd::verisium, lang::loot::poe2::known_items, diagnostics);
 	}
 
 	diagnostics.push_error_internal_compiler_error(__func__, autogen_origin);

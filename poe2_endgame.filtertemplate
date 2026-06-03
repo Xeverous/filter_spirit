@@ -352,7 +352,7 @@ Class == "Stackable Currency"
 		ShowHide $cfg_show_scrolls_wisdom
 	}
 
-	Autogen "Currency" "Abyss Currency" "Catalysts" "Emotions" "Expedition"
+	Autogen "Currency" "Abyss Currency" "Catalysts" "Emotions" "Expedition" "Verisium"
 	{
 		Price >= $cfg_currency_high_min_value
 		{

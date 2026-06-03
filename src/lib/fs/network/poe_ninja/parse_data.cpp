@@ -707,6 +707,7 @@ lang::market::poe2::item_price_data parse_item_price_data(const api_item_price_d
 	result.expedition           = parse_exchange_items(jsons.expedition,           result.rates, logger);
 	result.emotions             = parse_exchange_items(jsons.delirium,             result.rates, logger);
 	result.catalysts            = parse_exchange_items(jsons.breach,               result.rates, logger);
+	result.verisium             = parse_exchange_items(jsons.verisium,             result.rates, logger);
 
 	move_item("Kulemak's Invitation", result.abyss_currency, result.fragments);
 

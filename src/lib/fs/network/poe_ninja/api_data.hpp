@@ -150,6 +150,7 @@ inline constexpr const char file_stem_ritual[] = "Ritual";
 inline constexpr const char file_stem_expedition[] = "Expedition";
 inline constexpr const char file_stem_delirium[] = "Delirium";
 inline constexpr const char file_stem_breach[] = "Breach";
+inline constexpr const char file_stem_verisium[] = "Verisium";
 
 struct api_item_price_data
 {
@@ -183,6 +184,7 @@ struct api_item_price_data
 	json_file<file_stem_expedition, true> expedition;
 	json_file<file_stem_delirium, true> delirium; // Emotions + "Simulacrum Splinter"
 	json_file<file_stem_breach, true> breach; // Catalysts + "Breach Splinter"
+	json_file<file_stem_verisium, true> verisium;
 };
 
 } // namespace poe2

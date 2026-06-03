@@ -61,7 +61,8 @@ BOOST_FUSION_ADAPT_STRUCT(
 	ritual,
 	expedition,
 	delirium,
-	breach)
+	breach,
+	verisium)
 
 namespace fs::network::poe_ninja {
 

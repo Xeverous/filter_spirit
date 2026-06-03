@@ -396,7 +396,8 @@ enum class autogen_category
 	omens,
 	expedition,
 	emotions,
-	catalysts
+	catalysts,
+	verisium
 };
 
 constexpr std::optional<autogen_category> to_autogen_category(std::string_view sv)
@@ -429,6 +430,8 @@ constexpr std::optional<autogen_category> to_autogen_category(std::string_view s
 		return autogen_category::emotions;
 	else if (sv == "Catalysts")
 		return autogen_category::catalysts;
+	else if (sv == "Verisium")
+		return autogen_category::verisium;
 
 	return std::nullopt;
 }

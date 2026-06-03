@@ -311,7 +311,8 @@ log::message_stream& operator<<(log::message_stream& stream, const item_price_da
 		"\tOmens            : " << ipd.omens.size() << "\n"
 		"\tExpedition       : " << ipd.expedition.size() << "\n"
 		"\tEmotions         : " << ipd.emotions.size() << "\n"
-		"\tCatalysts        : " << ipd.catalysts.size() << "\n";
+		"\tCatalysts        : " << ipd.catalysts.size() << "\n"
+		"\tVerisium         : " << ipd.verisium.size() << "\n";
 }
 
 }

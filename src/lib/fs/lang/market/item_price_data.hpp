@@ -222,6 +222,7 @@ struct item_price_data
 	std::vector<elementary_item> expedition;
 	std::vector<elementary_item> emotions;
 	std::vector<elementary_item> catalysts;
+	std::vector<elementary_item> verisium;
 };
 
 log::message_stream& operator<<(log::message_stream& stream, const item_price_data& ipd);

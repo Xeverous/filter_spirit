@@ -117,6 +117,7 @@ namespace item_class_names {
 
 		constexpr auto emotions = currency_stackable;
 		constexpr auto catalysts = currency_stackable;
+		constexpr auto verisium = currency_stackable;
 
 		constexpr auto augment    = "Augment";
 		constexpr auto soul_cores = augment;
