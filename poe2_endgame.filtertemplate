@@ -259,7 +259,8 @@ $cfg_show_salvage_sockets = True
 $cfg_show_salvage_quality_flasks = True
 $cfg_show_salvage_quality_charms = True
 $cfg_show_salvage_quality_gear = True
-$cfg_gear_unid_tier_min = 1 # set to 1 to show all
+$cfg_show_magic_unid_tier_min = 1 # set to 1 to show all
+$cfg_show_rare_unid_tier_min = 1 # set to 1 to show all
 
 $cfg_always_show_splinters = True
 $cfg_always_show_expedition = True
@@ -1145,17 +1146,23 @@ Class "Rings" "Amulets" "Belts"
 	Show
 }
 
-# Hide remaining low-value gear
-# TODO potentially missing: Trap, Claw
-Rarity <= Magic
-Class "Flask" "Body" "Helmet" "Boots" "Gloves" "Shields" "Buckler" "Quiver" "Axe" "Mace" "Sword" "Staff" "Dagger" "Flail" "Quarter" "Spear" "Bow" "Crossbow" "Wand" "Sceptre" "Ring" "Belt" "Amulet" "Focus" "Talisman"
-AreaLevel >= 65
+Rarity Magic
+UnidentifiedItemTier >= $cfg_show_magic_unid_tier_min
 {
-	Hide
+	Show
 }
 
-Rarity Magic Rare
-UnidentifiedItemTier < $cfg_gear_unid_tier_min
+Rarity Rare
+UnidentifiedItemTier >= $cfg_show_rare_unid_tier_min
+{
+	Show
+}
+
+# Hide remaining low-value gear
+# TODO potentially missing: Trap, Claw
+Rarity <= Rare
+Class "Flask" "Body" "Helmet" "Boots" "Gloves" "Shields" "Buckler" "Quiver" "Axe" "Mace" "Sword" "Staff" "Dagger" "Flail" "Quarter" "Spear" "Bow" "Crossbow" "Wand" "Sceptre" "Ring" "Belt" "Amulet" "Focus" "Talisman"
+AreaLevel >= 65
 {
 	Hide
 }
