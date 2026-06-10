@@ -726,6 +726,9 @@ lang::market::poe2::item_price_data parse_item_price_data(const api_item_price_d
 	for (auto name : {"Amanamu's Gaze", "Tecrod's Gaze", "Kurgal's Gaze", "Ulaman's Gaze"})
 		move_item(name, result.abyss_currency, result.runes);
 
+	for (auto name : {"Aldur's Saga", "Medved's Saga", "Vorana's Saga", "Uhtred's Saga", "Olroth's Saga"})
+		move_item(name, result.expedition, result.omens);
+
 	return result;
 }
 
