@@ -23,8 +23,11 @@ $color_red                 = 255   0   0
 $color_golden              = 240 200 150
 $color_error               = $color_red
 $color_purple              = 175   0 175
+$color_brown               =  87  43   0
 
 # specific colors
+$color_quest               =  74 230  58
+$color_reliquary           = 204 153   0
 $color_gold                = 255 192 128
 $color_currency_high       = $color_red
 $color_currency_mid        = 249 150  25
@@ -193,8 +196,8 @@ $actions_currency_low_shards = {
 }
 
 $actions_quest_items = {
-	SetTextColor 74 230 58
-	SetBorderColor 74 230 58
+	SetTextColor $color_quest
+	SetBorderColor $color_quest
 	SetBackgroundColor $color_black
 	SetFontSize $font_max
 	MinimapIcon 0 Green Pentagon
@@ -880,9 +883,9 @@ Class == "Pinnacle Keys"
 Class == "Map Fragment"
 BaseType == "Cowardly Fate" "Deadly Fate" "Victorious Fate" "Idol of Estazunti" "Kulemak's Invitation" "The Triskelion Reforged" "Head of the King" "Breachlord Sac" "Raven's Reflection"
 {
-	SetTextColor $color_white
-	SetBorderColor 204 153 0
-	SetBackgroundColor 204 153 0
+	SetTextColor $color_brown
+	SetBorderColor $color_brown
+	SetBackgroundColor $color_white
 	SetFontSize $font_max
 	PlayEffect White
 	MinimapIcon 0 Brown Star
@@ -891,9 +894,9 @@ BaseType == "Cowardly Fate" "Deadly Fate" "Victorious Fate" "Idol of Estazunti" 
 }
 
 {
-	SetTextColor 74 230 58
-	SetBorderColor 74 230 58
-	SetBackgroundColor $color_black
+	SetTextColor $color_white
+	SetBorderColor $color_white
+	SetBackgroundColor $color_reliquary
 	SetFontSize $font_max
 	SetAlertSound $alert_extraordinary
 
