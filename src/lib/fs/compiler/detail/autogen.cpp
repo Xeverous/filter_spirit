@@ -540,6 +540,8 @@ poe2_make_autogen_func(
 		case cat_t::currency:
 			return make_autogen_stackable_item(st, conditions, autogen_origin, cn::currency_stackable, &ipd::currency, lang::loot::poe2::known_items, diagnostics);
 		case cat_t::fragments:
+			// TODO ninja merges "Map Fragments" and "Pinnacle Keys" and "Vault Keys" item classes
+			// best solution would be to support multiple item classes here
 			return make_autogen_simple(st, conditions, autogen_origin, cn::map_fragments, &ipd::fragments, diagnostics);
 		case cat_t::abyss_currency:
 			return make_autogen_stackable_item(st, conditions, autogen_origin, cn::currency_stackable, &ipd::abyss_currency, lang::loot::poe2::known_items, diagnostics);

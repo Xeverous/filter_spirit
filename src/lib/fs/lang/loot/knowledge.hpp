@@ -829,13 +829,14 @@ inline const std::initializer_list<known_item> currency_basic = {
 	{"Perfect Chaos Orb", known_item_properties(20, 79)},
 	{"Perfect Exalted Orb", known_item_properties(20, 79)},
 	{"Perfect Regal Orb", known_item_properties(20, 79)},
-	// special drop
+	// special drops
 	{"Fracturing Orb", known_item_properties(20, 1)}, // (only from Cleansed monsters)
 	{"Albino Rhoa Feather", known_item_properties(10, 1)},
+	{"Cryptic Key", known_item_properties(1, 1)}, // (Jado exclusive)
 	// splinters
-	{"Breach Splinter", known_item_properties(300, 1)},
-	{"Petition Splinter", known_item_properties(300, 1)},
-	{"Runic Splinter", known_item_properties(300, 1)},
+	{"Breach Splinter",     known_item_properties(300, 1)},
+	{"Petition Splinter",   known_item_properties(300, 1)}, // 0.3.0, legacy no use item since 0.5.0
+	{"Runic Splinter",      known_item_properties(300, 1)}, // 0.3.0, legacy no use item since 0.5.0
 	{"Simulacrum Splinter", known_item_properties(300, 1)},
 };
 
@@ -927,7 +928,8 @@ inline const std::initializer_list<known_item> currency_essences = {
 	{"Perfect Essence of Sorcery", known_item_properties(10, 72)},
 	{"Perfect Essence of the Body", known_item_properties(10, 72)},
 	{"Perfect Essence of the Infinite", known_item_properties(10, 72)},
-	{"Perfect Essence of the Mind", known_item_properties(10, 72)}
+	{"Perfect Essence of the Mind", known_item_properties(10, 72)},
+	{"Essence of the Breach", known_item_properties(10, 1)}, // 0.5.0
 };
 
 inline const std::initializer_list<known_item> currency_abyss = {
@@ -939,30 +941,41 @@ inline const std::initializer_list<known_item> currency_abyss = {
 	{"Preserved Jawbone", known_item_properties(20, 61)},
 	{"Preserved Rib", known_item_properties(20, 61)},
 	{"Preserved Cranium", known_item_properties(20, 65)},
-	{"Preserved Vertebrae", known_item_properties(20, 65)},
+	{"Preserved Vertebrae", known_item_properties(20, 65)}, // legacy since 0.4
 	{"Ancient Collarbone", known_item_properties(20, 75)},
 	{"Ancient Jawbone", known_item_properties(20, 75)},
 	{"Ancient Rib", known_item_properties(20, 75)},
-	// Augments
-	{"Ulaman's Gaze",  known_item_properties(1, 65)},
-	{"Kurgal's Gaze",  known_item_properties(1, 65)},
-	{"Tecrod's Gaze",  known_item_properties(1, 65)},
-	{"Amanamu's Gaze", known_item_properties(1, 65)}
+	{"Altered Collarbone", known_item_properties(20, 1)}, // 0.5.0, drops from Genesis Tree
 };
 
 inline const std::initializer_list<known_item> currency_catalysts = {
-	{"Adaptive Catalyst", known_item_properties(10, 1)},
-	{"Carapace Catalyst", known_item_properties(10, 1)},
-	{"Chayula's Catalyst", known_item_properties(10, 1)},
-	{"Esh's Catalyst", known_item_properties(10, 1)},
-	{"Flesh Catalyst", known_item_properties(10, 1)},
-	{"Neural Catalyst", known_item_properties(10, 1)},
-	{"Reaver Catalyst", known_item_properties(10, 1)},
-	{"Sibilant Catalyst", known_item_properties(10, 1)},
-	{"Skittering Catalyst", known_item_properties(10, 1)},
-	{"Tul's Catalyst", known_item_properties(10, 1)},
-	{"Uul-Netol's Catalyst", known_item_properties(10, 1)},
-	{"Xoph's Catalyst", known_item_properties(10, 1)}
+	{"Adaptive Catalyst",    known_item_properties(10, 30)},
+	{"Carapace Catalyst",    known_item_properties(10, 30)},
+	{"Chayula's Catalyst",   known_item_properties(10, 30)},
+	{"Esh's Catalyst",       known_item_properties(10, 30)},
+	{"Flesh Catalyst",       known_item_properties(10, 30)},
+	{"Neural Catalyst",      known_item_properties(10, 30)},
+	{"Reaver Catalyst",      known_item_properties(10, 30)},
+	{"Sibilant Catalyst",    known_item_properties(10, 30)},
+	{"Skittering Catalyst",  known_item_properties(10, 30)},
+	{"Tul's Catalyst",       known_item_properties(10, 30)},
+	{"Uul-Netol's Catalyst", known_item_properties(10, 30)},
+	{"Xoph's Catalyst",      known_item_properties(10, 30)},
+	{"Necrotic Catalyst",    known_item_properties(10, 30)}, // 0.5.2
+	// 0.5.2
+	{"Refined Adaptive Catalyst",    known_item_properties(10, 50)},
+	{"Refined Carapace Catalyst",    known_item_properties(10, 50)},
+	{"Refined Chayula's Catalyst",   known_item_properties(10, 50)},
+	{"Refined Esh's Catalyst",       known_item_properties(10, 50)},
+	{"Refined Flesh Catalyst",       known_item_properties(10, 50)},
+	{"Refined Neural Catalyst",      known_item_properties(10, 50)},
+	{"Refined Reaver Catalyst",      known_item_properties(10, 50)},
+	{"Refined Sibilant Catalyst",    known_item_properties(10, 50)},
+	{"Refined Skittering Catalyst",  known_item_properties(10, 50)},
+	{"Refined Tul's Catalyst",       known_item_properties(10, 50)},
+	{"Refined Uul-Netol's Catalyst", known_item_properties(10, 50)},
+	{"Refined Xoph's Catalyst",      known_item_properties(10, 50)},
+	{"Refined Necrotic Catalyst",    known_item_properties(10, 50)},
 };
 
 inline const std::initializer_list<known_item> currency_emotions = {
@@ -973,32 +986,521 @@ inline const std::initializer_list<known_item> currency_emotions = {
 	{"Liquid Disgust", known_item_properties(10, 1)},
 	{"Liquid Envy", known_item_properties(10, 1)},
 	{"Liquid Paranoia", known_item_properties(10, 1)},
-	{"Concentrated Liquid Fear", known_item_properties(10, 70)},
-	{"Concentrated Liquid Suffering", known_item_properties(10, 75)},
-	{"Concentrated Liquid Isolation", known_item_properties(10, 80)},
+	{"Potent Liquid Melancholy", known_item_properties(10, 65)}, // 0.5.0
+	{"Potent Liquid Ferocity", known_item_properties(10, 65)}, // 0.5.0
+	{"Potent Liquid Contempt", known_item_properties(10, 65)}, // 0.5.0
+	{"Concentrated Liquid Fear", known_item_properties(10, 69)},
+	{"Concentrated Liquid Suffering", known_item_properties(10, 73)},
+	{"Concentrated Liquid Isolation", known_item_properties(10, 77)},
+	// 0.5.0
+	{"Ancient Diluted Liquid Greed", known_item_properties(10, 1)},
+	{"Ancient Diluted Liquid Guilt", known_item_properties(10, 1)},
+	{"Ancient Diluted Liquid Ire", known_item_properties(10, 1)},
+	{"Ancient Liquid Despair", known_item_properties(10, 1)},
+	{"Ancient Liquid Disgust", known_item_properties(10, 1)},
+	{"Ancient Liquid Envy", known_item_properties(10, 1)},
+	{"Ancient Liquid Paranoia", known_item_properties(10, 1)},
+	{"Ancient Potent Liquid Melancholy", known_item_properties(10, 65)},
+	{"Ancient Potent Liquid Ferocity", known_item_properties(10, 65)},
+	{"Ancient Potent Liquid Contempt", known_item_properties(10, 65)},
+	{"Ancient Concentrated Liquid Fear", known_item_properties(10, 69)},
+	{"Ancient Concentrated Liquid Suffering", known_item_properties(10, 73)},
+	{"Ancient Concentrated Liquid Isolation", known_item_properties(10, 77)},
 };
 
 inline const std::initializer_list<known_item> currency_expedition = {
+	// since 0.5.0 legacy items with no use
 	{"Black Scythe Artifact", known_item_properties(20, 1)},
 	{"Broken Circle Artifact", known_item_properties(20, 1)},
 	{"Exotic Coinage", known_item_properties(20, 1)},
 	{"Order Artifact", known_item_properties(20, 1)},
 	{"Sun Artifact", known_item_properties(20, 1)},
+	// 0.5.0
+	{"Verisium",             known_item_properties(1000, 13)},
+	{"Liquid Verisium",      known_item_properties(1000,  1)}, // 0.5.4
+	{"Exceptional Verisium", known_item_properties(  50, 65)},
+	{"Medved's Crest of the Circle",  known_item_properties(10, 13)},
+	{"Vorana's Crest of the Scythe",  known_item_properties(10, 23)},
+	{"Uhtred's Crest of the Chalice", known_item_properties(10, 38)},
+	{"Olroth's Crest of the Sun",     known_item_properties(10, 65)},
+	{"Shattered Triskelion",  known_item_properties(1, 1, 2, 2)}, // note: "The Triskelion Reforged" is a map fragment
+	{"Starlit Ore",           known_item_properties(1, 1, 2, 2)},
+	{"Revered Starlit Ore",   known_item_properties(1, 1, 2, 4)},
+	{"Venerable Starlit Ore", known_item_properties(1, 1, 2, 3)},
+	{"Veridical Starlit Ore", known_item_properties(1, 1, 1, 1)},
+	{"Warding Starlit Ore",   known_item_properties(1, 1, 2, 4)},
+	// 0.5.0
+	{"Crackling Flux", known_item_properties(10, 65)},
+	{"Blazing Flux",   known_item_properties(10, 65)},
+	{"Void Flux",      known_item_properties(10, 65)},
+	{"Chilling Flux",  known_item_properties(10, 65)},
+	{"Perfect Flux",   known_item_properties(10, 75)},
+	// 0.5.0
+	{"Runic Alloy",            known_item_properties(10, 13)},
+	{"Adaptive Alloy",         known_item_properties(10, 23)},
+	{"Expansive Alloy",        known_item_properties(10, 23)},
+	{"Protective Alloy",       known_item_properties(10, 23)},
+	{"Cyclonic Alloy",         known_item_properties(10, 45)},
+	{"Mystic Alloy",           known_item_properties(10, 45)},
+	{"Prismatic Alloy",        known_item_properties(10, 45)},
+	{"Swift Alloy",            known_item_properties(10, 45)},
+	{"Celestial Alloy",        known_item_properties(10, 65)},
+	{"Sovereign Alloy",        known_item_properties(10, 65)},
+	{"The Runebinder's Alloy", known_item_properties(10, 65)},
+	{"The Runefather's Alloy", known_item_properties(10, 65)},
+	{"Transcendent Alloy",     known_item_properties(10, 65)},
+	// 0.5.0
+	// low-level ones may not drop due to Verisium Remnant restrictions (lowest level found is 8)
+	{"Thaumaturgic Flux (Level 1)",  known_item_properties(20,  1)},
+	{"Thaumaturgic Flux (Level 2)",  known_item_properties(20,  4)},
+	{"Thaumaturgic Flux (Level 3)",  known_item_properties(20,  7)},
+	{"Thaumaturgic Flux (Level 4)",  known_item_properties(20, 11)},
+	{"Thaumaturgic Flux (Level 5)",  known_item_properties(20, 15)},
+	{"Thaumaturgic Flux (Level 6)",  known_item_properties(20, 19)},
+	{"Thaumaturgic Flux (Level 7)",  known_item_properties(20, 23)},
+	{"Thaumaturgic Flux (Level 8)",  known_item_properties(20, 27)},
+	{"Thaumaturgic Flux (Level 9)",  known_item_properties(20, 32)},
+	{"Thaumaturgic Flux (Level 10)", known_item_properties(20, 37)},
+	{"Thaumaturgic Flux (Level 11)", known_item_properties(20, 42)},
+	{"Thaumaturgic Flux (Level 12)", known_item_properties(20, 47)},
+	{"Thaumaturgic Flux (Level 13)", known_item_properties(20, 53)},
+	{"Thaumaturgic Flux (Level 14)", known_item_properties(20, 59)},
+	{"Thaumaturgic Flux (Level 15)", known_item_properties(20, 62)},
+	{"Thaumaturgic Flux (Level 16)", known_item_properties(20, 62)},
+	{"Thaumaturgic Flux (Level 17)", known_item_properties(20, 62)},
+	{"Thaumaturgic Flux (Level 18)", known_item_properties(20, 62)},
+	{"Thaumaturgic Flux (Level 19)", known_item_properties(20, 62)},
+	{"Thaumaturgic Flux (Level 20)", known_item_properties(20, 62)},
 };
 
 inline const std::initializer_list<known_item> currency_vaal = { // 0.4.0
-	// drop level not known at the time of writing
 	{"Architect's Orb",         known_item_properties(10, 1)},
 	{"Crystallised Corruption", known_item_properties(10, 1)},
 	{"Vaal Cultivation Orb",    known_item_properties(10, 1)},
 	{"Ancient Infuser",         known_item_properties(10, 1)},
 	{"Orb of Extraction",       known_item_properties(10, 1)},
 	{"Core Destabiliser",       known_item_properties(10, 1)},
-	{"Vaal Infuser",            known_item_properties(10, 1)}
+	// 0.5.0
+	{"Vaal Catalysing Infuser",   known_item_properties(10, 1)},
+	{"Vaal Armourer's Infuser",   known_item_properties(10, 1)},
+	{"Vaal Blacksmith's Infuser", known_item_properties(10, 1)},
+	{"Vaal Arcanist's Infuser",   known_item_properties(10, 1)},
 };
+
+// all have max Drop Level of 31, core drop pool
+inline const std::initializer_list<known_item> augments_runes_lesser = {
+	{"Lesser Adept Rune",       known_item_properties(10,  5)},
+	{"Lesser Desert Rune",      known_item_properties(10,  5)},
+	{"Lesser Glacial Rune",     known_item_properties(10,  5)},
+	{"Lesser Iron Rune",        known_item_properties(10,  5)},
+	{"Lesser Resolve Rune",     known_item_properties(10,  5)},
+	{"Lesser Robust Rune",      known_item_properties(10,  5)},
+	{"Lesser Storm Rune",       known_item_properties(10,  5)},
+	{"Lesser Body Rune",        known_item_properties(10, 11)},
+	{"Lesser Mind Rune",        known_item_properties(10, 11)},
+	{"Lesser Stone Rune",       known_item_properties(10, 16)},
+	{"Lesser Vision Rune",      known_item_properties(10, 16)},
+	{"Lesser Inspiration Rune", known_item_properties(10, 21)},
+	{"Lesser Rebirth Rune",     known_item_properties(10, 21)},
+};
+
+// all have max Drop Level of 52, core drop pool
+inline const std::initializer_list<known_item> augments_runes_regular = {
+	{"Adept Rune",       known_item_properties(10, 31)},
+	{"Desert Rune",      known_item_properties(10, 31)},
+	{"Glacial Rune",     known_item_properties(10, 31)},
+	{"Iron Rune",        known_item_properties(10, 31)},
+	{"Resolve Rune",     known_item_properties(10, 31)},
+	{"Robust Rune",      known_item_properties(10, 31)},
+	{"Storm Rune",       known_item_properties(10, 31)},
+	{"Body Rune",        known_item_properties(10, 37)},
+	{"Mind Rune",        known_item_properties(10, 37)},
+	{"Stone Rune",       known_item_properties(10, 41)},
+	{"Vision Rune",      known_item_properties(10, 41)},
+	{"Inspiration Rune", known_item_properties(10, 45)},
+	{"Rebirth Rune",     known_item_properties(10, 45)},
+};
+
+// core drop pool
+inline const std::initializer_list<known_item> augments_runes_greater = {
+	{"Greater Adept Rune",       known_item_properties(10, 52)},
+	{"Greater Desert Rune",      known_item_properties(10, 52)},
+	{"Greater Glacial Rune",     known_item_properties(10, 52)},
+	{"Greater Iron Rune",        known_item_properties(10, 52)},
+	{"Greater Resolve Rune",     known_item_properties(10, 52)},
+	{"Greater Robust Rune",      known_item_properties(10, 52)},
+	{"Greater Storm Rune",       known_item_properties(10, 52)},
+	{"Greater Body Rune",        known_item_properties(10, 57)},
+	{"Greater Mind Rune",        known_item_properties(10, 57)},
+	{"Greater Stone Rune",       known_item_properties(10, 59)},
+	{"Greater Vision Rune",      known_item_properties(10, 59)},
+	{"Greater Inspiration Rune", known_item_properties(10, 62)},
+	{"Greater Rebirth Rune",     known_item_properties(10, 62)},
+};
+
+// not dropping, only through Masterwork Rune
+inline const std::initializer_list<known_item> augments_runes_perfect = {
+	{"Perfect Adept Rune",       known_item_properties(10, 65)},
+	{"Perfect Desert Rune",      known_item_properties(10, 65)},
+	{"Perfect Glacial Rune",     known_item_properties(10, 65)},
+	{"Perfect Iron Rune",        known_item_properties(10, 65)},
+	{"Perfect Resolve Rune",     known_item_properties(10, 65)},
+	{"Perfect Robust Rune",      known_item_properties(10, 65)},
+	{"Perfect Storm Rune",       known_item_properties(10, 65)},
+	{"Perfect Body Rune",        known_item_properties(10, 65)},
+	{"Perfect Mind Rune",        known_item_properties(10, 65)},
+	{"Perfect Stone Rune",       known_item_properties(10, 65)},
+	{"Perfect Vision Rune",      known_item_properties(10, 65)},
+	{"Perfect Inspiration Rune", known_item_properties(10, 65)},
+	{"Perfect Rebirth Rune",     known_item_properties(10, 65)},
+};
+
+// core drop pool
+inline const std::initializer_list<known_item> augments_runes_endgame = {
+	{"Countess Seske's Rune of Archery",     known_item_properties(10, 65)},
+	{"Courtesan Mannan's Rune of Cruelty",   known_item_properties(10, 65)},
+	{"Craiceann's Rune of Recovery",         known_item_properties(10, 65)},
+	{"Craiceann's Rune of Warding",          known_item_properties(10, 65)},
+	{"Farrul's Rune of Grace",               known_item_properties(10, 65)},
+	{"Farrul's Rune of the Chase",           known_item_properties(10, 65)},
+	{"Farrul's Rune of the Hunt",            known_item_properties(10, 65)},
+	{"Fenumus' Rune of Agony",               known_item_properties(10, 65)},
+	{"Fenumus' Rune of Draining",            known_item_properties(10, 65)},
+	{"Fenumus' Rune of Spinning",            known_item_properties(10, 65)},
+	{"Hedgewitch Assandra's Rune of Wisdom", known_item_properties(10, 65)},
+	{"Lady Hestra's Rune of Winter",         known_item_properties(10, 65)},
+	{"Saqawal's Rune of Erosion",            known_item_properties(10, 65)},
+	{"Saqawal's Rune of Memory",             known_item_properties(10, 65)},
+	{"Saqawal's Rune of the Sky",            known_item_properties(10, 65)},
+	{"Thane Girt's Rune of Wildness",        known_item_properties(10, 65)},
+	{"Thane Grannell's Rune of Mastery",     known_item_properties(10, 65)},
+	{"Thane Leld's Rune of Spring",          known_item_properties(10, 65)},
+	{"Thane Myrk's Rune of Summer",          known_item_properties(10, 65)},
+	{"The Greatwolf's Rune of Claws",        known_item_properties(10, 65)},
+	{"The Greatwolf's Rune of Willpower",    known_item_properties(10, 65)},
+};
+
+// only from The Ezomyte Megaliths
+inline const std::initializer_list<known_item> augments_runes_ezomyte_megaliths = {
+	{"Greater Rune of Alacrity",   known_item_properties(10, 65)},
+	{"Greater Rune of Leadership", known_item_properties(10, 65)},
+	{"Greater Rune of Nobility",   known_item_properties(10, 65)},
+	{"Greater Rune of Tithing",    known_item_properties(10, 65)},
+};
+
+// only from Verisium Remnant encounters
+inline const std::initializer_list<known_item> augments_runes_ward = {
+	{"Lesser Ward Rune",               known_item_properties(10,  5)},
+	{"Lesser Charging Rune",           known_item_properties(10,  5)},
+	{"Warding Rune of Reinforcement",  known_item_properties(10, 15)},
+	{"Warding Rune of Nourishment",    known_item_properties(10, 15)},
+	{"Warding Rune of Protection",     known_item_properties(10, 15)},
+	{"Warding Rune of Disintegration", known_item_properties(10, 15)},
+	{"Warding Rune of Desperation",    known_item_properties(10, 15)},
+	{"Warding Rune of Courage",        known_item_properties(10, 15)},
+	{"Warding Rune of Stability",      known_item_properties(10, 30)},
+	{"Warding Rune of Glancing",       known_item_properties(10, 30)},
+	{"Warding Rune of Heart",          known_item_properties(10, 30)},
+	{"Warding Rune of Annihilation",   known_item_properties(10, 30)},
+	{"Warding Rune of Salvaging",      known_item_properties(10, 30)},
+	{"Warding Rune of Symbiosis",      known_item_properties(10, 30)},
+	{"Ward Rune",                      known_item_properties(10, 31)},
+	{"Charging Rune",                  known_item_properties(10, 31)},
+	{"Warding Rune of Armature",       known_item_properties(10, 45)},
+	{"Warding Rune of Obsession",      known_item_properties(10, 45)},
+	{"Warding Rune of Equinox",        known_item_properties(10, 45)},
+	{"Warding Rune of Bodyguards",     known_item_properties(10, 45)},
+	{"Warding Rune of Hollowing",      known_item_properties(10, 45)},
+	{"Greater Ward Rune",              known_item_properties(10, 52)},
+	{"Greater Charging Rune",          known_item_properties(10, 52)},
+};
+
+// only from Verisium Remnant encounters
+inline const std::initializer_list<known_item> augments_runes_ancient = {
+	{"Ancient Rune of Animosity",   known_item_properties(10, 12)},
+	{"Ancient Rune of Control",     known_item_properties(10, 12)},
+	{"Ancient Rune of Decay",       known_item_properties(10, 12)},
+	{"Ancient Rune of Detonation",  known_item_properties(10, 12)},
+	{"Ancient Rune of Discovery",   known_item_properties(10, 12)},
+	{"Ancient Rune of Dueling",     known_item_properties(10, 12)},
+	{"Ancient Rune of Prowess",     known_item_properties(10, 12)},
+	{"Ancient Rune of Retaliation", known_item_properties(10, 12)},
+	{"Ancient Rune of Shattering",  known_item_properties(10, 12)},
+	{"Ancient Rune of Splinters",   known_item_properties(10, 12)},
+	{"Ancient Rune of the Horde",   known_item_properties(10, 12)},
+	{"Ancient Rune of the Titan",   known_item_properties(10, 12)},
+	{"Ancient Rune of Witchcraft",  known_item_properties(10, 12)},
+	{"Rune of Accumulation",        known_item_properties(10, 15)},
+	{"Rune of Acrobatics",          known_item_properties(10, 15)},
+	{"Rune of Confrontation",       known_item_properties(10, 15)},
+	{"Rune of Consistency",         known_item_properties(10, 15)},
+	{"Rune of Culmination",         known_item_properties(10, 15)},
+	{"Rune of Foundations",         known_item_properties(10, 15)},
+	{"Rune of Reach",               known_item_properties(10, 15)},
+	{"Rune of Renown",              known_item_properties(10, 15)},
+	{"Rune of the Blossom",         known_item_properties(10, 15)},
+	{"Rune of the Hunt",            known_item_properties(10, 15)},
+	{"Rune of the Prism",           known_item_properties(10, 15)},
+	{"Rune of Vital Flame",         known_item_properties(10, 15)},
+	{"Rune of Vitality",            known_item_properties(10, 15)},
+};
+
+// only from Verisium Remnant encounters
+inline const std::initializer_list<known_item> augments_runes_metacraft = {
+	{"Masterwork Rune",     known_item_properties(10, 37)},
+	{"Betrayal of Aldur",   known_item_properties(10, 65)},
+	{"Breath of Aldur",     known_item_properties(10, 65)},
+	{"Passion of Aldur",    known_item_properties(10, 65)},
+	{"Ire of Aldur",        known_item_properties(10, 65)},
+	{"Astrid's Creativity", known_item_properties(10, 65)},
+	{"Serle's Triumph",     known_item_properties(10, 65)},
+	{"Vorana's Carnage",    known_item_properties(10, 65)},
+	{"Cadigan's Epiphany",  known_item_properties(10, 65)},
+	{"Katla's Gloom",       known_item_properties(10, 65)},
+	{"Thrud's Might",       known_item_properties(10, 65)},
+	{"Kolr's Hunt",         known_item_properties(10, 65)},
+	{"Aldur's Legacy",      known_item_properties(10, 65)},
+	{"Medved's Tending",    known_item_properties(10, 65)},
+	{"Uhtred's Sidereus",   known_item_properties(10, 65)},
+};
+
+// The Aberration boss drops
+inline const std::initializer_list<known_item> augments_runes_aberration = {
+	{"Emergent Instinct",    known_item_properties(1, 65)},
+	{"Emergent Possibility", known_item_properties(1, 65)},
+	{"Emergent Protection",  known_item_properties(1, 65)},
+	{"Emergent Vigour",      known_item_properties(1, 65)},
+};
+
+inline const std::initializer_list<known_item> augments_abyss = {
+	{"Ulaman's Gaze",  known_item_properties(1, 65)},
+	{"Kurgal's Gaze",  known_item_properties(1, 65)},
+	{"Tecrod's Gaze",  known_item_properties(1, 65)},
+	{"Amanamu's Gaze", known_item_properties(1, 65)}
+};
+
+inline const std::initializer_list<known_item> augments_soul_cores_regular = {
+	{"Soul Core of Atmohua",     known_item_properties(10, 35)},
+	{"Soul Core of Azcapa",      known_item_properties(10, 35)},
+	{"Soul Core of Cholotl",     known_item_properties(10, 35)},
+	{"Soul Core of Citaqualotl", known_item_properties(10, 35)},
+	{"Soul Core of Jiquani",     known_item_properties(10, 35)},
+	{"Soul Core of Opiloti",     known_item_properties(10, 35)},
+	{"Soul Core of Puhuarte",    known_item_properties(10, 35)},
+	{"Soul Core of Quipolatl",   known_item_properties(10, 35)},
+	{"Soul Core of Tacati",      known_item_properties(10, 35)},
+	{"Soul Core of Ticaba",      known_item_properties(10, 35)},
+	{"Soul Core of Topotante",   known_item_properties(10, 35)},
+	{"Soul Core of Tzamoto",     known_item_properties(10, 35)},
+	{"Soul Core of Xopec",       known_item_properties(10, 35)},
+	{"Soul Core of Zalatl",      known_item_properties(10, 35)},
+	{"Soul Core of Zantipi",     known_item_properties(10, 35)},
+};
+
+inline const std::initializer_list<known_item> augments_soul_cores_endgame = {
+	{"Atmohua's Soul Core of Retreat",         known_item_properties(10, 65)},
+	{"Cholotl's Soul Core of War",             known_item_properties(10, 65)},
+	{"Citaqualotl's Soul Core of Foulness",    known_item_properties(10, 65)},
+	{"Estazunti's Soul Core of Convalescence", known_item_properties(10, 65)},
+	{"Guatelitzi's Soul Core of Endurance",    known_item_properties(10, 65)},
+	{"Hayoxi's Soul Core of Heatproofing",     known_item_properties(10, 65)},
+	{"Opiloti's Soul Core of Assault",         known_item_properties(10, 65)},
+	{"Quipolatl's Soul Core of Flow",          known_item_properties(10, 65)},
+	{"Tacati's Soul Core of Affliction",       known_item_properties(10, 65)},
+	{"Topotante's Soul Core of Dampening",     known_item_properties(10, 65)},
+	{"Tzamoto's Soul Core of Ferocity",        known_item_properties(10, 65)},
+	{"Uromoti's Soul Core of Attenuation",     known_item_properties(10, 65)},
+	{"Xipocado's Soul Core of Dominion",       known_item_properties(10, 65)},
+	{"Xopec's Soul Core of Power",             known_item_properties(10, 65)},
+	{"Zalatl's Soul Core of Insulation",       known_item_properties(10, 65)},
+};
+
+inline const std::initializer_list<known_item> augments_soul_cores_ancient = {
+	{"Citaqualotl's Thesis", known_item_properties(1, 65)},
+	{"Guatelitzi's Thesis",  known_item_properties(1, 65)},
+	{"Jiquani's Thesis",     known_item_properties(1, 65)},
+	{"Quipolatl's Thesis",   known_item_properties(1, 65)},
+};
+
+inline const std::initializer_list<known_item> augments_idols_regular = {
+	{"Bear Idol",    known_item_properties(10, 35)},
+	{"Boar Idol",    known_item_properties(10, 35)},
+	{"Cat Idol",     known_item_properties(10, 35)},
+	{"Owl Idol",     known_item_properties(10, 35)},
+	{"Ox Idol",      known_item_properties(10, 35)},
+	{"Primate Idol", known_item_properties(10, 35)},
+	{"Snake Idol",   known_item_properties(10, 35)},
+	{"Stag Idol",    known_item_properties(10, 35)},
+	{"Wolf Idol",    known_item_properties(10, 35)},
+	{"Fox Idol",     known_item_properties(10, 65)},
+	{"Rabbit Idol",  known_item_properties(10, 65)},
+};
+
+inline const std::initializer_list<known_item> augments_idols_endgame = {
+	{"Hawk Idol",             known_item_properties(10, 65)},
+	{"Idol of Alira",         known_item_properties(10, 65)},
+	{"Idol Eeshta",           known_item_properties(10, 65)},
+	{"Idol of Egrin",         known_item_properties(10, 65)},
+	{"Idol of Eramir",        known_item_properties(10, 65)},
+	{"Idol of Greust",        known_item_properties(10, 65)},
+	{"Idol of Grold",         known_item_properties(10, 65)},
+	{"Idol of Kraityn",       known_item_properties(10, 65)},
+	{"Idol of Maxarius",      known_item_properties(10, 65)},
+	{"Idol of Oak",           known_item_properties(10, 65)},
+	{"Idol of Ralakesh",      known_item_properties(10, 65)},
+	{"Idol of Silk",          known_item_properties(10, 65)},
+	{"Idol of Sirrius",       known_item_properties(10, 65)},
+	{"Idol of the Martyr",    known_item_properties(10, 65)},
+	{"Idol of the Pharisee",  known_item_properties(10, 65)},
+	{"Idol of the Sycophant", known_item_properties(10, 65)},
+	{"Idol of Thruldana",     known_item_properties(10, 65)},
+	{"Idol of Yeena",         known_item_properties(10, 65)},
+	{"Panther Idol",          known_item_properties(10, 65)},
+	{"Stoat Idol",            known_item_properties(10, 65)},
+};
+
+inline const std::initializer_list<known_item> augments_idols_ritual = {
+	{"Carved Cunning",  known_item_properties(1, 65)},
+	{"Carved Majesty",  known_item_properties(1, 65)},
+	{"Carved Mischief", known_item_properties(1, 65)},
+	{"Carved Tenacity", known_item_properties(1, 65)},
+};
+
+inline const std::initializer_list<known_item> augments_other = {
+	{"Raven-Touched Shard", known_item_properties(10, 65)}, // 0.5.0, drops from The Raven Trickster
+};
+
+inline const std::initializer_list<known_item> omens_legacy = {
+	{"Omen of Corruption",              known_item_properties(10,  1)}, // 0.1 - 0.5
+	{"Omen of Dextral Alchemy",         known_item_properties(10,  1)}, // 0.1 - 0.3
+	{"Omen of Dextral Coronation",      known_item_properties(10,  1)}, // 0.1 - 0.3
+	{"Omen of Sinistral Alchemy",       known_item_properties(10,  1)}, // 0.1 - 0.3
+	{"Omen of Sinistral Coronation",    known_item_properties(10,  1)}, // 0.1 - 0.3
+	{"Omen of Greater Annulment",       known_item_properties(10, 75)}, // 0.1 - 0.3
+	{"Omen of Homogenising Coronation", known_item_properties(10, 75)}, // 0.3 - 0.4
+	{"Omen of Homogenising Exaltation", known_item_properties(10, 75)}, // 0.3 - 0.4
+	// {"Omen of Recombination",           known_item_properties(10, 75)}, // 0.3 - 0.5 (deleted)
+};
+
+inline const std::initializer_list<known_item> omens_crafting = {
+	{"Omen of Chaotic Rarity",            known_item_properties(10,  1)}, // 0.3
+	{"Omen of Chaotic Monsters",          known_item_properties(10,  1)}, // 0.3
+	{"Omen of Chaotic Quantity",          known_item_properties(10,  1)}, // 0.3
+	{"Omen of Chaotic Effectiveness",     known_item_properties(10,  1)}, // 0.5
+	{"Omen of Sinistral Exaltation",      known_item_properties(10,  1)},
+	{"Omen of Dextral Exaltation",        known_item_properties(10,  1)},
+	{"Omen of Greater Exaltation",        known_item_properties(10,  1)},
+	{"Omen of the Ancients",              known_item_properties(10,  1)},
+	{"Omen of Whittling",                 known_item_properties(10, 75)},
+	{"Omen of Catalysing Exaltation",     known_item_properties(10, 75)},
+	{"Omen of Chance",                    known_item_properties(10, 75)},
+	{"Omen of Sinistral Crystallisation", known_item_properties(10, 75)},
+	{"Omen of Dextral Crystallisation",   known_item_properties(10, 75)},
+	{"Omen of Sinistral Erasure",         known_item_properties(10, 79)},
+	{"Omen of Dextral Erasure",           known_item_properties(10, 79)},
+	{"Omen of Sanctification",            known_item_properties(10, 79)},
+	{"Omen of the Blessed",               known_item_properties(10, 79)},
+	{"Omen of Sinistral Annulment",       known_item_properties(10, 79)},
+	{"Omen of Dextral Annulment",         known_item_properties(10, 79)},
+};
+
+inline const std::initializer_list<known_item> omens_non_crafting = {
+	{"Omen of Amelioration",        known_item_properties(10, 1)},
+	{"Omen of Answered Prayers",    known_item_properties(10, 1)},
+	{"Omen of Bartering",           known_item_properties(10, 1)},
+	{"Omen of Gambling",            known_item_properties(10, 1)},
+	{"Omen of Refreshment",         known_item_properties(10, 1)},
+	{"Omen of Reinforcements",      known_item_properties(10, 1)},
+	{"Omen of Resurgence",          known_item_properties(10, 1)},
+	{"Omen of Secret Compartments", known_item_properties(10, 1)},
+	{"Omen of the Hunt",            known_item_properties(10, 1)},
+};
+
+inline const std::initializer_list<known_item> omens_abyss = { // 0.3
+	{"Omen of Abyssal Echoes",       known_item_properties(10, 1)},
+	{"Omen of Dextral Necromancy",   known_item_properties(10, 1)},
+	{"Omen of Light",                known_item_properties(10, 1)},
+	{"Omen of Putrefaction",         known_item_properties(10, 1)},
+	{"Omen of Sinistral Necromancy", known_item_properties(10, 1)},
+	{"Omen of the Blackblooded",     known_item_properties(10, 1)},
+	{"Omen of the Liege",            known_item_properties(10, 1)},
+	{"Omen of the Sovereign",        known_item_properties(10, 1)},
+};
+
+inline const std::initializer_list<known_item> omens_expedition = { // 0.5
+	{"Aldur's Saga",  known_item_properties(10, 78)},
+	{"Medved's Saga", known_item_properties(10, 78)},
+	{"Vorana's Saga", known_item_properties(10, 78)},
+	{"Uhtred's Saga", known_item_properties(10, 78)},
+	{"Olroth's Saga", known_item_properties(10, 78)},
+};
+
+// Aldur's Legacy runes
+// (not listed, only obtainable through Aldur's Legacy rune crafting)
 
 inline const std::initializer_list<known_item> incubators = { // 0.4.0
 	{"Vaal Siphoner", known_item_properties(10, 1)}
+};
+
+inline const std::initializer_list<known_item> map_fragments = {
+	// 0.1.0
+	{"Cowardly Fate",             known_item_properties(1,  1)},
+	{"Deadly Fate",               known_item_properties(1,  1)},
+	{"Victorious Fate",           known_item_properties(1,  1)},
+	{"Simulacrum",                known_item_properties(1, 75)},
+	{"An Audience with the King", known_item_properties(1,  1)},
+	// 0.3.0
+	{"Kulemak's Invitation",    known_item_properties(1, 1)},
+	// 0.3.0 until 0.4.0 (removed from the game)
+	// {"Idol of Estazunti",      known_item_properties(1, 1)},
+	// 0.5.0
+	{"The Triskelion Reforged", known_item_properties(1, 1)},
+	{"Head of the King",        known_item_properties(1, 1)},
+	{"Breachlord Sac",          known_item_properties(1, 1)},
+	{"Raven's Reflection",      known_item_properties(1, 1)},
+};
+
+inline const std::initializer_list<known_item> pinnacle_keys = {
+	// 0.1.0
+	{"Ancient Crisis Fragment",   known_item_properties(1, 1)},
+	{"Faded Crisis Fragment",     known_item_properties(1, 1)},
+	{"Weathered Crisis Fragment", known_item_properties(1, 1)},
+	// 0.3.0 until 0.5.0 (now Uber Arbiter of Ash is legacy)
+	{"Primary Calamity Fragment",   known_item_properties(1, 1)},
+	{"Secondary Calamity Fragment", known_item_properties(1, 1)},
+	{"Tertiary Calamity Fragment",  known_item_properties(1, 1)},
+	// 0.5.0
+	{"Origin Spark",        known_item_properties(1, 1)},
+	{"Origin Cradle",       known_item_properties(1, 1)},
+	{"Origin Core",         known_item_properties(1, 1)},
+	{"Call of the Shadows", known_item_properties(1, 1)},
+};
+
+inline const std::initializer_list<known_item> reliquary_keys = {
+	{"Azmeri Reliquary Key",                         known_item_properties(1, 35)},
+	{"Xesht's Reliquary Key",                        known_item_properties(1, 35)},
+	{"Tangmazu's Reliquary Key",                     known_item_properties(1, 35)},
+	{"Olroth's Reliquary Key",                       known_item_properties(1, 35)},
+	{"The Arbiter's Reliquary Key",                  known_item_properties(1, 35)},
+	{"Ritualistic Reliquary Key",                    known_item_properties(1, 35)},
+	{"Zarokh's Reliquary Key: Against the Darkness", known_item_properties(1, 35)},
+	{"Zarokh's Reliquary Key: Sandstorm Visage",     known_item_properties(1, 35)},
+	{"Zarokh's Reliquary Key: Sekhema's Resolve",    known_item_properties(1, 35)},
+	{"Zarokh's Reliquary Key: Temporalis",           known_item_properties(1, 35)},
+	{"The Trialmaster's Reliquary Key",              known_item_properties(1, 35)},
+	{"Twilight Reliquary Key",                       known_item_properties(1, 65)},
+};
+
+// specially classed items
+
+// Class == "Breachstone" BaseType == "Breachstone"
+inline const std::initializer_list<known_item> breachstones = {
+	{"Breachstone", known_item_properties(1, 1)},
+};
+
+// Class == "Expedition Logbook" BaseType == "Expedition Logbook"
+inline const std::initializer_list<known_item> logbooks = {
+	{"Expedition Logbook", known_item_properties(10, 1)},
 };
 
 inline const auto known_items = known_items_store::create(
@@ -1010,7 +1512,35 @@ inline const auto known_items = known_items_store::create(
 	currency_emotions,
 	currency_expedition,
 	currency_vaal,
-	incubators
+	augments_runes_lesser,
+	augments_runes_regular,
+	augments_runes_greater,
+	augments_runes_perfect,
+	augments_runes_endgame,
+	augments_runes_ezomyte_megaliths,
+	augments_runes_ward,
+	augments_runes_ancient,
+	augments_runes_metacraft,
+	augments_runes_aberration,
+	augments_abyss,
+	augments_soul_cores_regular,
+	augments_soul_cores_endgame,
+	augments_soul_cores_ancient,
+	augments_idols_regular,
+	augments_idols_endgame,
+	augments_idols_ritual,
+	augments_other,
+	omens_legacy,
+	omens_crafting,
+	omens_non_crafting,
+	omens_abyss,
+	omens_expedition,
+	incubators,
+	map_fragments,
+	pinnacle_keys,
+	reliquary_keys,
+	breachstones,
+	logbooks
 );
 
 } // namespace poe2
