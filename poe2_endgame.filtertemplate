@@ -1059,6 +1059,7 @@ Rarity Unique
 	# "Body Armours" - "Ancient Mail" - "Decree of Loyalty" (trash)
 	# "Body Armours" - "Primal Markings" - "Forgotten Warden" (20ex)
 	# "Amulet" - "Veridical Chain" - "Eventide Petals" (15ex) (runeforging only)
+	# "Rings" - "Abyssal Signet" - "Grip of Kulemak" (usually trash)
 
 	# other
 	# "Rings" - "Two-Stone Ring" (has 3 Berek uniques, unique-only base)
@@ -1211,7 +1212,6 @@ Rarity <= Rare
 	}
 }
 
-# TODO any use for "Abyssal Signet" base?
 Class "Rings" "Amulets" "Belts"
 Rarity Rare
 {
@@ -1317,9 +1317,9 @@ UnidentifiedItemTier >= $cfg_show_rare_unid_tier_min
 }
 
 # Hide remaining low-value gear
-# TODO potentially missing: Trap, Claw
+# note: "Trap" and "Claw" are already accepted even though not in game
 Rarity <= Rare
-Class "Flask" "Body" "Helmet" "Boots" "Gloves" "Shields" "Buckler" "Quiver" "Axe" "Mace" "Sword" "Staff" "Dagger" "Flail" "Quarter" "Spear" "Bow" "Crossbow" "Wand" "Sceptre" "Ring" "Belt" "Amulet" "Focus" "Talisman"
+Class "Flask" "Body" "Helmet" "Boots" "Gloves" "Shields" "Buckler" "Quiver" "Axe" "Mace" "Sword" "Staff" "Dagger" "Flail" "Quarter" "Spear" "Bow" "Crossbow" "Wand" "Sceptre" "Ring" "Belt" "Amulet" "Focus" "Talisman" "Trap" "Claw"
 AreaLevel >= 65
 {
 	Hide
