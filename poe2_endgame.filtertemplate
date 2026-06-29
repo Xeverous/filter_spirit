@@ -125,13 +125,14 @@ $alert_gem_high            = $alert_high
 $alert_gem_mid             = $alert_mid
 $alert_gem_low             = $alert_low
 $alert_chance              = $alert_common
-$alert_item_exceptional    = $alert_very_specific
+$alert_item_special_base   = $alert_very_specific
 
 $beam_currency        = Yellow
 $beam_gem             = Green
 $beam_essence         = Blue
 $beam_augment         = Purple
 $beam_omen            = Brown
+$beam_special_base    = Grey
 
 $icon_gold_high       = 0 Yellow Circle
 $icon_gold_mid        = 2 Yellow Circle
@@ -193,6 +194,78 @@ $actions_currency_low_shards = {
 	SetBackgroundColor $color_black
 	SetFontSize $font_currency_very_low
 	SetAlertSound $alert_currency_very_low
+}
+
+$actions_augments_high = {
+	SetTextColor $color_white
+	SetBorderColor $color_augment_high
+	SetBackgroundColor $color_augment_high
+	SetFontSize $font_augment_high
+	SetAlertSound $alert_augment_high
+	PlayEffect $beam_augment
+	MinimapIcon $icon_augment_high
+}
+
+$actions_augments_mid = {
+	SetTextColor $color_black
+	SetBorderColor $color_augment_mid
+	SetBackgroundColor $color_augment_mid
+	SetFontSize $font_augment_mid
+	SetAlertSound $alert_augment_mid
+	PlayEffect $beam_augment
+	MinimapIcon $icon_augment_mid
+}
+
+$actions_augments_low = {
+	SetTextColor $color_black
+	SetBorderColor $color_augment_low
+	SetBackgroundColor $color_augment_low
+	SetFontSize $font_augment_low
+	SetAlertSound $alert_augment_low
+	MinimapIcon $icon_augment_low
+}
+
+$actions_augments_very_low = {
+	SetTextColor $color_augment_very_low
+	SetBackgroundColor $color_black
+	SetFontSize $font_augment_very_low
+}
+
+$actions_omens_high = {
+	SetTextColor $color_black
+	SetBorderColor $color_omen_high
+	SetBackgroundColor $color_omen_high
+	SetFontSize $font_omen_high
+	SetAlertSound $alert_omen_high
+	PlayEffect $beam_omen
+	MinimapIcon $icon_omen_high
+}
+
+$actions_omens_mid = {
+	SetTextColor $color_black
+	SetBorderColor $color_omen_mid
+	SetBackgroundColor $color_omen_mid
+	SetFontSize $font_omen_mid
+	SetAlertSound $alert_omen_mid
+	PlayEffect $beam_omen
+	MinimapIcon $icon_omen_mid
+}
+
+$actions_omens_low = {
+	SetTextColor $color_black
+	SetBorderColor $color_omen_low
+	SetBackgroundColor $color_omen_low
+	SetFontSize $font_omen_low
+	SetAlertSound $alert_omen_low
+	MinimapIcon $icon_omen_low
+}
+
+$actions_omens_very_low = {
+	SetTextColor $color_omen_very_low
+	SetBorderColor $color_omen_very_low
+	SetBackgroundColor $color_black
+	SetFontSize $font_omen_very_low
+	SetAlertSound $alert_omen_very_low
 }
 
 $actions_quest_items = {
@@ -337,12 +410,14 @@ Class == "Stackable Currency"
 	}
 
 	# Splinters etc
+	# Since 0.5.0 Petition Splinter and Runic Splinter are legacy and have no use
 	BaseType == "Simulacrum Splinter" "Breach Splinter" "Petition Splinter" "Runic Splinter"
 	{
 		Expand $actions_currency_low
 		ShowDiscard $cfg_always_show_splinters
 	}
 
+	# since 0.5.0 legacy items with no use
 	BaseType == "Broken Circle Artifact" "Black Scythe Artifact" "Order Artifact" "Sun Artifact" "Exotic Coinage"
 	{
 		Expand $actions_currency_low
@@ -386,23 +461,32 @@ Class == "Stackable Currency"
 	}
 
 	# Divine tier
-	BaseType == "Divine Orb" "Mirror of Kalandra" "Perfect Jeweller's Orb" "Concentrated Liquid Fear" "Concentrated Liquid Suffering" "Concentrated Liquid Isolation" "Hinekora's Lock" "Architect's Orb" "Crystallised Corruption"
+	BaseType == "Divine Orb" "Mirror of Kalandra" "Perfect Jeweller's Orb" "Concentrated Liquid Fear" "Concentrated Liquid Suffering" "Concentrated Liquid Isolation" "Hinekora's Lock" "Architect's Orb" "Crystallised Corruption" "Vaal Catalysing Infuser" "Ancient Potent Liquid Contempt" "Potent Liquid Ferocity" "Potent Liquid Contempt"
 	{
 		Expand $actions_currency_high
 		Show
 	}
 
 	# Chaos tier
-	BaseType == "Gemcutter's Prism" "Orb of Annulment" "Orb of Chance" "Glassblower's Bauble" "Vaal Orb" "Chaos Orb" "Greater Jeweller's Orb" "Artificer's Orb" "Greater Chaos Orb" "Perfect Chaos Orb" "Greater Exalted Orb" "Perfect Exalted Orb" "Fracturing Orb" "Vaal Cultivation Orb" "Ancient Infuser" "Orb of Extraction" "Core Destabiliser" "Vaal Armourer's Infuser" "Vaal Blacksmith's Infuser" "Vaal Arcanist's Infuser" "Vaal Catalysing Infuser" "Exceptional Verisium" "Liquid Verisium" "Kamasa's Orb of Sacrifice" "Kopec's Orb of Sacrifice" "Olroth's Crest of the Sun"
+	# note: Shattered Triskelion is a currency item but The Triskelion Reforged is a map fragment
+	# note: "Verisium" has very low value but drops in huge stacks
+	BaseType == "Gemcutter's Prism" "Orb of Annulment" "Orb of Chance" "Glassblower's Bauble" "Vaal Orb" "Chaos Orb" "Perfect Regal Orb" "Perfect Orb of Augmentation" "Greater Jeweller's Orb" "Artificer's Orb" "Greater Chaos Orb" "Perfect Chaos Orb" "Greater Exalted Orb" "Perfect Exalted Orb" "Fracturing Orb" "Vaal Cultivation Orb" "Ancient Infuser" "Orb of Extraction" "Core Destabiliser" "Vaal Armourer's Infuser" "Vaal Blacksmith's Infuser" "Vaal Arcanist's Infuser" "Verisium" "Exceptional Verisium" "Liquid Verisium" "Kamasa's Orb of Sacrifice" "Kopec's Orb of Sacrifice" "Olroth's Crest of the Sun" "Cryptic Key" "Concentrated Liquid Isolation" "Concentrated Liquid Suffering" "Shattered Triskelion"
 	{
 		Expand $actions_currency_mid
 		Show
 	}
 
 	# Exalt tier
-	BaseType == "Exalted Orb" "Chance Shard" "Orb of Alchemy" "Yugul's Orb of Sacrifice" "Yaomac's Orb of Sacrifice" "Medved's Crest of the Circle" "Vorana's Crest of the Scythe" "Uhtred's Crest of the Chalice"
+	BaseType == "Exalted Orb" "Chance Shard" "Orb of Alchemy" "Arcanist's Etcher" "Armourer's Scrap" "Perfect Orb of Transmutation" "Greater Orb of Augmentation" "Yugul's Orb of Sacrifice" "Yaomac's Orb of Sacrifice" "Medved's Crest of the Circle" "Vorana's Crest of the Scythe" "Uhtred's Crest of the Chalice"
 	{
 		Expand $actions_currency_low
+		Show
+	}
+
+	# Scrap tier
+	BaseType == "Blacksmith's Whetstone" "Regal Orb" "Orb of Augmentation" "Orb of Transmutation" "Lesser Jeweller's Orb" "Greater Orb of Transmutation" "Greater Regal Orb"
+	{
+		Expand $actions_currency_very_low
 		Show
 	}
 
@@ -462,17 +546,25 @@ Class == "Stackable Currency"
 		Show
 	}
 
-	# Scrap tier
-	BaseType == "Arcanist's Etcher" "Armourer's Scrap" "Blacksmith's Whetstone" "Regal Orb" "Orb of Augmentation" "Orb of Transmutation" "Lesser Jeweller's Orb" "Greater Orb of Transmutation" "Perfect Orb of Transmutation" "Greater Regal Orb" "Perfect Regal Orb" "Greater Orb of Augmentation" "Perfect Orb of Augmentation" "Verisium"
+	# Abyss crafting orbs - Divine tier
+	# "Preserved Vertebrae" is a legacy item since 0.4
+	BaseType == "Preserved Cranium" "Ancient Collarbone" "Altered Collarbone" "Ancient Rib" "Ancient Jawbone" "Preserved Vertebrae"
 	{
-		Expand $actions_currency_low
+		Expand $actions_currency_high
 		Show
 	}
 
-	# Abyss crafting orbs
-	BaseType == "Gnawed Jawbone" "Preserved Jawbone" "Ancient Jawbone" "Gnawed Rib" "Preserved Rib" "Ancient Rib" "Gnawed Collarbone" "Preserved Collarbone" "Ancient Collarbone" "Preserved Cranium" "Preserved Vertebrae" "Altered Collarbone"
+	# Abyss crafting orbs - Chaos tier
+	BaseType == "Preserved Jawbone" "Preserved Rib" "Preserved Collarbone"
 	{
 		Expand $actions_currency_mid
+		Show
+	}
+
+	# Abyss crafting orbs - Exalt tier
+	BaseType == "Gnawed Jawbone" "Gnawed Rib" "Gnawed Collarbone"
+	{
+		Expand $actions_currency_low
 		Show
 	}
 
@@ -484,13 +576,14 @@ Class == "Stackable Currency"
 	}
 
 	# Catalysts, Emotions - generic
+	# note: both fluxes are currency (resist swaps and skill gem upgrades)
 	BaseType "Catalyst" "Liquid" "Alloy" "Starlit Ore" "Flux"
 	{
 		Expand $actions_currency_mid
 		Show
 	}
 
-	BaseType == "Bronze Key" "Silver Key" "Gold Key" "Cryptic Key"
+	BaseType == "Bronze Key" "Silver Key" "Gold Key"
 	{
 		Expand $actions_quest_items
 		Show
@@ -510,50 +603,42 @@ Class == "Omen"
 	{
 		Price >= $cfg_omens_high_min_value
 		{
-			SetTextColor $color_black
-			SetBorderColor $color_omen_high
-			SetBackgroundColor $color_omen_high
-			SetFontSize $font_omen_high
-			SetAlertSound $alert_omen_high
-			PlayEffect $beam_omen
-			MinimapIcon $icon_omen_high
+			Expand $actions_omens_high
 			Show
 		}
 
 		Price < $cfg_omens_high_min_value
 		Price >= $cfg_omens_mid_min_value
 		{
-			SetTextColor $color_black
-			SetBorderColor $color_omen_mid
-			SetBackgroundColor $color_omen_mid
-			SetFontSize $font_omen_mid
-			SetAlertSound $alert_omen_mid
-			PlayEffect $beam_omen
-			MinimapIcon $icon_omen_mid
+			Expand $actions_omens_mid
 			ShowHide $cfg_show_omens_mid
 		}
 
 		Price < $cfg_omens_mid_min_value
 		Price >= $cfg_omens_low_min_value
 		{
-			SetTextColor $color_black
-			SetBorderColor $color_omen_low
-			SetBackgroundColor $color_omen_low
-			SetFontSize $font_omen_low
-			SetAlertSound $alert_omen_low
-			MinimapIcon $icon_omen_low
+			Expand $actions_omens_low
 			ShowHide $cfg_show_omens_low
 		}
 
 		Price < $cfg_omens_low_min_value
 		{
-			SetTextColor $color_omen_very_low
-			SetBorderColor $color_omen_very_low
-			SetBackgroundColor $color_black
-			SetFontSize $font_omen_very_low
-			SetAlertSound $alert_omen_very_low
+			Expand $actions_omens_very_low
 			ShowHide $cfg_show_omens_very_low
 		}
+	}
+
+	# known omens
+	BaseType == "Aldur's Saga" "Omen of Chance" "Omen of Sinistral Annulment" "Omen of Sinistral Erasure" "Omen of Light" "Omen of Whittling" "Omen of Dextral Annulment" "Omen of Dextral Erasure"
+	{
+		Expand $actions_omens_high
+		Show
+	}
+
+	BaseType == "Uhtred's Saga" "Omen of Sanctification" "Omen of Dextral Crystallisation" "Omen of Sinistral Crystallisation" "Omen of Abyssal Echoes"
+	{
+		Expand $actions_omens_mid
+		Show
 	}
 
 	# unknown price
@@ -572,6 +657,7 @@ Class == "Incubators"
 }
 
 # 0.5.0 breach
+# note: all Wombgifts have similar 1-20ex value, best is Lavish (for currency)
 Class == "Wombgifts"
 {
 	Expand $actions_currency_mid
@@ -585,53 +671,73 @@ Class == "Wombgifts"
 
 Class == "Augment"
 {
-	# ninja may still use the legacy name of Talismans, not Idols
 	Autogen "Runes" "Soul Cores" "Idols"
 	{
 		Price >= $cfg_augments_high_min_value
 		{
-			SetTextColor $color_white
-			SetBorderColor $color_augment_high
-			SetBackgroundColor $color_augment_high
-			SetFontSize $font_augment_high
-			SetAlertSound $alert_augment_high
-			PlayEffect $beam_augment
-			MinimapIcon $icon_augment_high
+			Expand $actions_augments_high
 			Show
 		}
 
 		Price < $cfg_augments_high_min_value
 		Price >= $cfg_augments_mid_min_value
 		{
-			SetTextColor $color_black
-			SetBorderColor $color_augment_mid
-			SetBackgroundColor $color_augment_mid
-			SetFontSize $font_augment_mid
-			SetAlertSound $alert_augment_mid
-			PlayEffect $beam_augment
-			MinimapIcon $icon_augment_mid
+			Expand $actions_augments_mid
 			ShowHide $cfg_show_augments_mid
 		}
 
 		Price < $cfg_augments_mid_min_value
 		Price >= $cfg_augments_low_min_value
 		{
-			SetTextColor $color_black
-			SetBorderColor $color_augment_low
-			SetBackgroundColor $color_augment_low
-			SetFontSize $font_augment_low
-			SetAlertSound $alert_augment_low
-			MinimapIcon $icon_augment_low
+			Expand $actions_augments_low
 			ShowHide $cfg_show_augments_low
 		}
 
 		Price < $cfg_augments_low_min_value
 		{
-			SetTextColor $color_augment_very_low
-			SetBackgroundColor $color_black
-			SetFontSize $font_augment_very_low
+			Expand $actions_augments_very_low
 			ShowHide $cfg_show_augments_very_low
 		}
+	}
+
+	# from Aldur's Legacy (not in drop pool)
+	BaseType "Legacy of"
+	{
+		Expand $actions_augments_high
+		Show
+	}
+
+	# known Runes
+	# Greater Rune of Leadership/Alacrity/Nobility/Tithing only from The Ezomyte Megaliths
+	BaseType == "Emergent Possibility" "Emergent Vigour" "Raven-Touched Shard" "Greater Rune of Leadership" "Greater Rune of Alacrity" "Serle's Triumph" "Astrid's Creativity" "Aldur's Legacy"
+	{
+		Expand $actions_augments_high
+		Show
+	}
+
+	BaseType == "Emergent Instinct" "Emergent Protection" "Greater Rune of Tithing" "Masterwork Rune" "Cadigan's Epiphany" "Uhtred's Sidereus" "Kolr's Hunt"
+	{
+		Expand $actions_augments_mid
+		Show
+	}
+
+	BaseType "Warding Rune of" "Ancient Rune of" "Passion of Aldur" "Breath of Aldur" "Ire of Aldur" "Betrayal of Aldur" "Greater Rune of Nobility"
+	{
+		Expand $actions_augments_low
+		Show
+	}
+
+	# known Idols
+	BaseType == "Carved Majesty" "Carved Cunning"
+	{
+		Expand $actions_augments_high
+		Show
+	}
+
+	BaseType == "Carved Tenacity" "Carved Mischief"
+	{
+		Expand $actions_augments_mid
+		Show
 	}
 
 	# Runes
@@ -641,17 +747,17 @@ Class == "Augment"
 		SetTextColor 0 0 0 255
 		PlayEffect Cyan Temp
 
-		BaseType == "Lesser Adept Rune" "Lesser Body Rune" "Lesser Desert Rune" "Lesser Glacial Rune" "Lesser Inspiration Rune" "Lesser Iron Rune" "Lesser Mind Rune" "Lesser Rebirth Rune" "Lesser Resolve Rune" "Lesser Robust Rune" "Lesser Stone Rune" "Lesser Storm Rune" "Lesser Vision Rune"
+		BaseType == "Lesser Adept Rune" "Lesser Body Rune" "Lesser Desert Rune" "Lesser Glacial Rune" "Lesser Inspiration Rune" "Lesser Iron Rune" "Lesser Mind Rune" "Lesser Rebirth Rune" "Lesser Resolve Rune" "Lesser Robust Rune" "Lesser Stone Rune" "Lesser Storm Rune" "Lesser Vision Rune" "Lesser Ward Rune" "Lesser Charging Rune"
 		{
 			ShowHide $cfg_show_runes_lesser
 		}
 
-		BaseType == "Adept Rune" "Body Rune" "Desert Rune" "Glacial Rune" "Inspiration Rune" "Iron Rune" "Mind Rune" "Rebirth Rune" "Resolve Rune" "Robust Rune" "Stone Rune" "Storm Rune" "Vision Rune"
+		BaseType == "Adept Rune" "Body Rune" "Desert Rune" "Glacial Rune" "Inspiration Rune" "Iron Rune" "Mind Rune" "Rebirth Rune" "Resolve Rune" "Robust Rune" "Stone Rune" "Storm Rune" "Vision Rune" "Ward Rune" "Charging Rune"
 		{
 			ShowHide $cfg_show_runes_regular
 		}
 
-		BaseType == "Greater Adept Rune" "Greater Body Rune" "Greater Desert Rune" "Greater Glacial Rune" "Greater Inspiration Rune" "Greater Iron Rune" "Greater Mind Rune" "Greater Rebirth Rune" "Greater Resolve Rune" "Greater Robust Rune" "Greater Stone Rune" "Greater Storm Rune" "Greater Vision Rune"
+		BaseType == "Greater Adept Rune" "Greater Body Rune" "Greater Desert Rune" "Greater Glacial Rune" "Greater Inspiration Rune" "Greater Iron Rune" "Greater Mind Rune" "Greater Rebirth Rune" "Greater Resolve Rune" "Greater Robust Rune" "Greater Stone Rune" "Greater Storm Rune" "Greater Vision Rune" "Greater Ward Rune" "Greater Charging Rune"
 		{
 			ShowHide $cfg_show_runes_greater
 		}
@@ -659,14 +765,6 @@ Class == "Augment"
 		# 0.2.1 endgame runes
 		BaseType == "Countess Seske's Rune of Archery" "Courtesan Mannan's Rune of Cruelty" "Craiceann's Rune of Recovery" "Craiceann's Rune of Warding" "Farrul's Rune of Grace" "Farrul's Rune of the Chase" "Farrul's Rune of the Hunt" "Fenumus' Rune of Agony" "Fenumus' Rune of Draining" "Fenumus' Rune of Spinning" "Hedgewitch Assandra's Rune of Wisdom" "Lady Hestra's Rune of Winter" "Saqawal's Rune of Erosion" "Saqawal's Rune of Memory" "Saqawal's Rune of the Sky" "Thane Girt's Rune of Wildness" "Thane Grannell's Rune of Mastery" "Thane Leld's Rune of Spring" "Thane Myrk's Rune of Summer" "The Greatwolf's Rune of Claws" "The Greatwolf's Rune of Willpower"
 		{
-			Show
-		}
-
-		# 0.2.0 The Phaaryl Megalith
-		BaseType == "Greater Rune of Leadership" "Greater Rune of Tithing" "Greater Rune of Alacrity" "Greater Rune of Nobility"
-		{
-			PlayEffect Cyan
-			MinimapIcon 0 Cyan Kite
 			Show
 		}
 
@@ -795,8 +893,20 @@ Class == "Uncut Skill Gems" "Uncut Spirit Gems" "Support Gems"
 	SetAlertSound $alert_mid
 	PlayEffect $beam_gem Temp
 
-	# 0.3.0 Lineage Supports (unknown price)
-	BaseType "Atalui's Bloodletting" "Einhar's Beastrite" "Vilenta's Propulsion" "Ahn's Citadel" "Brutus' Brain" "Tecrod's Revenge" "Uruk's Smelting" "Paquate's Pact" "Ailith's Chimes" "Doedre's Undoing" "Ratha's Assault" "Arjun's Medal" "Kaom's Madness" "Sione's Temper" "Ixchel's Torment" "Romira's Requital" "Tawhoa's Tending" "Dominus' Grasp" "Dialla's Desire" "Kalisa's Crescendo" "Xoph's Pyre" "Esh's Radiance" "Tul's Stillness" "Uul-Netol's Embrace" "Rakiata's Flow" "Rigwald's Ferocity" "Uhtred's Exodus" "Uhtred's Omen" "Uhtred's Augury" "Daresso's Passion" "Atziri's Allure" "Tacati's Ire" "Zarokh's Refrain" "Garukhan's Resolve" "Kurgal's Leash" "Kulemak's Dominion" "Amanamu's Tithe" "Varashta's Blessing" "Arbiter's Ignition" "Arakaali's Lust"
+	# 0.5.0 all Lineage Supports (unknown price)
+	BaseType == "Atalui's Bloodletting" "Einhar's Beastrite" "Vilenta's Propulsion" "Ahn's Citadel" "Brutus' Brain" "Tecrod's Revenge" "Uruk's Smelting" "Paquate's Pact" "Ailith's Chimes" "Doedre's Undoing" "Ratha's Assault" "Arjun's Medal" "Kaom's Madness" "Sione's Temper" "Ixchel's Torment" "Romira's Requital" "Tawhoa's Tending" "Dominus' Grasp" "Dialla's Desire" "Kalisa's Crescendo" "Xoph's Pyre" "Esh's Radiance" "Tul's Stillness" "Uul-Netol's Embrace" "Rakiata's Flow" "Rigwald's Ferocity" "Uhtred's Exodus" "Uhtred's Omen" "Uhtred's Augury" "Daresso's Passion" "Atziri's Allure" "Tacati's Ire" "Zarokh's Refrain" "Garukhan's Resolve" "Kurgal's Leash" "Kulemak's Dominion" "Amanamu's Tithe" "Varashta's Blessing" "Arbiter's Ignition" "Arakaali's Lust" "Arbiter's Reach" "Breachlord's Amalgam" "Catha's Brilliance" "Eonyr's Thunder" "Esh's Prowess" "Helbrym's Hide" "Her Declaration" "Medved's Felling" "Mórrigan's Insight" "Prototype Seventeen" "Seraph's Heart" "Styrn's Ferocity" "Styrn's Mountain" "Tangmazu's Thurible" "Trickster's Shard" "Tul's Avalanche" "Uhtred's Constellation" "Uhtred's Rite" "Vorana's Siege" "Vruun's Inevitability" "Vruun's Aftermath" "Olroth's Conviction" "Olroth's Hubris"
+	{
+		Show
+	}
+
+	# 0.5.0 Kalguuran Skills
+	BaseType == "Animus Exchange" "Animus Splinters" "Bitter Dead" "Conductive Runes" "Detonate Living" "Eternal March" "Explosive Transmutation" "Fragments of the Past" "Frostflame Nova" "Grim Pillars" "Hollow Shell" "Leylines" "Powered by Verisium" "Rain of Blades" "Refutation" "Remnants of Kalguur" "Repulsion" "Runic Reprieve" "Skyfall" "Triskelion Cascade" "Verisium Manifestations" "Voltaic Barrier" "Wardbound Minions"
+	{
+		Show
+	}
+
+	# 0.5.0 Kalguuran Supports
+	BaseType == "Concussive Runes" "Fist of Kalguur" "Healing Runes" "Runeforged Blades" "Runic Extraction" "Runic Infusion" "Scouring Flame"
 	{
 		Show
 	}
@@ -872,23 +982,6 @@ Class == "Trial Coins" "Inscribed Ultimatum"
 	Show
 }
 
-# Crisis Fragments (Arbiter of Ash)
-# Calamity Fragments (Uber Arbiter of Ash)
-Class == "Pinnacle Keys"
-{
-	SetTextColor $color_white
-	SetBorderColor $color_white
-	SetBackgroundColor $color_red
-	SetFontSize $font_max
-	SetAlertSound $alert_high
-	PlayEffect White
-	MinimapIcon 0 Brown Star
-	Show
-}
-
-# Trialmaster fragments, Vaal Vault key, Well of Souls key
-Class == "Map Fragment"
-BaseType == "Cowardly Fate" "Deadly Fate" "Victorious Fate" "Idol of Estazunti" "Kulemak's Invitation" "The Triskelion Reforged" "Head of the King" "Breachlord Sac" "Raven's Reflection"
 {
 	SetTextColor $color_brown
 	SetBorderColor $color_brown
@@ -897,31 +990,31 @@ BaseType == "Cowardly Fate" "Deadly Fate" "Victorious Fate" "Idol of Estazunti" 
 	PlayEffect White
 	MinimapIcon 0 Brown Star
 	SetAlertSound $alert_very_specific
-	Show
-}
 
-{
-	SetTextColor $color_white
-	SetBorderColor $color_white
-	SetBackgroundColor $color_reliquary
-	SetFontSize $font_max
-	SetAlertSound $alert_extraordinary
+	# Crisis Fragments (Arbiter of Ash)
+	# Calamity Fragments (Uber Arbiter of Ash) (legacy after 0.5.0)
+	# "Origin Spark/Cradle/Core" (Arbiter of Divinity)
+	# "Call of the Shadows" (The Bodach)
+	Class == "Pinnacle Keys"
+	{
+		Show
+	}
+
+	# Right now there are no trash map fragments
+	Class == "Map Fragment"
+	# BaseType == "Cowardly Fate" "Deadly Fate" "Victorious Fate" "Kulemak's Invitation" "The Triskelion Reforged" "Head of the King" "Breachlord Sac" "Raven's Reflection" "Simulacrum" "An Audience with the King"
+	{
+		Show
+	}
+
+	Class == "Breachstone"
+	# BaseType == "Breachstone"
+	{
+		Show
+	}
 
 	# 0.2.0 Twilight Reliquary Key etc.
 	Class == "Vault Keys"
-	{
-		Show
-	}
-
-	# 0.3.0 Legacy - now only as splinters
-	Class == "Map Fragment"
-	BaseType == "Simulacrum"
-	{
-		Show
-	}
-
-	# 0.3.0 Legacy - now only as splinters
-	Class == "Breachstone"
 	{
 		Show
 	}
@@ -936,8 +1029,11 @@ Rarity Unique
 	PlayEffect Brown
 
 	# Expensive uniques
-	BaseType == "Timeless Jewel" "Diamond" "Time-Lost Diamond" "Ring"
+	# note: swords not officially in game but bugged Ultimatum and Expedition can drop their uniques
+	# note: 2 of 3 uniques on "Irradiated Tablet" are very valueable
+	BaseType == "Timeless Jewel" "Diamond" "Time-Lost Diamond" "Ring" "Golden Charm" "Shortsword" "Scimitar" "Irradiated Tablet" "Abyss Tablet"
 	{
+		# TODO this color is reused many times
 		SetTextColor 0 240 190 255
 		SetBorderColor 0 240 190 255
 		SetBackgroundColor $color_white
@@ -946,6 +1042,28 @@ Rarity Unique
 		MinimapIcon 0 Brown Star
 		Show
 	}
+
+	# 1-unique unique-only bases (prices at 3 weeks into 0.5)
+	# "Two Hand Maces" - "Aberrant Sledge" - "Twisted Empyrean" (1/5 div)
+	# "Quarterstaves" - "Warding Quarterstaff" - "Duality" (trash)
+	# "Bows" - "Heartwood Shortbow" - "Periphery" (10ex)
+	# "Wands" - "Twisted Wand" - "Liminal Coil" (1/5 div)
+	# "Wands" - "Runic Fork" - "Runeseeker's Call" (800 div) (undroppable, from quest)
+	# "Staves" - "Perching Staff" - "The Raven's Flock" (5ex)
+	# "Helmets" - "Ancient Visor" - "Decree of Acuity" (trash)
+	# "Helmets" - "Tenebrous Crown" - "Vestige of Darkness" (trash)
+	# "Boots" - "Ancient Leggings" - "Decree of Flight" (20ex)
+	# "Tower Shields" - "Glacial Fortress" - "Nightfall" (20ex)
+	# "Targes" - "Venerable Defender" - "Eyes of the Runefather" (trash)
+	# "Body Armours" - "Ornate Ringmail" - "Loreweave" (1/6 div+) (undroppable, from quest)
+	# "Body Armours" - "Ancient Mail" - "Decree of Loyalty" (trash)
+	# "Body Armours" - "Primal Markings" - "Forgotten Warden" (20ex)
+	# "Amulet" - "Veridical Chain" - "Eventide Petals" (15ex) (runeforging only)
+
+	# other
+	# "Rings" - "Two-Stone Ring" (has 3 Berek uniques, unique-only base)
+	# "Crossbows" - "Trarthan Cannon" - "Redemption" (has 1 unique, 5ex)
+	# "Body Armours" - "Grasping Mail" (special base, from Genesis Tree only)
 
 	SetTextColor 175 96 37 255
 	SetBorderColor 175 96 37 255
@@ -1005,6 +1123,44 @@ TwiceCorrupted True
 	Show
 }
 
+# special bases (encounter-specific)
+# (???) "Ancient Gauntlets" - this base was announced on 0.5 filter info (thread 3933291) but is not present on wiki, PoEDB or trade
+{
+	SetAlertSound $alert_item_special_base
+	PlayEffect $beam_special_base
+	SetFontSize $font_mid
+
+	# Genesis Tree bases (valuable)
+	BaseType == "Breach Ring" "Refined Breach Ring" "Biostatic Ring" "Vitalic Ring" "Mnemonic Ring" "Kinetic Ring" "Oneiric Ring" "Grasping Ring" "Grasping Mail"
+	{
+		SetBorderColor $color_breach
+		SetBackgroundColor 0 96 0
+		Show
+	}
+
+	# Genesis Tree bases (potentially valuable)
+	BaseType == "Lament Amulet" "Portent Amulet" "Absent Amulet"
+	{
+		SetBorderColor $color_breach
+		Show
+	}
+
+	# Genesis Tree bases (not valuable)
+	BaseType == "Stalking Belt" "Invoking Belt" "Sinew Belt" "Forking Belt" "Corona Amulet"
+	{
+		SetBorderColor $color_breach
+		SetAlertSound None
+		Show
+	}
+
+	# Loathsome Mire (Delirium subarea, usually trash)
+	BaseType == "Distorted Amulet" "Twisted Amulet"
+	{
+		SetBorderColor $color_white
+		Show
+	}
+}
+
 Class "Jewel"
 {
 	#SetTextColor 0 240 190 255
@@ -1033,7 +1189,7 @@ Rarity <= Rare
 	SetTextColor $color_black
 	SetBackgroundColor $color_gear_exceptional
 	SetBorderColor $color_gear_exceptional
-	SetAlertSound $alert_item_exceptional
+	SetAlertSound $alert_item_special_base
 
 	Quality >= 28
 	{
@@ -1052,14 +1208,6 @@ Rarity <= Rare
 	Sockets > 1
 	{
 		ShowDiscard $cfg_show_gear_exceptional_sockets
-	}
-
-	# 3.28 new special bases (TBD)
-	BaseType == "Two-Stone Ring" "Biostatic Ring" "Vitalic Ring" "Mnemonic Ring" "Kinetic Ring" "Oneiric Ring" "Grasping Ring" "Veridical Chain" "Lament Amulet" "Portent Amulet" "Absent Amulet" "Corona Amulet" "Distorted Amulet" "Aberrant Sledge" "Warding Quarterstaff" "Heartwood Shortbow" "Trarthan Cannon" "Twisted Wand" "Runic Fork" "Perching Staff" "Ancient Visor" "Ancient Leggings" "Ancient Gauntlets" "Ornate Ringmail" "Ancient Mail" "Grasping Mail" "Primal Markings" "Stalking Belt" "Invoking Belt" "Sinew Belt" "Forking Belt" "Glacial Fortress" "Venerable Defender"
-	{
-		PlayEffect Pink
-		MinimapIcon 1 Pink Diamond
-		Show
 	}
 }
 
