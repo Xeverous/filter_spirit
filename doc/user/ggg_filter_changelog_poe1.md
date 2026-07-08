@@ -6,6 +6,12 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 
 *newest at the top*
 
+### 3.28.0j (Ancestors event) - [announcement](https://www.pathofexile.com/forum/view-thread/3968867)
+
+- Silver Coin
+- returning and new event-exclusive Forbidden Tattoos
+- per https://www.pathofexile.com/forum/view-thread/3974219: *Silver Coins and Forbidden Tattoos will be deleted at the end of the Return of the Ancestors event*
+
 ### 3.28.0d - [patch notes](https://www.pathofexile.com/forum/view-thread/3922013)
 
 - Updated built-in Neversink's console filters to version 8.19.1
