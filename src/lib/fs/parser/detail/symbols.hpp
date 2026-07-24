@@ -168,6 +168,7 @@ namespace rf
 				(lang::keywords::rf::zana_memory,               property::zana_memory)
 				(lang::keywords::rf::foulborn,                  property::foulborn)
 				(lang::keywords::rf::imbued,                    property::imbued)
+				(lang::keywords::rf::vestigial,                 property::vestigial)
 				// PoE 2 only
 				(lang::keywords::rf::is_vaal_unique,            property::is_vaal_unique)
 				(lang::keywords::rf::has_vaal_unique_mod,       property::has_vaal_unique_mod)

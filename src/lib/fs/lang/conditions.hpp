@@ -206,6 +206,11 @@ inline std::shared_ptr<boolean_condition> make_imbued_condition(boolean value, p
 	return std::make_shared<boolean_condition_with_field_test>(official_condition_property::imbued, &item::is_imbued, value, origin);
 }
 
+inline std::shared_ptr<boolean_condition> make_vestigial_condition(boolean value, position_tag origin)
+{
+	return std::make_shared<boolean_condition_with_field_test>(official_condition_property::vestigial, &item::is_vestigial, value, origin);
+}
+
 inline std::shared_ptr<boolean_condition> make_is_vaal_unique_condition(boolean value, position_tag origin) // PoE 2 only
 {
 	return std::make_shared<boolean_condition_with_field_test>(official_condition_property::is_vaal_unique, &item::is_vaal_unique, value, origin);

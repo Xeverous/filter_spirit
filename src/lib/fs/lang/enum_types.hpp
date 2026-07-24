@@ -63,6 +63,7 @@ enum class official_condition_property
 	zana_memory,
 	foulborn,
 	imbued,
+	vestigial,
 	// PoE 2 only
 	is_vaal_unique,
 	has_vaal_unique_mod,
@@ -179,6 +180,8 @@ inline std::string_view to_keyword(official_condition_property property)
 			return keywords::rf::foulborn;
 		case official_condition_property::imbued:
 			return keywords::rf::imbued;
+		case official_condition_property::vestigial:
+			return keywords::rf::vestigial;
 		case official_condition_property::is_vaal_unique:
 			return keywords::rf::is_vaal_unique;
 		case official_condition_property::has_vaal_unique_mod:
