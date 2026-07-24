@@ -64,6 +64,7 @@ $color_mortal              =  60 150   0
 $color_heist               = 204 130 130
 $color_sanctum             = $color_heist
 $color_expedition          =   0 105 255
+$color_allflame            =   0 205 145
 $color_harbinger           =  64 255 255
 $color_talisman            =  50 130  50
 $color_metamorph           =  25 181  25
@@ -165,6 +166,7 @@ $font_sanctum_research   = $font_high
 $font_heist_gear         = $font_mid
 $font_experimented_base  = $font_max
 $font_logbook            = $font_max
+$font_chart              = $font_max
 $font_corpse             = $font_max
 $font_influence_high     = $font_high
 $font_influence_mid      = $font_mid
@@ -285,6 +287,7 @@ $alert_blueprint           = $alert_common
 $alert_sanctum_relic       = $alert_very_specific
 $alert_sanctum_research    = $alert_uncommon
 $alert_logbook             = $alert_uncommon
+$alert_chart               = $alert_common
 $alert_corpse              = $alert_uncommon
 $alert_quest_item          = $alert_very_specific
 $alert_influence_high      = $alert_extraordinary
@@ -359,6 +362,7 @@ $icon_6_link          = 0 Red Hexagon
 $icon_base_defence    = 0 Grey Square
 $icon_ultimatum       = 0 Red Square
 $icon_logbook         = 0 Cyan Square
+$icon_chart           = 0 Green Square
 $icon_corpse          = 0 Grey UpsideDownHouse
 $icon_sanctum_research= 0 Brown Square
 $icon_error           = 0 Red UpsideDownHouse
@@ -776,6 +780,13 @@ Class == "Stackable Currency"
 
 	# 3.28
 	BaseType "Astrolabe"
+	{
+		Expand $actions_currency_mid
+		Show
+	}
+
+	# 3.29
+	BaseType == "Scrying Orb" "Karui Enshrouding Crystal" "Imperial Enshrouding Crystal" "Vaal Enshrouding Crystal" "Templar Enshrouding Crystal" "Maraketh Enshrouding Crystal" "Dead Man's Sulphur" "Message in a Bottle" "Merrick's Ducat" "Cyaxan's Ducat" "The Changeling's Ducat" "The Genteel's Ducat" "Kishara's Ducat" "Telesia's Ducat" "Rotmother's Ducat" "Brinehook's Ducat" "Katakohi's Ducat" "Tzamoto's Ducat"
 	{
 		Expand $actions_currency_mid
 		Show
@@ -1326,6 +1337,19 @@ Class == "Expedition Logbook"
 	Show
 }
 
+# 3.29 Allflame league mechanic
+# "Sandy Seabed Chart" "Coral Forest Chart" "Coral Reef Chart"
+Class == "Chart"
+{
+	SetTextColor $color_black
+	SetBorderColor $color_allflame
+	SetBackgroundColor $color_allflame
+	SetAlertSound $alert_chart
+	SetFontSize $font_chart
+	MinimapIcon $icon_chart
+	Show
+}
+
 # Gems can have lots of varying properties, with notable thresholds:
 # level: 21 / 20 / 19 / 18
 # quality: 23 / 22 / 21 / 20 / >0
@@ -1428,7 +1452,8 @@ Class == "Skill Gems" "Support Gems"
 	}
 
 	# 3.28 Exceptional Support Gems
-	BaseType == "Greater Spell Cascade Support" "Eclipse Support" "Invert the Rules Support" "Cast on Ward Break Support" "Vaal Sacrifice Support" "Greater Spell Echo Support" "Vaal Temptation Support" "Machinations Support" "Pyre Support" "Bonespire Support" "Foulgrasp Support" "Hiveborn Support" "Scornful Herald Support" "Cull the Weak Support" "Greater Ancestral Call Support" "Fissure Support" "Hextoad Support" "Hexpass Support" "Greater Fork Support" "Greater Chain Support" "Lethal Dose Support" "Companionship Support" "Divine Sentinel Support" "Annihilation Support" "Invention Support" "Greater Kinetic Instability Support" "Cooldown Recovery Support" "Voidstorm Support" "Void Shockwave Support" "Eldritch Blasphemy Support" "Gluttony Support" "Overheat Support" "Greater Multistrike Support" "Congregation Support" "Frostmage Support" "Greater Devour Support" "Greater Unleash Support" "Pacifism Support" "Bloodsoaked Banner Support" "Minion Pact Support" "Unholy Trinity Support" "Overloaded Intensity Support" "Transfusion Support"
+	# 3.29 added more (Pacts are Active Skill Gems)
+	BaseType == "Greater Spell Cascade Support" "Eclipse Support" "Invert the Rules Support" "Cast on Ward Break Support" "Vaal Sacrifice Support" "Greater Spell Echo Support" "Vaal Temptation Support" "Machinations Support" "Pyre Support" "Bonespire Support" "Foulgrasp Support" "Hiveborn Support" "Scornful Herald Support" "Cull the Weak Support" "Greater Ancestral Call Support" "Fissure Support" "Hextoad Support" "Hexpass Support" "Greater Fork Support" "Greater Chain Support" "Lethal Dose Support" "Companionship Support" "Divine Sentinel Support" "Annihilation Support" "Invention Support" "Greater Kinetic Instability Support" "Cooldown Recovery Support" "Voidstorm Support" "Void Shockwave Support" "Eldritch Blasphemy Support" "Gluttony Support" "Overheat Support" "Greater Multistrike Support" "Congregation Support" "Frostmage Support" "Greater Devour Support" "Greater Unleash Support" "Pacifism Support" "Bloodsoaked Banner Support" "Communion Support" "Unholy Trinity Support" "Overloaded Intensity Support" "Transfusion Support" "Pact of Beidat" "Pact of Ghorr" "Pact of K'Tash" "Pact of Lycia" "Coursing Current Support" "Crystalfall Support"
 	{
 		SetBorderColor $color_gem
 		SetTextColor $color_gem
@@ -1506,6 +1531,17 @@ Class == "Pieces"
 	SetBorderColor $color_unique
 	SetFontSize $font_max
 	SetAlertSound $alert_unique_piece
+	Show
+}
+
+# 3.29 Enshrouded unique items
+Class == "Enshrouded Items"
+{
+	SetTextColor $color_unique
+	SetBorderColor $color_unique
+	SetFontSize $font_unique
+	SetBorderColor $color_breach
+	SetAlertSound $alert_unique_unknown
 	Show
 }
 
@@ -1659,7 +1695,7 @@ Class == "Map Fragments"
 		Show
 	}
 
-	BaseType == "Divine Vessel"
+	BaseType == "Divine Vessel" "Mercenary Warrant"
 	{
 		SetTextColor $color_black
 		SetBorderColor $color_black
@@ -1746,7 +1782,8 @@ Class == "Map Fragments"
 	# 3.25 reintroduction of King of the Mists boss from Affliction league
 	# 3.26 reworked, now itemized Catarina entry
 	# 3.28 Mirage boss entry
-	BaseType == "An Audience With The King" "Syndicate Medallion" "The Black Barya"
+	# 3.29 Zorath Abyss boss keys
+	BaseType == "An Audience With The King" "Syndicate Medallion" "The Black Barya" "Zorath's Eye of Malevolence" "Zorath's Eye of Authority" "Zorath's Eye of the Inevitable" "Zorath's Eye of the Endless"
 	{
 		SetBorderColor $color_black
 		SetTextColor $color_black
