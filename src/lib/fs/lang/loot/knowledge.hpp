@@ -318,6 +318,17 @@ inline const std::initializer_list<known_item> currency_atlas = {
 
 	// drops in T11+ and in Delve
 	{"Valdo's Puzzle Box",              known_item_properties(10, 83)},
+
+	{"Templar Astrolabe",               known_item_properties(10,  1)},
+	{"Chaotic Astrolabe",               known_item_properties(10,  1)},
+	{"Deceptive Astrolabe",             known_item_properties(10,  1)},
+	{"Fruiting Astrolabe",              known_item_properties(10,  1)},
+	{"Fungal Astrolabe",                known_item_properties(10,  1)},
+	{"Grasping Astrolabe",              known_item_properties(10,  1)},
+	{"Lightless Astrolabe",             known_item_properties(10,  1)},
+	{"Nameless Astrolabe",              known_item_properties(10,  1)},
+	{"Runic Astrolabe",                 known_item_properties(10,  1)},
+	{"Timeless Astrolabe",              known_item_properties(10,  1)},
 };
 
 inline const std::initializer_list<known_item> currency_legacy = {
@@ -572,19 +583,19 @@ inline const std::initializer_list<known_item> currency_blight_oils_special = { 
 };
 
 inline const std::initializer_list<known_item> currency_catalysts = { // 3.9
-	{"Abrasive Catalyst",     known_item_properties(10,  1)},
-	{"Accelerating Catalyst", known_item_properties(10,  1)},
-	{"Imbued Catalyst",       known_item_properties(10,  1)},
-	{"Intrinsic Catalyst",    known_item_properties(10,  1)},
-	{"Noxious Catalyst",      known_item_properties(10,  1)},
-	{"Tainted Catalyst",      known_item_properties(10,  1)},
-	{"Turbulent Catalyst",    known_item_properties(10,  1)},
-	{"Unstable Catalyst",     known_item_properties(10,  1)},
-	{"Fertile Catalyst",      known_item_properties(10, 68)},
-	{"Prismatic Catalyst",    known_item_properties(10, 68)},
-	{"Tempering Catalyst",    known_item_properties(10, 68)},
-	{"Sinistral Catalyst",    known_item_properties(10,  1)}, // 3.28
-	{"Dextral Catalyst",      known_item_properties(10,  1)}, // 3.28
+	{"Abrasive Catalyst",     known_item_properties(20,  1)},
+	{"Accelerating Catalyst", known_item_properties(20,  1)},
+	{"Imbued Catalyst",       known_item_properties(20,  1)},
+	{"Intrinsic Catalyst",    known_item_properties(20,  1)},
+	{"Noxious Catalyst",      known_item_properties(20,  1)},
+	{"Tainted Catalyst",      known_item_properties(20,  1)},
+	{"Turbulent Catalyst",    known_item_properties(20,  1)},
+	{"Unstable Catalyst",     known_item_properties(20,  1)},
+	{"Fertile Catalyst",      known_item_properties(20, 68)},
+	{"Prismatic Catalyst",    known_item_properties(20, 68)},
+	{"Tempering Catalyst",    known_item_properties(20, 68)},
+	{"Sinistral Catalyst",    known_item_properties(20,  1)}, // 3.28
+	{"Dextral Catalyst",      known_item_properties(20,  1)}, // 3.28
 };
 
 inline const std::initializer_list<known_item> currency_delirium_generic = { // 3.10
