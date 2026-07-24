@@ -11,6 +11,10 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 - new keyword: `Vestigial` (boolean test)
 - new currency, scarabs, gems, talismans, divination cards
 - new item classes (e.g. charts)
+- Catalysts stack size increased from 10 to 20
+- some item renames
+- Unrelenting Emblems removed
+- Incubators no longer drop
 - [patch notes](https://www.pathofexile.com/forum/view-thread/3985332)
 - [new and changed gems](https://www.pathofexile.com/forum/view-thread/3987254)
 - league promo: https://www.pathofexile.com/allflame
