@@ -811,7 +811,7 @@ Class == "Stackable Currency"
 		Show
 	}
 
-	BaseType == "Omen of Fortune" "Omen of Connections" "Omen of Amelioration" "Omen of Blanching"
+	BaseType == "Omen of Fortune" "Omen of Connections" "Omen of Amelioration" "Omen of Trichromatism"
 	{
 		Expand $actions_currency_high
 		Show
