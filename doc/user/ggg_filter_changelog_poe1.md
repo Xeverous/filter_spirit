@@ -6,6 +6,15 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 
 *newest at the top*
 
+### 3.29 (Curse of the Allflame) - [Item Filter Information](https://www.pathofexile.com/forum/view-thread/3986972)
+
+- new keyword: `Vestigial` (boolean test)
+- new currency, scarabs, gems, talismans, divination cards
+- new item classes (e.g. charts)
+- [patch notes](https://www.pathofexile.com/forum/view-thread/3985332)
+- [new and changed gems](https://www.pathofexile.com/forum/view-thread/3987254)
+- league promo: https://www.pathofexile.com/allflame
+
 ### 3.28.0j (Ancestors event) - [announcement](https://www.pathofexile.com/forum/view-thread/3968867)
 
 - Silver Coin
