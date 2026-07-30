@@ -275,7 +275,7 @@ $alert_scourged            = None
 $alert_fractured_item      = $alert_very_specific
 $alert_synthesised_item    = $alert_very_specific
 $alert_experimented_base   = $alert_very_specific
-$alert_item_high_quality   = $alert_very_specific
+$alert_gear_high_quality   = $alert_very_specific
 $alert_veiled_item         = $alert_common
 $alert_metamorph           = $alert_common
 $alert_archnemesis         = $alert_common
@@ -624,7 +624,8 @@ $show_gear_mods_delve = True
 $show_gear_chrome_small = True
 # Apply border color for RGB items of any other size
 $show_gear_chrome_big = True
-$show_items_high_quality = True
+$cfg_gear_high_quality_min = 22
+$show_gear_high_quality = True
 $show_gear_enchanted_helmets = True
 $show_gear_enchanted_other = False
 # These are highest bases for each attribute combination.
@@ -1592,11 +1593,11 @@ Rarity Unique
 		Show
 	}
 
-	Quality >= 28
+	Quality >= $cfg_gear_high_quality_min
 	{
 		SetBorderColor $color_high_quality
-		SetAlertSound $alert_item_high_quality
-		ShowDiscard $show_items_high_quality
+		SetAlertSound $alert_gear_high_quality
+		ShowDiscard $show_gear_high_quality
 	}
 
 	# (removed all autogeneration before a new one is implemented)
@@ -2427,14 +2428,14 @@ Rarity <= Rare
 	}
 
 	# high-quality bases for Mythic Orb, crafting or chancing
-	Quality >= 28
+	Quality >= $cfg_gear_high_quality_min
 	Mirrored False
 	{
 		SetTextColor $color_black
 		SetBackgroundColor $color_high_quality
 		SetBorderColor $color_high_quality
-		SetAlertSound $alert_item_high_quality
-		ShowDiscard $show_items_high_quality
+		SetAlertSound $alert_gear_high_quality
+		ShowDiscard $show_gear_high_quality
 	}
 
 	AnyEnchantment True
