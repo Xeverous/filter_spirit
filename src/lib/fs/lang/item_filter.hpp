@@ -197,7 +197,7 @@ struct autogen_extension
 		std::vector<block_variant>& result_blocks,
 		std::unordered_set<std::string_view>& unknown_items) const;
 
-	static constexpr int unknown_item_assumed_max_stack_size = 1000;
+	static constexpr int unknown_item_assumed_max_stack_size = 50000;
 
 	using functions_container_type = boost::container::small_vector<std::function<blocks_generator_func_type>, 1u>;
 
