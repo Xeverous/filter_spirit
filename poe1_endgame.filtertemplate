@@ -1581,6 +1581,17 @@ Rarity Unique
 		Show
 	}
 
+	# Kalandra's Touch (always valuable)
+	BaseType == "Ring"
+	{
+		SetBackgroundColor $color_white
+		SetFontSize $font_max
+		SetAlertSound $alert_unique_high
+		PlayEffect $beam_unique
+		MinimapIcon $icon_unique_high
+		Show
+	}
+
 	Quality >= $cfg_gear_high_quality_min
 	{
 		SetBorderColor $color_high_quality
