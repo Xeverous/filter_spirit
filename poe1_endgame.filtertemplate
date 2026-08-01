@@ -657,7 +657,7 @@ $cfg_base_craft_min_ilvl = 86
 $cfg_base_craft_names = None
 $cfg_base_chance_names = None
 $show_gear_identified_magic = False
-$show_gear_identified_rare = False
+$show_gear_identified_rare = True
 # You generally want to set these to False once you reach maps
 $show_gear_any_rare = True
 $show_gear_any_magic = True
@@ -1566,18 +1566,6 @@ Rarity Unique
 		SetAlertSound $alert_map_valuable
 		PlayEffect $beam_unique
 		MinimapIcon $icon_map_unique
-		Show
-	}
-
-	# The Squire (always valuable)
-	Sockets == 3WWW
-	BaseType == "Elegant Round Shield"
-	{
-		SetBackgroundColor $color_white
-		SetFontSize $font_max
-		SetAlertSound $alert_unique_high
-		PlayEffect $beam_unique
-		MinimapIcon $icon_unique_high
 		Show
 	}
 
