@@ -491,6 +491,8 @@ $actions_influence_very_low = {
 #     some items can get wrong styles
 # - This filter has been written so that items with unknown price are always shown
 
+$show_gold_mid = True
+$show_gold_low = True
 $show_scrolls_wisdom = True
 $show_scrolls_portal = True
 $show_currency_low = True
@@ -1205,14 +1207,14 @@ Class == "Gold"
 		SetFontSize $font_currency_mid
 		SetAlertSound $alert_gold
 		MinimapIcon $icon_gold_mid
-		Show
+		ShowHide $show_gold_mid
 	}
 
 	SetTextColor $color_gold
 	SetBackgroundColor $color_black
 	SetFontSize $font_currency_mid
 	SetAlertSound $alert_gold
-	Show
+	ShowHide $show_gold_low
 }
 
 Class == "Corpses"
