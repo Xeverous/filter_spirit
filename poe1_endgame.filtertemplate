@@ -235,7 +235,7 @@ $alert_fragment_sacrifice  = $alert_frequent
 $alert_fragment_mortal     = $alert_common
 $alert_fragment_atlas      = $alert_uncommon
 $alert_fragment_sacred_blossom = $alert_uncommon
-$alert_fragment_mist_king  = $alert_uncommon
+$alert_fragment_uncommon   = $alert_uncommon
 $alert_breachstone         = $alert_uncommon
 $alert_emblem              = $alert_uncommon
 $alert_reliquary           = $alert_extraordinary
@@ -1791,7 +1791,7 @@ Class == "Map Fragments"
 		SetTextColor $color_black
 		SetBackgroundColor $color_white
 		SetFontSize $font_max
-		SetAlertSound $alert_fragment_mist_king
+		SetAlertSound $alert_fragment_uncommon
 		MinimapIcon $icon_fragment_worthy
 		Show
 	}
@@ -1818,9 +1818,6 @@ Class == "Map Fragments"
 		Show
 	}
 
-	# Simulacrum, Maven's Writ and Blood-filled Vessel do not drop but
-	# better make blocks for them, just in case of inventory missclick etc
-
 	BaseType == "Simulacrum"
 	{
 		SetTextColor $color_black
@@ -1832,24 +1829,16 @@ Class == "Map Fragments"
 		Show
 	}
 
-	BaseType == "The Maven's Writ" "Echo of Trauma" "Echo of Reverence" "Echo of Loneliness"
+	# Writ - drops from The Feared
+	# Echo - drop from the final memory chain boss
+	# Vessel - Ritual passive can cause encounters to drop filled vessels
+	BaseType == "The Maven's Writ" "Echo of Trauma" "Echo of Reverence" "Echo of Loneliness" "Blood-filled Vessel"
 	{
 		SetTextColor $color_atlas
 		SetBorderColor $color_atlas
 		SetBackgroundColor $color_white
 		SetFontSize $font_max
-		SetAlertSound $alert_undroppable
-		MinimapIcon $icon_fragment_worthy
-		Show
-	}
-
-	BaseType == "Blood-filled Vessel"
-	{
-		SetTextColor $color_atlas
-		SetBorderColor $color_atlas
-		SetBackgroundColor $color_white
-		SetFontSize $font_max
-		SetAlertSound $alert_undroppable
+		SetAlertSound $alert_fragment_uncommon
 		MinimapIcon $icon_fragment_worthy
 		Show
 	}
