@@ -1002,7 +1002,7 @@ Class == "Trial Coins" "Inscribed Ultimatum"
 
 	# Right now there are no trash map fragments
 	Class == "Map Fragment"
-	# BaseType == "Cowardly Fate" "Deadly Fate" "Victorious Fate" "Kulemak's Invitation" "The Triskelion Reforged" "Head of the King" "Breachlord Sac" "Raven's Reflection" "Simulacrum" "An Audience with the King"
+	# BaseType == "Cowardly Fate" "Deadly Fate" "Victorious Fate" "Kulemak's Invitation" "The Triskelion Reforged" "Head of the King" "Breachlord Sac" "Raven's Reflection" "Simulacrum" "An Audience with the King" "Sacred Bloom"
 	{
 		Show
 	}
