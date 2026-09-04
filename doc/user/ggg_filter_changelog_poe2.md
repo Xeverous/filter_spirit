@@ -6,6 +6,11 @@ Most threads contain a lit of new map tiers, new mods, new item base types and n
 
 *newest at the top*
 
+### (2026.09.04) 0.5.5 (Forbidden Rites) - [Item Filter Information](https://www.pathofexile.com/forum/view-thread/4000871)
+
+- [patch notes](https://www.pathofexile.com/forum/view-thread/4000864)
+- only few more Soul Cores and 1 Fragment and 1 Tablet type
+
 ### (2026.06.01) 0.5.0b Hotfix 6
 
 - [patch notes](https://www.pathofexile.com/forum/view-thread/3940564)
