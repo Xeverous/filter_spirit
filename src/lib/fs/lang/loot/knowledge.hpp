@@ -1324,6 +1324,24 @@ inline const std::initializer_list<known_item> augments_soul_cores_endgame = {
 	{"Xipocado's Soul Core of Dominion",       known_item_properties(10, 65)},
 	{"Xopec's Soul Core of Power",             known_item_properties(10, 65)},
 	{"Zalatl's Soul Core of Insulation",       known_item_properties(10, 65)},
+	// 0.5.5
+	{"Jiquani's Soul Core of Automation",      known_item_properties(10, 65)},
+	{"Jiquani's Soul Core of Malediction",     known_item_properties(10, 65)},
+	{"Jiquani's Soul Core of Targeting",       known_item_properties(10, 65)},
+	{"Jiquani's Soul Core of Rallying",        known_item_properties(10, 65)},
+	{"Jiquani's Soul Core of Radiance",        known_item_properties(10, 65)},
+	{"Jiquani's Soul Core of Severing",        known_item_properties(10, 65)},
+	{"Jiquani's Soul Core of Rippling",        known_item_properties(10, 65)},
+	{"Jiquani's Soul Core of Quaking",         known_item_properties(10, 65)},
+	{"Jiquani's Soul Core of Munitions",       known_item_properties(10, 65)},
+	{"Jiquani's Soul Core of Snares",          known_item_properties(10, 65)},
+	{"Jiquani's Soul Core of Abundance",       known_item_properties(10, 65)},
+	{"Jiquani's Soul Core of Squalls",         known_item_properties(10, 65)},
+	{"Jiquani's Soul Core of Thundering",      known_item_properties(10, 65)},
+	{"Atziri's Soul Core of Devotion",         known_item_properties(10, 65)},
+	{"Atziri's Soul Core of Vitality",         known_item_properties(10, 65)},
+	{"Atziri's Soul Core of Alacrity",         known_item_properties(10, 65)},
+	{"Atziri's Soul Core of Inoculation",      known_item_properties(10, 65)},
 };
 
 inline const std::initializer_list<known_item> augments_soul_cores_ancient = {
@@ -1469,6 +1487,8 @@ inline const std::initializer_list<known_item> map_fragments = {
 	{"Head of the King",        known_item_properties(1, 1)},
 	{"Breachlord Sac",          known_item_properties(1, 1)},
 	{"Raven's Reflection",      known_item_properties(1, 1)},
+	// 0.5.5
+	{"Sacred Bloom",            known_item_properties(1, 65)},
 };
 
 inline const std::initializer_list<known_item> pinnacle_keys = {
