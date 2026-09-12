@@ -282,6 +282,8 @@ $actions_quest_items = {
 $cfg_default_background_color = $color_black
 $cfg_default_font_size = 36
 
+$cfg_show_gold_mid = True
+$cfg_show_gold_low = True
 $cfg_show_scrolls_wisdom = True
 
 $cfg_currency_high_min_value = 20
@@ -384,14 +386,14 @@ BaseType == "Gold"
 		SetFontSize $font_currency_mid
 		SetAlertSound $alert_gold
 		MinimapIcon $icon_gold_mid
-		Show
+		ShowHide $cfg_show_gold_mid
 	}
 
 	SetTextColor $color_gold
 	SetBackgroundColor $color_black
 	SetFontSize $font_currency_mid
 	SetAlertSound $alert_gold
-	Show
+	ShowHide $cfg_show_gold_low
 }
 
 #--------------------------
