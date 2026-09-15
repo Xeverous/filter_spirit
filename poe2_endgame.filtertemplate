@@ -1170,23 +1170,15 @@ TwiceCorrupted True
 }
 
 Class "Jewel"
+BaseType "Time-Lost"
+Rarity Normal Magic Rare
 {
 	#SetTextColor 0 240 190 255
 	#SetBorderColor 0 240 190 255
 	SetFontSize 40
-
-	Rarity Rare
-	{
-		MinimapIcon 2 Cyan Triangle
-		PlayEffect Cyan
-		Show
-	}
-
-	Rarity Magic
-	{
-		PlayEffect Cyan Temp
-		Show
-	}
+	MinimapIcon 2 Cyan Triangle
+	PlayEffect Cyan
+	Show
 }
 
 # Exceptional bases - over 20 quality or with an extra socket
@@ -1217,17 +1209,6 @@ Rarity <= Rare
 	{
 		ShowDiscard $cfg_show_gear_exceptional_sockets
 	}
-}
-
-Class == "Rings" "Amulets" "Belts"
-Rarity Rare
-{
-	SetFontSize 40
-	SetTextColor 233 206 75 255
-	SetBorderColor 233 206 75 255
-	PlayEffect Yellow
-	MinimapIcon 1 Yellow Diamond
-	Show
 }
 
 # Chance Orb
