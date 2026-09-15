@@ -286,23 +286,23 @@ $cfg_show_gold_mid = True
 $cfg_show_gold_low = True
 $cfg_show_scrolls_wisdom = True
 
-$cfg_currency_high_min_value = 20
+$cfg_currency_high_min_value =  7
 $cfg_currency_mid_min_value  =  0.5
 $cfg_currency_low_min_value  =  0.05
 $cfg_show_currency_low        = True
 $cfg_show_currency_very_low   = True
 $cfg_show_currency_low_shards = True
 
-$cfg_essences_high_min_value = 20
+$cfg_essences_high_min_value =  7
 $cfg_essences_mid_min_value  =  1
-$cfg_essences_low_min_value  =  0.25
+$cfg_essences_low_min_value  =  0.1
 $cfg_show_essences_mid      = True
 $cfg_show_essences_low      = True
 $cfg_show_essences_very_low = True
 
-$cfg_omens_high_min_value = 50
-$cfg_omens_mid_min_value  = 10
-$cfg_omens_low_min_value  =  1
+$cfg_omens_high_min_value =  7
+$cfg_omens_mid_min_value  =  1
+$cfg_omens_low_min_value  =  0.1
 $cfg_show_omens_mid      = True
 $cfg_show_omens_low      = True
 $cfg_show_omens_very_low = True
@@ -310,9 +310,9 @@ $cfg_show_omens_very_low = True
 $cfg_show_augments_mid      = True
 $cfg_show_augments_low      = True
 $cfg_show_augments_very_low = True
-$cfg_augments_high_min_value = 50
-$cfg_augments_mid_min_value  = 10
-$cfg_augments_low_min_value  =  1
+$cfg_augments_high_min_value =  7
+$cfg_augments_mid_min_value  =  1
+$cfg_augments_low_min_value  =  0.1
 # (on unknown prices)
 $cfg_show_runes_lesser  = True
 $cfg_show_runes_regular = True
@@ -320,9 +320,9 @@ $cfg_show_runes_greater = True
 $cfg_show_idols_regular = True
 $cfg_show_idols_endgame = True
 
-$cfg_gems_high_min_value = 50
-$cfg_gems_mid_min_value  =  5
-$cfg_gems_low_min_value  =  0.5
+$cfg_gems_high_min_value =  7
+$cfg_gems_mid_min_value  =  1
+$cfg_gems_low_min_value  =  0.1
 $cfg_show_gems_mid      = True
 $cfg_show_gems_low      = True
 $cfg_show_gems_very_low = True
