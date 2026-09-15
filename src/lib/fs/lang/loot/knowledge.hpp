@@ -1096,6 +1096,11 @@ inline const std::initializer_list<known_item> currency_vaal = { // 0.4.0
 	{"Vaal Armourer's Infuser",   known_item_properties(10, 1)},
 	{"Vaal Blacksmith's Infuser", known_item_properties(10, 1)},
 	{"Vaal Arcanist's Infuser",   known_item_properties(10, 1)},
+	// 0.5.4
+	{"Kamasa's Orb of Sacrifice", known_item_properties(10, 1)},
+	{"Kopec's Orb of Sacrifice",  known_item_properties(10, 1)},
+	{"Yaomac's Orb of Sacrifice", known_item_properties(10, 1)},
+	{"Yugul's Orb of Sacrifice",  known_item_properties(10, 1)},
 };
 
 // all have max Drop Level of 31, core drop pool
