@@ -336,8 +336,14 @@ $cfg_show_salvage_sockets = True
 $cfg_show_salvage_quality_flasks = True
 $cfg_show_salvage_quality_charms = True
 $cfg_show_salvage_quality_gear = True
-$cfg_show_magic_unid_tier_min = 1 # set to 1 to show all
-$cfg_show_rare_unid_tier_min = 1 # set to 1 to show all
+# set to 1 to show all
+$cfg_show_magic_jewellery_unid_tier_min = 1
+$cfg_show_rare_jewellery_unid_tier_min = 1
+$cfg_show_magic_non_jewellery_unid_tier_min = 1
+$cfg_show_rare_non_jewellery_unid_tier_min = 1
+# (jewels have no unid tiers) (time-lost jewels are always shown)
+$cfg_show_magic_base_jewels = True
+$cfg_show_rare_base_jewels = True
 
 $cfg_always_show_splinters = True
 $cfg_always_show_expedition = True
@@ -1213,7 +1219,7 @@ Rarity <= Rare
 	}
 }
 
-Class "Rings" "Amulets" "Belts"
+Class == "Rings" "Amulets" "Belts"
 Rarity Rare
 {
 	SetFontSize 40
@@ -1296,39 +1302,56 @@ Rarity Normal Magic Rare
 # Gear - remaining sections
 #--------------------------
 
-# leveling - show jewellery
-AreaLevel < 65
-Rarity Normal Magic
-Class "Rings" "Amulets" "Belts"
+Class == "Jewels"
+BaseType == "Ruby" "Emerald" "Sapphire" # never hide Time-Lost bases
 {
-	SetFontSize 40
-	Show
+	Rarity Magic
+	{
+		ShowHide $cfg_show_magic_base_jewels
+	}
+
+	Rarity Rare
+	{
+		ShowHide $cfg_show_rare_base_jewels
+	}
 }
 
-Rarity Magic
-UnidentifiedItemTier >= $cfg_show_magic_unid_tier_min
+Class == "Rings" "Amulets" "Belts"
 {
-	Show
+	Rarity Magic
+	UnidentifiedItemTier >= $cfg_show_magic_jewellery_unid_tier_min
+	{
+		Show
+	}
+
+	Rarity Rare
+	UnidentifiedItemTier >= $cfg_show_rare_jewellery_unid_tier_min
+	{
+		Show
+	}
 }
 
-Rarity Rare
-UnidentifiedItemTier >= $cfg_show_rare_unid_tier_min
+Class != "Rings" "Amulets" "Belts"
 {
-	Show
+	Rarity Magic
+	UnidentifiedItemTier >= $cfg_show_magic_non_jewellery_unid_tier_min
+	{
+		Show
+	}
+
+	Rarity Rare
+	UnidentifiedItemTier >= $cfg_show_rare_non_jewellery_unid_tier_min
+	{
+		Show
+	}
 }
 
 # Hide remaining low-value gear
 # note: "Trap" and "Claw" are already accepted even though not in game
 Rarity <= Rare
-Class "Flask" "Body" "Helmet" "Boots" "Gloves" "Shields" "Buckler" "Quiver" "Axe" "Mace" "Sword" "Staff" "Dagger" "Flail" "Quarter" "Spear" "Bow" "Crossbow" "Wand" "Sceptre" "Ring" "Belt" "Amulet" "Focus" "Talisman" "Trap" "Claw"
-AreaLevel >= 65
+Class "Flask" "Body" "Helmet" "Boots" "Gloves" "Shields" "Buckler" "Quiver" "Axe" "Mace" "Sword" "Staff" "Dagger" "Flail" "Quarter" "Spear" "Bow" "Crossbow" "Wand" "Sceptre" "Ring" "Belt" "Amulet" "Jewels" "Focus" "Talisman" "Trap" "Claw"
 {
 	Hide
-}
-
-Rarity Normal Magic Rare
-{
-	Show
 }
 
 #--------------------------
