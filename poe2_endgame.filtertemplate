@@ -668,6 +668,7 @@ Class == "Incubators"
 Class == "Wombgifts"
 {
 	Expand $actions_currency_mid
+	MinimapIcon 1 Purple Star
 	SetBackgroundColor $color_breach
 	Show
 }
