@@ -77,6 +77,7 @@ namespace rf
 	constexpr auto foulborn         = "Foulborn";
 	constexpr auto imbued           = "Imbued";
 	constexpr auto vestigial        = "Vestigial";
+	constexpr auto fated            = "Fated";
 
 	// PoE 2 only
 	constexpr auto unidentified_item_tier = "UnidentifiedItemTier";

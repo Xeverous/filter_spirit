@@ -1,0 +1,9 @@
+Fated True
+UnidentifiedItemTier >= 2
+{
+	SetTextColor 255 0 255 0
+	Show
+}
+
+SetTextColor 200 200 200
+Show

@@ -441,6 +441,8 @@ make_official_condition(
 			return make_boolean_condition(std::move(pc), lang::make_imbued_condition, diagnostics);
 		case property_t::vestigial:
 			return make_boolean_condition(std::move(pc), lang::make_vestigial_condition, diagnostics);
+		case property_t::fated:
+			return make_boolean_condition(std::move(pc), lang::make_fated_condition, diagnostics);
 		case property_t::is_vaal_unique:
 			return make_boolean_condition(std::move(pc), lang::make_is_vaal_unique_condition, diagnostics);
 		case property_t::has_vaal_unique_mod:
@@ -724,6 +726,7 @@ spirit_filter_is_condition_allowed(
 		case property_t::foulborn:
 		case property_t::imbued:
 		case property_t::vestigial:
+		case property_t::fated:
 		case property_t::is_vaal_unique:
 		case property_t::has_vaal_unique_mod:
 		case property_t::twice_corrupted:

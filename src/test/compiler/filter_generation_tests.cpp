@@ -282,6 +282,11 @@ BOOST_AUTO_TEST_CASE(allflame_new_conditions)
 	BOOST_TEST(compile_from_files("poe1/allflame_new_conditions"));
 }
 
+BOOST_AUTO_TEST_CASE(covens_new_conditions)
+{
+	BOOST_TEST(compile_from_files("poe1/covens_new_conditions"));
+}
+
 BOOST_AUTO_TEST_CASE(shaper_voice_lines)
 {
 	BOOST_TEST(compile_from_files("common/shaper_voice_lines"));

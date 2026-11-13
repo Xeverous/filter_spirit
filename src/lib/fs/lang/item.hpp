@@ -667,6 +667,7 @@ struct item
 	bool is_foulborn = false;
 	bool is_imbued = false;
 	bool is_vestigial = false;
+	bool is_fated = false;
 	// PoE 2 only
 	bool is_vaal_unique = false;
 	bool has_vaal_unique_mod = false;

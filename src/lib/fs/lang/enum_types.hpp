@@ -64,6 +64,7 @@ enum class official_condition_property
 	foulborn,
 	imbued,
 	vestigial,
+	fated,
 	// PoE 2 only
 	is_vaal_unique,
 	has_vaal_unique_mod,
@@ -127,7 +128,6 @@ constexpr bool is_poe2_only(official_condition_property property)
 		prop_t::is_vaal_unique,
 		prop_t::twice_corrupted,
 		prop_t::always_show,
-		prop_t::unidentified_item_tier,
 		prop_t::waystone_tier,
 	}) {
 		if (property == prop)
@@ -182,6 +182,8 @@ inline std::string_view to_keyword(official_condition_property property)
 			return keywords::rf::imbued;
 		case official_condition_property::vestigial:
 			return keywords::rf::vestigial;
+		case official_condition_property::fated:
+			return keywords::rf::fated;
 		case official_condition_property::is_vaal_unique:
 			return keywords::rf::is_vaal_unique;
 		case official_condition_property::has_vaal_unique_mod:

@@ -340,7 +340,7 @@ Class == "Skill Gems"
 		BOOST_AUTO_TEST_CASE(invalid_condition_in_poe1_filter)
 		{
 			std::vector<std::pair<std::string, std::string>> conditions_to_test = {
-				{"UnidentifiedItemTier", ">= 1"},
+				{"HasVaalUniqueMod", "True"},
 				{"WaystoneTier", ">= 1"}
 			};
 
