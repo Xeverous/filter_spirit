@@ -1341,19 +1341,6 @@ Class == "Expedition Logbook"
 	Show
 }
 
-# 3.29 Allflame league mechanic
-# "Sandy Seabed Chart" "Coral Forest Chart" "Coral Reef Chart"
-Class == "Chart"
-{
-	SetTextColor $color_black
-	SetBorderColor $color_allflame
-	SetBackgroundColor $color_allflame
-	SetAlertSound $alert_chart
-	SetFontSize $font_chart
-	MinimapIcon $icon_chart
-	Show
-}
-
 # Gems can have lots of varying properties, with notable thresholds:
 # level: 21 / 20 / 19 / 18
 # quality: 23 / 22 / 21 / 20 / >0
@@ -2385,6 +2372,14 @@ Rarity <= Rare
 		SetBackgroundColor $color_veiled_item
 		SetAlertSound $alert_veiled_item
 		Show
+	}
+
+	# 3.30 Coven league drops
+	Fated True
+	{
+		SetBackgroundColor $color_allflame
+		Show
+		Continue
 	}
 
 	# enchants and RGB - part 1/2
