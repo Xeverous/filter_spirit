@@ -753,7 +753,7 @@ inline const known_item_collection group_currency = {{
 }};
 
 // UNFINISHED:
-// Scarabs (3.5)  (uses family matching)
+// Threads (3.30) (uses family matching)
 // Tattoos (3.22) (uses family matching)
 //   Omens (3.22) (NOT IMPLEMENTED)
 // (more items but they are not currency)
@@ -761,7 +761,7 @@ inline const known_item_collection group_currency = {{
 inline const auto known_items = known_items_store::create(
 	{
 		known_item{"Tattoo", known_item_properties(10)},
-		known_item{"Scarab", known_item_properties(20)}
+		known_item{"Thread", known_item_properties(100)}
 	},
 	currency_basic,
 	currency_shards,

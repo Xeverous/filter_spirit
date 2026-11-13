@@ -775,7 +775,7 @@ Class == "Stackable Currency"
 	}
 
 	# 3.28
-	BaseType == "Refracting Fog" "Flesh of Xesht" "Volatile Vaal Orb" "Memory of Trauma" "Memory of Reverence" "Memory of Loneliness" "Crystallised Rancour" "Coin of Restoration" "Coin of Desecration" "Coin of Knowledge" "Coin of Power" "Coin of Skill"
+	BaseType == "Refracting Fog" "Flesh of Xesht" "Volatile Vaal Orb" "Memory of Trauma" "Memory of Reverence" "Memory of Loneliness" "Crystallised Rancour" "Coin of Restoration" "Coin of Desecration" "Soul Core of Intellect" "Soul Core of Might" "Soul Core of Finesse"
 	{
 		Expand $actions_currency_mid
 		Show
@@ -789,7 +789,7 @@ Class == "Stackable Currency"
 	}
 
 	# 3.29
-	BaseType == "Scrying Orb" "Karui Enshrouding Crystal" "Imperial Enshrouding Crystal" "Vaal Enshrouding Crystal" "Templar Enshrouding Crystal" "Maraketh Enshrouding Crystal" "Dead Man's Sulphur" "Message in a Bottle" "Merrick's Ducat" "Cyaxan's Ducat" "The Changeling's Ducat" "The Genteel's Ducat" "Kishara's Ducat" "Telesia's Ducat" "Rotmother's Ducat" "Brinehook's Ducat" "Katakohi's Ducat" "Tzamoto's Ducat"
+	BaseType == "Scrying Orb" "Karui Enshrouding Crystal" "Imperial Enshrouding Crystal" "Vaal Enshrouding Crystal" "Templar Enshrouding Crystal" "Maraketh Enshrouding Crystal" "Afarud Enshrouding Crystal" "Dead Man's Sulphur" "Message in a Bottle" "Merrick's Ducat" "Cyaxan's Ducat" "The Changeling's Ducat" "The Genteel's Ducat" "Kishara's Ducat" "Telesia's Ducat" "Rotmother's Ducat" "Brinehook's Ducat" "Katakohi's Ducat" "Tzamoto's Ducat"
 	{
 		Expand $actions_currency_mid
 		Show
@@ -814,7 +814,7 @@ Class == "Stackable Currency"
 		Show
 	}
 
-	BaseType == "Omen of Fortune" "Omen of Connections" "Omen of Amelioration" "Omen of Trichromatism"
+	BaseType == "Omen of Fortune" "Omen of Connections" "Omen of Amelioration" "Omen of Trichromatism" "Soul Core of Instability"
 	{
 		Expand $actions_currency_high
 		Show
@@ -826,19 +826,20 @@ Class == "Stackable Currency"
 		Show
 	}
 
-	BaseType == "Veiled Scarab"
+	# 3.30 legacy item from Scarabs
+	BaseType == "Frayed Thread"
 	{
 		Expand $actions_currency_mid
 		Show
 	}
 
-	BaseType "Delirium Orb" "Catalyst" "Oil Extractor" "Scouting Report"
+	BaseType "Delirium Orb" "Catalyst" "Oil Extractor" "Scouting Report" "Allflame Ember"
 	{
 		Expand $actions_currency_mid
 		Show
 	}
 
-	BaseType "Maven's Chisel"
+	BaseType "Maven's Chisel" "Royal Visage"
 	{
 		Expand $actions_currency_mid
 		Show
@@ -1217,7 +1218,7 @@ Class == "Gold"
 	ShowHide $show_gold_low
 }
 
-Class == "Corpses"
+Class == "Corpses" "Viscera"
 {
 	SetTextColor $color_white
 	SetBorderColor $color_corpse
@@ -1686,8 +1687,8 @@ Class == "Map Fragments"
 		}
 	}
 
-	# scarabs with unknown value
-	BaseType "Scarab" "Lure"
+	# legacy items, unusable since 3.30 removed scarabs
+	BaseType "Lure"
 	{
 		SetTextColor $color_black
 		SetBorderColor $color_red
@@ -1768,12 +1769,6 @@ Class == "Map Fragments"
 			Show
 		}
 
-		# 3.26 Atlas Embers (scarab-like items)
-		BaseType "Allflame Ember"
-		{
-			Show
-		}
-
 		# 3.27 new Uber Memory boss Fragments + Breach boss
 		BaseType == "Hivebrain Gland" "Traumatic Fragment" "Reverent Fragment" "Lonely Fragment"
 		{
@@ -1785,7 +1780,8 @@ Class == "Map Fragments"
 	# 3.26 reworked, now itemized Catarina entry
 	# 3.28 Mirage boss entry
 	# 3.29 Zorath Abyss boss keys
-	BaseType == "An Audience With The King" "Syndicate Medallion" "The Black Barya" "Zorath's Eye of Malevolence" "Zorath's Eye of Authority" "Zorath's Eye of the Inevitable" "Zorath's Eye of the Endless"
+	# 3.30 Tenebria, The Coven Queen
+	BaseType == "An Audience With The King" "Syndicate Medallion" "The Black Barya" "Zorath's Eye of Malevolence" "Zorath's Eye of Authority" "Zorath's Eye of the Inevitable" "Zorath's Eye of the Endless" "Cursed Poppet"
 	{
 		SetBorderColor $color_black
 		SetTextColor $color_black
@@ -2478,9 +2474,7 @@ Rarity <= Rare
 		}
 	}
 
-	# experimented bases (Heist exclusive)
-	# these only drop from curio displays so we can always
-	# highlight them because it was player's choice to take them
+	# experimented bases (Heist content but also drops elsewhere)
 	BaseType == "Assembler Wand" "Congregator Wand" "Accumulator Wand" "Hollowpoint Dagger" "Pressurised Dagger" "Pneumatic Dagger" "Flickerflame Blade" "Flashfire Blade" "Infernal Blade" "Shadow Fangs" "Malign Fangs" "Void Fangs" "Maltreatment Axe" "Disapprobation Axe" "Psychotic Axe" "Fickle Spiritblade" "Capricious Spiritblade" "Anarchic Spiritblade" "Flare Mace" "Crack Mace" "Boom Mace" "Oscillating Sceptre" "Stabilising Sceptre" "Alternating Sceptre" "Hedron Bow" "Foundry Bow" "Solarine Bow" "Transformer Staff" "Reciprocation Staff" "Battery Staff" "Capacity Rod" "Potentiality Rod" "Eventuality Rod" "Prime Cleaver" "Honed Cleaver" "Apex Cleaver" "Rebuking Blade" "Blasting Blade" "Banishing Blade" "Blunt Force Condenser" "Crushing Force Magnifier" "Impact Force Propagator" "Exhausting Spirit Shield" "Subsuming Spirit Shield" "Transfer-attuned Spirit Shield" "Endothermic Buckler" "Polar Buckler" "Cold-attuned Buckler" "Exothermic Tower Shield" "Magmatic Tower Shield" "Heat-attuned Tower Shield" "Mechanical Belt" "Micro-Distillery Belt" "Mechalarm Belt" "Focused Amulet" "Simplex Amulet" "Astrolabe Amulet" "Cogwork Ring" "Composite Ring" "Geodesic Ring" "Helical Ring" "Manifold Ring" "Ratcheting Ring"
 	{
 		SetTextColor $color_black
