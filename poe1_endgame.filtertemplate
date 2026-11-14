@@ -664,6 +664,11 @@ $show_gear_identified_rare = True
 $show_gear_any_rare = True
 $show_gear_any_magic = True
 $show_gear_any_normal = False
+# set to 1 to show all
+$cfg_show_magic_jewellery_unid_tier_min = 1
+$cfg_show_rare_jewellery_unid_tier_min = 1
+$cfg_show_magic_non_jewellery_unid_tier_min = 1
+$cfg_show_rare_non_jewellery_unid_tier_min = 1
 # Show any equippable gear with specific links untill specified AreaLevel
 $cfg_gear_show_4_link_max_area_lvl = 67
 $cfg_gear_show_3_link_max_area_lvl = 30
@@ -2769,6 +2774,36 @@ Rarity Rare
 Identified True
 {
 	ShowDiscard $show_gear_identified_rare
+}
+
+Class == "Rings" "Amulets" "Belts"
+{
+	Rarity Magic
+	UnidentifiedItemTier < $cfg_show_magic_jewellery_unid_tier_min
+	{
+		Hide
+	}
+
+	Rarity Rare
+	UnidentifiedItemTier < $cfg_show_rare_jewellery_unid_tier_min
+	{
+		Hide
+	}
+}
+
+Class != "Rings" "Amulets" "Belts"
+{
+	Rarity Magic
+	UnidentifiedItemTier < $cfg_show_magic_non_jewellery_unid_tier_min
+	{
+		Hide
+	}
+
+	Rarity Rare
+	UnidentifiedItemTier < $cfg_show_rare_non_jewellery_unid_tier_min
+	{
+		Hide
+	}
 }
 
 # at this point all worthwhile items should be sorted out
