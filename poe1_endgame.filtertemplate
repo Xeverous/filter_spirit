@@ -1609,7 +1609,7 @@ BaseType == "Stone of Passage" "Flashpowder Keg"
 	Show
 }
 
-Class == "Atlas Upgrade Items"
+Class == "Atlas Upgrade Items" "Captured Soul"
 {
 	SetTextColor $color_white
 	SetBorderColor $color_atlas
