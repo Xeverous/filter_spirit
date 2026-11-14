@@ -1674,6 +1674,19 @@ Class == "Map Fragments"
 		}
 	}
 
+	# unknown threads
+	BaseType "Thread"
+	{
+		SetTextColor $color_black
+		SetBorderColor $color_scarab_mid
+		SetBackgroundColor $color_scarab_mid
+		SetFontSize $font_scarab_mid
+		SetAlertSound $alert_scarab_mid
+		PlayEffect $beam_scarab
+		MinimapIcon $icon_scarab_mid
+		Show
+	}
+
 	# legacy items, unusable since 3.30 removed scarabs
 	BaseType "Lure"
 	{
