@@ -1162,6 +1162,18 @@ Class == "Stackable Currency"
 		Show
 	}
 
+	# Since 3.30 Divine Vessel is a Currency item
+	BaseType == "Divine Vessel"
+	{
+		SetTextColor $color_black
+		SetBorderColor $color_black
+		SetBackgroundColor $color_atlas
+		SetFontSize $font_divine_vessel
+		SetAlertSound $alert_divine_vessel
+		MinimapIcon $icon_fragment_worthy
+		Show
+	}
+
 	BaseType "Net" "Cartographer's Seal"
 	{
 		Expand $actions_currency_mid
@@ -1703,7 +1715,7 @@ Class == "Map Fragments"
 		Show
 	}
 
-	BaseType == "Divine Vessel" "Mercenary Warrant"
+	BaseType == "Mercenary Warrant"
 	{
 		SetTextColor $color_black
 		SetBorderColor $color_black
