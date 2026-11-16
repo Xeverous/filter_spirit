@@ -318,6 +318,7 @@ $beam_influence       = Pink
 $beam_dominance       = Pink
 $beam_ultimatum       = Orange
 $beam_scarab          = Green
+$beam_harvest         = Blue
 
 $icon_quest_item      = 0 Green Pentagon
 $icon_fishing_rod     = 0 White Star
@@ -715,6 +716,7 @@ Class == "Stackable Currency"
 		SetBackgroundColor $color_harvest
 		SetFontSize $font_max
 		SetAlertSound $alert_currency_mid
+		PlayEffect $beam_harvest
 		MinimapIcon $icon_harvest
 		Show
 	}
