@@ -634,15 +634,17 @@ $show_gear_enchanted_other = False
 # These are highest bases for each attribute combination.
 # Rare items on these bases will get a different background color, final Show/Hide is unaffected.
 # If you don't like this feature, just set the variable below to None or show variable to False.
-$cfg_atlas_base_names = "Apothecary's Gloves" "Fingerless Silk Gloves" "Fugitive Boots" "Gripped Gloves" "Spiked Gloves" "Two-Toned Boots" "Convoking Wand" "Bone Helmet" "Artillery Quiver" "Marble Amulet" "Seaglass Amulet" "Blue Pearl Amulet" "Iolite Ring" "Vanguard Belt" "Crystal Belt" "Cerulean Ring" "Opal Ring" "Steel Ring" "Vermillion Ring" "Unset Amulet" "Dusk Ring" "Penumbra Ring" "Gloam Ring" "Tenebrous Ring" "Shadowed Ring" "Bone Ring"
 $cfg_t1_weapon_base_names = "Harbinger Bow" "Ambusher" "Ezomyte Dagger" "Platinum Kris" "Imperial Skean" "Demon Dagger" "Void Sceptre" "Sambar Sceptre" "Profane Wand" "Prophecy Wand" "Tornado Wand" "Opal Wand" "Demon's Horn"
 $cfg_t1_armour_base_names = "Giantslayer Helmet" "Majestic Pelt" "Lich's Circlet" "Haunted Bascinet" "Divine Crown" "Torturer's Mask" "Royal Plate" "Syndicate's Garb" "Twilight Regalia" "Conquest Lamellar" "Sacred Chainmail" "Necrotic Armour" "Leviathan Greaves" "Velour Boots" "Warlock Boots" "Wyvernscale Boots" "Paladin Boots" "Phantom Boots" "Leviathan Gauntlets" "Velour Gloves" "Warlock Gloves" "Wyvernscale Gauntlets" "Paladin Gloves" "Phantom Mitts"
 $cfg_t2_armour_base_names = "Conqueror's Helmet" "Grizzly Pelt" "Sunfire Circlet" "Conquest Helmet" "Paladin Crown" "Ancient Mask" "Legion Plate" "Astral Leather" "Nightweave Robe" "Marshall's Brigandine" "Paladin's Hauberk" "Torturer Garb" "Precursor Greaves" "Harpyskin Boots" "Sage Slippers" "Chimerascale Boots" "Martyr Boots" "Infiltrator Boots" "Precursor Gauntlets" "Harpyskin Gloves" "Sage Gloves" "Chimerascale Gauntlets" "Martyr Gloves" "Infiltrator Mitts"
 $cfg_t3_armour_base_names = "General's Helmet" "Dire Pelt" "Moonlit Circlet" "Knight Helm" "Faithful Helmet" "Jester Mask" "Titan Plate" "Supreme Leather" "Arcane Vestment" "Full Wyvernscale" "Grand Ringmail" "Sanguine Raiment"
-$cfg_bases_atlas = "Apothecary's Gloves" "Fingerless Silk Gloves" "Fugitive Boots" "Gripped Gloves" "Spiked Gloves" "Two-Toned Boots" "Convoking Wand" "Bone Helmet" "Artillery Quiver" "Marble Amulet" "Seaglass Amulet" "Blue Pearl Amulet" "Vanguard Belt" "Crystal Belt" "Cerulean Ring" "Iolite Ring" "Opal Ring" "Steel Ring" "Vermillion Ring"
+# no "Convoking Wand" because much more common and far less valuable
+$cfg_bases_atlas = "Apothecary's Gloves" "Fingerless Silk Gloves" "Fugitive Boots" "Gripped Gloves" "Spiked Gloves" "Two-Toned Boots" "Bone Helmet" "Artillery Quiver" "Marble Amulet" "Seaglass Amulet" "Blue Pearl Amulet" "Vanguard Belt" "Crystal Belt" "Cerulean Ring" "Iolite Ring" "Opal Ring" "Steel Ring" "Vermillion Ring"
+# Uul-Netol's Vow base + Reflecting Mist bases
+$cfg_bases_undroppable = "Unset Amulet" "Dusk Ring" "Penumbra Ring" "Gloam Ring" "Tenebrous Ring" "Shadowed Ring"
 $cfg_t1_other_base_names = "Stygian Vise"
-$cfg_good_base_names = $cfg_atlas_base_names $cfg_t1_weapon_base_names $cfg_t1_armour_base_names $cfg_t1_other_base_names
-$cfg_base_defence_base_names = $cfg_atlas_base_names $cfg_t1_armour_base_names $cfg_t1_other_base_names
+$cfg_good_base_names = $cfg_bases_atlas $cfg_t1_weapon_base_names $cfg_t1_armour_base_names $cfg_t1_other_base_names "Convoking Wand"
+$cfg_base_defence_base_names = $cfg_bases_atlas $cfg_t1_armour_base_names $cfg_t1_other_base_names
 $cfg_base_defence_percentile_min_value = 90
 $cfg_base_defence_percentile_min_ilvl = 84
 $highlight_gear_good_base = True
@@ -2502,10 +2504,11 @@ Rarity <= Rare
 		}
 	}
 
-	# experimented bases (Heist content but also drops elsewhere)
-	# + Atlas Bases
-	# + Cord Belt (3.29)
-	BaseType == "Assembler Wand" "Congregator Wand" "Accumulator Wand" "Hollowpoint Dagger" "Pressurised Dagger" "Pneumatic Dagger" "Flickerflame Blade" "Flashfire Blade" "Infernal Blade" "Shadow Fangs" "Malign Fangs" "Void Fangs" "Maltreatment Axe" "Disapprobation Axe" "Psychotic Axe" "Fickle Spiritblade" "Capricious Spiritblade" "Anarchic Spiritblade" "Flare Mace" "Crack Mace" "Boom Mace" "Oscillating Sceptre" "Stabilising Sceptre" "Alternating Sceptre" "Hedron Bow" "Foundry Bow" "Solarine Bow" "Transformer Staff" "Reciprocation Staff" "Battery Staff" "Capacity Rod" "Potentiality Rod" "Eventuality Rod" "Prime Cleaver" "Honed Cleaver" "Apex Cleaver" "Rebuking Blade" "Blasting Blade" "Banishing Blade" "Blunt Force Condenser" "Crushing Force Magnifier" "Impact Force Propagator" "Exhausting Spirit Shield" "Subsuming Spirit Shield" "Transfer-attuned Spirit Shield" "Endothermic Buckler" "Polar Buckler" "Cold-attuned Buckler" "Exothermic Tower Shield" "Magmatic Tower Shield" "Heat-attuned Tower Shield" "Mechanical Belt" "Micro-Distillery Belt" "Mechalarm Belt" "Focused Amulet" "Simplex Amulet" "Astrolabe Amulet" "Cogwork Ring" "Composite Ring" "Geodesic Ring" "Helical Ring" "Manifold Ring" "Ratcheting Ring" $cfg_bases_atlas "Cord Belt"
+	# Experimented bases (Heist content but since 3.30 also drops elsewhere)
+	# + Atlas Bases (without "Convoking Wand")
+	# + Cord Belt (3.28)
+	# + undroppable bases
+	BaseType == "Assembler Wand" "Congregator Wand" "Accumulator Wand" "Hollowpoint Dagger" "Pressurised Dagger" "Pneumatic Dagger" "Flickerflame Blade" "Flashfire Blade" "Infernal Blade" "Shadow Fangs" "Malign Fangs" "Void Fangs" "Maltreatment Axe" "Disapprobation Axe" "Psychotic Axe" "Fickle Spiritblade" "Capricious Spiritblade" "Anarchic Spiritblade" "Flare Mace" "Crack Mace" "Boom Mace" "Oscillating Sceptre" "Stabilising Sceptre" "Alternating Sceptre" "Hedron Bow" "Foundry Bow" "Solarine Bow" "Transformer Staff" "Reciprocation Staff" "Battery Staff" "Capacity Rod" "Potentiality Rod" "Eventuality Rod" "Prime Cleaver" "Honed Cleaver" "Apex Cleaver" "Rebuking Blade" "Blasting Blade" "Banishing Blade" "Blunt Force Condenser" "Crushing Force Magnifier" "Impact Force Propagator" "Exhausting Spirit Shield" "Subsuming Spirit Shield" "Transfer-attuned Spirit Shield" "Endothermic Buckler" "Polar Buckler" "Cold-attuned Buckler" "Exothermic Tower Shield" "Magmatic Tower Shield" "Heat-attuned Tower Shield" "Mechanical Belt" "Micro-Distillery Belt" "Mechalarm Belt" "Focused Amulet" "Simplex Amulet" "Astrolabe Amulet" "Cogwork Ring" "Composite Ring" "Geodesic Ring" "Helical Ring" "Manifold Ring" "Ratcheting Ring" $cfg_bases_atlas "Cord Belt" $cfg_bases_undroppable
 	{
 		SetTextColor $color_black
 		SetBackgroundColor $color_heist
