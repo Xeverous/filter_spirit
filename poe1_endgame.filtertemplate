@@ -1036,7 +1036,7 @@ Class == "Stackable Currency"
 			ShowHide $show_essences_t7_t6
 		}
 
-		BaseType == "Essence of Hysteria" "Essence of Insanity" "Essence of Horror" "Essence of Delirium"
+		BaseType == "Essence of Hysteria" "Essence of Insanity" "Essence of Horror" "Essence of Delirium" "Essence of Desolation" "Essence of Trickery"
 		{
 			SetFontSize $font_essence_special
 			SetAlertSound $alert_essence_special
