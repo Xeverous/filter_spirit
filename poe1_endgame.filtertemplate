@@ -805,6 +805,13 @@ Class == "Stackable Currency"
 		Show
 	}
 
+	# 3.30.0d
+	BaseType == "Originator's Exalted Orb" "Primordial Exalted Orb"
+	{
+		Expand $actions_currency_mid
+		Show
+	}
+
 	BaseType == "Foulborn Orb of Augmentation" "Foulborn Regal Orb"
 	{
 		Expand $actions_currency_mid
